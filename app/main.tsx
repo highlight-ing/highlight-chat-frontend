@@ -145,7 +145,7 @@ const HighlightChat = () => {
                       className="flex w-[450px] p-5 flex-col justify-center items-center gap-2.5 rounded-lg border border-[rgba(255,255,255,0.10)] bg-[rgba(255,255,255,0.05)]"
                       onClick={() => handleSuggestionClick(suggestion)}
                     >
-                      <span className="text-[rgba(255,255,255,0.60)] font-['Public_Sans'] text-base font-normal leading-[150%]">
+                      <span className="text-[rgba(255,255,255,0.60)] text-base font-normal leading-[150%]">
                         {suggestion}
                       </span>
                     </button>
@@ -180,7 +180,7 @@ const HighlightChat = () => {
                         ))}
                       </div>
                     )}
-                    <div className="text-[rgba(255,255,255,0.60)] font-['Public_Sans'] text-base font-normal leading-[150%]">
+                    <div className="text-[rgba(255,255,255,0.60)] font-normal leading-[150%]">
                       {message.content}
                     </div>
                   </div>
