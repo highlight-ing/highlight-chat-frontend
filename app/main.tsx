@@ -50,13 +50,23 @@ const HighlightChat = () => {
       setIsWorking(true);
       
       try {
+        const formData = new FormData();
+        formData.append('prompt', query);
+
+        // Create context from conversation history
+        const conversationHistory = messages.map(msg => `${msg.type}: ${msg.content}`).join('\n');
+
+        formData.append('context', conversationHistory || 'This is a new conversation with Highlight Chat.');
+
+        // Optional fields can be added here if needed
+        // formData.append('location', '');
+        // formData.append('topic', '');
+        // formData.append('image', imageFile);
+        // formData.append('voice', voiceFile);
+
         const response = await fetch('https://highlight-chat-backend-fq27dri5ra-ue.a.run.app/', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            prompt: query, 
-            context: '', // Add user context if available
-          }),
+          body: formData,
         });
 
         if (!response.ok) {
@@ -169,9 +179,6 @@ const HighlightChat = () => {
                           </div>
                         ))}
                       </div>
-                    )}
-                    {message.type === 'assistant' && (
-                      <span className="text-sm text-gray-400 mb-2">Here&apos;s your summary:</span>
                     )}
                     <div className="text-[rgba(255,255,255,0.60)] font-['Public_Sans'] text-base font-normal leading-[150%]">
                       {message.content}
