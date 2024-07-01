@@ -9,8 +9,8 @@ import { TopBarProps, Message, CompareResult } from './types/types';
 const TopBar: React.FC<TopBarProps> = ({ mode, setMode, onNewConversation }) => {
   return (
     <header className="absolute top-0 left-0 right-0 border-b border-[rgba(255,255,255,0.05)]">
-      <div className="flex w-[1122px] h-[64px] p-[12px] justify-between items-center mx-auto">
-        <button className="w-6 h-6 flex items-center justify-center">
+      <div className="flex w-[1122px] h-[64px] p-[12px] justify-end items-center mx-auto">
+        {/* <button className="w-6 h-6 flex items-center justify-center">
           <MenuIcon />
         </button>
         <button 
@@ -18,7 +18,7 @@ const TopBar: React.FC<TopBarProps> = ({ mode, setMode, onNewConversation }) => 
           onClick={() => setMode(mode === 'assistant' ? 'compare' : 'assistant')}
         >
           {mode === 'assistant' ? 'Assistant' : 'Compare'} Mode <ChevronDown className="ml-2" size={16} />
-        </button>
+        </button> */}
         <button 
           className="flex w-[24px] h-[24px] justify-center items-center"
           onClick={onNewConversation}
