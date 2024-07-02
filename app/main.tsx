@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useState, useRef } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { MenuIcon, AddIcon, PaperclipIcon, MicIcon, AddSquareIcon } from './icons/icons';
+import { MenuIcon, AddIcon, PaperclipIcon, MicIcon, AddSquareIcon, AssistantIcon } from './icons/icons';
 import { TopBarProps, Message, CompareResult } from './types/types';
 import ReactMarkdown from 'react-markdown';
 
@@ -184,30 +184,33 @@ const HighlightChat = () => {
               return (
                 <div key={index} className={`mb-4 flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
                   {message.type === 'assistant' && (
-                    <div className="
-                      flex w-8 h-8 p-1.5 justify-center items-center mr-2
-                      rounded-full bg-[rgba(255,255,255,0.05)]
-                    ">
-                      {/* Add your logo or icon here */}
+                    <div className="flex-shrink-0 mr-2">
+                      <div className="flex w-[32px] h-[32px] p-[6px] justify-center items-center rounded-full bg-[rgba(255,255,255,0.05)]">
+                        <AssistantIcon className="text-[#FFFFFF66]" />
+                      </div>
                     </div>
                   )}
                   <div className={`
-                    flex flex-col justify-center gap-4 p-5 max-w-[80%]
+                    flex flex-col justify-center gap-4 p-5
                     rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)]
                     ${message.type === 'user' ? 'items-end' : 'items-start'}
+                    ${message.type === 'user' && message.attachment ? 'max-w-[300px]' : 'max-w-[80%]'}
                   `}>
                     {message.type === 'user' && message.attachment && (
-                      <div className="mb-4">
-                        <div className="relative inline-block">
+                      <div className="mb-2 w-full">
+                        <div className="relative inline-block w-full">
                           <img 
                             src={message.attachment}
                             alt="Attachment" 
-                            className="w-[79.371px] h-[42px] rounded object-cover object-center"
+                            className="w-full h-auto rounded object-cover object-center"
+                            style={{
+                              maxHeight: '200px'
+                            }}
                           />
                         </div>
                       </div>
                     )}
-                    <div className="text-[rgba(255,255,255,0.60)] font-normal leading-[150%]">
+                    <div className="text-[rgba(255,255,255,0.60)] font-normal leading-[150%] break-words">
                       <ReactMarkdown>
                         {typeof message.content === 'string' ? message.content : ''}
                       </ReactMarkdown>
