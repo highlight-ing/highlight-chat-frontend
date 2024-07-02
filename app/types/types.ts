@@ -3,7 +3,7 @@ import * as React from 'react';
 export type Message = {
   type: 'user' | 'assistant' | 'compare';
   content: string | React.ReactNode;
-  attachments?: React.ReactNode[];
+  attachment?: string;
 };
 
 export type CompareResult = {

@@ -1,10 +1,11 @@
 'use client';
 
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { MenuIcon, AddIcon, PaperclipIcon, MicIcon } from './icons/icons';
+import { MenuIcon, AddIcon, PaperclipIcon, MicIcon, AddSquareIcon } from './icons/icons';
 import { TopBarProps, Message, CompareResult } from './types/types';
+import ReactMarkdown from 'react-markdown';
 
 const TopBar: React.FC<TopBarProps> = ({ mode, setMode, onNewConversation }) => {
   return (
@@ -35,17 +36,36 @@ const HighlightChat = () => {
   const [input, setInput] = useState('');
   const [isWorking, setIsWorking] = useState(false);
   const [mode, setMode] = useState<'assistant' | 'compare'>('assistant');
+  const [attachment, setAttachment] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSuggestionClick = (suggestion: string) => {
     setInput(suggestion);
     handleSubmit(null, suggestion);
   };
 
+  const handleAttachmentClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      setAttachment(file);
+    } else {
+      alert('Please select a valid image file.');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement> | null, suggestionInput?: string) => {
     if (e) e.preventDefault();
     const query = suggestionInput || input.trim();
-    if (query) {
-      setMessages(prevMessages => [...prevMessages, { type: 'user', content: query }]);
+    if (query || attachment) {
+      setMessages(prevMessages => [...prevMessages, { 
+        type: 'user', 
+        content: query,
+        attachment: attachment ? URL.createObjectURL(attachment) : undefined
+      }]);
       setInput('');
       setIsWorking(true);
       
@@ -58,13 +78,17 @@ const HighlightChat = () => {
 
         formData.append('context', conversationHistory || 'This is a new conversation with Highlight Chat.');
 
+        if (attachment) {
+          formData.append('image', attachment);
+        }
+
         // Optional fields can be added here if needed
         // formData.append('location', '');
         // formData.append('topic', '');
         // formData.append('image', imageFile);
         // formData.append('voice', voiceFile);
 
-        const response = await fetch('https://highlight-chat-backend-fq27dri5ra-ue.a.run.app/', {
+        const response = await fetch('http://0.0.0.0:8080/', { //fetch('https://highlight-chat-backend-fq27dri5ra-ue.a.run.app/', {
           method: 'POST',
           body: formData,
         });
@@ -113,6 +137,7 @@ const HighlightChat = () => {
         setMessages(prevMessages => [...prevMessages, { type: 'assistant', content: "Sorry, there was an error processing your request." }]);
       } finally {
         setIsWorking(false);
+        setAttachment(null); // Clear the attachment after sending
       }
     }
   };
@@ -171,17 +196,21 @@ const HighlightChat = () => {
                     rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)]
                     ${message.type === 'user' ? 'items-end' : 'items-start'}
                   `}>
-                    {message.type === 'user' && message.attachments && (
-                      <div className="flex items-center gap-2.5 mb-4">
-                        {message.attachments.map((attachment, i) => (
-                          <div key={i} className="w-10 h-10 bg-gray-700 rounded flex items-center justify-center">
-                            {/* Render attachment icon or preview here */}
-                          </div>
-                        ))}
+                    {message.type === 'user' && message.attachment && (
+                      <div className="mb-4">
+                        <div className="relative inline-block">
+                          <img 
+                            src={message.attachment}
+                            alt="Attachment" 
+                            className="w-[79.371px] h-[42px] rounded object-cover object-center"
+                          />
+                        </div>
                       </div>
                     )}
                     <div className="text-[rgba(255,255,255,0.60)] font-normal leading-[150%]">
-                      {message.content}
+                      <ReactMarkdown>
+                        {typeof message.content === 'string' ? message.content : ''}
+                      </ReactMarkdown>
                     </div>
                   </div>
                 </div>
@@ -201,20 +230,52 @@ const HighlightChat = () => {
         </div>
       </main>
       <footer className="fixed bottom-0 left-0 right-0 p-4">
-      <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
-        <div className="flex items-center gap-3 bg-[#161617] rounded-full border border-[rgba(255,255,255,0.1)] px-4 py-3">
-          <PaperclipIcon />
-          <input
-            type="text"
-            className="flex-1 bg-transparent outline-none text-white placeholder-[rgba(255,255,255,0.6)] text-base"
-            placeholder="Ask Highlight anything..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-          />
-          <MicIcon />
-        </div>
-      </form>
-    </footer>
+        <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
+          {attachment && (
+            <div className="mb-2">
+              <div className="relative inline-block">
+                <img 
+                  src={URL.createObjectURL(attachment)} 
+                  alt="Attachment" 
+                  className="w-[79.371px] h-[42px] rounded object-cover object-center"
+                  style={{
+                    background: `url(${URL.createObjectURL(attachment)}) lightgray 0px -0.146px / 100% 100.436% no-repeat`
+                  }}
+                />
+                <button 
+                  type="button" 
+                  onClick={() => setAttachment(null)} 
+                  className="absolute right-[3.001px] bottom-[3px] flex justify-center items-center w-[19px] h-[19px] bg-[rgba(22,22,23,0.9)] rounded-sm shadow-[0px_1px_2px_0px_rgba(0,0,0,0.75)]"
+                >
+                  <AddSquareIcon />
+                </button>
+              </div>
+            </div>
+          )}
+          <div className="flex items-center gap-3 bg-[#161617] rounded-lg border border-[rgba(255,255,255,0.1)] px-4 py-3">
+            <button type="button" onClick={handleAttachmentClick}>
+              <PaperclipIcon />
+            </button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/*"
+              className="hidden"
+            />
+            <input
+              type="text"
+              className="flex-1 bg-transparent outline-none text-white placeholder-[rgba(255,255,255,0.6)] text-base"
+              placeholder="Ask Highlight anything..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+            />
+            <button type="button">
+              {/* <MicIcon /> */}
+            </button>
+          </div>
+        </form>
+      </footer>
     </div>
   );
 };
