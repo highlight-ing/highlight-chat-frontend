@@ -5,6 +5,7 @@ import { useState, useRef } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { MenuIcon, AddIcon, PaperclipIcon, MicIcon, AddSquareIcon } from './icons/icons';
 import { TopBarProps, Message, CompareResult } from './types/types';
+import ReactMarkdown from 'react-markdown';
 
 const TopBar: React.FC<TopBarProps> = ({ mode, setMode, onNewConversation }) => {
   return (
@@ -207,7 +208,7 @@ const HighlightChat = () => {
                       </div>
                     )}
                     <div className="text-[rgba(255,255,255,0.60)] font-normal leading-[150%]">
-                      {message.content}
+                      <ReactMarkdown>{message.content}</ReactMarkdown>
                     </div>
                   </div>
                 </div>
