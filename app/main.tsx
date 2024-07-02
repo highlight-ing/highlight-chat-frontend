@@ -208,7 +208,9 @@ const HighlightChat = () => {
                       </div>
                     )}
                     <div className="text-[rgba(255,255,255,0.60)] font-normal leading-[150%]">
-                      <ReactMarkdown>{message.content}</ReactMarkdown>
+                      <ReactMarkdown>
+                        {typeof message.content === 'string' ? message.content : ''}
+                      </ReactMarkdown>
                     </div>
                   </div>
                 </div>
