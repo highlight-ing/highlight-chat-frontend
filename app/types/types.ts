@@ -1,9 +1,11 @@
 import * as React from 'react';
 
 export type Message = {
-  type: 'user' | 'assistant' | 'compare';
-  content: string | React.ReactNode;
+  type: 'user' | 'assistant';
+  content: string;
   attachment?: string;
+  clipboardText?: string | null;
+  ocrScreenContents?: string | null;
 };
 
 export type CompareResult = {

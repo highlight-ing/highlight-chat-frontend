@@ -1,9 +1,9 @@
 'use client';
 
 import * as React from 'react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { MenuIcon, AddIcon, PaperclipIcon, MicIcon, AddSquareIcon, AssistantIcon } from './icons/icons';
+import { MenuIcon, AddIcon, PaperclipIcon, MicIcon, AddSquareIcon, AssistantIcon, ClipboardTextIcon } from './icons/icons';
 import { TopBarProps, Message, CompareResult } from './types/types';
 import ReactMarkdown from 'react-markdown';
 import {
@@ -12,19 +12,19 @@ import {
 
 import api from '@highlight-ai/app-runtime';
 
+// Debounce function
+const debounce = (func: Function, delay: number) => {
+  let timeoutId: NodeJS.Timeout;
+  return (...args: any[]) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func(...args), delay);
+  };
+};
+
 const TopBar: React.FC<TopBarProps> = ({ mode, setMode, onNewConversation }) => {
   return (
     <header className="absolute top-0 left-0 right-0 border-b border-[rgba(255,255,255,0.05)]">
       <div className="flex w-[1122px] h-[64px] p-[12px] justify-end items-center mx-auto">
-        {/* <button className="w-6 h-6 flex items-center justify-center">
-          <MenuIcon />
-        </button>
-        <button 
-          className="flex px-[12px] py-[8px] justify-end items-center gap-[8px] rounded-[8px] bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.6)] text-sm font-medium"
-          onClick={() => setMode(mode === 'assistant' ? 'compare' : 'assistant')}
-        >
-          {mode === 'assistant' ? 'Assistant' : 'Compare'} Mode <ChevronDown className="ml-2" size={16} />
-        </button> */}
         <button 
           className="flex w-[24px] h-[24px] justify-center items-center"
           onClick={onNewConversation}
@@ -44,12 +44,32 @@ const HighlightChat = () => {
   const [attachment, setAttachment] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [highlightContext, setHighlightContext] = useState<HighlightContext | null>(null);
+  const [screenshotPath, setScreenshotPath] = useState<string | null>(null);
+  const [clipboardText, setClipboardText] = useState<string | null>(null);
+  const [ocrScreenContents, setOcrScreenContents] = useState<string | null>(null);
+  const [isClipboardSuggestion, setIsClipboardSuggestion] = useState(false);
+
+  const debouncedHandleSubmit = useCallback(
+    debounce((context: HighlightContext) => {
+      setInput(context.suggestion || '');
+      handleSubmit(null, context);
+    }, 300),
+    []
+  );
 
   useEffect(() => {
     api.addEventListener("onContext", (context: HighlightContext) => {
+      console.log('Highlight context event listener called:', context);
       setHighlightContext(context);
+      setScreenshotPath(context.environment.screenshotPath || null);
+      setClipboardText(context.environment.clipboardText || null);
+      setIsClipboardSuggestion(true);
+      setOcrScreenContents(context.environment.ocrScreenContents || null);
+      
+      // Handle context with debounce
+      debouncedHandleSubmit(context);
     });
-  }, []);
+  }, [debouncedHandleSubmit]);
 
   const handleSuggestionClick = (suggestion: string) => {
     setInput(suggestion);
@@ -69,34 +89,71 @@ const HighlightChat = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement> | null, suggestionInput?: string) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement> | null, contextOrSuggestion?: HighlightContext | string) => {
     if (e) e.preventDefault();
-    const query = suggestionInput || input.trim();
-    if (query || attachment) {
+    
+    let query: string;
+    let context: HighlightContext | null = null;
+
+    if (typeof contextOrSuggestion === 'string') {
+      query = contextOrSuggestion;
+    } else if (contextOrSuggestion && 'suggestion' in contextOrSuggestion) {
+      query = contextOrSuggestion.suggestion || '';
+      context = contextOrSuggestion;
+    } else {
+      query = input.trim();
+    }
+
+    if (query || attachment || clipboardText || ocrScreenContents) {
       setMessages(prevMessages => [...prevMessages, { 
         type: 'user', 
         content: query,
-        attachment: attachment ? URL.createObjectURL(attachment) : undefined
+        attachment: attachment ? URL.createObjectURL(attachment) : undefined,
+        clipboardText: clipboardText,
+        ocrScreenContents: ocrScreenContents
       }]);
       setInput('');
       setIsWorking(true);
+      setAttachment(null); // Clear the attachment immediately
+      setIsClipboardSuggestion(false);
+      setClipboardText(null);
+      setOcrScreenContents(null);
       
       try {
         const formData = new FormData();
         formData.append('prompt', query);
 
         if (attachment) {
+          console.log('appending attachement image')
           formData.append('image', attachment);
+        } else if (highlightContext?.environment.screenshotPath) {
+          console.log('appending screenshot image')
+          // Fetch the image from the screenshotPath and append it to formData
+          try {
+            const response = await fetch(highlightContext.environment.screenshotPath);
+            const blob = await response.blob();
+            formData.append('image', blob, 'screenshot.png');
+          } catch (error) {
+            console.error('Error fetching screenshot:', error);
+          }
+        } else {
+          console.log('no image to append')
         }
 
         // Create context from conversation history
         const conversationHistory = messages.map(msg => `${msg.type}: ${msg.content}`).join('\n');
         let contextString = conversationHistory || 'This is a new conversation with Highlight Chat.';
-      
-        // Append Highlight context if available
-        if (highlightContext) {
-          contextString += '\n\nMore Context:\n' + JSON.stringify(highlightContext, null, 2);
+
+        // Add clipboard text and OCR screen contents to the context
+        if (clipboardText) {
+          contextString += '\n\nThis is what the user has in their clipboard.Clipboard Text:\n' + clipboardText;
         }
+        if (ocrScreenContents) {
+          console.log('OCR Screen Contents:', ocrScreenContents);
+          contextString += '\n\nHere is the user screen OCR-ed. OCR Screen Contents:\n' + ocrScreenContents;
+        }
+
+        console.log('contextString:', contextString);
   
         formData.append('context', contextString);
 
@@ -128,7 +185,6 @@ const HighlightChat = () => {
           const { done, value } = await reader.read();
           if (done) break;
           const chunk = new TextDecoder().decode(value);
-          console.log('Received chunk:', chunk);
 
           // Split the chunk into individual JSON objects
           const jsonObjects = chunk.match(/\{[^\}]+\}/g) || [];
@@ -137,7 +193,6 @@ const HighlightChat = () => {
             try {
               const parsedChunk = JSON.parse(jsonObject);
               accumulatedResponse += parsedChunk.response;
-              console.log('Accumulated response:', accumulatedResponse);
 
               // Update the UI with the accumulated response
               setMessages(prevMessages => {
@@ -156,7 +211,6 @@ const HighlightChat = () => {
         setMessages(prevMessages => [...prevMessages, { type: 'assistant', content: "Sorry, there was an error processing your request." }]);
       } finally {
         setIsWorking(false);
-        setAttachment(null); // Clear the attachment after sending
       }
     }
   };
@@ -199,7 +253,6 @@ const HighlightChat = () => {
             </div>
           ) : (
             messages.map((message, index) => {
-              console.log('Rendering message:', message);
               return (
                 <div key={index} className={`mb-4 flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
                   {message.type === 'assistant' && (
@@ -213,19 +266,35 @@ const HighlightChat = () => {
                     flex flex-col justify-center gap-4 p-5
                     rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)]
                     ${message.type === 'user' ? 'items-end' : 'items-start'}
-                    ${message.type === 'user' && message.attachment ? 'max-w-[300px]' : 'max-w-[80%]'}
+                    ${message.type === 'user' && (message.attachment || message.clipboardText || message.ocrScreenContents) ? 'max-w-[300px]' : 'max-w-[80%]'}
                   `}>
-                    {message.type === 'user' && message.attachment && (
+                    {message.type === 'user' && (message.attachment || highlightContext?.environment.screenshotPath) && (
                       <div className="mb-2 w-full">
                         <div className="relative inline-block w-full">
                           <img 
-                            src={message.attachment}
+                            src={message.attachment || highlightContext?.environment.screenshotPath}
                             alt="Attachment" 
                             className="w-full h-auto rounded object-cover object-center"
                             style={{
                               maxHeight: '200px'
                             }}
                           />
+                        </div>
+                      </div>
+                    )}
+                    {message.type === 'user' && message.clipboardText && (
+                      <div className="mb-2 w-full">
+                        <div className="p-2 bg-[rgba(255,255,255,0.1)] rounded">
+                          <p className="text-sm text-white">Clipboard Text:</p>
+                          <p className="text-xs text-[rgba(255,255,255,0.8)]">{message.clipboardText}</p>
+                        </div>
+                      </div>
+                    )}
+                    {message.type === 'user' && message.ocrScreenContents && (
+                      <div className="mb-2 w-full">
+                        <div className="p-2 bg-[rgba(255,255,255,0.1)] rounded">
+                          <p className="text-sm text-white">OCR Content:</p>
+                          <p className="text-xs text-[rgba(255,255,255,0.8)]">{message.ocrScreenContents}</p>
                         </div>
                       </div>
                     )}
@@ -255,23 +324,11 @@ const HighlightChat = () => {
         <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
           {attachment && (
             <div className="mb-2">
-              <div className="relative inline-block">
-                <img 
-                  src={URL.createObjectURL(attachment)} 
-                  alt="Attachment" 
-                  className="w-[79.371px] h-[42px] rounded object-cover object-center"
-                  style={{
-                    background: `url(${URL.createObjectURL(attachment)}) lightgray 0px -0.146px / 100% 100.436% no-repeat`
-                  }}
-                />
-                <button 
-                  type="button" 
-                  onClick={() => setAttachment(null)} 
-                  className="absolute right-[3.001px] bottom-[3px] flex justify-center items-center w-[19px] h-[19px] bg-[rgba(22,22,23,0.9)] rounded-sm shadow-[0px_1px_2px_0px_rgba(0,0,0,0.75)]"
-                >
-                  <AddSquareIcon />
-                </button>
-              </div>
+              <img
+                src={URL.createObjectURL(attachment)}
+                alt="Attachment preview"
+                className="max-h-32 rounded"
+              />
             </div>
           )}
           <div className="flex items-center gap-3 bg-[#161617] rounded-lg border border-[rgba(255,255,255,0.1)] px-4 py-3">
@@ -292,9 +349,6 @@ const HighlightChat = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
             />
-            <button type="button">
-              {/* <MicIcon /> */}
-            </button>
           </div>
         </form>
       </footer>
