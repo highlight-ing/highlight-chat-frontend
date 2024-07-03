@@ -233,21 +233,9 @@ const HighlightChat = () => {
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
                 <h1 className="text-3xl font-bold mb-8">Highlight Chat</h1>
-                <div className="space-y-4">
-                  {['Write a response to the most recent Discord message',
-                    'Summarize the last 30 minutes of audio',
-                    'Help me fix the error in my IDE'].map((suggestion, index) => (
-                    <button 
-                      key={index} 
-                      className="flex w-[450px] p-5 flex-col justify-center items-center gap-2.5 rounded-lg border border-[rgba(255,255,255,0.10)] bg-[rgba(255,255,255,0.05)]"
-                      onClick={() => handleSuggestionClick(suggestion)}
-                    >
-                      <span className="text-[rgba(255,255,255,0.60)] text-base font-normal leading-[150%]">
-                        {suggestion}
-                      </span>
-                    </button>
-                  ))}
-                </div>
+                <p className="text-[rgba(255,255,255,0.60)] text-base font-normal leading-[150%]">
+                  Ask Highlight anything to get started.
+                </p>
               </div>
             </div>
           ) : (
