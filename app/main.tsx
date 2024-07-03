@@ -106,7 +106,8 @@ const HighlightChat = () => {
         // formData.append('image', imageFile);
         // formData.append('voice', voiceFile);
 
-        const response = await fetch('http://0.0.0.0:8080/', { //fetch('https://highlight-chat-backend-fq27dri5ra-ue.a.run.app/', {
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://0.0.0.0:8080/';
+        const response = await fetch(backendUrl, {
           method: 'POST',
           body: formData,
         });
