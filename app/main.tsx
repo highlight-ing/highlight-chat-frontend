@@ -1,11 +1,16 @@
 'use client';
 
 import * as React from 'react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { MenuIcon, AddIcon, PaperclipIcon, MicIcon, AddSquareIcon } from './icons/icons';
+import { MenuIcon, AddIcon, PaperclipIcon, MicIcon, AddSquareIcon, AssistantIcon } from './icons/icons';
 import { TopBarProps, Message, CompareResult } from './types/types';
 import ReactMarkdown from 'react-markdown';
+import {
+  type HighlightContext,
+} from "@highlight-ai/app-runtime";
+
+import api from '@highlight-ai/app-runtime';
 
 const TopBar: React.FC<TopBarProps> = ({ mode, setMode, onNewConversation }) => {
   return (
@@ -38,6 +43,13 @@ const HighlightChat = () => {
   const [mode, setMode] = useState<'assistant' | 'compare'>('assistant');
   const [attachment, setAttachment] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [highlightContext, setHighlightContext] = useState<HighlightContext | null>(null);
+
+  useEffect(() => {
+    api.addEventListener("onContext", (context: HighlightContext) => {
+      setHighlightContext(context);
+    });
+  }, []);
 
   const handleSuggestionClick = (suggestion: string) => {
     setInput(suggestion);
@@ -73,14 +85,20 @@ const HighlightChat = () => {
         const formData = new FormData();
         formData.append('prompt', query);
 
-        // Create context from conversation history
-        const conversationHistory = messages.map(msg => `${msg.type}: ${msg.content}`).join('\n');
-
-        formData.append('context', conversationHistory || 'This is a new conversation with Highlight Chat.');
-
         if (attachment) {
           formData.append('image', attachment);
         }
+
+        // Create context from conversation history
+        const conversationHistory = messages.map(msg => `${msg.type}: ${msg.content}`).join('\n');
+        let contextString = conversationHistory || 'This is a new conversation with Highlight Chat.';
+      
+        // Append Highlight context if available
+        if (highlightContext) {
+          contextString += '\n\nMore Context:\n' + JSON.stringify(highlightContext, null, 2);
+        }
+  
+        formData.append('context', contextString);
 
         // Optional fields can be added here if needed
         // formData.append('location', '');
@@ -88,7 +106,8 @@ const HighlightChat = () => {
         // formData.append('image', imageFile);
         // formData.append('voice', voiceFile);
 
-        const response = await fetch('http://0.0.0.0:8080/', { //fetch('https://highlight-chat-backend-fq27dri5ra-ue.a.run.app/', {
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://0.0.0.0:8080/';
+        const response = await fetch(backendUrl, {
           method: 'POST',
           body: formData,
         });
@@ -184,30 +203,33 @@ const HighlightChat = () => {
               return (
                 <div key={index} className={`mb-4 flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
                   {message.type === 'assistant' && (
-                    <div className="
-                      flex w-8 h-8 p-1.5 justify-center items-center mr-2
-                      rounded-full bg-[rgba(255,255,255,0.05)]
-                    ">
-                      {/* Add your logo or icon here */}
+                    <div className="flex-shrink-0 mr-2">
+                      <div className="flex w-[32px] h-[32px] p-[6px] justify-center items-center rounded-full bg-[rgba(255,255,255,0.05)]">
+                        <AssistantIcon className="text-[#FFFFFF66]" />
+                      </div>
                     </div>
                   )}
                   <div className={`
-                    flex flex-col justify-center gap-4 p-5 max-w-[80%]
+                    flex flex-col justify-center gap-4 p-5
                     rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)]
                     ${message.type === 'user' ? 'items-end' : 'items-start'}
+                    ${message.type === 'user' && message.attachment ? 'max-w-[300px]' : 'max-w-[80%]'}
                   `}>
                     {message.type === 'user' && message.attachment && (
-                      <div className="mb-4">
-                        <div className="relative inline-block">
+                      <div className="mb-2 w-full">
+                        <div className="relative inline-block w-full">
                           <img 
                             src={message.attachment}
                             alt="Attachment" 
-                            className="w-[79.371px] h-[42px] rounded object-cover object-center"
+                            className="w-full h-auto rounded object-cover object-center"
+                            style={{
+                              maxHeight: '200px'
+                            }}
                           />
                         </div>
                       </div>
                     )}
-                    <div className="text-[rgba(255,255,255,0.60)] font-normal leading-[150%]">
+                    <div className="text-[rgba(255,255,255,0.60)] font-normal leading-[150%] break-words">
                       <ReactMarkdown>
                         {typeof message.content === 'string' ? message.content : ''}
                       </ReactMarkdown>
@@ -220,8 +242,8 @@ const HighlightChat = () => {
           {isWorking && (
             <div className="flex justify-start mb-4">
               <div className="flex items-center">
-                <div className="w-6 h-6 bg-[#161617] rounded-full mr-2 flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">H</span>
+                <div className="flex w-[32px] h-[32px] p-[6px] justify-center items-center rounded-full bg-[rgba(255,255,255,0.05)] mr-2">
+                  <AssistantIcon className="text-[#FFFFFF66]" />
                 </div>
                 <span className="text-sm text-[rgba(255,255,255,0.6)]">Working on it...</span>
               </div>

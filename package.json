@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@highlight-ai/app-runtime": "^0.0.26",
     "ai": "^3.2.15",
     "iconsax-react": "^0.0.8",
     "lucide-react": "^0.397.0",
