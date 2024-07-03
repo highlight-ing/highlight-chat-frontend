@@ -44,6 +44,7 @@ const HighlightChat = () => {
   const [attachment, setAttachment] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [highlightContext, setHighlightContext] = useState<HighlightContext | null>(null);
+  const highlightContextRef = useRef<HighlightContext | null>(null);
   const [screenshotPath, setScreenshotPath] = useState<string | null>(null);
   const [clipboardText, setClipboardText] = useState<string | null>(null);
   const [ocrScreenContents, setOcrScreenContents] = useState<string | null>(null);
@@ -61,6 +62,7 @@ const HighlightChat = () => {
     api.addEventListener("onContext", (context: HighlightContext) => {
       console.log('Highlight context event listener called:', context);
       setHighlightContext(context);
+      highlightContextRef.current = context;
       setScreenshotPath(context.environment.screenshotPath || null);
       setClipboardText(context.environment.clipboardText || null);
       setIsClipboardSuggestion(true);
@@ -123,14 +125,20 @@ const HighlightChat = () => {
         const formData = new FormData();
         formData.append('prompt', query);
 
+        if (highlightContextRef.current) {
+          console.log('appending highlight context', highlightContextRef.current);
+        } else {
+          console.log('no highlight context at all')
+        }
+
         if (attachment) {
           console.log('appending attachement image')
           formData.append('image', attachment);
-        } else if (highlightContext?.environment.screenshotPath) {
+        } else if (highlightContextRef.current?.environment.screenshotPath) {
           console.log('appending screenshot image')
           // Fetch the image from the screenshotPath and append it to formData
           try {
-            const response = await fetch(highlightContext.environment.screenshotPath);
+            const response = await fetch(highlightContextRef.current.environment.screenshotPath);
             const blob = await response.blob();
             formData.append('image', blob, 'screenshot.png');
           } catch (error) {
@@ -144,24 +152,15 @@ const HighlightChat = () => {
         const conversationHistory = messages.map(msg => `${msg.type}: ${msg.content}`).join('\n');
         let contextString = conversationHistory || 'This is a new conversation with Highlight Chat.';
 
-        // Add clipboard text and OCR screen contents to the context
-        if (clipboardText) {
-          contextString += '\n\nThis is what the user has in their clipboard.Clipboard Text:\n' + clipboardText;
-        }
-        if (ocrScreenContents) {
-          console.log('OCR Screen Contents:', ocrScreenContents);
-          contextString += '\n\nHere is the user screen OCR-ed. OCR Screen Contents:\n' + ocrScreenContents;
+        // Add Highlight context if available
+        if (highlightContextRef.current) {
+          contextString += '\n\nHighlight Context:\n';
+          contextString += JSON.stringify(highlightContextRef.current, null, 2);
         }
 
         console.log('contextString:', contextString);
   
         formData.append('context', contextString);
-
-        // Optional fields can be added here if needed
-        // formData.append('location', '');
-        // formData.append('topic', '');
-        // formData.append('image', imageFile);
-        // formData.append('voice', voiceFile);
 
         const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://0.0.0.0:8080/';
         const response = await fetch(backendUrl, {
