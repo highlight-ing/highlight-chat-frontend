@@ -42,6 +42,7 @@ const HighlightChat = () => {
   const [isWorking, setIsWorking] = useState(false);
   const [mode, setMode] = useState<'assistant' | 'compare'>('assistant');
   const [attachment, setAttachment] = useState<File | null>(null);
+  const [attachmentType, setAttachmentType] = useState<'image' | 'pdf' | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [highlightContext, setHighlightContext] = useState<HighlightContext | null>(null);
   const highlightContextRef = useRef<HighlightContext | null>(null);
@@ -84,10 +85,11 @@ const HighlightChat = () => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file && file.type.startsWith('image/')) {
+    if (file && (file.type.startsWith('image/') || file.type === 'application/pdf')) {
       setAttachment(file);
+      setAttachmentType(file.type.startsWith('image/') ? 'image' : 'pdf');
     } else {
-      alert('Please select a valid image file.');
+      alert('Please select a valid image or PDF file.');
     }
   };
 
@@ -132,8 +134,13 @@ const HighlightChat = () => {
         }
 
         if (attachment) {
-          console.log('appending attachement image')
-          formData.append('image', attachment);
+          if (attachmentType === 'image') {
+            console.log('appending image attachment');
+            formData.append('image', attachment);
+          } else if (attachmentType === 'pdf') {
+            console.log('appending pdf attachment');
+            formData.append('pdf', attachment);
+          }
         } else if (highlightContextRef.current?.environment.screenshotPath) {
           console.log('appending screenshot image')
           // Fetch the image from the screenshotPath and append it to formData
@@ -311,11 +318,18 @@ const HighlightChat = () => {
         <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
           {attachment && (
             <div className="mb-2">
-              <img
-                src={URL.createObjectURL(attachment)}
-                alt="Attachment preview"
-                className="max-h-32 rounded"
-              />
+              {attachmentType === 'image' ? (
+                <img
+                  src={URL.createObjectURL(attachment)}
+                  alt="Attachment preview"
+                  className="max-h-32 rounded"
+                />
+              ) : (
+                <div className="flex items-center bg-[rgba(255,255,255,0.1)] p-2 rounded">
+                  <span className="text-sm font-bold text-white mr-2">PDF</span>
+                  <span className="text-sm text-white">{attachment.name}</span>
+                </div>
+              )}
             </div>
           )}
           <div className="flex items-center gap-3 bg-[#161617] rounded-lg border border-[rgba(255,255,255,0.1)] px-4 py-3">
@@ -326,7 +340,7 @@ const HighlightChat = () => {
               type="file"
               ref={fileInputRef}
               onChange={handleFileChange}
-              accept="image/*"
+              accept="image/*,application/pdf"
               className="hidden"
             />
             <input
