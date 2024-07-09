@@ -72,7 +72,6 @@ const HighlightChat = () => {
       setAccessToken(newAccessToken);
     } catch (error) {
       console.error('Token refresh failed:', error);
-      // Handle the error (e.g., redirect to login page)
     }
   };
 
@@ -102,12 +101,9 @@ const HighlightChat = () => {
   useEffect(() => {
     const authenticateUser = async () => {
       try {
-        console.log('Authenticating user');
         const { accessToken, refreshToken } = await Highlight.auth.signIn();
         setAccessToken(accessToken);
         setRefreshToken(refreshToken);
-        console.log('Access Token:', accessToken); // Add this line to print the access token
-        console.log('Refresh Token:', refreshToken); // Add this line to print the refresh token
       } catch (error) {
         console.error('Authentication failed:', error);
       }
@@ -115,11 +111,6 @@ const HighlightChat = () => {
 
     authenticateUser();
   }, []);
-
-  const handleSuggestionClick = (suggestion: string) => {
-    setInput(suggestion);
-    handleSubmit(null, suggestion);
-  };
 
   const handleAttachmentClick = () => {
     fileInputRef.current?.click();
@@ -426,38 +417,6 @@ const HighlightChat = () => {
           </div>
         </form>
       </footer>
-    </div>
-  );
-};
-
-const CompareView: React.FC<{ result: CompareResult }> = ({ result }) => {
-  return (
-    <div>
-      <div className="flex items-center mb-2">
-        <div className="w-6 h-6 bg-gray-600 rounded-full mr-2"></div>
-        <span className="text-sm text-gray-400">Overview</span>
-      </div>
-      <ul className="list-disc pl-6 mb-4">
-        {result.overview.map((item, index) => (
-          <li key={index} className="text-sm">{item}</li>
-        ))}
-      </ul>
-      <div className="mb-2">
-        <span className="text-sm font-semibold">Grok mentioned:</span>
-      </div>
-      <ul className="list-disc pl-6 mb-4">
-        {result.grok.map((item, index) => (
-          <li key={index} className="text-sm">{item}</li>
-        ))}
-      </ul>
-      <div className="mb-2">
-        <span className="text-sm font-semibold">Claude mentioned:</span>
-      </div>
-      <ul className="list-disc pl-6">
-        {result.claude.map((item, index) => (
-          <li key={index} className="text-sm">{item}</li>
-        ))}
-      </ul>
     </div>
   );
 };
