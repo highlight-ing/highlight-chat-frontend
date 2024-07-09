@@ -4,6 +4,7 @@ import { AttachmentsButton } from './AttachmentsButton'
 import { useInputContext } from '../context/InputContext'
 
 const PLACEHOLDER_TEXT = 'Ask Highlight anything...'
+const MAX_INPUT_HEIGHT = 80
 
 interface InputProps {
   onSubmit: () => void
@@ -12,43 +13,13 @@ interface InputProps {
 export const Input = ({ onSubmit }: InputProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { attachment, setAttachment, input, setInput } = useInputContext()
-  const inputRef = useRef<HTMLDivElement>(null)
-  const [isPlaceholderVisible, setIsPlaceholderVisible] = useState(true)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
 
-  useEffect(() => {
-    if (inputRef.current && isPlaceholderVisible) {
-      inputRef.current.textContent = PLACEHOLDER_TEXT
-    }
-  }, [isPlaceholderVisible])
-
-  const onFocusInput = () => {
-    if (isPlaceholderVisible && inputRef.current) {
-      inputRef.current.textContent = ''
-      setIsPlaceholderVisible(false)
-    }
-  }
-
-  const onBlurInput = () => {
-    if (input.length === 0 && inputRef.current) {
-      inputRef.current.textContent = PLACEHOLDER_TEXT
-      setIsPlaceholderVisible(true)
-    }
-  }
-
-  const onInput = (e: React.FormEvent<HTMLDivElement>) => {
-    const content = e.currentTarget.innerText
-    setInput(content ?? '')
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Enter') {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       onSubmit()
       setInput('')
-
-      if (inputRef.current) {
-        inputRef.current.textContent = ''
-      }
     }
   }
 
@@ -68,10 +39,20 @@ export const Input = ({ onSubmit }: InputProps) => {
     }
   }
 
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.style.height = '0px'
+      const scrollHeight = inputRef.current.scrollHeight
+
+      const newHeight = scrollHeight > MAX_INPUT_HEIGHT ? MAX_INPUT_HEIGHT : scrollHeight
+      inputRef.current.style.height = newHeight + 'px'
+    }
+  }, [inputRef, input])
+
   return (
-    <div className="flex flex-col gap-4 items-space-between bg-[#161617] rounded-lg border border-light-10 ml-[40px] px-4 py-3">
+    <div className="flex flex-col gap-2 items-space-between justify-center bg-[#161617] rounded-lg border border-light-10 ml-[40px] px-4 py-4 h-auto min-h-16">
       {attachment?.value && (
-        <div className="mb-2">
+        <div className="">
           {attachment.type === 'image' ? (
             <Attachment type="image" value={URL.createObjectURL(attachment.value)} />
           ) : (
@@ -79,7 +60,7 @@ export const Input = ({ onSubmit }: InputProps) => {
           )}
         </div>
       )}
-      <div className="flex flex-1 gap-3 items-center">
+      <div className="flex flex-1 gap-3 items-center h-fit">
         <AttachmentsButton onClick={handleAttachmentClick} />
         <input
           type="file"
@@ -88,15 +69,12 @@ export const Input = ({ onSubmit }: InputProps) => {
           accept="image/*,application/pdf"
           className="hidden"
         />
-        <div
-          contentEditable
-          className={`flex outline-none text-base bg-transparent overflow-y-auto overflow-x-hidden max-h-36 min-h-6 ${
-            !input ? 'text-light-60' : 'text-light'
-          } cursor-auto`}
+        <textarea
           ref={inputRef}
-          onInput={onInput}
-          onFocus={onFocusInput}
-          onBlur={onBlurInput}
+          className="flex text-sm w-full outline-none resize-none border-0 bg-transparent max-h-80 h-[15px] my-2 leading-4"
+          onInput={(e) => setInput(e.currentTarget.value)}
+          placeholder={PLACEHOLDER_TEXT}
+          value={input}
           onKeyDown={handleKeyDown}
         />
       </div>
