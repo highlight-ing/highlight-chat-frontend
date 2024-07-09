@@ -17,7 +17,7 @@ export type UserMessage = {
   clipboardText?: string
   audio?: string
   window?: WindowAttachment
-  file?: string
+  fileTitle?: string
   content: string
 }
 
@@ -38,4 +38,9 @@ export interface TopBarProps {
   mode: 'assistant' | 'compare'
   setMode: (mode: 'assistant' | 'compare') => void
   onNewConversation: () => void
+}
+
+export interface Attachment {
+  type: 'image' | 'pdf'
+  value: File | undefined
 }

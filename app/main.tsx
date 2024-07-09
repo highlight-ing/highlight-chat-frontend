@@ -8,8 +8,8 @@ import { type HighlightContext } from '@highlight-ai/app-runtime'
 
 import api from '@highlight-ai/app-runtime'
 import { Message } from './components/Message'
-import { AttachmentsButton } from './components/AttachmentsButton'
-import { Attachment } from './components/Attachment'
+import { useInputContext } from './context/InputContext'
+import { Input } from './components/Input'
 
 const debounce = (func: Function, delay: number) => {
   let timeoutId: NodeJS.Timeout
@@ -21,63 +21,22 @@ const debounce = (func: Function, delay: number) => {
 
 const TopBar: React.FC<TopBarProps> = ({ mode, setMode, onNewConversation }) => {
   return (
-    <header className="absolute top-0 left-0 right-0 border-b border-[rgba(255,255,255,0.05)]">
-      <div className="flex w-[1122px] h-[64px] p-[12px] justify-end items-center mx-auto">
-        <button className="flex w-[24px] h-[24px] justify-center items-center" onClick={onNewConversation}>
-          <AddIcon />
-        </button>
-      </div>
-    </header>
+    <div className="flex h-16 w-fill justify-end items-center border-b border-[rgba(255,255,255,0.05)] px-3">
+      <button className="flex w-[24px] h-[24px] justify-center items-center" onClick={onNewConversation}>
+        <AddIcon />
+      </button>
+    </div>
   )
 }
 
-const PLACEHOLDER_TEXT = 'Ask Highlight anything...'
-
 const HighlightChat = () => {
   const [messages, setMessages] = useState<MessageType[]>([])
-  const [input, setInput] = useState('')
   const [isWorking, setIsWorking] = useState(false)
   const [mode, setMode] = useState<'assistant' | 'compare'>('assistant')
-  const [attachment, setAttachment] = useState<File | undefined>(undefined)
-  const [attachmentType, setAttachmentType] = useState<'image' | 'pdf' | undefined>(undefined)
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const [highlightContext, setHighlightContext] = useState<HighlightContext | undefined>(undefined)
   const highlightContextRef = useRef<HighlightContext | null>(null)
-  const inputRef = useRef<HTMLDivElement>(null)
-  const [isPlaceholderVisible, setIsPlaceholderVisible] = useState(true)
 
-  useEffect(() => {
-    if (inputRef.current && isPlaceholderVisible) {
-      inputRef.current.textContent = PLACEHOLDER_TEXT
-    }
-  }, [isPlaceholderVisible])
-
-  const onFocusInput = () => {
-    if (isPlaceholderVisible && inputRef.current) {
-      inputRef.current.textContent = ''
-      setIsPlaceholderVisible(false)
-    }
-  }
-
-  const onBlurInput = () => {
-    if (input.length === 0 && inputRef.current) {
-      inputRef.current.textContent = PLACEHOLDER_TEXT
-      setIsPlaceholderVisible(true)
-    }
-  }
-
-  const onInput = (e: React.FormEvent<HTMLDivElement>) => {
-    const content = e.currentTarget.innerText
-    setInput(content ?? '')
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      handleSubmit()
-      setIsPlaceholderVisible(true)
-    }
-  }
+  const { attachment, setAttachment, input, setInput } = useInputContext()
 
   const debouncedHandleSubmit = useCallback(
     debounce((context: HighlightContext) => {
@@ -96,20 +55,6 @@ const HighlightChat = () => {
       debouncedHandleSubmit(context)
     })
   }, [debouncedHandleSubmit])
-
-  const handleAttachmentClick = () => {
-    fileInputRef.current?.click()
-  }
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file && (file.type.startsWith('image/') || file.type === 'application/pdf')) {
-      setAttachment(file)
-      setAttachmentType(file.type.startsWith('image/') ? 'image' : 'pdf')
-    } else {
-      alert('Please select a valid image or PDF file.')
-    }
-  }
 
   const addNewMessage = (message: MessageType) => {
     setMessages((prevMessages) => [...prevMessages, message])
@@ -180,6 +125,7 @@ const HighlightChat = () => {
     let ocrScreenContents = ''
     let rawContents = ''
     let audio = ''
+    let pdfTitle = ''
 
     if (context) {
       query = context.suggestion || ''
@@ -192,14 +138,22 @@ const HighlightChat = () => {
       query = input.trim()
     }
 
+    if (attachment && attachment.value) {
+      if (attachment.type === 'image') {
+        screenshotUrl = URL.createObjectURL(attachment.value)
+      } else if (attachment.type === 'pdf') {
+        pdfTitle = attachment.value.name
+      }
+    }
+
     if (query || attachment || clipboardText || ocrScreenContents || screenshotUrl || rawContents) {
       addNewMessage({
         type: 'user',
         content: query,
-        file: attachment ? URL.createObjectURL(attachment) : undefined,
         clipboardText,
         screenshot: screenshotUrl,
-        audio
+        audio,
+        fileTitle: pdfTitle
       })
 
       setInput('')
@@ -208,13 +162,13 @@ const HighlightChat = () => {
       const formData = new FormData()
       formData.append('prompt', query)
 
-      if (attachment) {
-        if (attachmentType === 'image') {
+      if (attachment && attachment.value) {
+        if (attachment.type === 'image') {
           console.log('appending image attachment')
-          formData.append('image', attachment)
-        } else if (attachmentType === 'pdf') {
+          formData.append('image', attachment.value)
+        } else if (attachment.type === 'pdf') {
           console.log('appending pdf attachment')
-          formData.append('pdf', attachment)
+          formData.append('pdf', attachment.value)
         }
       } else if (screenshotUrl) {
         console.log('appending screenshot url')
@@ -246,21 +200,18 @@ const HighlightChat = () => {
   }
 
   return (
-    <div className="fixed inset-0 bg-[rgba(255,255,255,0.05)] text-white overflow-hidden flex flex-col">
+    <div className="text-white overflow-scroll flex flex-1 flex-col w-fill h-fill max-w-6xl max-h-full">
       <TopBar mode={mode} setMode={setMode} onNewConversation={startNewConversation} />
-      <main className="flex-1 overflow-auto pt-14 pb-20">
-        <div className="max-w-3xl mx-auto h-full">
+      <div className="flex flex-1 px-[12%] flex-col overflow-autopt-14 pb-4">
+        <div className="flex flex-1 w-full mx-auto">
           {messages.length === 0 ? (
-            <div className="flex items-center justify-center h-full">
+            <div className="flex items-center justify-center h-full w-full">
               <div className="text-center">
                 <h1 className="text-3xl font-bold mb-8">Highlight Chat</h1>
-                <p className="text-light-60 text-base font-normal leading-[150%]">
-                  Ask Highlight anything to get started.
-                </p>
               </div>
             </div>
           ) : (
-            <div className="flex flex-col justify-end h-full">
+            <div className="flex flex-col w-full justify-end">
               {messages.map((message, index) => (
                 <Message key={index} message={message} />
               ))}
@@ -277,43 +228,8 @@ const HighlightChat = () => {
             </div>
           )}
         </div>
-      </main>
-      <footer className="fixed bottom-0 left-0 right-0 p-4">
-        <div className="max-w-3xl mx-auto">
-          <div className="flex flex-col gap-4 items-space-between bg-[#161617] rounded-lg border border-light-10 px-4 py-3">
-            {attachment && (
-              <div className="mb-2">
-                {attachmentType === 'image' ? (
-                  <Attachment type="image" value={URL.createObjectURL(attachment)} />
-                ) : (
-                  <Attachment type="pdf" value={attachment.name} />
-                )}
-              </div>
-            )}
-            <div className="flex gap-3">
-              <AttachmentsButton onClick={handleAttachmentClick} />
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                accept="image/*,application/pdf"
-                className="hidden"
-              />
-              <div
-                contentEditable
-                className={`flex-1 outline-none text-base bg-transparent overflow-auto max-h-40 min-h-6 resize ${
-                  !input ? 'text-light-60' : 'text-light'
-                }`}
-                ref={inputRef}
-                onInput={onInput}
-                onFocus={onFocusInput}
-                onBlur={onBlurInput}
-                onKeyDown={handleKeyDown}
-              />
-            </div>
-          </div>
-        </div>
-      </footer>
+        <Input onSubmit={handleSubmit} />
+      </div>
     </div>
   )
 }

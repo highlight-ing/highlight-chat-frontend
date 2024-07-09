@@ -6,7 +6,7 @@ import ReactMarkdown from 'react-markdown'
 import { Attachment } from './Attachment'
 
 const hasAttachment = (message: UserMessage) => {
-  return message.screenshot || message.clipboardText || message.window
+  return message.screenshot || message.clipboardText || message.window || message.fileTitle
 }
 
 interface MessageProps {
@@ -14,12 +14,12 @@ interface MessageProps {
 }
 
 export const Message = ({ message }: MessageProps) => {
-  console.log('message', message)
+  console.log('Message:', message)
   return (
     <div className={`mb-4 flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
       {message.type === 'assistant' && (
         <div className="flex-shrink-0 mr-2">
-          <div className="flex w-[32px] h-[32px] p-[6px] justify-center items-center rounded-full bg-[rgba(255,255,255,0.05)]">
+          <div className="flex w-[32px] h-[32px] p-[6px] justify-center items-center rounded-full bg-[#161617]">
             <AssistantIcon className="text-[#FFFFFF66]" />
           </div>
         </div>
@@ -27,7 +27,7 @@ export const Message = ({ message }: MessageProps) => {
       <div
         className={`
             flex justify-center gap-4 p-5 flex-col
-            rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)]
+            rounded-lg border border-light-10 bg-[#161617]
             max-w-[80%]
             ${message.type === 'user' ? 'items-end' : 'items-start'}
           `}
@@ -37,6 +37,7 @@ export const Message = ({ message }: MessageProps) => {
             {message.screenshot && <Attachment type="image" value={message.screenshot} />}
             {message.audio && <Attachment type="audio" value={message.audio} />}
             {message.clipboardText && <Attachment type="clipboard" value={message.clipboardText} />}
+            {message.fileTitle && <Attachment type="pdf" value={message.fileTitle} />}
           </div>
         )}
         <div
