@@ -44,7 +44,11 @@ export const Input = ({ onSubmit }: InputProps) => {
     if (e.key === 'Enter') {
       e.preventDefault()
       onSubmit()
-      setIsPlaceholderVisible(true)
+      setInput('')
+
+      if (inputRef.current) {
+        inputRef.current.textContent = ''
+      }
     }
   }
 
@@ -65,7 +69,7 @@ export const Input = ({ onSubmit }: InputProps) => {
   }
 
   return (
-    <div className="flex 2-full flex-col gap-4 items-space-between bg-[#161617] rounded-lg border border-light-10 mx-[40px] px-4 py-3 max-h-40">
+    <div className="flex flex-col gap-4 items-space-between bg-[#161617] rounded-lg border border-light-10 ml-[40px] px-4 py-3">
       {attachment?.value && (
         <div className="mb-2">
           {attachment.type === 'image' ? (
@@ -75,7 +79,7 @@ export const Input = ({ onSubmit }: InputProps) => {
           )}
         </div>
       )}
-      <div className="flex gap-3">
+      <div className="flex flex-1 gap-3 items-center">
         <AttachmentsButton onClick={handleAttachmentClick} />
         <input
           type="file"
@@ -86,9 +90,9 @@ export const Input = ({ onSubmit }: InputProps) => {
         />
         <div
           contentEditable
-          className={`flex-1 outline-none text-base bg-transparent overflow-auto max-h-36 min-h-6 ${
+          className={`flex outline-none text-base bg-transparent overflow-y-auto overflow-x-hidden max-h-36 min-h-6 ${
             !input ? 'text-light-60' : 'text-light'
-          }`}
+          } cursor-auto`}
           ref={inputRef}
           onInput={onInput}
           onFocus={onFocusInput}

@@ -10,6 +10,7 @@ import api from '@highlight-ai/app-runtime'
 import { Message } from './components/Message'
 import { useInputContext } from './context/InputContext'
 import { Input } from './components/Input'
+import { useAuthContext } from './context/AuthContext'
 
 const debounce = (func: Function, delay: number) => {
   let timeoutId: NodeJS.Timeout
@@ -21,7 +22,7 @@ const debounce = (func: Function, delay: number) => {
 
 const TopBar: React.FC<TopBarProps> = ({ mode, setMode, onNewConversation }) => {
   return (
-    <div className="flex h-16 w-fill justify-end items-center border-b border-[rgba(255,255,255,0.05)] px-3">
+    <div className="flex h-16 w-fill justify-end items-center border-b border-[rgba(255,255,255,0.05)] px-3 pt-4">
       <button className="flex w-[24px] h-[24px] justify-center items-center" onClick={onNewConversation}>
         <AddIcon />
       </button>
@@ -37,6 +38,7 @@ const HighlightChat = () => {
   const highlightContextRef = useRef<HighlightContext | null>(null)
 
   const { attachment, setAttachment, input, setInput } = useInputContext()
+  const { accessToken, refreshAccessToken } = useAuthContext()
 
   const debouncedHandleSubmit = useCallback(
     debounce((context: HighlightContext) => {
@@ -65,10 +67,26 @@ const HighlightChat = () => {
 
     try {
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://0.0.0.0:8080/'
-      const response = await fetch(backendUrl, {
+      let response = await fetch(backendUrl, {
         method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        },
         body: formData
       })
+
+      if (response.status === 401) {
+        // Token has expired, refresh it
+        await refreshAccessToken()
+        // Retry the request with the new token
+        response = await fetch(backendUrl, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          },
+          body: formData
+        })
+      }
 
       if (!response.ok) {
         throw new Error('Network response was not ok')
@@ -183,6 +201,21 @@ const HighlightChat = () => {
 
       // Add Highlight context if available
       if (highlightContextRef.current) {
+        // Trim audio attachment and remove screenshot attachment
+        if (highlightContextRef.current.attachments) {
+          highlightContextRef.current.attachments = highlightContextRef.current.attachments
+            .filter((attachment) => attachment.type !== 'screenshot')
+            .map((attachment) => {
+              if (attachment.type === 'audio') {
+                return {
+                  ...attachment,
+                  value: attachment.value.slice(0, 1000)
+                }
+              }
+              return attachment
+            })
+        }
+
         contextString += '\n\nHighlight Context:\n' + JSON.stringify(highlightContextRef.current, null, 2)
       }
 
@@ -200,30 +233,32 @@ const HighlightChat = () => {
   }
 
   return (
-    <div className="text-white overflow-scroll flex flex-1 flex-col w-fill h-fill max-w-6xl max-h-full">
+    <div className="text-white flex flex-col w-full h-dvh max-h-dvh max-w-6x overflow-auto">
       <TopBar mode={mode} setMode={setMode} onNewConversation={startNewConversation} />
-      <div className="flex flex-1 px-[12%] flex-col overflow-autopt-14 pb-4">
-        <div className="flex flex-1 w-full mx-auto">
+      <div className="flex px-[12%] flex-col pb-4 h-full">
+        <div className="flex w-full mx-auto h-full">
           {messages.length === 0 ? (
-            <div className="flex items-center justify-center h-full w-full">
+            <div className="flex flex-1 items-center justify-center h-full w-full">
               <div className="text-center">
                 <h1 className="text-3xl font-bold mb-8">Highlight Chat</h1>
               </div>
             </div>
           ) : (
-            <div className="flex flex-col w-full justify-end">
-              {messages.map((message, index) => (
-                <Message key={index} message={message} />
-              ))}
-            </div>
-          )}
-          {isWorking && (
-            <div className="flex justify-start mb-4">
-              <div className="flex items-center">
-                <div className="flex w-[32px] h-[32px] p-[6px] justify-center items-center rounded-full bg-light-5 mr-2">
-                  <AssistantIcon className="text-[#FFFFFF66]" />
-                </div>
-                <span className="text-sm text-light-60">Working on it...</span>
+            <div className="flex flex-col w-full h-full justify-end">
+              <div className={`flex flex-1 flex-col w-full max-h-[calc(100dvh-136px)] overflow-y-scroll mb-4`}>
+                {messages.map((message, index) => (
+                  <Message key={index} message={message} />
+                ))}
+                {isWorking && (
+                  <div className="flex justify-start mb-4">
+                    <div className="flex items-center">
+                      <div className="flex w-[32px] h-[32px] p-[6px] justify-center items-center rounded-full bg-light-5 mr-2">
+                        <AssistantIcon className="text-[#FFFFFF66]" />
+                      </div>
+                      <span className="text-sm text-light-60">Working on it...</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}

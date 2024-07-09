@@ -14,7 +14,6 @@ interface MessageProps {
 }
 
 export const Message = ({ message }: MessageProps) => {
-  console.log('Message:', message)
   return (
     <div className={`mb-4 flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
       {message.type === 'assistant' && (
