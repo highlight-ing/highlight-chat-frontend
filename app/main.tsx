@@ -11,6 +11,7 @@ import {
 } from "@highlight-ai/app-runtime";
 
 import api from '@highlight-ai/app-runtime';
+import Highlight from "@highlight-ai/app-runtime";
 
 // Debounce function
 const debounce = (func: Function, delay: number) => {
@@ -50,6 +51,30 @@ const HighlightChat = () => {
   const [clipboardText, setClipboardText] = useState<string | null>(null);
   const [ocrScreenContents, setOcrScreenContents] = useState<string | null>(null);
   const [isClipboardSuggestion, setIsClipboardSuggestion] = useState(false);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [refreshToken, setRefreshToken] = useState<string | null>(null);
+
+  const refreshAccessToken = async () => {
+    try {
+      const response = await fetch('/api/refresh-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to refresh token');
+      }
+
+      const { accessToken: newAccessToken } = await response.json();
+      setAccessToken(newAccessToken);
+    } catch (error) {
+      console.error('Token refresh failed:', error);
+      // Handle the error (e.g., redirect to login page)
+    }
+  };
 
   const debouncedHandleSubmit = useCallback(
     debounce((context: HighlightContext) => {
@@ -73,6 +98,23 @@ const HighlightChat = () => {
       debouncedHandleSubmit(context);
     });
   }, [debouncedHandleSubmit]);
+
+  useEffect(() => {
+    const authenticateUser = async () => {
+      try {
+        console.log('Authenticating user');
+        const { accessToken, refreshToken } = await Highlight.auth.signIn();
+        setAccessToken(accessToken);
+        setRefreshToken(refreshToken);
+        console.log('Access Token:', accessToken); // Add this line to print the access token
+        console.log('Refresh Token:', refreshToken); // Add this line to print the refresh token
+      } catch (error) {
+        console.error('Authentication failed:', error);
+      }
+    };
+
+    authenticateUser();
+  }, []);
 
   const handleSuggestionClick = (suggestion: string) => {
     setInput(suggestion);
@@ -129,6 +171,21 @@ const HighlightChat = () => {
 
         if (highlightContextRef.current) {
           console.log('appending highlight context', highlightContextRef.current);
+          
+          // Trim audio attachment and remove screenshot attachment
+          if (highlightContextRef.current.attachments) {
+            highlightContextRef.current.attachments = highlightContextRef.current.attachments
+              .filter(attachment => attachment.type !== 'screenshot')
+              .map(attachment => {
+                if (attachment.type === 'audio') {
+                  return {
+                    ...attachment,
+                    value: attachment.value.slice(0, 1000)
+                  };
+                }
+                return attachment;
+              });
+          }
         } else {
           console.log('no highlight context at all')
         }
@@ -170,10 +227,26 @@ const HighlightChat = () => {
         formData.append('context', contextString);
 
         const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://0.0.0.0:8080/';
-        const response = await fetch(backendUrl, {
+        let response = await fetch(backendUrl, {
           method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
           body: formData,
         });
+
+        if (response.status === 401) {
+          // Token has expired, refresh it
+          await refreshAccessToken();
+          // Retry the request with the new token
+          response = await fetch(backendUrl, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+            },
+            body: formData,
+          });
+        }
 
         if (!response.ok) {
           throw new Error('Network response was not ok');
