@@ -1,11 +1,3 @@
-// export type Message = {
-//   type: 'user' | 'assistant'
-//   content: string
-//   attachment?: string
-//   clipboardText?: string
-//   ocrScreenContents?: string
-// }
-
 type WindowAttachment = {
   title: string
   thumbnailUrl?: string

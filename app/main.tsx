@@ -20,7 +20,7 @@ const debounce = (func: Function, delay: number) => {
   }
 }
 
-const TopBar: React.FC<TopBarProps> = ({ mode, setMode, onNewConversation }) => {
+const TopBar: React.FC<TopBarProps> = ({ onNewConversation }) => {
   return (
     <div className="flex h-16 w-fill justify-end items-center border-b border-[rgba(255,255,255,0.05)] px-3 pt-4">
       <button className="flex w-[24px] h-[24px] justify-center items-center" onClick={onNewConversation}>
@@ -33,7 +33,6 @@ const TopBar: React.FC<TopBarProps> = ({ mode, setMode, onNewConversation }) => 
 const HighlightChat = () => {
   const [messages, setMessages] = useState<MessageType[]>([])
   const [isWorking, setIsWorking] = useState(false)
-  const [mode, setMode] = useState<'assistant' | 'compare'>('assistant')
   const [highlightContext, setHighlightContext] = useState<HighlightContext | undefined>(undefined)
   const highlightContextRef = useRef<HighlightContext | null>(null)
 
@@ -234,7 +233,7 @@ const HighlightChat = () => {
 
   return (
     <div className="text-white flex flex-col w-full h-dvh max-h-dvh max-w-6x overflow-auto">
-      <TopBar mode={mode} setMode={setMode} onNewConversation={startNewConversation} />
+      <TopBar onNewConversation={startNewConversation} />
       <div className="flex px-[12%] flex-col pb-4 h-full">
         <div className="flex w-full mx-auto h-full">
           {messages.length === 0 ? (
