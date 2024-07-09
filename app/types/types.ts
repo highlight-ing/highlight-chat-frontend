@@ -27,8 +27,6 @@ export type CompareResult = {
 }
 
 export interface TopBarProps {
-  mode: 'assistant' | 'compare'
-  setMode: (mode: 'assistant' | 'compare') => void
   onNewConversation: () => void
 }
 
