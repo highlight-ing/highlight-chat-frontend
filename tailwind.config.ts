@@ -10,10 +10,15 @@ const config: Config = {
     colors: {
       transparent: 'transparent',
       'light-5': 'rgba(255,255,255,0.05)',
+      'light-8': 'rgba(255,255,255,0.08)',
+      'light-16': 'rgba(255,255,255,0.16)',
       'light-10': 'rgba(255,255,255,0.10)',
       'light-20': 'rgba(255,255,255,0.20)',
       'light-60': 'rgba(255,255,255,0.60)',
-      light: '#FFFFFF'
+      'light-80': 'rgba(255,255,255,0.80)',
+      light: '#FFFFFF',
+      dark: '#000000',
+      'dark-90': 'rgba(0,0,0,0.90)'
     },
     extend: {
       backgroundImage: {
@@ -22,6 +27,11 @@ const config: Config = {
       }
     }
   },
-  plugins: []
+  plugins: [],
+  variants: {
+    extend: {
+      display: ['group-hover']
+    }
+  }
 }
 export default config

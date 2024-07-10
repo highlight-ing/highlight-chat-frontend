@@ -2,25 +2,43 @@ import React, { createContext, useContext, useState } from 'react'
 import { Attachment } from '../types/types'
 
 interface InputContextProps {
-  attachment?: Attachment
-  setAttachment: (attachment: Attachment | undefined) => void
+  attachments: Attachment[]
+  addAttachment: (attachment: Attachment) => void
+  removeAttachment: (attachmentType: string) => void
+  clearAttachments: () => void
   input: string
   setInput: (input: string) => void
 }
 
 export const InputContext = createContext<InputContextProps>({
-  attachment: undefined,
-  setAttachment: () => {},
+  attachments: [],
+  addAttachment: () => {},
+  removeAttachment: () => {},
+  clearAttachments: () => {},
   input: '',
   setInput: () => {}
 })
 
 export const InputContextProvider = ({ children }: { children: React.ReactNode }) => {
-  const [attachment, setAttachment] = useState<Attachment | undefined>(undefined)
+  const [attachments, setAttachments] = useState<Attachment[]>([])
   const [input, setInput] = useState('')
 
+  const addAttachment = (attachment: Attachment) => {
+    setAttachments((attachments) => [...attachments.filter((a) => a.type !== attachment.type), attachment])
+  }
+
+  const removeAttachment = (attachmentType: string) => {
+    setAttachments((attachments) => attachments.filter((a) => a.type !== attachmentType))
+  }
+
+  const clearAttachments = () => {
+    setAttachments([])
+  }
+
   return (
-    <InputContext.Provider value={{ attachment, setAttachment, input, setInput }}>{children}</InputContext.Provider>
+    <InputContext.Provider value={{ attachments, addAttachment, removeAttachment, clearAttachments, input, setInput }}>
+      {children}
+    </InputContext.Provider>
   )
 }
 

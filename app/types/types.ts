@@ -30,7 +30,19 @@ export interface TopBarProps {
   onNewConversation: () => void
 }
 
-export interface Attachment {
-  type: 'image' | 'pdf'
-  value: File | undefined
+export interface ImageAttachment {
+  type: 'image'
+  value: string
 }
+
+export interface PdfAttachment {
+  type: 'pdf'
+  value: File
+}
+
+export interface AudioAttachment {
+  type: 'audio'
+  value: string
+}
+
+export type Attachment = ImageAttachment | PdfAttachment | AudioAttachment

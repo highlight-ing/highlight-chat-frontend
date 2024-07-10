@@ -11,11 +11,12 @@ const hasAttachment = (message: UserMessage) => {
 
 interface MessageProps {
   message: MessageType
+  className?: string
 }
 
-export const Message = ({ message }: MessageProps) => {
+export const Message = ({ message, className }: MessageProps) => {
   return (
-    <div className={`mb-4 flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+    <div className={`mb-4 flex ${message.type === 'user' ? 'justify-end' : 'justify-start'} ${className}`}>
       {message.type === 'assistant' && (
         <div className="flex-shrink-0 mr-2">
           <div className="flex w-[32px] h-[32px] p-[6px] justify-center items-center rounded-full bg-[#161617]">

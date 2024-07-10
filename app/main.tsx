@@ -1,29 +1,24 @@
 'use client'
 
 import * as React from 'react'
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useEffect, useCallback } from 'react'
 import { AddIcon, AssistantIcon } from './icons/icons'
 import { TopBarProps, Message as MessageType } from './types/types'
 import { type HighlightContext } from '@highlight-ai/app-runtime'
+import { debounce } from 'throttle-debounce'
 
 import api from '@highlight-ai/app-runtime'
 import { Message } from './components/Message'
 import { useInputContext } from './context/InputContext'
 import { Input } from './components/Input'
-import { useAuthContext } from './context/AuthContext'
-
-const debounce = (func: Function, delay: number) => {
-  let timeoutId: NodeJS.Timeout
-  return (...args: any[]) => {
-    clearTimeout(timeoutId)
-    timeoutId = setTimeout(() => func(...args), delay)
-  }
-}
+import { useHighlightContextContext } from './context/HighlightContext'
+import { useSubmitQuery } from './hooks/useSubmitQuery'
+import { useMessagesContext } from './context/MessagesContext'
 
 const TopBar: React.FC<TopBarProps> = ({ onNewConversation }) => {
   return (
-    <div className="flex h-16 w-fill justify-end items-center border-b border-[rgba(255,255,255,0.05)] px-3 pt-4">
-      <button className="flex w-[24px] h-[24px] justify-center items-center" onClick={onNewConversation}>
+    <div className="flex h-16 w-fill justify-end items-center border-b border-[rgba(255,255,255,0.05)] px-3 py-3">
+      <button className="flex w-[36px] h-[36px] justify-center items-center" onClick={onNewConversation}>
         <AddIcon />
       </button>
     </div>
@@ -31,204 +26,31 @@ const TopBar: React.FC<TopBarProps> = ({ onNewConversation }) => {
 }
 
 const HighlightChat = () => {
-  const [messages, setMessages] = useState<MessageType[]>([])
-  const [isWorking, setIsWorking] = useState(false)
-  const [highlightContext, setHighlightContext] = useState<HighlightContext | undefined>(undefined)
-  const highlightContextRef = useRef<HighlightContext | null>(null)
-
-  const { attachment, setAttachment, input, setInput } = useInputContext()
-  const { accessToken, refreshAccessToken } = useAuthContext()
+  const { messages, clearMessages } = useMessagesContext()
+  const { setInput } = useInputContext()
+  const { setHighlightContext } = useHighlightContextContext()
+  const { isWorking, handleIncomingContext, cancelRequest } = useSubmitQuery()
 
   const debouncedHandleSubmit = useCallback(
-    debounce((context: HighlightContext) => {
+    debounce(300, async (context: HighlightContext) => {
       setInput(context.suggestion || '')
-      handleSubmit(context)
-    }, 300),
+      handleIncomingContext(context)
+    }),
     []
   )
 
   useEffect(() => {
     api.addEventListener('onContext', (context: HighlightContext) => {
-      console.log('Highlight context event listener called:', context)
       setHighlightContext(context)
-      highlightContextRef.current = context
       // Handle context with debounce
       debouncedHandleSubmit(context)
     })
-  }, [debouncedHandleSubmit])
-
-  const addNewMessage = (message: MessageType) => {
-    setMessages((prevMessages) => [...prevMessages, message])
-  }
-
-  const fetchResponse = async (formData: FormData) => {
-    setIsWorking(true)
-
-    try {
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://0.0.0.0:8080/'
-      let response = await fetch(backendUrl, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        },
-        body: formData
-      })
-
-      if (response.status === 401) {
-        // Token has expired, refresh it
-        await refreshAccessToken()
-        // Retry the request with the new token
-        response = await fetch(backendUrl, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${accessToken}`
-          },
-          body: formData
-        })
-      }
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok')
-      }
-
-      const reader = response.body?.getReader()
-      if (!reader) {
-        throw new Error('No reader available')
-      }
-
-      let accumulatedResponse = ''
-      setMessages((prevMessages) => [...prevMessages, { type: 'assistant', content: '' }])
-
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        const chunk = new TextDecoder().decode(value)
-
-        // Split the chunk into individual JSON objects
-        const jsonObjects = chunk.match(/\{[^\}]+\}/g) || []
-
-        for (const jsonObject of jsonObjects) {
-          try {
-            const parsedChunk = JSON.parse(jsonObject)
-            accumulatedResponse += parsedChunk.response
-
-            // Update the UI with the accumulated response
-            setMessages((prevMessages) => {
-              const newMessages = [...prevMessages]
-              newMessages[newMessages.length - 1] = { type: 'assistant', content: accumulatedResponse }
-              return newMessages
-            })
-          } catch (e) {
-            console.error('Error parsing chunk:', e)
-            console.error('Problematic JSON object:', jsonObject)
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching response:', error)
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { type: 'assistant', content: 'Sorry, there was an error processing your request.' }
-      ])
-    } finally {
-      setIsWorking(false)
-    }
-  }
-
-  const handleSubmit = async (context?: HighlightContext) => {
-    let query = ''
-    let screenshotUrl = ''
-    let clipboardText = ''
-    let ocrScreenContents = ''
-    let rawContents = ''
-    let audio = ''
-    let pdfTitle = ''
-
-    if (context) {
-      query = context.suggestion || ''
-      screenshotUrl = context.attachments?.find((a) => a.type === 'screenshot')?.value ?? ''
-      clipboardText = context.attachments?.find((a) => a.type === 'clipboard')?.value ?? ''
-      ocrScreenContents = context.environment.ocrScreenContents ?? ''
-      rawContents = context.application.focusedWindow.rawContents
-      audio = context.attachments?.find((a) => a.type === 'audio')?.value ?? ''
-    } else {
-      query = input.trim()
-    }
-
-    if (attachment && attachment.value) {
-      if (attachment.type === 'image') {
-        screenshotUrl = URL.createObjectURL(attachment.value)
-      } else if (attachment.type === 'pdf') {
-        pdfTitle = attachment.value.name
-      }
-    }
-
-    if (query || attachment || clipboardText || ocrScreenContents || screenshotUrl || rawContents) {
-      addNewMessage({
-        type: 'user',
-        content: query,
-        clipboardText,
-        screenshot: screenshotUrl,
-        audio,
-        fileTitle: pdfTitle
-      })
-
-      setInput('')
-      setAttachment(undefined) // Clear the attachment immediately
-
-      const formData = new FormData()
-      formData.append('prompt', query)
-
-      if (attachment && attachment.value) {
-        if (attachment.type === 'image') {
-          console.log('appending image attachment')
-          formData.append('image', attachment.value)
-        } else if (attachment.type === 'pdf') {
-          console.log('appending pdf attachment')
-          formData.append('pdf', attachment.value)
-        }
-      } else if (screenshotUrl) {
-        console.log('appending screenshot url')
-        formData.append('imageUrl', screenshotUrl)
-      } else {
-        console.log('no attachments to append')
-      }
-
-      // Create context from conversation history
-      const conversationHistory = messages.map((msg) => `${msg.type}: ${msg.content}`).join('\n')
-      let contextString = conversationHistory ?? 'This is a new conversation with Highlight Chat.'
-
-      // Add Highlight context if available
-      if (highlightContextRef.current) {
-        // Trim audio attachment and remove screenshot attachment
-        if (highlightContextRef.current.attachments) {
-          highlightContextRef.current.attachments = highlightContextRef.current.attachments
-            .filter((attachment) => attachment.type !== 'screenshot')
-            .map((attachment) => {
-              if (attachment.type === 'audio') {
-                return {
-                  ...attachment,
-                  value: attachment.value.slice(0, 1000)
-                }
-              }
-              return attachment
-            })
-        }
-
-        contextString += '\n\nHighlight Context:\n' + JSON.stringify(highlightContextRef.current, null, 2)
-      }
-
-      console.log('contextString:', contextString)
-      formData.append('context', contextString)
-
-      fetchResponse(formData)
-    }
-  }
+  }, [])
 
   const startNewConversation = () => {
-    setMessages([])
+    clearMessages()
     setInput('')
-    setIsWorking(false)
+    cancelRequest()
   }
 
   return (
@@ -244,9 +66,9 @@ const HighlightChat = () => {
             </div>
           ) : (
             <div className="flex flex-col w-full h-full justify-end">
-              <div className={`flex flex-1 flex-col w-full max-h-[calc(100dvh-136px)] overflow-y-scroll mb-4`}>
+              <div className={`flex flex-1 flex-col w-full max-h-[calc(100dvh-180px)] overflow-y-scroll mb-4`}>
                 {messages.map((message, index) => (
-                  <Message key={index} message={message} />
+                  <Message key={index} message={message} className={`${index === 0 && 'mt-auto'}`} />
                 ))}
                 {isWorking && (
                   <div className="flex justify-start mb-4">
@@ -262,7 +84,7 @@ const HighlightChat = () => {
             </div>
           )}
         </div>
-        <Input onSubmit={handleSubmit} />
+        <Input />
       </div>
     </div>
   )
