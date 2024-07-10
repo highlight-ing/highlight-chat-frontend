@@ -9,13 +9,13 @@ const PLACEHOLDER_TEXT = 'Ask Highlight anything...'
 const MAX_INPUT_HEIGHT = 80
 
 export const Input = () => {
-  const { attachments, addAttachment, input, setInput } = useInputContext()
-  const { isWorking, handleSubmit } = useSubmitQuery()
+  const { attachments, input, setInput, isDisabled } = useInputContext()
+  const { handleSubmit } = useSubmitQuery()
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (!isDisabled && e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleSubmit()
       setInput('')

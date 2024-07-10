@@ -14,6 +14,8 @@ import { Input } from './components/Input'
 import { useHighlightContextContext } from './context/HighlightContext'
 import { useSubmitQuery } from './hooks/useSubmitQuery'
 import { useMessagesContext } from './context/MessagesContext'
+import { useRef } from 'react'
+import { useState } from 'react'
 
 const TopBar: React.FC<TopBarProps> = ({ onNewConversation }) => {
   return (
@@ -27,14 +29,17 @@ const TopBar: React.FC<TopBarProps> = ({ onNewConversation }) => {
 
 const HighlightChat = () => {
   const { messages, clearMessages } = useMessagesContext()
-  const { setInput } = useInputContext()
+  const { input, setInput, isDisabled } = useInputContext()
   const { setHighlightContext } = useHighlightContextContext()
-  const { isWorking, handleIncomingContext, cancelRequest } = useSubmitQuery()
+  const { handleIncomingContext } = useSubmitQuery()
+  const [isUserScrolling, setIsUserScrolling] = useState(false)
+
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   const debouncedHandleSubmit = useCallback(
     debounce(300, async (context: HighlightContext) => {
       setInput(context.suggestion || '')
-      handleIncomingContext(context)
+      await handleIncomingContext(context)
     }),
     []
   )
@@ -47,10 +52,33 @@ const HighlightChat = () => {
     })
   }, [])
 
+  useEffect(() => {
+    if (!isUserScrolling && scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight
+    }
+  }, [messages])
+
+  // If the agent is not currently responding and the user types something, set isUserScrolling to false
+  // so that the next time the agent responds, the chat will scroll to the bottom.
+  useEffect(() => {
+    if (!isDisabled && isUserScrolling) {
+      setIsUserScrolling(false)
+    }
+  }, [input, isDisabled])
+
+  const handleScroll = () => {
+    if (!scrollContainerRef.current) return
+    const scrollTop = scrollContainerRef.current.scrollTop
+    const scrollHeight = scrollContainerRef.current.scrollHeight
+    const clientHeight = scrollContainerRef.current.clientHeight
+    const isScrolledToBottom = scrollTop + clientHeight >= scrollHeight - 10
+
+    setIsUserScrolling(!isScrolledToBottom)
+  }
+
   const startNewConversation = () => {
     clearMessages()
     setInput('')
-    cancelRequest()
   }
 
   return (
@@ -66,11 +94,15 @@ const HighlightChat = () => {
             </div>
           ) : (
             <div className="flex flex-col w-full h-full justify-end">
-              <div className={`flex flex-1 flex-col w-full max-h-[calc(100dvh-180px)] overflow-y-scroll mb-4`}>
+              <div
+                ref={scrollContainerRef}
+                onScroll={handleScroll}
+                className={`flex flex-1 flex-col w-full max-h-[calc(100dvh-180px)] overflow-y-scroll mb-4`}
+              >
                 {messages.map((message, index) => (
                   <Message key={index} message={message} className={`${index === 0 && 'mt-auto'}`} />
                 ))}
-                {isWorking && (
+                {isDisabled && (
                   <div className="flex justify-start mb-4">
                     <div className="flex items-center">
                       <div className="flex w-[32px] h-[32px] p-[6px] justify-center items-center rounded-full bg-light-5 mr-2">

@@ -8,6 +8,8 @@ interface InputContextProps {
   clearAttachments: () => void
   input: string
   setInput: (input: string) => void
+  isDisabled: boolean
+  setIsDisabled: (isDisabled: boolean) => void
 }
 
 export const InputContext = createContext<InputContextProps>({
@@ -16,12 +18,15 @@ export const InputContext = createContext<InputContextProps>({
   removeAttachment: () => {},
   clearAttachments: () => {},
   input: '',
-  setInput: () => {}
+  setInput: () => {},
+  isDisabled: false,
+  setIsDisabled: () => {}
 })
 
 export const InputContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [attachments, setAttachments] = useState<Attachment[]>([])
   const [input, setInput] = useState('')
+  const [isDisabled, setIsDisabled] = useState(false)
 
   const addAttachment = (attachment: Attachment) => {
     setAttachments((attachments) => [...attachments.filter((a) => a.type !== attachment.type), attachment])
@@ -36,7 +41,18 @@ export const InputContextProvider = ({ children }: { children: React.ReactNode }
   }
 
   return (
-    <InputContext.Provider value={{ attachments, addAttachment, removeAttachment, clearAttachments, input, setInput }}>
+    <InputContext.Provider
+      value={{
+        attachments,
+        addAttachment,
+        removeAttachment,
+        clearAttachments,
+        input,
+        setInput,
+        isDisabled,
+        setIsDisabled
+      }}
+    >
       {children}
     </InputContext.Provider>
   )
