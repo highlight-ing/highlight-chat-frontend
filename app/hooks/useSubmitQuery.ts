@@ -127,7 +127,9 @@ export const useSubmitQuery = () => {
         if (attachment && attachment.value) {
           if (attachment.type === 'image') {
             screenshot = attachment.value
-            formData.append('image', attachment.value)
+            if (attachment.file) {
+              formData.append('image', attachment.file)
+            }
           } else if (attachment.type === 'pdf') {
             fileTitle = attachment.value.name
             formData.append('pdf', attachment.value)
@@ -171,6 +173,10 @@ export const useSubmitQuery = () => {
         }
 
         contextString += '\n\nHighlight Context:\n' + JSON.stringify(highlightContext, null, 2)
+      }
+
+      if (contextString.trim() === '') {
+        contextString = 'This is a new conversation with Highlight Chat.'
       }
 
       console.log('contextString:', contextString)

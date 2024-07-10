@@ -30,7 +30,8 @@ export const AttachmentsButton = () => {
     if (file && file.type.startsWith('image/')) {
       addAttachment({
         type: 'image',
-        value: URL.createObjectURL(file)
+        value: URL.createObjectURL(file),
+        file: file
       })
     } else if (file && file.type === 'application/pdf') {
       addAttachment({

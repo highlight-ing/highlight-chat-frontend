@@ -33,6 +33,7 @@ export interface TopBarProps {
 export interface ImageAttachment {
   type: 'image'
   value: string
+  file: File | undefined
 }
 
 export interface PdfAttachment {
