@@ -6,9 +6,10 @@ import { useInputContext } from '../context/InputContext'
 interface AttachmentProps {
   type: 'audio' | 'clipboard' | 'image' | 'pdf'
   value: string
+  removeEnabled?: boolean
 }
 
-export const Attachment = ({ type, value }: AttachmentProps) => {
+export const Attachment = ({ type, value, removeEnabled = false }: AttachmentProps) => {
   const [isImageLoaded, setIsImageLoaded] = useState(false)
   const { removeAttachment } = useInputContext()
 
@@ -34,12 +35,14 @@ export const Attachment = ({ type, value }: AttachmentProps) => {
           <span className="flex justify-center items-center text-sm text-white truncate">{value}</span>
         </div>
       )}
-      <div
-        className="absolute top-[-5px] right-[-5px] hidden group-hover:flex cursor-pointer text-light-80"
-        onClick={() => removeAttachment(type)}
-      >
-        <CloseIcon size={16} />
-      </div>
+      {removeEnabled && (
+        <div
+          className="absolute top-[-5px] right-[-5px] hidden group-hover:flex cursor-pointer text-light-80"
+          onClick={() => removeAttachment(type)}
+        >
+          <CloseIcon size={16} />
+        </div>
+      )}
     </div>
   )
 }

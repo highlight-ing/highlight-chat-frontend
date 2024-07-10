@@ -39,6 +39,7 @@ export const Input = () => {
           <Attachment
             type={attachment.type}
             value={attachment.type === 'pdf' ? attachment.value.name : attachment.value}
+            removeEnabled
             key={index}
           />
         ))}
