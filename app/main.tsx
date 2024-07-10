@@ -196,7 +196,7 @@ const HighlightChat = () => {
 
       // Create context from conversation history
       const conversationHistory = messages.map((msg) => `${msg.type}: ${msg.content}`).join('\n')
-      let contextString = conversationHistory.trim() ?? 'This is a new conversation with Highlight Chat.'
+      let contextString = conversationHistory ?? 'This is a new conversation with Highlight Chat.'
 
       // Add Highlight context if available
       if (highlightContextRef.current) {
