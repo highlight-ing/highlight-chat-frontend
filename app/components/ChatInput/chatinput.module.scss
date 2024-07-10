@@ -1,0 +1,43 @@
+@import "app/variables.module";
+
+.inputContainer {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  gap: 8px;
+  background-color: $bg-second-layer;
+  border: 1px solid $light-10;
+  cursor: text;
+  border-radius: 8px;
+  //min-height: 64px;
+  width: 100%;
+  max-width: $chat-body-width;
+  flex-shrink: 0;
+
+  &:hover {
+    border-color: $light-20;
+  }
+
+  textarea {
+    flex: 1;
+    background-color: transparent;
+    font-weight: normal;
+    font-size: 15px;
+    //height: 100%;
+    resize: none;
+
+    &:focus {
+      outline: none;
+    }
+
+    &::placeholder {
+      color: $light-40;
+    }
+  }
+}
+
+.attachmentsButtonContainer {
+  display: flex;
+  align-items: flex-end;
+  height: 100%;
+}

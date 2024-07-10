@@ -5,8 +5,10 @@ import { useInputContext } from '../context/InputContext'
 import { Attachment as AttachmentType } from '../types/types'
 import { useSubmitQuery } from '../hooks/useSubmitQuery'
 
+import styles from './ChatInput/chatinput.module.scss'
+
 const PLACEHOLDER_TEXT = 'Ask Highlight anything...'
-const MAX_INPUT_HEIGHT = 80
+const MAX_INPUT_HEIGHT = 160
 
 export const Input = () => {
   const { attachments, input, setInput, isDisabled } = useInputContext()
@@ -22,6 +24,10 @@ export const Input = () => {
     }
   }
 
+  const onClickContainer = (e: React.MouseEvent) => {
+    inputRef.current?.focus()
+  }
+
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.style.height = '0px'
@@ -33,28 +39,32 @@ export const Input = () => {
   }, [inputRef, input])
 
   return (
-    <div className="flex flex-col gap-2 items-space-between justify-center bg-[#161617] rounded-lg border border-light-10 ml-[40px] px-4 py-4 h-fit min-h-16">
-      <div className="flex gap-2">
-        {attachments.map((attachment: AttachmentType, index: number) => (
-          <Attachment
-            type={attachment.type}
-            value={attachment.type === 'pdf' ? attachment.value.name : attachment.value}
-            removeEnabled
-            key={index}
-          />
-        ))}
-      </div>
-      <div className="flex flex-1 gap-3 items-center h-fit">
+    <div className={styles.inputContainer} onClick={onClickContainer}>
+      {attachments.length > 0 &&
+        <div className="flex gap-2">
+          {attachments.map((attachment: AttachmentType, index: number) => (
+            <Attachment
+              type={attachment.type}
+              value={attachment.type === 'pdf' ? attachment.value.name : attachment.value}
+              removeEnabled
+              key={index}
+            />
+          ))}
+        </div>
+      }
+      <div className={styles.attachmentsButtonContainer}>
         <AttachmentsButton />
-        <textarea
-          ref={inputRef}
-          className="flex text-sm w-full outline-none resize-none border-0 bg-transparent max-h-80 h-[15px] my-2 leading-4"
-          onInput={(e) => setInput(e.currentTarget.value)}
-          placeholder={PLACEHOLDER_TEXT}
-          value={input}
-          onKeyDown={handleKeyDown}
-        />
       </div>
+      <textarea
+        autoFocus={true}
+        ref={inputRef}
+        className=""
+        onInput={(e) => setInput(e.currentTarget.value)}
+        placeholder={PLACEHOLDER_TEXT}
+        value={input}
+        onKeyDown={handleKeyDown}
+        rows={1}
+      />
     </div>
   )
 }

@@ -1,0 +1,85 @@
+@import 'app/variables.module';
+
+.messageContainer {
+  display: flex;
+  width: 100%;
+  max-width: $chat-body-width;
+
+  &.first {
+    margin-top: auto;
+  }
+
+  &.self {
+    justify-content: flex-end;
+
+    .message {
+      background-color: $light-10;
+    }
+  }
+
+  .message {
+    display: flex;
+    flex-direction: column;
+    //justify-content: flex-start;
+    border-radius: 12px;
+    padding: 16px;
+    background-color: $light-5;
+    border: 1px solid $light-5;
+    position: relative;
+    gap: 16px;
+
+    .avatar {
+      position: absolute;
+      top: 0;
+      left: -40px;
+    }
+  }
+}
+
+.messageBody {
+  white-space: break-spaces;
+  font-size: 16px;
+  color: $light-60;
+  font-weight: 200;
+  line-height: 1.6;
+
+  ol {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    //list-style: disc;
+
+    li {
+      display: flex;
+
+      p {
+        margin: 0;
+        padding: 0;
+      }
+    }
+  }
+
+  code {
+    font-size: 13px;
+    background-color: $dark-80;
+    border: 1px solid $light-10;
+    padding: 4px;
+    border-radius: 6px;
+    color: $light-80;
+  }
+
+  pre {
+    font-size: 13px;
+    background-color: $dark-80;
+    border: 1px solid $light-10;
+    padding: 8px;
+    border-radius: 8px;
+
+    code {
+      background-color: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 0;
+    }
+  }
+}
