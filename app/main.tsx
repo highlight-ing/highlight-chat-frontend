@@ -218,6 +218,10 @@ const HighlightChat = () => {
         contextString += '\n\nHighlight Context:\n' + JSON.stringify(highlightContextRef.current, null, 2)
       }
 
+      if (contextString.trim() === '') {
+        contextString = 'This is a new conversation with Highlight Chat.'
+      }
+
       console.log('contextString:', contextString)
       formData.append('context', contextString)
 
