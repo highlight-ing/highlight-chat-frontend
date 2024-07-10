@@ -4,16 +4,16 @@ import { useInputContext } from '../context/InputContext'
 import { useMessagesContext } from '../context/MessagesContext'
 import { HighlightContext } from '@highlight-ai/app-runtime'
 import { useHighlightContextContext } from '../context/HighlightContext'
+import { useEffect } from 'react'
 
 export const useSubmitQuery = () => {
   const { accessToken, refreshAccessToken } = useAuthContext()
-  const { attachments, clearAttachments, input, setInput } = useInputContext()
+  const { attachments, clearAttachments, input, setInput, setIsDisabled } = useInputContext()
   const { messages, addMessage, updateLastMessage } = useMessagesContext()
   const { highlightContext } = useHighlightContextContext()
-  const [isWorking, setIsWorking] = useState(false)
 
   const fetchResponse = async (formData: FormData) => {
-    setIsWorking(true)
+    setIsDisabled(true)
 
     try {
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://0.0.0.0:8080/'
@@ -75,11 +75,11 @@ export const useSubmitQuery = () => {
       console.error('Error fetching response:', error)
       addMessage({ type: 'assistant', content: 'Sorry, there was an error processing your request.' })
     } finally {
-      setIsWorking(false)
+      setIsDisabled(false)
     }
   }
 
-  const handleIncomingContext = (context: HighlightContext) => {
+  const handleIncomingContext = async (context: HighlightContext) => {
     let query = context.suggestion || ''
     let screenshotUrl = context.attachments?.find((a) => a.type === 'screenshot')?.value ?? ''
     let clipboardText = context.attachments?.find((a) => a.type === 'clipboard')?.value ?? ''
@@ -108,7 +108,7 @@ export const useSubmitQuery = () => {
       console.log('contextString:', contextString)
       formData.append('context', contextString)
 
-      fetchResponse(formData)
+      await fetchResponse(formData)
     }
   }
 
@@ -129,11 +129,14 @@ export const useSubmitQuery = () => {
             screenshot = attachment.value
             if (attachment.file) {
               formData.append('image', attachment.file)
+            } else {
+              formData.append('base64_image', attachment.value)
             }
           } else if (attachment.type === 'pdf') {
             fileTitle = attachment.value.name
             formData.append('pdf', attachment.value)
           } else if (attachment.type === 'audio') {
+            console.log('audio:', attachment.value)
             audio = attachment.value
             formData.append('audio', attachment.value)
           }
@@ -182,13 +185,9 @@ export const useSubmitQuery = () => {
       console.log('contextString:', contextString)
       formData.append('context', contextString)
 
-      fetchResponse(formData)
+      await fetchResponse(formData)
     }
   }
 
-  const cancelRequest = () => {
-    setIsWorking(false)
-  }
-
-  return { isWorking, handleSubmit, handleIncomingContext, cancelRequest }
+  return { handleSubmit, handleIncomingContext }
 }

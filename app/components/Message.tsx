@@ -6,7 +6,7 @@ import ReactMarkdown from 'react-markdown'
 import { Attachment } from './Attachment'
 
 const hasAttachment = (message: UserMessage) => {
-  return message.screenshot || message.clipboardText || message.window || message.fileTitle
+  return message.screenshot || message.clipboardText || message.window || message.fileTitle || message.audio
 }
 
 interface MessageProps {

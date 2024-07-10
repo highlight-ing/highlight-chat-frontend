@@ -27,7 +27,7 @@ const config: Config = {
       }
     }
   },
-  plugins: [],
+  plugins: [require('@tailwindcss/line-clamp')],
   variants: {
     extend: {
       display: ['group-hover']
