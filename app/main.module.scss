@@ -42,13 +42,19 @@
   }
 }
 
+.messagesContainer {
+  display: flex;
+  flex-direction: column-reverse;
+  overflow-y: auto;
+  width: 100%;
+  height: 100%;
+  padding: 16px 0;
+}
+
 .messages {
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
   align-items: center;
-  overflow-y: auto;
-  flex: 1;
-  width: 100%;
-  padding: 16px 0;
   gap: 16px;
 }

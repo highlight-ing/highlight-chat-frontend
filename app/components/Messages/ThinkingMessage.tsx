@@ -8,13 +8,12 @@ const THINKING_MESSAGES = [
   'Hang on a second...'
 ]
 
-const ThinkingMessage = ({isFirst}: {isFirst: boolean}) => {
+const ThinkingMessage = () => {
   const thinkingMessage = useMemo(() => {
     return THINKING_MESSAGES[Math.floor(Math.random() * THINKING_MESSAGES.length)]
   }, [])
   return (
     <Message
-      isFirst={isFirst}
       isThinking={true}
       message={{type: 'assistant', content: thinkingMessage}}
     />

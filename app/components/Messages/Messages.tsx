@@ -9,14 +9,20 @@ const Messages = ({isUserScrolling, setIsUserScrolling}: {isUserScrolling: boole
   const { messages } = useMessagesContext()
   const { isDisabled } = useInputContext()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const chatEndRef = useRef<HTMLDivElement>(null)
 
   const handleScroll = () => {
-    if (!scrollContainerRef.current) return
-    const scrollTop = scrollContainerRef.current.scrollTop
-    const scrollHeight = scrollContainerRef.current.scrollHeight
-    const clientHeight = scrollContainerRef.current.clientHeight
-    const isScrolledToBottom = scrollTop + clientHeight >= scrollHeight - 10
-    setIsUserScrolling(!isScrolledToBottom)
+    if (!scrollContainerRef.current) {
+      return
+    }
+    // const scrollTop = scrollContainerRef.current.scrollTop
+    // const scrollHeight = scrollContainerRef.current.scrollHeight
+    // const clientHeight = scrollContainerRef.current.clientHeight
+    // const isScrolledToBottom = scrollTop + clientHeight >= scrollHeight - 10
+    // setIsUserScrolling(!isScrolledToBottom)
+
+    const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+    setIsUserScrolling(scrollHeight - scrollTop > clientHeight + 50)
   }
 
   useEffect(() => {
@@ -26,21 +32,22 @@ const Messages = ({isUserScrolling, setIsUserScrolling}: {isUserScrolling: boole
   }, [messages])
 
   return (
-    <div className={styles.messages} onScroll={handleScroll} ref={scrollContainerRef}>
-      {
-        messages.length > 0 &&
-        messages.map((message, index) => (
-          <Message
-            key={index}
-            isFirst={index === 0}
-            message={message}
-          />
-        ))
-      }
-      {
-        isDisabled && (!messages.length || messages[messages.length - 1].type !== 'assistant') &&
-        <ThinkingMessage isFirst={!messages.length}/>
-      }
+    <div className={styles.messagesContainer} onScroll={handleScroll} ref={scrollContainerRef}>
+      <div className={styles.messages}>
+        {
+          messages.length > 0 &&
+          messages.map((message, index) => (
+            <Message
+              key={index}
+              message={message}
+            />
+          ))
+        }
+        {
+          isDisabled && (!messages.length || messages[messages.length - 1].type !== 'assistant') &&
+          <ThinkingMessage/>
+        }
+      </div>
     </div>
   )
 }

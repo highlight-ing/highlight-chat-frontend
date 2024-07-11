@@ -13,14 +13,13 @@ const hasAttachment = (message: UserMessage) => {
 }
 
 interface MessageProps {
-  isFirst?: boolean
   isThinking?: boolean
   message: MessageType
 }
 
-export const Message = ({ message, isFirst, isThinking }: MessageProps) => {
+export const Message = ({ message, isThinking }: MessageProps) => {
   return (
-    <div className={`${styles.messageContainer} ${message.type === 'user' ? styles.self : ''} ${isFirst ? styles.first : ''}`}>
+    <div className={`${styles.messageContainer} ${message.type === 'user' ? styles.self : ''}`}>
       {message.type === 'assistant' && (
         <div className={styles.avatar}>
           <AssistantIcon />

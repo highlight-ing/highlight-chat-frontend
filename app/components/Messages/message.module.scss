@@ -6,10 +6,6 @@
   max-width: $chat-body-width;
   position: relative;
 
-  &.first {
-    margin-top: auto;
-  }
-
   &.self {
     justify-content: flex-end;
 
@@ -21,7 +17,6 @@
   .message {
     display: flex;
     flex-direction: column;
-    //justify-content: flex-start;
     border-radius: 12px;
     padding: 16px;
     background-color: $light-5;
@@ -53,13 +48,13 @@
     list-style: disc;
     padding: 0;
     //margin: 1em 0;
-    margin-inline-start: 1.25em;
+    margin-inline-start: 1.5em;
   }
   ul {
     list-style: disc;
     padding: 0;
     //margin: 1em 0;
-    margin-inline-start: 1.25em;
+    margin-inline-start: 1.5em;
   }
   li {
     padding: 0;
