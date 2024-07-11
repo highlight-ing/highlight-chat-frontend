@@ -9,18 +9,11 @@ const Messages = ({isUserScrolling, setIsUserScrolling}: {isUserScrolling: boole
   const { messages } = useMessagesContext()
   const { isDisabled } = useInputContext()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const chatEndRef = useRef<HTMLDivElement>(null)
 
   const handleScroll = () => {
     if (!scrollContainerRef.current) {
       return
     }
-    // const scrollTop = scrollContainerRef.current.scrollTop
-    // const scrollHeight = scrollContainerRef.current.scrollHeight
-    // const clientHeight = scrollContainerRef.current.clientHeight
-    // const isScrolledToBottom = scrollTop + clientHeight >= scrollHeight - 10
-    // setIsUserScrolling(!isScrolledToBottom)
-
     const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
     setIsUserScrolling(scrollHeight - scrollTop > clientHeight + 50)
   }
