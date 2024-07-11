@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { useEffect, useCallback, useState } from 'react'
+import {useEffect, useCallback, useState, useRef} from 'react'
 import { type HighlightContext } from '@highlight-ai/app-runtime'
 import { debounce } from 'throttle-debounce'
 
@@ -104,7 +104,9 @@ const HighlightChat = () => {
           (isDisabled || messages.length > 0) &&
           <Messages
             isUserScrolling={isUserScrolling}
-            setIsUserScrolling={setIsUserScrolling}
+            setIsUserScrolling={scrolled => {
+              setIsUserScrolling(scrolled)
+            }}
           />
         }
         <Input offset={!isDisabled && !messages.length}/>

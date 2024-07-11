@@ -8,18 +8,29 @@ import ThinkingMessage from "@/app/components/Messages/ThinkingMessage";
 const Messages = ({isUserScrolling, setIsUserScrolling}: {isUserScrolling: boolean, setIsUserScrolling: (isScrolling: boolean) => void}) => {
   const { messages } = useMessagesContext()
   const { isDisabled } = useInputContext()
+  const isScrolledRef = useRef(isUserScrolling)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   const handleScroll = () => {
     if (!scrollContainerRef.current) {
       return
     }
-    const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
-    setIsUserScrolling(scrollHeight - scrollTop > clientHeight + 50)
+    const { scrollTop } = scrollContainerRef.current;
+    isScrolledRef.current = scrollTop < -50
+    setIsUserScrolling(isScrolledRef.current)
   }
 
   useEffect(() => {
-    if (!isUserScrolling && scrollContainerRef.current) {
+    if (isUserScrolling !== isScrolledRef.current) {
+      isScrolledRef.current = isUserScrolling
+    }
+  }, [isUserScrolling])
+
+  useEffect(() => {
+    if (!scrollContainerRef.current) {
+      return
+    }
+    if (!isScrolledRef.current) {
       scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight
     }
   }, [messages])
