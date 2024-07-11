@@ -69,7 +69,6 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
 
   const getAccessToken = async (): Promise<string> => {
     if (!accessToken) {
-      console.log('getAccessToken: no access token')
       const newAccessToken = await authenticateUser()
       if (newAccessToken) {
         return newAccessToken
@@ -78,7 +77,6 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
       }
     }
 
-    console.log('getAccessToken: access token:', accessToken)
     return accessToken
   }
 
