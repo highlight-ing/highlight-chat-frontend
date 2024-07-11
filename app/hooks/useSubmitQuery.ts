@@ -45,6 +45,7 @@ export const useSubmitQuery = () => {
 
     try {
       const conversationId = getOrCreateConversationId()
+      console.log('conversationId:', conversationId)
       formData.append('conversation_id', conversationId)
 
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://0.0.0.0:8080/'
