@@ -158,10 +158,7 @@ export const useSubmitQuery = () => {
       formData.append('prompt', query)
 
       let contextString = 'This is a new conversation with Highlight Chat.'
-      
       contextString += prepareHighlightContext(context);
-      
-      console.log('contextString:', contextString)
       formData.append('context', contextString)
 
       const contextAttachments = context.attachments || []

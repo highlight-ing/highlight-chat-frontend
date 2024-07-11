@@ -19,18 +19,28 @@ export const AuthContext = createContext<AuthContextProps>(initialContext)
 export const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [accessToken, setAccessToken] = useState<string | undefined>(undefined)
   const [refreshToken, setRefreshToken] = useState<string | undefined>(undefined)
+  const [isAuthenticating, setIsAuthenticating] = useState(false)
 
-  useEffect(() => {
-    const authenticateUser = async () => {
-      try {
-        const { accessToken, refreshToken } = await Highlight.auth.signIn()
-        setAccessToken(accessToken)
-        setRefreshToken(refreshToken)
-      } catch (error) {
-        console.error('Authentication failed:', error)
-      }
+  const authenticateUser = async () => {
+    if (isAuthenticating) {
+      return null
     }
 
+    setIsAuthenticating(true)
+    try {
+      const { accessToken, refreshToken } = await Highlight.auth.signIn()
+      setAccessToken(accessToken)
+      setRefreshToken(refreshToken)
+      return accessToken
+    } catch (error) {
+      console.error('Authentication failed:', error)
+      return null
+    } finally {
+      setIsAuthenticating(false)
+    }
+  }
+
+  useEffect(() => {
     authenticateUser()
   }, [])
 
@@ -59,16 +69,14 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
 
   const getAccessToken = async (): Promise<string> => {
     if (!accessToken) {
-      // If there's no accessToken, wait for it to be set
-      return new Promise((resolve) => {
-        const checkToken = setInterval(() => {
-          if (accessToken) {
-            clearInterval(checkToken)
-            resolve(accessToken)
-          }
-        }, 100)
-      })
+      const newAccessToken = await authenticateUser()
+      if (newAccessToken) {
+        return newAccessToken
+      } else {
+        throw new Error('No access token')
+      }
     }
+
     return accessToken
   }
 
