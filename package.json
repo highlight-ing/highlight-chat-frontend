@@ -19,7 +19,8 @@
     "react-dom": "^18",
     "react-portal": "^4.2.2",
     "react-remark": "^2.1.0",
-    "throttle-debounce": "^5.0.2"
+    "throttle-debounce": "^5.0.2",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -27,11 +28,13 @@
     "@types/react-dom": "^18",
     "@types/react-portal": "^4.0.7",
     "@types/throttle-debounce": "^5.0.2",
+    "@types/uuid": "^10.0.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.4",
     "postcss": "^8",
     "sass": "^1.77.7",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
-  }
+  },
+  "packageManager": "pnpm@9.3.0+sha512.ee7b93e0c2bd11409c6424f92b866f31d3ea1bef5fbe47d3c7500cdc3c9668833d2e55681ad66df5b640c61fa9dc25d546efa54d76d7f8bf54b13614ac293631"
 }

@@ -3,34 +3,70 @@ import { useInputContext } from '../context/InputContext'
 import { useMessagesContext } from '../context/MessagesContext'
 import { HighlightContext } from '@highlight-ai/app-runtime'
 import { useHighlightContextContext } from '../context/HighlightContext'
+import { useConversationContext } from '../context/ConversationContext'
 
 export const useSubmitQuery = () => {
-  const { accessToken, refreshAccessToken } = useAuthContext()
+  const { getAccessToken, refreshAccessToken } = useAuthContext()
   const { attachments, clearAttachments, input, setInput, setIsDisabled } = useInputContext()
   const { messages, addMessage, updateLastMessage } = useMessagesContext()
   const { highlightContext } = useHighlightContextContext()
+  const { getOrCreateConversationId, resetConversationId } = useConversationContext()
 
-  const fetchResponse = async (formData: FormData) => {
+  const addAttachmentsToFormData = (formData: FormData, attachments: any[]) => {
+    let screenshot = undefined
+    let audio = undefined
+    let fileTitle = undefined
+
+    attachments.forEach((attachment) => {
+      if (attachment && attachment.value) {
+        if (attachment.type === 'image') {
+          screenshot = attachment.value
+          if (attachment.file) {
+            formData.append('image', attachment.file)
+          } else {
+            formData.append('base64_image', attachment.value)
+          }
+        } else if (attachment.type === 'pdf') {
+          fileTitle = attachment.value.name
+          formData.append('pdf', attachment.value)
+        } else if (attachment.type === 'audio') {
+          console.log('audio:', attachment.value)
+          audio = attachment.value
+          formData.append('audio', attachment.value)
+        }
+      }
+    })
+
+    return { screenshot, audio, fileTitle }
+  }
+
+  const fetchResponse = async (formData: FormData, token: string) => {
     setIsDisabled(true)
 
     try {
+      const conversationId = getOrCreateConversationId()
+      formData.append('conversation_id', conversationId)
+
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://0.0.0.0:8080/'
+      console.log('backendUrl:', backendUrl)
+      console.log('formData:', formData)
+      console.log('bearer:', `Bearer ${token}`)
       let response = await fetch(backendUrl, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${accessToken}`
+          Authorization: `Bearer ${token}`
         },
         body: formData
       })
 
       if (response.status === 401) {
         // Token has expired, refresh it
-        await refreshAccessToken()
+        const newToken = await refreshAccessToken()
         // Retry the request with the new token
         response = await fetch(backendUrl, {
           method: 'POST',
           headers: {
-            Authorization: `Bearer ${accessToken}`
+            Authorization: `Bearer ${newToken}`
           },
           body: formData
         })
@@ -77,7 +113,31 @@ export const useSubmitQuery = () => {
     }
   }
 
+  const prepareHighlightContext = (highlightContext: any) => {
+    if (!highlightContext) return '';
+
+    const processedContext = { ...highlightContext };
+    
+    if (processedContext.attachments) {
+      processedContext.attachments = processedContext.attachments
+        .filter((attachment: any) => attachment.type !== 'screenshot')
+        .map((attachment: any) => {
+          if (attachment.type === 'audio') {
+            return {
+              ...attachment,
+              value: attachment.value.slice(0, 1000)
+            };
+          }
+          return attachment;
+        });
+    }
+
+    return '\n\nHighlight Context:\n' + JSON.stringify(processedContext, null, 2);
+  }
+
   const handleIncomingContext = async (context: HighlightContext) => {
+    resetConversationId() // Reset conversation ID for new incoming context
+    
     let query = context.suggestion || ''
     let screenshotUrl = context.attachments?.find((a) => a.type === 'screenshot')?.value ?? ''
     let clipboardText = context.attachments?.find((a) => a.type === 'clipboard')?.value ?? ''
@@ -101,12 +161,17 @@ export const useSubmitQuery = () => {
       formData.append('prompt', query)
 
       let contextString = 'This is a new conversation with Highlight Chat.'
-      contextString += '\n\nHighlight Context:\n' + JSON.stringify(context, null, 2)
-
+      
+      contextString += prepareHighlightContext(context);
+      
       console.log('contextString:', contextString)
       formData.append('context', contextString)
 
-      await fetchResponse(formData)
+      const contextAttachments = context.attachments || []
+      addAttachmentsToFormData(formData, contextAttachments)
+
+      const accessToken = await getAccessToken()
+      await fetchResponse(formData, accessToken)
     }
   }
 
@@ -116,30 +181,7 @@ export const useSubmitQuery = () => {
       const formData = new FormData()
       formData.append('prompt', query)
 
-      // TODO (SP) Add clipboard text
-      let screenshot = undefined
-      let audio = undefined
-      let fileTitle = undefined
-
-      attachments.forEach((attachment) => {
-        if (attachment && attachment.value) {
-          if (attachment.type === 'image') {
-            screenshot = attachment.value
-            if (attachment.file) {
-              formData.append('image', attachment.file)
-            } else {
-              formData.append('base64_image', attachment.value)
-            }
-          } else if (attachment.type === 'pdf') {
-            fileTitle = attachment.value.name
-            formData.append('pdf', attachment.value)
-          } else if (attachment.type === 'audio') {
-            console.log('audio:', attachment.value)
-            audio = attachment.value
-            formData.append('audio', attachment.value)
-          }
-        }
-      })
+      const { screenshot, audio, fileTitle } = addAttachmentsToFormData(formData, attachments)
 
       addMessage({
         type: 'user',
@@ -156,25 +198,7 @@ export const useSubmitQuery = () => {
       const conversationHistory = messages.map((msg) => `${msg.type}: ${msg.content}`).join('\n')
       let contextString = conversationHistory ?? 'This is a new conversation with Highlight Chat.'
 
-      // Add Highlight context if available
-      if (highlightContext) {
-        // Trim audio attachment and remove screenshot attachment
-        if (highlightContext.attachments) {
-          highlightContext.attachments = highlightContext.attachments
-            .filter((attachment) => attachment.type !== 'screenshot')
-            .map((attachment) => {
-              if (attachment.type === 'audio') {
-                return {
-                  ...attachment,
-                  value: attachment.value.slice(0, 1000)
-                }
-              }
-              return attachment
-            })
-        }
-
-        contextString += '\n\nHighlight Context:\n' + JSON.stringify(highlightContext, null, 2)
-      }
+      contextString += prepareHighlightContext(highlightContext);
 
       if (contextString.trim() === '') {
         contextString = 'This is a new conversation with Highlight Chat.'
@@ -183,7 +207,13 @@ export const useSubmitQuery = () => {
       console.log('contextString:', contextString)
       formData.append('context', contextString)
 
-      await fetchResponse(formData)
+      // If it's a new conversation, reset the conversation ID
+      if (messages.length === 0) {
+        resetConversationId()
+      }
+
+      const accessToken = await getAccessToken()
+      await fetchResponse(formData, accessToken)
     }
   }
 

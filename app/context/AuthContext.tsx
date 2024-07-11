@@ -3,11 +3,18 @@ import Highlight from '@highlight-ai/app-runtime'
 import { Attachment } from '../types/types'
 
 interface AuthContextProps {
-  refreshAccessToken: () => Promise<void>
+  refreshAccessToken: () => Promise<string>
+  getAccessToken: () => Promise<string>
   accessToken?: string
 }
 
-export const AuthContext = createContext<AuthContextProps>({ refreshAccessToken: () => Promise.resolve() })
+const initialContext: AuthContextProps = {
+  refreshAccessToken: async () => '',
+  getAccessToken: async () => '',
+  accessToken: undefined
+}
+
+export const AuthContext = createContext<AuthContextProps>(initialContext)
 
 export const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [accessToken, setAccessToken] = useState<string | undefined>(undefined)
@@ -27,7 +34,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
     authenticateUser()
   }, [])
 
-  const refreshAccessToken = async () => {
+  const refreshAccessToken = async (): Promise<string> => {
     try {
       const response = await fetch('/api/refresh-token', {
         method: 'POST',
@@ -43,12 +50,33 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
 
       const { accessToken: newAccessToken } = await response.json()
       setAccessToken(newAccessToken)
+      return newAccessToken
     } catch (error) {
       console.error('Token refresh failed:', error)
+      throw error
     }
   }
 
-  return <AuthContext.Provider value={{ accessToken, refreshAccessToken }}>{children}</AuthContext.Provider>
+  const getAccessToken = async (): Promise<string> => {
+    if (!accessToken) {
+      // If there's no accessToken, wait for it to be set
+      return new Promise((resolve) => {
+        const checkToken = setInterval(() => {
+          if (accessToken) {
+            clearInterval(checkToken)
+            resolve(accessToken)
+          }
+        }, 100)
+      })
+    }
+    return accessToken
+  }
+
+  return (
+    <AuthContext.Provider value={{ accessToken, refreshAccessToken, getAccessToken }}>
+      {children}
+    </AuthContext.Provider>
+  )
 }
 
 export const useAuthContext = () => {
