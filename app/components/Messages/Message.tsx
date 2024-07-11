@@ -1,6 +1,5 @@
 import { AssistantIcon } from '../../icons/icons'
 import { Message as MessageType, UserMessage } from '../../types/types'
-// import Markdown from 'markdown-to-jsx'
 import { Remark } from 'react-remark';
 import { Attachment } from '../Attachment'
 
