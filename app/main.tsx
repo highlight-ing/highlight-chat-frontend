@@ -19,7 +19,7 @@ import History from "@/app/components/History/History";
 
 const HighlightChat = () => {
   const { messages, clearMessages } = useMessagesContext()
-  const { input, setInput, isDisabled } = useInputContext()
+  const { input, setInput, isDisabled, addAttachment } = useInputContext()
   const { setHighlightContext } = useHighlightContextContext()
   const { handleIncomingContext } = useSubmitQuery()
   const [isUserScrolling, setIsUserScrolling] = useState(false)
@@ -53,6 +53,43 @@ const HighlightChat = () => {
     clearMessages()
     setInput('')
   }
+
+  useEffect(() => {
+    const onClipboardPaste = (ev: ClipboardEvent) => {
+      const clipboardItems = ev.clipboardData?.items;
+      if (!clipboardItems?.length) {
+        return
+      }
+      for (let i = 0; i < clipboardItems.length; i++) {
+        const item = clipboardItems[i];
+
+        if (item.kind === 'file') {
+          const file = item.getAsFile();
+          if (file) {
+            if (file.type.startsWith('image/')) {
+              console.log('Pasted image');
+              console.log('Image data URL:', URL.createObjectURL(file));
+              addAttachment({
+                type: 'image',
+                value: URL.createObjectURL(file),
+                file: file
+              })
+            } else if (file.type === 'application/pdf') {
+              console.log('Pasted PDF');
+              addAttachment({
+                type: 'pdf',
+                value: file
+              })
+            }
+          }
+        }
+      }
+    }
+    document.addEventListener('paste', onClipboardPaste)
+    return () => {
+      document.removeEventListener('paste', onClipboardPaste)
+    }
+  }, [])
 
   return (
     <div className={styles.page}>
