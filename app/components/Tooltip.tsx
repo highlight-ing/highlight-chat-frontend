@@ -107,15 +107,18 @@ const Tooltip = ({
       style={wrapperStyle}
     >
       {children}
-      <Portal>
-        <div
-          ref={tooltipRef}
-          style={{ ...tooltipStyle, ...tooltipContainerStyle, visibility: tooltipVisible ? 'visible' : 'hidden' }}
-          className="group-hover:flex bg-dark border border-light-10 rounded-lg text-light-80 p-3 fixed min-w-min min-h-min w-fit h-fit whitespace-pre-wrap z-10"
-        >
-          {tooltip}
-        </div>
-      </Portal>
+      {
+        tooltipVisible &&
+        <Portal>
+          <div
+            ref={tooltipRef}
+            style={{ ...tooltipStyle, ...tooltipContainerStyle, visibility: tooltipVisible ? 'visible' : 'hidden' }}
+            className="group-hover:flex bg-dark border border-light-10 rounded-lg text-light-80 p-3 fixed min-w-min min-h-min w-fit h-fit whitespace-pre-wrap z-10"
+          >
+            {tooltip}
+          </div>
+        </Portal>
+      }
     </div>
   )
 }

@@ -1,0 +1,68 @@
+@import "app/variables.module";
+
+.inputContainer {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  gap: 8px;
+  background-color: $bg-second-layer;
+  border: 1px solid $light-10;
+  cursor: text;
+  border-radius: 8px;
+  width: 100%;
+  max-width: $chat-body-width;
+  flex-shrink: 0;
+  position: absolute;
+  bottom: 16px;
+  transform: translateY(0);
+  transition: transform 300ms ease;
+
+  &.offset {
+    transform: translateY(calc(-50vh + 64px));
+  }
+
+  &:hover {
+    border-color: $light-20;
+  }
+
+  textarea {
+    flex: 1;
+    background-color: transparent;
+    font-weight: 200;
+    font-size: 16px;
+    //height: 100%;
+    resize: none;
+
+    &:focus {
+      outline: none;
+    }
+
+    &::placeholder {
+      color: $light-40;
+    }
+  }
+}
+
+.attachmentsButtonContainer {
+  display: flex;
+  align-items: flex-end;
+  height: 100%;
+}
+
+.empty {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: -72px;
+  pointer-events: none;
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 200ms ease, scale 200ms ease;
+
+  &.hide {
+    opacity: 0;
+    transform: scale(0);
+  }
+}

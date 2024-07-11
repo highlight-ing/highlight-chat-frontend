@@ -47,10 +47,12 @@ export const AttachmentsButton = () => {
   const onAddScreenshot = async () => {
     setIsLoadingAttachment(true)
     const screenshot = await Highlight.user.getScreenshot()
-    addAttachment({
-      type: 'image',
-      value: screenshot
-    })
+    if (screenshot?.length > 0) {
+      addAttachment({
+        type: 'image',
+        value: screenshot
+      })
+    }
     setIsLoadingAttachment(false)
   }
 

@@ -8,16 +8,14 @@ import HighlightChat from './main'
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen max-h-dvh justify-center bg-[#rgba(13, 13, 13, 1)]">
-      <AuthContextProvider>
-        <HighlightContextContextProvider>
-          <MessagesContextProvider>
-            <InputContextProvider>
-              <HighlightChat />
-            </InputContextProvider>
-          </MessagesContextProvider>
-        </HighlightContextContextProvider>
-      </AuthContextProvider>
-    </div>
+    <AuthContextProvider>
+      <HighlightContextContextProvider>
+        <MessagesContextProvider>
+          <InputContextProvider>
+            <HighlightChat />
+          </InputContextProvider>
+        </MessagesContextProvider>
+      </HighlightContextContextProvider>
+    </AuthContextProvider>
   )
 }

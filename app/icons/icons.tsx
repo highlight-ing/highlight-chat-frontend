@@ -1,4 +1,4 @@
-import { type MouseEvent } from 'react'
+import {type MouseEvent} from 'react'
 
 export interface IconPropTypes {
   color?: string
@@ -17,47 +17,26 @@ export const PaperclipIcon = () => (
   </svg>
 )
 
-export const AddIcon = () => (
-  <svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    style={{ flexShrink: 0 }}
-  >
-    <path
-      d="M12 2C6.49 2 2 6.49 2 12C2 17.51 6.49 22 12 22C17.51 22 22 17.51 22 12C22 6.49 17.51 2 12 2ZM16 12.75H12.75V16C12.75 16.41 12.41 16.75 12 16.75C11.59 16.75 11.25 16.41 11.25 16V12.75H8C7.59 12.75 7.25 12.41 7.25 12C7.25 11.59 7.59 11.25 8 11.25H11.25V8C11.25 7.59 11.59 7.25 12 7.25C12.41 7.25 12.75 7.59 12.75 8V11.25H16C16.41 11.25 16.75 11.59 16.75 12C16.75 12.41 16.41 12.75 16 12.75Z"
-      fill="white"
-      fillOpacity="0.2"
-    />
+export const AssistantIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="32" height="32" rx="16" fill="#181818"/>
+    <rect width="32" height="32" rx="16" fill="url(#paint0_linear_273_196)" fillOpacity="0.2"/>
+    <path d="M7 10.3469C7 9.30616 7.83947 8.46249 8.875 8.46249C9.91053 8.46249 10.75 9.30616 10.75 10.3469V21.6531C10.75 22.6938 9.91053 23.5375 8.875 23.5375C7.83947 23.5375 7 22.6938 7 21.6531V10.3469Z" fill="white" fillOpacity="0.6"/>
+    <path d="M21.25 10.3469C21.25 9.30616 22.0895 8.46249 23.125 8.46249C24.1605 8.46249 25 9.30616 25 10.3469V21.6531C25 22.6938 24.1605 23.5375 23.125 23.5375C22.0895 23.5375 21.25 22.6938 21.25 21.6531V10.3469Z" fill="white" fillOpacity="0.6"/>
+    <path d="M20.5 16C20.5 18.4977 18.4853 20.5225 16 20.5225C13.5147 20.5225 11.5 18.4977 11.5 16C11.5 13.5023 13.5147 11.4775 16 11.4775C18.4853 11.4775 20.5 13.5023 20.5 16Z" fill="white" fillOpacity="0.6"/>
+    <defs>
+      <linearGradient id="paint0_linear_273_196" x1="16" y1="0" x2="16" y2="32" gradientUnits="userSpaceOnUse">
+        <stop stopColor="#AFAFAF" stopOpacity="0.5"/>
+        <stop offset="1"/>
+      </linearGradient>
+    </defs>
   </svg>
+
 )
 
-export const AssistantIcon = ({ className }: { className?: string }) => (
-  <svg width="24" height="20" viewBox="0 0 24 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <g id="Highlight Logo">
-      <g id="Vector">
-        <path
-          d="M0.75 2.93359C0.75 1.6327 1.79933 0.578125 3.09375 0.578125C4.38817 0.578125 5.4375 1.6327 5.4375 2.93359V17.0664C5.4375 18.3673 4.38817 19.4219 3.09375 19.4219C1.79933 19.4219 0.75 18.3673 0.75 17.0664V2.93359Z"
-          fill="currentColor"
-        />
-        <path
-          d="M18.5625 2.93359C18.5625 1.6327 19.6118 0.578125 20.9062 0.578125C22.2007 0.578125 23.25 1.6327 23.25 2.93359V17.0664C23.25 18.3673 22.2007 19.4219 20.9062 19.4219C19.6118 19.4219 18.5625 18.3673 18.5625 17.0664V2.93359Z"
-          fill="currentColor"
-        />
-        <path
-          d="M17.625 10C17.625 13.1221 15.1066 15.6531 12 15.6531C8.8934 15.6531 6.375 13.1221 6.375 10C6.375 6.87787 8.8934 4.34687 12 4.34687C15.1066 4.34687 17.625 6.87787 17.625 10Z"
-          fill="currentColor"
-        />
-      </g>
-    </g>
-  </svg>
-)
-
-export const CloseIcon = ({ size, color = 'currentColor' }: IconPropTypes) => (
+export const CloseIcon = ({size, color = 'currentColor'}: IconPropTypes) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none">
-    <rect width={size} height={size} rx="12" fill="black" />
+    <rect width={size} height={size} rx="12" fill="black"/>
     <path
       d="M12 0C5.388 0 0 5.388 0 12C0 18.612 5.388 24 12 24C18.612 24 24 18.612 24 12C24 5.388 18.612 0 12 0ZM16.032 14.76C16.38 15.108 16.38 15.684 16.032 16.032C15.852 16.212 15.624 16.296 15.396 16.296C15.168 16.296 14.94 16.212 14.76 16.032L12 13.272L9.24 16.032C9.06 16.212 8.832 16.296 8.604 16.296C8.376 16.296 8.148 16.212 7.968 16.032C7.62 15.684 7.62 15.108 7.968 14.76L10.728 12L7.968 9.24C7.62 8.892 7.62 8.316 7.968 7.968C8.316 7.62 8.892 7.62 9.24 7.968L12 10.728L14.76 7.968C15.108 7.62 15.684 7.62 16.032 7.968C16.38 8.316 16.38 8.892 16.032 9.24L13.272 12L16.032 14.76Z"
       fill={color}

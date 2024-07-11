@@ -1,0 +1,40 @@
+$light-5: rgba(255, 255, 255, 0.05);
+$light-10: rgba(255, 255, 255, 0.1);
+$light-20: rgba(255, 255, 255, 0.2);
+$light-40: rgba(255, 255, 255, 0.4);
+$light-60: rgba(255, 255, 255, 0.6);
+$light-80: rgba(255, 255, 255, 0.8);
+$light-100: rgba(255, 255, 255, 1);
+
+$dark-5: rgba(0, 0, 0, 0.05);
+$dark-10: rgba(0, 0, 0, 0.1);
+$dark-20: rgba(0, 0, 0, 0.2);
+$dark-40: rgba(0, 0, 0, 0.4);
+$dark-60: rgba(0, 0, 0, 0.6);
+$dark-80: rgba(0, 0, 0, 0.8);
+$dark-100: rgba(0, 0, 0, 1);
+
+$bg-first-layer: #000;
+$bg-second-layer: #161617;
+$bg-third-layer: #1F1F20;
+
+$chat-body-width: min(800px, 88%);
+$chat-history-width: 250px;
+
+:export {
+  light5: $light-5;
+  light10: $light-10;
+  light20: $light-20;
+  light40: $light-40;
+  light60: $light-60;
+  light80: $light-80;
+  light100: $light-100;
+
+  dark5: $dark-5;
+  dark10: $dark-10;
+  dark20: $dark-20;
+  dark40: $dark-40;
+  dark60: $dark-60;
+  dark80: $dark-80;
+  dark100: $dark-100;
+}
