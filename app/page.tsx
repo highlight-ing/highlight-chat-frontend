@@ -1,6 +1,7 @@
 'use client'
 
 import { AuthContextProvider } from './context/AuthContext'
+import { ConversationProvider } from './context/ConversationContext'
 import { HighlightContextContextProvider } from './context/HighlightContext'
 import { InputContextProvider } from './context/InputContext'
 import { MessagesContextProvider } from './context/MessagesContext'
@@ -10,11 +11,13 @@ export default function Home() {
   return (
     <AuthContextProvider>
       <HighlightContextContextProvider>
-        <MessagesContextProvider>
-          <InputContextProvider>
+        <ConversationProvider>
+          <MessagesContextProvider>
+            <InputContextProvider>
             <HighlightChat />
           </InputContextProvider>
         </MessagesContextProvider>
+        </ConversationProvider>
       </HighlightContextContextProvider>
     </AuthContextProvider>
   )
