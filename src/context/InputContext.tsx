@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import { Attachment } from "../app/types/types";
+import { Attachment } from "../types/types";
 
 interface InputContextProps {
   attachments: Attachment[];

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import { Message } from "../app/types/types";
+import { Message } from "../types/types";
 import { HighlightContext } from "@highlight-ai/app-runtime";
 
 interface HighlightContextContextProps {

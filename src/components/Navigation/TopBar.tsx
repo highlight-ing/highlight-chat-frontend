@@ -1,5 +1,5 @@
 import * as React from "react";
-import { TopBarProps } from "../../app/types/types";
+import { TopBarProps } from "../../types/types";
 
 import styles from "./top-bar.module.scss";
 import { AddCircle, Category } from "iconsax-react";

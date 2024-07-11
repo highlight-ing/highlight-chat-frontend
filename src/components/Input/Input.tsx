@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { Attachment } from "../Attachment";
 import { AttachmentsButton } from "../AttachmentsButton";
 import { useInputContext } from "../../context/InputContext";
-import { Attachment as AttachmentType } from "../../app/types/types";
+import { Attachment as AttachmentType } from "../../types/types";
 import { useSubmitQuery } from "../../hooks/useSubmitQuery";
 
 import styles from "./chatinput.module.scss";

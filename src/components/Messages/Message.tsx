@@ -1,5 +1,5 @@
 import { AssistantIcon } from "../../icons/icons";
-import { Message as MessageType, UserMessage } from "../../app/types/types";
+import { Message as MessageType, UserMessage } from "../../types/types";
 import { Remark } from "react-remark";
 import { Attachment } from "../Attachment";
 
