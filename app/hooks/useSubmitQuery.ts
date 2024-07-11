@@ -48,9 +48,6 @@ export const useSubmitQuery = () => {
       formData.append('conversation_id', conversationId)
 
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://0.0.0.0:8080/'
-      console.log('backendUrl:', backendUrl)
-      console.log('formData:', formData)
-      console.log('bearer:', `Bearer ${token}`)
       let response = await fetch(backendUrl, {
         method: 'POST',
         headers: {
