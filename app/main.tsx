@@ -56,7 +56,7 @@ const HighlightChat = () => {
 
   return (
     <div className={styles.page}>
-      <History showHistory={showHistory}/>
+      <History showHistory={showHistory} setShowHistory={setShowHistory}/>
       <div className={`${styles.contents} ${showHistory ? styles.partial : styles.full}`}>
         <TopBar
           onNewConversation={startNewConversation}

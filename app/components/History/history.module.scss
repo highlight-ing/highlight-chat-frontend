@@ -23,3 +23,41 @@
     transform: translateX(-$chat-history-width);
   }
 }
+
+.header {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  line-height: 1;
+  padding: 12px;
+  border-bottom: 1px solid $light-10;
+  font-size: 15px;
+  gap: 8px;
+  color: $light-60;
+}
+
+.chats {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 8px;
+  gap: 1px;
+}
+
+.chat {
+  display: block;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 200;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: $light-60;
+
+  &:hover {
+    background-color: $light-10;
+  }
+}
+

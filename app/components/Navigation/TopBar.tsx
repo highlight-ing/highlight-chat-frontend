@@ -9,7 +9,8 @@ import Tooltip from "@/app/components/Tooltip";
 const TopBar: React.FC<TopBarProps> = ({ onNewConversation, showHistory, setShowHistory }) => {
   return (
     <div className={styles.topBar}>
-      <Tooltip tooltip="Chat history" position="right">
+      {/* @TODO re-enable when history is working, set condition back to !showHistory */}
+      <Tooltip tooltip="Show chats" position="right" wrapperStyle={true ? {visibility: "hidden"} : undefined}>
         <CircleButton onClick={() => setShowHistory(!showHistory)}>
           <Category variant={"Bold"} size={24}/>
         </CircleButton>
