@@ -30,10 +30,17 @@ const Messages = ({isUserScrolling, setIsUserScrolling}: {isUserScrolling: boole
     if (!scrollContainerRef.current) {
       return
     }
-    if (!isScrolledRef.current) {
-      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight
+    const observer = new MutationObserver(() => {
+      if (isScrolledRef.current) {
+        return
+      }
+      scrollContainerRef.current!.scrollTop = scrollContainerRef.current!.scrollHeight
+    });
+    observer.observe(scrollContainerRef.current, {childList: true});
+    return () => {
+      observer.disconnect()
     }
-  }, [messages])
+  }, [])
 
   return (
     <div className={styles.messagesContainer} onScroll={handleScroll} ref={scrollContainerRef}>
