@@ -41,6 +41,8 @@ export const useSubmitQuery = () => {
   }
 
   const fetchResponse = async (formData: FormData, token: string) => {
+    console.log('fetching response')
+
     setIsDisabled(true)
 
     try {
@@ -133,7 +135,10 @@ export const useSubmitQuery = () => {
   }
 
   const handleIncomingContext = async (context: HighlightContext) => {
+    console.log('handleIncomingContext:', context)
     resetConversationId() // Reset conversation ID for new incoming context
+
+    console.log('reset conversation id')
     
     let query = context.suggestion || ''
     let screenshotUrl = context.attachments?.find((a) => a.type === 'screenshot')?.value ?? ''
@@ -141,6 +146,13 @@ export const useSubmitQuery = () => {
     let ocrScreenContents = context.environment.ocrScreenContents ?? ''
     let rawContents = context.application.focusedWindow.rawContents
     let audio = context.attachments?.find((a) => a.type === 'audio')?.value ?? ''
+
+    console.log('query:', query)
+    console.log('clipboardText:', clipboardText)
+    console.log('ocrScreenContents:', ocrScreenContents)
+    console.log('screenshotUrl:', screenshotUrl)
+    console.log('rawContents:', rawContents)
+    console.log('audio:', audio)
 
     if (query || clipboardText || ocrScreenContents || screenshotUrl || rawContents || audio) {
       addMessage({
@@ -151,8 +163,14 @@ export const useSubmitQuery = () => {
         audio
       })
 
+      console.log('added message')
+
       setInput('')
+
+      console.log('input cleared')
       clearAttachments() // Clear the attachment immediately
+
+      console.log('cleared attachments')
 
       const formData = new FormData()
       formData.append('prompt', query)
@@ -167,7 +185,10 @@ export const useSubmitQuery = () => {
       const contextAttachments = context.attachments || []
       addAttachmentsToFormData(formData, contextAttachments)
 
+      console.log('added attachments')
+
       const accessToken = await getAccessToken()
+      console.log('accessToken:', accessToken)
       await fetchResponse(formData, accessToken)
     }
   }

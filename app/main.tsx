@@ -27,6 +27,7 @@ const HighlightChat = () => {
 
   const debouncedHandleSubmit = useCallback(
     debounce(300, async (context: HighlightContext) => {
+      console.log('context:', context)
       setInput(context.suggestion || '')
       await handleIncomingContext(context)
     }),
@@ -35,6 +36,7 @@ const HighlightChat = () => {
 
   useEffect(() => {
     api.addEventListener('onContext', (context: HighlightContext) => {
+      console.log('received on context')
       setHighlightContext(context)
       // Handle context with debounce
       debouncedHandleSubmit(context)
