@@ -18,7 +18,7 @@ import Messages from "@/app/components/Messages/Messages";
 import History from "@/app/components/History/History";
 
 const HighlightChat = () => {
-  const { clearMessages } = useMessagesContext()
+  const { messages, clearMessages } = useMessagesContext()
   const { input, setInput, isDisabled } = useInputContext()
   const { setHighlightContext } = useHighlightContextContext()
   const { handleIncomingContext } = useSubmitQuery()
@@ -63,11 +63,14 @@ const HighlightChat = () => {
           showHistory={showHistory}
           setShowHistory={setShowHistory}
         />
-        <Messages
-          isUserScrolling={isUserScrolling}
-          setIsUserScrolling={setIsUserScrolling}
-        />
-        <Input />
+        {
+          (isDisabled || messages.length > 0) &&
+          <Messages
+            isUserScrolling={isUserScrolling}
+            setIsUserScrolling={setIsUserScrolling}
+          />
+        }
+        <Input offset={!isDisabled && !messages.length}/>
       </div>
     </div>
   )

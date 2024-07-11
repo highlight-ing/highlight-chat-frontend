@@ -3,6 +3,7 @@ import {Message} from "@/app/components/Messages/Message";
 import {useMessagesContext} from "@/app/context/MessagesContext";
 import {useInputContext} from "@/app/context/InputContext";
 import styles from "@/app/main.module.scss";
+import ThinkingMessage from "@/app/components/Messages/ThinkingMessage";
 
 const Messages = ({isUserScrolling, setIsUserScrolling}: {isUserScrolling: boolean, setIsUserScrolling: (isScrolling: boolean) => void}) => {
   const { messages } = useMessagesContext()
@@ -38,11 +39,7 @@ const Messages = ({isUserScrolling, setIsUserScrolling}: {isUserScrolling: boole
       }
       {
         isDisabled && (!messages.length || messages[messages.length - 1].type !== 'assistant') &&
-        <Message
-          isFirst={!messages.length}
-          isThinking={true}
-          message={{type: 'assistant', content: 'Hmm... Let me think...'}}
-        />
+        <ThinkingMessage isFirst={!messages.length}/>
       }
     </div>
   )

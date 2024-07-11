@@ -16,7 +16,7 @@ const ThinkingMessage = ({isFirst}: {isFirst: boolean}) => {
     <Message
       isFirst={isFirst}
       isThinking={true}
-      message={{type: 'assistant', content: 'Hmm... Let me think...'}}
+      message={{type: 'assistant', content: thinkingMessage}}
     />
   )
 }

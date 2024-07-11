@@ -12,6 +12,14 @@
   width: 100%;
   max-width: $chat-body-width;
   flex-shrink: 0;
+  position: absolute;
+  bottom: 16px;
+  transform: translateY(0);
+  transition: transform 300ms ease;
+
+  &.offset {
+    transform: translateY(calc(-50vh + 64px));
+  }
 
   &:hover {
     border-color: $light-20;
@@ -39,4 +47,18 @@
   display: flex;
   align-items: flex-end;
   height: 100%;
+}
+
+.empty {
+  position: absolute;
+  top: -72px;
+  pointer-events: none;
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 200ms ease, scale 200ms ease;
+
+  &.hide {
+    opacity: 0;
+    transform: scale(0);
+  }
 }

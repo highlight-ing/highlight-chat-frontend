@@ -14,11 +14,12 @@
     "ai": "^3.2.15",
     "iconsax-react": "^0.0.8",
     "lucide-react": "^0.397.0",
+    "markdown-to-jsx": "^7.4.7",
     "next": "14.2.4",
     "react": "^18",
     "react-dom": "^18",
-    "react-markdown": "^9.0.1",
     "react-portal": "^4.2.2",
+    "react-remark": "^2.1.0",
     "throttle-debounce": "^5.0.2"
   },
   "devDependencies": {

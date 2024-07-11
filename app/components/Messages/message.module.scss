@@ -37,36 +37,39 @@
 }
 
 .messageBody {
-  white-space: pre-wrap;
   font-size: 16px;
   color: $light-60;
   font-weight: 200;
   line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 
   strong {
-    font-weight: 500;
     color: $light-80;
   }
 
-  ol, ul {
-    display: list-item;
-    gap: 16px;
-    line-height: 1em;
-    margin: -1em 0;
+  ol {
+    list-style: disc;
+    padding: 0;
+    //margin: 1em 0;
+    margin-inline-start: 1.25em;
+  }
+  ul {
+    list-style: disc;
+    padding: 0;
+    //margin: 1em 0;
+    margin-inline-start: 1.25em;
+  }
+  li {
+    padding: 0;
+    margin: 0.5em 0;
   }
 
-  li {
-    display: list-item;
-    list-style: disc outside none;
-    padding: 0;
-    margin: 0;
-    margin-inline-start: 1em;
-    line-height: 1.6;
-
-    p {
-      margin: 0;
-      padding: 0;
-    }
+  h1, h2, h3, h4 {
+    margin-top: 12px;
+    color: $light-80;
+    font-weight: 300;
   }
 
   code {
@@ -81,11 +84,11 @@
 
   pre {
     font-size: 13px;
-    background-color: $dark-60;
+    background-color: $dark-40;
     border: 1px solid $light-10;
     padding: 8px;
     border-radius: 8px;
-    margin: 8px 0;
+    white-space: pre-wrap;
 
     code {
       background-color: transparent;

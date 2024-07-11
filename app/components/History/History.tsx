@@ -18,7 +18,7 @@ const HistoryData = {
     {
       context: 'This is a recent conversation with Highlight Chat',
       created_at: '2024-07-10T12:41:43.184414+00:00',
-      id: '80305b5d-2c49-49d7-be17-3080167113e7',
+      id: '80305b5d-2c49-49d7-be17-3080167113e6',
       messages: [],
       updated_at: '2024-07-10T12:41:43.184414+00:00',
       userId: '0a737dcd-48bb-4bd9-aa19-110a03333318'
@@ -46,7 +46,7 @@ const History: React.FC<HistoryProps> = ({showHistory, setShowHistory}: HistoryP
         {
           HistoryData.conversations.map(chat => {
             return (
-              <div className={styles.chat}>
+              <div key={chat.id} className={styles.chat}>
                 <span className={styles.chatText}>{chat.context}</span>
               </div>
             )
