@@ -1,9 +1,22 @@
 import { useAuthContext } from '../context/AuthContext'
 import {useEffect, useState} from "react";
 
-export const useChatHistory = () => {
+interface ChatHistoryItem {
+  id: string;
+  context: string;
+  created_at: string;
+  updated_at: string;
+  userId: string;
+  messages: any[];
+}
+
+interface ChatHistoryResponse {
+  conversations: ChatHistoryItem[];
+}
+
+export const useChatHistory = (): ChatHistoryItem[] => {
   const { accessToken, refreshAccessToken } = useAuthContext()
-  const [ chatHistory, setChatHistory ] = useState([])
+  const [ chatHistory, setChatHistory ] = useState<ChatHistoryItem[]>([])
 
   const fetchResponse = async () => {
     try {
@@ -32,11 +45,12 @@ export const useChatHistory = () => {
         throw new Error('Network response was not ok')
       }
 
-      const data = await response.json()
+      const data: ChatHistoryResponse = await response.json()
       console.log('chat history:', data)
-      setChatHistory(data)
+      setChatHistory(data.conversations)
     } catch (error) {
       console.error('Error fetching response:', error)
+      setChatHistory([])
     }
   }
 

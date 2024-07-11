@@ -11,6 +11,7 @@ import { Input } from '@/app/components/Input/Input'
 import { useHighlightContextContext } from './context/HighlightContext'
 import { useSubmitQuery } from './hooks/useSubmitQuery'
 import { useMessagesContext } from './context/MessagesContext'
+import { useConversationContext } from './context/ConversationContext'
 
 import styles from './main.module.scss'
 import TopBar from "@/app/components/Navigation/TopBar";
@@ -22,8 +23,9 @@ const HighlightChat = () => {
   const { input, setInput, isDisabled, addAttachment } = useInputContext()
   const { setHighlightContext } = useHighlightContextContext()
   const { handleIncomingContext } = useSubmitQuery()
+  const { resetConversationId } = useConversationContext()
   const [isUserScrolling, setIsUserScrolling] = useState(false)
-  const [showHistory, setShowHistory] = useState(false)
+  const [showHistory, setShowHistory] = useState(true)
 
   const debouncedHandleSubmit = useCallback(
     debounce(300, async (context: HighlightContext) => {
@@ -52,6 +54,7 @@ const HighlightChat = () => {
   const startNewConversation = () => {
     clearMessages()
     setInput('')
+    resetConversationId()
   }
 
   useEffect(() => {
