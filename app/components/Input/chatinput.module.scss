@@ -50,6 +50,10 @@
 }
 
 .empty {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
   position: absolute;
   top: -72px;
   pointer-events: none;
