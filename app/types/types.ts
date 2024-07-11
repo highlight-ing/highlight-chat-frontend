@@ -28,6 +28,8 @@ export type CompareResult = {
 
 export interface TopBarProps {
   onNewConversation: () => void
+  showHistory: boolean
+  setShowHistory: (show: boolean) => void
 }
 
 export interface ImageAttachment {

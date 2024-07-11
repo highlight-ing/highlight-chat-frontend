@@ -15,6 +15,7 @@ import { useMessagesContext } from './context/MessagesContext'
 import styles from './main.module.scss'
 import TopBar from "@/app/components/Navigation/TopBar";
 import Messages from "@/app/components/Messages/Messages";
+import History from "@/app/components/History/History";
 
 const HighlightChat = () => {
   const { clearMessages } = useMessagesContext()
@@ -22,6 +23,7 @@ const HighlightChat = () => {
   const { setHighlightContext } = useHighlightContextContext()
   const { handleIncomingContext } = useSubmitQuery()
   const [isUserScrolling, setIsUserScrolling] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
 
   const debouncedHandleSubmit = useCallback(
     debounce(300, async (context: HighlightContext) => {
@@ -54,12 +56,19 @@ const HighlightChat = () => {
 
   return (
     <div className={styles.page}>
-      <TopBar onNewConversation={startNewConversation} />
-      <Messages
-        isUserScrolling={isUserScrolling}
-        setIsUserScrolling={setIsUserScrolling}
-      />
-      <Input />
+      <History showHistory={showHistory}/>
+      <div className={`${styles.contents} ${showHistory ? styles.partial : styles.full}`}>
+        <TopBar
+          onNewConversation={startNewConversation}
+          showHistory={showHistory}
+          setShowHistory={setShowHistory}
+        />
+        <Messages
+          isUserScrolling={isUserScrolling}
+          setIsUserScrolling={setIsUserScrolling}
+        />
+        <Input />
+      </div>
     </div>
   )
 }

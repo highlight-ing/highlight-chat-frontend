@@ -6,11 +6,11 @@ import {AddCircle, Category} from "iconsax-react";
 import CircleButton from "@/app/components/CircleButton/CircleButton";
 import Tooltip from "@/app/components/Tooltip";
 
-const TopBar: React.FC<TopBarProps> = ({ onNewConversation }) => {
+const TopBar: React.FC<TopBarProps> = ({ onNewConversation, showHistory, setShowHistory }) => {
   return (
     <div className={styles.topBar}>
       <Tooltip tooltip="Chat history" position="right">
-        <CircleButton onClick={() => {}}>
+        <CircleButton onClick={() => setShowHistory(!showHistory)}>
           <Category variant={"Bold"} size={24}/>
         </CircleButton>
       </Tooltip>

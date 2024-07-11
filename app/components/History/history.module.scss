@@ -1,0 +1,25 @@
+@import 'app/variables.module';
+
+.history {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: $chat-history-width;
+  display: flex;
+  flex-direction: column;
+  background-color: $dark-20;
+  border-right: 1px solid $light-5;
+  overflow-x: hidden;
+  transition: transform 250ms ease;
+
+  &.show {
+    pointer-events: initial;
+    transform: translateX(0);
+  }
+
+  &.hide {
+    pointer-events: none;
+    transform: translateX(-$chat-history-width);
+  }
+}

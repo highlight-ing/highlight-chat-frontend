@@ -2,12 +2,44 @@
 
 .page {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: flex-end;
   width: 100vw;
   height: 100vh;
-  padding-bottom: 16px;
   background-color: $light-5;
+}
+
+.contents {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 16px;
+  flex: 1;
+
+  &.full {
+    animation: history-hide 250ms ease forwards;
+  }
+
+  &.partial {
+    animation: history-show 250ms ease forwards;
+  }
+}
+
+@keyframes history-show {
+  from {
+    max-width: 100vw;
+  }
+  to {
+    max-width: calc(100vw - $chat-history-width);
+  }
+}
+
+@keyframes history-hide {
+  from {
+    max-width: calc(100vw - $chat-history-width);
+  }
+  to {
+    max-width: 100vw;
+  }
 }
 
 .messages {
