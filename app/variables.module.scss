@@ -18,7 +18,7 @@ $bg-first-layer: #000;
 $bg-second-layer: #161617;
 $bg-third-layer: #1F1F20;
 
-$chat-body-width: 768px;
+$chat-body-width: min(800px, 88vw);
 
 :export {
   light5: $light-5;

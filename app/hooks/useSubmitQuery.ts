@@ -1,10 +1,8 @@
-import { useState } from 'react'
 import { useAuthContext } from '../context/AuthContext'
 import { useInputContext } from '../context/InputContext'
 import { useMessagesContext } from '../context/MessagesContext'
 import { HighlightContext } from '@highlight-ai/app-runtime'
 import { useHighlightContextContext } from '../context/HighlightContext'
-import { useEffect } from 'react'
 
 export const useSubmitQuery = () => {
   const { accessToken, refreshAccessToken } = useAuthContext()

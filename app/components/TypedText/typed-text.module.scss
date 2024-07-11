@@ -1,0 +1,18 @@
+.shadowText {
+  visibility: hidden;
+  position: relative;
+}
+
+.visibleText {
+  position: absolute;
+  visibility: visible;
+  left: 0;
+}
+
+.cursor {
+  position: absolute;
+  right: -3px;
+  top: calc(50% - 13px);
+  font-weight: 200;
+  color: white;
+}

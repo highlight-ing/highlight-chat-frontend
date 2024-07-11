@@ -9,7 +9,6 @@
   border: 1px solid $light-10;
   cursor: text;
   border-radius: 8px;
-  //min-height: 64px;
   width: 100%;
   max-width: $chat-body-width;
   flex-shrink: 0;
@@ -21,8 +20,8 @@
   textarea {
     flex: 1;
     background-color: transparent;
-    font-weight: normal;
-    font-size: 15px;
+    font-weight: 200;
+    font-size: 16px;
     //height: 100%;
     resize: none;
 

@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
-import { Attachment } from './Attachment'
-import { AttachmentsButton } from './AttachmentsButton'
-import { useInputContext } from '../context/InputContext'
-import { Attachment as AttachmentType } from '../types/types'
-import { useSubmitQuery } from '../hooks/useSubmitQuery'
+import { useEffect, useRef } from 'react'
+import { Attachment } from '../Attachment'
+import { AttachmentsButton } from '../AttachmentsButton'
+import { useInputContext } from '../../context/InputContext'
+import { Attachment as AttachmentType } from '../../types/types'
+import { useSubmitQuery } from '../../hooks/useSubmitQuery'
 
-import styles from './ChatInput/chatinput.module.scss'
+import styles from './chatinput.module.scss'
 
 const PLACEHOLDER_TEXT = 'Ask Highlight anything...'
 const MAX_INPUT_HEIGHT = 160
@@ -56,14 +56,13 @@ export const Input = () => {
         <AttachmentsButton />
       </div>
       <textarea
-        autoFocus={true}
         ref={inputRef}
-        className=""
-        onInput={(e) => setInput(e.currentTarget.value)}
+        autoFocus={true}
         placeholder={PLACEHOLDER_TEXT}
         value={input}
-        onKeyDown={handleKeyDown}
         rows={1}
+        onInput={(e) => setInput(e.currentTarget.value)}
+        onKeyDown={handleKeyDown}
       />
     </div>
   )
