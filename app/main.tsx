@@ -25,7 +25,7 @@ const HighlightChat = () => {
   const { handleIncomingContext } = useSubmitQuery()
   const { resetConversationId } = useConversationContext()
   const [isUserScrolling, setIsUserScrolling] = useState(false)
-  const [showHistory, setShowHistory] = useState(true)
+  const [showHistory, setShowHistory] = useState(false)
 
   const debouncedHandleSubmit = useCallback(
     debounce(300, async (context: HighlightContext) => {
