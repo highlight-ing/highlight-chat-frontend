@@ -32,6 +32,13 @@ export const InputContextProvider = ({ children }: { children: React.ReactNode }
   const [isDisabled, setIsDisabled] = useState(false)
 
   const addAttachment = (attachment: Attachment) => {
+    // Clear fileInputRef if replacing an uploaded image with a screenshot url
+    if (attachment.type === 'image' && fileInputRef.current) {
+      if (attachments.find((a) => a.type === 'image' && a.file)) {
+        fileInputRef.current.value = ''
+      }
+    }
+
     setAttachments((attachments) => [...attachments.filter((a) => a.type !== attachment.type), attachment])
   }
 
