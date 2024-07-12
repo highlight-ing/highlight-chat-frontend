@@ -1,4 +1,3 @@
-import { on } from 'events'
 import { PropsWithChildren, ReactElement, ReactHTMLElement, useCallback, useEffect, useRef, useState } from 'react'
 import { Portal } from 'react-portal'
 
