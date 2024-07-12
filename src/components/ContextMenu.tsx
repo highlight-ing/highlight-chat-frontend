@@ -1,3 +1,4 @@
+import { on } from 'events'
 import { PropsWithChildren, ReactElement, ReactHTMLElement, useCallback, useEffect, useRef, useState } from 'react'
 import { Portal } from 'react-portal'
 
@@ -5,7 +6,7 @@ const PIXEL_SPACING = 4
 
 type Position = 'top' | 'bottom' | 'left' | 'right'
 
-interface MenuItemType {
+export interface MenuItemType {
   divider?: true
   label?: string | ReactHTMLElement<HTMLAnchorElement> | ReactElement
   onClick?: (e: React.MouseEvent<HTMLDivElement>) => void
@@ -20,6 +21,7 @@ interface ContextMenuProps {
   position: Position
   triggerId: string
   wrapperStyle?: React.CSSProperties
+  onOpen?: () => void
 }
 
 const ContextMenu = ({
@@ -30,7 +32,8 @@ const ContextMenu = ({
   leftClick,
   items,
   offset = 0,
-  wrapperStyle
+  wrapperStyle,
+  onOpen
 }: PropsWithChildren<ContextMenuProps>) => {
   const [isOpen, setOpen] = useState(false)
   const [appliedStyle, setAppliedStyle] = useState<React.CSSProperties>({})
@@ -136,6 +139,7 @@ const ContextMenu = ({
 
   useEffect(() => {
     if (isOpen) {
+      if (onOpen) onOpen()
       recalculatePosition()
     }
   }, [isOpen])

@@ -1,15 +1,16 @@
-import React, { createContext, useContext, useState } from "react";
-import { Attachment } from "../types/types";
+import React, { createContext, useContext, useRef, useState } from 'react'
+import { Attachment } from '../types/types'
 
 interface InputContextProps {
-  attachments: Attachment[];
-  addAttachment: (attachment: Attachment) => void;
-  removeAttachment: (attachmentType: string) => void;
-  clearAttachments: () => void;
-  input: string;
-  setInput: (input: string) => void;
-  isDisabled: boolean;
-  setIsDisabled: (isDisabled: boolean) => void;
+  attachments: Attachment[]
+  addAttachment: (attachment: Attachment) => void
+  removeAttachment: (attachmentType: string) => void
+  clearAttachments: () => void
+  input: string
+  setInput: (input: string) => void
+  fileInputRef: React.RefObject<HTMLInputElement>
+  isDisabled: boolean
+  setIsDisabled: (isDisabled: boolean) => void
 }
 
 export const InputContext = createContext<InputContextProps>({
@@ -17,37 +18,40 @@ export const InputContext = createContext<InputContextProps>({
   addAttachment: () => {},
   removeAttachment: () => {},
   clearAttachments: () => {},
-  input: "",
+  input: '',
   setInput: () => {},
+  fileInputRef: { current: null },
   isDisabled: false,
-  setIsDisabled: () => {},
-});
+  setIsDisabled: () => {}
+})
 
-export const InputContextProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
-  const [attachments, setAttachments] = useState<Attachment[]>([]);
-  const [input, setInput] = useState("");
-  const [isDisabled, setIsDisabled] = useState(false);
+export const InputContextProvider = ({ children }: { children: React.ReactNode }) => {
+  const [attachments, setAttachments] = useState<Attachment[]>([])
+  const [input, setInput] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [isDisabled, setIsDisabled] = useState(false)
 
   const addAttachment = (attachment: Attachment) => {
-    setAttachments((attachments) => [
-      ...attachments.filter((a) => a.type !== attachment.type),
-      attachment,
-    ]);
-  };
+    setAttachments((attachments) => [...attachments.filter((a) => a.type !== attachment.type), attachment])
+  }
 
   const removeAttachment = (attachmentType: string) => {
-    setAttachments((attachments) =>
-      attachments.filter((a) => a.type !== attachmentType)
-    );
-  };
+    // reset file input value if attachment is pdf or file
+    const attachment = attachments.find((a) => a.type === attachmentType)
+    if (
+      attachment &&
+      fileInputRef.current &&
+      (attachment.type === 'pdf' || ('file' in attachment && attachment.file))
+    ) {
+      fileInputRef.current.value = ''
+    }
+
+    setAttachments((attachments) => attachments.filter((a) => a.type !== attachmentType))
+  }
 
   const clearAttachments = () => {
-    setAttachments([]);
-  };
+    setAttachments([])
+  }
 
   return (
     <InputContext.Provider
@@ -58,15 +62,16 @@ export const InputContextProvider = ({
         clearAttachments,
         input,
         setInput,
+        fileInputRef,
         isDisabled,
-        setIsDisabled,
+        setIsDisabled
       }}
     >
       {children}
     </InputContext.Provider>
-  );
-};
+  )
+}
 
 export const useInputContext = () => {
-  return useContext(InputContext);
-};
+  return useContext(InputContext)
+}
