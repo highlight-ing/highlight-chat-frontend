@@ -17,7 +17,7 @@ const TopBar: React.FC<TopBarProps> = ({
       <Tooltip
         tooltip="Show chats"
         position="right"
-        wrapperStyle={true ? { visibility: "hidden" } : undefined}
+        wrapperStyle={showHistory ? { visibility: "hidden" } : undefined}
       >
         <CircleButton onClick={() => setShowHistory(!showHistory)}>
           <Category variant={"Bold"} size={24} />
