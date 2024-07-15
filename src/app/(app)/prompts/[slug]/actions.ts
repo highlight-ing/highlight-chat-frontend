@@ -2,16 +2,16 @@
 
 export async function fetchPrompt(appSlug: string) {
   const appResponse = await fetch(
-    `https://backend.workers.highlight.ing/v1/apps/${appSlug}`
+    `https://backend.workers.highlight.ing/v1/apps/${appSlug}/prompt`
   );
 
-  const app = await appResponse.json();
-
-  if (!app.is_prompt_app) {
-    throw new Error("App is not a prompt app.");
+  if (!appResponse.ok) {
+    throw new Error("Failed to fetch prompt URL from Highlight backend.");
   }
 
-  const prompt = await fetch(app.entry_point_url, {
+  const promptUrl = await appResponse.text();
+
+  const prompt = await fetch(promptUrl, {
     headers: {
       "User-Agent": "Highlight Chat",
     },
