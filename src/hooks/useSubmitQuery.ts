@@ -122,7 +122,7 @@ export const useSubmitQuery = () => {
     return '\n\nHighlight Context:\n' + JSON.stringify(processedContext, null, 2);
   }
 
-  const handleIncomingContext = async (context: HighlightContext) => {
+  const handleIncomingContext = async (context: HighlightContext, systemPrompt?: string) => {
     resetConversationId() // Reset conversation ID for new incoming context
     
     let query = context.suggestion || ''
@@ -146,6 +146,9 @@ export const useSubmitQuery = () => {
 
       const formData = new FormData()
       formData.append('prompt', query)
+      if (systemPrompt) {
+        formData.append('system_prompt', systemPrompt)
+      }
 
       let contextString = 'This is a new conversation with Highlight Chat.'
       
@@ -162,11 +165,14 @@ export const useSubmitQuery = () => {
     }
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (systemPrompt?: string) => {
     const query = input.trim()
     if (query) {
       const formData = new FormData()
       formData.append('prompt', query)
+      if (systemPrompt) {
+        formData.append('system_prompt', systemPrompt)
+      }
 
       const { screenshot, audio, fileTitle } = addAttachmentsToFormData(formData, attachments)
 
