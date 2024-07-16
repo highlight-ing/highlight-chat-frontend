@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { Attachment } from '../Attachment'
 import { AttachmentsButton } from '../AttachmentsButton/AttachmentsButton'
 import { useInputContext } from '../../context/InputContext'
+import { usePromptContext } from '../../context/PromptContext'
 import { Attachment as AttachmentType } from '../../types/types'
 import { useSubmitQuery } from '../../hooks/useSubmitQuery'
 
@@ -14,13 +15,14 @@ const MAX_INPUT_HEIGHT = 160
 export const Input = ({ offset }: { offset: boolean }) => {
   const { attachments, input, setInput, isDisabled } = useInputContext()
   const { handleSubmit } = useSubmitQuery()
+  const { prompt } = usePromptContext()
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (!isDisabled && e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      handleSubmit()
+      handleSubmit(prompt)
       setInput('')
     }
   }

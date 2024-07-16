@@ -12,6 +12,7 @@ import { useHighlightContextContext } from "../../context/HighlightContext";
 import { useSubmitQuery } from "../../hooks/useSubmitQuery";
 import { useMessagesContext } from "../../context/MessagesContext";
 import { useConversationContext } from "../../context/ConversationContext";
+import { usePromptContext } from "../../context/PromptContext";
 
 import styles from "@/main.module.scss";
 import TopBar from "@/components/Navigation/TopBar";
@@ -24,13 +25,14 @@ const HighlightChat = () => {
   const { setHighlightContext } = useHighlightContextContext();
   const { handleIncomingContext } = useSubmitQuery();
   const { resetConversationId } = useConversationContext();
+  const { prompt } = usePromptContext();
   const [isUserScrolling, setIsUserScrolling] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
   const debouncedHandleSubmit = useCallback(
     debounce(300, async (context: HighlightContext) => {
       setInput(context.suggestion || "");
-      await handleIncomingContext(context);
+      await handleIncomingContext(context, prompt);
     }),
     []
   );
