@@ -182,7 +182,6 @@ export const useSubmitQuery = () => {
   }
 
   const handleSubmit = async (systemPrompt?: string) => {
-    console.log('handleSubmit')
     const query = input.trim()
     if (query) {
       const formData = new FormData()
@@ -204,10 +203,6 @@ export const useSubmitQuery = () => {
       formData.append('previous_messages', JSON.stringify(previousMessages))
 
       const { screenshot, audio, fileTitle } = addAttachmentsToFormData(formData, attachments)
-
-      console.log('screenshot:', screenshot)
-      console.log('audio:', audio)
-      console.log('fileTitle:', fileTitle)
 
       addMessage({
         type: 'user',
