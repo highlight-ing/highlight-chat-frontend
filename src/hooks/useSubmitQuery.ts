@@ -14,35 +14,50 @@ export const useSubmitQuery = () => {
   const { getOrCreateConversationId, resetConversationId } = useConversationContext()
   const { aboutMe } = useAboutMeContext();
 
-  const addAttachmentsToFormData = (formData: FormData, attachments: any[]) => {
-    let screenshot = undefined
-    let audio = undefined
-    let fileTitle = undefined
+  const addAttachmentsToFormData = async (formData: FormData, attachments: any[]) => {
+    let screenshot, audio, fileTitle;
 
-    attachments.forEach((attachment) => {
-      if (attachment && attachment.value) {
-        /*
-         * Within Highlight Chat, image attachments have type `image` whereas image attachments from
-         * the Highlight API have type `screenshot`.
-         */
-        if (attachment.type === 'image' || attachment.type === 'screenshot') {
-          screenshot = attachment.value
-          if (attachment.file) {
-            formData.append('image', attachment.file)
-          } else {
-            formData.append('base64_image', attachment.value)
-          }
-        } else if (attachment.type === 'pdf') {
-          fileTitle = attachment.value.name
-          formData.append('pdf', attachment.value)
-        } else if (attachment.type === 'audio') {
-          audio = attachment.value
-          formData.append('audio', attachment.value)
+    for (const attachment of attachments) {
+      if (attachment?.value) {
+        switch (attachment.type) {
+          case 'image':
+          case 'screenshot':
+            screenshot = attachment.value;
+            if (attachment.file) {
+              const base64data = await readFileAsBase64(attachment.file);
+              const mimeType = attachment.file.type || 'image/png';
+              const base64WithMimeType = `data:${mimeType};base64,${base64data.split(',')[1]}`;
+              formData.append('base64_image', base64WithMimeType);
+            } else if (typeof attachment.value === 'string' && attachment.value.startsWith('data:image')) {
+              formData.append('base64_image', attachment.value);
+            } else {
+              console.error('Unsupported image format:', attachment.value);
+            }
+            break;
+          case 'pdf':
+            fileTitle = attachment.value.name;
+            formData.append('pdf', attachment.value);
+            break;
+          case 'audio':
+            audio = attachment.value;
+            formData.append('audio', attachment.value);
+            break;
+          default:
+            console.warn('Unknown attachment type:', attachment.type);
         }
       }
-    })
+    }
 
-    return { screenshot, audio, fileTitle }
+    return { screenshot, audio, fileTitle };
+  }
+
+  const readFileAsBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
   }
 
   const fetchResponse = async (formData: FormData, token: string) => {
@@ -175,7 +190,7 @@ export const useSubmitQuery = () => {
       }
 
       const contextAttachments = context.attachments || []
-      addAttachmentsToFormData(formData, contextAttachments)
+      await addAttachmentsToFormData(formData, contextAttachments)
       const accessToken = await getAccessToken()
       await fetchResponse(formData, accessToken)
     }
@@ -202,7 +217,7 @@ export const useSubmitQuery = () => {
       }))
       formData.append('previous_messages', JSON.stringify(previousMessages))
 
-      const { screenshot, audio, fileTitle } = addAttachmentsToFormData(formData, attachments)
+      const { screenshot, audio, fileTitle } = await addAttachmentsToFormData(formData, attachments)
 
       addMessage({
         type: 'user',
