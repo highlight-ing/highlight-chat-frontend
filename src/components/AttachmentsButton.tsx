@@ -23,13 +23,16 @@ export const AttachmentsButton = () => {
   };
 
   const onAddAudio = async () => {
+    console.log('onAddAudio')
     setIsLoadingAttachment(true);
     const audio = await Highlight.user.getAudio(true);
+    console.log('audio:', audio)
     addAttachment({ type: "audio", value: audio });
     setIsLoadingAttachment(false);
   };
 
   const onAddFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('onAddFile')
     setIsLoadingAttachment(true);
     const file = e.target.files?.[0];
     if (file && file.type.startsWith("image/")) {
@@ -50,6 +53,7 @@ export const AttachmentsButton = () => {
   };
 
   const onAddScreenshot = async () => {
+    console.log('onAddScreenshot')
     setIsLoadingAttachment(true);
     const screenshot = await Highlight.user.getScreenshot();
     if (screenshot?.length > 0) {

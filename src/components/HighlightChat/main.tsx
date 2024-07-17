@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useEffect, useCallback, useState, useRef } from "react";
 import { type HighlightContext } from "@highlight-ai/app-runtime";
+import Highlight from "@highlight-ai/app-runtime";
 import { debounce } from "throttle-debounce";
 
 import api from "@highlight-ai/app-runtime";
@@ -13,6 +14,7 @@ import { useSubmitQuery } from "../../hooks/useSubmitQuery";
 import { useMessagesContext } from "../../context/MessagesContext";
 import { useConversationContext } from "../../context/ConversationContext";
 import { usePromptContext } from "../../context/PromptContext";
+import { useAboutMeContext } from "@/context/AboutMeContext";
 
 import styles from "@/main.module.scss";
 import TopBar from "@/components/Navigation/TopBar";
@@ -26,6 +28,7 @@ const HighlightChat = () => {
   const { handleIncomingContext } = useSubmitQuery();
   const { resetConversationId } = useConversationContext();
   const { prompt } = usePromptContext();
+  const { setAboutMe } = useAboutMeContext();
   const [isUserScrolling, setIsUserScrolling] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
@@ -43,6 +46,16 @@ const HighlightChat = () => {
       // Handle context with debounce
       debouncedHandleSubmit(context);
     });
+  }, []);
+
+  useEffect(() => {
+    const getAboutMe = async () => {
+      const aboutMe = await Highlight.user.getFacts();
+      const aboutMeString = aboutMe.join('\n');
+      console.log("About Me:", aboutMeString);
+      setAboutMe(aboutMeString);
+    };
+    getAboutMe();
   }, []);
 
   // If the agent is not currently responding and the user types something, set isUserScrolling to false
