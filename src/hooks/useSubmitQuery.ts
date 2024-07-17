@@ -4,6 +4,7 @@ import { useMessagesContext } from '../context/MessagesContext'
 import { HighlightContext } from '@highlight-ai/app-runtime'
 import { useHighlightContextContext } from '../context/HighlightContext'
 import { useConversationContext } from '../context/ConversationContext'
+import { useAboutMeContext } from '@/context/AboutMeContext'
 
 export const useSubmitQuery = () => {
   const { getAccessToken, refreshAccessToken } = useAuthContext()
@@ -11,6 +12,7 @@ export const useSubmitQuery = () => {
   const { messages, addMessage, updateLastMessage } = useMessagesContext()
   const { highlightContext } = useHighlightContextContext()
   const { getOrCreateConversationId, resetConversationId } = useConversationContext()
+  const { aboutMe } = useAboutMeContext();
 
   const addAttachmentsToFormData = (formData: FormData, attachments: any[]) => {
     let screenshot = undefined
@@ -153,12 +155,24 @@ export const useSubmitQuery = () => {
         formData.append('system_prompt', systemPrompt)
       }
 
+      // Add previous messages to form data as an array of objects
+      const previousMessages = messages.map(msg => ({
+        type: msg.type,
+        content: msg.content
+      }))
+      formData.append('previous_messages', JSON.stringify(previousMessages))
+
       let contextString = 'This is a new conversation with Highlight Chat.'
 
       contextString += prepareHighlightContext(context)
 
       console.log('contextString:', contextString)
       formData.append('context', contextString)
+
+      // Add about_me to form data
+      if (aboutMe) {
+        formData.append('about_me', JSON.stringify(aboutMe))
+      }
 
       const contextAttachments = context.attachments || []
       addAttachmentsToFormData(formData, contextAttachments)
@@ -176,6 +190,18 @@ export const useSubmitQuery = () => {
         formData.append('system_prompt', systemPrompt)
       }
 
+      // Add about_me to form data
+      if (aboutMe) {
+        formData.append('about_me', JSON.stringify(aboutMe))
+      }
+
+      // Add previous messages to form data as an array of objects
+      const previousMessages = messages.map(msg => ({
+        type: msg.type,
+        content: msg.content
+      }))
+      formData.append('previous_messages', JSON.stringify(previousMessages))
+
       const { screenshot, audio, fileTitle } = addAttachmentsToFormData(formData, attachments)
 
       addMessage({
@@ -189,14 +215,10 @@ export const useSubmitQuery = () => {
       setInput('')
       clearAttachments() // Clear the attachment immediately
 
-      // Create context from conversation history
-      const conversationHistory = messages.map((msg) => `${msg.type}: ${msg.content}`).join('\n')
-      let contextString = conversationHistory ?? 'This is a new conversation with Highlight Chat.'
-
-      contextString += prepareHighlightContext(highlightContext)
+      let contextString = prepareHighlightContext(highlightContext);
 
       if (contextString.trim() === '') {
-        contextString = 'This is a new conversation with Highlight Chat.'
+        contextString = 'This is a new conversation with Highlight Chat. You do not have any Highlight Context available.'
       }
 
       console.log('contextString:', contextString)
