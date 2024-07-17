@@ -21,7 +21,11 @@ export const useSubmitQuery = () => {
 
     attachments.forEach((attachment) => {
       if (attachment && attachment.value) {
-        if (attachment.type === 'image') {
+        /*
+         * Within Highlight Chat, image attachments have type `image` whereas image attachments from
+         * the Highlight API have type `screenshot`.
+         */
+        if (attachment.type === 'image' || attachment.type === 'screenshot') {
           screenshot = attachment.value
           if (attachment.file) {
             formData.append('image', attachment.file)
@@ -32,7 +36,6 @@ export const useSubmitQuery = () => {
           fileTitle = attachment.value.name
           formData.append('pdf', attachment.value)
         } else if (attachment.type === 'audio') {
-          console.log('audio in attachments:', attachment.value)
           audio = attachment.value
           formData.append('audio', attachment.value)
         }
@@ -103,10 +106,10 @@ export const useSubmitQuery = () => {
   }
 
   const prepareHighlightContext = (highlightContext: any) => {
-    if (!highlightContext) return '';
+    if (!highlightContext) return ''
 
-    const processedContext = { ...highlightContext };
-    
+    const processedContext = { ...highlightContext }
+
     if (processedContext.attachments) {
       processedContext.attachments = processedContext.attachments
         .filter((attachment: any) => attachment.type !== 'screenshot')
@@ -115,19 +118,18 @@ export const useSubmitQuery = () => {
             return {
               ...attachment,
               value: attachment.value.slice(0, 1000)
-            };
+            }
           }
-          return attachment;
-        });
+          return attachment
+        })
     }
 
-    return '\n\nHighlight Context:\n' + JSON.stringify(processedContext, null, 2);
+    return '\n\nHighlight Context:\n' + JSON.stringify(processedContext, null, 2)
   }
 
   const handleIncomingContext = async (context: HighlightContext, systemPrompt?: string) => {
-    console.log('handleIncomingContext')
     resetConversationId() // Reset conversation ID for new incoming context
-    
+
     let query = context.suggestion || ''
     let screenshotUrl = context.attachments?.find((a) => a.type === 'screenshot')?.value ?? ''
     let clipboardText = context.attachments?.find((a) => a.type === 'clipboard')?.value ?? ''
@@ -161,9 +163,9 @@ export const useSubmitQuery = () => {
       formData.append('previous_messages', JSON.stringify(previousMessages))
 
       let contextString = 'This is a new conversation with Highlight Chat.'
-      
-      contextString += prepareHighlightContext(context);
-      
+
+      contextString += prepareHighlightContext(context)
+
       console.log('contextString:', contextString)
       formData.append('context', contextString)
 
@@ -174,7 +176,6 @@ export const useSubmitQuery = () => {
 
       const contextAttachments = context.attachments || []
       addAttachmentsToFormData(formData, contextAttachments)
-
       const accessToken = await getAccessToken()
       await fetchResponse(formData, accessToken)
     }

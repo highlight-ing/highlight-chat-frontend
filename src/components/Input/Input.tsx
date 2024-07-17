@@ -1,60 +1,50 @@
-import { useEffect, useRef } from "react";
-import { Attachment } from "../Attachment";
-import { AttachmentsButton } from "../AttachmentsButton";
-import { useInputContext } from "../../context/InputContext";
-import { usePromptContext } from "../../context/PromptContext";
-import { Attachment as AttachmentType } from "../../types/types";
-import { useSubmitQuery } from "../../hooks/useSubmitQuery";
+import { useEffect, useRef } from 'react'
+import { Attachment } from '../Attachment'
+import { AttachmentsButton } from '../AttachmentsButton/AttachmentsButton'
+import { useInputContext } from '../../context/InputContext'
+import { usePromptContext } from '../../context/PromptContext'
+import { Attachment as AttachmentType } from '../../types/types'
+import { useSubmitQuery } from '../../hooks/useSubmitQuery'
 
-import styles from "./chatinput.module.scss";
-import * as React from "react";
+import styles from './chatinput.module.scss'
+import * as React from 'react'
 
-const PLACEHOLDER_TEXT = "Ask Highlight anything...";
-const MAX_INPUT_HEIGHT = 160;
+const PLACEHOLDER_TEXT = 'Ask Highlight anything...'
+const MAX_INPUT_HEIGHT = 160
 
 export const Input = ({ offset }: { offset: boolean }) => {
-  const { attachments, input, setInput, isDisabled } = useInputContext();
-  const { handleSubmit } = useSubmitQuery();
-  const { prompt } = usePromptContext();
+  const { attachments, input, setInput, isDisabled } = useInputContext()
+  const { handleSubmit } = useSubmitQuery()
+  const { prompt } = usePromptContext()
 
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (!isDisabled && e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmit(prompt);
-      setInput("");
+    if (!isDisabled && e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSubmit(prompt)
+      setInput('')
     }
-  };
+  }
 
   const onClickContainer = (e: React.MouseEvent) => {
-    inputRef.current?.focus();
-  };
+    inputRef.current?.focus()
+  }
 
   useEffect(() => {
     if (inputRef.current) {
-      inputRef.current.style.height = "0px";
-      const scrollHeight = inputRef.current.scrollHeight;
+      inputRef.current.style.height = '0px'
+      const scrollHeight = inputRef.current.scrollHeight
 
-      const newHeight =
-        scrollHeight > MAX_INPUT_HEIGHT ? MAX_INPUT_HEIGHT : scrollHeight;
-      inputRef.current.style.height = newHeight + "px";
+      const newHeight = scrollHeight > MAX_INPUT_HEIGHT ? MAX_INPUT_HEIGHT : scrollHeight
+      inputRef.current.style.height = newHeight + 'px'
     }
-  }, [inputRef, input]);
+  }, [inputRef, input])
 
   return (
-    <div
-      className={`${styles.inputContainer} ${offset ? styles.offset : ""}`}
-      onClick={onClickContainer}
-    >
-      <div className={`${styles.empty} ${!offset ? styles.hide : ""}`}>
-        <svg
-          width="705"
-          height="48"
-          viewBox="0 0 705 141"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
+    <div className={`${styles.inputContainer} ${offset ? styles.offset : ''}`} onClick={onClickContainer}>
+      <div className={`${styles.empty} ${!offset ? styles.hide : ''}`}>
+        <svg width="705" height="48" viewBox="0 0 705 141" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M0 30.614C0 23.2712 5.87626 17.3187 13.125 17.3187C20.3737 17.3187 26.25 23.2712 26.25 30.614V110.386C26.25 117.729 20.3737 123.681 13.125 123.681C5.87626 123.681 0 117.729 0 110.386V30.614Z"
             fill="white"
@@ -78,11 +68,7 @@ export const Input = ({ offset }: { offset: boolean }) => {
           {attachments.map((attachment: AttachmentType, index: number) => (
             <Attachment
               type={attachment.type}
-              value={
-                attachment.type === "pdf"
-                  ? attachment.value.name
-                  : attachment.value
-              }
+              value={attachment.type === 'pdf' ? attachment.value.name : attachment.value}
               removeEnabled
               key={index}
             />
@@ -102,5 +88,5 @@ export const Input = ({ offset }: { offset: boolean }) => {
         onKeyDown={handleKeyDown}
       />
     </div>
-  );
-};
+  )
+}
