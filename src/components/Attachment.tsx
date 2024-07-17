@@ -10,14 +10,20 @@ interface AttachmentProps {
   removeEnabled?: boolean
 }
 
-export const Attachment = ({ type, value, removeEnabled = false }: AttachmentProps) => {
+export const Attachment = ({
+  type,
+  value,
+  removeEnabled = false,
+}: AttachmentProps) => {
   const [isImageLoaded, setIsImageLoaded] = useState(false)
   const { removeAttachment } = useInputContext()
 
   return (
     <Tooltip
       key="attachment-tooltip"
-      tooltip={<div className="max-w-[300px] max-h-[100px] line-clamp-3">{value}</div>}
+      tooltip={
+        <div className="max-w-[300px] max-h-[100px] line-clamp-3">{value}</div>
+      }
       position="right"
       disabled={!value || value.length === 0 || type === 'image'}
     >
@@ -39,7 +45,9 @@ export const Attachment = ({ type, value, removeEnabled = false }: AttachmentPro
         {type === 'pdf' && (
           <div className="flex w-full justify-center align-center gap-2 p-2">
             <Document className="text-white min-w-5" />
-            <span className="flex justify-center items-center text-sm text-white truncate max-w-40">{value}</span>
+            <span className="inline-block align-middle text-sm text-white truncate max-w-40">
+              {value}
+            </span>
           </div>
         )}
         {removeEnabled && (
