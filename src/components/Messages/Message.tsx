@@ -56,6 +56,7 @@ export const Message = ({ message, isThinking }: MessageProps) => {
             <Remark>
               {typeof message.content === "string" ? message.content : ""}
             </Remark>
+            {message.type === 'assistant' && <p>test</p>}
           </div>
         </div>
       ) : (
