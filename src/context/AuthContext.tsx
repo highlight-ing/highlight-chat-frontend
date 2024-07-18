@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import Highlight from "@highlight-ai/app-runtime";
-import { Attachment } from "../types/types";
+import { Attachment } from "../types";
 
 interface AuthContextProps {
   refreshAccessToken: () => Promise<string>;

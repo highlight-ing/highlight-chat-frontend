@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import { Message } from "../types/types";
+import { Message } from "../types";
 
 interface MessagesContextProps {
   messages: Message[];
