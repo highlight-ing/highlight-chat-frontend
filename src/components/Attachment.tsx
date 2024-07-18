@@ -1,8 +1,8 @@
 import { ClipboardText, Document, Sound } from "iconsax-react";
 import { useState } from "react";
 import { CloseIcon } from "../icons/icons";
-import { useInputContext } from "../context/InputContext";
 import Tooltip from "./Tooltip";
+import { useStore } from "@/providers/store-provider";
 
 interface AttachmentProps {
   type: "audio" | "clipboard" | "image" | "pdf";
@@ -16,7 +16,10 @@ export const Attachment = ({
   removeEnabled = false,
 }: AttachmentProps) => {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
-  const { removeAttachment } = useInputContext();
+
+  const { removeAttachment } = useStore((state) => ({
+    removeAttachment: state.removeAttachment,
+  }));
 
   return (
     <Tooltip

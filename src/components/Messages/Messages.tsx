@@ -1,9 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import { Message } from "@/components/Messages/Message";
-import { useMessagesContext } from "@/context/MessagesContext";
-import { useInputContext } from "@/context/InputContext";
 import styles from "@/main.module.scss";
 import ThinkingMessage from "@/components/Messages/ThinkingMessage";
+import { useStore } from "@/providers/store-provider";
 
 const Messages = ({
   isUserScrolling,
@@ -12,8 +11,12 @@ const Messages = ({
   isUserScrolling: boolean;
   setIsUserScrolling: (isScrolling: boolean) => void;
 }) => {
-  const { messages } = useMessagesContext();
-  const { isDisabled } = useInputContext();
+  const messages = useStore((state) => state.messages);
+
+  const { inputIsDisabled } = useStore((state) => ({
+    inputIsDisabled: state.inputIsDisabled,
+  }));
+
   const isScrolledRef = useRef(isUserScrolling);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -60,7 +63,7 @@ const Messages = ({
           messages.map((message, index) => (
             <Message key={index} message={message} />
           ))}
-        {isDisabled &&
+        {inputIsDisabled &&
           (!messages.length ||
             messages[messages.length - 1].type !== "assistant") && (
             <ThinkingMessage />

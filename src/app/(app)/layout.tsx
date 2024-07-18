@@ -1,21 +1,29 @@
+"use client";
+
 import React from "react";
-import type { Metadata } from "next";
 import { Public_Sans } from "next/font/google";
-import AppLayout from "@/components/AppLayout";
+import { StoreProvider } from "@/providers/store-provider";
+import { AuthContextProvider } from "@/context/AuthContext";
+import { HighlightContextContextProvider } from "@/context/HighlightContext";
+import { PromptContextProvider } from "@/context/PromptContext";
+import App from "@/components/App";
 
 import "./globals.css";
 
 const publicSans = Public_Sans({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
-  title: "Highlight Chat",
-  description: "Chat with Highlight",
-};
-
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className={publicSans.className}>
-      <AppLayout>{children}</AppLayout>
+      <StoreProvider>
+        <AuthContextProvider>
+          <HighlightContextContextProvider>
+            <PromptContextProvider>
+              <App>{children}</App>
+            </PromptContextProvider>
+          </HighlightContextContextProvider>
+        </AuthContextProvider>
+      </StoreProvider>
     </div>
   );
 }

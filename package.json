@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@highlight-ai/app-runtime": "^0.0.30",
+    "@highlight-ai/app-runtime": "^0.0.35",
     "@tailwindcss/line-clamp": "^0.4.4",
     "ai": "^3.2.15",
     "iconsax-react": "^0.0.8",

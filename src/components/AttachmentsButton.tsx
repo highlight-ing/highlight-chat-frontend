@@ -8,15 +8,18 @@ import Highlight from "@highlight-ai/app-runtime";
 
 import { PaperclipIcon } from "../icons/icons";
 import ContextMenu from "./ContextMenu";
-import { useInputContext } from "../context/InputContext";
 import { useRef } from "react";
 import { useState } from "react";
 import Spinner from "./Spinner";
+import { useStore } from "@/providers/store-provider";
 
 export const AttachmentsButton = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoadingAttachment, setIsLoadingAttachment] = useState(false);
-  const { addAttachment } = useInputContext();
+
+  const { addAttachment } = useStore((state) => ({
+    addAttachment: state.addAttachment,
+  }));
 
   const handleAttachmentClick = () => {
     fileInputRef.current?.click();

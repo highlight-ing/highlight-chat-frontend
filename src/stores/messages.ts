@@ -6,11 +6,9 @@ export interface MessagesState {
 }
 
 export type MessagesSlice = MessagesState & {
-  actions: {
-    addMessage: (message: Message) => void;
-    updateLastMessage: (message: Message) => void;
-    clearMessages: () => void;
-  };
+  addMessage: (message: Message) => void;
+  updateLastMessage: (message: Message) => void;
+  clearMessages: () => void;
 };
 
 export const initialMessagesState: MessagesState = {
@@ -19,11 +17,9 @@ export const initialMessagesState: MessagesState = {
 
 export const createMessagesSlice: StateCreator<MessagesSlice> = (set) => ({
   ...initialMessagesState,
-  actions: {
-    addMessage: (message: Message) =>
-      set((state) => ({ messages: [...state.messages, message] })),
-    updateLastMessage: (message: Message) =>
-      set((state) => ({ messages: [...state.messages.slice(0, -1), message] })),
-    clearMessages: () => set({ messages: [] }),
-  },
+  addMessage: (message: Message) =>
+    set((state) => ({ messages: [...state.messages, message] })),
+  updateLastMessage: (message: Message) =>
+    set((state) => ({ messages: [...state.messages.slice(0, -1), message] })),
+  clearMessages: () => set({ messages: [] }),
 });

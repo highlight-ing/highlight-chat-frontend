@@ -1,26 +1,34 @@
 import { useEffect, useRef } from "react";
 import { Attachment } from "../Attachment";
 import { AttachmentsButton } from "../AttachmentsButton";
-import { useInputContext } from "../../context/InputContext";
 import { usePromptContext } from "../../context/PromptContext";
-import { Attachment as AttachmentType } from "../../types/types";
+import { Attachment as AttachmentType } from "@/types";
 import { useSubmitQuery } from "../../hooks/useSubmitQuery";
 
 import styles from "./chatinput.module.scss";
 import * as React from "react";
+import { useStore } from "@/providers/store-provider";
 
 const PLACEHOLDER_TEXT = "Ask Highlight anything...";
 const MAX_INPUT_HEIGHT = 160;
 
 export const Input = ({ offset }: { offset: boolean }) => {
-  const { attachments, input, setInput, isDisabled } = useInputContext();
+  const { attachments, input, setInput, inputIsDisabled } = useStore(
+    (state) => ({
+      attachments: state.attachments,
+      input: state.input,
+      setInput: state.setInput,
+      inputIsDisabled: state.inputIsDisabled,
+    })
+  );
+
   const { handleSubmit } = useSubmitQuery();
   const { prompt } = usePromptContext();
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (!isDisabled && e.key === "Enter" && !e.shiftKey) {
+    if (!inputIsDisabled && e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(prompt);
       setInput("");

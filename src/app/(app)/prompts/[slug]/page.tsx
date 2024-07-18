@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
-import HighlightChat from "@/components/HighlightChat/main";
+import HighlightChat from "@/components/HighlightChat/HighlightChat";
 import { usePromptContext } from "@/context/PromptContext";
 import { fetchPrompt } from "./actions";
 
