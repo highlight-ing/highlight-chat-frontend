@@ -1,5 +1,8 @@
 "use server";
 
+/**
+ * Calls the Highlight backend worker, fetches the prompt, and returns the raw prompt text.
+ */
 export async function fetchPrompt(appSlug: string) {
   const appResponse = await fetch(
     `https://backend.workers.highlight.ing/v1/apps/${appSlug}/prompt`

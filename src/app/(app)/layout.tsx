@@ -1,25 +1,21 @@
-"use client";
-
 import React from "react";
-import { AuthContextProvider } from "../../context/AuthContext";
-import { ConversationProvider } from "../../context/ConversationContext";
-import { HighlightContextContextProvider } from "../../context/HighlightContext";
-import { InputContextProvider } from "../../context/InputContext";
-import { MessagesContextProvider } from "../../context/MessagesContext";
-import { PromptContextProvider } from "../../context/PromptContext";
+import type { Metadata } from "next";
+import { Public_Sans } from "next/font/google";
+import AppLayout from "@/components/AppLayout";
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+import "./globals.css";
+
+const publicSans = Public_Sans({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: "Highlight Chat",
+  description: "Chat with Highlight",
+};
+
+export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <AuthContextProvider>
-      <HighlightContextContextProvider>
-        <ConversationProvider>
-          <MessagesContextProvider>
-            <InputContextProvider>
-              <PromptContextProvider>{children}</PromptContextProvider>
-            </InputContextProvider>
-          </MessagesContextProvider>
-        </ConversationProvider>
-      </HighlightContextContextProvider>
-    </AuthContextProvider>
+    <div className={publicSans.className}>
+      <AppLayout>{children}</AppLayout>
+    </div>
   );
 }
