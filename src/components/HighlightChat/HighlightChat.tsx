@@ -87,12 +87,6 @@ const HighlightChat = () => {
     }
   }, [input, inputIsDisabled]);
 
-  const startNewConversation = () => {
-    clearMessages();
-    setInput("");
-    resetConversationId();
-  };
-
   return (
     <div className={styles.page}>
       <History showHistory={showHistory} setShowHistory={setShowHistory} />
@@ -101,11 +95,7 @@ const HighlightChat = () => {
           showHistory ? styles.partial : styles.full
         }`}
       >
-        <TopBar
-          onNewConversation={startNewConversation}
-          showHistory={showHistory}
-          setShowHistory={setShowHistory}
-        />
+        <TopBar showHistory={showHistory} setShowHistory={setShowHistory} />
         {(inputIsDisabled || messages.length > 0) && (
           <Messages
             isUserScrolling={isUserScrolling}
