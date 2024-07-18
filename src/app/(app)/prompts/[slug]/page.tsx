@@ -60,14 +60,14 @@ export default function PromptsPage() {
   return (
     <>
       {/* This iframe is used to load any JS the prompt app provides in a sandboxed environment */}
-      <iframe
+      {/* <iframe
         id="sandbox-frame"
         sandbox="allow-scripts"
         className="hidden"
         src={`/prompts/${slug}/iframe`}
         ref={iframeRef}
         onLoad={() => setIframeLoaded(true)}
-      ></iframe>
+      ></iframe> */}
       <HighlightChat />
     </>
   );

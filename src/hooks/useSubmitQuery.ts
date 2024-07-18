@@ -65,6 +65,7 @@ export const useSubmitQuery = () => {
 
     try {
       const conversationId = getOrCreateConversationId();
+      console.log("conversation ID:", conversationId);
       formData.append("conversation_id", conversationId);
 
       const backendUrl =

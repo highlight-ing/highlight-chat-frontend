@@ -2,7 +2,7 @@ import { createContext, type ReactNode, useContext, useRef } from "react";
 import { type StoreApi, useStore as useZustandStore } from "zustand";
 
 /**
- * This is setup to support Next.JS and Zustand
+ * This is setup to support Next.JS and our Zustand store
  * This is all boilerplate
  * @see https://github.com/pmndrs/zustand/discussions/2326
  */
