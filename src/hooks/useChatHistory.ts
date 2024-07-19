@@ -1,5 +1,5 @@
-import { useAuthContext } from "../context/AuthContext";
 import { useEffect, useState } from "react";
+import useAuth from "./useAuth";
 
 interface ChatHistoryItem {
   id: string;
@@ -15,10 +15,12 @@ interface ChatHistoryResponse {
 }
 
 export const useChatHistory = (): ChatHistoryItem[] => {
-  const { accessToken, refreshAccessToken } = useAuthContext();
+  const { getTokens } = useAuth();
   const [chatHistory, setChatHistory] = useState<ChatHistoryItem[]>([]);
 
   const fetchResponse = async () => {
+    const { accessToken } = await getTokens();
+
     try {
       const backendUrl =
         process.env.NEXT_PUBLIC_BACKEND_URL || "http://0.0.0.0:8080/";
@@ -29,18 +31,6 @@ export const useChatHistory = (): ChatHistoryItem[] => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-
-      if (response.status === 401) {
-        // Token has expired, refresh it
-        await refreshAccessToken();
-        // Retry the request with the new token
-        response = await fetch(backendUrl, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-      }
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -56,10 +46,8 @@ export const useChatHistory = (): ChatHistoryItem[] => {
   };
 
   useEffect(() => {
-    if (accessToken) {
-      fetchResponse();
-    }
-  }, [accessToken]);
+    fetchResponse();
+  }, []);
 
   return chatHistory;
 };

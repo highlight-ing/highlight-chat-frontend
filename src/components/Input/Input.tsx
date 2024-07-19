@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Attachment } from "../Attachment";
 import { AttachmentsButton } from "../AttachmentsButton/AttachmentsButton";
-import { useInputContext } from "../../context/InputContext";
 import { usePromptContext } from "../../context/PromptContext";
 import { Attachment as AttachmentType } from "@/types";
 import { useSubmitQuery } from "../../hooks/useSubmitQuery";
