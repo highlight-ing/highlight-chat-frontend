@@ -61,17 +61,10 @@ function useHandleClipboardPaste() {
 const HighlightChat = () => {
   // STATE
   const [isUserScrolling, setIsUserScrolling] = useState(false);
-  const { messages, clearMessages, input, setInput, inputIsDisabled } =
-    useStore((state) => ({
-      messages: state.messages,
-      clearMessages: state.clearMessages,
-      input: state.input,
-      setInput: state.setInput,
-      inputIsDisabled: state.inputIsDisabled,
-    }));
-
-  const { resetConversationId } = useStore((state) => ({
-    resetConversationId: state.resetConversationId,
+  const { messages, input, inputIsDisabled } = useStore((state) => ({
+    messages: state.messages,
+    input: state.input,
+    inputIsDisabled: state.inputIsDisabled,
   }));
 
   const [showHistory, setShowHistory] = useState(false);

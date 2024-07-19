@@ -39,5 +39,6 @@ export const createConversationSlice: StateCreator<
     get().resetConversationId();
     get().clearMessages();
     get().clearInput();
+    get().clearAttachments();
   },
 });
