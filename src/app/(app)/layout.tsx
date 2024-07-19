@@ -7,18 +7,21 @@ import { HighlightContextContextProvider } from "../../context/HighlightContext"
 import { InputContextProvider } from "../../context/InputContext";
 import { MessagesContextProvider } from "../../context/MessagesContext";
 import { PromptContextProvider } from "../../context/PromptContext";
+import { AboutMeContextProvider } from "@/context/AboutMeContext";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthContextProvider>
       <HighlightContextContextProvider>
-        <ConversationProvider>
-          <MessagesContextProvider>
+        <AboutMeContextProvider>
+          <ConversationProvider>
+            <MessagesContextProvider>
             <InputContextProvider>
               <PromptContextProvider>{children}</PromptContextProvider>
             </InputContextProvider>
-          </MessagesContextProvider>
-        </ConversationProvider>
+            </MessagesContextProvider>
+          </ConversationProvider>
+        </AboutMeContextProvider>
       </HighlightContextContextProvider>
     </AuthContextProvider>
   );

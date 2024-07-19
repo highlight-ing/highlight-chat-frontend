@@ -4,6 +4,8 @@ import { useMessagesContext } from '../context/MessagesContext'
 import { HighlightContext } from '@highlight-ai/app-runtime'
 import { useHighlightContextContext } from '../context/HighlightContext'
 import { useConversationContext } from '../context/ConversationContext'
+import { useAboutMeContext } from '@/context/AboutMeContext'
+import imageCompression from 'browser-image-compression';
 
 export const useSubmitQuery = () => {
   const { getAccessToken, refreshAccessToken } = useAuthContext()
@@ -11,33 +13,73 @@ export const useSubmitQuery = () => {
   const { messages, addMessage, updateLastMessage } = useMessagesContext()
   const { highlightContext } = useHighlightContextContext()
   const { getOrCreateConversationId, resetConversationId } = useConversationContext()
+  const { aboutMe } = useAboutMeContext();
 
-  const addAttachmentsToFormData = (formData: FormData, attachments: any[]) => {
-    let screenshot = undefined
-    let audio = undefined
-    let fileTitle = undefined
+  const addAttachmentsToFormData = async (formData: FormData, attachments: any[]) => {
+    let screenshot, audio, fileTitle;
 
-    attachments.forEach((attachment) => {
-      if (attachment && attachment.value) {
-        if (attachment.type === 'image') {
-          screenshot = attachment.value
-          if (attachment.file) {
-            formData.append('image', attachment.file)
-          } else {
-            formData.append('base64_image', attachment.value)
-          }
-        } else if (attachment.type === 'pdf') {
-          fileTitle = attachment.value.name
-          formData.append('pdf', attachment.value)
-        } else if (attachment.type === 'audio') {
-          console.log('audio:', attachment.value)
-          audio = attachment.value
-          formData.append('audio', attachment.value)
+    for (const attachment of attachments) {
+      if (attachment?.value) {
+        switch (attachment.type) {
+          case 'image':
+          case 'screenshot':
+            screenshot = attachment.value;
+            if (attachment.file) {
+              const compressedFile = await compressImageIfNeeded(attachment.file);
+              const base64data = await readFileAsBase64(compressedFile);
+              const mimeType = compressedFile.type || 'image/png';
+              const base64WithMimeType = `data:${mimeType};base64,${base64data.split(',')[1]}`;
+              formData.append('base64_image', base64WithMimeType);
+            } else if (typeof attachment.value === 'string' && attachment.value.startsWith('data:image')) {
+              formData.append('base64_image', attachment.value);
+            } else {
+              console.error('Unsupported image format:', attachment.value);
+            }
+            break;
+          case 'pdf':
+            fileTitle = attachment.value.name;
+            formData.append('pdf', attachment.value);
+            break;
+          case 'audio':
+            audio = attachment.value;
+            formData.append('audio', attachment.value);
+            break;
+          default:
+            console.warn('Unknown attachment type:', attachment.type);
         }
       }
-    })
+    }
 
-    return { screenshot, audio, fileTitle }
+    return { screenshot, audio, fileTitle };
+  }
+
+  const compressImageIfNeeded = async (file: File): Promise<File> => {
+    const ONE_MB = 1 * 1024 * 1024; // 1MB in bytes
+    if (file.size <= ONE_MB) {
+      return file;
+    }
+
+    const options = {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+    };
+
+    try {
+      return await imageCompression(file, options);
+    } catch (error) {
+      console.error('Error compressing image:', error);
+      return file;
+    }
+  }
+
+  const readFileAsBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
   }
 
   const fetchResponse = async (formData: FormData, token: string) => {
@@ -101,10 +143,10 @@ export const useSubmitQuery = () => {
   }
 
   const prepareHighlightContext = (highlightContext: any) => {
-    if (!highlightContext) return '';
+    if (!highlightContext) return ''
 
-    const processedContext = { ...highlightContext };
-    
+    const processedContext = { ...highlightContext }
+
     if (processedContext.attachments) {
       processedContext.attachments = processedContext.attachments
         .filter((attachment: any) => attachment.type !== 'screenshot')
@@ -113,18 +155,18 @@ export const useSubmitQuery = () => {
             return {
               ...attachment,
               value: attachment.value.slice(0, 1000)
-            };
+            }
           }
-          return attachment;
-        });
+          return attachment
+        })
     }
 
-    return '\n\nHighlight Context:\n' + JSON.stringify(processedContext, null, 2);
+    return '\n\nHighlight Context:\n' + JSON.stringify(processedContext, null, 2)
   }
 
   const handleIncomingContext = async (context: HighlightContext, systemPrompt?: string) => {
     resetConversationId() // Reset conversation ID for new incoming context
-    
+
     let query = context.suggestion || ''
     let screenshotUrl = context.attachments?.find((a) => a.type === 'screenshot')?.value ?? ''
     let clipboardText = context.attachments?.find((a) => a.type === 'clipboard')?.value ?? ''
@@ -150,16 +192,27 @@ export const useSubmitQuery = () => {
         formData.append('system_prompt', systemPrompt)
       }
 
+      // Add previous messages to form data as an array of objects
+      const previousMessages = messages.map(msg => ({
+        type: msg.type,
+        content: msg.content
+      }))
+      formData.append('previous_messages', JSON.stringify(previousMessages))
+
       let contextString = 'This is a new conversation with Highlight Chat.'
-      
-      contextString += prepareHighlightContext(context);
-      
+
+      contextString += prepareHighlightContext(context)
+
       console.log('contextString:', contextString)
       formData.append('context', contextString)
 
-      const contextAttachments = context.attachments || []
-      addAttachmentsToFormData(formData, contextAttachments)
+      // Add about_me to form data
+      if (aboutMe) {
+        formData.append('about_me', JSON.stringify(aboutMe))
+      }
 
+      const contextAttachments = context.attachments || []
+      await addAttachmentsToFormData(formData, contextAttachments)
       const accessToken = await getAccessToken()
       await fetchResponse(formData, accessToken)
     }
@@ -174,7 +227,19 @@ export const useSubmitQuery = () => {
         formData.append('system_prompt', systemPrompt)
       }
 
-      const { screenshot, audio, fileTitle } = addAttachmentsToFormData(formData, attachments)
+      // Add about_me to form data
+      if (aboutMe) {
+        formData.append('about_me', JSON.stringify(aboutMe))
+      }
+
+      // Add previous messages to form data as an array of objects
+      const previousMessages = messages.map(msg => ({
+        type: msg.type,
+        content: msg.content
+      }))
+      formData.append('previous_messages', JSON.stringify(previousMessages))
+
+      const { screenshot, audio, fileTitle } = await addAttachmentsToFormData(formData, attachments)
 
       addMessage({
         type: 'user',
@@ -187,14 +252,10 @@ export const useSubmitQuery = () => {
       setInput('')
       clearAttachments() // Clear the attachment immediately
 
-      // Create context from conversation history
-      const conversationHistory = messages.map((msg) => `${msg.type}: ${msg.content}`).join('\n')
-      let contextString = conversationHistory ?? 'This is a new conversation with Highlight Chat.'
-
-      contextString += prepareHighlightContext(highlightContext);
+      let contextString = prepareHighlightContext(highlightContext);
 
       if (contextString.trim() === '') {
-        contextString = 'This is a new conversation with Highlight Chat.'
+        contextString = 'This is a new conversation with Highlight Chat. You do not have any Highlight Context available.'
       }
 
       console.log('contextString:', contextString)
