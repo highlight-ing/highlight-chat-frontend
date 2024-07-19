@@ -7,6 +7,7 @@ import { debounce } from "throttle-debounce";
 import { useSubmitQuery } from "@/hooks/useSubmitQuery";
 import { usePromptContext } from "@/context/PromptContext";
 import { useStore } from "@/providers/store-provider";
+import { useAboutMeContext } from "@/context/AboutMeContext";
 
 /**
  * When the Highlight runtime sends us context, handle it by setting the input to the suggestion the user picked
@@ -53,6 +54,21 @@ function useContextRecievedHandler() {
  */
 export default function App({ children }: { children: React.ReactNode }) {
   useContextRecievedHandler();
+
+  const { setAboutMe } = useAboutMeContext();
+
+  // Move this to a new hook
+  useEffect(() => {
+    const getAboutMe = async () => {
+      const aboutMe = await Highlight.user.getFacts();
+      if (aboutMe?.length > 0) {
+        const aboutMeString = aboutMe.join("\n");
+        console.log("About Me:", aboutMeString);
+        setAboutMe(aboutMeString);
+      }
+    };
+    getAboutMe();
+  }, []);
 
   return <>{children}</>;
 }
