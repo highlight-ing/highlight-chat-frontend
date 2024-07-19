@@ -3,7 +3,6 @@
 import React from "react";
 import { Public_Sans } from "next/font/google";
 import { StoreProvider } from "@/providers/store-provider";
-import { AuthContextProvider } from "@/context/AuthContext";
 import { HighlightContextContextProvider } from "@/context/HighlightContext";
 import { PromptContextProvider } from "@/context/PromptContext";
 import App from "@/components/App";
@@ -18,13 +17,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <div className={publicSans.className}>
       <AboutMeContextProvider>
         <StoreProvider>
-          <AuthContextProvider>
-            <HighlightContextContextProvider>
-              <PromptContextProvider>
-                <App>{children}</App>
-              </PromptContextProvider>
-            </HighlightContextContextProvider>
-          </AuthContextProvider>
+          <HighlightContextContextProvider>
+            <PromptContextProvider>
+              <App>{children}</App>
+            </PromptContextProvider>
+          </HighlightContextContextProvider>
         </StoreProvider>
       </AboutMeContextProvider>
     </div>
