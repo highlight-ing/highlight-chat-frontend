@@ -1,59 +1,55 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Message } from "@/components/Messages/Message";
 import { useMessagesContext } from "@/context/MessagesContext";
 import { useInputContext } from "@/context/InputContext";
 import styles from "@/main.module.scss";
 import ThinkingMessage from "@/components/Messages/ThinkingMessage";
 
-const Messages = ({
-  isUserScrolling,
-  setIsUserScrolling,
-}: {
-  isUserScrolling: boolean;
-  setIsUserScrolling: (isScrolling: boolean) => void;
-}) => {
+const Messages = () => {
   const { messages } = useMessagesContext();
   const { isDisabled } = useInputContext();
-  const isScrolledRef = useRef(isUserScrolling);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
+  const lastMessageRef = useRef<string | null>(null);
+
+  const scrollToBottom = () => {
+    if (scrollContainerRef.current && shouldAutoScroll) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+    }
+  };
 
   const handleScroll = () => {
-    if (!scrollContainerRef.current) {
-      return;
+    if (scrollContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+      const isAtBottom = Math.abs(scrollHeight - scrollTop - clientHeight) < 1;
+      setShouldAutoScroll(isAtBottom);
     }
-    const { scrollTop } = scrollContainerRef.current;
-    isScrolledRef.current = scrollTop < -50;
-    setIsUserScrolling(isScrolledRef.current);
   };
 
   useEffect(() => {
-    if (isUserScrolling !== isScrolledRef.current) {
-      isScrolledRef.current = isUserScrolling;
+    if (messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      
+      if (lastMessage.type === 'user') {
+        setShouldAutoScroll(true);
+        scrollToBottom();
+      } else if (lastMessage.content !== lastMessageRef.current) {
+        scrollToBottom();
+      }
+
+      lastMessageRef.current = lastMessage.content;
     }
-  }, [isUserScrolling]);
+  }, [messages]);
 
   useEffect(() => {
-    if (!scrollContainerRef.current) {
-      return;
-    }
-    const observer = new MutationObserver(() => {
-      if (isScrolledRef.current) {
-        return;
-      }
-      scrollContainerRef.current!.scrollTop =
-        scrollContainerRef.current!.scrollHeight;
-    });
-    observer.observe(scrollContainerRef.current, { childList: true });
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
+    scrollToBottom();
+  }, [shouldAutoScroll]);
 
   return (
     <div
       className={styles.messagesContainer}
-      onScroll={handleScroll}
       ref={scrollContainerRef}
+      onScroll={handleScroll}
     >
       <div className={styles.messages}>
         {messages.length > 0 &&
