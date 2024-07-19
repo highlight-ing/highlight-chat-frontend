@@ -1,13 +1,15 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Message } from "@/components/Messages/Message";
-import { useMessagesContext } from "@/context/MessagesContext";
-import { useInputContext } from "@/context/InputContext";
 import styles from "@/main.module.scss";
 import ThinkingMessage from "@/components/Messages/ThinkingMessage";
+import { useStore } from "@/providers/store-provider";
 
 const Messages = () => {
-  const { messages } = useMessagesContext();
-  const { isDisabled } = useInputContext();
+  const { messages, inputIsDisabled } = useStore((state) => ({
+    messages: state.messages,
+    inputIsDisabled: state.inputIsDisabled,
+  }));
+
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
   const lastMessageRef = useRef<string | null>(null);
@@ -35,9 +37,10 @@ const Messages = () => {
 
   const handleScroll = () => {
     if (scrollContainerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+      const { scrollTop, scrollHeight, clientHeight } =
+        scrollContainerRef.current;
       const isAtBottom = scrollHeight - scrollTop - clientHeight < 100;
-      
+
       setIsUserScrolling(true);
       setShouldAutoScroll(isAtBottom);
 
@@ -65,7 +68,10 @@ const Messages = () => {
     });
 
     if (scrollContainerRef.current) {
-      observer.observe(scrollContainerRef.current, { childList: true, subtree: true });
+      observer.observe(scrollContainerRef.current, {
+        childList: true,
+        subtree: true,
+      });
     }
 
     return () => observer.disconnect();
@@ -95,8 +101,11 @@ const Messages = () => {
   useEffect(() => {
     if (messages.length > 0) {
       const lastMessage = messages[messages.length - 1];
-      
-      if (lastMessage.type === 'user' || lastMessage.content !== lastMessageRef.current) {
+
+      if (
+        lastMessage.type === "user" ||
+        lastMessage.content !== lastMessageRef.current
+      ) {
         setShouldAutoScroll(true);
         scrollToBottom();
       }
@@ -116,7 +125,7 @@ const Messages = () => {
           messages.map((message, index) => (
             <Message key={index} message={message} />
           ))}
-        {isDisabled &&
+        {inputIsDisabled &&
           (!messages.length ||
             messages[messages.length - 1].type !== "assistant") && (
             <ThinkingMessage />

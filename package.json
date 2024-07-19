@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@highlight-ai/app-runtime": "^0.0.30",
+    "@highlight-ai/app-runtime": "^0.0.35",
     "@tailwindcss/line-clamp": "^0.4.4",
     "ai": "^3.2.15",
     "browser-image-compression": "^2.0.2",
@@ -21,7 +21,8 @@
     "react-portal": "^4.2.2",
     "react-remark": "^2.1.0",
     "throttle-debounce": "^5.0.2",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "zustand": "^4.5.4"
   },
   "devDependencies": {
     "@types/node": "^20",

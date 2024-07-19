@@ -1,8 +1,4 @@
-import type { Metadata } from "next";
-import { Public_Sans } from "next/font/google";
-import "./globals.css";
-
-const publicSans = Public_Sans({ subsets: ["latin"] });
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Highlight Chat",
@@ -16,7 +12,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={publicSans.className}>{children}</body>
+      <body>{children}</body>
     </html>
   );
 }
