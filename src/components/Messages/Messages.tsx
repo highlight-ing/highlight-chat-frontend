@@ -1,58 +1,39 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useLayoutEffect } from "react";
 import { Message } from "@/components/Messages/Message";
 import { useMessagesContext } from "@/context/MessagesContext";
 import { useInputContext } from "@/context/InputContext";
 import styles from "@/main.module.scss";
 import ThinkingMessage from "@/components/Messages/ThinkingMessage";
 
-const Messages = ({
-  isUserScrolling,
-  setIsUserScrolling,
-}: {
-  isUserScrolling: boolean;
-  setIsUserScrolling: (isScrolling: boolean) => void;
-}) => {
+const Messages = () => {
   const { messages } = useMessagesContext();
   const { isDisabled } = useInputContext();
-  const isScrolledRef = useRef(isUserScrolling);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const handleScroll = () => {
-    if (!scrollContainerRef.current) {
-      return;
+  const scrollToBottom = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
     }
-    const { scrollTop } = scrollContainerRef.current;
-    isScrolledRef.current = scrollTop < -50;
-    setIsUserScrolling(isScrolledRef.current);
   };
 
-  useEffect(() => {
-    if (isUserScrolling !== isScrolledRef.current) {
-      isScrolledRef.current = isUserScrolling;
-    }
-  }, [isUserScrolling]);
+  useLayoutEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   useEffect(() => {
-    if (!scrollContainerRef.current) {
-      return;
-    }
-    const observer = new MutationObserver(() => {
-      if (isScrolledRef.current) {
-        return;
-      }
-      scrollContainerRef.current!.scrollTop =
-        scrollContainerRef.current!.scrollHeight;
-    });
-    observer.observe(scrollContainerRef.current, { childList: true });
-    return () => {
-      observer.disconnect();
-    };
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const observer = new MutationObserver(scrollToBottom);
+    observer.observe(container, { childList: true, subtree: true, characterData: true });
+
+    return () => observer.disconnect();
   }, []);
 
   return (
     <div
       className={styles.messagesContainer}
-      onScroll={handleScroll}
       ref={scrollContainerRef}
     >
       <div className={styles.messages}>
@@ -66,6 +47,7 @@ const Messages = ({
             <ThinkingMessage />
           )}
       </div>
+      <div ref={messagesEndRef} />
     </div>
   );
 };

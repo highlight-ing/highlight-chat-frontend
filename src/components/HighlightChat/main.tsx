@@ -29,7 +29,6 @@ const HighlightChat = () => {
   const { resetConversationId } = useConversationContext();
   const { prompt } = usePromptContext();
   const { setAboutMe } = useAboutMeContext();
-  const [isUserScrolling, setIsUserScrolling] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
   const debouncedHandleSubmit = useCallback(
@@ -57,14 +56,6 @@ const HighlightChat = () => {
     };
     getAboutMe();
   }, []);
-
-  // If the agent is not currently responding and the user types something, set isUserScrolling to false
-  // so that the next time the agent responds, the chat will scroll to the bottom.
-  useEffect(() => {
-    if (!isDisabled && isUserScrolling) {
-      setIsUserScrolling(false);
-    }
-  }, [input, isDisabled]);
 
   const startNewConversation = () => {
     clearMessages();
@@ -123,12 +114,7 @@ const HighlightChat = () => {
           setShowHistory={setShowHistory}
         />
         {(isDisabled || messages.length > 0) && (
-          <Messages
-            isUserScrolling={isUserScrolling}
-            setIsUserScrolling={(scrolled) => {
-              setIsUserScrolling(scrolled);
-            }}
-          />
+          <Messages />
         )}
         <Input offset={!isDisabled && !messages.length} />
       </div>
