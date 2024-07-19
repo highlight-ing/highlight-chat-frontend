@@ -28,13 +28,11 @@ export const Attachment = ({
         <div className="max-w-[300px] max-h-[100px] line-clamp-3">{value}</div>
       }
       position="right"
-      disabled={
-        !value || value.length === 0 || type === "image" || type === "pdf"
-      }
+      disabled={!value || value.length === 0 || type === "image"}
     >
       <div
         className={`group relative flex items-center justify-center h-12 min-w-12 rounded-md border border-light-10 bg-light-20 ${
-          type === "pdf" ? "max-w-fit" : "max-w-20"
+          type === "pdf" ? "max-w-40" : "max-w-20"
         } w-fit`}
       >
         {type === "image" && (
@@ -48,9 +46,9 @@ export const Attachment = ({
         {type === "clipboard" && <ClipboardText className="text-white" />}
         {type === "audio" && <Sound className="text-white" />}
         {type === "pdf" && (
-          <div className="flex flex-1 justify-center align-center gap-2 p-2 w-full">
+          <div className="flex w-full justify-center align-center gap-2 p-2">
             <Document className="text-white min-w-5" />
-            <span className="flex justify-center items-center text-sm text-white truncate">
+            <span className="inline-block align-middle text-sm text-white truncate max-w-40">
               {value}
             </span>
           </div>

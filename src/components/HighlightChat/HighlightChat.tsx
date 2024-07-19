@@ -60,6 +60,7 @@ function useHandleClipboardPaste() {
 
 const HighlightChat = () => {
   // STATE
+  const [isUserScrolling, setIsUserScrolling] = useState(false);
   const { messages, clearMessages, input, setInput, inputIsDisabled } =
     useStore((state) => ({
       messages: state.messages,
@@ -73,7 +74,6 @@ const HighlightChat = () => {
     resetConversationId: state.resetConversationId,
   }));
 
-  const [isUserScrolling, setIsUserScrolling] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
   // HOOKS
@@ -96,14 +96,7 @@ const HighlightChat = () => {
         }`}
       >
         <TopBar showHistory={showHistory} setShowHistory={setShowHistory} />
-        {(inputIsDisabled || messages.length > 0) && (
-          <Messages
-            isUserScrolling={isUserScrolling}
-            setIsUserScrolling={(scrolled) => {
-              setIsUserScrolling(scrolled);
-            }}
-          />
-        )}
+        {(inputIsDisabled || messages.length > 0) && <Messages />}
         <Input offset={!inputIsDisabled && !messages.length} />
       </div>
     </div>

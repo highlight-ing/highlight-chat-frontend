@@ -9,21 +9,24 @@ import { PromptContextProvider } from "@/context/PromptContext";
 import App from "@/components/App";
 
 import "./globals.css";
+import { AboutMeContextProvider } from "@/context/AboutMeContext";
 
 const publicSans = Public_Sans({ subsets: ["latin"] });
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className={publicSans.className}>
-      <StoreProvider>
-        <AuthContextProvider>
-          <HighlightContextContextProvider>
-            <PromptContextProvider>
-              <App>{children}</App>
-            </PromptContextProvider>
-          </HighlightContextContextProvider>
-        </AuthContextProvider>
-      </StoreProvider>
+      <AboutMeContextProvider>
+        <StoreProvider>
+          <AuthContextProvider>
+            <HighlightContextContextProvider>
+              <PromptContextProvider>
+                <App>{children}</App>
+              </PromptContextProvider>
+            </HighlightContextContextProvider>
+          </AuthContextProvider>
+        </StoreProvider>
+      </AboutMeContextProvider>
     </div>
   );
 }
