@@ -5,6 +5,7 @@ import { HighlightContext } from '@highlight-ai/app-runtime'
 import { useHighlightContextContext } from '../context/HighlightContext'
 import { useConversationContext } from '../context/ConversationContext'
 import { useAboutMeContext } from '@/context/AboutMeContext'
+import imageCompression from 'browser-image-compression';
 
 export const useSubmitQuery = () => {
   const { getAccessToken, refreshAccessToken } = useAuthContext()
@@ -24,8 +25,9 @@ export const useSubmitQuery = () => {
           case 'screenshot':
             screenshot = attachment.value;
             if (attachment.file) {
-              const base64data = await readFileAsBase64(attachment.file);
-              const mimeType = attachment.file.type || 'image/png';
+              const compressedFile = await compressImageIfNeeded(attachment.file);
+              const base64data = await readFileAsBase64(compressedFile);
+              const mimeType = compressedFile.type || 'image/png';
               const base64WithMimeType = `data:${mimeType};base64,${base64data.split(',')[1]}`;
               formData.append('base64_image', base64WithMimeType);
             } else if (typeof attachment.value === 'string' && attachment.value.startsWith('data:image')) {
@@ -49,6 +51,26 @@ export const useSubmitQuery = () => {
     }
 
     return { screenshot, audio, fileTitle };
+  }
+
+  const compressImageIfNeeded = async (file: File): Promise<File> => {
+    const ONE_MB = 1 * 1024 * 1024; // 1MB in bytes
+    if (file.size <= ONE_MB) {
+      return file;
+    }
+
+    const options = {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+    };
+
+    try {
+      return await imageCompression(file, options);
+    } catch (error) {
+      console.error('Error compressing image:', error);
+      return file;
+    }
   }
 
   const readFileAsBase64 = (file: File): Promise<string> => {
