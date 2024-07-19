@@ -50,9 +50,11 @@ const HighlightChat = () => {
   useEffect(() => {
     const getAboutMe = async () => {
       const aboutMe = await Highlight.user.getFacts();
-      const aboutMeString = aboutMe.join('\n');
-      console.log("About Me:", aboutMeString);
-      setAboutMe(aboutMeString);
+      if (aboutMe?.length > 0) {
+        const aboutMeString = aboutMe.join('\n');
+        console.log("About Me:", aboutMeString);
+        setAboutMe(aboutMeString);
+      }
     };
     getAboutMe();
   }, []);
