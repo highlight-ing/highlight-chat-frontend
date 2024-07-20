@@ -6,11 +6,21 @@ import { AddCircle, Category } from "iconsax-react";
 import CircleButton from "@/components/CircleButton/CircleButton";
 import Tooltip from "@/components/Tooltip";
 import { useStore } from "@/providers/store-provider";
+import { useRouter } from "next/navigation";
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
-  const { startNewConversation } = useStore((state) => ({
+  const router = useRouter();
+
+  const { startNewConversation, promptName } = useStore((state) => ({
     startNewConversation: state.startNewConversation,
+    promptName: state.promptName,
   }));
+
+  const onNewChatClick = () => {
+    startNewConversation();
+
+    router.push("/");
+  };
 
   return (
     <div className={styles.topBar}>
@@ -24,9 +34,9 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
           <Category variant={"Bold"} size={24} />
         </CircleButton>
       </Tooltip>
-      Highlight Chat
+      {promptName ? promptName : "Highlight Chat"}
       <Tooltip tooltip="Start new chat" position="left">
-        <CircleButton onClick={startNewConversation}>
+        <CircleButton onClick={onNewChatClick}>
           <AddCircle variant={"Bold"} size={24} />
         </CircleButton>
       </Tooltip>
