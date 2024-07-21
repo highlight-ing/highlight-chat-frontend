@@ -15,6 +15,9 @@ import { useAboutMeContext } from "@/context/AboutMeContext";
  * and then calling the handleIncomingContext function.
  */
 function useContextRecievedHandler() {
+  const { addAttachment } = useStore((state) => ({
+    addAttachment: state.addAttachment,
+  }));
   const { setHighlightContext } = useHighlightContextContext();
 
   const { setInput } = useStore((state) => ({
@@ -43,10 +46,16 @@ function useContextRecievedHandler() {
 
     const attachmentDestroyer = Highlight.app.addListener(
       "onConversationAttachment",
-      (attachment: any) => {
+      (attachment: string) => {
         // Handle the attachment here
         console.log("Received conversation attachment:", attachment);
-        // You may want to add additional logic to process the attachment
+
+        addAttachment({
+          type: "audio",
+          value: attachment
+        });
+
+        console.log("Added attachment:", attachment);
       }
     );
 
