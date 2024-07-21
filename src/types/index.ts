@@ -27,8 +27,8 @@ export type CompareResult = {
 };
 
 export interface TopBarProps {
-  showHistory: boolean;
-  setShowHistory: (show: boolean) => void;
+  showHistory?: boolean;
+  setShowHistory?: (show: boolean) => void;
 }
 
 export interface ImageAttachment {

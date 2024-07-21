@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { TopBarProps } from "../../types";
 
@@ -6,11 +8,61 @@ import { AddCircle, Category } from "iconsax-react";
 import CircleButton from "@/components/CircleButton/CircleButton";
 import Tooltip from "@/components/Tooltip";
 import { useStore } from "@/providers/store-provider";
+import { useRouter } from "next/navigation";
+import {
+  Dropdown,
+  DropdownButton,
+  DropdownItem,
+  DropdownMenu,
+} from "@/components/catalyst/dropdown";
+
+function TopBarAppName() {
+  const router = useRouter();
+
+  const { promptName, clearPrompt } = useStore((state) => ({
+    promptName: state.promptName,
+    clearPrompt: state.clearPrompt,
+  }));
+
+  const onBackToHighlightChat = () => {
+    clearPrompt();
+    router.push("/");
+  };
+
+  return (
+    <Dropdown>
+      <DropdownButton plain>{promptName || "Highlight Chat"}</DropdownButton>
+      <DropdownMenu>
+        <DropdownItem href="/prompts">View Prompts</DropdownItem>
+        {promptName && (
+          <DropdownItem onClick={onBackToHighlightChat}>
+            Back to Highlight Chat
+          </DropdownItem>
+        )}
+      </DropdownMenu>
+    </Dropdown>
+  );
+}
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
-  const { startNewConversation } = useStore((state) => ({
+  const router = useRouter();
+
+  const { startNewConversation, promptName } = useStore((state) => ({
     startNewConversation: state.startNewConversation,
+    promptName: state.promptName,
   }));
+
+  const onNewChatClick = () => {
+    startNewConversation();
+
+    router.push("/");
+  };
+
+  const onShowHistoryClick = () => {
+    if (setShowHistory) {
+      setShowHistory(!showHistory);
+    }
+  };
 
   return (
     <div className={styles.topBar}>
@@ -20,13 +72,14 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
         position="right"
         wrapperStyle={true ? { visibility: "hidden" } : undefined}
       >
-        <CircleButton onClick={() => setShowHistory(!showHistory)}>
+        <CircleButton onClick={onShowHistoryClick}>
           <Category variant={"Bold"} size={24} />
         </CircleButton>
       </Tooltip>
-      Highlight Chat
+      <TopBarAppName />
+
       <Tooltip tooltip="Start new chat" position="left">
-        <CircleButton onClick={startNewConversation}>
+        <CircleButton onClick={onNewChatClick}>
           <AddCircle variant={"Bold"} size={24} />
         </CircleButton>
       </Tooltip>

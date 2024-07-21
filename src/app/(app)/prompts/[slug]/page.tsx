@@ -10,7 +10,7 @@ import { fetchPrompt } from "./actions";
  * This page is for "prompt apps", apps that are simply prompts and do not need their own interface.
  * They use Highlight Chat's interface instead.
  */
-export default function PromptsPage() {
+export default function PromptPage() {
   // STATE
   const [loaded, setLoaded] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
@@ -25,6 +25,7 @@ export default function PromptsPage() {
     const fetch = async () => {
       const prompt = await fetchPrompt(slug);
       promptContext.setPrompt(prompt);
+      console.log("using prompt", prompt);
       setLoaded(true);
     };
     fetch();
