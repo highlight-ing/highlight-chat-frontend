@@ -9,9 +9,18 @@ interface PromptBoxProps {
 export default function PromptBox({ name, description }: PromptBoxProps) {
   const router = useRouter();
 
-  const setPrompt = useStore((state) => state.setPrompt);
+  const { setPrompt, clearPrompt } = useStore((state) => ({
+    setPrompt: state.setPrompt,
+    clearPrompt: state.clearPrompt,
+  }));
 
   function onClick() {
+    if (name === "Highlight Chat") {
+      clearPrompt();
+      router.push("/");
+      return;
+    }
+
     setPrompt({ promptName: name, promptDescription: description });
 
     router.push("/");

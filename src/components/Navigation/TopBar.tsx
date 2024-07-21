@@ -7,6 +7,40 @@ import CircleButton from "@/components/CircleButton/CircleButton";
 import Tooltip from "@/components/Tooltip";
 import { useStore } from "@/providers/store-provider";
 import { useRouter } from "next/navigation";
+import {
+  Dropdown,
+  DropdownButton,
+  DropdownItem,
+  DropdownMenu,
+} from "@/components/catalyst/dropdown";
+
+function TopBarAppName() {
+  const router = useRouter();
+
+  const { promptName, clearPrompt } = useStore((state) => ({
+    promptName: state.promptName,
+    clearPrompt: state.clearPrompt,
+  }));
+
+  const onBackToHighlightChat = () => {
+    clearPrompt();
+    router.push("/");
+  };
+
+  return (
+    <Dropdown>
+      <DropdownButton plain>{promptName || "Highlight Chat"}</DropdownButton>
+      <DropdownMenu>
+        <DropdownItem href="/prompts">View Prompts</DropdownItem>
+        {promptName && (
+          <DropdownItem onClick={onBackToHighlightChat}>
+            Back to Highlight Chat
+          </DropdownItem>
+        )}
+      </DropdownMenu>
+    </Dropdown>
+  );
+}
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const router = useRouter();
@@ -34,7 +68,8 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
           <Category variant={"Bold"} size={24} />
         </CircleButton>
       </Tooltip>
-      {promptName ? promptName : "Highlight Chat"}
+      <TopBarAppName />
+
       <Tooltip tooltip="Start new chat" position="left">
         <CircleButton onClick={onNewChatClick}>
           <AddCircle variant={"Bold"} size={24} />

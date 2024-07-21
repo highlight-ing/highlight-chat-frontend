@@ -26,6 +26,10 @@ export default function PromptsPage() {
           Create your own prompts or use already existing prompts.
         </p>
         <div className="grid grid-cols-3 gap-4 mt-4">
+          <PromptBox
+            name="Highlight Chat"
+            description="The standard Highlight Chat. Oriented towards critical thinking and questioning."
+          />
           {prompts.map((prompt) => (
             <PromptBox
               key={prompt.name}
