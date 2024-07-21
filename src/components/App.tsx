@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Highlight, { type HighlightContext } from "@highlight-ai/app-runtime";
 import { useHighlightContextContext } from "@/context/HighlightContext";
+
 import { debounce } from "throttle-debounce";
 import { useSubmitQuery } from "@/hooks/useSubmitQuery";
 import { usePromptContext } from "@/context/PromptContext";
@@ -32,17 +33,26 @@ function useContextRecievedHandler() {
   );
 
   useEffect(() => {
-    const destroyer = Highlight.app.addListener(
+    const contextDestroyer = Highlight.app.addListener(
       "onContext",
       (context: HighlightContext) => {
         setHighlightContext(context);
-
         debouncedHandleSubmit(context);
       }
     );
 
+    const attachmentDestroyer = Highlight.app.addListener(
+      "onConversationAttachment",
+      (attachment: any) => {
+        // Handle the attachment here
+        console.log("Received conversation attachment:", attachment);
+        // You may want to add additional logic to process the attachment
+      }
+    );
+
     return () => {
-      destroyer();
+      contextDestroyer();
+      attachmentDestroyer();
     };
   }, []);
 }
