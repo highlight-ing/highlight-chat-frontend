@@ -187,6 +187,12 @@ export const useSubmitQuery = () => {
     context: HighlightContext,
     systemPrompt?: string
   ) => {
+    console.log('Received context inside handleIncomingContext: ', context)
+      // Check if the context is empty or only contains empty suggestion and attachments
+      if (!context.suggestion && (!context.attachments || context.attachments.length === 0)) {
+        console.log('Empty context received, ignoring.');
+        return;
+      }
     resetConversationId(); // Reset conversation ID for new incoming context
 
     let query = context.suggestion || "";
@@ -194,8 +200,8 @@ export const useSubmitQuery = () => {
       context.attachments?.find((a) => a.type === "screenshot")?.value ?? "";
     let clipboardText =
       context.attachments?.find((a) => a.type === "clipboard")?.value ?? "";
-    let ocrScreenContents = context.environment.ocrScreenContents ?? "";
-    let rawContents = context.application.focusedWindow.rawContents;
+    let ocrScreenContents = context.environment?.ocrScreenContents ?? "";
+    let rawContents = context.application.focusedWindow?.rawContents;
     let audio =
       context.attachments?.find((a) => a.type === "audio")?.value ?? "";
 
