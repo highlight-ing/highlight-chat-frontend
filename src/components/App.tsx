@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Highlight, { type HighlightContext } from "@highlight-ai/app-runtime";
 import { useHighlightContextContext } from "@/context/HighlightContext";
+
 import { debounce } from "throttle-debounce";
 import { useSubmitQuery } from "@/hooks/useSubmitQuery";
 import { usePromptContext } from "@/context/PromptContext";
@@ -14,6 +15,9 @@ import { useAboutMeContext } from "@/context/AboutMeContext";
  * and then calling the handleIncomingContext function.
  */
 function useContextRecievedHandler() {
+  const { addAttachment } = useStore((state) => ({
+    addAttachment: state.addAttachment,
+  }));
   const { setHighlightContext } = useHighlightContextContext();
 
   const { setInput } = useStore((state) => ({
@@ -32,17 +36,32 @@ function useContextRecievedHandler() {
   );
 
   useEffect(() => {
-    const destroyer = Highlight.app.addListener(
+    const contextDestroyer = Highlight.app.addListener(
       "onContext",
       (context: HighlightContext) => {
         setHighlightContext(context);
-
         debouncedHandleSubmit(context);
       }
     );
 
+    const attachmentDestroyer = Highlight.app.addListener(
+      "onConversationAttachment",
+      (attachment: string) => {
+        // Handle the attachment here
+        console.log("Received conversation attachment:", attachment);
+
+        addAttachment({
+          type: "audio",
+          value: attachment
+        });
+
+        console.log("Added attachment:", attachment);
+      }
+    );
+
     return () => {
-      destroyer();
+      contextDestroyer();
+      attachmentDestroyer();
     };
   }, []);
 }

@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.1.2",
-    "@highlight-ai/app-runtime": "^0.0.35",
+    "@highlight-ai/app-runtime": "^0.0.40",
     "@tailwindcss/line-clamp": "^0.4.4",
     "ai": "^3.2.15",
     "browser-image-compression": "^2.0.2",
