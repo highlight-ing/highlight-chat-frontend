@@ -1,25 +1,25 @@
-"use client";
-
 import TopBar from "@/components/Navigation/TopBar";
 import PromptBox from "@/components/prompts/PromptBox";
 import { useMemo } from "react";
 
-function fetchPrompts() {
-  return [
-    {
-      name: "Write For Me",
-      description:
-        "Write tailored, engaging content with a focus on quality, relevance and precise word count.",
-    },
-  ];
+async function fetchPrompts() {
+  const appsResponse = await fetch(
+    "https://backend.workers.highlight.ing/v1/apps/prompts?q=1"
+  );
+
+  const apps = await appsResponse.json();
+
+  console.log(apps);
+
+  return apps;
 }
 
-export default function PromptsPage() {
-  const prompts = useMemo(() => fetchPrompts(), []);
+export default async function PromptsPage() {
+  const prompts = await fetchPrompts();
 
   return (
     <div className="bg-light-5 h-screen">
-      <TopBar showHistory={false} setShowHistory={() => {}} />
+      <TopBar />
       <div className="p-4">
         <h1 className="text-2xl">Prompts</h1>
         <p className="text-light-60">
@@ -27,12 +27,14 @@ export default function PromptsPage() {
         </p>
         <div className="grid grid-cols-3 gap-4 mt-4">
           <PromptBox
+            slug="hlchat"
             name="Highlight Chat"
             description="The standard Highlight Chat. Oriented towards critical thinking and questioning."
           />
-          {prompts.map((prompt) => (
+          {prompts.map((prompt: any) => (
             <PromptBox
-              key={prompt.name}
+              key={prompt.id}
+              slug={prompt.slug}
               name={prompt.name}
               description={prompt.description}
             />

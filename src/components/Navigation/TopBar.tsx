@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { TopBarProps } from "../../types";
 
@@ -56,6 +58,12 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
     router.push("/");
   };
 
+  const onShowHistoryClick = () => {
+    if (setShowHistory) {
+      setShowHistory(!showHistory);
+    }
+  };
+
   return (
     <div className={styles.topBar}>
       {/* @TODO re-enable when history is working, set condition back to !showHistory */}
@@ -64,7 +72,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
         position="right"
         wrapperStyle={true ? { visibility: "hidden" } : undefined}
       >
-        <CircleButton onClick={() => setShowHistory(!showHistory)}>
+        <CircleButton onClick={onShowHistoryClick}>
           <Category variant={"Bold"} size={24} />
         </CircleButton>
       </Tooltip>

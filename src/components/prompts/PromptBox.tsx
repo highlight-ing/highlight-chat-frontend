@@ -1,12 +1,15 @@
+"use client";
+
 import { useStore } from "@/providers/store-provider";
 import { useRouter } from "next/navigation";
 
 interface PromptBoxProps {
+  slug: string;
   name: string;
   description: string;
 }
 
-export default function PromptBox({ name, description }: PromptBoxProps) {
+export default function PromptBox({ slug, name, description }: PromptBoxProps) {
   const router = useRouter();
 
   const { setPrompt, clearPrompt } = useStore((state) => ({
@@ -21,9 +24,13 @@ export default function PromptBox({ name, description }: PromptBoxProps) {
       return;
     }
 
-    setPrompt({ promptName: name, promptDescription: description });
+    setPrompt({
+      promptName: name,
+      promptDescription: description,
+      promptAppName: slug,
+    });
 
-    router.push("/");
+    router.push(`/prompts/${slug}`);
   }
 
   return (
