@@ -4,7 +4,14 @@ import * as React from "react";
 import { TopBarProps } from "../../types";
 
 import styles from "./top-bar.module.scss";
-import { AddCircle, ArrowDown2, Category } from "iconsax-react";
+import {
+  AddCircle,
+  ArrowDown2,
+  ArrowLeft,
+  ArrowLeft2,
+  Category,
+  DocumentText,
+} from "iconsax-react";
 import CircleButton from "@/components/CircleButton/CircleButton";
 import Tooltip from "@/components/Tooltip";
 import { useStore } from "@/providers/store-provider";
@@ -36,9 +43,13 @@ function AppDropdown() {
         <ArrowDown2 size={20} />
       </DropdownButton>
       <DropdownMenu>
-        <DropdownItem href="/prompts">View Prompts</DropdownItem>
+        <DropdownItem href="/prompts">
+          <DocumentText size={20} className="mr-2" />
+          View Prompts
+        </DropdownItem>
         {promptName && (
           <DropdownItem onClick={onBackToHighlightChat}>
+            <ArrowLeft size={20} className="mr-2" />
             Back to Highlight Chat
           </DropdownItem>
         )}
