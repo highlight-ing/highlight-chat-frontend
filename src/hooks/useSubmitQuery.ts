@@ -1,6 +1,4 @@
 import { HighlightContext } from "@highlight-ai/app-runtime";
-import { useHighlightContextContext } from "../context/HighlightContext";
-import { useAboutMeContext } from "@/context/AboutMeContext";
 import imageCompression from "browser-image-compression";
 import { useStore } from "@/providers/store-provider";
 import useAuth from "./useAuth";
@@ -69,7 +67,7 @@ export default async function addAttachmentsToFormData(
           break;
         case "audio":
           audio = attachment.value;
-          formData.append("audio", attachment.value);
+          formData.append("audio", attachment.value.slice(0, 1000));
           break;
         default:
           console.warn("Unknown attachment type:", attachment.type);
@@ -96,6 +94,10 @@ export const useSubmitQuery = () => {
     updateLastMessage: state.updateLastMessage,
   }));
 
+  const { highlightContext } = useStore((state) => ({
+    highlightContext: state.highlightContext,
+  }));
+
   const { getOrCreateConversationId, resetConversationId } = useStore(
     (state) => ({
       getOrCreateConversationId: state.getOrCreateConversationId,
@@ -105,8 +107,9 @@ export const useSubmitQuery = () => {
 
   const { getTokens } = useAuth();
 
-  const { highlightContext } = useHighlightContextContext();
-  const { aboutMe } = useAboutMeContext();
+  const { aboutMe } = useStore((state) => ({
+    aboutMe: state.aboutMe,
+  }));
 
   const fetchResponse = async (formData: FormData, token: string) => {
     setIsDisabled(true);
@@ -165,17 +168,10 @@ export const useSubmitQuery = () => {
     const processedContext = { ...highlightContext };
 
     if (processedContext.attachments) {
-      processedContext.attachments = processedContext.attachments
-        .filter((attachment: any) => attachment.type !== "screenshot")
-        .map((attachment: any) => {
-          if (attachment.type === "audio") {
-            return {
-              ...attachment,
-              value: attachment.value.slice(0, 1000),
-            };
-          }
-          return attachment;
-        });
+      processedContext.attachments = processedContext.attachments.filter(
+        (attachment: any) =>
+          attachment.type !== "screenshot" && attachment.type !== "audio"
+      );
     }
 
     return (
@@ -187,6 +183,23 @@ export const useSubmitQuery = () => {
     context: HighlightContext,
     systemPrompt?: string
   ) => {
+    console.log("Received context inside handleIncomingContext: ", context);
+    if (!context.suggestion || context.suggestion.trim() === "") {
+      console.log("No context received, ignoring.");
+      return;
+    }
+
+    if (!context.application) {
+      console.log("No application data in context, ignoring.");
+      return;
+    }
+    // Check if the context is empty, only contains empty suggestion and attachments, or has no application data
+    if (!context.attachments || context.attachments.length === 0) {
+      console.log("Empty or invalid context received, ignoring.");
+      return;
+    }
+
+    console.log("context:", context);
     resetConversationId(); // Reset conversation ID for new incoming context
 
     let query = context.suggestion || "";
@@ -194,8 +207,8 @@ export const useSubmitQuery = () => {
       context.attachments?.find((a) => a.type === "screenshot")?.value ?? "";
     let clipboardText =
       context.attachments?.find((a) => a.type === "clipboard")?.value ?? "";
-    let ocrScreenContents = context.environment.ocrScreenContents ?? "";
-    let rawContents = context.application.focusedWindow.rawContents;
+    let ocrScreenContents = context.environment?.ocrScreenContents ?? "";
+    let rawContents = context.application?.focusedWindow?.rawContents;
     let audio =
       context.attachments?.find((a) => a.type === "audio")?.value ?? "";
 
@@ -231,9 +244,8 @@ export const useSubmitQuery = () => {
       }));
       formData.append("previous_messages", JSON.stringify(previousMessages));
 
-      let contextString = "This is a new conversation with Highlight Chat.";
-
-      contextString += prepareHighlightContext(context);
+      let contextString =
+        "This is a new conversation with Highlight Chat. You do not have any Highlight Context available.";
 
       console.log("contextString:", contextString);
       formData.append("context", contextString);
@@ -252,6 +264,12 @@ export const useSubmitQuery = () => {
 
   const handleSubmit = async (systemPrompt?: string) => {
     const query = input.trim();
+
+    if (!query) {
+      console.log("No query provided, ignoring.");
+      return;
+    }
+
     if (query) {
       const formData = new FormData();
       formData.append("prompt", query);
