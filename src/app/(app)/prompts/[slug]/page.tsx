@@ -3,8 +3,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import HighlightChat from "@/components/HighlightChat/HighlightChat";
-import { usePromptContext } from "@/context/PromptContext";
 import { fetchPrompt } from "./actions";
+import { useStore } from "@/providers/store-provider";
 
 /**
  * This page is for "prompt apps", apps that are simply prompts and do not need their own interface.
@@ -15,17 +15,21 @@ export default function PromptPage() {
   const [loaded, setLoaded] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
 
+  const { setPrompt } = useStore((state) => ({
+    setPrompt: state.setPrompt,
+  }));
+
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   // HOOKS
   const { slug } = useParams<{ slug: string }>();
-  const promptContext = usePromptContext();
 
   useEffect(() => {
     const fetch = async () => {
       const prompt = await fetchPrompt(slug);
-      promptContext.setPrompt(prompt);
-      console.log("using prompt", prompt);
+      setPrompt({
+        prompt,
+      });
       setLoaded(true);
     };
     fetch();

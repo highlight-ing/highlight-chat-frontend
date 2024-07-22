@@ -1,6 +1,5 @@
 import TopBar from "@/components/Navigation/TopBar";
 import PromptBox from "@/components/prompts/PromptBox";
-import { useMemo } from "react";
 
 async function fetchPrompts() {
   const appsResponse = await fetch(
@@ -9,8 +8,6 @@ async function fetchPrompts() {
 
   const apps = await appsResponse.json();
 
-  console.log(apps);
-
   return apps;
 }
 
@@ -18,7 +15,7 @@ export default async function PromptsPage() {
   const prompts = await fetchPrompts();
 
   return (
-    <div className="bg-light-5 h-screen">
+    <div className="h-screen">
       <TopBar />
       <div className="p-4">
         <h1 className="text-2xl">Prompts</h1>
