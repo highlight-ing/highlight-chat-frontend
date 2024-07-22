@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import Highlight, { type HighlightContext } from "@highlight-ai/app-runtime";
-import { useHighlightContextContext } from "@/context/HighlightContext";
 
 import { debounce } from "throttle-debounce";
 import { useSubmitQuery } from "@/hooks/useSubmitQuery";
@@ -13,10 +12,10 @@ import { useStore } from "@/providers/store-provider";
  * and then calling the handleIncomingContext function.
  */
 function useContextRecievedHandler() {
-  const { addAttachment } = useStore((state) => ({
+  const { addAttachment, setHighlightContext } = useStore((state) => ({
     addAttachment: state.addAttachment,
+    setHighlightContext: state.setHighlightContext,
   }));
-  const { setHighlightContext } = useHighlightContextContext();
 
   const { setInput, prompt } = useStore((state) => ({
     setInput: state.setInput,

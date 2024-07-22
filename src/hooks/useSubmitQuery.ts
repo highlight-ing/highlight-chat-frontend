@@ -1,5 +1,4 @@
 import { HighlightContext } from "@highlight-ai/app-runtime";
-import { useHighlightContextContext } from "../context/HighlightContext";
 import imageCompression from "browser-image-compression";
 import { useStore } from "@/providers/store-provider";
 import useAuth from "./useAuth";
@@ -95,6 +94,10 @@ export const useSubmitQuery = () => {
     updateLastMessage: state.updateLastMessage,
   }));
 
+  const { highlightContext } = useStore((state) => ({
+    highlightContext: state.highlightContext,
+  }));
+
   const { getOrCreateConversationId, resetConversationId } = useStore(
     (state) => ({
       getOrCreateConversationId: state.getOrCreateConversationId,
@@ -103,8 +106,6 @@ export const useSubmitQuery = () => {
   );
 
   const { getTokens } = useAuth();
-
-  const { highlightContext } = useHighlightContextContext();
 
   const { aboutMe } = useStore((state) => ({
     aboutMe: state.aboutMe,
