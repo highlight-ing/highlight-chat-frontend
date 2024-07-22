@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import HighlightChat from "@/components/HighlightChat/HighlightChat";
-import { fetchPrompt } from "./actions";
+import { fetchPrompt } from "../actions";
 import { useStore } from "@/providers/store-provider";
 
 /**

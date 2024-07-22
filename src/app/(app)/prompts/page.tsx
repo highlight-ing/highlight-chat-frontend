@@ -1,26 +1,33 @@
 import TopBar from "@/components/Navigation/TopBar";
 import PromptBox from "@/components/prompts/PromptBox";
+import { supabaseAdmin } from "@/lib/supabase";
 
 async function fetchPrompts() {
-  const appsResponse = await fetch(
-    "https://backend.workers.highlight.ing/v1/apps/prompts?q=1"
-  );
+  const { data: prompts, error } = await supabaseAdmin
+    .from("prompts")
+    .select("*");
 
-  const apps = await appsResponse.json();
+  if (error) {
+    console.error("Error fetching prompts from Supabase", error);
+    return [];
+  }
 
-  return apps;
+  console.log("prompts", prompts);
+
+  return prompts;
 }
 
 export default async function PromptsPage() {
   const prompts = await fetchPrompts();
 
   return (
-    <div className="h-screen">
+    <div className="h-screen bg-light-5">
       <TopBar />
       <div className="p-4">
         <h1 className="text-2xl">Prompts</h1>
         <p className="text-light-60">
-          Create your own prompts or use already existing prompts.
+          Prompts change the way Highlight Chat talks to you. Create your own or
+          use already existing prompts.
         </p>
         <div className="grid grid-cols-3 gap-4 mt-4">
           <PromptBox
@@ -28,12 +35,12 @@ export default async function PromptsPage() {
             name="Highlight Chat"
             description="The standard Highlight Chat. Oriented towards critical thinking and questioning."
           />
-          {prompts.map((prompt: any) => (
+          {prompts.map((prompt) => (
             <PromptBox
-              key={prompt.id}
-              slug={prompt.slug}
+              key={prompt.external_id}
+              slug={prompt.external_id}
               name={prompt.name}
-              description={prompt.description}
+              description={prompt.description ?? ""}
             />
           ))}
         </div>
