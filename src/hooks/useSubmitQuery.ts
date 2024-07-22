@@ -163,13 +163,22 @@ export const useSubmitQuery = () => {
 
   const handleIncomingContext = async (context: HighlightContext, systemPrompt?: string) => {
     console.log('Received context inside handleIncomingContext: ', context)
+    if (!context.suggestion || context.suggestion.trim() === '') {
+      console.log('No context received, ignoring.')
+      return
+    }
+
+    if (!context.application) {
+      console.log('No application data in context, ignoring.')
+      return
+    }
     // Check if the context is empty, only contains empty suggestion and attachments, or has no application data
-    if ((!context.suggestion || context.suggestion.trim() === '') && 
-        (!context.attachments || context.attachments.length === 0) && 
-        !context.application) {
+    if (!context.attachments || context.attachments.length === 0) {
       console.log('Empty or invalid context received, ignoring.')
       return
     }
+
+    console.log('context:', context)
     resetConversationId() // Reset conversation ID for new incoming context
 
     let query = context.suggestion || ''
