@@ -39,6 +39,12 @@ import {
   createPromptSlice,
   initialPromptState,
 } from "./prompt";
+import {
+  AboutMeSlice,
+  AboutMeState,
+  createAboutMeSlice,
+  initialAboutMeState,
+} from "./about-me";
 
 /**
  * To add a new store, create a new file and reference messages.ts
@@ -52,14 +58,16 @@ export type StoreState = MessagesState &
   ChatInputState &
   ChatAttachmentsState &
   ConversationState &
-  PromptState;
+  PromptState &
+  AboutMeState;
 
 export type Store = MessagesSlice &
   AuthSlice &
   ChatInputSlice &
   ChatAttachmentsSlice &
   ConversationSlice &
-  PromptSlice;
+  PromptSlice &
+  AboutMeSlice;
 
 const defaultState: StoreState = {
   ...initialMessagesState,
@@ -68,6 +76,7 @@ const defaultState: StoreState = {
   ...initialChatAttachmentsState,
   ...initialConversationState,
   ...initialPromptState,
+  ...initialAboutMeState,
 };
 
 export const initStore: () => StoreState = () => {
@@ -83,5 +92,6 @@ export const createStore = (initState: StoreState = defaultState) => {
     ...createChatAttachmentsSlice(...a),
     ...createConversationSlice(...a),
     ...createPromptSlice(...a),
+    ...createAboutMeSlice(...a),
   }));
 };

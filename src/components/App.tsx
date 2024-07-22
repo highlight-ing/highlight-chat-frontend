@@ -6,9 +6,7 @@ import { useHighlightContextContext } from "@/context/HighlightContext";
 
 import { debounce } from "throttle-debounce";
 import { useSubmitQuery } from "@/hooks/useSubmitQuery";
-import { usePromptContext } from "@/context/PromptContext";
 import { useStore } from "@/providers/store-provider";
-import { useAboutMeContext } from "@/context/AboutMeContext";
 
 /**
  * When the Highlight runtime sends us context, handle it by setting the input to the suggestion the user picked
@@ -20,12 +18,12 @@ function useContextRecievedHandler() {
   }));
   const { setHighlightContext } = useHighlightContextContext();
 
-  const { setInput } = useStore((state) => ({
+  const { setInput, prompt } = useStore((state) => ({
     setInput: state.setInput,
+    prompt: state.prompt,
   }));
 
   const { handleIncomingContext } = useSubmitQuery();
-  const { prompt } = usePromptContext();
 
   const debouncedHandleSubmit = debounce(
     300,
@@ -52,7 +50,7 @@ function useContextRecievedHandler() {
 
         addAttachment({
           type: "audio",
-          value: attachment
+          value: attachment,
         });
 
         console.log("Added attachment:", attachment);
@@ -67,16 +65,13 @@ function useContextRecievedHandler() {
 }
 
 /**
- * The main app component.
- *
- * This should hold all the providers and context providers.
+ * Hook that automatically registers the about me data when the app mounts.
  */
-export default function App({ children }: { children: React.ReactNode }) {
-  useContextRecievedHandler();
+function useAboutMeRegister() {
+  const { setAboutMe } = useStore((state) => ({
+    setAboutMe: state.setAboutMe,
+  }));
 
-  const { setAboutMe } = useAboutMeContext();
-
-  // Move this to a new hook
   useEffect(() => {
     const getAboutMe = async () => {
       const aboutMe = await Highlight.user.getFacts();
@@ -88,6 +83,16 @@ export default function App({ children }: { children: React.ReactNode }) {
     };
     getAboutMe();
   }, []);
+}
+
+/**
+ * The main app component.
+ *
+ * This should hold all the providers and context providers.
+ */
+export default function App({ children }: { children: React.ReactNode }) {
+  useContextRecievedHandler();
+  useAboutMeRegister();
 
   return <>{children}</>;
 }

@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Attachment } from "../Attachment";
 import { AttachmentsButton } from "../AttachmentsButton/AttachmentsButton";
-import { usePromptContext } from "../../context/PromptContext";
 import { Attachment as AttachmentType } from "@/types";
 import { useSubmitQuery } from "../../hooks/useSubmitQuery";
 import { useStore } from "@/providers/store-provider";
@@ -33,18 +32,21 @@ function InputHeading() {
   );
 }
 
+/**
+ * This is the main Highlight Chat input box, not a reusable Input component.
+ */
 export const Input = ({ offset }: { offset: boolean }) => {
-  const { attachments, input, setInput, inputIsDisabled, promptName } =
+  const { attachments, input, setInput, inputIsDisabled, promptName, prompt } =
     useStore((state) => ({
       attachments: state.attachments,
       input: state.input,
       setInput: state.setInput,
       inputIsDisabled: state.inputIsDisabled,
       promptName: state.promptName,
+      prompt: state.prompt,
     }));
 
   const { handleSubmit } = useSubmitQuery();
-  const { prompt } = usePromptContext();
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
