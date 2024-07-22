@@ -15,7 +15,7 @@ export default async function PromptsPage() {
   const prompts = await fetchPrompts();
 
   return (
-    <div className="h-screen">
+    <div className="h-screen bg-light-5">
       <TopBar />
       <div className="p-4">
         <h1 className="text-2xl">Prompts</h1>

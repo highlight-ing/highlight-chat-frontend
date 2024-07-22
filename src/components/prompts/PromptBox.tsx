@@ -1,5 +1,6 @@
 "use client";
 
+import { fetchPrompt } from "@/app/(app)/prompts/actions";
 import { useStore } from "@/providers/store-provider";
 import { useRouter } from "next/navigation";
 
@@ -17,20 +18,24 @@ export default function PromptBox({ slug, name, description }: PromptBoxProps) {
     clearPrompt: state.clearPrompt,
   }));
 
-  function onClick() {
+  async function onClick() {
     if (name === "Highlight Chat") {
       clearPrompt();
       router.push("/");
       return;
     }
 
+    // Fetch the prompt
+    const prompt = await fetchPrompt(slug);
+
     setPrompt({
       promptName: name,
       promptDescription: description,
       promptAppName: slug,
+      prompt,
     });
 
-    router.push(`/prompts/${slug}`);
+    router.push(`/`);
   }
 
   return (
