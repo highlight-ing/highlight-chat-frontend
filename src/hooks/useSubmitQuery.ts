@@ -4,6 +4,7 @@ import { useAboutMeContext } from "@/context/AboutMeContext";
 import imageCompression from "browser-image-compression";
 import { useStore } from "@/providers/store-provider";
 import useAuth from "./useAuth";
+import { v4 as uuidv4 } from 'uuid';
 
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024; // 1MB in bytes
@@ -41,6 +42,7 @@ export default async function addAttachmentsToFormData(
   let screenshot, audio, fileTitle;
 
   for (const attachment of attachments) {
+    console.log("attachment", attachment);
     if (attachment?.value) {
       switch (attachment.type) {
         case "image":
@@ -65,6 +67,7 @@ export default async function addAttachmentsToFormData(
           break;
         case "pdf":
           fileTitle = attachment.value.name;
+          console.log("pdf", attachment.value);
           formData.append("pdf", attachment.value);
           break;
         case "audio":
@@ -108,6 +111,33 @@ export const useSubmitQuery = () => {
   const { highlightContext } = useHighlightContextContext();
   const { aboutMe } = useAboutMeContext();
 
+  const addInitialAssistantMessage = () => {
+    addMessage({ type: "assistant", content: "" });
+  };
+  
+
+  const uploadImage = async (file: File, token: string): Promise<string> => {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const backendUrl = "http://0.0.0.0:8080/upload-image";
+    updateLastMessage({ type: "assistant", content: "Uploading image..." });
+    const response = await fetch(backendUrl, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to upload image');
+    }
+
+    const data = await response.json();
+    return data.image_id;
+  };
+
   const fetchResponse = async (formData: FormData, token: string) => {
     setIsDisabled(true);
 
@@ -115,8 +145,9 @@ export const useSubmitQuery = () => {
       const conversationId = getOrCreateConversationId();
       formData.append("conversation_id", conversationId);
 
-      const backendUrl =
-        process.env.NEXT_PUBLIC_BACKEND_URL || "http://0.0.0.0:8080/";
+      updateLastMessage({ type: "assistant", content: "Processing your request..." });
+
+      const backendUrl = "http://0.0.0.0:8080/";
       let response = await fetch(backendUrl, {
         method: "POST",
         headers: {
@@ -135,7 +166,6 @@ export const useSubmitQuery = () => {
       }
 
       let accumulatedResponse = "";
-      addMessage({ type: "assistant", content: "" });
 
       while (true) {
         const { done, value } = await reader.read();
@@ -309,6 +339,16 @@ export const useSubmitQuery = () => {
       }
 
       const { accessToken } = await getTokens();
+
+      addInitialAssistantMessage();
+      // Handle image upload
+      for (const attachment of attachments) {
+        if (attachment.type === 'image' && attachment.file) {
+          const imageId = await uploadImage(attachment.file, accessToken);
+          formData.append('image_id', imageId);
+        }
+      }
+
       await fetchResponse(formData, accessToken);
     }
   };
