@@ -1,6 +1,7 @@
 "use server";
 
 import { supabaseAdmin } from "@/lib/supabase";
+import { z } from "zod";
 
 /**
  * Calls the Highlight backend worker, fetches the prompt, and returns the raw prompt text.
@@ -46,4 +47,41 @@ export async function fetchPrompt(externalId: string) {
   const promptText = await appResponse.text();
 
   return promptText;
+}
+
+export interface CreatePromptData {
+  name: string;
+  description: string;
+  instructions: string;
+  slug: string;
+}
+
+const CreatePromptSchema = z.object({
+  name: z.string(),
+  description: z.string(),
+  instructions: z.string(),
+  slug: z.string(),
+});
+
+/**
+ * Creates a new prompt in the database.
+ */
+export async function createPrompt(data: CreatePromptData) {
+  const validatedData = CreatePromptSchema.safeParse(data);
+
+  if (!validatedData.success) {
+    return { error: "Invalid prompt data" };
+  }
+
+  const { data: prompt, error } = await supabaseAdmin.from("prompts").insert({
+    name: validatedData.data.name,
+    description: validatedData.data.description,
+    prompt_text: validatedData.data.instructions,
+  });
+
+  if (error) {
+    return { error: "Error creating prompt in our database." };
+  }
+
+  return { prompt: prompt };
 }

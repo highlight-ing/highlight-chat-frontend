@@ -1,4 +1,5 @@
 import TopBar from "@/components/Navigation/TopBar";
+import { Button } from "@/components/catalyst/button";
 import PromptBox from "@/components/prompts/PromptBox";
 import { supabaseAdmin } from "@/lib/supabase";
 
@@ -43,6 +44,28 @@ export default async function PromptsPage() {
               description={prompt.description ?? ""}
             />
           ))}
+        </div>
+
+        <div className="flex flex-row justify-between items-center mt-4">
+          <div>
+            <h1 className="text-2xl">My Prompts</h1>
+            <p className="text-light-60">
+              Create your own prompts or use already existing prompts.
+            </p>
+          </div>
+          <div>
+            <Button outline href="/prompts/create">
+              Create New Prompt
+            </Button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-4 mt-4">
+          <PromptBox
+            slug="hlchat"
+            name="Highlight Chat"
+            description="The standard Highlight Chat. Oriented towards critical thinking and questioning."
+          />
         </div>
       </div>
     </div>

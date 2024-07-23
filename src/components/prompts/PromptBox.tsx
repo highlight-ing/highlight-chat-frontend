@@ -3,6 +3,7 @@
 import { fetchPrompt } from "@/app/(app)/prompts/actions";
 import { useStore } from "@/providers/store-provider";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/catalyst/button";
 
 interface PromptBoxProps {
   slug: string;
@@ -18,7 +19,7 @@ export default function PromptBox({ slug, name, description }: PromptBoxProps) {
     clearPrompt: state.clearPrompt,
   }));
 
-  async function onClick() {
+  const onClick = async () => {
     if (name === "Highlight Chat") {
       clearPrompt();
       router.push("/");
@@ -36,15 +37,17 @@ export default function PromptBox({ slug, name, description }: PromptBoxProps) {
     });
 
     router.push(`/`);
-  }
+  };
 
   return (
-    <div
-      onClick={onClick}
-      className="bg-light-10 p-4 rounded-lg hover:bg-light-20 cursor-pointer"
-    >
-      <h3>{name}</h3>
-      <p className="text-sm text-light-60">{description}</p>
-    </div>
+    <a href="#" onClick={onClick}>
+      <div className="bg-light-10 p-4 rounded-lg hover:bg-light-20 cursor-pointer">
+        <h3>{name}</h3>
+        <p className="text-sm text-light-60">{description}</p>
+        <div className="mt-1 flex flex-row ">
+          <Button plain>Edit</Button>
+        </div>
+      </div>
+    </a>
   );
 }
