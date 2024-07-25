@@ -29,11 +29,11 @@ export const createConversationSlice: StateCreator<
   ...initialConversationState,
   resetConversationId: () => set({ conversationId: undefined }),
   getOrCreateConversationId: () => {
-    const newId = uuidv4();
-
-    set({ conversationId: newId });
-
-    return newId;
+    if (!get().conversationId) {
+      const newId = uuidv4();
+      set({ conversationId: newId });
+    }
+    return get().conversationId!;
   },
   startNewConversation: () => {
     get().resetConversationId();

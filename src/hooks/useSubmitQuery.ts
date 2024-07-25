@@ -118,8 +118,8 @@ export const useSubmitQuery = () => {
       const conversationId = getOrCreateConversationId();
       formData.append("conversation_id", conversationId);
 
-      const backendUrl =
-        process.env.NEXT_PUBLIC_BACKEND_URL || "http://0.0.0.0:8080/";
+      const backendUrl = "http://0.0.0.0:8080/api/v1/chat/";
+        //process.env.NEXT_PUBLIC_BACKEND_URL || "http://0.0.0.0:8080/";
       let response = await fetch(backendUrl, {
         method: "POST",
         headers: {
