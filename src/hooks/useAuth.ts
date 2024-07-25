@@ -1,5 +1,4 @@
 import { useStore } from "@/providers/store-provider";
-import { useEffect } from "react";
 import Highlight from "@highlight-ai/app-runtime";
 
 /**
