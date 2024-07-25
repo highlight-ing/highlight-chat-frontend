@@ -3,6 +3,10 @@
 import Script from "next/script";
 import { useEffect } from "react";
 
+/**
+ * This is an in-progress experiment to support third party code inside of Highlight Chat in the future.
+ */
+
 export default function IframePage() {
   useEffect(() => {
     const listener = (event: MessageEvent) => {

@@ -87,7 +87,7 @@ function useAboutMeRegister() {
 /**
  * The main app component.
  *
- * This should hold all the providers and context providers.
+ * This should hold all the providers.
  */
 export default function App({ children }: { children: React.ReactNode }) {
   useContextRecievedHandler();
