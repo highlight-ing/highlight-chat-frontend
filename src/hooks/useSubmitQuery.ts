@@ -118,9 +118,9 @@ export const useSubmitQuery = () => {
       const conversationId = getOrCreateConversationId();
       formData.append("conversation_id", conversationId);
 
-      const backendUrl = "http://0.0.0.0:8080/api/v1/chat/";
-        //process.env.NEXT_PUBLIC_BACKEND_URL || "http://0.0.0.0:8080/";
-      let response = await fetch(backendUrl, {
+      const backendUrl =
+        process.env.NEXT_PUBLIC_BACKEND_URL || "http://0.0.0.0:8080";
+      let response = await fetch(`${backendUrl}/api/v1/chat/`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

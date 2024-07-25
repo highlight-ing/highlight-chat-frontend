@@ -22,10 +22,9 @@ export const useChatHistory = (): ChatHistoryItem[] => {
     const { accessToken } = await getTokens();
 
     try {
-      const backendUrl = "http://0.0.0.0:8080/api/v1/history/";
-        //process.env.NEXT_PUBLIC_BACKEND_URL || "http://0.0.0.0:8080/";
-      const requestUrl = `${backendUrl}`;
-      let response = await fetch(requestUrl, {
+      const backendUrl =
+        process.env.NEXT_PUBLIC_BACKEND_URL || "http://0.0.0.0:8080";
+      let response = await fetch(`${backendUrl}/api/v1/history/`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${accessToken}`,
