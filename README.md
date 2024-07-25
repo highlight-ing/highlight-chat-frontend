@@ -37,3 +37,7 @@ This project is deployed using Vercel on pushes to the main branch.
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request. All PRs will be validated by Highlight team members. Please join [our Discord](https://discord.gg/hlai) if you have any questions or need help getting started.
+
+## License
+
+MIT, see [LICENSE.md](LICENSE.md)
