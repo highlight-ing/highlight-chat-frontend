@@ -13,7 +13,6 @@ import { Radio, RadioField, RadioGroup } from "@/components/catalyst/radio";
 import { Textarea } from "@/components/catalyst/textarea";
 import useAuth from "@/hooks/useAuth";
 import { useStore } from "@/providers/store-provider";
-import { revalidatePath } from "next/cache";
 import { useRouter } from "next/navigation";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 
@@ -44,7 +43,6 @@ export default function CreatePromptForm() {
       return;
     }
 
-    revalidatePath("/prompts");
     router.push(`/prompts`);
   };
 
