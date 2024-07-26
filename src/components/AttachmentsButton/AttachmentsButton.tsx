@@ -3,7 +3,7 @@ import { DocumentUpload, GalleryAdd, Sound } from 'iconsax-react'
 import Highlight from '@highlight-ai/app-runtime'
 
 import { PaperclipIcon } from '../../icons/icons'
-import ContextMenu, { MenuItemType } from '../ContextMenu'
+import ContextMenu, { MenuItemType } from '../ContextMenu/ContextMenu'
 import styles from './attachments-button.module.scss'
 import { useStore } from '@/providers/store-provider'
 

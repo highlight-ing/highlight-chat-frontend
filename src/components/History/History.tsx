@@ -7,6 +7,7 @@ import { Category } from "iconsax-react";
 import {useStore} from "@/providers/store-provider";
 import {useApi} from "@/hooks/useApi";
 import {Message} from "@/types";
+import ContextMenu from "@/components/ContextMenu/ContextMenu";
 
 interface HistoryProps {
   showHistory: boolean;
@@ -17,12 +18,17 @@ const History: React.FC<HistoryProps> = ({
   showHistory,
   setShowHistory,
 }: HistoryProps) => {
-  const {get} = useApi()
-  const chatHistory = useChatHistory();
-  const loadConversation = useStore(({loadConversation}) => loadConversation);
+  const {get, deleteRequest} = useApi()
+  const {chatHistory, refreshChatHistory} = useChatHistory();
+  const {conversationId, loadConversation, startNewConversation} = useStore((state) => state);
 
   const onSelectChat = async (chat: ChatHistoryItem) => {
     const response = await get(`history/${chat.id}/messages`)
+    if (!response.ok) {
+      // @TODO Error handling
+      console.error('Failed to select chat')
+      return
+    }
     const {messages} = await response.json()
     loadConversation(chat.id, messages.map((message: any) => {
       return {
@@ -30,6 +36,19 @@ const History: React.FC<HistoryProps> = ({
         content: message.content
       } as Message
     }))
+  }
+
+  const onDeleteChat = async (chat: ChatHistoryItem) => {
+    const response = await deleteRequest(`history/${chat.id}`)
+    if (!response.ok) {
+      // @TODO Error handling
+      console.error('Failed to delete')
+      return
+    }
+    if (chat.id === conversationId) {
+      startNewConversation()
+    }
+    await refreshChatHistory()
   }
 
   return (
@@ -47,12 +66,23 @@ const History: React.FC<HistoryProps> = ({
       <div className={styles.chats}>
         {chatHistory?.length > 0 ? (
           chatHistory.map((chat) => (
-            <div key={chat.id} className={styles.chat} onClick={() => onSelectChat(chat)}>
-              <span className={styles.chatText}>{chat.title}</span>
-            </div>
+            <ContextMenu
+              items={[
+                {label: 'Open Chat', onClick: () => onSelectChat(chat)},
+                {divider: true},
+                {label: <span className="text-red-400">Delete Chat</span>, onClick: () => onDeleteChat(chat)},
+              ]}
+              position={'bottom'}
+              triggerId={`chat-${chat.id}`}
+              wrapperStyle={{width: '100%'}}
+            >
+              <div key={chat.id} id={`chat-${chat.id}`} className={styles.chat} onClick={() => onSelectChat(chat)}>
+                <span className={styles.chatText}>{chat.title}</span>
+              </div>
+            </ContextMenu>
           ))
         ) : (
-          <div>No chat history available</div>
+          <div className={styles.emptyChatHistory}>No chat history available</div>
         )}
       </div>
     </div>

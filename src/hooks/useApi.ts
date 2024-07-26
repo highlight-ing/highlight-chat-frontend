@@ -48,8 +48,18 @@ export const useApi = () => {
     })
   }
 
+  const deleteRequest = async (route: string, options?: RequestOptions) => {
+    const {accessToken} = await getTokens()
+    return fetchRequest(route, {
+      bearerToken: accessToken,
+      method: 'DELETE',
+      version: options?.version,
+    })
+  }
+
   return {
     get,
-    post
+    post,
+    deleteRequest: deleteRequest
   }
 }

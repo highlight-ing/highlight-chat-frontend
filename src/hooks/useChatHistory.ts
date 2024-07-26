@@ -14,11 +14,12 @@ interface ChatHistoryResponse {
   conversations: ChatHistoryItem[];
 }
 
-export const useChatHistory = (): ChatHistoryItem[] => {
+export const useChatHistory = (): {chatHistory: ChatHistoryItem[], refreshChatHistory: () => Promise<ChatHistoryItem[]>} => {
   const {get} = useApi()
   const [chatHistory, setChatHistory] = useState<ChatHistoryItem[]>([]);
   const conversationId = useStore(({conversationId}) => conversationId)
-  const fetchTimeoutRef = useRef<NodeJS.Timeout>()
+  const fetchRetryRef = useRef<NodeJS.Timeout>()
+  const fetchRetryCountRef = useRef(0)
 
   const fetchResponse = async () => {
     try {
@@ -28,37 +29,56 @@ export const useChatHistory = (): ChatHistoryItem[] => {
       }
       const data: ChatHistoryResponse = await response.json();
       setChatHistory(data.conversations);
+      return data.conversations
     } catch (error) {
       console.error("Error fetching response:", error);
       setChatHistory([]);
+      return []
     }
   };
 
+  // Handle initial fetch of chat history
   useEffect(() => {
-    if (fetchTimeoutRef.current) {
-      clearTimeout(fetchTimeoutRef.current)
-    }
+    fetchResponse();
+  }, [])
 
-    if (!chatHistory?.length) {
-      fetchResponse();
+  useEffect(() => {
+    // If a new conversationId is found
+    if (conversationId && !chatHistory.some(chat => chat.id === conversationId)) {
+      console.log('Refreshing chat history, new conversation found')
+      fetchResponse()
       return
     }
-    if (!chatHistory.some(chat => chat.id === conversationId)) {
-      fetchResponse()
 
-      // Hope that a title is assigned within a second or two
-      fetchTimeoutRef.current = setTimeout(() => {
+    // If the latest conversation title is "New Conversation"
+    const chat = chatHistory.find(chat => chat.id === conversationId)
+    if (chat?.title === 'New Conversation' && fetchRetryCountRef.current < 10) {
+      console.log('Refreshing chat history until title is provided')
+
+      // Retry until title is assigned
+      fetchRetryRef.current = setTimeout(() => {
         fetchResponse()
-        fetchTimeoutRef.current = undefined
-      }, 2000)
+          .then((conversations) => {
+            const chat = conversations.find(chat => chat.id === conversationId)
+            if (chat && chat.title !== 'New Conversation') {
+              fetchRetryCountRef.current = 0
+              console.log('Reset history retry counter')
+            }
+          })
+        fetchRetryRef.current = undefined
+        fetchRetryCountRef.current++
+      }, 1000)
     }
 
     return () => {
-      if (fetchTimeoutRef.current) {
-        clearTimeout(fetchTimeoutRef.current)
+      if (fetchRetryRef.current) {
+        clearInterval(fetchRetryRef.current)
       }
     }
-  }, [conversationId]);
+  }, [chatHistory, conversationId]);
 
-  return chatHistory;
+  return {
+    chatHistory,
+    refreshChatHistory: fetchResponse
+  };
 };
