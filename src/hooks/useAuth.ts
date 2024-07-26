@@ -5,6 +5,7 @@ import { decodeJwt } from "jose";
 
 /**
  * Hook that handles automatically fetching tokens, refreshing them, etc.
+ * @todo Add persistant store to Zustand, this hook matter that much without persistant storage.
  */
 export default function useAuth() {
   let { accessToken, refreshToken, authExpiration, setAuth } = useStore(

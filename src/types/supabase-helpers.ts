@@ -1,5 +1,5 @@
 /**
- * Rexport types from Supabase with proper names
+ * Re-export types from Supabase with more proper names to improve developer experience.
  */
 
 import { Database } from "./supabase";

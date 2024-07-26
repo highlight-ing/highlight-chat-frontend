@@ -13,6 +13,10 @@ interface PromptBoxProps {
   editable?: boolean;
 }
 
+/**
+ * Component that shows a prompt box with a name, description, and when clicked, opens the prompt.
+ * If the editable prop is true, the component will show a button to edit the prompt.
+ */
 export default function PromptBox({
   slug,
   name,
