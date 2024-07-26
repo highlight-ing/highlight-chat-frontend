@@ -93,7 +93,6 @@ export const AttachmentsButton = () => {
   return (
     <ContextMenu
       position="top"
-      alignment="left"
       triggerId="attachments-button"
       leftClick={true}
       items={menuItems}
