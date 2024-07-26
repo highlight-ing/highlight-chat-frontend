@@ -63,39 +63,8 @@
   position: relative;
   cursor: pointer;
 
-  .chatMenu {
-    display: none;
-  }
-
   &:hover {
     background-color: $light-10;
     color: $light-100;
-
-    .chatMenu {
-      display: flex;
-    }
-  }
-}
-
-.chatMenu {
-  position: absolute;
-  right: 0;
-  top: 0;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(90deg, rgba(35, 35, 35, 0) 0%, #232323 40%);
-  padding-inline-start: 16px;
-  z-index: 1;
-
-  svg circle {
-    fill: $light-60;
-  }
-
-  &:hover {
-    svg circle {
-      fill: $light-100;
-    }
   }
 }
