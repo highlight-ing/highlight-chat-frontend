@@ -123,7 +123,7 @@ const Messages = () => {
       <div className={styles.messages}>
         {messages.length > 0 &&
           messages.map((message, index) => {
-            if (message.type === 'assistant' && !message.content?.length) {
+            if (message.type === 'assistant' && !message.content?.trim()?.length) {
               return ''
             }
             return <Message key={index} message={message}/>
@@ -132,7 +132,7 @@ const Messages = () => {
         {inputIsDisabled &&
           (!messages.length ||
             messages[messages.length - 1].type !== "assistant" ||
-            !messages[messages.length - 1].content?.length) && (
+            !messages[messages.length - 1].content?.trim()?.length) && (
             <ThinkingMessage />
           )}
       </div>

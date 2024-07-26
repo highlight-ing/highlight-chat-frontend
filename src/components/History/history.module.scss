@@ -49,15 +49,17 @@
   padding: 8px;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 200;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   color: $light-60;
+  flex-shrink: 0;
 
   &:hover {
     background-color: $light-10;
+    color: $light-100;
   }
 }
 

@@ -1,9 +1,12 @@
 import styles from "./history.module.scss";
 import * as React from "react";
-import { useChatHistory } from "@/hooks/useChatHistory";
+import {ChatHistoryItem, useChatHistory} from "@/hooks/useChatHistory";
 import Tooltip from "@/components/Tooltip";
 import CircleButton from "@/components/CircleButton/CircleButton";
 import { Category } from "iconsax-react";
+import {useStore} from "@/providers/store-provider";
+import {useApi} from "@/hooks/useApi";
+import {Message} from "@/types";
 
 interface HistoryProps {
   showHistory: boolean;
@@ -14,7 +17,20 @@ const History: React.FC<HistoryProps> = ({
   showHistory,
   setShowHistory,
 }: HistoryProps) => {
+  const {get} = useApi()
   const chatHistory = useChatHistory();
+  const loadConversation = useStore(({loadConversation}) => loadConversation);
+
+  const onSelectChat = async (chat: ChatHistoryItem) => {
+    const response = await get(`history/${chat.id}/messages`)
+    const {messages} = await response.json()
+    loadConversation(chat.id, messages.map((message: any) => {
+      return {
+        type: message.role,
+        content: message.content
+      } as Message
+    }))
+  }
 
   return (
     <div
@@ -29,10 +45,10 @@ const History: React.FC<HistoryProps> = ({
         Chats
       </div>
       <div className={styles.chats}>
-        {chatHistory.length > 0 ? (
+        {chatHistory?.length > 0 ? (
           chatHistory.map((chat) => (
-            <div key={chat.id} className={styles.chat}>
-              <span className={styles.chatText}>{chat.context}</span>
+            <div key={chat.id} className={styles.chat} onClick={() => onSelectChat(chat)}>
+              <span className={styles.chatText}>{chat.title}</span>
             </div>
           ))
         ) : (
