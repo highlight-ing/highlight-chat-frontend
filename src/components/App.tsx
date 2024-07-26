@@ -6,6 +6,7 @@ import Highlight, { type HighlightContext } from "@highlight-ai/app-runtime";
 import { debounce } from "throttle-debounce";
 import { useSubmitQuery } from "@/hooks/useSubmitQuery";
 import { useStore } from "@/providers/store-provider";
+import Modals from "./modals/Modals";
 
 /**
  * When the Highlight runtime sends us context, handle it by setting the input to the suggestion the user picked
@@ -45,14 +46,20 @@ function useContextRecievedHandler() {
       "onConversationAttachment",
       (attachment: string) => {
         // Handle the attachment here
-        console.log("Received conversation attachment:", attachment);
+        console.log(
+          "[useContextRecievedHandler] Received conversation attachment:",
+          attachment
+        );
 
         addAttachment({
           type: "audio",
           value: attachment,
         });
 
-        console.log("Added attachment:", attachment);
+        console.log(
+          "[useContextRecievedHandler] Added attachment:",
+          attachment
+        );
       }
     );
 
@@ -93,5 +100,10 @@ export default function App({ children }: { children: React.ReactNode }) {
   useContextRecievedHandler();
   useAboutMeRegister();
 
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <Modals />
+    </>
+  );
 }

@@ -108,7 +108,7 @@ export const useSubmitQuery = () => {
     })
   );
 
-  const { getTokens } = useAuth();
+  const { getAccessToken } = useAuth();
 
   const { aboutMe } = useStore((state) => ({
     aboutMe: state.aboutMe,
@@ -231,15 +231,12 @@ export const useSubmitQuery = () => {
         formData.append("system_prompt", systemPrompt);
       }
 
-      // Add previous messages to form data as an array of objects
-      const previousMessages = messages.map((msg) => ({
-        type: msg.type,
-        content: msg.content,
-      }));
-      formData.append("previous_messages", JSON.stringify(previousMessages));
+      let contextString = prepareHighlightContext(context);
 
-      let contextString =
-        "This is a new conversation with Highlight Chat. You do not have any Highlight Context available.";
+      if (contextString.trim() === "") {
+        contextString =
+          "This is a new conversation with Highlight Chat. You do not have any Highlight Context available.";
+      }
 
       console.log("contextString:", contextString);
       formData.append("context", contextString);
@@ -251,7 +248,7 @@ export const useSubmitQuery = () => {
 
       const contextAttachments = context.attachments || [];
       await addAttachmentsToFormData(formData, contextAttachments);
-      const { accessToken } = await getTokens();
+      const accessToken = await getAccessToken();
       await fetchResponse(formData, accessToken);
     }
   };
@@ -276,13 +273,6 @@ export const useSubmitQuery = () => {
         formData.append("about_me", JSON.stringify(aboutMe));
       }
 
-      // Add previous messages to form data as an array of objects
-      const previousMessages = messages.map((msg) => ({
-        type: msg.type,
-        content: msg.content,
-      }));
-      formData.append("previous_messages", JSON.stringify(previousMessages));
-
       const { screenshot, audio, fileTitle } = await addAttachmentsToFormData(
         formData,
         attachments
@@ -299,12 +289,8 @@ export const useSubmitQuery = () => {
       setInput("");
       clearAttachments(); // Clear the attachment immediately
 
-      let contextString = prepareHighlightContext(highlightContext);
-
-      if (contextString.trim() === "") {
-        contextString =
-          "This is a new conversation with Highlight Chat. You do not have any Highlight Context available.";
-      }
+      let contextString =
+        "This is a new conversation with Highlight Chat. You do not have any Highlight Context available.";
 
       console.log("contextString:", contextString);
       formData.append("context", contextString);
@@ -314,7 +300,7 @@ export const useSubmitQuery = () => {
         resetConversationId();
       }
 
-      const { accessToken } = await getTokens();
+      const accessToken = await getAccessToken();
       await fetchResponse(formData, accessToken);
     }
   };
