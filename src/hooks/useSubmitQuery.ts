@@ -105,7 +105,7 @@ export const useSubmitQuery = () => {
     })
   );
 
-  const { getTokens } = useAuth();
+  const { getAccessToken } = useAuth();
 
   const { aboutMe } = useStore((state) => ({
     aboutMe: state.aboutMe,
@@ -254,7 +254,7 @@ export const useSubmitQuery = () => {
 
       const contextAttachments = context.attachments || [];
       await addAttachmentsToFormData(formData, contextAttachments);
-      const { accessToken } = await getTokens();
+      const accessToken = await getAccessToken();
       await fetchResponse(formData, accessToken);
     }
   };
@@ -298,7 +298,6 @@ export const useSubmitQuery = () => {
       let contextString =
         "This is a new conversation with Highlight Chat. You do not have any Highlight Context available.";
 
-
       console.log("contextString:", contextString);
       formData.append("context", contextString);
 
@@ -307,7 +306,7 @@ export const useSubmitQuery = () => {
         resetConversationId();
       }
 
-      const { accessToken } = await getTokens();
+      const accessToken = await getAccessToken();
       await fetchResponse(formData, accessToken);
     }
   };
