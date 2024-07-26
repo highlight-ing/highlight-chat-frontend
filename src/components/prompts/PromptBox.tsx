@@ -1,17 +1,24 @@
 "use client";
 
-import { fetchPrompt } from "@/app/(app)/prompts/actions";
+import { fetchPromptText } from "@/app/(app)/prompts/actions";
 import { useStore } from "@/providers/store-provider";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/catalyst/button";
+import clsx from "clsx";
 
 interface PromptBoxProps {
   slug: string;
   name: string;
   description: string;
+  editable?: boolean;
 }
 
-export default function PromptBox({ slug, name, description }: PromptBoxProps) {
+export default function PromptBox({
+  slug,
+  name,
+  description,
+  editable = false,
+}: PromptBoxProps) {
   const router = useRouter();
 
   const { setPrompt, clearPrompt } = useStore((state) => ({
@@ -27,7 +34,7 @@ export default function PromptBox({ slug, name, description }: PromptBoxProps) {
     }
 
     // Fetch the prompt
-    const prompt = await fetchPrompt(slug);
+    const prompt = await fetchPromptText(slug);
 
     setPrompt({
       promptName: name,
@@ -39,15 +46,40 @@ export default function PromptBox({ slug, name, description }: PromptBoxProps) {
     router.push(`/`);
   };
 
+  const BaseElement = ({ children }: { children: React.ReactNode }) => {
+    const baseClasses = "bg-light-10 p-4 rounded-lg";
+
+    if (editable) {
+      return <div className={baseClasses}>{children}</div>;
+    }
+
+    return (
+      <a
+        className={clsx(baseClasses, "hover:bg-light-20 cursor-pointer")}
+        href="#"
+        onClick={onClick}
+      >
+        {children}
+      </a>
+    );
+  };
+
+  console.log("slug", slug);
+
   return (
-    <a href="#" onClick={onClick}>
-      <div className="bg-light-10 p-4 rounded-lg hover:bg-light-20 cursor-pointer">
-        <h3>{name}</h3>
-        <p className="text-sm text-light-60">{description}</p>
-        <div className="mt-1 flex flex-row ">
-          <Button plain>Edit</Button>
+    <BaseElement>
+      <h3>{name}</h3>
+      <p className="text-sm text-light-60">{description}</p>
+      {editable && (
+        <div className="mt-2 flex flex-row space-x-3">
+          <Button plain onClick={onClick}>
+            View
+          </Button>
+          <Button plain href={`/prompts/${slug}/edit`}>
+            Edit
+          </Button>
         </div>
-      </div>
-    </a>
+      )}
+    </BaseElement>
   );
 }

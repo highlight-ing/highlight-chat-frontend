@@ -1,12 +1,6 @@
 "use client";
 
 import { CreatePromptData, createPrompt } from "@/app/(app)/prompts/actions";
-import {
-  Alert,
-  AlertActions,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/catalyst/alert";
 import { Button } from "@/components/catalyst/button";
 import {
   Description,
@@ -15,10 +9,13 @@ import {
 } from "@/components/catalyst/fieldset";
 import { Input } from "@/components/catalyst/input";
 import { Textarea } from "@/components/catalyst/textarea";
-import { useState } from "react";
+import useAuth from "@/hooks/useAuth";
+import { useStore } from "@/providers/store-provider";
+import { useRouter } from "next/navigation";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 export default function CreatePromptForm() {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -26,15 +23,21 @@ export default function CreatePromptForm() {
     formState: { errors },
   } = useForm<CreatePromptData>();
 
-  const [errorAlertIsOpen, setErrorAlertIsOpen] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const { openErrorModal } = useStore((state) => ({
+    openErrorModal: state.openErrorModal,
+  }));
+
+  const { getTokens } = useAuth();
 
   const onSubmit: SubmitHandler<CreatePromptData> = async (data) => {
-    const prompt = await createPrompt(data);
-    if (prompt.error) {
-      setErrorMessage(prompt.error);
-      setErrorAlertIsOpen(true);
+    const { accessToken } = await getTokens();
+    const { error } = await createPrompt(data, accessToken);
+    if (error) {
+      openErrorModal(error);
+      return;
     }
+
+    router.push(`/prompts`);
   };
 
   return (
@@ -74,6 +77,10 @@ export default function CreatePromptForm() {
               required: true,
             })}
           />
+          <Description>
+            Provide a description of your prompt that other users will see on
+            the prompts store.
+          </Description>
           {errors.description && (
             <ErrorMessage>Prompt description is required</ErrorMessage>
           )}
@@ -93,16 +100,6 @@ export default function CreatePromptForm() {
           Create
         </Button>
       </form>
-      {/* Error dialog */}
-      <Alert open={errorAlertIsOpen} onClose={setErrorAlertIsOpen}>
-        <AlertTitle>Error</AlertTitle>
-        <AlertDescription>{errorMessage}</AlertDescription>
-        <AlertActions>
-          <Button plain onClick={() => setErrorAlertIsOpen(false)}>
-            Close
-          </Button>
-        </AlertActions>
-      </Alert>
     </div>
   );
 }
