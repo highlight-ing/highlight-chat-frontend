@@ -244,8 +244,12 @@ export const useSubmitQuery = () => {
       }));
       formData.append("previous_messages", JSON.stringify(previousMessages));
 
-      let contextString =
-        "This is a new conversation with Highlight Chat. You do not have any Highlight Context available.";
+      let contextString = prepareHighlightContext(context);
+
+      if (contextString.trim() === "") {
+        contextString =
+          "This is a new conversation with Highlight Chat. You do not have any Highlight Context available.";
+      }
 
       console.log("contextString:", contextString);
       formData.append("context", contextString);
@@ -305,12 +309,9 @@ export const useSubmitQuery = () => {
       setInput("");
       clearAttachments(); // Clear the attachment immediately
 
-      let contextString = prepareHighlightContext(highlightContext);
+      let contextString =
+        "This is a new conversation with Highlight Chat. You do not have any Highlight Context available.";
 
-      if (contextString.trim() === "") {
-        contextString =
-          "This is a new conversation with Highlight Chat. You do not have any Highlight Context available.";
-      }
 
       console.log("contextString:", contextString);
       formData.append("context", contextString);
