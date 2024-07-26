@@ -36,8 +36,6 @@ export default function PromptBox({
     // Fetch the prompt
     const prompt = await fetchPromptText(slug);
 
-    console.log("prompt", prompt);
-
     setPrompt({
       promptName: name,
       promptDescription: description,
@@ -65,8 +63,6 @@ export default function PromptBox({
       </a>
     );
   };
-
-  console.log("slug", slug);
 
   return (
     <BaseElement>

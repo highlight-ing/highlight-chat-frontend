@@ -46,14 +46,20 @@ function useContextRecievedHandler() {
       "onConversationAttachment",
       (attachment: string) => {
         // Handle the attachment here
-        console.log("Received conversation attachment:", attachment);
+        console.log(
+          "[useContextRecievedHandler] Received conversation attachment:",
+          attachment
+        );
 
         addAttachment({
           type: "audio",
           value: attachment,
         });
 
-        console.log("Added attachment:", attachment);
+        console.log(
+          "[useContextRecievedHandler] Added attachment:",
+          attachment
+        );
       }
     );
 

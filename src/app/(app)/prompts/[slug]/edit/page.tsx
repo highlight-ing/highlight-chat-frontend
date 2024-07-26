@@ -1,6 +1,7 @@
 import TopBar from "@/components/Navigation/TopBar";
 import { fetchPrompt } from "../../actions";
 import EditPromptForm from "@/components/prompts/EditPromptForm/EditPromptForm";
+import Link from "next/link";
 
 export const revalidate = 0;
 
@@ -9,13 +10,29 @@ export default async function EditPromptPage({
 }: {
   params: { slug: string };
 }) {
-  console.log("slug", params.slug);
-
   // Fetch the prompt from the database
   const { prompt, error } = await fetchPrompt(params.slug);
 
   if (!prompt) {
-    return <div>Prompt not found</div>;
+    return (
+      <div>
+        <h2 className="text-2xl">
+          We couldn't find the prompt <pre>{params.slug}</pre>.
+        </h2>
+        <Link href="/prompts">Go back to prompts</Link>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div>
+        <h2 className="text-2xl">
+          Error fetching prompt, please try again later.
+        </h2>
+        <Link href="/prompts">Go back to prompts</Link>
+      </div>
+    );
   }
 
   return (

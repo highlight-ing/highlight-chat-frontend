@@ -161,7 +161,6 @@ export async function updatePrompt(
   }
 
   if (!prompt) {
-    console.log("prompt", prompt);
     return {
       error:
         "Something went wrong while updating your prompt. (nothing was returned)",
