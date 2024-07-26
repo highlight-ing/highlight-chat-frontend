@@ -2,81 +2,7 @@ import { HighlightContext } from "@highlight-ai/app-runtime";
 import imageCompression from "browser-image-compression";
 import { useStore } from "@/providers/store-provider";
 import useAuth from "./useAuth";
-
-async function compressImageIfNeeded(file: File): Promise<File> {
-  const ONE_MB = 1 * 1024 * 1024; // 1MB in bytes
-  if (file.size <= ONE_MB) {
-    return file;
-  }
-
-  const options = {
-    maxSizeMB: 1,
-    maxWidthOrHeight: 1920,
-    useWebWorker: true,
-  };
-
-  try {
-    return await imageCompression(file, options);
-  } catch (error) {
-    console.error("Error compressing image:", error);
-    return file;
-  }
-}
-
-async function readFileAsBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-export default async function addAttachmentsToFormData(
-  formData: FormData,
-  attachments: any[]
-) {
-  let screenshot, audio, fileTitle;
-
-  for (const attachment of attachments) {
-    if (attachment?.value) {
-      switch (attachment.type) {
-        case "image":
-        case "screenshot":
-          screenshot = attachment.value;
-          if (attachment.file) {
-            const compressedFile = await compressImageIfNeeded(attachment.file);
-            const base64data = await readFileAsBase64(compressedFile);
-            const mimeType = compressedFile.type || "image/png";
-            const base64WithMimeType = `data:${mimeType};base64,${
-              base64data.split(",")[1]
-            }`;
-            formData.append("base64_image", base64WithMimeType);
-          } else if (
-            typeof attachment.value === "string" &&
-            attachment.value.startsWith("data:image")
-          ) {
-            formData.append("base64_image", attachment.value);
-          } else {
-            console.error("Unsupported image format:", attachment.value);
-          }
-          break;
-        case "pdf":
-          fileTitle = attachment.value.name;
-          formData.append("pdf", attachment.value);
-          break;
-        case "audio":
-          audio = attachment.value;
-          formData.append("audio", attachment.value.slice(0, 1000));
-          break;
-        default:
-          console.warn("Unknown attachment type:", attachment.type);
-      }
-    }
-  }
-
-  return { screenshot, audio, fileTitle };
-}
+import addAttachmentsToFormData from "@/utils/attachmentUtils";
 
 export const useSubmitQuery = () => {
   const { attachments, clearAttachments, input, setInput, setIsDisabled } =
@@ -118,8 +44,8 @@ export const useSubmitQuery = () => {
       const conversationId = getOrCreateConversationId();
       formData.append("conversation_id", conversationId);
 
-      const backendUrl =
-        process.env.NEXT_PUBLIC_BACKEND_URL || "http://0.0.0.0:8080/";
+      const backendUrl = "http://0.0.0.0:8080/"
+        //process.env.NEXT_PUBLIC_BACKEND_URL || "http://0.0.0.0:8080/";
       let response = await fetch(`${backendUrl}api/v1/chat/`, {
         method: "POST",
         headers: {
