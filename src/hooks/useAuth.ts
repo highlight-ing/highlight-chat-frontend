@@ -62,6 +62,10 @@ export default function useAuth() {
    * Fetches tokens from the auth store or fetches new ones if they don't exist.
    */
   async function getAccessToken() {
+    console.log("Stored access token:", accessToken);
+    console.log("Stored refresh token:", refreshToken);
+    console.log("Stored auth expiration:", authExpiration);
+
     let validAccessToken;
 
     // Check if the store already has tokens
