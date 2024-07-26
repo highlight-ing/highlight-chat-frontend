@@ -98,6 +98,7 @@ export type Database = {
           name: string
           prompt_text: string | null
           prompt_url: string | null
+          public: boolean
           slug: string | null
           user_id: string
         }
@@ -109,6 +110,7 @@ export type Database = {
           name: string
           prompt_text?: string | null
           prompt_url?: string | null
+          public?: boolean
           slug?: string | null
           user_id: string
         }
@@ -120,6 +122,7 @@ export type Database = {
           name?: string
           prompt_text?: string | null
           prompt_url?: string | null
+          public?: boolean
           slug?: string | null
           user_id?: string
         }

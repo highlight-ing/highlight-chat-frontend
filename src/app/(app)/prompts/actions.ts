@@ -56,6 +56,7 @@ const CreatePromptSchema = z.object({
   description: z.string(),
   instructions: z.string(),
   slug: z.string(),
+  visibility: z.enum(["public", "unlisted"]),
 });
 
 export type CreatePromptData = z.infer<typeof CreatePromptSchema>;
@@ -91,6 +92,7 @@ export async function createPrompt(data: CreatePromptData, authToken: string) {
     prompt_text: validatedData.data.instructions,
     user_id: userId,
     slug: validatedData.data.slug,
+    public: validatedData.data.visibility === "public",
   });
 
   if (error) {
@@ -104,6 +106,7 @@ const UpdatePromptSchema = z.object({
   name: z.string(),
   description: z.string(),
   instructions: z.string(),
+  visibility: z.enum(["public", "unlisted"]),
 });
 
 export type UpdatePromptData = z.infer<typeof UpdatePromptSchema>;
@@ -143,6 +146,7 @@ export async function updatePrompt(
       name: data.name,
       description: data.description,
       prompt_text: data.instructions,
+      public: data.visibility === "public",
     })
     .eq("slug", slug)
     .eq("user_id", userId);

@@ -16,15 +16,17 @@ import {
   Description,
   ErrorMessage,
   Field,
+  Label,
 } from "@/components/catalyst/fieldset";
 import { Input } from "@/components/catalyst/input";
+import { Radio, RadioField, RadioGroup } from "@/components/catalyst/radio";
 import { Textarea } from "@/components/catalyst/textarea";
 import useAuth from "@/hooks/useAuth";
 import { useStore } from "@/providers/store-provider";
 import { Prompt } from "@/types/supabase-helpers";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
 
 function ConfirmDeleteModal({
   isOpen,
@@ -74,9 +76,13 @@ export default function EditPromptForm({
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
-  } = useForm<UpdatePromptData>();
+    control,
+  } = useForm<UpdatePromptData>({
+    defaultValues: {
+      visibility: initialData.public ? "public" : "unlisted",
+    },
+  });
 
   const { openErrorModal } = useStore((state) => ({
     openErrorModal: state.openErrorModal,
@@ -159,6 +165,27 @@ export default function EditPromptForm({
           />
           {errors.instructions && (
             <ErrorMessage>Prompt instructions are required</ErrorMessage>
+          )}
+        </Field>
+        <Field>
+          <Controller
+            control={control}
+            name="visibility"
+            render={({ field: { onChange, value } }) => (
+              <RadioGroup value={value} onChange={onChange}>
+                <RadioField>
+                  <Radio value="public" />
+                  <Label>Public</Label>
+                </RadioField>
+                <RadioField>
+                  <Radio value="unlisted" />
+                  <Label>Unlisted</Label>
+                </RadioField>
+              </RadioGroup>
+            )}
+          />
+          {errors.visibility && (
+            <ErrorMessage>Prompt visibility is required</ErrorMessage>
           )}
         </Field>
         <div className="flex flex-row space-x-4">

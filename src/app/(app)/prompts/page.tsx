@@ -63,6 +63,7 @@ export default function PromptsPage() {
           />
           {prompts
             .filter((prompt) => prompt.user_id !== userId)
+            .filter((prompt) => prompt.public)
             .map((prompt) => (
               <PromptBox
                 key={prompt.external_id}
