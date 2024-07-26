@@ -24,8 +24,7 @@ export const useChatHistory = (): ChatHistoryItem[] => {
     try {
       const backendUrl =
         process.env.NEXT_PUBLIC_BACKEND_URL || "http://0.0.0.0:8080/";
-      const requestUrl = `${backendUrl}chat-history`;
-      let response = await fetch(requestUrl, {
+      let response = await fetch(`${backendUrl}api/v1/history/`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${accessToken}`,
