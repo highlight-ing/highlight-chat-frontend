@@ -45,11 +45,10 @@
   user-select: none;
 }
 
-.chat {
+.baseHistoryItem {
   display: block;
   padding: 8px;
   border-radius: 8px;
-  cursor: pointer;
   font-size: 15px;
   font-weight: 200;
   white-space: nowrap;
@@ -57,7 +56,12 @@
   text-overflow: ellipsis;
   color: $light-60;
   flex-shrink: 0;
+}
+
+.chat {
+  @extend .baseHistoryItem;
   position: relative;
+  cursor: pointer;
 
   .chatMenu {
     display: none;
@@ -71,19 +75,6 @@
       display: flex;
     }
   }
-}
-
-.emptyChatHistory {
-  display: block;
-  padding: 8px;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 200;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: $light-60;
-  flex-shrink: 0;
 }
 
 .chatMenu {
