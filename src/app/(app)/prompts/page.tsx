@@ -77,7 +77,7 @@ export default function PromptsPage() {
               {communityPrompts.map((prompt) => (
                 <PromptBox
                   key={prompt.external_id}
-                  slug={prompt.external_id}
+                  slug={prompt.slug ?? ""}
                   name={prompt.name}
                   description={prompt.description ?? ""}
                 />
