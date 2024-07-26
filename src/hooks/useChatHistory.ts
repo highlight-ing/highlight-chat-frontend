@@ -15,11 +15,11 @@ interface ChatHistoryResponse {
 }
 
 export const useChatHistory = (): ChatHistoryItem[] => {
-  const { getTokens } = useAuth();
+  const { getAccessToken } = useAuth();
   const [chatHistory, setChatHistory] = useState<ChatHistoryItem[]>([]);
 
   const fetchResponse = async () => {
-    const { accessToken } = await getTokens();
+    const accessToken = await getAccessToken();
 
     try {
       const backendUrl =

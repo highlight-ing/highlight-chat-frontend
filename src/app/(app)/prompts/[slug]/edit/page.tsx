@@ -2,6 +2,8 @@ import TopBar from "@/components/Navigation/TopBar";
 import { fetchPrompt } from "../../actions";
 import EditPromptForm from "@/components/prompts/EditPromptForm/EditPromptForm";
 
+export const revalidate = 0;
+
 export default async function EditPromptPage({
   params,
 }: {

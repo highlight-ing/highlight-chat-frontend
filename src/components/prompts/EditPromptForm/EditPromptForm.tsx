@@ -80,6 +80,9 @@ export default function EditPromptForm({
     control,
   } = useForm<UpdatePromptData>({
     defaultValues: {
+      name: initialData.name,
+      description: initialData.description ?? "",
+      instructions: initialData.prompt_text ?? "",
       visibility: initialData.public ? "public" : "unlisted",
     },
   });
@@ -88,10 +91,10 @@ export default function EditPromptForm({
     openErrorModal: state.openErrorModal,
   }));
 
-  const { getTokens } = useAuth();
+  const { getAccessToken } = useAuth();
 
   const onSubmit: SubmitHandler<UpdatePromptData> = async (data) => {
-    const { accessToken } = await getTokens();
+    const accessToken = await getAccessToken();
     const response = await updatePrompt(slug, data, accessToken);
 
     if (response && response.error) {
@@ -104,7 +107,7 @@ export default function EditPromptForm({
 
   // When the user confirms they want to delete the prompt through the modal
   const onDeleteConfirm = async () => {
-    const { accessToken } = await getTokens();
+    const accessToken = await getAccessToken();
     const response = await deletePrompt(slug, accessToken);
 
     if (response && response.error) {
@@ -132,7 +135,6 @@ export default function EditPromptForm({
           <Input
             className=""
             placeholder="Name"
-            value={initialData.name}
             {...register("name", {
               required: true,
             })}
@@ -142,7 +144,6 @@ export default function EditPromptForm({
         <Field>
           <Textarea
             placeholder="Description"
-            value={initialData.description ?? ""}
             {...register("description", {
               required: true,
             })}
@@ -158,7 +159,6 @@ export default function EditPromptForm({
         <Field>
           <Textarea
             placeholder="Instructions"
-            value={initialData.prompt_text ?? ""}
             {...register("instructions", {
               required: true,
             })}

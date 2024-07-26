@@ -3,6 +3,7 @@
 import { validateHighlightJWT } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
 import { JWTPayload, JWTVerifyResult } from "jose";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 /**
@@ -140,7 +141,7 @@ export async function updatePrompt(
     return { error: "'sub' was missing from auth token" };
   }
 
-  const { error } = await supabaseAdmin
+  const { data: prompt, error } = await supabaseAdmin
     .from("prompts")
     .update({
       name: data.name,
@@ -149,11 +150,25 @@ export async function updatePrompt(
       public: data.visibility === "public",
     })
     .eq("slug", slug)
-    .eq("user_id", userId);
+    .eq("user_id", userId)
+    .select()
+    .maybeSingle();
 
   if (error) {
     return { error: "Error updating prompt in our database." };
   }
+
+  if (!prompt) {
+    console.log("prompt", prompt);
+    return {
+      error:
+        "Something went wrong while updating your prompt. (nothing was returned)",
+    };
+  }
+
+  revalidatePath("/", "layout");
+
+  return { prompt };
 }
 
 /**

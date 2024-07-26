@@ -35,10 +35,10 @@ export default function CreatePromptForm() {
     openErrorModal: state.openErrorModal,
   }));
 
-  const { getTokens } = useAuth();
+  const { getAccessToken } = useAuth();
 
   const onSubmit: SubmitHandler<CreatePromptData> = async (data) => {
-    const { accessToken } = await getTokens();
+    const accessToken = await getAccessToken();
     const { error } = await createPrompt(data, accessToken);
     if (error) {
       openErrorModal(error);

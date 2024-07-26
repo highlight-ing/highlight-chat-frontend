@@ -17,16 +17,19 @@ export default function PromptsPage() {
   const [loading, setLoading] = useState(true);
 
   // HOOKS
-  const { getTokens } = useAuth();
+  const { getAccessToken } = useAuth();
   const { openErrorModal } = useStore((state) => ({
     openErrorModal: state.openErrorModal,
   }));
 
+  const communityPrompts = prompts
+    .filter((prompt) => prompt.user_id !== userId)
+    .filter((prompt) => prompt.public);
   const myPrompts = prompts.filter((prompt) => prompt.user_id === userId);
 
   useEffect(() => {
     const loadPrompts = async () => {
-      const { accessToken } = await getTokens();
+      const accessToken = await getAccessToken();
 
       const response = await fetchPrompts(accessToken);
 
@@ -55,25 +58,35 @@ export default function PromptsPage() {
           Prompts change the way Highlight Chat talks to you. Create your own or
           use already existing prompts.
         </p>
-        <div className="grid grid-cols-3 gap-4 mt-4">
+
+        {/* OFFICIAL PROMPTS */}
+        <h2 className="text-xl mt-4">Official Prompts</h2>
+        <div className="grid grid-cols-3 gap-4 mt-1">
           <PromptBox
             slug="hlchat"
             name="Highlight Chat"
             description="The standard Highlight Chat. Oriented towards critical thinking and questioning."
           />
-          {prompts
-            .filter((prompt) => prompt.user_id !== userId)
-            .filter((prompt) => prompt.public)
-            .map((prompt) => (
-              <PromptBox
-                key={prompt.external_id}
-                slug={prompt.external_id}
-                name={prompt.name}
-                description={prompt.description ?? ""}
-              />
-            ))}
         </div>
 
+        {/* COMMUNITY PROMPTS */}
+        {communityPrompts.length > 0 && (
+          <>
+            <h2 className="text-xl mt-4">Community Prompts</h2>
+            <div className="grid grid-cols-3 gap-4 mt-1">
+              {communityPrompts.map((prompt) => (
+                <PromptBox
+                  key={prompt.external_id}
+                  slug={prompt.external_id}
+                  name={prompt.name}
+                  description={prompt.description ?? ""}
+                />
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* MY PROMPTS */}
         <div className="flex flex-row justify-between items-center mt-4">
           <div>
             <h1 className="text-2xl">My Prompts</h1>
