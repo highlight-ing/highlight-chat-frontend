@@ -237,13 +237,6 @@ export const useSubmitQuery = () => {
         formData.append("system_prompt", systemPrompt);
       }
 
-      // Add previous messages to form data as an array of objects
-      const previousMessages = messages.map((msg) => ({
-        type: msg.type,
-        content: msg.content,
-      }));
-      formData.append("previous_messages", JSON.stringify(previousMessages));
-
       let contextString = prepareHighlightContext(context);
 
       if (contextString.trim() === "") {
@@ -285,13 +278,6 @@ export const useSubmitQuery = () => {
       if (aboutMe) {
         formData.append("about_me", JSON.stringify(aboutMe));
       }
-
-      // Add previous messages to form data as an array of objects
-      const previousMessages = messages.map((msg) => ({
-        type: msg.type,
-        content: msg.content,
-      }));
-      formData.append("previous_messages", JSON.stringify(previousMessages));
 
       const { screenshot, audio, fileTitle } = await addAttachmentsToFormData(
         formData,
