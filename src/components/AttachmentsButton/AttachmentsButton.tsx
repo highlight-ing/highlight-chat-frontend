@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { DocumentUpload, GalleryAdd, Sound } from 'iconsax-react'
+import { ClipboardText, DocumentUpload, GalleryAdd, Sound } from 'iconsax-react'
 import Highlight from '@highlight-ai/app-runtime'
 
 import { PaperclipIcon } from '../../icons/icons'
@@ -79,6 +79,34 @@ export const AttachmentsButton = () => {
     }
   }
 
+  const onAddClipboard = async () => {
+    console.log('on add clipboard clicked')
+    const hasClipboardReadPermissions = await Highlight.permissions.requestBackgroundPermission()
+
+    if (!hasClipboardReadPermissions) {
+      console.log('Clipboard read permission denied')
+    }
+
+    // TODO make request to actually get clipboard context
+    // const clipboard = await Highlight.user.getClipboardContents()
+    // const clipboard = undefined
+    // const clipboard = { type: 'text', value: 'Clipboard text' }
+    const clipboard = { type: 'image', value: 'Clipboard image' }
+    if (!clipboard) return
+
+    if (clipboard.type === 'image') {
+      addAttachment({
+        type: 'image',
+        value: clipboard.value
+      })
+    } else {
+      addAttachment({
+        type: 'clipboard',
+        value: clipboard.value
+      })
+    }
+  }
+
   const audioDurations: { duration: number; unit: 'hours' | 'minutes' }[] = [
     { duration: 5, unit: 'minutes' },
     { duration: 30, unit: 'minutes' },
@@ -119,7 +147,15 @@ export const AttachmentsButton = () => {
 
   const menuItems = [
     audioMenuItem,
-    screenshot && screenshotMenuItem,
+    {
+      label: (
+        <div className={styles.menuItem}>
+          <ClipboardText size={24} color="#fff" />
+          Clipboard
+        </div>
+      ),
+      onClick: onAddClipboard
+    },
     {
       label: (
         <div className={styles.menuItem}>
@@ -128,7 +164,8 @@ export const AttachmentsButton = () => {
         </div>
       ),
       onClick: handleAttachmentClick
-    }
+    },
+    screenshot && screenshotMenuItem
   ].filter(Boolean) as MenuItemType[]
 
   return (

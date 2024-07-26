@@ -48,6 +48,11 @@ export interface AudioAttachment {
   duration: number
 }
 
-export type Attachment = ImageAttachment | PdfAttachment | AudioAttachment
+export interface ClipboardAttachment {
+  type: 'clipboard'
+  value: string
+}
+
+export type Attachment = ImageAttachment | PdfAttachment | AudioAttachment | ClipboardAttachment
 
 export type AttachmentType = 'audio' | 'clipboard' | 'image' | 'pdf'

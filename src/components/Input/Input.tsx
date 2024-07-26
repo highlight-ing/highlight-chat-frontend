@@ -73,7 +73,6 @@ export const Input = ({ offset }: { offset: boolean }) => {
   }, [inputRef, input])
 
   const getValue = (attachment: AttachmentType) => {
-    console.log('help me', attachment)
     switch (attachment.type) {
       case 'pdf':
         return attachment.value.name
