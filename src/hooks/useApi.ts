@@ -27,10 +27,10 @@ const fetchRequest = async (route: string, {bearerToken, body, version, method}:
 }
 
 export const useApi = () => {
-  const { getTokens } = useAuth();
+  const { getAccessToken } = useAuth();
 
   const get = async (route: string, options?: RequestOptions) => {
-    const {accessToken} = await getTokens()
+    const accessToken = await getAccessToken()
     return fetchRequest(route, {
       bearerToken: accessToken,
       method: 'GET',
@@ -39,7 +39,7 @@ export const useApi = () => {
   }
 
   const post = async (route: string, body: FormData, options?: RequestOptions) => {
-    const {accessToken} = await getTokens()
+    const accessToken = await getAccessToken()
     return fetchRequest(route, {
       bearerToken: accessToken,
       body,
@@ -49,7 +49,7 @@ export const useApi = () => {
   }
 
   const deleteRequest = async (route: string, options?: RequestOptions) => {
-    const {accessToken} = await getTokens()
+    const accessToken = await getAccessToken()
     return fetchRequest(route, {
       bearerToken: accessToken,
       method: 'DELETE',
