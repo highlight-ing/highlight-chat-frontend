@@ -7,7 +7,7 @@ import { decodeJwt } from "jose";
  * Hook that handles automatically fetching tokens, refreshing them, etc.
  */
 export default function useAuth() {
-  const { accessToken, refreshToken, authExpiration, setAuth } = useStore(
+  let { accessToken, refreshToken, authExpiration, setAuth } = useStore(
     (state) => ({
       accessToken: state.accessToken,
       refreshToken: state.refreshToken,
@@ -17,9 +17,10 @@ export default function useAuth() {
   );
 
   async function getNewTokens() {
-    const { accessToken, refreshToken } = await Highlight.auth.signIn();
+    const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
+      await Highlight.auth.signIn();
 
-    const payload = decodeJwt(accessToken);
+    const payload = decodeJwt(newAccessToken);
 
     const exp = payload.exp;
 
@@ -29,12 +30,19 @@ export default function useAuth() {
       );
     }
 
-    const userId = payload.sub;
+    const newUserId = payload.sub;
 
     // Store the expiration time in the auth store
-    setAuth({ accessToken, refreshToken, userId, authExpiration: exp });
+    setAuth({
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+      userId: newUserId,
+      authExpiration: exp,
+    });
 
-    return accessToken;
+    accessToken = newAccessToken;
+    refreshToken = newRefreshToken;
+    authExpiration = exp;
   }
 
   async function attemptToRefreshTokens() {
@@ -50,11 +58,13 @@ export default function useAuth() {
         authExpiration: refreshTokensResponse.expires_in,
       });
 
-      return refreshTokensResponse.access_token;
+      accessToken = refreshTokensResponse.access_token;
+      refreshToken = refreshTokensResponse.refresh_token;
+      authExpiration = refreshTokensResponse.expires_in;
     } catch (error) {
       // If the refresh fails, get new tokens
       console.log("[useAuth] Refresh failed, getting new tokens.");
-      return await getNewTokens();
+      await getNewTokens();
     }
   }
 
@@ -62,33 +72,27 @@ export default function useAuth() {
    * Fetches tokens from the auth store or fetches new ones if they don't exist.
    */
   async function getAccessToken() {
-    console.log("Stored access token:", accessToken);
-    console.log("Stored refresh token:", refreshToken);
-    console.log("Stored auth expiration:", authExpiration);
-
-    let validAccessToken;
-
     // Check if the store already has tokens
     if (!accessToken || !refreshToken || !authExpiration) {
       console.log(
         "[useAuth] No existing auth tokens found, getting new tokens."
       );
-      validAccessToken = await getNewTokens();
+      await getNewTokens();
     }
 
     // Check if the current tokens are expired
-    if (Date.now() > authExpiration!) {
-      validAccessToken = await attemptToRefreshTokens();
+    if (authExpiration && Date.now() >= authExpiration * 1000) {
+      await attemptToRefreshTokens();
     }
 
-    if (!validAccessToken) {
+    if (!accessToken) {
       // The new access token should be set by now...
       throw new Error(
         "Access token wasn't set after trying to refresh/generate a new one."
       );
     }
 
-    return validAccessToken;
+    return accessToken;
   }
 
   return { getAccessToken };
