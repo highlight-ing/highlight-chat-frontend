@@ -19,7 +19,7 @@ export async function refreshTokens(refreshToken: string) {
   const formData = new FormData();
 
   formData.append("grant_type", "refresh_token");
-  formData.append("refresh_token", "your_refresh_token");
+  formData.append("refresh_token", refreshToken);
   formData.append("client_id", HIGHLIGHT_CLIENT_ID);
   formData.append("client_secret", HIGHLIGHT_CLIENT_SECRET);
 
@@ -33,6 +33,10 @@ export async function refreshTokens(refreshToken: string) {
   );
 
   if (!response.ok) {
+    const responseBody = await response.text();
+
+    console.error("Auth refresh response body:", responseBody);
+
     throw new Error(
       "Failed to refresh token, Highlight auth service returned a non-OK status."
     );

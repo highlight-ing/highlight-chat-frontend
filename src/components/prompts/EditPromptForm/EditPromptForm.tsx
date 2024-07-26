@@ -24,6 +24,7 @@ import { Textarea } from "@/components/catalyst/textarea";
 import useAuth from "@/hooks/useAuth";
 import { useStore } from "@/providers/store-provider";
 import { Prompt } from "@/types/supabase-helpers";
+import { revalidatePath } from "next/cache";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
@@ -115,6 +116,7 @@ export default function EditPromptForm({
       return;
     }
 
+    revalidatePath("/prompts");
     router.push(`/prompts`);
   };
 

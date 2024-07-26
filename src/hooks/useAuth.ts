@@ -37,6 +37,27 @@ export default function useAuth() {
     return accessToken;
   }
 
+  async function attemptToRefreshTokens() {
+    // Attempt to refresh the tokens
+    try {
+      const refreshTokensResponse = await refreshTokens(refreshToken!);
+
+      console.log("[useAuth] Refreshed tokens from backend.");
+
+      setAuth({
+        accessToken: refreshTokensResponse.access_token,
+        refreshToken: refreshTokensResponse.refresh_token,
+        authExpiration: refreshTokensResponse.expires_in,
+      });
+
+      return refreshTokensResponse.access_token;
+    } catch (error) {
+      // If the refresh fails, get new tokens
+      console.log("[useAuth] Refresh failed, getting new tokens.");
+      return await getNewTokens();
+    }
+  }
+
   /**
    * Fetches tokens from the auth store or fetches new ones if they don't exist.
    */
@@ -53,27 +74,11 @@ export default function useAuth() {
 
     // Check if the current tokens are expired
     if (Date.now() > authExpiration!) {
-      // Attempt to refresh the tokens
-      try {
-        const refreshTokensResponse = await refreshTokens(refreshToken!);
-
-        console.log("[useAuth] Refreshed tokens from backend.");
-
-        setAuth({
-          accessToken: refreshTokensResponse.access_token,
-          refreshToken: refreshTokensResponse.refresh_token,
-          authExpiration: refreshTokensResponse.expires_in,
-        });
-
-        validAccessToken = refreshTokensResponse.access_token;
-      } catch (error) {
-        // If the refresh fails, get new tokens
-        console.log("[useAuth] Refresh failed, getting new tokens.");
-        validAccessToken = await getNewTokens();
-      }
+      validAccessToken = await attemptToRefreshTokens();
     }
 
     if (!validAccessToken) {
+      // The new access token should be set by now...
       throw new Error(
         "Access token wasn't set after trying to refresh/generate a new one."
       );

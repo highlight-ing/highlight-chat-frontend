@@ -3,7 +3,6 @@
 import { validateHighlightJWT } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
 import { JWTPayload, JWTVerifyResult } from "jose";
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 /**
@@ -165,8 +164,6 @@ export async function updatePrompt(
         "Something went wrong while updating your prompt. (nothing was returned)",
     };
   }
-
-  revalidatePath("/", "layout");
 
   return { prompt };
 }
