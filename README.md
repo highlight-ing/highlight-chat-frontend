@@ -12,7 +12,7 @@ npm install
 
 ### Setup Environment Variables
 
-Add a `.env.development` file using `.env.sample` as a reference.
+Add a `.env.development` file using `.env.sample` as a reference. Note for non Highlight employees, we are working on a solution to use a Supabase anon key for most actions instead of the superuser key. At the moment, it will be difficult to test/work on things until we make this change.
 
 ### Running the Development Server
 
@@ -33,3 +33,11 @@ npm run gen:supabase-types
 ## Deployment
 
 This project is deployed using Vercel on pushes to the main branch.
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request. All PRs will be validated by Highlight team members. Please join [our Discord](https://discord.gg/hlai) if you have any questions or need help getting started.
+
+## License
+
+MIT, see [LICENSE.md](LICENSE.md)

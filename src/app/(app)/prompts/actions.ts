@@ -38,7 +38,7 @@ export async function fetchPromptText(slug: string) {
   // Otherwise, fetch the prompt from the remote URL specified
   const appResponse = await fetch(prompt.prompt_url, {
     headers: {
-      "User-Agent": "Highlight Chat/1.0",
+      "User-Agent": "Highlight Chat/0.0.1",
     },
   });
 
