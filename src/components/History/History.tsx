@@ -18,9 +18,9 @@ const History: React.FC<HistoryProps> = ({
   showHistory,
   setShowHistory,
 }: HistoryProps) => {
-  const {get, deleteRequest} = useApi()
-  const {history, refreshChatHistory} = useChatHistory();
-  const {conversationId, loadConversation, startNewConversation, openModal} = useStore((state) => state);
+  const {get} = useApi()
+  const {history} = useChatHistory();
+  const {loadConversation, openModal} = useStore((state) => state);
 
   const onSelectChat = async (chat: ChatHistoryItem) => {
     const response = await get(`history/${chat.id}/messages`)
@@ -39,20 +39,7 @@ const History: React.FC<HistoryProps> = ({
   }
 
   const onDeleteChat = async (chat: ChatHistoryItem) => {
-    if (true) {
-      openModal('delete-chat', chat)
-      return
-    }
-    const response = await deleteRequest(`history/${chat.id}`)
-    if (!response.ok) {
-      // @TODO Error handling
-      console.error('Failed to delete')
-      return
-    }
-    if (chat.id === conversationId) {
-      startNewConversation()
-    }
-    await refreshChatHistory()
+    openModal('delete-chat', chat)
   }
 
   return (
