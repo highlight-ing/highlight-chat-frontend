@@ -1,0 +1,58 @@
+@import "@/variables.module";
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  cursor: pointer;
+  gap: 6px;
+  font-weight: 500;
+  border: none;
+  box-sizing: border-box;
+  white-space: nowrap;
+  line-height: 1;
+  flex-shrink: 0;
+  border-radius: 8px;
+
+  &.disabled {
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  &.xsmall {
+    padding: 0 8px;
+    font-size: 12px;
+    height: 24px;
+    border-radius: 6px;
+  }
+  &.small {
+    padding: 0 12px;
+    font-size: 12px;
+    height: 32px;
+  }
+  &.medium {
+    padding: 0 12px;
+    font-size: 14px;
+    height: 36px;
+  }
+  &.large {
+    padding: 0 16px;
+    font-size: 14px;
+    height: 42px;
+  }
+
+  &.secondary {
+    background-color: $light-80;
+    color: $dark-100;
+    border: none;
+
+    &:hover {
+      background-color: $light-100;
+    }
+
+    &:active {
+      background-color: $light-60;
+    }
+  }
+}

@@ -159,8 +159,8 @@ const ContextMenu = ({
               }
               return (
                 <div
-                  className={styles.contextMenuItem}
                   key={`menu-item-${index}`}
+                  className={styles.contextMenuItem}
                   onClick={(e) => {
                     setOpen(false)
                     item?.onClick?.(e)

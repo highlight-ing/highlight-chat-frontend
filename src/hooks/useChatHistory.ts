@@ -1,23 +1,15 @@
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useRef} from "react";
 import {useApi} from "@/hooks/useApi";
 import {useStore} from "@/providers/store-provider";
-
-export interface ChatHistoryItem {
-  id: string;
-  created_at: string;
-  updated_at: string;
-  user_id: string;
-  title: string;
-}
+import {ChatHistoryItem} from "@/types";
 
 interface ChatHistoryResponse {
   conversations: ChatHistoryItem[];
 }
 
-export const useChatHistory = (): {chatHistory: ChatHistoryItem[], refreshChatHistory: () => Promise<ChatHistoryItem[]>} => {
+export const useChatHistory = (): {history: ChatHistoryItem[], refreshChatHistory: () => Promise<ChatHistoryItem[]>} => {
   const {get} = useApi()
-  const [chatHistory, setChatHistory] = useState<ChatHistoryItem[]>([]);
-  const conversationId = useStore(({conversationId}) => conversationId)
+  const {conversationId, history, setHistory} = useStore((state) => state);
   const fetchRetryRef = useRef<NodeJS.Timeout>()
   const fetchRetryCountRef = useRef(0)
 
@@ -28,11 +20,11 @@ export const useChatHistory = (): {chatHistory: ChatHistoryItem[], refreshChatHi
         throw new Error("Network response was not ok");
       }
       const data: ChatHistoryResponse = await response.json();
-      setChatHistory(data.conversations);
+      setHistory(data.conversations);
       return data.conversations
     } catch (error) {
       console.error("Error fetching response:", error);
-      setChatHistory([]);
+      setHistory([]);
       return []
     }
   };
@@ -44,14 +36,14 @@ export const useChatHistory = (): {chatHistory: ChatHistoryItem[], refreshChatHi
 
   useEffect(() => {
     // If a new conversationId is found
-    if (conversationId && !chatHistory.some(chat => chat.id === conversationId)) {
+    if (conversationId && !history.some(chat => chat.id === conversationId)) {
       console.log('Refreshing chat history, new conversation found')
       fetchResponse()
       return
     }
 
     // If the latest conversation title is "New Conversation"
-    const chat = chatHistory.find(chat => chat.id === conversationId)
+    const chat = history.find(chat => chat.id === conversationId)
     if (chat?.title === 'New Conversation' && fetchRetryCountRef.current < 10) {
       console.log('Refreshing chat history until title is provided')
 
@@ -75,10 +67,10 @@ export const useChatHistory = (): {chatHistory: ChatHistoryItem[], refreshChatHi
         clearInterval(fetchRetryRef.current)
       }
     }
-  }, [chatHistory, conversationId]);
+  }, [history, conversationId]);
 
   return {
-    chatHistory,
+    history,
     refreshChatHistory: fetchResponse
   };
 };

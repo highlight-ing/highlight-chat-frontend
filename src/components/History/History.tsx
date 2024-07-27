@@ -1,12 +1,12 @@
 import styles from "./history.module.scss";
 import * as React from "react";
-import {ChatHistoryItem, useChatHistory} from "@/hooks/useChatHistory";
+import {useChatHistory} from "@/hooks/useChatHistory";
 import Tooltip from "@/components/Tooltip";
 import CircleButton from "@/components/CircleButton/CircleButton";
 import { Category } from "iconsax-react";
 import {useStore} from "@/providers/store-provider";
 import {useApi} from "@/hooks/useApi";
-import {Message} from "@/types";
+import {ChatHistoryItem, Message} from "@/types";
 import ContextMenu from "@/components/ContextMenu/ContextMenu";
 
 interface HistoryProps {
@@ -19,8 +19,8 @@ const History: React.FC<HistoryProps> = ({
   setShowHistory,
 }: HistoryProps) => {
   const {get, deleteRequest} = useApi()
-  const {chatHistory, refreshChatHistory} = useChatHistory();
-  const {conversationId, loadConversation, startNewConversation} = useStore((state) => state);
+  const {history, refreshChatHistory} = useChatHistory();
+  const {conversationId, loadConversation, startNewConversation, openModal} = useStore((state) => state);
 
   const onSelectChat = async (chat: ChatHistoryItem) => {
     const response = await get(`history/${chat.id}/messages`)
@@ -39,6 +39,10 @@ const History: React.FC<HistoryProps> = ({
   }
 
   const onDeleteChat = async (chat: ChatHistoryItem) => {
+    if (true) {
+      openModal('delete-chat', chat)
+      return
+    }
     const response = await deleteRequest(`history/${chat.id}`)
     if (!response.ok) {
       // @TODO Error handling
@@ -64,9 +68,10 @@ const History: React.FC<HistoryProps> = ({
         Chats
       </div>
       <div className={styles.chats}>
-        {chatHistory?.length > 0 ? (
-          chatHistory.map((chat) => (
+        {history?.length > 0 ? (
+          history.map((chat) => (
             <ContextMenu
+              key={`menu-${chat.id}`}
               items={[
                 {label: 'Open Chat', onClick: () => onSelectChat(chat)},
                 {divider: true},
