@@ -1,0 +1,19 @@
+@import '@/variables.module';
+
+.contextMenuItem {
+  padding: 12px 16px;
+  font-size: 15px;
+  font-weight: normal;
+  color: $light-60;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+
+  &:hover {
+    color: $light-100;
+    background-color: $light-10;
+  }
+}

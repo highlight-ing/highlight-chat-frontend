@@ -2,6 +2,7 @@ import { HighlightContext } from "@highlight-ai/app-runtime";
 import imageCompression from "browser-image-compression";
 import { useStore } from "@/providers/store-provider";
 import useAuth from "./useAuth";
+import {useApi} from "@/hooks/useApi";
 
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024; // 1MB in bytes
@@ -79,6 +80,8 @@ export default async function addAttachmentsToFormData(
 }
 
 export const useSubmitQuery = () => {
+  const {post} = useApi()
+
   const { attachments, clearAttachments, input, setInput, setIsDisabled } =
     useStore((state) => ({
       attachments: state.attachments,
@@ -118,16 +121,7 @@ export const useSubmitQuery = () => {
       const conversationId = getOrCreateConversationId();
       formData.append("conversation_id", conversationId);
 
-      const backendUrl =
-        process.env.NEXT_PUBLIC_BACKEND_URL || "http://0.0.0.0:8080/";
-      let response = await fetch(`${backendUrl}api/v1/chat/`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
+      const response = await post('chat/', formData)
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }

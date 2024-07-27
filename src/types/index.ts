@@ -48,3 +48,16 @@ export interface AudioAttachment {
 }
 
 export type Attachment = ImageAttachment | PdfAttachment | AudioAttachment;
+
+export interface ChatHistoryItem {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  user_id: string;
+  title: string;
+}
+
+export interface ModalObjectProps {
+  id: string
+  context?: Record<string, any>
+}
