@@ -1,0 +1,87 @@
+@import '@/variables.module';
+
+.outerContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.innerContainer {
+  display: flex;
+  justify-content: space-evenly;
+  background-color: $bg-third-layer;
+  border: 1px solid $light-5;
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+
+.columnHeader {
+  font-size: 16px;
+  color: $light-40;
+}
+
+.displays {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  border-right: 1px solid $light-5;
+  padding-right: 16px;
+}
+
+.displayImages {
+  display: flex;
+  gap: 8px
+}
+
+.display {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-radius: 4px;
+  height: 100px;
+  width: 'auto';
+  cursor: pointer;
+}
+
+.windows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  padding-left: 16px;
+}
+
+.windowRows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.window {
+  display: flex;
+  gap: 4px;
+  cursor: pointer;
+  max-width: 200px;
+}
+
+.windowIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.windowTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: $light-60;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
