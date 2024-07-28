@@ -55,6 +55,7 @@ function useContextRecievedHandler() {
         addAttachment({
           type: "audio",
           value: attachment,
+          duration: 0,
         });
 
         console.log(

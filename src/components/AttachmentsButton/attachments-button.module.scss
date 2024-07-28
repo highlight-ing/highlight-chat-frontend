@@ -6,6 +6,31 @@
   align-items: center;
 }
 
+.audioMenuItem {
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+}
+
+.audioDurationsContainer {
+  display: flex;
+  gap: 8px;
+}
+
+
+.audioDurationContainer {
+  font-size: 12px;
+  color: $light-40;
+  background-color: $light-10;
+  border-radius: 4px;
+  padding: 4px 8px;
+
+  &:hover {
+    background-color: $light-20;
+    color: $light-100;
+  }
+}
+
 .button {
   display: flex;
   align-items: center;
