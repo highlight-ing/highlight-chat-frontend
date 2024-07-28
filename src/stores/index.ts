@@ -48,6 +48,13 @@ import {
   createHighlightContextSlice,
   initialHighlightContextState,
 } from "./highlight-context";
+import {
+  ModalsSlice,
+  ModalsState,
+  createModalsSlice,
+  initialModalsState,
+} from "./modals";
+import {createHistorySlice, HistorySlice, HistoryState, initialHistoryState} from "@/stores/history";
 
 /**
  * To add a new store, create a new file and reference messages.ts
@@ -63,7 +70,9 @@ export type StoreState = MessagesState &
   ConversationState &
   PromptState &
   AboutMeState &
-  HighlightContextState;
+  HighlightContextState &
+  ModalsState &
+  HistoryState;
 
 export type Store = MessagesSlice &
   AuthSlice &
@@ -72,7 +81,9 @@ export type Store = MessagesSlice &
   ConversationSlice &
   PromptSlice &
   AboutMeSlice &
-  HighlightContextSlice;
+  HighlightContextSlice &
+  ModalsSlice &
+  HistorySlice;
 
 const defaultState: StoreState = {
   ...initialMessagesState,
@@ -83,6 +94,8 @@ const defaultState: StoreState = {
   ...initialPromptState,
   ...initialAboutMeState,
   ...initialHighlightContextState,
+  ...initialModalsState,
+  ...initialHistoryState
 };
 
 export const initStore: () => StoreState = () => {
@@ -93,6 +106,7 @@ export const createStore = (initState: StoreState = defaultState) => {
   return create<Store>()((...a) => ({
     ...initState,
     ...createMessagesSlice(...a),
+    ...createHistorySlice(...a),
     ...createAuthSlice(...a),
     ...createChatInputSlice(...a),
     ...createChatAttachmentsSlice(...a),
@@ -100,5 +114,6 @@ export const createStore = (initState: StoreState = defaultState) => {
     ...createPromptSlice(...a),
     ...createAboutMeSlice(...a),
     ...createHighlightContextSlice(...a),
+    ...createModalsSlice(...a),
   }));
 };

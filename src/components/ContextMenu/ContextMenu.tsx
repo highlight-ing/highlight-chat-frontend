@@ -1,6 +1,8 @@
 import { PropsWithChildren, ReactElement, ReactHTMLElement, useCallback, useEffect, useRef, useState } from 'react'
 import { Portal } from 'react-portal'
 
+import styles from './contextmenu.module.scss'
+
 const PIXEL_SPACING = 4
 
 type Position = 'top' | 'bottom' | 'left' | 'right'
@@ -12,7 +14,6 @@ export interface MenuItemType {
 }
 
 interface ContextMenuProps {
-  alignment: Position
   disabled?: boolean
   items: MenuItemType[]
   leftClick?: boolean
@@ -27,7 +28,6 @@ const ContextMenu = ({
   children,
   triggerId,
   position,
-  alignment,
   leftClick,
   items,
   offset = 0,
@@ -159,8 +159,8 @@ const ContextMenu = ({
               }
               return (
                 <div
-                  className="flex flex-nowrap px-4 py-2 text-[15px] text-light-60 cursor-pointer gap-2 select-none hover:light-8"
                   key={`menu-item-${index}`}
+                  className={styles.contextMenuItem}
                   onClick={(e) => {
                     setOpen(false)
                     item?.onClick?.(e)
