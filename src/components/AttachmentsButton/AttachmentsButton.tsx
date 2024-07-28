@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { DocumentUpload, GalleryAdd, Sound } from 'iconsax-react'
+import { ClipboardText, DocumentUpload, GalleryAdd, Sound } from 'iconsax-react'
 import Highlight from '@highlight-ai/app-runtime'
 
 import { PaperclipIcon } from '../../icons/icons'
@@ -78,6 +78,30 @@ export const AttachmentsButton = () => {
     }
   }
 
+  const onAddClipboard = async () => {
+    const hasClipboardReadPermissions = await Highlight.permissions.requestClipboardReadPermission()
+
+    if (!hasClipboardReadPermissions) {
+      console.log('Clipboard read permission denied')
+      return
+    }
+
+    const clipboard = await Highlight.user.getClipboardContents()
+    if (!clipboard) return
+
+    if (clipboard.type === 'image') {
+      addAttachment({
+        type: 'image',
+        value: clipboard.value
+      })
+    } else {
+      addAttachment({
+        type: 'clipboard',
+        value: clipboard.value
+      })
+    }
+  }
+
   const audioDurations: { duration: number; unit: 'hours' | 'minutes' }[] = [
     { duration: 5, unit: 'minutes' },
     { duration: 30, unit: 'minutes' },
@@ -118,6 +142,15 @@ export const AttachmentsButton = () => {
 
   const menuItems = [
     audioMenuItem,
+    {
+      label: (
+        <div className={styles.menuItem}>
+          <ClipboardText size={24} color="#fff" />
+          Clipboard
+        </div>
+      ),
+      onClick: onAddClipboard
+    },
     screenshot && screenshotMenuItem,
     {
       label: (
@@ -127,7 +160,7 @@ export const AttachmentsButton = () => {
         </div>
       ),
       onClick: handleAttachmentClick
-    }
+    },
   ].filter(Boolean) as MenuItemType[]
 
   return (

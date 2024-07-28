@@ -37,7 +37,7 @@ export default async function addAttachmentsToFormData(
   formData: FormData,
   attachments: any[]
 ) {
-  let screenshot, audio, fileTitle;
+  let screenshot, audio, fileTitle, clipboardText;
 
   for (const attachment of attachments) {
     if (attachment?.value) {
@@ -70,13 +70,17 @@ export default async function addAttachmentsToFormData(
           audio = attachment.value;
           formData.append("audio", attachment.value.slice(0, 1000));
           break;
+        case "clipboard":
+          clipboardText = attachment.value;
+          // TODO (SP) add clipboard text to form data once backend supports
+          break;
         default:
           console.warn("Unknown attachment type:", attachment.type);
       }
     }
   }
 
-  return { screenshot, audio, fileTitle };
+  return { screenshot, audio, fileTitle, clipboardText };
 }
 
 export const useSubmitQuery = () => {
@@ -95,10 +99,6 @@ export const useSubmitQuery = () => {
     messages: state.messages,
     addMessage: state.addMessage,
     updateLastMessage: state.updateLastMessage,
-  }));
-
-  const { highlightContext } = useStore((state) => ({
-    highlightContext: state.highlightContext,
   }));
 
   const { getOrCreateConversationId, resetConversationId } = useStore(
@@ -273,7 +273,7 @@ export const useSubmitQuery = () => {
         formData.append("about_me", JSON.stringify(aboutMe));
       }
 
-      const { screenshot, audio, fileTitle } = await addAttachmentsToFormData(
+      const { screenshot, audio, fileTitle, clipboardText } = await addAttachmentsToFormData(
         formData,
         attachments
       );
@@ -284,13 +284,18 @@ export const useSubmitQuery = () => {
         screenshot,
         audio,
         fileTitle,
+        clipboardText,
       });
 
       setInput("");
       clearAttachments(); // Clear the attachment immediately
 
-      let contextString =
-        "This is a new conversation with Highlight Chat. You do not have any Highlight Context available.";
+
+      // TODO (SP) this is a workaround to ensure clipboard text is processed by the prompt until
+      // the backend supports clipboard text
+      let contextString = clipboardText
+        ? `HighlightContext: { "attachments": [ { "type": "clipboard", "value": ${clipboardText}}]`
+        : "This is a new conversation with Highlight Chat. You do not have any Highlight Context available.";
 
       console.log("contextString:", contextString);
       formData.append("context", contextString);
