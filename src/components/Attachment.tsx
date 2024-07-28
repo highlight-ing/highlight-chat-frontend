@@ -40,11 +40,11 @@ export const Attachment = ({ type, value, isFile = false, removeEnabled = false 
       <div
         className={`group relative flex items-center justify-center h-12 rounded-md border border-light-10 bg-light-20 ${
           type === 'pdf' ? 'max-w-40' : 'max-w-20'
-        } w-fit`}
+        } ${type !== 'image' ? 'min-w-12' : 'min-w-2'} w-fit`}
       >
         {type === 'image' && (
           <img
-            className="transition-opacity transition-padding duration-150 ease-in-out flex h-12 w-auto max-w-20 object-cover items-center overflow-hidden rounded-sm opacity-50 pointer-events-none"
+            className="transition-opacity transition-padding duration-150 ease-in-out flex h-12 w-auto max-w-20 items-center overflow-hidden rounded-sm opacity-50 pointer-events-none"
             style={{ opacity: isImageLoaded ? 1 : 0 }}
             src={value}
             onLoad={() => setIsImageLoaded(true)}

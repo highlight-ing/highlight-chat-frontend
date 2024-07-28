@@ -64,7 +64,7 @@ export const AttachmentsButton = () => {
   }
 
   const onClickScreenshot = async () => {
-    const hasClipboardReadPermissions = await Highlight.permissions.requestBackgroundPermission()
+    const hasClipboardReadPermissions = await Highlight.permissions.requestScreenshotPermission()
 
     if (!hasClipboardReadPermissions) {
       console.log('Screenshot permission denied')
@@ -75,7 +75,7 @@ export const AttachmentsButton = () => {
   }
 
   const onAddClipboard = async () => {
-    const hasClipboardReadPermissions = await Highlight.permissions.requestBackgroundPermission()
+    const hasClipboardReadPermissions = await Highlight.permissions.requestClipboardReadPermission()
 
     if (!hasClipboardReadPermissions) {
       console.log('Clipboard read permission denied')
