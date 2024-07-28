@@ -45,7 +45,7 @@ export interface PdfAttachment {
 export interface AudioAttachment {
   type: 'audio'
   value: string
-  duration: number
+  duration: number // in minutes
 }
 
 export type Attachment = ImageAttachment | PdfAttachment | AudioAttachment
