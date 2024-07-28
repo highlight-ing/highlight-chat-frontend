@@ -7,6 +7,7 @@ import ContextMenu, { MenuItemType } from '../ContextMenu/ContextMenu'
 import styles from './attachments-button.module.scss'
 import { useStore } from '@/providers/store-provider'
 import { getDurationUnit } from '@/utils/string'
+import { ScreenshotAttachmentPicker } from '../ScreenshotAttachmentPicker/ScrenshotAttachmentPicker'
 
 interface AudioDurationProps {
   duration: number
@@ -25,8 +26,8 @@ const AudioDuration = ({ duration, unit, onClick }: AudioDurationProps) => {
 }
 
 export const AttachmentsButton = () => {
-  const [screenshot, setScreenshot] = useState<string>('')
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [screenshotPickerVisible, setScreenshotPickerVisible] = useState(false)
 
   const { setFileInputRef, addAttachment } = useStore((state) => ({
     addAttachment: state.addAttachment,
@@ -36,11 +37,6 @@ export const AttachmentsButton = () => {
   useEffect(() => {
     setFileInputRef(fileInputRef)
   }, [fileInputRef])
-
-  const updateAttachments = async () => {
-    const screenshot = await Highlight.user.getScreenshot()
-    setScreenshot(screenshot)
-  }
 
   const handleAttachmentClick = () => {
     fileInputRef?.current?.click()
@@ -64,18 +60,18 @@ export const AttachmentsButton = () => {
         type: 'pdf',
         value: file
       })
-    } else {
-      alert('Please select a valid image or PDF file.')
     }
   }
 
-  const onAddScreenshot = async () => {
-    if (screenshot.length > 0) {
-      addAttachment({
-        type: 'image',
-        value: screenshot
-      })
+  const onClickScreenshot = async () => {
+    const hasClipboardReadPermissions = await Highlight.permissions.requestScreenshotPermission()
+
+    if (!hasClipboardReadPermissions) {
+      console.log('Screenshot permission denied')
+      return
     }
+
+    setScreenshotPickerVisible(true)
   }
 
   const onAddClipboard = async () => {
@@ -130,16 +126,6 @@ export const AttachmentsButton = () => {
     )
   }
 
-  const screenshotMenuItem = {
-    label: (
-      <div className={styles.menuItem}>
-        <GalleryAdd variant="Bold" size={24} color="#fff" />
-        Screenshot
-      </div>
-    ),
-    onClick: onAddScreenshot
-  }
-
   const menuItems = [
     audioMenuItem,
     {
@@ -151,7 +137,15 @@ export const AttachmentsButton = () => {
       ),
       onClick: onAddClipboard
     },
-    screenshot && screenshotMenuItem,
+    {
+      label: (
+        <div className={styles.menuItem}>
+          <GalleryAdd variant="Bold" size={24} color="#fff" />
+          Screenshot
+        </div>
+      ),
+      onClick: onClickScreenshot
+    },
     {
       label: (
         <div className={styles.menuItem}>
@@ -160,27 +154,27 @@ export const AttachmentsButton = () => {
         </div>
       ),
       onClick: handleAttachmentClick
-    },
+    }
   ].filter(Boolean) as MenuItemType[]
 
   return (
-    <ContextMenu
-      position="top"
-      triggerId="attachments-button"
-      leftClick={true}
-      items={menuItems}
-      onOpen={updateAttachments}
-    >
-      <button type="button" className={styles.button} id="attachments-button">
-        <PaperclipIcon />
-        <input
-          type="file"
-          ref={fileInputRef}
-          onChange={onAddFile}
-          accept="image/*,application/pdf"
-          className={styles.hiddenInput}
-        />
-      </button>
-    </ContextMenu>
+    <>
+      <ContextMenu position="top" triggerId="attachments-button" leftClick={true} items={menuItems}>
+        <button type="button" className={styles.button} id="attachments-button">
+          <PaperclipIcon />
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={onAddFile}
+            accept="image/*,application/pdf"
+            className={styles.hiddenInput}
+          />
+        </button>
+      </ContextMenu>
+      <ScreenshotAttachmentPicker
+        isVisible={screenshotPickerVisible}
+        onClose={() => setScreenshotPickerVisible(false)}
+      />
+    </>
   )
 }

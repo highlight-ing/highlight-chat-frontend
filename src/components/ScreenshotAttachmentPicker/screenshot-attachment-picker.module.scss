@@ -1,0 +1,112 @@
+@import '@/variables.module';
+
+.outerContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  backdrop-filter: blur(5px);
+}
+
+.innerContainer {
+  display: flex;
+  justify-content: space-evenly;
+  background-color: $bg-first-layer;
+  border: 1px solid $light-20;
+  border-radius: 8px;
+  padding: 16px 16px;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.closeButton {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  cursor: pointer;
+  color: $light-80;
+}
+
+.columnHeader {
+  font-size: 16px;
+  font-weight: normal;
+  color: $light-100;
+}
+
+.displays {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  border-right: 1px solid $light-20;
+  padding-right: 16px;
+}
+
+.displayImages {
+  display: flex;
+  flex-direction: column;
+  gap: 8px
+}
+
+.display {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-radius: 4px;
+  height: 100px;
+  width: 'auto';
+  cursor: pointer;
+  opacity: 0.8;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.windows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  padding-left: 16px;
+}
+
+.windowRows {
+  display: flex;
+  flex-direction: column;
+  max-width: 300px;
+}
+
+.window {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  padding: 4px 8px;
+  color: $light-60;
+
+  &:hover {
+    background-color: $light-10;
+    border-radius: 4px;
+    color: $light-100;
+  }
+}
+
+.windowIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.windowTitle {
+  font-size: 16px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
