@@ -1,4 +1,4 @@
-import { ClipboardText, Document, Sound } from 'iconsax-react'
+import { ClipboardText, Document, Keyboard, Sound } from 'iconsax-react'
 import { useState } from 'react'
 import { CloseIcon } from '../icons/icons'
 import Tooltip from './Tooltip'
@@ -58,6 +58,7 @@ export const Attachment = ({ type, value, isFile = false, removeEnabled = false 
             <span className="inline-block align-middle text-sm text-white truncate max-w-40">{value}</span>
           </div>
         )}
+        {type === 'window' && <Keyboard className="text-white" />}
         {removeEnabled && (
           <div
             className="absolute top-[-5px] right-[-5px] hidden group-hover:flex cursor-pointer text-light-80"

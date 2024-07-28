@@ -55,7 +55,7 @@ export interface ClipboardAttachment {
 
 export type Attachment = ImageAttachment | PdfAttachment | AudioAttachment | ClipboardAttachment
 
-export type AttachmentType = 'audio' | 'clipboard' | 'image' | 'pdf'
+export type AttachmentType = 'audio' | 'clipboard' | 'image' | 'pdf' | 'window'
 
 export interface ChatHistoryItem {
   id: string
