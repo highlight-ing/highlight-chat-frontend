@@ -83,6 +83,7 @@ export const AttachmentsButton = () => {
 
     if (!hasClipboardReadPermissions) {
       console.log('Clipboard read permission denied')
+      return
     }
 
     const clipboard = await Highlight.user.getClipboardContents()
@@ -150,6 +151,7 @@ export const AttachmentsButton = () => {
       ),
       onClick: onAddClipboard
     },
+    screenshot && screenshotMenuItem,
     {
       label: (
         <div className={styles.menuItem}>
@@ -159,7 +161,6 @@ export const AttachmentsButton = () => {
       ),
       onClick: handleAttachmentClick
     },
-    screenshot && screenshotMenuItem
   ].filter(Boolean) as MenuItemType[]
 
   return (
