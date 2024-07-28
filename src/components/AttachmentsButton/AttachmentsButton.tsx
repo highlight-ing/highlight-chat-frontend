@@ -79,18 +79,13 @@ export const AttachmentsButton = () => {
   }
 
   const onAddClipboard = async () => {
-    console.log('on add clipboard clicked')
     const hasClipboardReadPermissions = await Highlight.permissions.requestBackgroundPermission()
 
     if (!hasClipboardReadPermissions) {
       console.log('Clipboard read permission denied')
     }
 
-    // TODO make request to actually get clipboard context
-    // const clipboard = await Highlight.user.getClipboardContents()
-    // const clipboard = undefined
-    // const clipboard = { type: 'text', value: 'Clipboard text' }
-    const clipboard = { type: 'image', value: 'Clipboard image' }
+    const clipboard = await Highlight.user.getClipboardContents()
     if (!clipboard) return
 
     if (clipboard.type === 'image') {
