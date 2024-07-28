@@ -79,7 +79,7 @@ export const AttachmentsButton = () => {
   }
 
   const onAddClipboard = async () => {
-    const hasClipboardReadPermissions = await Highlight.permissions.requestBackgroundPermission()
+    const hasClipboardReadPermissions = await Highlight.permissions.requestClipboardReadPermission()
 
     if (!hasClipboardReadPermissions) {
       console.log('Clipboard read permission denied')
