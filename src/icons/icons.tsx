@@ -112,3 +112,13 @@ export const HighlightIcon = () => (
     />
   </svg>
 );
+
+export const MenuDots = ({size = 24, color = 'white'}: IconPropTypes) => {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="1.5" cy="1.5" r="1.5" transform="matrix(-1 0 0 1 8.5 10.5)" fill={color}/>
+      <circle cx="1.5" cy="1.5" r="1.5" transform="matrix(-1 0 0 1 13.5 10.5)" fill={color}/>
+      <circle cx="1.5" cy="1.5" r="1.5" transform="matrix(-1 0 0 1 18.5 10.5)" fill={color}/>
+    </svg>
+  )
+}

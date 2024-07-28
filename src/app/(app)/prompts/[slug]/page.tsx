@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import HighlightChat from "@/components/HighlightChat/HighlightChat";
-import { fetchPrompt } from "../actions";
+import { fetchPromptText } from "../actions";
 import { useStore } from "@/providers/store-provider";
 
 /**
@@ -26,7 +26,7 @@ export default function PromptPage() {
 
   useEffect(() => {
     const fetch = async () => {
-      const prompt = await fetchPrompt(slug);
+      const prompt = await fetchPromptText(slug);
       setPrompt({
         prompt,
       });

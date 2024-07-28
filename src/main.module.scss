@@ -14,6 +14,7 @@
   align-items: center;
   padding-bottom: 70px;
   flex: 1;
+  position: relative;
 
   &.full {
     animation: history-hide 250ms ease forwards;

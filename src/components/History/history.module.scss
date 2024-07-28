@@ -42,22 +42,29 @@
   overflow-y: auto;
   padding: 8px;
   gap: 1px;
+  user-select: none;
 }
 
-.chat {
+.baseHistoryItem {
   display: block;
   padding: 8px;
   border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 200;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   color: $light-60;
+  flex-shrink: 0;
+}
+
+.chat {
+  @extend .baseHistoryItem;
+  position: relative;
+  cursor: pointer;
 
   &:hover {
     background-color: $light-10;
+    color: $light-100;
   }
 }
-

@@ -3,7 +3,7 @@ import { ClipboardText, DocumentUpload, GalleryAdd, Sound } from 'iconsax-react'
 import Highlight from '@highlight-ai/app-runtime'
 
 import { PaperclipIcon } from '../../icons/icons'
-import ContextMenu, { MenuItemType } from '../ContextMenu'
+import ContextMenu, { MenuItemType } from '../ContextMenu/ContextMenu'
 import styles from './attachments-button.module.scss'
 import { useStore } from '@/providers/store-provider'
 import { getDurationUnit } from '@/utils/string'
@@ -42,10 +42,9 @@ export const AttachmentsButton = () => {
     fileInputRef?.current?.click()
   }
 
-  const onAddAudio = async (duration: number) => {
-    // TODO: get audio for specified duration
-    const audio = await Highlight.user.getAudio(false)
-    addAttachment({ type: 'audio', value: audio, duration })
+  const onAddAudio = async (durationInMinutes: number) => {
+    const audio = await Highlight.user.getAudioForDuration(durationInMinutes * 60)
+    addAttachment({ type: 'audio', value: audio, duration: durationInMinutes })
   }
 
   const onAddFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,13 +60,10 @@ export const AttachmentsButton = () => {
         type: 'pdf',
         value: file
       })
-    } else {
-      alert('Please select a valid image or PDF file.')
     }
   }
 
   const onClickScreenshot = async () => {
-    console.log('on click screenshot clicked')
     const hasClipboardReadPermissions = await Highlight.permissions.requestBackgroundPermission()
 
     if (!hasClipboardReadPermissions) {
@@ -79,7 +75,6 @@ export const AttachmentsButton = () => {
   }
 
   const onAddClipboard = async () => {
-    console.log('on add clipboard clicked')
     const hasClipboardReadPermissions = await Highlight.permissions.requestBackgroundPermission()
 
     if (!hasClipboardReadPermissions) {
@@ -87,11 +82,7 @@ export const AttachmentsButton = () => {
       return
     }
 
-    // TODO make request to actually get clipboard context
-    // const clipboard = await Highlight.user.getClipboardContents()
-    // const clipboard = undefined
-    // const clipboard = { type: 'text', value: 'Clipboard text' }
-    const clipboard = { type: 'image', value: 'Clipboard image' }
+    const clipboard = await Highlight.user.getClipboardContents()
     if (!clipboard) return
 
     if (clipboard.type === 'image') {
@@ -168,7 +159,7 @@ export const AttachmentsButton = () => {
 
   return (
     <>
-      <ContextMenu position="top" alignment="left" triggerId="attachments-button" leftClick={true} items={menuItems}>
+      <ContextMenu position="top" triggerId="attachments-button" leftClick={true} items={menuItems}>
         <button type="button" className={styles.button} id="attachments-button">
           <PaperclipIcon />
           <input

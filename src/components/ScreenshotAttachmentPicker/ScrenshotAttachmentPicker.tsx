@@ -3,7 +3,8 @@ import { createPortal } from 'react-dom'
 import Highlight from '@highlight-ai/app-runtime'
 
 import styles from './screenshot-attachment-picker.module.scss'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { CloseIcon } from '@/icons/icons'
 
 interface ScreenshotAttachmentPickerProps {
   isVisible: boolean
@@ -11,6 +12,9 @@ interface ScreenshotAttachmentPickerProps {
 }
 
 export const ScreenshotAttachmentPicker = ({ isVisible, onClose }: ScreenshotAttachmentPickerProps) => {
+  const [windows, setWindows] = useState<{ windowTitle: string; appIcon?: string }[]>([])
+  const [displays, setDisplays] = useState<{ thumbnail: string }[]>([])
+
   const { addAttachment } = useStore((state) => ({
     addAttachment: state.addAttachment
   }))
@@ -46,14 +50,11 @@ export const ScreenshotAttachmentPicker = ({ isVisible, onClose }: ScreenshotAtt
   }
 
   const onClickWindow = async (windowTitle: string) => {
-    console.log('clicked windowTitle', windowTitle)
+    const screenshot = await Highlight.user.getWindowScreenshot(windowTitle)
 
-    // TODO fetch window screenshot
-    // const screenshot = await Highlight.user.getWindowScreenshot(windowTitle)
-
-    // if (screenshot.length > 0) {
-    //   onAddScreenshot(screenshot)
-    // }
+    if (screenshot.length > 0) {
+      onAddScreenshot(screenshot)
+    }
     onClose()
   }
 
@@ -62,9 +63,22 @@ export const ScreenshotAttachmentPicker = ({ isVisible, onClose }: ScreenshotAtt
     onClose()
   }
 
-  const windows = []
+  useEffect(() => {
+    const fetchWindows = async () => {
+      const windows = await Highlight.user.getWindows()
+      setWindows(windows)
+    }
 
-  const displays = []
+    const fetchDisplays = async () => {
+      const displays = await Highlight.user.getDisplayScreenshots()
+      setDisplays(displays)
+    }
+
+    if (isVisible) {
+      fetchWindows()
+      fetchDisplays()
+    }
+  }, [isVisible])
 
   return (
     <>
@@ -72,6 +86,9 @@ export const ScreenshotAttachmentPicker = ({ isVisible, onClose }: ScreenshotAtt
         createPortal(
           <div ref={outerContainerRef} className={styles.outerContainer}>
             <div ref={innerContainerRef} className={styles.innerContainer}>
+              <div className={styles.closeButton} onClick={onClose}>
+                <CloseIcon size={16} />
+              </div>
               <div className={styles.displays}>
                 <span className={styles.columnHeader}>Displays</span>
                 <div className={styles.displayImages}>
