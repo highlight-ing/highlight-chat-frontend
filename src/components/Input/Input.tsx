@@ -73,7 +73,6 @@ export const Input = ({ offset }: { offset: boolean }) => {
   }, [inputRef, input])
 
   const getValue = (attachment: AttachmentType) => {
-    console.log('help me', attachment)
     switch (attachment.type) {
       case 'pdf':
         return attachment.value.name
@@ -96,7 +95,13 @@ export const Input = ({ offset }: { offset: boolean }) => {
       {attachments.length > 0 && (
         <div className="flex gap-2">
           {attachments.map((attachment: AttachmentType, index: number) => (
-            <Attachment type={attachment.type} value={getValue(attachment)} removeEnabled key={index} />
+            <Attachment
+              type={attachment.type}
+              value={getValue(attachment)}
+              isFile={attachment.type === 'pdf' || (attachment.type === 'image' && !!attachment.file)}
+              removeEnabled
+              key={index}
+            />
           ))}
         </div>
       )}

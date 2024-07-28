@@ -8,10 +8,11 @@ import { AttachmentType } from '@/types'
 interface AttachmentProps {
   type: AttachmentType
   value: string
+  isFile?: boolean
   removeEnabled?: boolean
 }
 
-export const Attachment = ({ type, value, removeEnabled = false }: AttachmentProps) => {
+export const Attachment = ({ type, value, isFile = false, removeEnabled = false }: AttachmentProps) => {
   const [isImageLoaded, setIsImageLoaded] = useState(false)
 
   const { removeAttachment, fileInputRef } = useStore((state) => ({
@@ -22,7 +23,9 @@ export const Attachment = ({ type, value, removeEnabled = false }: AttachmentPro
   const onRemoveAttachment = (type: AttachmentType) => {
     removeAttachment(type)
 
-    if (type === 'pdf' && fileInputRef?.current) {
+    // We need to clear the file input value when removing a PDF attachment. If we don't do this,
+    // the user won't be able to re-attach the same PDF file after removing it.
+    if (fileInputRef?.current && isFile) {
       fileInputRef.current.value = ''
     }
   }
