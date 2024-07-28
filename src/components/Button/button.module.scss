@@ -1,0 +1,153 @@
+@import "@/variables.module";
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  cursor: pointer;
+  gap: 6px;
+  font-weight: 500;
+  border: none;
+  box-sizing: border-box;
+  white-space: nowrap;
+  line-height: 1;
+  flex-shrink: 0;
+  border-radius: 8px;
+
+  &.disabled {
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  &.xsmall {
+    padding: 0 8px;
+    font-size: 12px;
+    height: 24px;
+    border-radius: 6px;
+  }
+  &.small {
+    padding: 0 12px;
+    font-size: 12px;
+    height: 32px;
+  }
+  &.medium {
+    padding: 0 12px;
+    font-size: 14px;
+    height: 36px;
+  }
+  &.large {
+    padding: 0 16px;
+    font-size: 14px;
+    height: 42px;
+  }
+
+  &.primary {
+    background-color: $primary-90;
+    color: $dark-100;
+    border: none;
+
+    &:hover {
+      background-color: $primary-100;
+    }
+
+    &:active {
+      background-color: $primary-80;
+    }
+  }
+
+  &.secondary {
+    background-color: $light-80;
+    color: $dark-100;
+    border: none;
+
+    &:hover {
+      background-color: $light-100;
+    }
+
+    &:active {
+      background-color: $light-60;
+    }
+  }
+
+  &.tertiary {
+    background-color: $tertiary-50;
+    color: $light-80;
+    border: none;
+
+    &:hover {
+      background-color: $tertiary-30;
+      color: $light-100;
+    }
+
+    &:active {
+      background-color: $tertiary-70;
+      color: $light-60;
+    }
+  }
+
+  &.ghost {
+    background-color: transparent;
+    color: $primary-80;
+
+    &:hover {
+      background-color: $primary-10;
+      color: $primary-100;
+    }
+
+    &:active {
+      background-color: $primary-5;
+      color: $primary-60;
+    }
+  }
+
+  &.ghost-neutral {
+    background-color: transparent;
+    color: $light-80;
+
+    &:hover {
+      color: $light-100;
+      background-color: $light-20;
+    }
+
+    &:active {
+      color: $light-60;
+      background-color: $light-10;
+    }
+  }
+
+  &.danger {
+    border: 1px solid $red-80;
+    color: $red-100;
+
+    &:hover {
+      background-color: $red-10;
+      border-color: $red-100;
+      color: $red-100;
+    }
+
+    &:active {
+      background-color: $red-5;
+      border-color: $red-80;
+      color: $red-80;
+    }
+  }
+
+  &.success {
+    border: 1px solid $green-80;
+    //background-color: $light-5;
+    color: $green-80;
+
+    &:hover {
+      background-color: $green-10;
+      border-color: $green-100;
+      color: $green-100;
+    }
+
+    &:active {
+      background-color: $green-5;
+      border-color: $green-80;
+      color: $green-80;
+    }
+  }
+}

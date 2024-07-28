@@ -8,7 +8,7 @@ import { useStore } from '@/providers/store-provider'
 import styles from './chatinput.module.scss'
 import * as React from 'react'
 import { HighlightIcon } from '@/icons/icons'
-import { getDurationUnit } from '@/utils/string'
+import { getAudioAttachmentPreview } from '@/utils/attachments'
 
 const MAX_INPUT_HEIGHT = 160
 
@@ -77,11 +77,7 @@ export const Input = ({ offset }: { offset: boolean }) => {
       case 'pdf':
         return attachment.value.name
       case 'audio':
-        return `Last ${
-          attachment.duration % 60 === 0 ? attachment.duration / 60 : attachment.duration
-        } ${getDurationUnit(attachment.duration, attachment.duration % 60 === 0 ? 'hours' : 'minutes')}:\n${
-          attachment.value
-        }`
+        return getAudioAttachmentPreview(attachment)
       default:
         return attachment.value
     }
@@ -95,7 +91,13 @@ export const Input = ({ offset }: { offset: boolean }) => {
       {attachments.length > 0 && (
         <div className="flex gap-2">
           {attachments.map((attachment: AttachmentType, index: number) => (
-            <Attachment type={attachment.type} value={getValue(attachment)} removeEnabled key={index} />
+            <Attachment
+              type={attachment.type}
+              value={getValue(attachment)}
+              isFile={attachment.type === 'pdf' || (attachment.type === 'image' && !!attachment.file)}
+              removeEnabled
+              key={index}
+            />
           ))}
         </div>
       )}

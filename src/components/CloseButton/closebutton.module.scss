@@ -1,0 +1,40 @@
+@import "@/variables.module";
+
+.closeButton {
+  background-color: transparent;
+  border: none;
+  width: var(--size, 22px);
+  height: var(--size, 22px);
+  border-radius: 50%;
+  cursor: pointer;
+  pointer-events: all;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  top: var(--position, 20px);
+  right: var(--position, 20px);
+  box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.64);
+
+  svg {
+    pointer-events: none;
+
+    .x {
+      stroke: $light-100;
+    }
+    .circle {
+      fill: #5e5c61;
+    }
+  }
+
+  &:hover {
+    box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.9);
+    svg {
+      .x {
+        stroke: $dark-100
+      }
+      .circle {
+        fill: $light-100
+      }
+    }
+  }
+}

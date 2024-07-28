@@ -3,7 +3,7 @@ import { ClipboardText, DocumentUpload, GalleryAdd, Sound } from 'iconsax-react'
 import Highlight from '@highlight-ai/app-runtime'
 
 import { PaperclipIcon } from '../../icons/icons'
-import ContextMenu, { MenuItemType } from '../ContextMenu'
+import ContextMenu, { MenuItemType } from '../ContextMenu/ContextMenu'
 import styles from './attachments-button.module.scss'
 import { useStore } from '@/providers/store-provider'
 import { getDurationUnit } from '@/utils/string'
@@ -46,10 +46,9 @@ export const AttachmentsButton = () => {
     fileInputRef?.current?.click()
   }
 
-  const onAddAudio = async (duration: number) => {
-    // TODO: get audio for specified duration
-    const audio = await Highlight.user.getAudio(false)
-    addAttachment({ type: 'audio', value: audio, duration })
+  const onAddAudio = async (durationInMinutes: number) => {
+    const audio = await Highlight.user.getAudioForDuration(durationInMinutes * 60)
+    addAttachment({ type: 'audio', value: audio, duration: durationInMinutes })
   }
 
   const onAddFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -171,7 +170,6 @@ export const AttachmentsButton = () => {
   return (
     <ContextMenu
       position="top"
-      alignment="left"
       triggerId="attachments-button"
       leftClick={true}
       items={menuItems}

@@ -13,26 +13,23 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          messages: Json | null
           title: string
           updated_at: string | null
-          userId: string | null
+          user_id: string | null
         }
         Insert: {
           created_at?: string
-          id: string
-          messages?: Json | null
+          id?: string
           title: string
           updated_at?: string | null
-          userId?: string | null
+          user_id?: string | null
         }
         Update: {
           created_at?: string
           id?: string
-          messages?: Json | null
           title?: string
           updated_at?: string | null
-          userId?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -57,6 +54,41 @@ export type Database = {
         }
         Relationships: []
       }
+      message: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: number
+          role: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          conversation_id?: string
+          created_at?: string
+          id?: number
+          role: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: number
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversation"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       prompts: {
         Row: {
           created_at: string
@@ -66,6 +98,9 @@ export type Database = {
           name: string
           prompt_text: string | null
           prompt_url: string | null
+          public: boolean
+          slug: string | null
+          user_id: string
         }
         Insert: {
           created_at?: string
@@ -75,6 +110,9 @@ export type Database = {
           name: string
           prompt_text?: string | null
           prompt_url?: string | null
+          public?: boolean
+          slug?: string | null
+          user_id: string
         }
         Update: {
           created_at?: string
@@ -84,6 +122,9 @@ export type Database = {
           name?: string
           prompt_text?: string | null
           prompt_url?: string | null
+          public?: boolean
+          slug?: string | null
+          user_id?: string
         }
         Relationships: []
       }
