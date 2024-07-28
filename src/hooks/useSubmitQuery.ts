@@ -205,6 +205,7 @@ export const useSubmitQuery = () => {
     let rawContents = context.application?.focusedWindow?.rawContents;
     let audio =
       context.attachments?.find((a) => a.type === "audio")?.value ?? "";
+    let windowTitle = context.application?.focusedWindow?.title;
 
     if (
       query ||
@@ -220,6 +221,7 @@ export const useSubmitQuery = () => {
         clipboardText,
         screenshot: screenshotUrl,
         audio,
+        window: { title: windowTitle },
       });
 
       setInput("");
