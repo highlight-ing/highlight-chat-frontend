@@ -291,8 +291,8 @@ export const useSubmitQuery = () => {
       clearAttachments(); // Clear the attachment immediately
 
 
-      // TODO (SP) this is a workaround to ensure clipboard text is processed by the prompt until the backend supports
-      // clipboard text
+      // TODO (SP) this is a workaround to ensure clipboard text is processed by the prompt until
+      // the backend supports clipboard text
       let contextString = clipboardText
         ? `HighlightContext: { "attachments": [ { "type": "clipboard", "value": ${clipboardText}}]`
         : "This is a new conversation with Highlight Chat. You do not have any Highlight Context available.";
