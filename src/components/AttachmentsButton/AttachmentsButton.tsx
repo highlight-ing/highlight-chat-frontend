@@ -129,6 +129,9 @@ export const AttachmentsButton = () => {
   const menuItems = [
     audioMenuItem,
     {
+      divider: true
+    },
+    {
       label: (
         <div className={styles.menuItem}>
           <ClipboardText size={24} color="#fff" />
