@@ -80,16 +80,18 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
 
   return (
     <div className={styles.topBar}>
-      {/* @TODO re-enable when history is working, set condition back to !showHistory */}
       <Tooltip
         tooltip="Show chats"
         position="right"
-        wrapperStyle={showHistory ? { visibility: "hidden" } : undefined}
+        wrapperStyle={
+          showHistory || !setShowHistory ? { visibility: "hidden" } : undefined
+        }
       >
         <CircleButton onClick={onShowHistoryClick}>
           <Category variant={"Bold"} size={24} />
         </CircleButton>
       </Tooltip>
+
       <AppDropdown />
 
       <Tooltip tooltip="Start new chat" position="left">
