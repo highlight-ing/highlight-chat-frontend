@@ -99,6 +99,16 @@ function useAboutMeRegister() {
  * This should hold all the providers.
  */
 export default function App({ children }: { children: React.ReactNode }) {
+
+  // Require that Highlight Chat is running within Highlight
+  useEffect(() => {
+    if (!Highlight.isRunningInHighlight()) {
+      // Redirect them to the Highlight App Store page
+      window.location.href = "https://highlight.ing/apps/highlightchat";
+    }
+  }, []);
+
+
   useContextRecievedHandler();
   useAboutMeRegister();
 
