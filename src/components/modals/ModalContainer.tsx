@@ -4,12 +4,14 @@ import React, {Fragment, useEffect} from "react";
 import DeleteChatModal from "@/presentations/modals/DeleteChatModal";
 import {useStore} from "@/providers/store-provider";
 import {ModalObjectProps} from "@/types";
+import PromptsModal from "@/presentations/modals/PromptsModal";
 
 type FunctionalComponent = (props: ModalObjectProps) => JSX.Element
 
 // Register the modal components by ID here
 const ModalMap: Record<string, FunctionalComponent> = {
-  'delete-chat': DeleteChatModal
+  'delete-chat': DeleteChatModal,
+  'prompts-modal': PromptsModal
 }
 
 export const ModalContainer = () => {

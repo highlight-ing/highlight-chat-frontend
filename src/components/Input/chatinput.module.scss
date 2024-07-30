@@ -18,7 +18,7 @@
   transition: transform 300ms ease;
 
   &.offset {
-    transform: translateY(calc(-50vh + 64px));
+    transform: translateY(calc(-70vh + 64px));
   }
 
   &:hover {
@@ -30,8 +30,8 @@
     background-color: transparent;
     font-weight: 200;
     font-size: 16px;
-    //height: 100%;
     resize: none;
+    outline: none;
 
     &:focus {
       outline: none;

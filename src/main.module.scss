@@ -15,6 +15,7 @@
   padding-bottom: 70px;
   flex: 1;
   position: relative;
+  overflow-y: auto;
 
   &.full {
     animation: history-hide 250ms ease forwards;

@@ -69,3 +69,16 @@ export interface ModalObjectProps {
   id: string
   context?: Record<string, any>
 }
+
+export interface PromptProps {
+  created_at: string
+  description: string | null
+  external_id: string
+  id: number
+  name: string
+  prompt_text: string | null
+  prompt_url: string | null
+  public: boolean
+  slug: string | null
+  user_id: string
+}

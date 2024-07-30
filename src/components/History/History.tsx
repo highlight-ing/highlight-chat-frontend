@@ -74,7 +74,7 @@ const History: React.FC<HistoryProps> = ({
             </ContextMenu>
           ))
         ) : (
-          <div className={styles.emptyChatHistory}>No chat history available</div>
+          <div className={styles.baseHistoryItem}>No chat history available</div>
         )}
       </div>
     </div>

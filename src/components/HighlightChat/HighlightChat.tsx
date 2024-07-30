@@ -9,6 +9,7 @@ import TopBar from "@/components/Navigation/TopBar";
 import Messages from "@/components/Messages/Messages";
 import History from "@/components/History/History";
 import { useStore } from "@/providers/store-provider";
+import ChatHome from "@/components/ChatHome/ChatHome";
 
 /**
  * Hook that handles pasting from the clipboard.
@@ -83,14 +84,15 @@ const HighlightChat = () => {
   return (
     <div className={styles.page}>
       <History showHistory={showHistory} setShowHistory={setShowHistory} />
+      <TopBar showHistory={showHistory} setShowHistory={setShowHistory} />
       <div
         className={`${styles.contents} ${
           showHistory ? styles.partial : styles.full
         }`}
       >
-        <TopBar showHistory={showHistory} setShowHistory={setShowHistory} />
         {(inputIsDisabled || messages.length > 0) && <Messages />}
         <Input offset={!inputIsDisabled && !messages.length} />
+        <ChatHome isShowing={!inputIsDisabled && messages.length === 0}/>
       </div>
     </div>
   );

@@ -9,6 +9,7 @@ import styles from './chatinput.module.scss'
 import * as React from 'react'
 import { HighlightIcon } from '@/icons/icons'
 import { getAudioAttachmentPreview } from '@/utils/attachments'
+import ChatHome from "@/components/ChatHome/ChatHome";
 
 const MAX_INPUT_HEIGHT = 160
 

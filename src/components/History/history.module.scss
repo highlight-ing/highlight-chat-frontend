@@ -12,6 +12,7 @@
   border-right: 1px solid $light-5;
   overflow-x: hidden;
   transition: transform 250ms ease;
+  z-index: 2;
 
   &.show {
     pointer-events: initial;

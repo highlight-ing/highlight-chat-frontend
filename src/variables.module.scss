@@ -42,6 +42,14 @@ $primary-80: rgba(0, 250, 255, 0.8);
 $primary-90: rgba(0, 250, 255, 0.9);
 $primary-100: rgba(0, 250, 255, 1);
 
+$pink-5: rgba(255, 32, 153, 0.05);
+$pink-10: rgba(255, 32, 153, 0.1);
+$pink-20: rgba(255, 32, 153, 0.2);
+$pink-40: rgba(255, 32, 153, 0.4);
+$pink-60: rgba(255, 32, 153, 0.6);
+$pink-80: rgba(255, 32, 153, 0.8);
+$pink-100: #FF2099;
+
 // These are not in the same order as the others, copied from Medal theme format
 $tertiary-0: #B3B1B6;
 $tertiary-30: #83817c;
@@ -55,8 +63,21 @@ $bg-third-layer: #1F1F20;
 
 $chat-body-width: min(800px, 88%);
 $chat-history-width: 250px;
+$topbar-height: 64px;
 
 :export {
+  primary5: $primary-5;
+  primary10: $primary-10;
+  primary20: $primary-20;
+  primary30: $primary-30;
+  primary40: $primary-40;
+  primary50: $primary-50;
+  primary60: $primary-60;
+  primary70: $primary-70;
+  primary80: $primary-80;
+  primary90: $primary-90;
+  primary100: $primary-100;
+
   light5: $light-5;
   light10: $light-10;
   light20: $light-20;
@@ -72,4 +93,28 @@ $chat-history-width: 250px;
   dark60: $dark-60;
   dark80: $dark-80;
   dark100: $dark-100;
+
+  green5: $green-5;
+  green10: $green-10;
+  green20: $green-20;
+  green40: $green-40;
+  green60: $green-60;
+  green80: $green-80;
+  green100: $green-100;
+
+  red5: $red-5;
+  red10: $red-10;
+  red20: $red-20;
+  red40: $red-40;
+  red60: $red-60;
+  red80: $red-80;
+  red100: $red-100;
+
+  pink5: $pink-5;
+  pink10: $pink-10;
+  pink20: $pink-20;
+  pink40: $pink-40;
+  pink60: $pink-60;
+  pink80: $pink-80;
+  pink100: $pink-100;
 }

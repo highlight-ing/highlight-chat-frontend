@@ -1,6 +1,22 @@
+@import '@/variables.module';
+
 .deleteChat {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 16px;
+}
+
+.promptsModal {
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+  overflow-y: scroll;
+  gap: 8px;
+
+  h1 {
+    font-size: 18px;
+    font-weight: 400;
+    color: $light-100;
+  }
 }

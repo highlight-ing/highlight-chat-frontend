@@ -1,0 +1,159 @@
+@import '@/variables.module';
+
+.chatHomeContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  transition: opacity 100ms ease;
+  margin-top: calc(30vh + 96px);
+  position: fixed;
+  opacity: 0;
+
+  &.show {
+    margin-top: calc(40vh + 32px);
+    position: relative;
+    opacity: 1;
+
+    .homeCallout {
+      transform: scale(1)
+    }
+
+    .prompts {
+      transform: translateY(0px);
+      opacity: 1;
+    }
+  }
+}
+
+.callouts {
+  display: flex;
+  gap: 24px;
+}
+
+
+.homeCallout {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 20px;
+  border: 1px solid $light-10;
+  background-color: $light-5;
+  font-weight: 300;
+  font-size: 14px;
+  color: $light-60;
+  width: 250px;
+  user-select: none;
+  cursor: pointer;
+  transform: scale(0);
+  transition: transform 150ms ease;
+
+  &:nth-child(1) {
+    transition-duration: 150ms;
+  }
+  &:nth-child(2) {
+    transition-duration: 300ms;
+  }
+  &:nth-child(3) {
+    transition-duration: 450ms;
+  }
+
+  &:hover {
+    border-color: $light-20;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 400;
+    color: $light-100;
+    gap: 12px;
+  }
+}
+
+.prompts {
+  display: flex;
+  flex-direction: column;
+  background-color: $light-5;
+  padding: 8px;
+  gap: 8px;
+  border-radius: 20px;
+  opacity: 0;
+  transition: opacity 300ms ease, transform 300ms ease;
+  transform: translateY(100px);
+}
+
+.baseOption {
+  display: flex;
+  gap: 16px;
+  font-size: 15px;
+  font-weight: 250;
+  color: $light-60;
+  padding: 8px;
+  border-radius: 16px;
+  cursor: pointer;
+  user-select: none;
+  align-items: center;
+
+  &:hover {
+    background-color: $light-5;
+  }
+}
+
+.promptOption {
+  @extend .baseOption;
+  align-items: flex-start;
+
+  &:hover {
+    background-color: $pink-5;
+  }
+
+  &.official {
+    &:hover {
+      background-color: $light-5;
+    }
+
+    .promptName {
+      color: $light-100;
+    }
+
+    .promptIcon {
+      background-color: $light-20;
+      color: $light-100;
+    }
+  }
+
+  &.prompt {
+    &:hover {
+      background-color: $pink-5;
+    }
+
+    .promptName {
+      color: $pink-100;
+    }
+
+    .promptIcon {
+      background-color: $pink-20;
+      color: $pink-100;
+    }
+  }
+}
+
+.baseIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 49px;
+  height: 49px;
+  border-radius: 50%;
+  background-color: $light-5;
+}
+
+.promptIcon {
+  @extend .baseIcon;
+}
+
+.promptName {
+  font-weight: 500;
+}

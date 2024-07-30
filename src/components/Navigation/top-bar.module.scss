@@ -1,14 +1,17 @@
 @import '@/variables.module';
 
 .topBar {
+  position: fixed;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 12px;
   border-bottom: 1px solid $light-10;
+  backdrop-filter: blur(16px);
   width: 100%;
-  height: 64px;
+  height: $topbar-height;
   font-size: 14px;
   font-weight: 500;
   color: $light-80;
+  z-index: 1;
 }
