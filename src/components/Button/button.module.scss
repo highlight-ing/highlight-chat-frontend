@@ -24,7 +24,7 @@
     padding: 0 8px;
     font-size: 12px;
     height: 24px;
-    border-radius: 6px;
+    border-radius: 6px
   }
   &.small {
     padding: 0 12px;
@@ -103,7 +103,7 @@
 
   &.ghost-neutral {
     background-color: transparent;
-    color: $light-80;
+    color: $light-60;
 
     &:hover {
       color: $light-100;
