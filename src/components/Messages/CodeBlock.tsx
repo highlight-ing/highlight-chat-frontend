@@ -22,9 +22,11 @@ const CodeBlock = ({children, language}: PropsWithChildren<CodeBlockProps>) => {
           <Copy variant={"Linear"} size={16}/> Copy Code
         </Button>
       </div>
-      <SyntaxHighlighter language={language} style={darcula} customStyle={{backgroundColor: 'rgba(0, 0, 0, 0.6)'}}>
-        {code}
-      </SyntaxHighlighter>
+      <div className="overflow-x-auto" style={{width: '100%'}}>
+        <SyntaxHighlighter language={language} style={darcula} customStyle={{backgroundColor: 'rgba(0, 0, 0, 0.6)', padding: '12px', boxSizing: 'border-box'}}>
+          {code}
+        </SyntaxHighlighter>
+      </div>
     </div>
   )
 }
