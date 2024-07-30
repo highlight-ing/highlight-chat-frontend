@@ -1,11 +1,16 @@
-import { AssistantIcon } from "../../icons/icons";
-import { Message as MessageType, UserMessage } from "../../types";
 import { Remark } from "react-remark";
+
+// @ts-ignore
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { darcula } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+
+import { AssistantIcon } from "@/icons/icons";
+import { Message as MessageType, UserMessage } from "../../types";
 import { Attachment } from "../Attachment";
 
 import styles from "./message.module.scss";
 import TypedText from "@/components/TypedText/TypedText";
-import { PropsWithChildren } from "react";
+import CodeBlock from "@/components/Messages/CodeBlock";
 
 const hasAttachment = (message: UserMessage) => {
   return (
@@ -56,7 +61,21 @@ export const Message = ({ message, isThinking }: MessageProps) => {
             </div>
           )}
           <div className={styles.messageBody}>
-            <Remark>
+            <Remark rehypeReactOptions={{
+              components: {
+                code: (props: any) => {
+                  const match = /language-(\w+)/.exec(props.className || '')
+                  if (match) {
+                    return (
+                      <CodeBlock language={match[1]}>
+                        {props.children}
+                      </CodeBlock>
+                    )
+                  }
+                  return <code {...props}/>
+                }
+              }
+            }}>
               {typeof message.content === "string" ? message.content : ""}
             </Remark>
           </div>
