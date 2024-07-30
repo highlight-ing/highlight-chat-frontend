@@ -74,14 +74,11 @@
     border: 1px solid $light-10;
     padding: 4px;
     border-radius: 6px;
-    //color: $light-80;
     height: fit-content;
   }
 
   pre {
     font-size: 13px;
-    //border-bottom-left-radius: 8px;
-    //border-bottom-right-radius: 8px;
 
     code {
       background-color: transparent;
@@ -111,8 +108,6 @@
   align-items: center;
   justify-content: space-between;
   padding: 4px 4px 4px 12px;
-  //border-top-left-radius: 8px;
-  //border-top-right-radius: 8px;
   background-color: $light-5;
   color: $light-40;
   font-size: 13px;
