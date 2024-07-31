@@ -185,6 +185,14 @@
   font-weight: 500;
 }
 
+.promptDescription {
+  max-width: calc(100% - 32px);
+
+  &.isCta {
+    max-width: calc(100% - 100px);
+  }
+}
+
 .promptArrow {
   display: none;
   align-items: center;

@@ -19,14 +19,14 @@ const PromptListRow = ({prompt, icon, type, isCta, onClick, onClickEdit}: Prompt
       <div className={styles.promptIcon}>
         {icon ?? <MessageProgramming variant={"Bold"}/>}
       </div>
-      <div className="flex flex-col mt-0.5">
+      <div className="flex flex-col mt-0.5 flex-1">
         {
           prompt.name &&
           <span className={styles.promptName}>{prompt.name}</span>
         }
         {
           prompt.description &&
-          <span>{prompt.description}</span>
+          <span className={`${styles.promptDescription} ${isCta ? styles.isCta : ''}`}>{prompt.description}</span>
         }
       </div>
       <div className={`${styles.promptArrow} ${(isCta || typeof onClickEdit === 'function') ? styles.show : ''}`}>
