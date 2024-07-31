@@ -79,6 +79,21 @@ export default async function addAttachmentsToFormData(
   return { screenshot, audio, fileTitle };
 }
 
+const prepareAttachments = (attachments: any[]): HLChatDBAttachment[] => {
+  return attachments.map(attachment => {
+    switch (attachment.type) {
+      case "screenshot":
+        return HLChatDBAttachment.SCREENSHOT;
+      case "audio":
+        return HLChatDBAttachment.VOICE;
+      case "clipboard":
+        return HLChatDBAttachment.CLIPBOARD;
+      default:
+        return HLChatDBAttachment.SCREENSHOT;
+    }
+  }) as HLChatDBAttachment[];
+};
+
 export const useSubmitQuery = () => {
   const {post} = useApi()
 
@@ -248,6 +263,11 @@ export const useSubmitQuery = () => {
 
       const contextAttachments = context.attachments || [];
       await addAttachmentsToFormData(formData, contextAttachments);
+      
+      // Add attachments to form data
+      const preparedAttachments = prepareAttachments(contextAttachments);
+      formData.append("attachments", JSON.stringify(preparedAttachments));
+
       const accessToken = await getAccessToken();
       await fetchResponse(formData, accessToken);
     }
@@ -300,6 +320,10 @@ export const useSubmitQuery = () => {
         resetConversationId();
       }
 
+      // Add attachments to form data
+      const preparedAttachments = prepareAttachments(attachments);
+      formData.append("attachments", JSON.stringify(preparedAttachments));
+
       const accessToken = await getAccessToken();
       await fetchResponse(formData, accessToken);
     }
@@ -307,3 +331,11 @@ export const useSubmitQuery = () => {
 
   return { handleSubmit, handleIncomingContext };
 };
+
+// Add this enum at the top of the file or in a separate types file
+enum HLChatDBAttachment {
+  SCREENSHOT = "screenshot",
+  VOICE = "voice",
+  CLIPBOARD = "clipboard",
+  OCR = "ocr",
+}

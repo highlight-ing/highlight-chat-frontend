@@ -23,19 +23,20 @@ const History: React.FC<HistoryProps> = ({
   const {loadConversation, openModal} = useStore((state) => state);
 
   const onSelectChat = async (chat: ChatHistoryItem) => {
-    const response = await get(`history/${chat.id}/messages`)
-    if (!response.ok) {
-      // @TODO Error handling
-      console.error('Failed to select chat')
-      return
-    }
-    const {messages} = await response.json()
-    loadConversation(chat.id, messages.map((message: any) => {
-      return {
-        type: message.role,
-        content: message.content
-      } as Message
-    }))
+    // console.log("Selecting chat", chat)
+    // const response = await get(`history/${chat.id}/messages`)
+    // if (!response.ok) {
+    //   // @TODO Error handling
+    //   console.error('Failed to select chat')
+    //   return
+    // }
+    // const {messages} = await response.json()
+    // loadConversation(chat.id, messages.map((message: any) => {
+    //   return {
+    //     type: message.role,
+    //     content: message.content
+    //   } as Message
+    // }))
   }
 
   const onDeleteChat = async (chat: ChatHistoryItem) => {

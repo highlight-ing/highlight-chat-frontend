@@ -14,17 +14,18 @@ const DeleteChatModal = ({id, context}: ModalObjectProps) => {
   const {conversationId, startNewConversation, closeModal} = useStore((state) => state);
 
   const onDelete = async () => {
-    const response = await deleteRequest(`history/${chat.id}`)
-    if (!response.ok) {
-      // @TODO Error handling
-      console.error('Failed to delete')
-      return
-    }
-    if (chat.id === conversationId) {
-      startNewConversation()
-    }
-    await refreshChatHistory()
-    closeModal(id)
+    // console.log("Deleting chat", chat)
+    // const response = await deleteRequest(`history/${chat.id}`)
+    // if (!response.ok) {
+    //   // @TODO Error handling
+    //   console.error('Failed to delete')
+    //   return
+    // }
+    // if (chat.id === conversationId) {
+    //   startNewConversation()
+    // }
+    // await refreshChatHistory()
+    // closeModal(id)
   }
 
   return (
