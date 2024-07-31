@@ -28,7 +28,7 @@ const ChatHome = ({isShowing}: {isShowing: boolean}) => {
           icon={<Setting color={variables.green100} variant={"Bold"}/>}
           title={"Explore Apps"}
           description={"Try Highlight apps created by the community."}
-          onClick={() => window.open('highlight-dev://appstore', '_blank')}
+          onClick={() => window.open('highlight://appstore', '_blank')}
         />
         <Callout
           icon={<Setting color={variables.pink100} variant={"Bold"}/>}
