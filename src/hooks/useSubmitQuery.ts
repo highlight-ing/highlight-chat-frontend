@@ -1,4 +1,4 @@
-import { HighlightContext } from "@highlight-ai/app-runtime";
+import { type HighlightContext } from "@highlight-ai/app-runtime";
 import imageCompression from "browser-image-compression";
 import { useStore } from "@/providers/store-provider";
 import useAuth from "./useAuth";
@@ -291,7 +291,6 @@ export const useSubmitQuery = () => {
         audio,
         fileTitle,
         clipboardText,
-        ocrText,
       });
 
       setInput("");
