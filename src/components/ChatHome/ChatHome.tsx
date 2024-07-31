@@ -18,12 +18,12 @@ const ChatHome = ({isShowing}: {isShowing: boolean}) => {
         <Input sticky={false} />
       </div>
       <div className={styles.callouts}>
-        <Callout
-          icon={<Setting color={variables.primary100} variant={"Bold"}/>}
-          title={"Play with Highlight"}
-          description={"Take Highlight for a spin and learn what it can do."}
-          onClick={() => {}}
-        />
+        {/*<Callout*/}
+        {/*  icon={<Setting color={variables.primary100} variant={"Bold"}/>}*/}
+        {/*  title={"Play with Highlight"}*/}
+        {/*  description={"Take Highlight for a spin and learn what it can do."}*/}
+        {/*  onClick={() => {}}*/}
+        {/*/>*/}
         <Callout
           icon={<Setting color={variables.green100} variant={"Bold"}/>}
           title={"Explore Apps"}

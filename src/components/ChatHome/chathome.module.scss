@@ -9,6 +9,7 @@
   opacity: 0;
   padding-top: 48px;
   pointer-events: none;
+  min-width: min(800px, 95vw);
 
   &.show {
     position: relative;
@@ -58,6 +59,7 @@
   font-size: 14px;
   color: $light-60;
   width: 250px;
+  flex: 1;
   user-select: none;
   cursor: pointer;
   transform: scale(0);
