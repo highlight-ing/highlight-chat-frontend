@@ -38,6 +38,10 @@ const PromptsModal = ({id, context}: ModalObjectProps) => {
     return prompts.filter((prompt) => prompt.user_id === userId);
   }, [prompts, userId])
 
+  const selectedPrompt = useMemo(() => {
+    return prompts.find(prompt => prompt.id === context?.prompt?.id) ?? context?.prompt
+  }, [context, prompts])
+
   const onClick = async (prompt: PromptApp) => {
     if (prompt.slug === 'hlchat') {
       clearPrompt();
@@ -75,28 +79,49 @@ const PromptsModal = ({id, context}: ModalObjectProps) => {
   }, []);
 
   return (
-    <Modal id={id} size={'medium'} bodyClassName={styles.promptsModal}>
-      <h1>From the Highlight Team</h1>
-      <PromptListRow
-        type={'official'}
-        // @ts-ignore
-        prompt={HighlightChatPrompt}
-        // @ts-ignore
-        onClick={() => onClick(HighlightChatPrompt)}
-      />
-      <Divider style={{margin: '8px 0 16px 0'}}/>
-      <h1>Made by the Community</h1>
+    <Modal
+      id={id}
+      size={selectedPrompt ? 'small' : 'medium'}
+      header={selectedPrompt ? 'Continue with prompt?' : undefined}
+      bodyClassName={selectedPrompt ? undefined : styles.promptsModal}
+    >
       {
-        communityPrompts.map((prompt: PromptApp) => {
-          return (
-            <PromptListRow
-              key={prompt.slug}
-              type={'prompt'}
-              prompt={prompt}
-              onClick={() => onClick(prompt)}
-            />
-          )
-        })
+        selectedPrompt &&
+        <>
+          <PromptListRow
+            type={'prompt'}
+            prompt={selectedPrompt}
+            onClick={() => onClick(selectedPrompt)}
+            isCta={true}
+          />
+        </>
+      }
+      {
+        !selectedPrompt &&
+        <>
+          <h1>From the Highlight Team</h1>
+          <PromptListRow
+            type={'official'}
+            // @ts-ignore
+            prompt={HighlightChatPrompt}
+            // @ts-ignore
+            onClick={() => onClick(HighlightChatPrompt)}
+          />
+          <Divider style={{margin: '8px 0 16px 0'}}/>
+          <h1>Made by the Community</h1>
+          {
+            communityPrompts.map((prompt: PromptApp) => {
+              return (
+                <PromptListRow
+                  key={prompt.slug}
+                  type={'prompt'}
+                  prompt={prompt}
+                  onClick={() => onClick(prompt)}
+                />
+              )
+            })
+          }
+        </>
       }
     </Modal>
   )

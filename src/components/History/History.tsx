@@ -69,7 +69,13 @@ const History: React.FC<HistoryProps> = ({
               wrapperStyle={{width: '100%'}}
             >
               <div key={chat.id} id={`chat-${chat.id}`} className={styles.chat} onClick={() => onSelectChat(chat)}>
-                <span className={styles.chatText}>{chat.title}</span>
+                <span className={styles.chatText}>
+                  {
+                    chat.title.charAt(0) === '"' && chat.title.charAt(chat.title.length - 1) === '"'
+                      ? chat.title.substring(1, chat.title.length - 1)
+                      : chat.title
+                  }
+                </span>
               </div>
             </ContextMenu>
           ))

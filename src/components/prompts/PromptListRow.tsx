@@ -8,8 +8,9 @@ interface PromptListRowProps {
   icon?: React.ReactElement
   type: 'prompt' | 'official'
   onClick: (e: React.MouseEvent) => void
+  isCta?: boolean
 }
-const PromptListRow = ({prompt, icon, type, onClick}: PromptListRowProps) => {
+const PromptListRow = ({prompt, icon, type, isCta, onClick}: PromptListRowProps) => {
   return (
     <div key={prompt.slug} className={`${styles.promptOption} ${styles[type]}`} onClick={onClick}>
       <div className={styles.promptIcon}>
@@ -25,7 +26,11 @@ const PromptListRow = ({prompt, icon, type, onClick}: PromptListRowProps) => {
           <span>{prompt.description}</span>
         }
       </div>
-      <div className={styles.promptArrow}>
+      <div className={`${styles.promptArrow} ${isCta ? styles.show : ''}`}>
+        {
+          isCta &&
+          <span>Start Chat</span>
+        }
         <ArrowRight size={20}/>
       </div>
     </div>

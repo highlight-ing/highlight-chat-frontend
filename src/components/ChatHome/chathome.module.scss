@@ -184,7 +184,6 @@
 }
 
 .promptArrow {
-  //display: flex;
   display: none;
   pointer-events: none;
   align-items: center;
@@ -193,4 +192,13 @@
   right: 16px;
   top: 0;
   bottom: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: $pink-100;
+  gap: 8px;
+  line-height: 1;
+
+  &.show {
+    display: flex;
+  }
 }
