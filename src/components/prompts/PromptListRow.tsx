@@ -1,24 +1,32 @@
 import styles from "@/components/ChatHome/chathome.module.scss";
-import {Setting} from "iconsax-react";
+import {ArrowRight, Setting} from "iconsax-react";
 import React from "react";
-import {PromptProps} from "@/types";
-import {useStore} from "@/providers/store-provider";
+import {PromptApp} from "@/types";
 
 interface PromptListRowProps {
-  prompt: PromptProps
+  prompt: PromptApp
+  icon?: React.ReactElement
   type: 'prompt' | 'official'
+  onClick: (e: React.MouseEvent) => void
 }
-const PromptListRow = ({prompt, type}: PromptListRowProps) => {
-  const {openModal} = useStore((state) => state)
-
+const PromptListRow = ({prompt, icon, type, onClick}: PromptListRowProps) => {
   return (
-    <div key={prompt.slug} className={`${styles.promptOption} ${styles[type]}`} onClick={() => openModal('prompts-modal', {prompt})}>
+    <div key={prompt.slug} className={`${styles.promptOption} ${styles[type]}`} onClick={onClick}>
       <div className={styles.promptIcon}>
-        <Setting variant={"Bold"}/>
+        {icon ?? <Setting variant={"Bold"}/>}
       </div>
       <div className="flex flex-col mt-0.5">
-        <span className={styles.promptName}>{prompt.name}</span>
-        <span>{prompt.description}</span>
+        {
+          prompt.name &&
+          <span className={styles.promptName}>{prompt.name}</span>
+        }
+        {
+          prompt.description &&
+          <span>{prompt.description}</span>
+        }
+      </div>
+      <div className={styles.promptArrow}>
+        <ArrowRight size={20}/>
       </div>
     </div>
   )

@@ -12,10 +12,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-bottom: 70px;
+  padding-bottom: 64px;
   flex: 1;
   position: relative;
   overflow-y: auto;
+  top: $topbar-height;
+  height: calc(100% - $topbar-height);
 
   &.full {
     animation: history-hide 250ms ease forwards;

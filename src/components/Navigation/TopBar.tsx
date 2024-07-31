@@ -1,16 +1,15 @@
 "use client";
 
 import * as React from "react";
-import { TopBarProps } from "../../types";
-
+import { TopBarProps } from "@/types";
+import variables from '@/variables.module.scss'
 import styles from "./top-bar.module.scss";
 import {
   AddCircle,
   ArrowDown2,
   ArrowLeft,
-  ArrowLeft2,
   Category,
-  DocumentText,
+  DocumentText, MessageProgramming,
 } from "iconsax-react";
 import CircleButton from "@/components/CircleButton/CircleButton";
 import Tooltip from "@/components/Tooltip";
@@ -61,9 +60,10 @@ function AppDropdown() {
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const router = useRouter();
 
-  const { startNewConversation, promptName } = useStore((state) => ({
+  const { startNewConversation, promptName, openModal } = useStore((state) => ({
     startNewConversation: state.startNewConversation,
     promptName: state.promptName,
+    openModal: state.openModal
   }));
 
   const onNewChatClick = () => {
@@ -92,13 +92,22 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
         </CircleButton>
       </Tooltip>
 
-      <AppDropdown />
+      {/*<AppDropdown />*/}
 
-      <Tooltip tooltip="Start new chat" position="left">
-        <CircleButton onClick={onNewChatClick}>
-          <AddCircle variant={"Bold"} size={24} />
-        </CircleButton>
-      </Tooltip>
+      <div className="flex gap-1">
+        <Tooltip tooltip="Switch prompts" position="left">
+          <CircleButton fitContents={!!promptName} className={!!promptName ? styles.promptSwitch : undefined} onClick={() => openModal('prompts-modal')}>
+            {promptName && <div className="flex items-center font-bold">{promptName}</div>}
+            <MessageProgramming variant={"Bold"} size={24}/>
+          </CircleButton>
+        </Tooltip>
+
+        <Tooltip tooltip="Start new chat" position="left">
+          <CircleButton onClick={onNewChatClick}>
+            <AddCircle variant={"Bold"} size={24} />
+          </CircleButton>
+        </Tooltip>
+      </div>
     </div>
   );
 };

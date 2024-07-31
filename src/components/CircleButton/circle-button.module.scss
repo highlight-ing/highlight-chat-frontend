@@ -7,11 +7,19 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  border-radius: 50%;
-  color: $light-20;
+  border-radius: 18px;
+  color: $light-40;
+  line-height: 1;
 
   &:hover {
     background-color: $light-20;
     color: $light-100;
+  }
+
+  &.fitContents {
+    min-width: 36px;
+    width: fit-content;
+    gap: 8px;
+    padding: 0 8px;
   }
 }

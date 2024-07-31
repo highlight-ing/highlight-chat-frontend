@@ -5,14 +5,15 @@
   flex-direction: column;
   gap: 48px;
   transition: opacity 100ms ease;
-  margin-top: calc(30vh + 96px);
   position: fixed;
   opacity: 0;
+  padding-top: 48px;
+  pointer-events: none;
 
   &.show {
-    margin-top: calc(40vh + 32px);
     position: relative;
     opacity: 1;
+    pointer-events: initial;
 
     .homeCallout {
       transform: scale(1)
@@ -22,7 +23,21 @@
       transform: translateY(0px);
       opacity: 1;
     }
+
+    .input {
+      transform: scale(1);
+      opacity: 1;
+    }
   }
+}
+
+.input {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  opacity: 0;
+  transform: scale(0.75);
+  transition: opacity 150ms ease, transform 150ms ease;
 }
 
 .callouts {
@@ -95,18 +110,32 @@
   cursor: pointer;
   user-select: none;
   align-items: center;
+  position: relative;
 
   &:hover {
     background-color: $light-5;
   }
 }
 
+.baseIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: $light-5;
+}
+
 .promptOption {
   @extend .baseOption;
-  align-items: flex-start;
 
   &:hover {
     background-color: $pink-5;
+
+    .promptArrow {
+      display: flex;
+    }
   }
 
   &.official {
@@ -121,6 +150,9 @@
     .promptIcon {
       background-color: $light-20;
       color: $light-100;
+    }
+    .promptArrow {
+      color: $light-80;
     }
   }
 
@@ -137,17 +169,10 @@
       background-color: $pink-20;
       color: $pink-100;
     }
+    .promptArrow {
+      color: $pink-80;
+    }
   }
-}
-
-.baseIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 49px;
-  height: 49px;
-  border-radius: 50%;
-  background-color: $light-5;
 }
 
 .promptIcon {
@@ -156,4 +181,16 @@
 
 .promptName {
   font-weight: 500;
+}
+
+.promptArrow {
+  //display: flex;
+  display: none;
+  pointer-events: none;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 16px;
+  top: 0;
+  bottom: 0;
 }

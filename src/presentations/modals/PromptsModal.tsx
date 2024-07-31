@@ -1,18 +1,32 @@
-import {ModalObjectProps, PromptProps} from "@/types";
+import {ModalObjectProps, PromptApp} from "@/types";
 import Modal from "@/components/modals/Modal";
 import useAuth from "@/hooks/useAuth";
 import {useStore} from "@/providers/store-provider";
 import {useEffect, useMemo, useState} from "react";
 import {Prompt} from "@/types/supabase-helpers";
-import {fetchPrompts} from "@/app/(app)/prompts/actions";
+import {fetchPrompts, fetchPromptText} from "@/app/(app)/prompts/actions";
 import PromptListRow from "@/components/prompts/PromptListRow";
 import styles from './modals.module.scss'
 import {Divider} from "@/components/catalyst/divider";
+import {useRouter} from "next/navigation";
+
+const HighlightChatPrompt = {
+  slug: 'hlchat',
+  name: 'Highlight Chat',
+  description: 'A helpful chat assistant created by Highlight.'
+}
 
 const PromptsModal = ({id, context}: ModalObjectProps) => {
   const { getAccessToken } = useAuth();
+  const router = useRouter();
+  const { closeModal } = useStore((state) => state)
   const [userId, setUserId] = useState<string>()
   const [prompts, setPrompts] = useState<Prompt[]>([]);
+
+  const { setPrompt, clearPrompt } = useStore((state) => ({
+    setPrompt: state.setPrompt,
+    clearPrompt: state.clearPrompt,
+  }));
 
   const communityPrompts = useMemo(() => {
     return prompts
@@ -23,6 +37,28 @@ const PromptsModal = ({id, context}: ModalObjectProps) => {
   const myPrompts = useMemo(() => {
     return prompts.filter((prompt) => prompt.user_id === userId);
   }, [prompts, userId])
+
+  const onClick = async (prompt: PromptApp) => {
+    if (prompt.slug === 'hlchat') {
+      clearPrompt();
+      router.push("/");
+      closeModal(id)
+      return;
+    }
+
+    // Fetch the prompt
+    const text = await fetchPromptText(prompt.slug!);
+
+    setPrompt({
+      promptName: prompt.name,
+      promptDescription: prompt.description!,
+      promptAppName: prompt.slug!,
+      prompt: text,
+    });
+
+    router.push(`/`);
+    closeModal(id)
+  };
 
   useEffect(() => {
     const loadPrompts = async () => {
@@ -44,17 +80,20 @@ const PromptsModal = ({id, context}: ModalObjectProps) => {
       <PromptListRow
         type={'official'}
         // @ts-ignore
-        prompt={{slug: 'hlchat', name: 'Highlight Chat', description: 'A helpful chat assistant created by Highlight.'}}
+        prompt={HighlightChatPrompt}
+        // @ts-ignore
+        onClick={() => onClick(HighlightChatPrompt)}
       />
       <Divider style={{margin: '8px 0 16px 0'}}/>
       <h1>Made by the Community</h1>
       {
-        communityPrompts.map((prompt: PromptProps) => {
+        communityPrompts.map((prompt: PromptApp) => {
           return (
             <PromptListRow
               key={prompt.slug}
               type={'prompt'}
               prompt={prompt}
+              onClick={() => onClick(prompt)}
             />
           )
         })

@@ -1,16 +1,22 @@
 import variables from '@/variables.module.scss'
 import styles from './chathome.module.scss'
-import {AddCircle, Setting} from "iconsax-react";
+import {AddCircle, ArrowRight, Setting} from "iconsax-react";
 import React, {useEffect, useState} from "react";
 import {Prompt} from "@/types/supabase-helpers";
 import useAuth from "@/hooks/useAuth";
 import {fetchPrompts} from "@/app/(app)/prompts/actions";
 import {useStore} from "@/providers/store-provider";
 import PromptListRow from "@/components/prompts/PromptListRow";
+import {Input} from "@/components/Input/Input";
+import {HighlightIcon} from "@/icons/icons";
 
 const ChatHome = ({isShowing}: {isShowing: boolean}) => {
   return (
     <div className={`${styles.chatHomeContainer} ${isShowing ? styles.show : ''}`}>
+      <div className={styles.input}>
+        <InputHeading />
+        <Input sticky={false} />
+      </div>
       <div className={styles.callouts}>
         <Callout
           icon={<Setting color={variables.primary100} variant={"Bold"}/>}
@@ -37,6 +43,27 @@ const ChatHome = ({isShowing}: {isShowing: boolean}) => {
 }
 
 export default ChatHome
+
+/**
+ * The space above the actual input that shows the Highlight/prompt logo or name.
+ */
+function InputHeading() {
+  const { promptName, promptDescription } = useStore((state) => ({
+    promptName: state.promptName,
+    promptDescription: state.promptDescription
+  }))
+
+  if (!promptName || !promptDescription) {
+    return <div className="flex items-center justify-center"><HighlightIcon /></div>
+  }
+
+  return (
+    <div className="flex flex-col gap-1 text-center">
+      <h3 className="text-xl text-light-40">{promptName}</h3>
+      <p className="text-light-60">{promptDescription}</p>
+    </div>
+  )
+}
 
 // Components
 const Callout = ({icon, title, description, onClick}: {icon: React.ReactElement, title: string, description: string, onClick: (e: React.MouseEvent) => void}) => {
@@ -83,17 +110,18 @@ const Prompts = () => {
             key={prompt.slug}
             prompt={prompt}
             type={'prompt'}
+            onClick={() => openModal('prompts-modal', {prompt})}
           />
         )
       })}
-      <div className={styles.baseOption}>
-        <div className={styles.baseIcon}>
-          <AddCircle color={variables.light40} variant={"Bold"}/>
-        </div>
-        <div className="flex flex-col mt-0.5">
-          <span>Create a Highlight app</span>
-        </div>
-      </div>
+
+      <PromptListRow
+        // @ts-ignore
+        prompt={{slug: 'create', description: 'Create your own prompt'}}
+        icon={<AddCircle variant={"Bold"} color={variables.light60}/>}
+        type={'official'}
+        onClick={() => {}}
+      />
     </div>
   )
 }

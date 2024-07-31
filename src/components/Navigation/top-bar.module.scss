@@ -15,3 +15,13 @@
   color: $light-80;
   z-index: 1;
 }
+
+.promptSwitch {
+  background-color: $pink-5;
+  color: $pink-80 !important;
+
+  &:hover {
+    background-color: $pink-20 !important;
+    color: $pink-100 !important;
+  }
+}

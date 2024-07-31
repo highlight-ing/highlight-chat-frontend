@@ -88,9 +88,9 @@ export const CloseIcon = ({ size, color = "currentColor" }: IconPropTypes) => (
 
 export const HighlightIcon = ({withText}: {withText?: boolean}) => (
   <svg
-    width="705"
+    width={withText ? 705 : 48}
     height="48"
-    viewBox={`0 0 ${withText ? '705' : 141} 141`}
+    viewBox={`0 0 ${withText ? 705 : 141} 141`}
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >

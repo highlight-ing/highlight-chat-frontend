@@ -14,30 +14,9 @@ import ChatHome from "@/components/ChatHome/ChatHome";
 const MAX_INPUT_HEIGHT = 160
 
 /**
- * The space above the actual input that shows the Highlight/prompt logo or name.
- */
-function InputHeading() {
-  const { promptName, promptDescription } = useStore((state) => ({
-    promptName: state.promptName,
-    promptDescription: state.promptDescription
-  }))
-
-  if (!promptName || !promptDescription) {
-    return <HighlightIcon />
-  }
-
-  return (
-    <div className="flex flex-col gap-1 text-center">
-      <h3 className="text-xl text-light-40">{promptName}</h3>
-      <p className="text-light-60">{promptDescription}</p>
-    </div>
-  )
-}
-
-/**
  * This is the main Highlight Chat input box, not a reusable Input component.
  */
-export const Input = ({ offset }: { offset: boolean }) => {
+export const Input = ({ sticky }: { sticky: boolean }) => {
   const { attachments, input, setInput, inputIsDisabled, promptName, prompt } = useStore((state) => ({
     attachments: state.attachments,
     input: state.input,
@@ -85,10 +64,7 @@ export const Input = ({ offset }: { offset: boolean }) => {
   }
 
   return (
-    <div className={`${styles.inputContainer} ${offset ? styles.offset : ''}`} onClick={onClickContainer}>
-      <div className={`${styles.empty} ${!offset ? styles.hide : ''}`}>
-        <InputHeading />
-      </div>
+    <div className={`${styles.inputContainer} ${sticky ? styles.sticky : ''}`} onClick={onClickContainer}>
       {attachments.length > 0 && (
         <div className="flex gap-2">
           {attachments.map((attachment: AttachmentType, index: number) => (

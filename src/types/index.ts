@@ -70,7 +70,7 @@ export interface ModalObjectProps {
   context?: Record<string, any>
 }
 
-export interface PromptProps {
+export interface PromptApp {
   created_at: string
   description: string | null
   external_id: string
