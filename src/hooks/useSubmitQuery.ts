@@ -37,7 +37,7 @@ export default async function addAttachmentsToFormData(
   formData: FormData,
   attachments: any[]
 ) {
-  let screenshot, audio, fileTitle, clipboardText;
+  let screenshot, audio, fileTitle, clipboardText, ocrText;
 
   for (const attachment of attachments) {
     if (attachment?.value) {
@@ -72,7 +72,11 @@ export default async function addAttachmentsToFormData(
           break;
         case "clipboard":
           clipboardText = attachment.value;
-          // TODO (SP) add clipboard text to form data once backend supports
+          formData.append("clipboard_text", attachment.value);
+          break;
+        case "ocr":
+          ocrText = attachment.value;
+          formData.append("ocr_text", attachment.value);
           break;
         default:
           console.warn("Unknown attachment type:", attachment.type);
@@ -80,7 +84,7 @@ export default async function addAttachmentsToFormData(
     }
   }
 
-  return { screenshot, audio, fileTitle, clipboardText };
+  return { screenshot, audio, fileTitle, clipboardText, ocrText };
 }
 
 export const useSubmitQuery = () => {
@@ -275,7 +279,7 @@ export const useSubmitQuery = () => {
         formData.append("about_me", JSON.stringify(aboutMe));
       }
 
-      const { screenshot, audio, fileTitle, clipboardText } = await addAttachmentsToFormData(
+      const { screenshot, audio, fileTitle, clipboardText, ocrText } = await addAttachmentsToFormData(
         formData,
         attachments
       );
@@ -287,17 +291,13 @@ export const useSubmitQuery = () => {
         audio,
         fileTitle,
         clipboardText,
+        ocrText,
       });
 
       setInput("");
       clearAttachments(); // Clear the attachment immediately
 
-
-      // TODO (SP) this is a workaround to ensure clipboard text is processed by the prompt until
-      // the backend supports clipboard text
-      let contextString = clipboardText
-        ? `HighlightContext: { "attachments": [ { "type": "clipboard", "value": ${clipboardText}}]`
-        : "This is a new conversation with Highlight Chat. You do not have any Highlight Context available.";
+      let contextString = "This is a new conversation with Highlight Chat. You do not have any Highlight Context available.";
 
       console.log("contextString:", contextString);
       formData.append("context", contextString);
