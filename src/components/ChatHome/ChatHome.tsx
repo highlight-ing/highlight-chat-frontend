@@ -31,7 +31,7 @@ const ChatHome = ({isShowing}: {isShowing: boolean}) => {
           onClick={() => window.open('highlight://appstore', '_blank')}
         />
         <Callout
-          icon={<Setting color={variables.pink100} variant={"Bold"}/>}
+          icon={<Setting color={variables.primary100} variant={"Bold"}/>}
           title={"Build with Highlight"}
           description={"Make your own Highlight apps and publish them."}
           onClick={() => window.open('https://docs.highlight.ing/documentation/introduction', '_blank')}
