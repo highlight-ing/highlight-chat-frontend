@@ -2,13 +2,16 @@ import {ModalObjectProps, PromptApp} from "@/types";
 import Modal from "@/components/modals/Modal";
 import useAuth from "@/hooks/useAuth";
 import {useStore} from "@/providers/store-provider";
-import {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {Prompt} from "@/types/supabase-helpers";
-import {fetchPrompts, fetchPromptText} from "@/app/(app)/prompts/actions";
+import {fetchPrompts, fetchPromptText} from "@/utils/prompts";
 import PromptListRow from "@/components/prompts/PromptListRow";
 import styles from './modals.module.scss'
 import {Divider} from "@/components/catalyst/divider";
 import {useRouter} from "next/navigation";
+import {AddCircle} from "iconsax-react";
+import variables from "@/variables.module.scss";
+import usePromptApps from "@/hooks/usePromptApps";
 
 const HighlightChatPrompt = {
   slug: 'hlchat',
@@ -17,32 +20,23 @@ const HighlightChatPrompt = {
 }
 
 const PromptsModal = ({id, context}: ModalObjectProps) => {
-  const { getAccessToken } = useAuth();
   const router = useRouter();
-  const { closeModal } = useStore((state) => state)
-  const [userId, setUserId] = useState<string>()
-  const [prompts, setPrompts] = useState<Prompt[]>([]);
+  const { openModal, closeModal } = useStore((state) => ({
+    openModal: state.openModal,
+    closeModal: state.closeModal
+  }))
+  const { prompts, myPrompts, communityPrompts } = usePromptApps()
 
   const { setPrompt, clearPrompt } = useStore((state) => ({
     setPrompt: state.setPrompt,
     clearPrompt: state.clearPrompt,
   }));
 
-  const communityPrompts = useMemo(() => {
-    return prompts
-      .filter((prompt) => prompt.user_id !== userId)
-      .filter((prompt) => prompt.public)
-  }, [prompts, userId]);
-
-  const myPrompts = useMemo(() => {
-    return prompts.filter((prompt) => prompt.user_id === userId);
-  }, [prompts, userId])
-
   const selectedPrompt = useMemo(() => {
     return prompts.find(prompt => prompt.id === context?.prompt?.id) ?? context?.prompt
   }, [context, prompts])
 
-  const onClick = async (prompt: PromptApp) => {
+  const onSelectPrompt = async (prompt: PromptApp) => {
     if (prompt.slug === 'hlchat') {
       clearPrompt();
       router.push("/");
@@ -64,20 +58,6 @@ const PromptsModal = ({id, context}: ModalObjectProps) => {
     closeModal(id)
   };
 
-  useEffect(() => {
-    const loadPrompts = async () => {
-      const accessToken = await getAccessToken();
-      const response = await fetchPrompts(accessToken);
-      if (response.error) {
-        return
-      }
-      setUserId(response.userId)
-      setPrompts(response.prompts ?? []);
-    };
-
-    loadPrompts();
-  }, []);
-
   return (
     <Modal
       id={id}
@@ -91,7 +71,7 @@ const PromptsModal = ({id, context}: ModalObjectProps) => {
           <PromptListRow
             type={'prompt'}
             prompt={selectedPrompt}
-            onClick={() => onClick(selectedPrompt)}
+            onClick={() => onSelectPrompt(selectedPrompt)}
             isCta={true}
           />
         </>
@@ -105,7 +85,29 @@ const PromptsModal = ({id, context}: ModalObjectProps) => {
             // @ts-ignore
             prompt={HighlightChatPrompt}
             // @ts-ignore
-            onClick={() => onClick(HighlightChatPrompt)}
+            onClick={() => onSelectPrompt(HighlightChatPrompt)}
+          />
+          <Divider style={{margin: '8px 0 16px 0'}}/>
+          <h1>My Prompts</h1>
+          {
+            myPrompts.map(prompt => {
+              return (
+                <PromptListRow
+                  key={prompt.slug}
+                  prompt={prompt}
+                  type={'prompt'}
+                  onClick={() => onSelectPrompt(prompt)}
+                  onClickEdit={(e) => openModal('edit-prompt', {prompt})}
+                />
+              )
+            })
+          }
+          <PromptListRow
+            // @ts-ignore
+            prompt={{slug: 'create', description: 'Create your own prompt'}}
+            icon={<AddCircle variant={"Bold"} color={variables.light60}/>}
+            type={'official'}
+            onClick={() => openModal('create-prompt')}
           />
           <Divider style={{margin: '8px 0 16px 0'}}/>
           <h1>Made by the Community</h1>
@@ -116,7 +118,7 @@ const PromptsModal = ({id, context}: ModalObjectProps) => {
                   key={prompt.slug}
                   type={'prompt'}
                   prompt={prompt}
-                  onClick={() => onClick(prompt)}
+                  onClick={() => onSelectPrompt(prompt)}
                 />
               )
             })

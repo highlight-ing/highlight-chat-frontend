@@ -37,6 +37,12 @@ import {
   initialPromptState,
 } from "./prompt";
 import {
+  PromptsSlice,
+  PromptsState,
+  createPromptsSlice,
+  initialPromptsState,
+} from "./prompts";
+import {
   AboutMeSlice,
   AboutMeState,
   createAboutMeSlice,
@@ -80,6 +86,7 @@ export type Store = MessagesSlice &
   ChatAttachmentsSlice &
   ConversationSlice &
   PromptSlice &
+  PromptsSlice &
   AboutMeSlice &
   HighlightContextSlice &
   ModalsSlice &
@@ -92,6 +99,7 @@ const defaultState: StoreState = {
   ...initialChatAttachmentsState,
   ...initialConversationState,
   ...initialPromptState,
+  ...initialPromptsState,
   ...initialAboutMeState,
   ...initialHighlightContextState,
   ...initialModalsState,
@@ -112,6 +120,7 @@ export const createStore = (initState: StoreState = defaultState) => {
     ...createChatAttachmentsSlice(...a),
     ...createConversationSlice(...a),
     ...createPromptSlice(...a),
+    ...createPromptsSlice(...a),
     ...createAboutMeSlice(...a),
     ...createHighlightContextSlice(...a),
     ...createModalsSlice(...a),

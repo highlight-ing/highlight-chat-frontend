@@ -2,6 +2,7 @@ import React, { PropsWithChildren, ReactElement, ReactNode, useEffect } from 're
 import CloseButton from '@/components/CloseButton/CloseButton'
 
 import styles from './modals.module.scss'
+import {useStore} from "@/providers/store-provider";
 
 type SizeType = 'xsmall' | 'small' | 'medium' | 'large' | 'xlarge' | 'fullscreen' | string
 
@@ -49,6 +50,8 @@ const BaseModal = ({
   showClose,
   bodyClassName,
 }: PropsWithChildren<ModalProps & BaseModalProps>) => {
+  const { modals } = useStore((state) => ({modals: state.modals}))
+
   const close = (e: null | React.MouseEvent, force?: boolean) => {
     // @ts-ignore
     const isTargetModalOverlay = e?.target?.id === id
@@ -75,8 +78,12 @@ const BaseModal = ({
       if (exitOnEscape === false) {
         return
       }
+      if (modals[modals.length - 1].id !== id) {
+        return
+      }
       if (e.key === 'Escape') {
-        e.stopPropagation()
+        e.stopImmediatePropagation()
+        // e.stopPropagation()
         close(null, true)
       }
     }
@@ -84,14 +91,12 @@ const BaseModal = ({
     return () => {
       document.removeEventListener('keydown', onKeyDown)
     }
-  }, [])
-
-  console.log('bodyClassName:', bodyClassName)
+  }, [modals])
 
   return (
     <div
-      className={`${styles.modalOverlay} ${position ?? ''}`}
       id={id}
+      className={`${styles.modalOverlay} ${position ?? ''}`}
       onClick={(e) => {
         if (exitOnClick !== false) {
           close(e)

@@ -4,7 +4,7 @@ import {
   UpdatePromptData,
   deletePrompt,
   updatePrompt,
-} from "@/app/(app)/prompts/actions";
+} from "@/utils/prompts";
 import {
   Alert,
   AlertActions,
@@ -27,51 +27,21 @@ import { Prompt } from "@/types/supabase-helpers";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
-
-function ConfirmDeleteModal({
-  isOpen,
-  setIsOpen,
-  onDelete,
-}: {
-  isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
-  onDelete: () => void;
-}) {
-  const _onDelete = () => {
-    onDelete();
-    setIsOpen(false);
-  };
-  return (
-    <Alert open={isOpen} onClose={setIsOpen}>
-      <AlertTitle>Delete Prompt?</AlertTitle>
-      <AlertDescription>
-        Are you sure you want to delete this prompt? This action cannot be
-        undone.
-      </AlertDescription>
-      <AlertActions>
-        <Button plain onClick={() => setIsOpen(false)}>
-          Cancel
-        </Button>
-        <Button color="red" onClick={_onDelete}>
-          Delete
-        </Button>
-      </AlertActions>
-    </Alert>
-  );
-}
+import ConfirmationModal from "@/components/modals/ConfirmationModal";
+import usePromptApps from "@/hooks/usePromptApps";
 
 export default function EditPromptForm({
   slug,
   initialData,
+  onUpdate,
 }: {
   slug: string;
   initialData: Prompt;
+  onUpdate: () => void
 }) {
+  const { refreshPrompts } = usePromptApps()
   // STATE
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-  // HOOKS
-  const router = useRouter();
 
   const {
     register,
@@ -87,7 +57,9 @@ export default function EditPromptForm({
     },
   });
 
-  const { openErrorModal } = useStore((state) => ({
+  const { promptAppName, clearPrompt, openErrorModal } = useStore((state) => ({
+    promptAppName: state.promptAppName,
+    clearPrompt: state.clearPrompt,
     openErrorModal: state.openErrorModal,
   }));
 
@@ -102,7 +74,8 @@ export default function EditPromptForm({
       return;
     }
 
-    router.push(`/prompts`);
+    refreshPrompts()
+    onUpdate()
   };
 
   // When the user confirms they want to delete the prompt through the modal
@@ -115,7 +88,12 @@ export default function EditPromptForm({
       return;
     }
 
-    router.push(`/prompts`);
+    if (promptAppName === slug) {
+      clearPrompt()
+    }
+
+    refreshPrompts()
+    onUpdate()
   };
 
   return (
@@ -202,11 +180,18 @@ export default function EditPromptForm({
           </Button>
         </div>
       </form>
-      <ConfirmDeleteModal
-        isOpen={isDeleteModalOpen}
-        setIsOpen={setIsDeleteModalOpen}
-        onDelete={onDeleteConfirm}
-      />
+      {
+        isDeleteModalOpen &&
+        <ConfirmationModal
+          id={'delete-prompt'}
+          header={'Delete Prompt?'}
+          primaryAction={{label: 'Delete Forever', onClick: onDeleteConfirm}}
+          secondaryAction={{label: 'Nevermind', onClick: () => setIsDeleteModalOpen(false)}}
+        >
+          <span>Are you sure you want to delete this prompt?</span>
+          <span>This action cannot be undone.</span>
+        </ConfirmationModal>
+      }
     </>
   );
 }

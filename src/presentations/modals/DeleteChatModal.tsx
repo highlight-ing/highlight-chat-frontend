@@ -6,6 +6,7 @@ import Button from "@/components/Button/Button";
 import {useApi} from "@/hooks/useApi";
 import {useChatHistory} from "@/hooks/useChatHistory";
 import {useStore} from "@/providers/store-provider";
+import ConfirmationModal from "@/components/modals/ConfirmationModal";
 
 const DeleteChatModal = ({id, context}: ModalObjectProps) => {
   const chat = context as ChatHistoryItem
@@ -28,15 +29,20 @@ const DeleteChatModal = ({id, context}: ModalObjectProps) => {
   }
 
   return (
-    <Modal id={id} size={'small'} header={'Are you sure?'} bodyClassName={styles.deleteChat}>
-      <div className="flex flex-col items-center gap-1">
-        <div><span className="text-red-400 font-medium">Warning:</span> Deleting this chat cannot be undone:</div>
-        <div className="font-medium">{chat.title}</div>
-      </div>
-      <Button size={'medium'} variant={'danger'} onClick={onDelete}>
-        Delete Forever
-      </Button>
-    </Modal>
+    <ConfirmationModal
+      id={id}
+      primaryAction={{
+        label: 'Delete Forever',
+        onClick: onDelete
+      }}
+      secondaryAction={{
+        label: 'Nevermind',
+        onClick: () => closeModal(id)
+      }}
+    >
+      <div><span className="text-red-400 font-medium">Warning:</span> Deleting this chat cannot be undone:</div>
+      <div className="font-medium">{chat.title}</div>
+    </ConfirmationModal>
   )
 }
 

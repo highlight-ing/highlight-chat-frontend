@@ -1,10 +1,10 @@
 import variables from '@/variables.module.scss'
 import styles from './chathome.module.scss'
-import {AddCircle, ArrowRight, Setting} from "iconsax-react";
+import {AddCircle, Setting} from "iconsax-react";
 import React, {useEffect, useState} from "react";
 import {Prompt} from "@/types/supabase-helpers";
 import useAuth from "@/hooks/useAuth";
-import {fetchPrompts} from "@/app/(app)/prompts/actions";
+import {fetchPrompts} from "@/utils/prompts";
 import {useStore} from "@/providers/store-provider";
 import PromptListRow from "@/components/prompts/PromptListRow";
 import {Input} from "@/components/Input/Input";

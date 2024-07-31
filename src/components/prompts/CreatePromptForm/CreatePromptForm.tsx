@@ -1,6 +1,6 @@
 "use client";
 
-import { CreatePromptData, createPrompt } from "@/app/(app)/prompts/actions";
+import { CreatePromptData, createPrompt } from "@/utils/prompts";
 import { Button } from "@/components/catalyst/button";
 import {
   Description,
@@ -13,11 +13,14 @@ import { Radio, RadioField, RadioGroup } from "@/components/catalyst/radio";
 import { Textarea } from "@/components/catalyst/textarea";
 import useAuth from "@/hooks/useAuth";
 import { useStore } from "@/providers/store-provider";
-import { useRouter } from "next/navigation";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
+import usePromptApps from "@/hooks/usePromptApps";
 
-export default function CreatePromptForm() {
-  const router = useRouter();
+interface CreatePromptFormProps {
+  onCreate: () => void
+}
+
+export default function CreatePromptForm(props: CreatePromptFormProps) {
   const {
     register,
     handleSubmit,
@@ -28,7 +31,7 @@ export default function CreatePromptForm() {
       visibility: "unlisted",
     },
   });
-
+  const { refreshPrompts } = usePromptApps()
   const { openErrorModal } = useStore((state) => ({
     openErrorModal: state.openErrorModal,
   }));
@@ -43,7 +46,8 @@ export default function CreatePromptForm() {
       return;
     }
 
-    router.push(`/prompts`);
+    refreshPrompts()
+    props.onCreate()
   };
 
   return (
@@ -124,7 +128,7 @@ export default function CreatePromptForm() {
             )}
           </Field>
         </div>
-        <Button type="submit" color="cyan" className="h-10 mt-5">
+        <Button type="submit" color="cyan" className="h-10 mt-5 cursor-pointer">
           Create
         </Button>
       </form>

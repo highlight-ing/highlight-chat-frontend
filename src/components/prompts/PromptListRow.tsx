@@ -1,16 +1,19 @@
 import styles from "@/components/ChatHome/chathome.module.scss";
-import {ArrowRight, Setting} from "iconsax-react";
+import {ArrowRight, Edit2, Setting} from "iconsax-react";
 import React from "react";
 import {PromptApp} from "@/types";
+import CircleButton from "@/components/CircleButton/CircleButton";
+import Tooltip from "@/components/Tooltip";
 
 interface PromptListRowProps {
   prompt: PromptApp
   icon?: React.ReactElement
   type: 'prompt' | 'official'
   onClick: (e: React.MouseEvent) => void
+  onClickEdit?: (e: React.MouseEvent) => void
   isCta?: boolean
 }
-const PromptListRow = ({prompt, icon, type, isCta, onClick}: PromptListRowProps) => {
+const PromptListRow = ({prompt, icon, type, isCta, onClick, onClickEdit}: PromptListRowProps) => {
   return (
     <div key={prompt.slug} className={`${styles.promptOption} ${styles[type]}`} onClick={onClick}>
       <div className={styles.promptIcon}>
@@ -26,12 +29,28 @@ const PromptListRow = ({prompt, icon, type, isCta, onClick}: PromptListRowProps)
           <span>{prompt.description}</span>
         }
       </div>
-      <div className={`${styles.promptArrow} ${isCta ? styles.show : ''}`}>
+      <div className={`${styles.promptArrow} ${(isCta || typeof onClickEdit === 'function') ? styles.show : ''}`}>
         {
-          isCta &&
-          <span>Start Chat</span>
+          typeof onClickEdit === 'function' &&
+          <Tooltip tooltip={'Edit Prompt'} position={'left'}>
+            <CircleButton onClick={e => {
+              e.stopPropagation()
+              onClickEdit(e)
+            }}>
+              <Edit2 variant={"Bold"}/>
+            </CircleButton>
+          </Tooltip>
         }
-        <ArrowRight size={20}/>
+        {
+          typeof onClickEdit === 'undefined' &&
+          <>
+            {
+              isCta &&
+              <span>Start Chat</span>
+            }
+            <ArrowRight size={20}/>
+          </>
+        }
       </div>
     </div>
   )
