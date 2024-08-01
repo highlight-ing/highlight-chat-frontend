@@ -192,7 +192,7 @@ export const useSubmitQuery = () => {
       return;
     }
     // Check if the context is empty, only contains empty suggestion and attachments, or has no application data
-    if (!context.attachments || context.attachments.length === 0) {
+    if (!context.suggestion && (!context.attachments || context.attachments.length === 0)) {
       console.log("Empty or invalid context received, ignoring.");
       return;
     }
@@ -202,13 +202,13 @@ export const useSubmitQuery = () => {
 
     let query = context.suggestion || "";
     let screenshotUrl =
-      context.attachments?.find((a) => a.type === "screenshot")?.value ?? "";
+      context.attachments?.find((a) => a.type === "screenshot")?.value;
     let clipboardText =
-      context.attachments?.find((a) => a.type === "clipboard")?.value ?? "";
-    let ocrScreenContents = context.environment?.ocrScreenContents ?? "";
+      context.attachments?.find((a) => a.type === "clipboard")?.value;
+    let ocrScreenContents = context.environment?.ocrScreenContents;
     let rawContents = context.application?.focusedWindow?.rawContents;
     let audio =
-      context.attachments?.find((a) => a.type === "audio")?.value ?? "";
+      context.attachments?.find((a) => a.type === "audio")?.value;
     let windowTitle = context.application?.focusedWindow?.title;
 
     if (
@@ -225,7 +225,7 @@ export const useSubmitQuery = () => {
         clipboardText,
         screenshot: screenshotUrl,
         audio,
-        window: { title: windowTitle },
+        window: windowTitle ? { title: windowTitle } : undefined, 
       });
 
       setInput("");
