@@ -12,6 +12,7 @@ export const useChatHistory = (): {history: ChatHistoryItem[], refreshChatHistor
   const {conversationId, history, setHistory} = useStore((state) => state);
 
   const fetchResponse = async () => {
+    console.log('fetching chat history')
     try {
       const response = await get('history/')
       if (!response.ok) {
@@ -22,17 +23,21 @@ export const useChatHistory = (): {history: ChatHistoryItem[], refreshChatHistor
       return data.conversations
     } catch (error) {
       console.error("Error fetching response:", error);
-      setHistory([]);
+      if (history.length > 0) {
+        setHistory([]);
+      }
       return []
     }
   };
 
   // Handle initial fetch of chat history
   useEffect(() => {
+    console.log('Initial fetch of chat history')
     fetchResponse();
   }, [])
 
   useEffect(() => {
+    console.log('Checking for new conversation')
     // If a new conversationId is found
     if (conversationId && !history.some(chat => chat.id === conversationId)) {
       console.log('Refreshing chat history, new conversation found')
