@@ -301,11 +301,6 @@ export const useSubmitQuery = () => {
       console.log("contextString:", contextString);
       formData.append("context", contextString);
 
-      // If it's a new conversation, reset the conversation ID
-      if (messages.length === 0) {
-        resetConversationId();
-      }
-
       const accessToken = await getAccessToken();
       await fetchResponse(formData, accessToken);
     }
