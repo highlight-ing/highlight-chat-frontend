@@ -22,7 +22,9 @@ export const useChatHistory = (): {history: ChatHistoryItem[], refreshChatHistor
       return data.conversations
     } catch (error) {
       console.error("Error fetching response:", error);
-      setHistory([]);
+      if (history.length > 0) {
+        setHistory([]);
+      }
       return []
     }
   };
