@@ -43,7 +43,8 @@ const History: React.FC<HistoryProps> = ({
           ...baseMessage,
           context: message.context,
           ocr_text: message.ocr_text,
-          clipboard_text: message.clipboard_text
+          clipboard_text: message.clipboard_text,
+          image_url: message.image_url
         } as UserMessage;
       } else {
         return baseMessage as AssistantMessage;
