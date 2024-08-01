@@ -63,6 +63,7 @@ export interface ChatHistoryItem {
   updated_at: string
   user_id: string
   title: string
+  system_prompt: string
 }
 
 export interface ModalObjectProps {
