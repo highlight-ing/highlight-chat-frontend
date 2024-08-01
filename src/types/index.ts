@@ -3,20 +3,26 @@ type WindowAttachment = {
   thumbnailUrl?: string
 }
 
-export type UserMessage = {
-  type: 'user'
+export type BaseMessage = {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+export type UserMessage = BaseMessage & {
+  role: 'user';
+  context?: string;
+  image_url?: string;
+  ocr_text?: string;
+  clipboard_text?: string;
   screenshot?: string
-  clipboardText?: string
   audio?: string
   window?: WindowAttachment
   fileTitle?: string
-  content: string
 }
 
-export type AssistantMessage = {
-  type: 'assistant'
-  content: string
-}
+export type AssistantMessage = BaseMessage & {
+  role: 'assistant';
+};
 
 export type Message = UserMessage | AssistantMessage
 
