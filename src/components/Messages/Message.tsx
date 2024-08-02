@@ -18,7 +18,7 @@ const hasAttachment = (message: UserMessage) => {
     message.screenshot ||
     message.clipboard_text ||
     message.window ||
-    message.fileTitle ||
+    message.file_title ||
     message.audio || 
     message.image_url
   );
@@ -57,8 +57,8 @@ export const Message = ({ message, isThinking }: MessageProps) => {
               {message.clipboard_text && (
                 <Attachment type="clipboard" value={message.clipboard_text} />
               )}
-              {message.fileTitle && (
-                <Attachment type="pdf" value={message.fileTitle} />
+              {message.file_title && (
+                <Attachment type="pdf" value={message.file_title} />
               )}
               {message.image_url && (
                 <Attachment type="image" value={message.image_url} />

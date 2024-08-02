@@ -17,7 +17,7 @@ export type UserMessage = BaseMessage & {
   screenshot?: string
   audio?: string
   window?: WindowAttachment
-  fileTitle?: string
+  file_title?: string
 }
 
 export type AssistantMessage = BaseMessage & {

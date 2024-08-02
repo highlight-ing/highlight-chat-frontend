@@ -289,7 +289,7 @@ export const useSubmitQuery = () => {
         content: query,
         screenshot,
         audio,
-        fileTitle,
+        file_title: fileTitle,
         clipboard_text: clipboardText, 
       });
 
