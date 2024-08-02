@@ -56,9 +56,26 @@ export const useApi = () => {
     })
   }
 
+  const getImage = async (route: string, options?: RequestOptions) => {
+    const accessToken = await getAccessToken()
+    const response = await fetchRequest(route, {
+      bearerToken: accessToken,
+      method: 'GET',
+      version: options?.version,
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch image')
+    }
+
+    const blob = await response.blob()
+    return URL.createObjectURL(blob)
+  }
+
   return {
     get,
     post,
-    deleteRequest: deleteRequest
+    deleteRequest: deleteRequest,
+    getImage
   }
 }

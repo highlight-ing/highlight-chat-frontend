@@ -7,6 +7,7 @@ import { darcula } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { AssistantIcon } from "@/icons/icons";
 import { Message as MessageType, UserMessage } from "../../types";
 import { Attachment } from "../Attachment";
+import { AttachmentType } from '@/types';
 
 import styles from "./message.module.scss";
 import TypedText from "@/components/TypedText/TypedText";
