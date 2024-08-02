@@ -38,7 +38,6 @@ const History: React.FC<HistoryProps> = ({
       };
 
       if (message.role === 'user') {
-        console.log(message)
         return {
           ...baseMessage,
           context: message.context,
