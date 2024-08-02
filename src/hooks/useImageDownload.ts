@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useApi } from '@/hooks/useApi';
 
-export const useImageDownload = (imageId: string) => {
+export const useImageDownload = (imageId: string | null) => {
   const { getImage } = useApi();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -11,13 +11,18 @@ export const useImageDownload = (imageId: string) => {
     let isMounted = true;
 
     const fetchImage = async () => {
-      if (!imageId) return;
+      if (!imageId) {
+        setImageUrl(null);
+        setIsLoading(false);
+        setError(null);
+        return;
+      }
 
       setIsLoading(true);
       setError(null);
 
       try {
-        const url = await getImage(`image/${imageId}`);
+        const url = await getImage(imageId);
         if (isMounted) {
           setImageUrl(url);
         }
@@ -40,7 +45,7 @@ export const useImageDownload = (imageId: string) => {
         URL.revokeObjectURL(imageUrl);
       }
     };
-  }, [imageId, getImage]);
+  }, []);
 
   return { imageUrl, isLoading, error };
 };

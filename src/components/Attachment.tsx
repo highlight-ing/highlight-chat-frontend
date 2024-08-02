@@ -20,7 +20,7 @@ export const Attachment = ({ type, value, isFile = false, removeEnabled = false 
     fileInputRef: state.fileInputRef
   }))
 
-  const { imageUrl, isLoading, error } = useImageDownload(type === 'image' ? value : '')
+  const { imageUrl, isLoading, error } = useImageDownload(type === 'image' ? value : null)
 
   const onRemoveAttachment = () => {
     removeAttachment(type)

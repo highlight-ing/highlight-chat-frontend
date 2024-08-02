@@ -1,6 +1,6 @@
 import useAuth from "@/hooks/useAuth";
 
-const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://0.0.0.0:8080/";
+const backendUrl = "http://0.0.0.0:8080/"//process.env.NEXT_PUBLIC_BACKEND_URL || "http://0.0.0.0:8080/";
 
 type ApiVersion = 'v1'
 
@@ -56,11 +56,15 @@ export const useApi = () => {
     })
   }
 
-  const getImage = async (route: string, options?: RequestOptions) => {
+  const getImage = async (imageUrl: string, options?: RequestOptions) => {
     const accessToken = await getAccessToken()
-    const response = await fetchRequest(route, {
+    const formData = new FormData()
+    formData.append('imageUrl', imageUrl)
+
+    const response = await fetchRequest('image/', {
       bearerToken: accessToken,
-      method: 'GET',
+      method: 'POST',
+      body: formData,
       version: options?.version,
     })
 
