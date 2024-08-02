@@ -46,7 +46,7 @@ export default function PromptsPage() {
   }, []);
 
   return (
-    <div className="h-screen bg-light-5">
+    <div className="min-h-screen bg-light-5">
       <div
         aria-live="assertive"
         className="pointer-events-none fixed inset-0 flex items-end px-4 py-6 sm:items-start sm:p-6"

@@ -71,7 +71,7 @@ export default function PromptBox({
   return (
     <BaseElement>
       <h3>{name}</h3>
-      <p className="text-sm text-light-60">{description}</p>
+      <p className="text-sm text-light-60 line-clamp-4">{description}</p>
       {editable && (
         <div className="mt-2 flex flex-row space-x-3">
           <Button plain onClick={onClick}>
