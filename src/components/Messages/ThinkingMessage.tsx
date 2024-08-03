@@ -17,7 +17,7 @@ const ThinkingMessage = () => {
   return (
     <Message
       isThinking={true}
-      message={{ role: "assistant", content: thinkingMessage }}
+      message={{ type: "assistant", content: thinkingMessage }}
     />
   );
 };

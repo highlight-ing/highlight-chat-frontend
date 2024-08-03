@@ -7,7 +7,6 @@ import { darcula } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { AssistantIcon } from "@/icons/icons";
 import { Message as MessageType, UserMessage } from "../../types";
 import { Attachment } from "../Attachment";
-import { AttachmentType } from '@/types';
 
 import styles from "./message.module.scss";
 import TypedText from "@/components/TypedText/TypedText";
@@ -16,11 +15,10 @@ import CodeBlock from "@/components/Messages/CodeBlock";
 const hasAttachment = (message: UserMessage) => {
   return (
     message.screenshot ||
-    message.clipboard_text ||
+    message.clipboardText ||
     message.window ||
-    message.file_title ||
-    message.audio || 
-    message.image_url
+    message.fileTitle ||
+    message.audio
   );
 };
 
@@ -33,17 +31,17 @@ export const Message = ({ message, isThinking }: MessageProps) => {
   return (
     <div
       className={`${styles.messageContainer} ${
-        message.role === "user" ? styles.self : ""
+        message.type === "user" ? styles.self : ""
       }`}
     >
-      {message.role === "assistant" && (
+      {message.type === "assistant" && (
         <div className={styles.avatar}>
           <AssistantIcon />
         </div>
       )}
       {!isThinking ? (
         <div className={styles.message}>
-          {message.role === "user" && hasAttachment(message as UserMessage) && (
+          {message.type === "user" && hasAttachment(message as UserMessage) && (
             <div className={`flex gap-2`}>
               {message.screenshot && (
                 <Attachment type="image" value={message.screenshot} />
@@ -54,14 +52,11 @@ export const Message = ({ message, isThinking }: MessageProps) => {
               {message.window && message.window?.title && (
                 <Attachment type="window" value={message.window.title} />
               )}
-              {message.clipboard_text && (
-                <Attachment type="clipboard" value={message.clipboard_text} />
+              {message.clipboardText && (
+                <Attachment type="clipboard" value={message.clipboardText} />
               )}
-              {message.file_title && (
-                <Attachment type="pdf" value={message.file_title} />
-              )}
-              {message.image_url && (
-                <Attachment type="image" value={message.image_url} />
+              {message.fileTitle && (
+                <Attachment type="pdf" value={message.fileTitle} />
               )}
             </div>
           )}
