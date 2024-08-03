@@ -68,7 +68,7 @@ export default async function addAttachmentsToFormData(
           break;
         case "audio":
           audio = attachment.value;
-          formData.append("audio", attachment.value.slice(0, 1000));
+          formData.append("audio", attachment.value);
           break;
         case "clipboard":
           clipboardText = attachment.value;
@@ -295,11 +295,6 @@ export const useSubmitQuery = () => {
 
       setInput("");
       clearAttachments(); // Clear the attachment immediately
-
-      let contextString = "This is a new conversation with Highlight Chat. You do not have any Highlight Context available.";
-
-      console.log("contextString:", contextString);
-      formData.append("context", contextString);
 
       const accessToken = await getAccessToken();
       await fetchResponse(formData, accessToken);
