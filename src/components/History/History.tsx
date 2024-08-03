@@ -8,7 +8,6 @@ import {useStore} from "@/providers/store-provider";
 import {useApi} from "@/hooks/useApi";
 import {ChatHistoryItem, Message} from "@/types";
 import ContextMenu from "@/components/ContextMenu/ContextMenu";
-import { BaseMessage, UserMessage, AssistantMessage } from "@/types";
 
 interface HistoryProps {
   showHistory: boolean;
@@ -30,24 +29,12 @@ const History: React.FC<HistoryProps> = ({
       console.error('Failed to select chat')
       return
     }
-    const { messages } = await response.json()
+    const {messages} = await response.json()
     loadConversation(chat.id, messages.map((message: any) => {
-      const baseMessage: BaseMessage = {
-        role: message.role,
-        content: message.content,
-      };
-
-      if (message.role === 'user') {
-        return {
-          ...baseMessage,
-          context: message.context,
-          ocr_text: message.ocr_text,
-          clipboard_text: message.clipboard_text,
-          image_url: message.image_url
-        } as UserMessage;
-      } else {
-        return baseMessage as AssistantMessage;
-      }
+      return {
+        type: message.role,
+        content: message.content
+      } as Message
     }))
   }
 

@@ -136,7 +136,7 @@ export const useSubmitQuery = () => {
       }
 
       let accumulatedResponse = "";
-      addMessage({ role: "assistant", content: "" });
+      addMessage({ type: "assistant", content: "" });
 
       while (true) {
         const { done, value } = await reader.read();
@@ -147,13 +147,13 @@ export const useSubmitQuery = () => {
         accumulatedResponse += chunk;
 
         // Update the UI with the accumulated response
-        updateLastMessage({ role: "assistant", content: accumulatedResponse });
+        updateLastMessage({ type: "assistant", content: accumulatedResponse });
       }
     } catch (error) {
       console.error("Error fetching response:", error);
       addMessage({
-        role: "assistant",
-        content: "Sorry, there was an error processing your request."
+        type: "assistant",
+        content: "Sorry, there was an error processing your request.",
       });
     } finally {
       setIsDisabled(false);
@@ -220,9 +220,9 @@ export const useSubmitQuery = () => {
       audio
     ) {
       addMessage({
-        role: "user",
+        type: "user",
         content: query,
-        clipboard_text: clipboardText,
+        clipboardText,
         screenshot: screenshotUrl,
         audio,
         window: windowTitle ? { title: windowTitle } : undefined, 
@@ -285,12 +285,12 @@ export const useSubmitQuery = () => {
       );
 
       addMessage({
-        role: "user",
+        type: "user",
         content: query,
         screenshot,
         audio,
-        file_title: fileTitle,
-        clipboard_text: clipboardText, 
+        fileTitle,
+        clipboardText,
       });
 
       setInput("");
