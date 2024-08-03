@@ -1,4 +1,4 @@
-import { ClipboardText, Document, Keyboard, Sound } from 'iconsax-react'
+import { ClipboardText, Document, Keyboard, Sound, GallerySlash } from 'iconsax-react'
 import { useState } from 'react'
 import { CloseIcon } from '../icons/icons'
 import Tooltip from './Tooltip'
@@ -20,7 +20,7 @@ export const Attachment = ({ type, value, isFile = false, removeEnabled = false 
     fileInputRef: state.fileInputRef
   }))
 
-  const { imageUrl, isLoading, error } = useImageDownload(type === 'image' ? value : null)
+  const { imageUrl, isLoading, error } = useImageDownload(type === 'image' && !value.startsWith('data:image') ? value : null)
 
   const onRemoveAttachment = () => {
     removeAttachment(type)
@@ -32,17 +32,36 @@ export const Attachment = ({ type, value, isFile = false, removeEnabled = false 
   const renderAttachmentContent = () => {
     switch (type) {
       case 'image':
-        if (isLoading) return <div>Loading image...</div>
-        if (error) return <div>Error loading image: {error.message}</div>
-        return imageUrl ? (
-          <img
-            className="transition-opacity transition-padding duration-150 ease-in-out flex h-12 w-auto max-w-20 items-center overflow-hidden rounded-sm opacity-50 pointer-events-none"
-            style={{ opacity: isImageLoaded ? 1 : 0 }}
-            src={imageUrl}
-            onLoad={() => setIsImageLoaded(true)}
-            alt="Attachment"
-          />
-        ) : null
+        const isBase64 = value.startsWith('data:image');
+        if (isBase64) {
+          // Local image (base64)
+          return (
+            <img
+              className="transition-opacity transition-padding duration-150 ease-in-out flex h-12 w-auto max-w-20 items-center overflow-hidden rounded-sm pointer-events-none"
+              src={value}
+              alt="Attachment"
+            />
+          )
+        } else {
+          // Remote image
+          if (isLoading) {
+            return (
+              <div className="w-20 h-12 bg-gradient-to-r from-light-20 to-light-30 animate-shimmer" 
+                   style={{backgroundSize: '200% 100%'}}
+              />
+            )
+          }
+          if (error) return <GallerySlash size={32} color="#FF8A65" />
+          return (
+            <img
+              className="transition-opacity transition-padding duration-150 ease-in-out flex h-12 w-auto max-w-20 items-center overflow-hidden rounded-sm opacity-50 pointer-events-none"
+              style={{ opacity: isImageLoaded ? 1 : 0 }}
+              src={imageUrl || value}
+              onLoad={() => setIsImageLoaded(true)}
+              alt="Attachment"
+            />
+          )
+        }
       case 'clipboard':
         return <ClipboardText className="text-white" />
       case 'audio':
@@ -68,15 +87,17 @@ export const Attachment = ({ type, value, isFile = false, removeEnabled = false 
       position="right"
       disabled={!value || value.length === 0 || type === 'image'}
     >
-      <div
-        className={`group relative flex items-center justify-center h-12 rounded-md border border-light-10 bg-light-20 ${
-          type === 'pdf' ? 'max-w-40' : 'max-w-20'
-        } ${type !== 'image' ? 'min-w-12' : 'min-w-2'} w-fit`}
-      >
-        {renderAttachmentContent()}
+      <div className="group relative">
+        <div
+          className={`flex items-center justify-center h-12 rounded-md border border-light-10 bg-light-20 ${
+            type === 'pdf' ? 'max-w-40' : 'max-w-20'
+          } ${type !== 'image' ? 'min-w-12' : 'min-w-20'} w-fit overflow-hidden`}
+        >
+          {renderAttachmentContent()}
+        </div>
         {removeEnabled && (
           <div
-            className="absolute top-[-5px] right-[-5px] hidden group-hover:flex cursor-pointer text-light-80"
+            className="absolute top-[-8px] right-[-8px] hidden group-hover:flex cursor-pointer text-light-80 bg-light-20 rounded-full p-0.5"
             onClick={onRemoveAttachment}
           >
             <CloseIcon size={16} />
