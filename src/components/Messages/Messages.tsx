@@ -103,7 +103,7 @@ const Messages = () => {
       const lastMessage = messages[messages.length - 1];
 
       if (
-        lastMessage.type === "user" ||
+        lastMessage.role === "user" ||
         lastMessage.content !== lastMessageRef.current
       ) {
         setShouldAutoScroll(true);
@@ -123,7 +123,7 @@ const Messages = () => {
       <div className={styles.messages}>
         {messages.length > 0 &&
           messages.map((message, index) => {
-            if (message.type === 'assistant' && !message.content?.trim()?.length) {
+            if (message.role === 'assistant' && !message.content?.trim()?.length) {
               return ''
             }
             return <Message key={index} message={message}/>
@@ -131,7 +131,7 @@ const Messages = () => {
         }
         {inputIsDisabled &&
           (!messages.length ||
-            messages[messages.length - 1].type !== "assistant" ||
+            messages[messages.length - 1].role !== "assistant" ||
             !messages[messages.length - 1].content?.trim()?.length) && (
             <ThinkingMessage />
           )}
