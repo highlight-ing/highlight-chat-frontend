@@ -10,6 +10,7 @@ interface ChatHistoryResponse {
 export const useChatHistory = (): {history: ChatHistoryItem[], refreshChatHistory: () => Promise<ChatHistoryItem[]>} => {
   const {get} = useApi()
   const {conversationId, history, setHistory} = useStore((state) => state);
+  const initialFetchDone = useRef(false);
 
   const fetchResponse = async () => {
     try {
@@ -29,16 +30,15 @@ export const useChatHistory = (): {history: ChatHistoryItem[], refreshChatHistor
     }
   };
 
-  // Handle initial fetch of chat history
   useEffect(() => {
-    fetchResponse();
-  }, [])
-
-  useEffect(() => {
-    // If a new conversationId is found
-    if (conversationId && !history.some(chat => chat.id === conversationId)) {
-      console.log('Refreshing chat history, new conversation found')
-      fetchResponse()
+    if (!initialFetchDone.current) {
+      // Initial fetch
+      fetchResponse();
+      initialFetchDone.current = true;
+    } else if (conversationId && !history.some(chat => chat.id === conversationId)) {
+      // New conversation found after initial fetch
+      console.log('Refreshing chat history, new conversation found');
+      fetchResponse();
     }
   }, [history, conversationId]);
 
