@@ -66,7 +66,7 @@ export interface SpreadsheetAttachment {
 
 export type Attachment = ImageAttachment | PdfAttachment | AudioAttachment | ClipboardAttachment | SpreadsheetAttachment
 
-export type AttachmentType = 'audio' | 'clipboard' | 'image' | 'pdf' | 'window'
+export type AttachmentType = 'audio' | 'clipboard' | 'image' | 'pdf' | 'window' | 'spreadsheet'
 
 export interface ChatHistoryItem {
   id: string
