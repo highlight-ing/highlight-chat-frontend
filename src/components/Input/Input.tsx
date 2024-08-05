@@ -80,6 +80,8 @@ export const Input = ({ offset }: { offset: boolean }) => {
         return attachment.value.name;
       case "audio":
         return getAudioAttachmentPreview(attachment);
+      case "spreadsheet":
+        return attachment.value.name;
       default:
         return attachment.value;
     }
@@ -101,7 +103,8 @@ export const Input = ({ offset }: { offset: boolean }) => {
               value={getValue(attachment)}
               isFile={
                 attachment.type === "pdf" ||
-                (attachment.type === "image" && !!attachment.file)
+                (attachment.type === "image" && !!attachment.file) ||
+                attachment.type === "spreadsheet"
               }
               removeEnabled
               key={index}
