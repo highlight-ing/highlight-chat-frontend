@@ -70,6 +70,10 @@ export default async function addAttachmentsToFormData(
           audio = attachment.value;
           formData.append("audio", attachment.value);
           break;
+        case "spreadsheet":
+          fileTitle = attachment.value.name;
+          formData.append("spreadsheet", attachment.value);
+          break;
         case "clipboard":
           clipboardText = attachment.value;
           formData.append("clipboard_text", attachment.value);
