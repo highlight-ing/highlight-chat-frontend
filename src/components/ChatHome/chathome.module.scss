@@ -9,7 +9,8 @@
   opacity: 0;
   padding-top: 48px;
   pointer-events: none;
-  min-width: min(800px, 95vw);
+  //min-width: min(800px, 95vw);
+  max-width: min(800px, 95vw);
 
   &.show {
     position: relative;
