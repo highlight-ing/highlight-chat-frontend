@@ -62,14 +62,14 @@ const PromptsModal = ({id, context}: ModalObjectProps) => {
     <Modal
       id={id}
       size={selectedPrompt ? 'small' : 'medium'}
-      header={selectedPrompt ? 'Continue with prompt?' : undefined}
+      header={selectedPrompt ? 'Continue with chat app?' : undefined}
       bodyClassName={selectedPrompt ? undefined : styles.promptsModal}
     >
       {
         selectedPrompt &&
         <>
           <PromptListRow
-            type={'prompt'}
+            type={myPrompts.some(prompt => prompt.id === selectedPrompt.id) ? 'self' : 'community'}
             prompt={selectedPrompt}
             onClick={() => onSelectPrompt(selectedPrompt)}
             isCta={true}
@@ -95,7 +95,7 @@ const PromptsModal = ({id, context}: ModalObjectProps) => {
                 <PromptListRow
                   key={prompt.slug}
                   prompt={prompt}
-                  type={'prompt'}
+                  type={'self'}
                   onClick={() => onSelectPrompt(prompt)}
                   onClickEdit={(e) => openModal('edit-prompt', {prompt})}
                 />
@@ -104,9 +104,9 @@ const PromptsModal = ({id, context}: ModalObjectProps) => {
           }
           <PromptListRow
             // @ts-ignore
-            prompt={{slug: 'create', description: 'Create your own prompt'}}
+            prompt={{slug: 'create', description: 'Create your own chat app'}}
             icon={<AddCircle variant={"Bold"} color={variables.light60}/>}
-            type={'official'}
+            type={'default'}
             onClick={() => openModal('create-prompt')}
           />
           <Divider style={{margin: '8px 0 16px 0'}}/>
@@ -116,7 +116,7 @@ const PromptsModal = ({id, context}: ModalObjectProps) => {
               return (
                 <PromptListRow
                   key={prompt.slug}
-                  type={'prompt'}
+                  type={'community'}
                   prompt={prompt}
                   onClick={() => onSelectPrompt(prompt)}
                 />

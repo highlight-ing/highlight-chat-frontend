@@ -12,12 +12,6 @@ export type CompareResult = {
   claude: string[];
 };
 
-export interface TopBarProps {
-  mode: 'assistant' | 'compare';
-  setMode: (mode: 'assistant' | 'compare') => void;
-  onNewConversation: () => void;
-}
-
 interface Window {
   SpeechRecognition: SpeechRecognitionConstructor;
   webkitSpeechRecognition: SpeechRecognitionConstructor;

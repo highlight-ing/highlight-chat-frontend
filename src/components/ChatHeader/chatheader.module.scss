@@ -15,6 +15,7 @@
   transition: opacity 100ms ease, transform 100ms ease;
   transform: scale(0.75);
   position: fixed;
+  top: $topbar-height;
 
   &.show {
     position: relative;
@@ -36,6 +37,6 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background-color: $pink-5;
-  color: $pink-80;
+  background-color: $purple-20;
+  color: $purple-100;
 }

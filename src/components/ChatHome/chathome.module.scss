@@ -3,13 +3,13 @@
 .chatHomeContainer {
   display: flex;
   flex-direction: column;
-  gap: 48px;
+  gap: 24px;
   transition: opacity 100ms ease;
   position: fixed;
   opacity: 0;
   padding-top: 48px;
   pointer-events: none;
-  //min-width: min(800px, 95vw);
+  min-width: min(800px, 95vw);
   max-width: min(800px, 95vw);
 
   &.show {
@@ -36,7 +36,7 @@
 .input {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 48px;
   opacity: 0;
   transform: scale(0.75);
   transition: opacity 150ms ease, transform 150ms ease;
@@ -55,7 +55,6 @@
   padding: 16px;
   border-radius: 20px;
   border: 1px solid $light-10;
-  background-color: $light-5;
   font-weight: 300;
   font-size: 14px;
   color: $light-60;
@@ -134,14 +133,12 @@
   @extend .baseOption;
 
   &:hover {
-    background-color: $pink-5;
-
     .promptArrow {
       display: flex;
     }
   }
 
-  &.official {
+  &.default {
     &:hover {
       background-color: $light-5;
     }
@@ -159,13 +156,13 @@
     }
   }
 
-  &.prompt {
+  &.official {
     &:hover {
       background-color: $pink-5;
     }
 
     .promptName {
-      color: $pink-100;
+      color: $light-100;
     }
 
     .promptIcon {
@@ -173,7 +170,61 @@
       color: $pink-100;
     }
     .promptArrow {
-      color: $pink-80;
+      color: $pink-100;
+    }
+  }
+
+  &.self {
+    &:hover {
+      background-color: $pink-5;
+    }
+
+    .promptName {
+      color: $light-100;
+    }
+
+    .promptIcon {
+      background-color: $pink-20;
+      color: $pink-100;
+    }
+    .promptArrow {
+      color: $pink-100;
+    }
+  }
+
+  &.self {
+    &:hover {
+      background-color: $purple-5;
+    }
+
+    .promptName {
+      color: $light-100;
+    }
+
+    .promptIcon {
+      background-color: $purple-20;
+      color: $purple-100;
+    }
+    .promptArrow {
+      color: $purple-100;
+    }
+  }
+
+  &.community {
+    &:hover {
+      background-color: $primary-5;
+    }
+
+    .promptName {
+      color: $light-100;
+    }
+
+    .promptIcon {
+      background-color: $primary-20;
+      color: $primary-100;
+    }
+    .promptArrow {
+      color: $primary-100;
     }
   }
 }
@@ -188,6 +239,11 @@
 
 .promptDescription {
   max-width: calc(100% - 32px);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
   &.isCta {
     max-width: calc(100% - 100px);
@@ -204,11 +260,20 @@
   bottom: 0;
   font-size: 13px;
   font-weight: 500;
-  color: $pink-100;
+  color: $purple-100;
   gap: 8px;
   line-height: 1;
 
   &.show {
     display: flex;
   }
+}
+
+.highlightTutorial {
+  display: flex;
+  padding: 20px;
+  border-radius: 24px;
+  background-color: $light-5;
+  font-size: 15px;
+  font-weight: 300;
 }
