@@ -3,20 +3,26 @@ type WindowAttachment = {
   thumbnailUrl?: string
 }
 
-export type UserMessage = {
-  type: 'user'
-  screenshot?: string
-  clipboardText?: string
-  audio?: string
-  window?: WindowAttachment
-  fileTitle?: string
-  content: string
+export type BaseMessage = {
+  role: 'user' | 'assistant';
+  content: string;
 }
 
-export type AssistantMessage = {
-  type: 'assistant'
-  content: string
+export type UserMessage = BaseMessage & {
+  role: 'user';
+  context?: string;
+  image_url?: string;
+  ocr_text?: string;
+  clipboard_text?: string;
+  screenshot?: string
+  audio?: string
+  window?: WindowAttachment
+  file_title?: string
 }
+
+export type AssistantMessage = BaseMessage & {
+  role: 'assistant';
+};
 
 export type Message = UserMessage | AssistantMessage
 
@@ -53,9 +59,14 @@ export interface ClipboardAttachment {
   value: string
 }
 
-export type Attachment = ImageAttachment | PdfAttachment | AudioAttachment | ClipboardAttachment
+export interface SpreadsheetAttachment {
+  type: 'spreadsheet'
+  value: File
+}
 
-export type AttachmentType = 'audio' | 'clipboard' | 'image' | 'pdf' | 'window'
+export type Attachment = ImageAttachment | PdfAttachment | AudioAttachment | ClipboardAttachment | SpreadsheetAttachment
+
+export type AttachmentType = 'audio' | 'clipboard' | 'image' | 'pdf' | 'window' | 'spreadsheet'
 
 export interface ChatHistoryItem {
   id: string
@@ -63,6 +74,7 @@ export interface ChatHistoryItem {
   updated_at: string
   user_id: string
   title: string
+  system_prompt: string
 }
 
 export interface ModalObjectProps {

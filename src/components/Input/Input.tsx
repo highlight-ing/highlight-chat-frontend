@@ -1,17 +1,15 @@
-import { useEffect, useRef } from 'react'
-import { Attachment } from '../Attachment'
-import { AttachmentsButton } from '../AttachmentsButton/AttachmentsButton'
-import { Attachment as AttachmentType } from '@/types'
-import { useSubmitQuery } from '../../hooks/useSubmitQuery'
-import { useStore } from '@/providers/store-provider'
+import { useEffect, useRef } from "react";
+import { Attachment } from "../Attachment";
+import { AttachmentsButton } from "../AttachmentsButton/AttachmentsButton";
+import { Attachment as AttachmentType } from "@/types";
+import { useSubmitQuery } from "../../hooks/useSubmitQuery";
+import { useStore } from "@/providers/store-provider";
 
 import styles from './chatinput.module.scss'
 import * as React from 'react'
-import { HighlightIcon } from '@/icons/icons'
 import { getAudioAttachmentPreview } from '@/utils/attachments'
-import ChatHome from "@/components/ChatHome/ChatHome";
 
-const MAX_INPUT_HEIGHT = 160
+const MAX_INPUT_HEIGHT = 160;
 
 /**
  * This is the main Highlight Chat input box, not a reusable Input component.
@@ -26,42 +24,45 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
     prompt: state.prompt
   }))
 
-  const { handleSubmit } = useSubmitQuery()
+  const { handleSubmit } = useSubmitQuery();
 
-  const inputRef = useRef<HTMLTextAreaElement>(null)
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (!inputIsDisabled && e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSubmit(prompt)
-      setInput('')
+    if (!inputIsDisabled && e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(prompt);
+      setInput("");
     }
-  }
+  };
 
   const onClickContainer = (e: React.MouseEvent) => {
-    inputRef.current?.focus()
-  }
+    inputRef.current?.focus();
+  };
 
   useEffect(() => {
     if (inputRef.current) {
-      inputRef.current.style.height = '0px'
-      const scrollHeight = inputRef.current.scrollHeight
+      inputRef.current.style.height = "0px";
+      const scrollHeight = inputRef.current.scrollHeight;
 
-      const newHeight = scrollHeight > MAX_INPUT_HEIGHT ? MAX_INPUT_HEIGHT : scrollHeight
-      inputRef.current.style.height = newHeight + 'px'
+      const newHeight =
+        scrollHeight > MAX_INPUT_HEIGHT ? MAX_INPUT_HEIGHT : scrollHeight;
+      inputRef.current.style.height = newHeight + "px";
     }
-  }, [inputRef, input])
+  }, [inputRef, input]);
 
   const getValue = (attachment: AttachmentType) => {
     switch (attachment.type) {
-      case 'pdf':
-        return attachment.value.name
-      case 'audio':
-        return getAudioAttachmentPreview(attachment)
+      case "pdf":
+        return attachment.value.name;
+      case "audio":
+        return getAudioAttachmentPreview(attachment);
+      case "spreadsheet":
+        return attachment.value.name;
       default:
-        return attachment.value
+        return attachment.value;
     }
-  }
+  };
 
   return (
     <div className={`${styles.inputContainer} ${sticky ? styles.sticky : ''}`} onClick={onClickContainer}>
@@ -71,7 +72,11 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
             <Attachment
               type={attachment.type}
               value={getValue(attachment)}
-              isFile={attachment.type === 'pdf' || (attachment.type === 'image' && !!attachment.file)}
+              isFile={
+                attachment.type === "pdf" ||
+                (attachment.type === "image" && !!attachment.file) ||
+                attachment.type === "spreadsheet"
+              }
               removeEnabled
               key={index}
             />
@@ -84,12 +89,12 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
       <textarea
         ref={inputRef}
         autoFocus={true}
-        placeholder={`Ask ${promptName ? promptName : 'Highlight'} anything...`}
+        placeholder={`Ask ${promptName ? promptName : "Highlight"} anything...`}
         value={input}
         rows={1}
         onInput={(e) => setInput(e.currentTarget.value)}
         onKeyDown={handleKeyDown}
       />
     </div>
-  )
-}
+  );
+};

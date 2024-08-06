@@ -1,4 +1,4 @@
-import { HighlightContext } from "@highlight-ai/app-runtime";
+import { type HighlightContext } from "@highlight-ai/app-runtime";
 import imageCompression from "browser-image-compression";
 import { useStore } from "@/providers/store-provider";
 import useAuth from "./useAuth";
@@ -37,7 +37,7 @@ export default async function addAttachmentsToFormData(
   formData: FormData,
   attachments: any[]
 ) {
-  let screenshot, audio, fileTitle, clipboardText;
+  let screenshot, audio, fileTitle, clipboardText, ocrText;
 
   for (const attachment of attachments) {
     if (attachment?.value) {
@@ -68,11 +68,19 @@ export default async function addAttachmentsToFormData(
           break;
         case "audio":
           audio = attachment.value;
-          formData.append("audio", attachment.value.slice(0, 1000));
+          formData.append("audio", attachment.value);
+          break;
+        case "spreadsheet":
+          fileTitle = attachment.value.name;
+          formData.append("spreadsheet", attachment.value);
           break;
         case "clipboard":
           clipboardText = attachment.value;
-          // TODO (SP) add clipboard text to form data once backend supports
+          formData.append("clipboard_text", attachment.value);
+          break;
+        case "ocr":
+          ocrText = attachment.value;
+          formData.append("ocr_text", attachment.value);
           break;
         default:
           console.warn("Unknown attachment type:", attachment.type);
@@ -80,7 +88,7 @@ export default async function addAttachmentsToFormData(
     }
   }
 
-  return { screenshot, audio, fileTitle, clipboardText };
+  return { screenshot, audio, fileTitle, clipboardText, ocrText };
 }
 
 export const useSubmitQuery = () => {
@@ -132,7 +140,7 @@ export const useSubmitQuery = () => {
       }
 
       let accumulatedResponse = "";
-      addMessage({ type: "assistant", content: "" });
+      addMessage({ role: "assistant", content: "" });
 
       while (true) {
         const { done, value } = await reader.read();
@@ -143,13 +151,13 @@ export const useSubmitQuery = () => {
         accumulatedResponse += chunk;
 
         // Update the UI with the accumulated response
-        updateLastMessage({ type: "assistant", content: accumulatedResponse });
+        updateLastMessage({ role: "assistant", content: accumulatedResponse });
       }
     } catch (error) {
       console.error("Error fetching response:", error);
       addMessage({
-        type: "assistant",
-        content: "Sorry, there was an error processing your request.",
+        role: "assistant",
+        content: "Sorry, there was an error processing your request."
       });
     } finally {
       setIsDisabled(false);
@@ -188,7 +196,7 @@ export const useSubmitQuery = () => {
       return;
     }
     // Check if the context is empty, only contains empty suggestion and attachments, or has no application data
-    if (!context.attachments || context.attachments.length === 0) {
+    if (!context.suggestion && (!context.attachments || context.attachments.length === 0)) {
       console.log("Empty or invalid context received, ignoring.");
       return;
     }
@@ -198,13 +206,13 @@ export const useSubmitQuery = () => {
 
     let query = context.suggestion || "";
     let screenshotUrl =
-      context.attachments?.find((a) => a.type === "screenshot")?.value ?? "";
+      context.attachments?.find((a) => a.type === "screenshot")?.value;
     let clipboardText =
-      context.attachments?.find((a) => a.type === "clipboard")?.value ?? "";
-    let ocrScreenContents = context.environment?.ocrScreenContents ?? "";
+      context.attachments?.find((a) => a.type === "clipboard")?.value;
+    let ocrScreenContents = context.environment?.ocrScreenContents;
     let rawContents = context.application?.focusedWindow?.rawContents;
     let audio =
-      context.attachments?.find((a) => a.type === "audio")?.value ?? "";
+      context.attachments?.find((a) => a.type === "audio")?.value;
     let windowTitle = context.application?.focusedWindow?.title;
 
     if (
@@ -216,12 +224,12 @@ export const useSubmitQuery = () => {
       audio
     ) {
       addMessage({
-        type: "user",
+        role: "user",
         content: query,
-        clipboardText,
+        clipboard_text: clipboardText,
         screenshot: screenshotUrl,
         audio,
-        window: { title: windowTitle },
+        window: windowTitle ? { title: windowTitle } : undefined, 
       });
 
       setInput("");
@@ -275,37 +283,22 @@ export const useSubmitQuery = () => {
         formData.append("about_me", JSON.stringify(aboutMe));
       }
 
-      const { screenshot, audio, fileTitle, clipboardText } = await addAttachmentsToFormData(
+      const { screenshot, audio, fileTitle, clipboardText, ocrText } = await addAttachmentsToFormData(
         formData,
         attachments
       );
 
       addMessage({
-        type: "user",
+        role: "user",
         content: query,
         screenshot,
         audio,
-        fileTitle,
-        clipboardText,
+        file_title: fileTitle,
+        clipboard_text: clipboardText, 
       });
 
       setInput("");
       clearAttachments(); // Clear the attachment immediately
-
-
-      // TODO (SP) this is a workaround to ensure clipboard text is processed by the prompt until
-      // the backend supports clipboard text
-      let contextString = clipboardText
-        ? `HighlightContext: { "attachments": [ { "type": "clipboard", "value": ${clipboardText}}]`
-        : "This is a new conversation with Highlight Chat. You do not have any Highlight Context available.";
-
-      console.log("contextString:", contextString);
-      formData.append("context", contextString);
-
-      // If it's a new conversation, reset the conversation ID
-      if (messages.length === 0) {
-        resetConversationId();
-      }
 
       const accessToken = await getAccessToken();
       await fetchResponse(formData, accessToken);

@@ -49,17 +49,24 @@ export const AttachmentsButton = () => {
 
   const onAddFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file && file.type.startsWith('image/')) {
-      addAttachment({
-        type: 'image',
-        value: URL.createObjectURL(file),
-        file: file
-      })
-    } else if (file && file.type === 'application/pdf') {
-      addAttachment({
-        type: 'pdf',
-        value: file
-      })
+    if (file) {
+      if (file.type.startsWith('image/')) {
+        addAttachment({
+          type: 'image',
+          value: URL.createObjectURL(file),
+          file: file
+        })
+      } else if (file.type === 'application/pdf') {
+        addAttachment({
+          type: 'pdf',
+          value: file
+        })
+      } else if (file.type === 'text/csv' || file.type === 'application/vnd.ms-excel' || file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+        addAttachment({
+          type: 'spreadsheet',
+          value: file
+        })
+      }
     }
   }
 
@@ -169,7 +176,7 @@ export const AttachmentsButton = () => {
             type="file"
             ref={fileInputRef}
             onChange={onAddFile}
-            accept="image/*,application/pdf"
+            accept="image/*,application/pdf,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             className={styles.hiddenInput}
           />
         </button>
