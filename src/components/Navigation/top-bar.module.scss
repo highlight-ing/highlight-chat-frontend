@@ -27,6 +27,14 @@
 }
 
 .promptSwitch {
+  &.default {
+    color: $light-40 !important;
+
+    &:hover {
+      background-color: $light-20 !important;
+      color: $light-100 !important;
+    }
+  }
   &.official {
     color: $pink-100 !important;
 
@@ -50,14 +58,5 @@
       background-color: $purple-20 !important;
       color: $purple-100 !important;
     }
-  }
-}
-
-.promptSwitchDull {
-  color: $light-40 !important;
-
-  &:hover {
-    background-color: $light-20 !important;
-    color: $light-100 !important;
   }
 }

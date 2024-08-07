@@ -67,7 +67,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
           <Tooltip tooltip="Switch chat app" position="bottom">
             <CircleButton
               fitContents={true}
-              className={!!promptName ? (!messages.length ? styles.promptSwitchDull : `${styles.promptSwitch} ${promptType ? styles[promptType] : ''}`) : undefined}
+              className={`${styles.promptSwitch} ${promptType ? styles[(!promptName || !messages.length) ? 'default' : promptType] : ''}`}
               onClick={() => openModal('prompts-modal')}
             >
               {
