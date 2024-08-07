@@ -5,9 +5,9 @@ import { Attachment as AttachmentType } from "@/types";
 import { useSubmitQuery } from "../../hooks/useSubmitQuery";
 import { useStore } from "@/providers/store-provider";
 
-import styles from './chatinput.module.scss'
-import * as React from 'react'
-import { getAudioAttachmentPreview } from '@/utils/attachments'
+import styles from "./chatinput.module.scss";
+import * as React from "react";
+import { getAudioAttachmentPreview } from "@/utils/attachments";
 
 const MAX_INPUT_HEIGHT = 160;
 
@@ -15,14 +15,15 @@ const MAX_INPUT_HEIGHT = 160;
  * This is the main Highlight Chat input box, not a reusable Input component.
  */
 export const Input = ({ sticky }: { sticky: boolean }) => {
-  const { attachments, input, setInput, inputIsDisabled, promptName, prompt } = useStore((state) => ({
-    attachments: state.attachments,
-    input: state.input,
-    setInput: state.setInput,
-    inputIsDisabled: state.inputIsDisabled,
-    promptName: state.promptName,
-    prompt: state.prompt
-  }))
+  const { attachments, input, setInput, inputIsDisabled, promptName, prompt } =
+    useStore((state) => ({
+      attachments: state.attachments,
+      input: state.input,
+      setInput: state.setInput,
+      inputIsDisabled: state.inputIsDisabled,
+      promptName: state.promptName,
+      prompt: state.prompt,
+    }));
 
   const { handleSubmit } = useSubmitQuery();
 
@@ -65,7 +66,10 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
   };
 
   return (
-    <div className={`${styles.inputContainer} ${sticky ? styles.sticky : ''}`} onClick={onClickContainer}>
+    <div
+      className={`${styles.inputContainer} ${sticky ? styles.sticky : ""}`}
+      onClick={onClickContainer}
+    >
       {attachments.length > 0 && (
         <div className="flex gap-2">
           {attachments.map((attachment: AttachmentType, index: number) => (
