@@ -207,10 +207,6 @@ export const useSubmitQuery = () => {
       rawContents ||
       audio
     ) {
-      resetConversationId();
-      startNewConversation();
-      navigateToNewChat();
-
       addMessage({
         role: "user",
         content: query,
