@@ -29,7 +29,7 @@ const ChatHeader = ({isShowing}: {isShowing: boolean}) => {
       <div className={`${styles.promptIcon} ${styles[promptType]}`}>
         <MessageText variant={"Bold"} size={36}/>
       </div>
-      <div className="flex flex-col items-center justify-center gap-0.5">
+      <div className="flex flex-col items-center justify-center gap-0.5 max-w-screen-sm text-center">
         <span className={styles.promptName}>{promptName}</span>
         <span>{promptDescription}</span>
       </div>
