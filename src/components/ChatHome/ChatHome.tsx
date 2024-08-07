@@ -2,7 +2,6 @@ import variables from '@/variables.module.scss'
 import styles from './chathome.module.scss'
 import {AddCircle, MouseCircle, SearchStatus, Setting} from "iconsax-react";
 import React, {useEffect, useState} from "react";
-import useAuth from "@/hooks/useAuth";
 import {useStore} from "@/providers/store-provider";
 import PromptListRow from "@/components/prompts/PromptListRow";
 import {Input} from "@/components/Input/Input";

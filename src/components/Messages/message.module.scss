@@ -48,9 +48,10 @@
   color: $light-80;
   font-weight: 200;
   line-height: 1.6;
-  display: flex;
-  flex-direction: column;
+  //display: flex;
+  //flex-direction: column;
   gap: 8px;
+  //white-space: pre-wrap;
 
   strong {
     color: $light-80;
@@ -97,6 +98,30 @@
       border-radius: 0;
       padding: 0;
     }
+  }
+
+  table {
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 16px 0;
+    width: 100%;
+  }
+  th {
+    background-color: $light-5;
+  }
+  td, th {
+    border: 1px solid $light-5;
+    padding: 8px;
+  }
+  td {
+    vertical-align: top;
+    font-size: 15px;
+  }
+  tr:nth-child(odd) {
+    background-color: $dark-20;
+  }
+  tr:nth-child(even) {
+    background-color: $dark-10;
   }
 }
 

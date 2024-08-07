@@ -6,7 +6,7 @@ const Hotkey = ({hotkey}: {hotkey: string}) => {
       {
         hotkey.split(' + ').map(key => {
           return (
-            <div className={styles.hotkey}>{key === 'Cmd' ? '⌘ ' : ''}{key.toLowerCase()}</div>
+            <div key={key} className={styles.hotkey}>{key === 'Cmd' ? '⌘ ' : ''}{key.toLowerCase()}</div>
           )
         })
       }
