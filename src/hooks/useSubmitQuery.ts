@@ -169,8 +169,8 @@ export const useSubmitQuery = () => {
 
   const handleIncomingContext = async (
     context: HighlightContext,
-    systemPrompt?: string,
-    navigateToNewChat: () => void
+    navigateToNewChat: () => void,
+    systemPrompt?: string
   ) => {
     console.log("Received context inside handleIncomingContext: ", context);
     if (!context.suggestion || context.suggestion.trim() === "") {
