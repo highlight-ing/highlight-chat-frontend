@@ -1,10 +1,11 @@
 import {useStore} from "@/providers/store-provider";
-import {useEffect, useMemo} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {fetchPrompts} from "@/utils/prompts";
 import useAuth from "@/hooks/useAuth";
 
 export default () => {
   const {getAccessToken} = useAuth()
+  const [isLoadingPrompts, setLoadingPrompts] = useState(true)
 
   const { prompts, setPrompts, promptUserId, setPromptUserId } = useStore((state) => ({
     prompts: state.prompts,
@@ -24,13 +25,16 @@ export default () => {
   }, [prompts, promptUserId])
 
   const refreshPrompts = async () => {
+    setLoadingPrompts(true)
     const accessToken = await getAccessToken();
     const response = await fetchPrompts(accessToken);
     if (response.error) {
+      setLoadingPrompts(false)
       return
     }
     setPromptUserId(response.userId)
     setPrompts(response.prompts ?? []);
+    setLoadingPrompts(false)
   }
 
   useEffect(() => {
@@ -38,6 +42,7 @@ export default () => {
   }, [])
 
   return {
+    isLoadingPrompts,
     prompts,
     communityPrompts,
     myPrompts,

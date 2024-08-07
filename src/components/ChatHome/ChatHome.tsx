@@ -1,5 +1,6 @@
 import variables from '@/variables.module.scss'
 import styles from './chathome.module.scss'
+import mainStyles from '@/main.module.scss'
 import {AddCircle, MouseCircle, SearchStatus, Setting} from "iconsax-react";
 import React, {useEffect, useState} from "react";
 import {useStore} from "@/providers/store-provider";
@@ -98,10 +99,27 @@ const Callout = ({icon, title, description, onClick}: {icon: React.ReactElement,
 
 const Prompts = () => {
   const { openModal } = useStore((state) => state)
-  const { myPrompts } = usePromptApps()
+  const { isLoadingPrompts, myPrompts } = usePromptApps()
+  const [hotkey, setHotkey] = useState<string>('alt + .')
+
+  useEffect(() => {
+    const fetchHotkey = async () => {
+      const hotkey = await Highlight.app.getHotkey()
+      setHotkey(hotkey)
+    }
+    fetchHotkey()
+  }, [])
+
+  if (isLoadingPrompts) {
+    return (
+      <div className={`${styles.prompts} ${mainStyles.loadingGradient}`}>
+        <div className={'w-full h-20 p-16'}/>
+      </div>
+    )
+  }
 
   if (!myPrompts.length) {
-    return <HighlightTutorial/>
+    return <HighlightTutorial hotkey={hotkey}/>
   }
 
   return (
@@ -128,17 +146,7 @@ const Prompts = () => {
   )
 }
 
-const HighlightTutorial = () => {
-  const [hotkey, setHotkey] = useState<string>('alt + .')
-
-  useEffect(() => {
-    const fetchHotkey = async () => {
-      const hotkey = await Highlight.app.getHotkey()
-      setHotkey(hotkey)
-    }
-    fetchHotkey()
-  }, [])
-
+const HighlightTutorial = ({hotkey}: {hotkey: string}) => {
   return (
     <div className={styles.highlightTutorial}>
       <div className={'flex flex-col gap-3 flex-shrink-0'}>
@@ -155,7 +163,7 @@ const HighlightTutorial = () => {
         </div>
         <div className={'flex items-center gap-3 text-light-60'}>
           <SearchStatus size={32} variant={'Bold'}/>
-          <div className={'flex items-center gap-1.5'}>Press <Hotkey hotkey={hotkey!}/> to Highlight what's on your screen</div>
+          <div className={'flex items-center gap-1.5'}>Press <Hotkey hotkey={hotkey}/> to Highlight what's on your screen</div>
         </div>
       </div>
       <ExpandableVideo
