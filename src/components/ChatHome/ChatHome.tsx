@@ -2,9 +2,7 @@ import variables from '@/variables.module.scss'
 import styles from './chathome.module.scss'
 import {AddCircle, MouseCircle, SearchStatus, Setting} from "iconsax-react";
 import React, {useEffect, useState} from "react";
-import {Prompt} from "@/types/supabase-helpers";
 import useAuth from "@/hooks/useAuth";
-import {fetchPrompts} from "@/utils/prompts";
 import {useStore} from "@/providers/store-provider";
 import PromptListRow from "@/components/prompts/PromptListRow";
 import {Input} from "@/components/Input/Input";
@@ -13,11 +11,26 @@ import usePromptApps from "@/hooks/usePromptApps";
 
 const ChatHome = ({isShowing}: {isShowing: boolean}) => {
   const { openModal } = useStore((state) => ({openModal: state.openModal}))
+  const [isVisible, setVisible] = useState(isShowing)
+
+  useEffect(() => {
+    if (isShowing) {
+      setVisible(true)
+    } else {
+      setTimeout(() => {
+        setVisible(false)
+      }, 500)
+    }
+  }, [isShowing])
+
   return (
     <div className={`${styles.chatHomeContainer} ${isShowing ? styles.show : ''}`}>
       <div className={styles.input}>
         <InputHeading />
-        <Input sticky={false} />
+        {
+          isVisible &&
+          <Input sticky={false} />
+        }
       </div>
       <div className={styles.callouts}>
         <Callout
