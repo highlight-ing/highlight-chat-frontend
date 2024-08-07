@@ -1,69 +1,30 @@
 "use client";
 
 import * as React from "react";
-import { TopBarProps } from "../../types";
-
+import { TopBarProps } from "@/types";
 import styles from "./top-bar.module.scss";
 import {
   AddCircle,
   ArrowDown2,
-  ArrowLeft,
-  ArrowLeft2,
-  Category,
-  DocumentText,
+  Clock,
+  MessageText,
 } from "iconsax-react";
 import CircleButton from "@/components/CircleButton/CircleButton";
 import Tooltip from "@/components/Tooltip";
 import { useStore } from "@/providers/store-provider";
 import { useRouter } from "next/navigation";
-import {
-  Dropdown,
-  DropdownButton,
-  DropdownItem,
-  DropdownMenu,
-} from "@/components/catalyst/dropdown";
-
-function AppDropdown() {
-  const router = useRouter();
-
-  const { promptName, clearPrompt } = useStore((state) => ({
-    promptName: state.promptName,
-    clearPrompt: state.clearPrompt,
-  }));
-
-  const onBackToHighlightChat = () => {
-    clearPrompt();
-    router.push("/");
-  };
-
-  return (
-    <Dropdown>
-      <DropdownButton plain>
-        {promptName || "Highlight Chat"}
-        <ArrowDown2 size={20} />
-      </DropdownButton>
-      <DropdownMenu>
-        <DropdownItem href="/prompts">
-          <DocumentText size={20} className="mr-2" />
-          View Prompts
-        </DropdownItem>
-        {promptName && (
-          <DropdownItem onClick={onBackToHighlightChat}>
-            <ArrowLeft size={20} className="mr-2" />
-            Back to Highlight Chat
-          </DropdownItem>
-        )}
-      </DropdownMenu>
-    </Dropdown>
-  );
-}
+import Button from "@/components/Button/Button";
+import {HighlightIcon} from "@/icons/icons";
+import variables from '@/variables.module.scss'
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const router = useRouter();
 
-  const { startNewConversation, promptName } = useStore((state) => ({
+  const { startNewConversation, promptName, openModal, messages } = useStore((state) => ({
     startNewConversation: state.startNewConversation,
     promptName: state.promptName,
+    openModal: state.openModal,
+    messages: state.messages
   }));
 
   const onNewChatClick = () => {
@@ -87,18 +48,44 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
           showHistory || !setShowHistory ? { visibility: "hidden" } : undefined
         }
       >
-        <CircleButton onClick={onShowHistoryClick}>
-          <Category variant={"Bold"} size={24} />
-        </CircleButton>
+        <Button size={'medium'} variant={'ghost-neutral'} onClick={onShowHistoryClick}>
+          <Clock size={20} variant={'Bold'}/>
+          History
+        </Button>
       </Tooltip>
 
-      <AppDropdown />
+      {
+        (promptName || !!messages.length) &&
+        <div className={styles.middle}>
+          <Tooltip tooltip="Switch chat app" position="bottom">
+            <CircleButton
+              fitContents={true}
+              className={!!promptName ? (!messages.length ? styles.promptSwitchDull : styles.promptSwitch) : undefined}
+              onClick={() => openModal('prompts-modal')}
+            >
+              {
+                promptName
+                  ? <MessageText variant={"Bold"} size={24}/>
+                  : <HighlightIcon size={20} color={variables.light40}/>
+              }
+              {promptName ?? 'Highlight'}
+              <ArrowDown2 size={20} variant={'Bold'}/>
+            </CircleButton>
+          </Tooltip>
+        </div>
+      }
 
-      <Tooltip tooltip="Start new chat" position="left">
-        <CircleButton onClick={onNewChatClick}>
-          <AddCircle variant={"Bold"} size={24} />
-        </CircleButton>
-      </Tooltip>
+      {
+        (promptName || messages.length > 0) &&
+        <div className="flex gap-1">
+          <Tooltip tooltip="Start new chat" position="left">
+            <Button size={'medium'} variant={'ghost-neutral'} onClick={onNewChatClick}>
+              New
+              <AddCircle variant={"Bold"} size={20} />
+            </Button>
+          </Tooltip>
+        </div>
+      }
     </div>
   );
 };

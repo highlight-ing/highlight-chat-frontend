@@ -3,12 +3,13 @@ import * as React from "react";
 import {useChatHistory} from "@/hooks/useChatHistory";
 import Tooltip from "@/components/Tooltip";
 import CircleButton from "@/components/CircleButton/CircleButton";
-import { Category } from "iconsax-react";
+import {Category, Clock} from "iconsax-react";
 import {useStore} from "@/providers/store-provider";
 import {useApi} from "@/hooks/useApi";
 import {ChatHistoryItem, Message} from "@/types";
 import ContextMenu from "@/components/ContextMenu/ContextMenu";
 import { BaseMessage, UserMessage, AssistantMessage } from "@/types";
+import Button from "@/components/Button/Button";
 
 interface HistoryProps {
   showHistory: boolean;
@@ -61,11 +62,11 @@ const History: React.FC<HistoryProps> = ({
     >
       <div className={styles.header}>
         <Tooltip tooltip="Hide chats" position="right">
-          <CircleButton onClick={() => setShowHistory(!showHistory)}>
-            <Category variant={"Bold"} size={24} />
-          </CircleButton>
+          <Button size={'medium'} variant={'ghost-neutral'} onClick={() => setShowHistory(!showHistory)}>
+            <Clock size={20} variant={'Bold'}/>
+            History
+          </Button>
         </Tooltip>
-        Chats
       </div>
       <div className={styles.chats}>
         {history?.length > 0 ? (
@@ -82,12 +83,18 @@ const History: React.FC<HistoryProps> = ({
               wrapperStyle={{width: '100%'}}
             >
               <div key={chat.id} id={`chat-${chat.id}`} className={styles.chat} onClick={() => onSelectChat(chat)}>
-                <span className={styles.chatText}>{chat.title}</span>
+                <span className={styles.chatText}>
+                  {
+                    chat.title.charAt(0) === '"' && chat.title.charAt(chat.title.length - 1) === '"'
+                      ? chat.title.substring(1, chat.title.length - 1)
+                      : chat.title
+                  }
+                </span>
               </div>
             </ContextMenu>
           ))
         ) : (
-          <div className={styles.emptyChatHistory}>No chat history available</div>
+          <div className={styles.baseHistoryItem}>No chat history available</div>
         )}
       </div>
     </div>

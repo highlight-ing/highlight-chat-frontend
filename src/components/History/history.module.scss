@@ -12,6 +12,7 @@
   border-right: 1px solid $light-5;
   overflow-x: hidden;
   transition: transform 250ms ease;
+  z-index: 2;
 
   &.show {
     pointer-events: initial;
@@ -25,11 +26,11 @@
 }
 
 .header {
-  height: 64px;
+  height: $topbar-height;
   display: flex;
   align-items: center;
   line-height: 1;
-  padding: 12px;
+  padding: 6px;
   border-bottom: 1px solid $light-10;
   font-size: 15px;
   gap: 8px;

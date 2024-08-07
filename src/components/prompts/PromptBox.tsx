@@ -1,6 +1,6 @@
 "use client";
 
-import { fetchPromptText } from "@/app/(app)/prompts/actions";
+import { fetchPromptText } from "@/utils/prompts";
 import { useStore } from "@/providers/store-provider";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/catalyst/button";

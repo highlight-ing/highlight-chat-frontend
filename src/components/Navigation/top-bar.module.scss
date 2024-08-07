@@ -1,14 +1,46 @@
+@use 'sass:color';
 @import '@/variables.module';
 
 .topBar {
+  position: fixed;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px;
-  border-bottom: 1px solid $light-10;
+  padding: 6px;
+  //border-bottom: 1px solid $light-10;
+  background-color: rgba(15, 15, 15, 0.5);
+  backdrop-filter: blur(16px);
   width: 100%;
-  height: 64px;
+  height: $topbar-height;
   font-size: 14px;
   font-weight: 500;
   color: $light-80;
+  z-index: 1;
+}
+
+.middle {
+  position: absolute;
+  left: calc(50% - 100px);
+  width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.promptSwitch {
+  color: $purple-100 !important;
+
+  &:hover {
+    background-color: $purple-20 !important;
+    color: $purple-100 !important;
+  }
+}
+
+.promptSwitchDull {
+  color: $light-40 !important;
+
+  &:hover {
+    background-color: $light-20 !important;
+    color: $light-100 !important;
+  }
 }

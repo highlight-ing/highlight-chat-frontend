@@ -1,5 +1,14 @@
 @import "@/variables.module";
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .inputContainer {
   display: flex;
   align-items: center;
@@ -10,15 +19,13 @@
   cursor: text;
   border-radius: 8px;
   width: 100%;
-  max-width: $chat-body-width;
   flex-shrink: 0;
-  position: absolute;
   bottom: 16px;
-  transform: translateY(0);
-  transition: transform 300ms ease;
+  animation: fadeIn 400ms forwards;
 
-  &.offset {
-    transform: translateY(calc(-50vh + 64px));
+  &.sticky {
+    position: absolute;
+    max-width: $chat-body-width;
   }
 
   &:hover {
@@ -30,8 +37,8 @@
     background-color: transparent;
     font-weight: 200;
     font-size: 16px;
-    //height: 100%;
     resize: none;
+    outline: none;
 
     &:focus {
       outline: none;

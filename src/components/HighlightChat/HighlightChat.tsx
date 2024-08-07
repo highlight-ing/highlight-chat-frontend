@@ -9,6 +9,8 @@ import TopBar from "@/components/Navigation/TopBar";
 import Messages from "@/components/Messages/Messages";
 import History from "@/components/History/History";
 import { useStore } from "@/providers/store-provider";
+import ChatHome from "@/components/ChatHome/ChatHome";
+import ChatHeader from "@/components/ChatHeader/ChatHeader";
 
 /**
  * Hook that handles pasting from the clipboard.
@@ -61,13 +63,16 @@ function useHandleClipboardPaste() {
 const HighlightChat = () => {
   // STATE
   const [isUserScrolling, setIsUserScrolling] = useState(false);
-  const { messages, input, inputIsDisabled } = useStore((state) => ({
+  const { messages, input, inputIsDisabled, promptName } = useStore((state) => ({
     messages: state.messages,
     input: state.input,
     inputIsDisabled: state.inputIsDisabled,
+    promptName: state.promptName,
   }));
 
   const [showHistory, setShowHistory] = useState(false);
+
+  const isChatting = (inputIsDisabled || messages.length > 0)
 
   // HOOKS
   useHandleClipboardPaste();
@@ -83,14 +88,19 @@ const HighlightChat = () => {
   return (
     <div className={styles.page}>
       <History showHistory={showHistory} setShowHistory={setShowHistory} />
+      <TopBar showHistory={showHistory} setShowHistory={setShowHistory} />
       <div
         className={`${styles.contents} ${
           showHistory ? styles.partial : styles.full
         }`}
       >
-        <TopBar showHistory={showHistory} setShowHistory={setShowHistory} />
-        {(inputIsDisabled || messages.length > 0) && <Messages />}
-        <Input offset={!inputIsDisabled && !messages.length} />
+        <ChatHeader isShowing={!!promptName && messages.length === 0}/>
+        {isChatting && <Messages />}
+        {
+          (isChatting || promptName) &&
+          <Input sticky={true} />
+        }
+        <ChatHome isShowing={!isChatting && !promptName}/>
       </div>
     </div>
   );
