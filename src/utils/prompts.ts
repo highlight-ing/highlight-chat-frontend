@@ -5,6 +5,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { JWTPayload, JWTVerifyResult } from "jose";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import {PromptApp} from "@/types";
 
 /**
  * Fetches the raw prompt text from the database.

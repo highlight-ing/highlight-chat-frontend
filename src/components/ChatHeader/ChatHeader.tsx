@@ -2,17 +2,7 @@ import {useStore} from "@/providers/store-provider";
 
 import styles from './chatheader.module.scss'
 import {MessageText} from "iconsax-react";
-import {PromptApp} from "@/types";
-
-const getPromptType = (selfUserId?: string, prompt?: PromptApp) => {
-  if (selfUserId && prompt && selfUserId === prompt?.user_id) {
-    return 'self'
-  }
-  if (prompt?.slug === 'hlchat') {
-    return 'official'
-  }
-  return 'community'
-}
+import {getPromptAppType} from "@/lib/promptapps";
 
 const ChatHeader = ({isShowing}: {isShowing: boolean}) => {
   const {promptApp, promptName, promptDescription, promptUserId} = useStore((state) => ({
@@ -22,7 +12,7 @@ const ChatHeader = ({isShowing}: {isShowing: boolean}) => {
     promptUserId: state.promptUserId
   }))
 
-  const promptType = getPromptType(promptUserId, promptApp)
+  const promptType = getPromptAppType(promptUserId, promptApp)
 
   return (
     <div className={`${styles.chatHeader} ${isShowing ? styles.show : ''}`}>

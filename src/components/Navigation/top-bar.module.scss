@@ -27,11 +27,29 @@
 }
 
 .promptSwitch {
-  color: $purple-100 !important;
+  &.official {
+    color: $pink-100 !important;
 
-  &:hover {
-    background-color: $purple-20 !important;
+    &:hover {
+      background-color: $pink-20 !important;
+      color: $pink-100 !important;
+    }
+  }
+  &.community {
+    color: $primary-100 !important;
+
+    &:hover {
+      background-color: $primary-20 !important;
+      color: $primary-100 !important;
+    }
+  }
+  &.self {
     color: $purple-100 !important;
+
+    &:hover {
+      background-color: $purple-20 !important;
+      color: $purple-100 !important;
+    }
   }
 }
 
