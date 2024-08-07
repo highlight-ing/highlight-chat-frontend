@@ -91,6 +91,23 @@ export default async function addAttachmentsToFormData(
   return { screenshot, audio, fileTitle, clipboardText, ocrText };
 }
 
+const prepareHighlightContext = (highlightContext: any) => {
+  if (!highlightContext) return "";
+
+  const processedContext = { ...highlightContext };
+
+  if (processedContext.attachments) {
+    processedContext.attachments = processedContext.attachments.filter(
+      (attachment: any) =>
+        attachment.type !== "screenshot" && attachment.type !== "audio"
+    );
+  }
+
+  return (
+    "\n\nHighlight Context:\n" + JSON.stringify(processedContext, null, 2)
+  );
+};
+
 export const useSubmitQuery = () => {
   const {post} = useApi()
 
@@ -199,6 +216,13 @@ export const useSubmitQuery = () => {
       context.attachments?.find((a) => a.type === "audio")?.value;
     let windowTitle = context.application?.focusedWindow?.title;
 
+    console.log("query: ", query)
+    console.log("clipboardText: ", clipboardText)
+    console.log("ocrScreenContents: ", ocrScreenContents)
+    console.log("screenshotUrl: ", screenshotUrl)
+    console.log("rawContents: ", rawContents)
+    console.log("audio: ", audio)
+
     if (
       query ||
       clipboardText ||
@@ -232,6 +256,13 @@ export const useSubmitQuery = () => {
 
       const contextAttachments = context.attachments || [];
       await addAttachmentsToFormData(formData, contextAttachments);
+
+      let contextString = prepareHighlightContext(context);
+
+       if (contextString.trim() !== "") {
+         formData.append("context", contextString);
+       }
+
       const accessToken = await getAccessToken();
       await fetchResponse(formData, accessToken);
     }
