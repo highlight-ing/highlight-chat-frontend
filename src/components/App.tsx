@@ -25,8 +25,8 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
       setInput(context.suggestion || "");
       await handleIncomingContext(
         context,
-        prompt,
-        navigateToNewChat
+        navigateToNewChat,
+        prompt
       );
     }
   );
