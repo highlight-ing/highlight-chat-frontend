@@ -216,13 +216,6 @@ export const useSubmitQuery = () => {
       context.attachments?.find((a) => a.type === "audio")?.value;
     let windowTitle = context.application?.focusedWindow?.title;
 
-    console.log("query: ", query)
-    console.log("clipboardText: ", clipboardText)
-    console.log("ocrScreenContents: ", ocrScreenContents)
-    console.log("screenshotUrl: ", screenshotUrl)
-    console.log("rawContents: ", rawContents)
-    console.log("audio: ", audio)
-
     if (
       query ||
       clipboardText ||
