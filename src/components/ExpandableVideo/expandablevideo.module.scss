@@ -1,0 +1,88 @@
+@import '@/variables.module';
+
+.example {
+  $is-fullscreen: false;
+  background-color: $light-5;
+  border-radius: 8px;
+  border: 1px solid $light-5;
+  cursor: #{if($is-fullscreen, 'normal', 'pointer')};
+
+  video {
+    width: 100%;
+    opacity: #{if($is-fullscreen, 1, 0.25)};
+    transition: opacity 100ms ease;
+    border-radius: 8px 8px 0 0;
+  }
+
+  &:hover,
+  &.active {
+    border-color: $light-10;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
+
+    video {
+      opacity: 1;
+    }
+
+    .description {
+      color: $light-80;
+    }
+  }
+}
+
+.videoControls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  .close {
+    position: absolute;
+    right: -42px;
+    top: 0;
+  }
+}
+
+.description {
+  gap: 12px;
+  padding: 8px 12px;
+  color: $light-40;
+  font-size: 12px;
+  font-weight: 350;
+  font-family: monospace;
+  transition: color 100ms ease;
+  align-items: center;
+
+  img {
+    border-radius: 6px;
+  }
+
+  span {
+    padding: 4px 0;
+  }
+}
+
+.open {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  cursor: pointer;
+
+  &:hover {
+    color: white;
+  }
+}
+
+.largeOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  background-color: rgba(0, 0, 0, 0.64);
+  backdrop-filter: blur(4px);
+}

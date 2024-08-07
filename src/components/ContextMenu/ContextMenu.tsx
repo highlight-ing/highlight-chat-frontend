@@ -95,6 +95,8 @@ const ContextMenu = ({
         break
     }
 
+    console.log('applied style:', position, styles)
+
     setAppliedStyle(styles)
   }
 

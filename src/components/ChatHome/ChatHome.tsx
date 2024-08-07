@@ -9,6 +9,7 @@ import {HighlightIcon} from "@/icons/icons";
 import usePromptApps from "@/hooks/usePromptApps";
 import Highlight from '@highlight-ai/app-runtime'
 import Hotkey from "@/components/Hotkey/Hotkey";
+import ExpandableVideo from "@/components/ExpandableVideo/ExpandableVideo";
 
 const ChatHome = ({isShowing}: {isShowing: boolean}) => {
   const { openModal } = useStore((state) => ({openModal: state.openModal}))
@@ -140,7 +141,7 @@ const HighlightTutorial = () => {
 
   return (
     <div className={styles.highlightTutorial}>
-      <div className={'flex flex-col gap-3'}>
+      <div className={'flex flex-col gap-3 flex-shrink-0'}>
         <div className={'flex items-center gap-3 text-light-60'}>
           <MouseCircle size={32} variant={'Bold'}/>
           <span>
@@ -157,7 +158,12 @@ const HighlightTutorial = () => {
           <div className={'flex items-center gap-1.5'}>Press <Hotkey hotkey={hotkey!}/> to Highlight what's on your screen</div>
         </div>
       </div>
-      video
+      <ExpandableVideo
+        src={'https://cdn.highlight.ing/media/examples/FloatyExample.mp4#t=0.1'}
+        style={{
+          maxWidth: '148px',
+        }}
+      />
     </div>
   )
 }

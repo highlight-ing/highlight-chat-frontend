@@ -38,7 +38,7 @@ interface MessageProps {
  *
  * Thanks to @prashantbhudwal on GitHub:
  * https://github.com/remarkjs/react-markdown/issues/785#issuecomment-1966495891
- * 
+ *
  * @param content
  */
 const preprocessLaTeX = (content: string) => {
