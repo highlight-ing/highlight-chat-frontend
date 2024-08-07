@@ -2,7 +2,7 @@ import { type HighlightContext } from "@highlight-ai/app-runtime";
 import imageCompression from "browser-image-compression";
 import { useStore } from "@/providers/store-provider";
 import useAuth from "./useAuth";
-import {useApi} from "@/hooks/useApi";
+import { useApi } from "@/hooks/useApi";
 
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024; // 1MB in bytes
@@ -107,7 +107,7 @@ const prepareHighlightContext = (highlightContext: any) => {
 };
 
 export const useSubmitQuery = () => {
-  const {post} = useApi()
+  const { post } = useApi();
 
   const { attachments, clearAttachments, input, setInput, setIsDisabled } =
     useStore((state) => ({
@@ -123,21 +123,14 @@ export const useSubmitQuery = () => {
     updateLastMessage: state.updateLastMessage,
   }));
 
-  const { getOrCreateConversationId, resetConversationId } = useStore(
-    (state) => ({
-      getOrCreateConversationId: state.getOrCreateConversationId,
-      resetConversationId: state.resetConversationId,
-    })
-  );
+  const { getOrCreateConversationId } = useStore((state) => ({
+    getOrCreateConversationId: state.getOrCreateConversationId,
+  }));
 
   const { getAccessToken } = useAuth();
 
   const { aboutMe } = useStore((state) => ({
     aboutMe: state.aboutMe,
-  }));
-
-  const { startNewConversation } = useStore((state) => ({
-    startNewConversation: state.startNewConversation,
   }));
 
   const fetchResponse = async (formData: FormData, token: string) => {
@@ -147,7 +140,7 @@ export const useSubmitQuery = () => {
       const conversationId = getOrCreateConversationId();
       formData.append("conversation_id", conversationId);
 
-      const response = await post('chat/', formData)
+      const response = await post("chat/", formData);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -175,7 +168,7 @@ export const useSubmitQuery = () => {
       console.error("Error fetching response:", error);
       addMessage({
         role: "assistant",
-        content: "Sorry, there was an error processing your request."
+        content: "Sorry, there was an error processing your request.",
       });
     } finally {
       setIsDisabled(false);
@@ -198,20 +191,24 @@ export const useSubmitQuery = () => {
       return;
     }
     // Check if the context is empty, only contains empty suggestion and attachments, or has no application data
-    if (!context.suggestion && (!context.attachments || context.attachments.length === 0)) {
+    if (
+      !context.suggestion &&
+      (!context.attachments || context.attachments.length === 0)
+    ) {
       console.log("Empty or invalid context received, ignoring.");
       return;
     }
 
     let query = context.suggestion || "";
-    let screenshotUrl =
-      context.attachments?.find((a) => a.type === "screenshot")?.value;
-    let clipboardText =
-      context.attachments?.find((a) => a.type === "clipboard")?.value;
+    let screenshotUrl = context.attachments?.find(
+      (a) => a.type === "screenshot"
+    )?.value;
+    let clipboardText = context.attachments?.find(
+      (a) => a.type === "clipboard"
+    )?.value;
     let ocrScreenContents = context.environment?.ocrScreenContents;
     let rawContents = context.application?.focusedWindow?.rawContents;
-    let audio =
-      context.attachments?.find((a) => a.type === "audio")?.value;
+    let audio = context.attachments?.find((a) => a.type === "audio")?.value;
     let windowTitle = context.application?.focusedWindow?.title;
 
     if (
@@ -228,7 +225,7 @@ export const useSubmitQuery = () => {
         clipboard_text: clipboardText,
         screenshot: screenshotUrl,
         audio,
-        window: windowTitle ? { title: windowTitle } : undefined, 
+        window: windowTitle ? { title: windowTitle } : undefined,
       });
 
       setInput("");
@@ -236,6 +233,8 @@ export const useSubmitQuery = () => {
 
       const formData = new FormData();
       formData.append("prompt", query);
+
+      console.log(systemPrompt);
       if (systemPrompt) {
         formData.append("system_prompt", systemPrompt);
       }
@@ -250,9 +249,9 @@ export const useSubmitQuery = () => {
 
       let contextString = prepareHighlightContext(context);
 
-       if (contextString.trim() !== "") {
-         formData.append("context", contextString);
-       }
+      if (contextString.trim() !== "") {
+        formData.append("context", contextString);
+      }
 
       const accessToken = await getAccessToken();
       await fetchResponse(formData, accessToken);
@@ -279,10 +278,8 @@ export const useSubmitQuery = () => {
         formData.append("about_me", JSON.stringify(aboutMe));
       }
 
-      const { screenshot, audio, fileTitle, clipboardText, ocrText } = await addAttachmentsToFormData(
-        formData,
-        attachments
-      );
+      const { screenshot, audio, fileTitle, clipboardText, ocrText } =
+        await addAttachmentsToFormData(formData, attachments);
 
       addMessage({
         role: "user",
@@ -290,7 +287,7 @@ export const useSubmitQuery = () => {
         screenshot,
         audio,
         file_title: fileTitle,
-        clipboard_text: clipboardText, 
+        clipboard_text: clipboardText,
       });
 
       setInput("");

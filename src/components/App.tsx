@@ -2,36 +2,34 @@
 
 import { useEffect, useCallback } from "react";
 import Highlight, { type HighlightContext } from "@highlight-ai/app-runtime";
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter } from "next/navigation";
 import { debounce } from "throttle-debounce";
 import { useSubmitQuery } from "@/hooks/useSubmitQuery";
 import { useStore } from "@/providers/store-provider";
 import Modals from "./modals/Modals";
-import {ModalContainer} from "@/components/modals/ModalContainer";
+import { ModalContainer } from "@/components/modals/ModalContainer";
 
 function useContextReceivedHandler(navigateToNewChat: () => void) {
-  const { addAttachment, setHighlightContext, setInput, prompt } = useStore((state) => ({
-    addAttachment: state.addAttachment,
-    setHighlightContext: state.setHighlightContext,
-    setInput: state.setInput,
-    prompt: state.prompt,
-  }));
+  const { addAttachment, setHighlightContext, setInput, prompt } = useStore(
+    (state) => ({
+      addAttachment: state.addAttachment,
+      setHighlightContext: state.setHighlightContext,
+      setInput: state.setInput,
+      prompt: state.prompt,
+    })
+  );
 
   const { handleIncomingContext } = useSubmitQuery();
 
-  const debouncedHandleSubmit = debounce(
-    300,
-    async (context: HighlightContext) => {
-      setInput(context.suggestion || "");
-      await handleIncomingContext(
-        context,
-        navigateToNewChat,
-        prompt
-      );
-    }
-  );
-
   useEffect(() => {
+    const debouncedHandleSubmit = debounce(
+      300,
+      async (context: HighlightContext) => {
+        setInput(context.suggestion || "");
+        await handleIncomingContext(context, navigateToNewChat, prompt);
+      }
+    );
+
     const contextDestroyer = Highlight.app.addListener(
       "onContext",
       (context: HighlightContext) => {
@@ -65,7 +63,7 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
       contextDestroyer();
       attachmentDestroyer();
     };
-  }, []);
+  }, [prompt]);
 }
 
 /**
@@ -99,13 +97,13 @@ export default function App({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   const navigateToNewChat = useCallback(() => {
-    if (pathname !== '/') {
+    if (pathname !== "/") {
       router.push("/");
     }
   }, [pathname, router]);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && !Highlight.isRunningInHighlight()) {
+    if (typeof window !== "undefined" && !Highlight.isRunningInHighlight()) {
       window.location.href = "https://highlight.ing/apps/highlightchat";
     }
   }, []);
@@ -116,7 +114,7 @@ export default function App({ children }: { children: React.ReactNode }) {
   return (
     <>
       {children}
-      <ModalContainer/>
+      <ModalContainer />
       <Modals />
     </>
   );
