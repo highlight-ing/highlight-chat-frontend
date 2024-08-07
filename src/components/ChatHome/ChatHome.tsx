@@ -1,23 +1,39 @@
 import variables from '@/variables.module.scss'
 import styles from './chathome.module.scss'
+import mainStyles from '@/main.module.scss'
 import {AddCircle, MouseCircle, SearchStatus, Setting} from "iconsax-react";
 import React, {useEffect, useState} from "react";
-import {Prompt} from "@/types/supabase-helpers";
-import useAuth from "@/hooks/useAuth";
-import {fetchPrompts} from "@/utils/prompts";
 import {useStore} from "@/providers/store-provider";
 import PromptListRow from "@/components/prompts/PromptListRow";
 import {Input} from "@/components/Input/Input";
 import {HighlightIcon} from "@/icons/icons";
 import usePromptApps from "@/hooks/usePromptApps";
+import Highlight from '@highlight-ai/app-runtime'
+import Hotkey from "@/components/Hotkey/Hotkey";
+import ExpandableVideo from "@/components/ExpandableVideo/ExpandableVideo";
 
 const ChatHome = ({isShowing}: {isShowing: boolean}) => {
   const { openModal } = useStore((state) => ({openModal: state.openModal}))
+  const [isVisible, setVisible] = useState(isShowing)
+
+  useEffect(() => {
+    if (isShowing) {
+      setVisible(true)
+    } else {
+      setTimeout(() => {
+        setVisible(false)
+      }, 500)
+    }
+  }, [isShowing])
+
   return (
     <div className={`${styles.chatHomeContainer} ${isShowing ? styles.show : ''}`}>
       <div className={styles.input}>
         <InputHeading />
-        <Input sticky={false} />
+        {
+          isVisible &&
+          <Input sticky={false} />
+        }
       </div>
       <div className={styles.callouts}>
         <Callout
@@ -82,12 +98,28 @@ const Callout = ({icon, title, description, onClick}: {icon: React.ReactElement,
 
 
 const Prompts = () => {
-  const { getAccessToken } = useAuth();
   const { openModal } = useStore((state) => state)
-  const { myPrompts } = usePromptApps()
+  const { isLoadingPrompts, myPrompts } = usePromptApps()
+  const [hotkey, setHotkey] = useState<string>('alt + .')
+
+  useEffect(() => {
+    const fetchHotkey = async () => {
+      const hotkey = await Highlight.app.getHotkey()
+      setHotkey(hotkey)
+    }
+    fetchHotkey()
+  }, [])
+
+  if (isLoadingPrompts) {
+    return (
+      <div className={`${styles.prompts} ${mainStyles.loadingGradient}`}>
+        <div className={'w-full h-20 p-16'}/>
+      </div>
+    )
+  }
 
   if (!myPrompts.length) {
-    return null
+    return <HighlightTutorial hotkey={hotkey}/>
   }
 
   return (
@@ -114,10 +146,10 @@ const Prompts = () => {
   )
 }
 
-const HighlightTutorial = () => {
+const HighlightTutorial = ({hotkey}: {hotkey: string}) => {
   return (
     <div className={styles.highlightTutorial}>
-      <div className={'flex flex-col gap-3'}>
+      <div className={'flex flex-col gap-3 flex-shrink-0'}>
         <div className={'flex items-center gap-3 text-light-60'}>
           <MouseCircle size={32} variant={'Bold'}/>
           <span>
@@ -131,10 +163,15 @@ const HighlightTutorial = () => {
         </div>
         <div className={'flex items-center gap-3 text-light-60'}>
           <SearchStatus size={32} variant={'Bold'}/>
-          <span>Press cmd + ; to Highlight what's on your screen</span>
+          <div className={'flex items-center gap-1.5'}>Press <Hotkey hotkey={hotkey}/> to Highlight what's on your screen</div>
         </div>
       </div>
-      video
+      <ExpandableVideo
+        src={'https://cdn.highlight.ing/media/examples/FloatyExample.mp4#t=0.1'}
+        style={{
+          maxWidth: '148px',
+        }}
+      />
     </div>
   )
 }

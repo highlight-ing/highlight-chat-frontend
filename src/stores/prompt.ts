@@ -1,10 +1,15 @@
 import { StateCreator } from "zustand";
+import {PromptApp} from "@/types";
 
 export interface PromptState {
   /**
    * Stores the actual prompt that is used to generate the response
    */
   prompt?: string;
+  /**
+   * The selected prompt app object.
+   */
+  promptApp?: PromptApp;
   /**
    * The friendly name of the prompt, displayed to the user.
    */
@@ -23,6 +28,7 @@ export type PromptSlice = PromptState & {
 
 export const initialPromptState: PromptState = {
   prompt: undefined,
+  promptApp: undefined,
   promptName: undefined,
   promptDescription: undefined,
   promptAppName: undefined,

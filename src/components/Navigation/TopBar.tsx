@@ -20,15 +20,17 @@ import variables from '@/variables.module.scss'
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const router = useRouter();
 
-  const { startNewConversation, promptName, openModal, messages } = useStore((state) => ({
+  const { startNewConversation, promptName, openModal, messages, clearPrompt } = useStore((state) => ({
     startNewConversation: state.startNewConversation,
     promptName: state.promptName,
     openModal: state.openModal,
-    messages: state.messages
+    messages: state.messages,
+    clearPrompt: state.clearPrompt
   }));
 
   const onNewChatClick = () => {
     startNewConversation();
+    clearPrompt()
 
     router.push("/");
   };

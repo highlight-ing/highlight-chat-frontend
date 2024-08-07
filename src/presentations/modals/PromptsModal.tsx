@@ -1,10 +1,8 @@
 import {ModalObjectProps, PromptApp} from "@/types";
 import Modal from "@/components/modals/Modal";
-import useAuth from "@/hooks/useAuth";
 import {useStore} from "@/providers/store-provider";
-import React, {useEffect, useMemo, useState} from "react";
-import {Prompt} from "@/types/supabase-helpers";
-import {fetchPrompts, fetchPromptText} from "@/utils/prompts";
+import React, {useMemo} from "react";
+import {fetchPromptText} from "@/utils/prompts";
 import PromptListRow from "@/components/prompts/PromptListRow";
 import styles from './modals.module.scss'
 import {Divider} from "@/components/catalyst/divider";
@@ -48,6 +46,7 @@ const PromptsModal = ({id, context}: ModalObjectProps) => {
     const text = await fetchPromptText(prompt.slug!);
 
     setPrompt({
+      promptApp: prompt,
       promptName: prompt.name,
       promptDescription: prompt.description!,
       promptAppName: prompt.slug!,

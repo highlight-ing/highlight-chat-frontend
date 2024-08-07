@@ -9,8 +9,8 @@
   opacity: 0;
   padding-top: 48px;
   pointer-events: none;
-  min-width: min(800px, 95vw);
-  max-width: min(800px, 95vw);
+  min-width: min(800px, 95%);
+  max-width: min(800px, 95%);
 
   &.show {
     position: relative;
@@ -21,8 +21,8 @@
       transform: scale(1)
     }
 
-    .prompts {
-      transform: translateY(0px);
+    .prompts, .highlightTutorial {
+      transform: none;
       opacity: 1;
     }
 
@@ -95,7 +95,7 @@
   background-color: $light-5;
   padding: 8px;
   gap: 8px;
-  border-radius: 20px;
+  border-radius: 24px;
   opacity: 0;
   transition: opacity 300ms ease, transform 300ms ease;
   transform: translateY(100px);
@@ -271,9 +271,13 @@
 
 .highlightTutorial {
   display: flex;
+  justify-content: space-between;
   padding: 20px;
+  gap: 20px;
   border-radius: 24px;
   background-color: $light-5;
   font-size: 15px;
   font-weight: 300;
+  transition: opacity 300ms ease, transform 300ms ease;
+  transform: translateY(100px);
 }

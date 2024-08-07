@@ -1,0 +1,19 @@
+@import '@/variables.module';
+
+.hotkeyContainer {
+  display: flex;
+  gap: 5px;
+}
+
+.hotkey {
+  display: flex;
+  align-items: center;
+  color: $light-60;
+  border-bottom: 2px solid $dark-40;
+  background-color: $light-20;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.32);
+  border-radius: 5px;
+  padding: 4px 6px;
+  font-size: 12px;
+  font-weight: bold;
+}
