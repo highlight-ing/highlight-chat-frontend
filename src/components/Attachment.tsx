@@ -20,7 +20,7 @@ export const Attachment = ({ type, value, isFile = false, removeEnabled = false 
     fileInputRef: state.fileInputRef
   }))
 
-  const { imageUrl, isLoading, error } = useImageDownload(type === 'image' && !value.startsWith('data:image') ? value : null)
+  const { imageUrl, isLoading, error } = useImageDownload(type === 'image' && !value.startsWith('data:image') && !value.startsWith('blob:') ? value : null)
 
   const onRemoveAttachment = () => {
     removeAttachment(type)
@@ -33,11 +33,12 @@ export const Attachment = ({ type, value, isFile = false, removeEnabled = false 
     switch (type) {
       case 'image':
         const isBase64 = value.startsWith('data:image');
-        if (isBase64) {
+        const isBlob = value.startsWith('blob:');
+        if (isBase64 || isBlob) {
           // Local image (base64)
           return (
             <img
-              className="transition-opacity transition-padding duration-150 ease-in-out flex h-12 w-auto max-w-20 items-center overflow-hidden rounded-sm pointer-events-none"
+              className="transition-opacity transition-padding duration-150 ease-in-out flex h-12 w-auto max-w-20 items-center overflow-hidden rounded-sm pointer-events-none object-cover"
               src={value}
               alt="Attachment"
             />
@@ -54,7 +55,7 @@ export const Attachment = ({ type, value, isFile = false, removeEnabled = false 
           if (error) return <GallerySlash size={32} color="#FF8A65" />
           return (
             <img
-              className="transition-opacity transition-padding duration-150 ease-in-out flex h-12 w-auto max-w-20 items-center overflow-hidden rounded-sm opacity-50 pointer-events-none"
+              className="transition-opacity transition-padding duration-150 ease-in-out flex h-12 w-auto max-w-20 items-center overflow-hidden rounded-sm opacity-50 pointer-events-none object-cover"
               style={{ opacity: isImageLoaded ? 1 : 0 }}
               src={imageUrl || value}
               onLoad={() => setIsImageLoaded(true)}
@@ -91,7 +92,7 @@ export const Attachment = ({ type, value, isFile = false, removeEnabled = false 
         <div
           className={`flex items-center justify-center h-12 rounded-md border border-light-10 bg-light-20 ${
             type === 'pdf' ? 'max-w-40' : 'max-w-20'
-          } ${type !== 'image' ? 'min-w-12' : 'min-w-20'} w-fit overflow-hidden`}
+          } ${type !== 'image' ? 'min-w-12' : 'min-w-8'} w-fit overflow-hidden`}
         >
           {renderAttachmentContent()}
         </div>
