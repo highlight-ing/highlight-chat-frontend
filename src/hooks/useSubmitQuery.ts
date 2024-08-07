@@ -103,9 +103,7 @@ const prepareHighlightContext = (highlightContext: any) => {
     );
   }
 
-  return (
-    "\n\nHighlight Context:\n" + JSON.stringify(processedContext, null, 2)
-  );
+  return JSON.stringify(processedContext);
 };
 
 export const useSubmitQuery = () => {
