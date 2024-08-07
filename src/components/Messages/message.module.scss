@@ -51,7 +51,7 @@
   //display: flex;
   //flex-direction: column;
   gap: 8px;
-  //white-space: pre-wrap;
+  white-space: pre-wrap;
 
   strong {
     color: $light-80;
@@ -62,16 +62,19 @@
     padding: 0;
     //margin: 1em 0;
     margin-inline-start: 1.5em;
+    white-space: initial;
   }
   ul {
     list-style: disc;
     padding: 0;
     //margin: 1em 0;
     margin-inline-start: 1.5em;
+    white-space: initial;
   }
   li {
     padding: 0;
     margin: 0.5em 0;
+    white-space: initial;
   }
 
   h1, h2, h3, h4 {
@@ -103,7 +106,7 @@
   table {
     border-radius: 8px;
     overflow: hidden;
-    margin: 16px 0;
+    //margin: 16px 0;
     width: 100%;
   }
   th {

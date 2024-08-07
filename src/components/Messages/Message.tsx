@@ -9,6 +9,12 @@ import { Attachment } from "../Attachment";
 import styles from "./message.module.scss";
 import TypedText from "@/components/TypedText/TypedText";
 import CodeBlock from "@/components/Messages/CodeBlock";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import 'katex/dist/katex.min.css';
+
+// @ts-ignore
+import { BlockMath, InlineMath } from 'react-katex'
 
 const hasAttachment = (message: UserMessage) => {
   return (
@@ -25,6 +31,29 @@ interface MessageProps {
   isThinking?: boolean;
   message: MessageType;
 }
+
+/**
+ * LLMs spit out formulas with delimiters that katex doesn't recognize.
+ * In this case, we try to replace it with `$$` delimiters.
+ *
+ * Thanks to @prashantbhudwal on GitHub:
+ * https://github.com/remarkjs/react-markdown/issues/785#issuecomment-1966495891
+ * 
+ * @param content
+ */
+const preprocessLaTeX = (content: string) => {
+  // Replace block-level LaTeX delimiters \[ \] with $$ $$
+  const blockProcessedContent = content.replace(
+    /\\\[(.*?)\\\]/g,
+    (_, equation) => `$$${equation}$$`,
+  );
+  // Replace inline LaTeX delimiters \( \) with $ $
+  const inlineProcessedContent = blockProcessedContent.replace(
+    /\\\((.*?)\\\)/g,
+    (_, equation) => `$${equation}$`,
+  );
+  return inlineProcessedContent;
+};
 
 export const Message = ({ message, isThinking }: MessageProps) => {
   return (
@@ -64,7 +93,8 @@ export const Message = ({ message, isThinking }: MessageProps) => {
           )}
           <div className={styles.messageBody}>
             <Markdown
-              remarkPlugins={[remarkGfm]}
+              remarkPlugins={[remarkGfm, remarkMath]}
+              rehypePlugins={[rehypeKatex]}
               components={{
                 // @ts-ignore
                 code({node, inline, className, children, ...props}) {
@@ -115,7 +145,7 @@ export const Message = ({ message, isThinking }: MessageProps) => {
               //     }
               // }}}
             >
-              {typeof message.content === "string" ? message.content : ""}
+              {typeof message.content === "string" ? preprocessLaTeX(message.content) : ""}
             </Markdown>
           </div>
         </div>
