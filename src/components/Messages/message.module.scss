@@ -17,11 +17,9 @@
   animation: fadeIn 200ms forwards;
 
   &.self {
-    //justify-content: flex-end;
-
     .message {
       background-color: transparent;
-      //align-items: flex-end;
+      border: 1px solid $light-10;
     }
   }
 
@@ -31,10 +29,8 @@
     border-radius: 12px;
     padding: 16px;
     background-color: $light-5;
-    border: 1px solid $light-10;
     gap: 16px;
     width: 100%;
-    //max-width: 100%;
   }
 }
 
@@ -61,14 +57,12 @@
   ol {
     list-style: disc;
     padding: 0;
-    //margin: 1em 0;
     margin-inline-start: 1.5em;
     white-space: initial;
   }
   ul {
     list-style: disc;
     padding: 0;
-    //margin: 1em 0;
     margin-inline-start: 1.5em;
     white-space: initial;
   }
@@ -107,7 +101,6 @@
   table {
     border-radius: 8px;
     overflow: hidden;
-    //margin: 16px 0;
     width: 100%;
   }
   th {
