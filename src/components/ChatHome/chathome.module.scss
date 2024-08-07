@@ -95,7 +95,7 @@
   background-color: $light-5;
   padding: 8px;
   gap: 8px;
-  border-radius: 20px;
+  border-radius: 24px;
   opacity: 0;
   transition: opacity 300ms ease, transform 300ms ease;
   transform: translateY(100px);
@@ -271,6 +271,7 @@
 
 .highlightTutorial {
   display: flex;
+  justify-content: space-between;
   padding: 20px;
   border-radius: 24px;
   background-color: $light-5;

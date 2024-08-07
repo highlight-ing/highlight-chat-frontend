@@ -8,6 +8,8 @@ import PromptListRow from "@/components/prompts/PromptListRow";
 import {Input} from "@/components/Input/Input";
 import {HighlightIcon} from "@/icons/icons";
 import usePromptApps from "@/hooks/usePromptApps";
+import Highlight from '@highlight-ai/app-runtime'
+import Hotkey from "@/components/Hotkey/Hotkey";
 
 const ChatHome = ({isShowing}: {isShowing: boolean}) => {
   const { openModal } = useStore((state) => ({openModal: state.openModal}))
@@ -95,12 +97,11 @@ const Callout = ({icon, title, description, onClick}: {icon: React.ReactElement,
 
 
 const Prompts = () => {
-  const { getAccessToken } = useAuth();
   const { openModal } = useStore((state) => state)
   const { myPrompts } = usePromptApps()
 
   if (!myPrompts.length) {
-    return null
+    return <HighlightTutorial/>
   }
 
   return (
@@ -128,6 +129,16 @@ const Prompts = () => {
 }
 
 const HighlightTutorial = () => {
+  const [hotkey, setHotkey] = useState<string>('alt + .')
+
+  useEffect(() => {
+    const fetchHotkey = async () => {
+      const hotkey = await Highlight.app.getHotkey()
+      setHotkey(hotkey)
+    }
+    fetchHotkey()
+  }, [])
+
   return (
     <div className={styles.highlightTutorial}>
       <div className={'flex flex-col gap-3'}>
@@ -144,7 +155,7 @@ const HighlightTutorial = () => {
         </div>
         <div className={'flex items-center gap-3 text-light-60'}>
           <SearchStatus size={32} variant={'Bold'}/>
-          <span>Press cmd + ; to Highlight what's on your screen</span>
+          <div className={'flex items-center gap-1.5'}>Press <Hotkey hotkey={hotkey!}/> to Highlight what's on your screen</div>
         </div>
       </div>
       video
