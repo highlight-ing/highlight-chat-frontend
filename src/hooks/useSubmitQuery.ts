@@ -217,7 +217,7 @@ export const useSubmitQuery = () => {
       });
 
       setInput("");
-      clearAttachments(); // Clear the attachment immediately
+      // clearAttachments(); // Clear the attachment immediately
 
       const formData = new FormData();
       formData.append("prompt", query);
