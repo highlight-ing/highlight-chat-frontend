@@ -91,6 +91,21 @@ export default async function addAttachmentsToFormData(
   return { screenshot, audio, fileTitle, clipboardText, ocrText };
 }
 
+const prepareHighlightContext = (highlightContext: any) => {
+  if (!highlightContext) return "";
+
+  const processedContext = { ...highlightContext };
+
+  if (processedContext.attachments) {
+    processedContext.attachments = processedContext.attachments.filter(
+      (attachment: any) =>
+        attachment.type !== "screenshot" && attachment.type !== "audio"
+    );
+  }
+
+  return JSON.stringify(processedContext);
+};
+
 export const useSubmitQuery = () => {
   const {post} = useApi()
 
@@ -207,10 +222,6 @@ export const useSubmitQuery = () => {
       rawContents ||
       audio
     ) {
-      resetConversationId();
-      startNewConversation();
-      navigateToNewChat();
-
       addMessage({
         role: "user",
         content: query,
@@ -236,6 +247,13 @@ export const useSubmitQuery = () => {
 
       const contextAttachments = context.attachments || [];
       await addAttachmentsToFormData(formData, contextAttachments);
+
+      let contextString = prepareHighlightContext(context);
+
+       if (contextString.trim() !== "") {
+         formData.append("context", contextString);
+       }
+
       const accessToken = await getAccessToken();
       await fetchResponse(formData, accessToken);
     }
