@@ -1,25 +1,18 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import Highlight, { type HighlightContext } from "@highlight-ai/app-runtime";
-
+import { usePathname, useRouter } from 'next/navigation';
 import { debounce } from "throttle-debounce";
 import { useSubmitQuery } from "@/hooks/useSubmitQuery";
 import { useStore } from "@/providers/store-provider";
 import Modals from "./modals/Modals";
 import {ModalContainer} from "@/components/modals/ModalContainer";
 
-/**
- * When the Highlight runtime sends us context, handle it by setting the input to the suggestion the user picked
- * and then calling the handleIncomingContext function.
- */
-function useContextRecievedHandler() {
-  const { addAttachment, setHighlightContext } = useStore((state) => ({
+function useContextReceivedHandler(navigateToNewChat: () => void) {
+  const { addAttachment, setHighlightContext, setInput, prompt } = useStore((state) => ({
     addAttachment: state.addAttachment,
     setHighlightContext: state.setHighlightContext,
-  }));
-
-  const { setInput, prompt } = useStore((state) => ({
     setInput: state.setInput,
     prompt: state.prompt,
   }));
@@ -30,7 +23,11 @@ function useContextRecievedHandler() {
     300,
     async (context: HighlightContext) => {
       setInput(context.suggestion || "");
-      await handleIncomingContext(context, prompt);
+      await handleIncomingContext(
+        context,
+        prompt,
+        navigateToNewChat
+      );
     }
   );
 
@@ -46,9 +43,8 @@ function useContextRecievedHandler() {
     const attachmentDestroyer = Highlight.app.addListener(
       "onConversationAttachment",
       (attachment: string) => {
-        // Handle the attachment here
         console.log(
-          "[useContextRecievedHandler] Received conversation attachment:",
+          "[useContextReceivedHandler] Received conversation attachment:",
           attachment
         );
 
@@ -59,7 +55,7 @@ function useContextRecievedHandler() {
         });
 
         console.log(
-          "[useContextRecievedHandler] Added attachment:",
+          "[useContextReceivedHandler] Added attachment:",
           attachment
         );
       }
@@ -99,17 +95,22 @@ function useAboutMeRegister() {
  * This should hold all the providers.
  */
 export default function App({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const router = useRouter();
 
-  // Require that Highlight Chat is running within Highlight
+  const navigateToNewChat = useCallback(() => {
+    if (pathname !== '/') {
+      router.push("/");
+    }
+  }, [pathname, router]);
+
   useEffect(() => {
-    if (!Highlight.isRunningInHighlight()) {
-      // Redirect them to the Highlight App Store page
+    if (typeof window !== 'undefined' && !Highlight.isRunningInHighlight()) {
       window.location.href = "https://highlight.ing/apps/highlightchat";
     }
   }, []);
 
-
-  useContextRecievedHandler();
+  useContextReceivedHandler(navigateToNewChat);
   useAboutMeRegister();
 
   return (
