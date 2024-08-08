@@ -178,7 +178,7 @@ export const useSubmitQuery = () => {
   const handleIncomingContext = async (
     context: HighlightContext,
     navigateToNewChat: () => void,
-    appId?: string
+    systemPrompt?: string
   ) => {
     console.log("Received context inside handleIncomingContext: ", context);
     if (!context.suggestion || context.suggestion.trim() === "") {
@@ -234,9 +234,9 @@ export const useSubmitQuery = () => {
       const formData = new FormData();
       formData.append("prompt", query);
 
-      console.log(appId);
-      if (appId) {
-        formData.append("app_id", appId);
+      console.log(systemPrompt);
+      if (systemPrompt) {
+        formData.append("system_prompt", systemPrompt);
       }
 
       // Add about_me to form data
