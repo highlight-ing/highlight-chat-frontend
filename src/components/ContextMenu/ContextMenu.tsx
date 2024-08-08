@@ -56,10 +56,20 @@ const ContextMenu = ({
       case 'top':
         styles.bottom = window.innerHeight - targetRect.top + PIXEL_SPACING + offset
         styles.left = targetRect.left + targetRect.width / 2 - elem.offsetWidth / 2
+
+        if (elem.offsetHeight - styles.bottom < 0) {
+          styles.top = targetRect.bottom + PIXEL_SPACING + offset
+          styles.left = targetRect.left + targetRect.width / 2 - elem.offsetWidth / 2
+        }
         break
       case 'bottom':
         styles.top = targetRect.bottom + PIXEL_SPACING + offset
         styles.left = targetRect.left + targetRect.width / 2 - elem.offsetWidth / 2
+
+        if (elem.offsetHeight + styles.top > window.innerHeight) {
+          styles.bottom = window.innerHeight - targetRect.top + PIXEL_SPACING + offset
+          styles.left = targetRect.left + targetRect.width / 2 - elem.offsetWidth / 2
+        }
         break
       case 'left':
         styles.top = targetRect.top

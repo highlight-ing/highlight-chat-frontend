@@ -7,8 +7,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 6px;
-  //border-bottom: 1px solid $light-10;
-  background-color: rgba(17, 17, 17, 0.5);
+  background-color: rgba(16, 16, 16, 0.5);
   backdrop-filter: blur(16px);
   width: 100%;
   height: $topbar-height;
@@ -28,19 +27,36 @@
 }
 
 .promptSwitch {
-  color: $purple-100 !important;
+  &.default {
+    color: $light-40 !important;
 
-  &:hover {
-    background-color: $purple-20 !important;
-    color: $purple-100 !important;
+    &:hover {
+      background-color: $light-20 !important;
+      color: $light-100 !important;
+    }
   }
-}
+  &.official {
+    color: $pink-100 !important;
 
-.promptSwitchDull {
-  color: $light-40 !important;
+    &:hover {
+      background-color: $pink-20 !important;
+      color: $pink-100 !important;
+    }
+  }
+  &.community {
+    color: $primary-100 !important;
 
-  &:hover {
-    background-color: $light-20 !important;
-    color: $light-100 !important;
+    &:hover {
+      background-color: $primary-20 !important;
+      color: $primary-100 !important;
+    }
+  }
+  &.self {
+    color: $purple-100 !important;
+
+    &:hover {
+      background-color: $purple-20 !important;
+      color: $purple-100 !important;
+    }
   }
 }

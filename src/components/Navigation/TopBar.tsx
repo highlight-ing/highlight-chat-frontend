@@ -16,15 +16,18 @@ import { useRouter } from "next/navigation";
 import Button from "@/components/Button/Button";
 import {HighlightIcon} from "@/icons/icons";
 import variables from '@/variables.module.scss'
+import {getPromptAppType} from "@/lib/promptapps";
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const router = useRouter();
 
-  const { startNewConversation, promptName, openModal, messages, clearPrompt } = useStore((state) => ({
+  const { startNewConversation, promptName, openModal, messages, promptApp, promptUserId, clearPrompt } = useStore((state) => ({
     startNewConversation: state.startNewConversation,
     promptName: state.promptName,
     openModal: state.openModal,
     messages: state.messages,
+    promptApp: state.promptApp,
+    promptUserId: state.promptUserId,
     clearPrompt: state.clearPrompt
   }));
 
@@ -40,6 +43,8 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
       setShowHistory(!showHistory);
     }
   };
+
+  const promptType = promptApp ? getPromptAppType(promptUserId, promptApp) : undefined
 
   return (
     <div className={styles.topBar}>
@@ -62,7 +67,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
           <Tooltip tooltip="Switch chat app" position="bottom">
             <CircleButton
               fitContents={true}
-              className={!!promptName ? (!messages.length ? styles.promptSwitchDull : styles.promptSwitch) : undefined}
+              className={`${styles.promptSwitch} ${promptType ? styles[(!promptName || !messages.length) ? 'default' : promptType] : ''}`}
               onClick={() => openModal('prompts-modal')}
             >
               {
