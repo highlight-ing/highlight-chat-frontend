@@ -15,14 +15,14 @@ const MAX_INPUT_HEIGHT = 160;
  * This is the main Highlight Chat input box, not a reusable Input component.
  */
 export const Input = ({ sticky }: { sticky: boolean }) => {
-  const { attachments, input, setInput, inputIsDisabled, promptName, prompt } =
+  const { attachments, input, setInput, inputIsDisabled, promptName, promptApp } =
     useStore((state) => ({
       attachments: state.attachments,
       input: state.input,
       setInput: state.setInput,
       inputIsDisabled: state.inputIsDisabled,
       promptName: state.promptName,
-      prompt: state.prompt,
+      promptApp: state.promptApp,
     }));
 
   const { handleSubmit } = useSubmitQuery();
@@ -32,7 +32,7 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (!inputIsDisabled && e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(prompt);
+      handleSubmit(promptApp);
       setInput("");
     }
   };

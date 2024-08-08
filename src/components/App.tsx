@@ -63,7 +63,7 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
       contextDestroyer();
       attachmentDestroyer();
     };
-  }, [prompt]);
+  }, [promptApp]);
 }
 
 /**
