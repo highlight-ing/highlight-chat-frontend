@@ -259,7 +259,7 @@ export const useSubmitQuery = () => {
     }
   };
 
-  const handleSubmit = async (systemPrompt?: string) => {
+  const handleSubmit = async (promptApp?: PromptApp) => {
     const query = input.trim();
 
     if (!query) {
@@ -270,8 +270,8 @@ export const useSubmitQuery = () => {
     if (query) {
       const formData = new FormData();
       formData.append("prompt", query);
-      if (systemPrompt) {
-        formData.append("system_prompt", systemPrompt);
+      if (promptApp) {
+        formData.append("app_id", promptApp.id.toString());
       }
 
       // Add about_me to form data
