@@ -44,6 +44,16 @@
   padding: 8px;
   gap: 1px;
   user-select: none;
+
+  h1 {
+    font-size: 13px;
+    color: $light-80;
+    padding: 8px 8px 2px;
+  }
+
+  h1:not(:first-child) {
+    margin-top: 8px;
+  }
 }
 
 .baseHistoryItem {
