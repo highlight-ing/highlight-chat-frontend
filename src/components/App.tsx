@@ -10,12 +10,12 @@ import Modals from "./modals/Modals";
 import { ModalContainer } from "@/components/modals/ModalContainer";
 
 function useContextReceivedHandler(navigateToNewChat: () => void) {
-  const { addAttachment, setHighlightContext, setInput, prompt } = useStore(
+  const { addAttachment, setHighlightContext, setInput, promptApp } = useStore(
     (state) => ({
       addAttachment: state.addAttachment,
       setHighlightContext: state.setHighlightContext,
       setInput: state.setInput,
-      prompt: state.prompt,
+      promptApp: state.promptApp,
     })
   );
 
@@ -26,7 +26,7 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
       300,
       async (context: HighlightContext) => {
         setInput(context.suggestion || "");
-        await handleIncomingContext(context, navigateToNewChat, prompt);
+        await handleIncomingContext(context, navigateToNewChat, promptApp);
       }
     );
 
