@@ -3,6 +3,7 @@ import imageCompression from "browser-image-compression";
 import { useStore } from "@/providers/store-provider";
 import useAuth from "./useAuth";
 import { useApi } from "@/hooks/useApi";
+import { PromptApp } from "@/types";
 
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024; // 1MB in bytes
@@ -178,7 +179,7 @@ export const useSubmitQuery = () => {
   const handleIncomingContext = async (
     context: HighlightContext,
     navigateToNewChat: () => void,
-    systemPrompt?: string
+    promptApp?: PromptApp
   ) => {
     console.log("Received context inside handleIncomingContext: ", context);
     if (!context.suggestion || context.suggestion.trim() === "") {
@@ -234,9 +235,9 @@ export const useSubmitQuery = () => {
       const formData = new FormData();
       formData.append("prompt", query);
 
-      console.log(systemPrompt);
-      if (systemPrompt) {
-        formData.append("system_prompt", systemPrompt);
+      console.log("prompt app: ", promptApp);
+      if (promptApp) {
+        formData.append("app_id", promptApp.id.toString());
       }
 
       // Add about_me to form data
