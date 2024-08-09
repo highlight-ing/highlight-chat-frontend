@@ -50,7 +50,7 @@ const BaseModal = ({
   showClose,
   bodyClassName,
 }: PropsWithChildren<ModalProps & BaseModalProps>) => {
-  const { modals } = useStore((state) => ({modals: state.modals}))
+  const modals = useStore((state) => state.modals)
 
   const close = (e: null | React.MouseEvent, force?: boolean) => {
     // @ts-ignore

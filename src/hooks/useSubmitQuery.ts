@@ -1,9 +1,11 @@
 import { type HighlightContext } from "@highlight-ai/app-runtime";
+import Highlight from "@highlight-ai/app-runtime";
 import imageCompression from "browser-image-compression";
 import { useStore } from "@/providers/store-provider";
 import useAuth from "./useAuth";
 import { useApi } from "@/hooks/useApi";
-import Highlight from "@highlight-ai/app-runtime";
+import { PromptApp } from "@/types";
+import { useShallow } from "zustand/react/shallow";
 
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024; // 1MB in bytes
@@ -115,29 +117,31 @@ const prepareHighlightContext = (highlightContext: any) => {
 export const useSubmitQuery = () => {
   const { post } = useApi();
 
-  const { attachments, clearAttachments, input, setInput, setIsDisabled } =
-    useStore((state) => ({
+  const {
+    getOrCreateConversationId,
+    attachments,
+    clearAttachments,
+    input,
+    setInput,
+    setIsDisabled,
+    addMessage,
+    updateLastMessage,
+    aboutMe,
+  } = useStore(
+    useShallow((state) => ({
+      getOrCreateConversationId: state.getOrCreateConversationId,
       attachments: state.attachments,
       clearAttachments: state.clearAttachments,
       input: state.input,
       setInput: state.setInput,
       setIsDisabled: state.setInputIsDisabled,
-    }));
-
-  const { addMessage, updateLastMessage } = useStore((state) => ({
-    addMessage: state.addMessage,
-    updateLastMessage: state.updateLastMessage,
-  }));
-
-  const { getOrCreateConversationId } = useStore((state) => ({
-    getOrCreateConversationId: state.getOrCreateConversationId,
-  }));
+      addMessage: state.addMessage,
+      updateLastMessage: state.updateLastMessage,
+      aboutMe: state.aboutMe,
+    }))
+  );
 
   const { getAccessToken } = useAuth();
-
-  const { aboutMe } = useStore((state) => ({
-    aboutMe: state.aboutMe,
-  }));
 
   const fetchResponse = async (formData: FormData, token: string) => {
     setIsDisabled(true);
@@ -184,7 +188,7 @@ export const useSubmitQuery = () => {
   const handleIncomingContext = async (
     context: HighlightContext,
     navigateToNewChat: () => void,
-    systemPrompt?: string
+    promptApp?: PromptApp
   ) => {
     console.log("Received context inside handleIncomingContext: ", context);
     if (!context.suggestion || context.suggestion.trim() === "") {
@@ -245,9 +249,9 @@ export const useSubmitQuery = () => {
       formData.append("prompt", query);
       formData.append("windows", JSON.stringify(windows)); // Add windows to formData
 
-      console.log(systemPrompt);
-      if (systemPrompt) {
-        formData.append("system_prompt", systemPrompt);
+      console.log("prompt app: ", promptApp);
+      if (promptApp) {
+        formData.append("app_id", promptApp.id.toString());
       }
 
       // Add about_me to form data
@@ -269,7 +273,7 @@ export const useSubmitQuery = () => {
     }
   };
 
-  const handleSubmit = async (systemPrompt?: string) => {
+  const handleSubmit = async (promptApp?: PromptApp) => {
     const query = input.trim();
 
     if (!query) {
@@ -280,8 +284,8 @@ export const useSubmitQuery = () => {
     if (query) {
       const formData = new FormData();
       formData.append("prompt", query);
-      if (systemPrompt) {
-        formData.append("system_prompt", systemPrompt);
+      if (promptApp) {
+        formData.append("app_id", promptApp.id.toString());
       }
 
       // Add about_me to form data

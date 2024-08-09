@@ -7,6 +7,7 @@ import {ModalObjectProps} from "@/types";
 import PromptsModal from "@/presentations/modals/PromptsModal";
 import CreatePromptModal from "@/presentations/modals/CreatePromptModal";
 import EditPromptModal from "@/presentations/modals/EditPromptModal";
+import {useShallow} from "zustand/react/shallow";
 
 type FunctionalComponent = (props: ModalObjectProps) => JSX.Element
 
@@ -19,7 +20,13 @@ const ModalMap: Record<string, FunctionalComponent> = {
 }
 
 export const ModalContainer = () => {
-  const { modals, openModal, closeModal } = useStore((state) => state)
+  const { modals, openModal, closeModal } = useStore(
+    useShallow((state) => ({
+      modals: state.modals,
+      openModal: state.openModal,
+      closeModal: state.closeModal
+    }))
+  )
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {

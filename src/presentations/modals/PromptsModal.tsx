@@ -2,14 +2,13 @@ import {ModalObjectProps, PromptApp} from "@/types";
 import Modal from "@/components/modals/Modal";
 import {useStore} from "@/providers/store-provider";
 import React, {useMemo} from "react";
-import {fetchPromptText} from "@/utils/prompts";
 import PromptListRow from "@/components/prompts/PromptListRow";
 import styles from './modals.module.scss'
 import {Divider} from "@/components/catalyst/divider";
-import {useRouter} from "next/navigation";
 import {AddCircle} from "iconsax-react";
 import variables from "@/variables.module.scss";
 import usePromptApps from "@/hooks/usePromptApps";
+import {useShallow} from "zustand/react/shallow";
 
 const HighlightChatPrompt = {
   slug: 'hlchat',
@@ -18,42 +17,20 @@ const HighlightChatPrompt = {
 }
 
 const PromptsModal = ({id, context}: ModalObjectProps) => {
-  const router = useRouter();
-  const { openModal, closeModal } = useStore((state) => ({
-    openModal: state.openModal,
-    closeModal: state.closeModal
-  }))
-  const { prompts, myPrompts, communityPrompts } = usePromptApps()
-
-  const { setPrompt, clearPrompt } = useStore((state) => ({
-    setPrompt: state.setPrompt,
-    clearPrompt: state.clearPrompt,
-  }));
+  const { openModal, closeModal } = useStore(
+    useShallow((state) => ({
+      openModal: state.openModal,
+      closeModal: state.closeModal
+    }))
+  )
+  const { prompts, myPrompts, communityPrompts, selectPrompt } = usePromptApps()
 
   const selectedPrompt = useMemo(() => {
     return prompts.find(prompt => prompt.id === context?.prompt?.id) ?? context?.prompt
   }, [context, prompts])
 
   const onSelectPrompt = async (prompt: PromptApp) => {
-    if (prompt.slug === 'hlchat') {
-      clearPrompt();
-      router.push("/");
-      closeModal(id)
-      return;
-    }
-
-    // Fetch the prompt
-    const text = await fetchPromptText(prompt.slug!);
-
-    setPrompt({
-      promptApp: prompt,
-      promptName: prompt.name,
-      promptDescription: prompt.description!,
-      promptAppName: prompt.slug!,
-      prompt: text,
-    });
-
-    router.push(`/`);
+    await selectPrompt(prompt)
     closeModal(id)
   };
 

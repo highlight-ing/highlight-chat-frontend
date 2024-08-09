@@ -41,5 +41,3 @@ Contributions are welcome! Please open an issue or submit a pull request. All PR
 ## License
 
 MIT, see [LICENSE.md](LICENSE.md)
-
-bruh

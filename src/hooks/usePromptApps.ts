@@ -1,18 +1,26 @@
 import {useStore} from "@/providers/store-provider";
 import {useEffect, useMemo, useState} from "react";
-import {fetchPrompts} from "@/utils/prompts";
+import {fetchPrompts, fetchPromptText} from "@/utils/prompts";
 import useAuth from "@/hooks/useAuth";
+import {PromptApp} from "@/types";
+import {useRouter} from "next/navigation";
+import {useShallow} from "zustand/react/shallow";
 
 export default () => {
   const {getAccessToken} = useAuth()
+  const router = useRouter()
   const [isLoadingPrompts, setLoadingPrompts] = useState(true)
 
-  const { prompts, setPrompts, promptUserId, setPromptUserId } = useStore((state) => ({
-    prompts: state.prompts,
-    setPrompts: state.setPrompts,
-    promptUserId: state.promptUserId,
-    setPromptUserId: state.setPromptUserId
-  }))
+  const { prompts, setPrompts, promptUserId, setPromptUserId, setPrompt, clearPrompt } = useStore(
+    useShallow((state) => ({
+      prompts: state.prompts,
+      setPrompts: state.setPrompts,
+      promptUserId: state.promptUserId,
+      setPromptUserId: state.setPromptUserId,
+      setPrompt: state.setPrompt,
+      clearPrompt: state.clearPrompt
+    }))
+  )
 
   const communityPrompts = useMemo(() => {
     return prompts
@@ -37,6 +45,27 @@ export default () => {
     setLoadingPrompts(false)
   }
 
+  const selectPrompt = async (prompt: PromptApp) => {
+    if (prompt.slug === 'hlchat') {
+      clearPrompt();
+      router.push("/");
+      return;
+    }
+
+    // Fetch the prompt
+    const text = await fetchPromptText(prompt.slug!);
+
+    setPrompt({
+      promptApp: prompt,
+      promptName: prompt.name,
+      promptDescription: prompt.description!,
+      promptAppName: prompt.slug!,
+      prompt: text,
+    });
+
+    router.push(`/`);
+  };
+
   useEffect(() => {
     refreshPrompts()
   }, [])
@@ -46,6 +75,7 @@ export default () => {
     prompts,
     communityPrompts,
     myPrompts,
-    refreshPrompts
+    refreshPrompts,
+    selectPrompt,
   }
 }

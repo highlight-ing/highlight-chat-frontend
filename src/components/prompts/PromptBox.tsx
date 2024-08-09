@@ -5,6 +5,7 @@ import { useStore } from "@/providers/store-provider";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/catalyst/button";
 import clsx from "clsx";
+import {useShallow} from "zustand/react/shallow";
 
 interface PromptBoxProps {
   slug: string;
@@ -25,10 +26,12 @@ export default function PromptBox({
 }: PromptBoxProps) {
   const router = useRouter();
 
-  const { setPrompt, clearPrompt } = useStore((state) => ({
-    setPrompt: state.setPrompt,
-    clearPrompt: state.clearPrompt,
-  }));
+  const { setPrompt, clearPrompt } = useStore(
+    useShallow((state) => ({
+      setPrompt: state.setPrompt,
+      clearPrompt: state.clearPrompt,
+    }))
+  );
 
   const onClick = async () => {
     if (name === "Highlight Chat") {

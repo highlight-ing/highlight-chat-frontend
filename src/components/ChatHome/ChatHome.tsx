@@ -11,9 +11,10 @@ import usePromptApps from "@/hooks/usePromptApps";
 import Highlight from '@highlight-ai/app-runtime'
 import Hotkey from "@/components/Hotkey/Hotkey";
 import ExpandableVideo from "@/components/ExpandableVideo/ExpandableVideo";
+import {useShallow} from "zustand/react/shallow";
 
 const ChatHome = ({isShowing}: {isShowing: boolean}) => {
-  const { openModal } = useStore((state) => ({openModal: state.openModal}))
+  const openModal = useStore((state) => state.openModal)
   const [isVisible, setVisible] = useState(isShowing)
 
   useEffect(() => {
@@ -66,10 +67,12 @@ export default ChatHome
  * The space above the actual input that shows the Highlight/prompt logo or name.
  */
 function InputHeading() {
-  const { promptName, promptDescription } = useStore((state) => ({
-    promptName: state.promptName,
-    promptDescription: state.promptDescription
-  }))
+  const { promptName, promptDescription } = useStore(
+    useShallow((state) => ({
+      promptName: state.promptName,
+      promptDescription: state.promptDescription
+    }))
+  )
 
   if (!promptName || !promptDescription) {
     return <div className="flex items-center justify-center"><HighlightIcon /></div>
@@ -98,8 +101,8 @@ const Callout = ({icon, title, description, onClick}: {icon: React.ReactElement,
 
 
 const Prompts = () => {
-  const { openModal } = useStore((state) => state)
-  const { isLoadingPrompts, myPrompts } = usePromptApps()
+  const openModal = useStore((state) => state.openModal)
+  const { isLoadingPrompts, myPrompts, selectPrompt } = usePromptApps()
   const [hotkey, setHotkey] = useState<string>('alt + .')
 
   useEffect(() => {
@@ -130,7 +133,7 @@ const Prompts = () => {
             key={prompt.slug}
             prompt={prompt}
             type={'self'}
-            onClick={() => openModal('prompts-modal', {prompt})}
+            onClick={() => selectPrompt(prompt)}
           />
         )
       })}

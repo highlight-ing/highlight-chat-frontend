@@ -15,9 +15,7 @@ export const ScreenshotAttachmentPicker = ({ isVisible, onClose }: ScreenshotAtt
   const [windows, setWindows] = useState<{ windowTitle: string; appIcon?: string }[]>([])
   const [displays, setDisplays] = useState<{ thumbnail: string }[]>([])
 
-  const { addAttachment } = useStore((state) => ({
-    addAttachment: state.addAttachment
-  }))
+  const addAttachment = useStore((state) => state.addAttachment)
 
   const outerContainerRef = useRef<HTMLDivElement>(null)
   const innerContainerRef = useRef<HTMLDivElement>(null)

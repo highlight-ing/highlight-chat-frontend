@@ -8,15 +8,18 @@ import { useSubmitQuery } from "@/hooks/useSubmitQuery";
 import { useStore } from "@/providers/store-provider";
 import Modals from "./modals/Modals";
 import { ModalContainer } from "@/components/modals/ModalContainer";
+import {useShallow} from "zustand/react/shallow";
 
 function useContextReceivedHandler(navigateToNewChat: () => void) {
-  const { addAttachment, setHighlightContext, setInput, prompt } = useStore(
-    (state) => ({
-      addAttachment: state.addAttachment,
-      setHighlightContext: state.setHighlightContext,
-      setInput: state.setInput,
-      prompt: state.prompt,
-    })
+  const { addAttachment, setHighlightContext, setInput, promptApp } = useStore(
+    useShallow(
+      (state) => ({
+        addAttachment: state.addAttachment,
+        setHighlightContext: state.setHighlightContext,
+        setInput: state.setInput,
+        promptApp: state.promptApp,
+      })
+    )
   );
 
   const { handleIncomingContext } = useSubmitQuery();
@@ -26,7 +29,7 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
       300,
       async (context: HighlightContext) => {
         setInput(context.suggestion || "");
-        await handleIncomingContext(context, navigateToNewChat, prompt);
+        await handleIncomingContext(context, navigateToNewChat, promptApp);
       }
     );
 
@@ -63,16 +66,14 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
       contextDestroyer();
       attachmentDestroyer();
     };
-  }, [prompt]);
+  }, [promptApp]);
 }
 
 /**
  * Hook that automatically registers the about me data when the app mounts.
  */
 function useAboutMeRegister() {
-  const { setAboutMe } = useStore((state) => ({
-    setAboutMe: state.setAboutMe,
-  }));
+  const setAboutMe = useStore((state) => state.setAboutMe);
 
   useEffect(() => {
     const getAboutMe = async () => {
