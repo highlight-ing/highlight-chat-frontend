@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useEffect, useState } from "react";
+import {useEffect, useMemo, useState} from "react";
 import { Input } from "@/components/Input/Input";
 
 import styles from "@/main.module.scss";
@@ -62,28 +62,20 @@ function useHandleClipboardPaste() {
 
 const HighlightChat = () => {
   // STATE
-  const [isUserScrolling, setIsUserScrolling] = useState(false);
-  const { messages, input, inputIsDisabled, promptName } = useStore((state) => ({
+  const { messages, inputIsDisabled, promptName } = useStore((state) => ({
     messages: state.messages,
-    input: state.input,
     inputIsDisabled: state.inputIsDisabled,
     promptName: state.promptName,
   }));
 
   const [showHistory, setShowHistory] = useState(false);
 
-  const isChatting = (inputIsDisabled || messages.length > 0)
+  const isChatting = useMemo(() => {
+    return inputIsDisabled || messages.length > 0
+  }, [inputIsDisabled, messages])
 
   // HOOKS
   useHandleClipboardPaste();
-
-  // If the agent is not currently responding and the user types something, set isUserScrolling to false
-  // so that the next time the agent responds, the chat will scroll to the bottom.
-  useEffect(() => {
-    if (!inputIsDisabled && isUserScrolling) {
-      setIsUserScrolling(false);
-    }
-  }, [input, inputIsDisabled]);
 
   return (
     <div className={styles.page}>
@@ -95,7 +87,7 @@ const HighlightChat = () => {
         }`}
       >
         <ChatHeader isShowing={!!promptName && messages.length === 0}/>
-        {isChatting && <Messages />}
+        {isChatting && <Messages key={'messages'}/>}
         {
           (isChatting || promptName) &&
           <Input sticky={true} />
