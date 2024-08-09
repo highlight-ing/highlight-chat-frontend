@@ -2,14 +2,13 @@ import {ModalObjectProps, PromptApp} from "@/types";
 import Modal from "@/components/modals/Modal";
 import {useStore} from "@/providers/store-provider";
 import React, {useMemo} from "react";
-import {fetchPromptText} from "@/utils/prompts";
 import PromptListRow from "@/components/prompts/PromptListRow";
 import styles from './modals.module.scss'
 import {Divider} from "@/components/catalyst/divider";
-import {useRouter} from "next/navigation";
 import {AddCircle} from "iconsax-react";
 import variables from "@/variables.module.scss";
 import usePromptApps from "@/hooks/usePromptApps";
+import {useShallow} from "zustand/react/shallow";
 
 const HighlightChatPrompt = {
   slug: 'hlchat',
@@ -18,17 +17,13 @@ const HighlightChatPrompt = {
 }
 
 const PromptsModal = ({id, context}: ModalObjectProps) => {
-  const router = useRouter();
-  const { openModal, closeModal } = useStore((state) => ({
-    openModal: state.openModal,
-    closeModal: state.closeModal
-  }))
+  const { openModal, closeModal } = useStore(
+    useShallow((state) => ({
+      openModal: state.openModal,
+      closeModal: state.closeModal
+    }))
+  )
   const { prompts, myPrompts, communityPrompts, selectPrompt } = usePromptApps()
-
-  const { setPrompt, clearPrompt } = useStore((state) => ({
-    setPrompt: state.setPrompt,
-    clearPrompt: state.clearPrompt,
-  }));
 
   const selectedPrompt = useMemo(() => {
     return prompts.find(prompt => prompt.id === context?.prompt?.id) ?? context?.prompt

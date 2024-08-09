@@ -5,6 +5,7 @@ import Tooltip from './Tooltip'
 import { useStore } from '@/providers/store-provider'
 import { AttachmentType } from '@/types'
 import { useImageDownload } from '@/hooks/useImageDownload'
+import {useShallow} from "zustand/react/shallow";
 
 interface AttachmentProps {
   type: AttachmentType
@@ -15,10 +16,12 @@ interface AttachmentProps {
 
 export const Attachment = ({ type, value, isFile = false, removeEnabled = false }: AttachmentProps) => {
   const [isImageLoaded, setIsImageLoaded] = useState(false)
-  const { removeAttachment, fileInputRef } = useStore((state) => ({
-    removeAttachment: state.removeAttachment,
-    fileInputRef: state.fileInputRef
-  }))
+  const { removeAttachment, fileInputRef } = useStore(
+    useShallow((state) => ({
+      removeAttachment: state.removeAttachment,
+      fileInputRef: state.fileInputRef
+    }))
+  )
 
   const { imageUrl, isLoading, error } = useImageDownload(type === 'image' && !value.startsWith('data:image') && !value.startsWith('blob:') ? value : null)
 
@@ -47,7 +50,7 @@ export const Attachment = ({ type, value, isFile = false, removeEnabled = false 
           // Remote image
           if (isLoading) {
             return (
-              <div className="w-20 h-12 bg-gradient-to-r from-light-20 to-light-30 animate-shimmer" 
+              <div className="w-20 h-12 bg-gradient-to-r from-light-20 to-light-30 animate-shimmer"
                    style={{backgroundSize: '200% 100%'}}
               />
             )

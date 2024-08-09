@@ -4,20 +4,23 @@ import {fetchPrompts, fetchPromptText} from "@/utils/prompts";
 import useAuth from "@/hooks/useAuth";
 import {PromptApp} from "@/types";
 import {useRouter} from "next/navigation";
+import {useShallow} from "zustand/react/shallow";
 
 export default () => {
   const {getAccessToken} = useAuth()
   const router = useRouter()
   const [isLoadingPrompts, setLoadingPrompts] = useState(true)
 
-  const { prompts, setPrompts, promptUserId, setPromptUserId, setPrompt, clearPrompt } = useStore((state) => ({
-    prompts: state.prompts,
-    setPrompts: state.setPrompts,
-    promptUserId: state.promptUserId,
-    setPromptUserId: state.setPromptUserId,
-    setPrompt: state.setPrompt,
-    clearPrompt: state.clearPrompt
-  }))
+  const { prompts, setPrompts, promptUserId, setPromptUserId, setPrompt, clearPrompt } = useStore(
+    useShallow((state) => ({
+      prompts: state.prompts,
+      setPrompts: state.setPrompts,
+      promptUserId: state.promptUserId,
+      setPromptUserId: state.setPromptUserId,
+      setPrompt: state.setPrompt,
+      clearPrompt: state.clearPrompt
+    }))
+  )
 
   const communityPrompts = useMemo(() => {
     return prompts

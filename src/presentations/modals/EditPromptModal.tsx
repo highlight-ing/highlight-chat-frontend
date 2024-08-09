@@ -4,7 +4,7 @@ import {useStore} from "@/providers/store-provider";
 import EditPromptForm from "@/components/prompts/EditPromptForm/EditPromptForm";
 
 const EditPromptModal = ({id, context}: ModalObjectProps) => {
-  const { closeModal } = useStore((state) => ({ closeModal: state.closeModal }))
+  const closeModal = useStore((state) => state.closeModal)
   return (
     <Modal
       id={id}

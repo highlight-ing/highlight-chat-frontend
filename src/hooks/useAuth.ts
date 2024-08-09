@@ -2,6 +2,7 @@ import { refreshTokens } from "@/app/(app)/actions";
 import { useStore } from "@/providers/store-provider";
 import Highlight from "@highlight-ai/app-runtime";
 import { decodeJwt } from "jose";
+import {useShallow} from "zustand/react/shallow";
 
 /**
  * Hook that handles automatically fetching tokens, refreshing them, etc.
@@ -9,12 +10,13 @@ import { decodeJwt } from "jose";
  */
 export default function useAuth() {
   let { accessToken, refreshToken, authExpiration, setAuth } = useStore(
-    (state) => ({
-      accessToken: state.accessToken,
-      refreshToken: state.refreshToken,
-      setAuth: state.setAuth,
-      authExpiration: state.authExpiration,
-    })
+    useShallow(
+      (state) => ({
+        accessToken: state.accessToken,
+        refreshToken: state.refreshToken,
+        setAuth: state.setAuth,
+        authExpiration: state.authExpiration,
+      }))
   );
 
   async function getNewTokens() {

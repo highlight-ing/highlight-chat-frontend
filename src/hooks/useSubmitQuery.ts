@@ -4,6 +4,7 @@ import { useStore } from "@/providers/store-provider";
 import useAuth from "./useAuth";
 import { useApi } from "@/hooks/useApi";
 import { PromptApp } from "@/types";
+import {useShallow} from "zustand/react/shallow";
 
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024; // 1MB in bytes
@@ -110,29 +111,31 @@ const prepareHighlightContext = (highlightContext: any) => {
 export const useSubmitQuery = () => {
   const { post } = useApi();
 
-  const { attachments, clearAttachments, input, setInput, setIsDisabled } =
-    useStore((state) => ({
+  const {
+    getOrCreateConversationId,
+    attachments,
+    clearAttachments,
+    input,
+    setInput,
+    setIsDisabled,
+    addMessage,
+    updateLastMessage,
+    aboutMe
+  } = useStore(
+    useShallow((state) => ({
+      getOrCreateConversationId: state.getOrCreateConversationId,
       attachments: state.attachments,
       clearAttachments: state.clearAttachments,
       input: state.input,
       setInput: state.setInput,
       setIsDisabled: state.setInputIsDisabled,
-    }));
-
-  const { addMessage, updateLastMessage } = useStore((state) => ({
-    addMessage: state.addMessage,
-    updateLastMessage: state.updateLastMessage,
-  }));
-
-  const { getOrCreateConversationId } = useStore((state) => ({
-    getOrCreateConversationId: state.getOrCreateConversationId,
-  }));
+      addMessage: state.addMessage,
+      updateLastMessage: state.updateLastMessage,
+      aboutMe: state.aboutMe
+    }))
+  );
 
   const { getAccessToken } = useAuth();
-
-  const { aboutMe } = useStore((state) => ({
-    aboutMe: state.aboutMe,
-  }));
 
   const fetchResponse = async (formData: FormData, token: string) => {
     setIsDisabled(true);
