@@ -3,14 +3,17 @@ import {useStore} from "@/providers/store-provider";
 import styles from './chatheader.module.scss'
 import {MessageText} from "iconsax-react";
 import {getPromptAppType} from "@/lib/promptapps";
+import {useShallow} from "zustand/react/shallow";
 
 const ChatHeader = ({isShowing}: {isShowing: boolean}) => {
-  const {promptApp, promptName, promptDescription, promptUserId} = useStore((state) => ({
-    promptApp: state.promptApp,
-    promptName: state.promptName,
-    promptDescription: state.promptDescription,
-    promptUserId: state.promptUserId
-  }))
+  const {promptApp, promptName, promptDescription, promptUserId} = useStore(
+    useShallow((state) => ({
+      promptApp: state.promptApp,
+      promptName: state.promptName,
+      promptDescription: state.promptDescription,
+      promptUserId: state.promptUserId
+    }))
+  )
 
   const promptType = getPromptAppType(promptUserId, promptApp)
 

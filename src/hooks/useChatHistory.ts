@@ -2,6 +2,7 @@ import {useEffect, useRef} from "react";
 import {useApi} from "@/hooks/useApi";
 import {useStore} from "@/providers/store-provider";
 import {ChatHistoryItem} from "@/types";
+import {useShallow} from "zustand/react/shallow";
 
 interface ChatHistoryResponse {
   conversations: ChatHistoryItem[];
@@ -12,7 +13,13 @@ const RETRY_INTERVAL = 10000
 
 export const useChatHistory = (): {history: ChatHistoryItem[], refreshChatHistory: () => Promise<ChatHistoryItem[]>} => {
   const {get} = useApi()
-  const {conversationId, history, setHistory} = useStore((state) => state);
+  const {conversationId, history, setHistory} = useStore(
+    useShallow((state) => ({
+      conversationId: state.conversationId,
+      history: state.history,
+      setHistory: state.setHistory
+    }))
+  );
   const initialFetchDone = useRef(false);
   const fetchRetryRef = useRef<NodeJS.Timeout>()
   const fetchRetryCountRef = useRef(0)

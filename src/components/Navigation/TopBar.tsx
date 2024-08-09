@@ -17,19 +17,22 @@ import Button from "@/components/Button/Button";
 import {HighlightIcon} from "@/icons/icons";
 import variables from '@/variables.module.scss'
 import {getPromptAppType} from "@/lib/promptapps";
+import {useShallow} from "zustand/react/shallow";
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const router = useRouter();
 
-  const { startNewConversation, promptName, openModal, messages, promptApp, promptUserId, clearPrompt } = useStore((state) => ({
-    startNewConversation: state.startNewConversation,
-    promptName: state.promptName,
-    openModal: state.openModal,
-    messages: state.messages,
-    promptApp: state.promptApp,
-    promptUserId: state.promptUserId,
-    clearPrompt: state.clearPrompt
-  }));
+  const { startNewConversation, promptName, openModal, messages, promptApp, promptUserId, clearPrompt } = useStore(
+    useShallow((state) => ({
+      startNewConversation: state.startNewConversation,
+      promptName: state.promptName,
+      openModal: state.openModal,
+      messages: state.messages,
+      promptApp: state.promptApp,
+      promptUserId: state.promptUserId,
+      clearPrompt: state.clearPrompt
+    }))
+  );
 
   const onNewChatClick = () => {
     startNewConversation();

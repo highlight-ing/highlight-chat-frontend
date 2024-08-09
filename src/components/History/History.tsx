@@ -11,6 +11,7 @@ import ContextMenu from "@/components/ContextMenu/ContextMenu";
 import { BaseMessage, UserMessage, AssistantMessage } from "@/types";
 import Button from "@/components/Button/Button";
 import {useMemo} from "react";
+import {useShallow} from "zustand/react/shallow";
 
 interface HistoryProps {
   showHistory: boolean;
@@ -119,7 +120,12 @@ export default History;
 
 const HistoryItem = ({chat}: {chat: ChatHistoryItem}) => {
   const {get} = useApi()
-  const {loadConversation, openModal} = useStore((state) => state);
+  const {loadConversation, openModal} = useStore(
+    useShallow((state) => ({
+      loadConversation: state.loadConversation,
+      openModal: state.openModal
+    }))
+  );
 
   const onSelectChat = async (chat: ChatHistoryItem) => {
     const response = await get(`history/${chat.id}/messages`)

@@ -32,9 +32,7 @@ export default function CreatePromptForm(props: CreatePromptFormProps) {
     },
   });
   const { refreshPrompts } = usePromptApps()
-  const { openErrorModal } = useStore((state) => ({
-    openErrorModal: state.openErrorModal,
-  }));
+  const openErrorModal = useStore((state) => state.openErrorModal);
 
   const { getAccessToken } = useAuth();
 

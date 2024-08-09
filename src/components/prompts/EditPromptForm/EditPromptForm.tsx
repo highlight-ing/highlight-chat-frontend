@@ -29,6 +29,7 @@ import { useState } from "react";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import ConfirmationModal from "@/components/modals/ConfirmationModal";
 import usePromptApps from "@/hooks/usePromptApps";
+import {useShallow} from "zustand/react/shallow";
 
 export default function EditPromptForm({
   slug,
@@ -57,11 +58,13 @@ export default function EditPromptForm({
     },
   });
 
-  const { promptAppName, clearPrompt, openErrorModal } = useStore((state) => ({
-    promptAppName: state.promptAppName,
-    clearPrompt: state.clearPrompt,
-    openErrorModal: state.openErrorModal,
-  }));
+  const { promptAppName, clearPrompt, openErrorModal } = useStore(
+    useShallow((state) => ({
+      promptAppName: state.promptAppName,
+      clearPrompt: state.clearPrompt,
+      openErrorModal: state.openErrorModal,
+    }))
+  );
 
   const { getAccessToken } = useAuth();
 

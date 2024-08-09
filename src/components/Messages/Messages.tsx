@@ -3,15 +3,18 @@ import { Message } from "@/components/Messages/Message";
 import styles from "@/main.module.scss";
 import ThinkingMessage from "@/components/Messages/ThinkingMessage";
 import { useStore } from "@/providers/store-provider";
+import {useShallow} from "zustand/react/shallow";
 
 // The threshold in pixels to consider chat "scrolled up" by the user.
 const IS_SCROLLED_THRESHOLD_PX = 10
 
 const Messages = () => {
-  const { messages, inputIsDisabled } = useStore((state) => ({
-    messages: state.messages,
-    inputIsDisabled: state.inputIsDisabled,
-  }));
+  const { messages, inputIsDisabled } = useStore(
+    useShallow(((state) => ({
+      messages: state.messages,
+      inputIsDisabled: state.inputIsDisabled,
+    })))
+  );
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isUserScrolledRef = useRef<boolean>(false);
@@ -37,8 +40,8 @@ const Messages = () => {
   }
 
   useEffect(() => {
-    const observer = new MutationObserver((mutations) => {
-      console.log('MUTATION OCCURRED:', mutations)
+    const observer = new MutationObserver(() => {
+      console.log('MUTATION OCCURRED')
       handleScrollableUpdate()
     });
 

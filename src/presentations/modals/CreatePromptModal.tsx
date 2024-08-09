@@ -4,7 +4,7 @@ import CreatePromptForm from "@/components/prompts/CreatePromptForm/CreatePrompt
 import {useStore} from "@/providers/store-provider";
 
 const CreatePromptModal = ({id, context}: ModalObjectProps) => {
-  const { closeModal } = useStore((state) => ({ closeModal: state.closeModal }))
+  const closeModal = useStore((state) => state.closeModal)
   return (
     <Modal
       id={id}

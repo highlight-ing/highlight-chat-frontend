@@ -8,6 +8,7 @@ import styles from './attachments-button.module.scss'
 import { useStore } from '@/providers/store-provider'
 import { getDurationUnit } from '@/utils/string'
 import { ScreenshotAttachmentPicker } from '../ScreenshotAttachmentPicker/ScrenshotAttachmentPicker'
+import {useShallow} from "zustand/react/shallow";
 
 interface AudioDurationProps {
   duration: number
@@ -29,10 +30,12 @@ export const AttachmentsButton = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [screenshotPickerVisible, setScreenshotPickerVisible] = useState(false)
 
-  const { setFileInputRef, addAttachment } = useStore((state) => ({
-    addAttachment: state.addAttachment,
-    setFileInputRef: state.setFileInputRef
-  }))
+  const { setFileInputRef, addAttachment } = useStore(
+    useShallow((state) => ({
+      addAttachment: state.addAttachment,
+      setFileInputRef: state.setFileInputRef
+    }))
+  )
 
   useEffect(() => {
     setFileInputRef(fileInputRef)

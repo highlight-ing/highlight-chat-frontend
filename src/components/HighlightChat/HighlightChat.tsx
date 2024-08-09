@@ -11,14 +11,13 @@ import History from "@/components/History/History";
 import { useStore } from "@/providers/store-provider";
 import ChatHome from "@/components/ChatHome/ChatHome";
 import ChatHeader from "@/components/ChatHeader/ChatHeader";
+import {useShallow} from "zustand/react/shallow";
 
 /**
  * Hook that handles pasting from the clipboard.
  */
 function useHandleClipboardPaste() {
-  const { addAttachment } = useStore((state) => ({
-    addAttachment: state.addAttachment,
-  }));
+  const addAttachment = useStore((state) => state.addAttachment);
 
   useEffect(() => {
     const onClipboardPaste = (ev: ClipboardEvent) => {
@@ -62,11 +61,13 @@ function useHandleClipboardPaste() {
 
 const HighlightChat = () => {
   // STATE
-  const { messages, inputIsDisabled, promptName } = useStore((state) => ({
-    messages: state.messages,
-    inputIsDisabled: state.inputIsDisabled,
-    promptName: state.promptName,
-  }));
+  const { messages, inputIsDisabled, promptName } = useStore(
+    useShallow((state) => ({
+      messages: state.messages,
+      inputIsDisabled: state.inputIsDisabled,
+      promptName: state.promptName,
+    }))
+  );
 
   const [showHistory, setShowHistory] = useState(false);
 
