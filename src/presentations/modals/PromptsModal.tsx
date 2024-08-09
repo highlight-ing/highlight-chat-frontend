@@ -23,7 +23,7 @@ const PromptsModal = ({id, context}: ModalObjectProps) => {
     openModal: state.openModal,
     closeModal: state.closeModal
   }))
-  const { prompts, myPrompts, communityPrompts } = usePromptApps()
+  const { prompts, myPrompts, communityPrompts, selectPrompt } = usePromptApps()
 
   const { setPrompt, clearPrompt } = useStore((state) => ({
     setPrompt: state.setPrompt,
@@ -35,25 +35,7 @@ const PromptsModal = ({id, context}: ModalObjectProps) => {
   }, [context, prompts])
 
   const onSelectPrompt = async (prompt: PromptApp) => {
-    if (prompt.slug === 'hlchat') {
-      clearPrompt();
-      router.push("/");
-      closeModal(id)
-      return;
-    }
-
-    // Fetch the prompt
-    const text = await fetchPromptText(prompt.slug!);
-
-    setPrompt({
-      promptApp: prompt,
-      promptName: prompt.name,
-      promptDescription: prompt.description!,
-      promptAppName: prompt.slug!,
-      prompt: text,
-    });
-
-    router.push(`/`);
+    await selectPrompt(prompt)
     closeModal(id)
   };
 

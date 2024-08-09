@@ -99,7 +99,7 @@ const Callout = ({icon, title, description, onClick}: {icon: React.ReactElement,
 
 const Prompts = () => {
   const { openModal } = useStore((state) => state)
-  const { isLoadingPrompts, myPrompts } = usePromptApps()
+  const { isLoadingPrompts, myPrompts, selectPrompt } = usePromptApps()
   const [hotkey, setHotkey] = useState<string>('alt + .')
 
   useEffect(() => {
@@ -130,7 +130,7 @@ const Prompts = () => {
             key={prompt.slug}
             prompt={prompt}
             type={'self'}
-            onClick={() => openModal('prompts-modal', {prompt})}
+            onClick={() => selectPrompt(prompt)}
           />
         )
       })}
