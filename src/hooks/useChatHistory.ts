@@ -11,6 +11,7 @@ interface ChatHistoryResponse {
 const MAX_RETRIES = 3;
 const RETRY_INTERVAL = 10000
 
+
 export const useChatHistory = (): {history: ChatHistoryItem[], refreshChatHistory: () => Promise<ChatHistoryItem[]>} => {
   const {get} = useApi()
   const {conversationId, history, setHistory} = useStore(
@@ -42,6 +43,21 @@ export const useChatHistory = (): {history: ChatHistoryItem[], refreshChatHistor
     }
   };
 
+  const fetchNewConversation = async (conversationId: string): Promise<ChatHistoryItem | null> => {
+    try {
+      const response = await get(`history/${conversationId}`);
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      return data.conversation;
+    } catch (error) {
+      console.error("Error fetching conversation:", error);
+      return null;
+    }
+  }
+  
+
   useEffect(() => {
     if (!initialFetchDone.current) {
       // Initial fetch
@@ -49,33 +65,39 @@ export const useChatHistory = (): {history: ChatHistoryItem[], refreshChatHistor
       initialFetchDone.current = true;
     } else if (conversationId && !history.some(chat => chat.id === conversationId)) {
       // New conversation found after initial fetch
-      console.log('Refreshing chat history, new conversation found');
-      fetchResponse();
-    } else {
-      // If the latest conversation title is "New Conversation"
+      console.log('Fetching new conversation');
+      fetchNewConversation(conversationId).then(newConversation => {
+        if (newConversation) {
+          setHistory([newConversation, ...history]);
+        }
+      });
+    } else if (conversationId) {
+      // Existing code for updating "New Conversation" title
       const chat = history.find(chat => chat.id === conversationId)
       if (chat?.title === 'New Conversation' && fetchRetryCountRef.current < MAX_RETRIES) {
-        console.log(`Refreshing chat history until title is provided, ${MAX_RETRIES - fetchRetryCountRef.current} tries remaining`)
+        console.log(`Fetching updated conversation, ${MAX_RETRIES - fetchRetryCountRef.current} tries remaining`)
 
         // Retry until title is assigned
-        fetchRetryRef.current = setTimeout(() => {
-          fetchResponse()
-            .then((conversations) => {
-              const chat = conversations.find(chat => chat.id === conversationId)
-              if (chat && chat.title !== 'New Conversation') {
-                fetchRetryCountRef.current = 0
-                console.log('Reset history retry counter')
-              }
-            })
-          fetchRetryRef.current = undefined
-          fetchRetryCountRef.current++
+        fetchRetryRef.current = setTimeout(async () => {
+          const updatedConversation = await fetchNewConversation(conversationId);
+          if (updatedConversation && updatedConversation.title !== 'New Conversation') {
+            const updatedHistory = history.map(chat => 
+              chat.id === conversationId ? updatedConversation : chat
+            );
+            setHistory(updatedHistory);
+            fetchRetryCountRef.current = 0;
+            console.log('Updated conversation');
+          } else {
+            fetchRetryCountRef.current++;
+          }
+          fetchRetryRef.current = undefined;
         }, RETRY_INTERVAL)
       }
     }
 
     return () => {
       if (fetchRetryRef.current) {
-        clearInterval(fetchRetryRef.current)
+        clearTimeout(fetchRetryRef.current);
       }
     }
   }, [history, conversationId]);
