@@ -1,11 +1,10 @@
 import { type HighlightContext } from "@highlight-ai/app-runtime";
-import Highlight from "@highlight-ai/app-runtime";
 import imageCompression from "browser-image-compression";
 import { useStore } from "@/providers/store-provider";
 import useAuth from "./useAuth";
 import { useApi } from "@/hooks/useApi";
 import { PromptApp } from "@/types";
-import { useShallow } from "zustand/react/shallow";
+import {useShallow} from "zustand/react/shallow";
 
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024; // 1MB in bytes
@@ -25,11 +24,6 @@ async function compressImageIfNeeded(file: File): Promise<File> {
     console.error("Error compressing image:", error);
     return file;
   }
-}
-
-async function fetchWindows() {
-  const windows = await Highlight.user.getWindows();
-  return windows.map((window) => window.windowTitle);
 }
 
 async function readFileAsBase64(file: File): Promise<string> {
@@ -126,7 +120,7 @@ export const useSubmitQuery = () => {
     setIsDisabled,
     addMessage,
     updateLastMessage,
-    aboutMe,
+    aboutMe
   } = useStore(
     useShallow((state) => ({
       getOrCreateConversationId: state.getOrCreateConversationId,
@@ -137,7 +131,7 @@ export const useSubmitQuery = () => {
       setIsDisabled: state.setInputIsDisabled,
       addMessage: state.addMessage,
       updateLastMessage: state.updateLastMessage,
-      aboutMe: state.aboutMe,
+      aboutMe: state.aboutMe
     }))
   );
 
@@ -221,9 +215,6 @@ export const useSubmitQuery = () => {
     let audio = context.attachments?.find((a) => a.type === "audio")?.value;
     let windowTitle = context.application?.focusedWindow?.title;
 
-    // Fetch windows information
-    const windows = await fetchWindows();
-
     if (
       query ||
       clipboardText ||
@@ -239,7 +230,6 @@ export const useSubmitQuery = () => {
         screenshot: screenshotUrl,
         audio,
         window: windowTitle ? { title: windowTitle } : undefined,
-        windows: windows, // Add windows information to the message
       });
 
       setInput("");
@@ -247,7 +237,6 @@ export const useSubmitQuery = () => {
 
       const formData = new FormData();
       formData.append("prompt", query);
-      formData.append("windows", JSON.stringify(windows)); // Add windows to formData
 
       console.log("prompt app: ", promptApp);
       if (promptApp) {
@@ -293,10 +282,6 @@ export const useSubmitQuery = () => {
         formData.append("about_me", JSON.stringify(aboutMe));
       }
 
-      // Fetch windows information
-      const windows = await fetchWindows();
-      formData.append("windows", JSON.stringify(windows));
-
       const { screenshot, audio, fileTitle, clipboardText, ocrText } =
         await addAttachmentsToFormData(formData, attachments);
 
@@ -307,7 +292,6 @@ export const useSubmitQuery = () => {
         audio,
         file_title: fileTitle,
         clipboard_text: clipboardText,
-        windows: windows, // Add windows information to the message
       });
 
       setInput("");
