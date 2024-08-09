@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef } from "react";
 import { Message } from "@/components/Messages/Message";
 import styles from "@/main.module.scss";
 import ThinkingMessage from "@/components/Messages/ThinkingMessage";
@@ -11,63 +11,35 @@ const Messages = () => {
   }));
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
-  const lastMessageRef = useRef<string | null>(null);
-  const lastScrollHeightRef = useRef<number>(0);
-  const [isUserScrolling, setIsUserScrolling] = useState(false);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const scrollToBottom = useCallback(() => {
-    if (scrollContainerRef.current && shouldAutoScroll && !isUserScrolling) {
-      const scrollContainer = scrollContainerRef.current;
-      const newScrollHeight = scrollContainer.scrollHeight;
-      const heightDifference = newScrollHeight - lastScrollHeightRef.current;
-
-      scrollContainer.scrollTop = scrollContainer.scrollHeight;
-      lastScrollHeightRef.current = newScrollHeight;
-
-      // If height has increased significantly, ensure we're still at the bottom
-      if (heightDifference > 10) {
-        setTimeout(() => {
-          scrollContainer.scrollTop = scrollContainer.scrollHeight;
-        }, 50);
-      }
-    }
-  }, [shouldAutoScroll, isUserScrolling]);
+  const isUserScrolledRef = useRef<boolean>(false);
 
   const handleScroll = () => {
-    if (scrollContainerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } =
-        scrollContainerRef.current;
-      const isAtBottom = scrollHeight - scrollTop - clientHeight < 100;
-
-      setIsUserScrolling(true);
-      setShouldAutoScroll(isAtBottom);
-
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-      }
-
-      scrollTimeoutRef.current = setTimeout(() => {
-        setIsUserScrolling(false);
-      }, 150);
+    if (!scrollContainerRef.current) {
+      return
     }
+
+    // If the user has scrolled 5px up or more, then consider it scrolled up
+    isUserScrolledRef.current = scrollContainerRef.current.scrollTop < -5
   };
 
-  useEffect(() => {
-    if (!isUserScrolling && shouldAutoScroll) {
-      scrollToBottom();
+  const handleScrollableUpdate = () => {
+    // If the user has scrolled up, do not update the scroll position.
+    if (isUserScrolledRef.current || !scrollContainerRef.current) {
+      return
     }
-  }, [messages, isUserScrolling, shouldAutoScroll, scrollToBottom]);
+    scrollContainerRef.current.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    })
+  }
 
   useEffect(() => {
     const observer = new MutationObserver(() => {
-      if (shouldAutoScroll) {
-        scrollToBottom();
-      }
+      handleScrollableUpdate()
     });
 
     if (scrollContainerRef.current) {
+      // Listen for new children in the scrollable tree (new messages / contents)
       observer.observe(scrollContainerRef.current, {
         childList: true,
         subtree: true,
@@ -75,44 +47,7 @@ const Messages = () => {
     }
 
     return () => observer.disconnect();
-  }, [shouldAutoScroll]);
-
-  useEffect(() => {
-    const scrollContainer = scrollContainerRef.current;
-    if (scrollContainer) {
-      lastScrollHeightRef.current = scrollContainer.scrollHeight;
-    }
   }, []);
-
-  useEffect(() => {
-    const observer = new ResizeObserver(() => {
-      if (shouldAutoScroll) {
-        scrollToBottom();
-      }
-    });
-
-    if (scrollContainerRef.current) {
-      observer.observe(scrollContainerRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [shouldAutoScroll, scrollToBottom]);
-
-  useEffect(() => {
-    if (messages.length > 0) {
-      const lastMessage = messages[messages.length - 1];
-
-      if (
-        lastMessage.role === "user" ||
-        lastMessage.content !== lastMessageRef.current
-      ) {
-        setShouldAutoScroll(true);
-        scrollToBottom();
-      }
-
-      lastMessageRef.current = lastMessage.content;
-    }
-  }, [messages, scrollToBottom]);
 
   return (
     <div
