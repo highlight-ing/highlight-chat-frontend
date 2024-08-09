@@ -32,7 +32,7 @@ const Messages = () => {
     }
     scrollContainerRef.current.scrollTo({
       top: 0,
-      behavior: 'smooth'
+      behavior: 'instant'
     })
   }
 
