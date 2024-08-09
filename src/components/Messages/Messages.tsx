@@ -4,6 +4,9 @@ import styles from "@/main.module.scss";
 import ThinkingMessage from "@/components/Messages/ThinkingMessage";
 import { useStore } from "@/providers/store-provider";
 
+// The threshold in pixels to consider chat "scrolled up" by the user.
+const IS_SCROLLED_THRESHOLD_PX = 10
+
 const Messages = () => {
   const { messages, inputIsDisabled } = useStore((state) => ({
     messages: state.messages,
@@ -19,7 +22,7 @@ const Messages = () => {
     }
 
     // If the user has scrolled 5px up or more, then consider it scrolled up
-    isUserScrolledRef.current = scrollContainerRef.current.scrollTop < -5
+    isUserScrolledRef.current = scrollContainerRef.current.scrollTop < -IS_SCROLLED_THRESHOLD_PX
   };
 
   const handleScrollableUpdate = () => {
