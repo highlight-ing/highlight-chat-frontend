@@ -37,8 +37,8 @@ const Messages = () => {
   }
 
   useEffect(() => {
-    const observer = new MutationObserver(() => {
-      console.log('MUTATION OCCURRED')
+    const observer = new MutationObserver((mutations) => {
+      console.log('MUTATION OCCURRED:', mutations)
       handleScrollableUpdate()
     });
 

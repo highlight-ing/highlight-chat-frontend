@@ -87,7 +87,7 @@ const HighlightChat = () => {
         }`}
       >
         <ChatHeader isShowing={!!promptName && messages.length === 0}/>
-        {isChatting && <Messages key={'messages'}/>}
+        {isChatting && <Messages/>}
         {
           (isChatting || promptName) &&
           <Input sticky={true} />
