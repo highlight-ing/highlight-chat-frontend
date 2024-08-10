@@ -115,14 +115,21 @@ export const Message = ({ message, isThinking }: MessageProps) => {
                   if (typeof children === 'string') {
                     return <td>{children}</td>
                   }
+                  if (Array.isArray(children)) {
+                    return (
+                      <td>
+                        {/*// @ts-ignore*/}
+                        {children.map((child, index) => (
+                          <Fragment key={index}>
+                            {child === '<br>' ? <br/> : child}
+                          </Fragment>
+                        ))}
+                      </td>
+                    )
+                  }
                   return (
                     <td>
-                      {/*// @ts-ignore*/}
-                      {children.map((child, index) => (
-                        <Fragment key={index}>
-                          {child === '<br>' ? <br/> : child}
-                        </Fragment>
-                      ))}
+                      {children}
                     </td>
                   )
                 }
