@@ -50,6 +50,13 @@ export default async function addAttachmentsToFormData(
   for (const attachment of attachments) {
     if (attachment?.value) {
       switch (attachment.type) {
+        case "file":
+          switch (
+            attachment.mimeType
+            // TODO: HANDLE
+          ) {
+          }
+          break;
         case "image":
         case "screenshot":
           screenshot = attachment.value;
@@ -191,6 +198,10 @@ export const useSubmitQuery = () => {
     promptApp?: PromptApp
   ) => {
     console.log("Received context inside handleIncomingContext: ", context);
+    console.log("Got attachment count: ", context.attachments?.length);
+    context.attachments?.map((attachment) => {
+      console.log("Attachment: ", JSON.stringify(attachment));
+    });
     if (!context.suggestion || context.suggestion.trim() === "") {
       console.log("No context received, ignoring.");
       return;
