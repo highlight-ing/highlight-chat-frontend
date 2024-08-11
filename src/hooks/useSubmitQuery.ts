@@ -50,11 +50,26 @@ export default async function addAttachmentsToFormData(
   for (const attachment of attachments) {
     if (attachment?.value) {
       switch (attachment.type) {
-        case "file":
-          switch (
-            attachment.mimeType
-            // TODO: HANDLE
-          ) {
+        case "file": // TODO: Handle all mime types. PDFs and all images types are encoded as base64 in the value propery. Text/CSV/Excel values are already parsed as text.
+          switch (attachment.mimeType) {
+            case "application/pdf":
+              formData.append("pdf", attachment.value);
+              break;
+            case "image/png":
+            case "image/jpeg":
+            case "image/gif":
+              formData.append("base64_image", attachment.value);
+              break;
+            case "text/plain":
+            case "text/csv":
+              formData.append("text_file", attachment.value);
+              break;
+            case "application/vnd.ms-excel":
+            case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+              formData.append("spreadsheet", attachment.value);
+              break;
+            default:
+              console.warn("Unsupported file type:", attachment.mimeType);
           }
           break;
         case "image":
