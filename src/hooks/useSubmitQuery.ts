@@ -23,7 +23,11 @@ function base64ToFile(
 
     return new File([bytes], fileName, { type: mimeType });
   } catch (error) {
-    console.error("Error converting base64 to File:", JSON.stringify(error));
+    console.error(
+      "Error converting base64 to File:",
+      fileName,
+      JSON.stringify(error)
+    );
     return null;
   }
 }
@@ -62,13 +66,11 @@ async function readFileAsBase64(file: File): Promise<string> {
   });
 }
 
+// TODO: Handle .docx and .pptx
 const textBasedTypes = [
   "application/json",
   "application/xml",
   "application/javascript",
-  "application/x-yaml",
-  "application/msword",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ];
 
 export default async function addAttachmentsToFormData(
@@ -80,7 +82,7 @@ export default async function addAttachmentsToFormData(
   for (const attachment of attachments) {
     if (attachment?.value) {
       switch (attachment.type) {
-        case "file": // TODO: Handle all mime types. PDFs and all images types are encoded as base64 in the value propery. Text/CSV/Excel values are already parsed as text.
+        case "file":
           const mime = attachment?.mimeType;
           if (mime === "application/json") {
             let pdfFile = base64ToFile(
@@ -118,7 +120,7 @@ export default async function addAttachmentsToFormData(
           ) {
             formData.append("text_file", attachment.value);
           } else {
-            console.warn("Unsupported file type:", attachment.mimeType);
+            console.error("Unsupported file type:", attachment.mimeType);
           }
         case "image":
         case "screenshot":
@@ -143,15 +145,7 @@ export default async function addAttachmentsToFormData(
         case "pdf":
           fileTitle = attachment.value.name;
 
-          const base64 = await readFileAsBase64(attachment.value);
-
-          const file = base64ToFile(
-            base64,
-            "testfilename.pdf",
-            "application/pdf"
-          );
-
-          formData.append("pdf", file);
+          formData.append("pdf", attachment.value);
           break;
         case "audio":
           audio = attachment.value;
@@ -168,6 +162,9 @@ export default async function addAttachmentsToFormData(
         case "ocr":
           ocrText = attachment.value;
           formData.append("ocr_text", attachment.value);
+          break;
+        case "text":
+          formData.append("text_file", attachment.value);
           break;
         default:
           console.warn("Unknown attachment type:", attachment.type);

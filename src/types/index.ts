@@ -63,9 +63,14 @@ export interface ClipboardAttachment {
 export interface FileAttachment {
   type: "file";
   value: string;
+  fileName: string;
   mimeType: string;
 }
 
+export interface TextFileAttachment {
+  type: "text_file";
+  value: string;
+}
 export interface SpreadsheetAttachment {
   type: "spreadsheet";
   value: File;
@@ -77,7 +82,8 @@ export type Attachment =
   | AudioAttachment
   | ClipboardAttachment
   | SpreadsheetAttachment
-  | FileAttachment;
+  | FileAttachment
+  | TextFileAttachment;
 
 export type AttachmentType =
   | "audio"
@@ -86,7 +92,8 @@ export type AttachmentType =
   | "pdf"
   | "window"
   | "spreadsheet"
-  | "file";
+  | "file"
+  | "text_file";
 
 export interface ChatHistoryItem {
   id: string;
