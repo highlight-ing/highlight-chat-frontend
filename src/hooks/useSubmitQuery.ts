@@ -7,6 +7,29 @@ import { useApi } from "@/hooks/useApi";
 import { PromptApp } from "@/types";
 import { useShallow } from "zustand/react/shallow";
 
+function base64ToFile(
+  base64String: string,
+  fileName: string,
+  mimeType: string
+): File | null {
+  try {
+    // Decode the base64 string
+    const binaryString = atob(base64String);
+
+    // Convert binary string to ArrayBuffer
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    // Create a File object from the Blob
+    return new File([bytes], fileName, { type: mimeType });
+  } catch (error) {
+    console.error("Error converting base64 to File:", error);
+    return null;
+  }
+}
+
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024; // 1MB in bytes
   if (file.size <= ONE_MB) {
@@ -53,7 +76,18 @@ export default async function addAttachmentsToFormData(
         case "file": // TODO: Handle all mime types. PDFs and all images types are encoded as base64 in the value propery. Text/CSV/Excel values are already parsed as text.
           switch (attachment.mimeType) {
             case "application/pdf":
-              formData.append("pdf", attachment.value);
+              // TODO: Turn Base64 back into node File object
+              let fileBase64 = attachment.value;
+
+              let file = base64ToFile(
+                attachment.value,
+                "file.pdf",
+                "application/pdf"
+              );
+              if (file) {
+                formData.append("pdf", file);
+              }
+
               break;
             case "image/png":
             case "image/jpeg":
@@ -61,7 +95,10 @@ export default async function addAttachmentsToFormData(
               formData.append("base64_image", attachment.value);
               break;
             case "text/plain":
+            case "application/json":
             case "text/csv":
+              // Add
+
               formData.append("text_file", attachment.value);
               break;
             case "application/vnd.ms-excel":
