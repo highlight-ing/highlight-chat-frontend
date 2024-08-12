@@ -1,6 +1,9 @@
 import { Database } from "@/types/supabase";
 import { createClient } from "@supabase/supabase-js";
 
+export const PROMPTS_TABLE_SELECT_FIELDS =
+  "external_id, name, description, prompt_text, created_at, slug, user_id";
+
 /**
  * Admin Supabase client, this client is privileged,
  * be careful when using it.
