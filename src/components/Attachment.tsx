@@ -99,6 +99,8 @@ export const Attachment = ({
         );
       case "window":
         return <Keyboard className="text-white" />;
+      case "text_file":
+        return <Document className="text-white" />;
       default:
         return null;
     }
