@@ -13,19 +13,17 @@ function base64ToFile(
   mimeType: string
 ): File | null {
   try {
+    const base64Data = base64String.replace(/^data:[^;]+;base64,/, "");
+
     // Decode the base64 string
-    const binaryString = atob(base64String);
+    const binaryString = Buffer.from(base64Data, "base64");
 
-    // Convert binary string to ArrayBuffer
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
+    // Create a Uint8Array from the Buffer
+    const bytes = new Uint8Array(binaryString);
 
-    // Create a File object from the Blob
     return new File([bytes], fileName, { type: mimeType });
   } catch (error) {
-    console.error("Error converting base64 to File:", error);
+    console.error("Error converting base64 to File:", JSON.stringify(error));
     return null;
   }
 }
@@ -64,6 +62,15 @@ async function readFileAsBase64(file: File): Promise<string> {
   });
 }
 
+const textBasedTypes = [
+  "application/json",
+  "application/xml",
+  "application/javascript",
+  "application/x-yaml",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+];
+
 export default async function addAttachmentsToFormData(
   formData: FormData,
   attachments: any[]
@@ -74,41 +81,45 @@ export default async function addAttachmentsToFormData(
     if (attachment?.value) {
       switch (attachment.type) {
         case "file": // TODO: Handle all mime types. PDFs and all images types are encoded as base64 in the value propery. Text/CSV/Excel values are already parsed as text.
-          switch (attachment.mimeType) {
-            case "application/pdf":
-              // TODO: Turn Base64 back into node File object
-              let fileBase64 = attachment.value;
-
-              let file = base64ToFile(
-                attachment.value,
-                "file.pdf",
-                "application/pdf"
-              );
-              if (file) {
-                formData.append("pdf", file);
-              }
-
-              break;
-            case "image/png":
-            case "image/jpeg":
-            case "image/gif":
-              formData.append("base64_image", attachment.value);
-              break;
-            case "text/plain":
-            case "application/json":
-            case "text/csv":
-              // Add
-
-              formData.append("text_file", attachment.value);
-              break;
-            case "application/vnd.ms-excel":
-            case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-              formData.append("spreadsheet", attachment.value);
-              break;
-            default:
-              console.warn("Unsupported file type:", attachment.mimeType);
+          const mime = attachment?.mimeType;
+          if (mime === "application/json") {
+            let pdfFile = base64ToFile(
+              attachment.value,
+              "file.pdf",
+              "application/pdf"
+            );
+            if (pdfFile) {
+              formData.append("pdf", pdfFile);
+            }
+          } else if (mime.startsWith("image/")) {
+            const imageNameFromMimeType = mime.replace("image/", "");
+            let imageFile = base64ToFile(
+              attachment.value,
+              `file.${imageNameFromMimeType}`,
+              mime
+            );
+            if (!imageFile) return;
+            const compressedFile = await compressImageIfNeeded(imageFile);
+            const base64data = await readFileAsBase64(compressedFile);
+            const mimeType = compressedFile.type || "image/png";
+            const base64WithMimeType = `data:${mimeType};base64,${
+              base64data.split(",")[1]
+            }`;
+            formData.append("base64_image", base64WithMimeType);
+          } else if (
+            mime === "application/vnd.ms-excel" ||
+            mime ===
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          ) {
+            formData.append("spreadsheet", attachment.value);
+          } else if (
+            mime.startsWith("text/") ||
+            textBasedTypes.includes(attachment.mimeType)
+          ) {
+            formData.append("text_file", attachment.value);
+          } else {
+            console.warn("Unsupported file type:", attachment.mimeType);
           }
-          break;
         case "image":
         case "screenshot":
           screenshot = attachment.value;
@@ -131,7 +142,16 @@ export default async function addAttachmentsToFormData(
           break;
         case "pdf":
           fileTitle = attachment.value.name;
-          formData.append("pdf", attachment.value);
+
+          const base64 = await readFileAsBase64(attachment.value);
+
+          const file = base64ToFile(
+            base64,
+            "testfilename.pdf",
+            "application/pdf"
+          );
+
+          formData.append("pdf", file);
           break;
         case "audio":
           audio = attachment.value;
