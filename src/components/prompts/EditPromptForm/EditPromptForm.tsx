@@ -1,16 +1,6 @@
 "use client";
 
-import {
-  UpdatePromptData,
-  deletePrompt,
-  updatePrompt,
-} from "@/utils/prompts";
-import {
-  Alert,
-  AlertActions,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/catalyst/alert";
+import { UpdatePromptData, deletePrompt, updatePrompt } from "@/utils/prompts";
 import { Button } from "@/components/catalyst/button";
 import {
   Description,
@@ -24,12 +14,11 @@ import { Textarea } from "@/components/catalyst/textarea";
 import useAuth from "@/hooks/useAuth";
 import { useStore } from "@/providers/store-provider";
 import { Prompt } from "@/types/supabase-helpers";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import ConfirmationModal from "@/components/modals/ConfirmationModal";
 import usePromptApps from "@/hooks/usePromptApps";
-import {useShallow} from "zustand/react/shallow";
+import { useShallow } from "zustand/react/shallow";
 
 export default function EditPromptForm({
   slug,
@@ -38,9 +27,9 @@ export default function EditPromptForm({
 }: {
   slug: string;
   initialData: Prompt;
-  onUpdate: () => void
+  onUpdate: () => void;
 }) {
-  const { refreshPrompts } = usePromptApps()
+  const { refreshPrompts } = usePromptApps();
   // STATE
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -77,8 +66,8 @@ export default function EditPromptForm({
       return;
     }
 
-    refreshPrompts()
-    onUpdate()
+    refreshPrompts();
+    onUpdate();
   };
 
   // When the user confirms they want to delete the prompt through the modal
@@ -92,11 +81,11 @@ export default function EditPromptForm({
     }
 
     if (promptAppName === slug) {
-      clearPrompt()
+      clearPrompt();
     }
 
-    refreshPrompts()
-    onUpdate()
+    refreshPrompts();
+    onUpdate();
   };
 
   return (
@@ -183,18 +172,20 @@ export default function EditPromptForm({
           </Button>
         </div>
       </form>
-      {
-        isDeleteModalOpen &&
+      {isDeleteModalOpen && (
         <ConfirmationModal
-          id={'delete-prompt'}
-          header={'Delete Prompt?'}
-          primaryAction={{label: 'Delete Forever', onClick: onDeleteConfirm}}
-          secondaryAction={{label: 'Nevermind', onClick: () => setIsDeleteModalOpen(false)}}
+          id={"delete-prompt"}
+          header={"Delete Prompt?"}
+          primaryAction={{ label: "Delete Forever", onClick: onDeleteConfirm }}
+          secondaryAction={{
+            label: "Nevermind",
+            onClick: () => setIsDeleteModalOpen(false),
+          }}
         >
           <span>Are you sure you want to delete this prompt?</span>
           <span>This action cannot be undone.</span>
         </ConfirmationModal>
-      }
+      )}
     </>
   );
 }
