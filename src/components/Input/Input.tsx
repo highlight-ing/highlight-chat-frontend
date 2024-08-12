@@ -7,10 +7,77 @@ import { useStore } from "@/providers/store-provider";
 
 import styles from "./chatinput.module.scss";
 import * as React from "react";
-import { getAudioAttachmentPreview } from "@/utils/attachments";
+import { base64ToFile, getAudioAttachmentPreview } from "@/utils/attachments";
 import { useShallow } from "zustand/react/shallow";
 
 const MAX_INPUT_HEIGHT = 160;
+
+function prepareFileAttachments(atts: AttachmentType[]): AttachmentType[] {
+  const processedAttachments: AttachmentType[] = atts.map((attachment) => {
+    if (attachment.type !== "file") {
+      return attachment;
+    }
+
+    const mimeType = attachment.mimeType.toLowerCase();
+
+    if (mimeType.startsWith("image/")) {
+      return {
+        type: "image",
+        value: attachment.value,
+      };
+    } else if (mimeType === "application/pdf") {
+      const file = base64ToFile(
+        attachment.value,
+        attachment.fileName,
+        mimeType
+      );
+      if (!file) {
+        return attachment;
+      }
+      return {
+        type: "pdf",
+        value: file,
+      };
+    } else if (
+      mimeType.includes("spreadsheetml") ||
+      mimeType.includes("excel") ||
+      attachment.fileName.endsWith(".xlsx")
+    ) {
+      const file = base64ToFile(
+        attachment.value,
+        attachment.fileName,
+        mimeType
+      );
+      if (!file) {
+        return attachment;
+      }
+
+      return {
+        type: "spreadsheet",
+        value: file,
+      };
+    } else if (
+      mimeType.startsWith("text/") ||
+      mimeType === "application/json" ||
+      mimeType === "application/xml" ||
+      mimeType === "application/javascript"
+    ) {
+      return {
+        type: "text_file",
+        value: attachment.value,
+      };
+    } else {
+      return attachment;
+    }
+  });
+
+  // Remove any unhandled attachments
+  const filteredAttachments = processedAttachments.filter(
+    (att) => att.type !== "file"
+  );
+
+  return filteredAttachments;
+}
 
 /**
  * This is the main Highlight Chat input box, not a reusable Input component.
@@ -69,32 +136,38 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
         return getAudioAttachmentPreview(attachment);
       case "spreadsheet":
         return attachment.value.name;
+      case "file":
+        return attachment.fileName;
       default:
         return attachment.value;
     }
   };
+
+  const preparedAttachments = prepareFileAttachments(attachments);
 
   return (
     <div
       className={`${styles.inputContainer} ${sticky ? styles.sticky : ""}`}
       onClick={onClickContainer}
     >
-      {attachments.length > 0 && (
+      {preparedAttachments.length > 0 && (
         <div className="flex gap-2">
-          {attachments.map((attachment: AttachmentType, index: number) => (
-            <Attachment
-              type={attachment.type}
-              value={getValue(attachment)}
-              isFile={
-                attachment.type === "pdf" ||
-                (attachment.type === "image" && !!attachment.file) ||
-                attachment.type === "spreadsheet" ||
-                attachment.type === "file"
-              }
-              removeEnabled
-              key={index}
-            />
-          ))}
+          {preparedAttachments.map(
+            (attachment: AttachmentType, index: number) => (
+              <Attachment
+                type={attachment.type}
+                value={getValue(attachment)}
+                isFile={
+                  attachment.type === "pdf" ||
+                  (attachment.type === "image" && !!attachment.file) ||
+                  attachment.type === "spreadsheet" ||
+                  attachment.type === "text_file"
+                }
+                removeEnabled
+                key={index}
+              />
+            )
+          )}
         </div>
       )}
       <div className={styles.attachmentsButtonContainer}>
