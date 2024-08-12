@@ -276,10 +276,6 @@ export const useSubmitQuery = () => {
     let rawContents = context.application?.focusedWindow?.rawContents;
     let audio = context.attachments?.find((a) => a.type === "audio")?.value;
     let windowTitle = context.application?.focusedWindow?.title;
-    let fileAtt = context.attachments?.find((a) => a.type === "file") as
-      | FileAttachment
-      | undefined;
-    let fileTitle = fileAtt?.fileName;
 
     // Fetch windows information
     const windows = await fetchWindows();
@@ -290,8 +286,7 @@ export const useSubmitQuery = () => {
       ocrScreenContents ||
       screenshotUrl ||
       rawContents ||
-      audio ||
-      fileTitle
+      audio
     ) {
       addMessage({
         role: "user",
@@ -301,7 +296,6 @@ export const useSubmitQuery = () => {
         audio,
         window: windowTitle ? { title: windowTitle } : undefined,
         windows: windows, // Add windows information to the message
-        file_title: fileTitle,
       });
 
       setInput("");
