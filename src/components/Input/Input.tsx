@@ -8,7 +8,8 @@ import { useStore } from "@/providers/store-provider";
 import styles from "./chatinput.module.scss";
 import * as React from "react";
 import { getAudioAttachmentPreview } from "@/utils/attachments";
-import {useShallow} from "zustand/react/shallow";
+import { useShallow } from "zustand/react/shallow";
+import { trackEvent } from '@/utils/amplitude';
 
 const MAX_INPUT_HEIGHT = 160;
 
@@ -37,11 +38,17 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
       e.preventDefault();
       handleSubmit(promptApp);
       setInput("");
+      trackEvent('hl_chat_query_submitted', { 
+        promptName, 
+        promptApp,
+        hasAttachments: attachments.length > 0
+      });
     }
   };
 
   const onClickContainer = (e: React.MouseEvent) => {
     inputRef.current?.focus();
+    trackEvent('hl_chat_input_focused', {});
   };
 
   useEffect(() => {
@@ -54,6 +61,15 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
       inputRef.current.style.height = newHeight + "px";
     }
   }, [inputRef, input]);
+
+  useEffect(() => {
+    if (attachments.length > 0) {
+      trackEvent('hl_chat_attachments_present', { 
+        attachmentCount: attachments.length,
+        attachmentTypes: attachments.map(a => a.type)
+      });
+    }
+  }, [attachments]);
 
   const getValue = (attachment: AttachmentType) => {
     switch (attachment.type) {
@@ -101,6 +117,7 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
         rows={1}
         onInput={(e) => setInput(e.currentTarget.value)}
         onKeyDown={handleKeyDown}
+        onFocus={() => trackEvent('hl_chat_input_focused', {})}
       />
     </div>
   );

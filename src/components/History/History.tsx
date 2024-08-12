@@ -10,8 +10,9 @@ import {ChatHistoryItem, Message} from "@/types";
 import ContextMenu from "@/components/ContextMenu/ContextMenu";
 import { BaseMessage, UserMessage, AssistantMessage } from "@/types";
 import Button from "@/components/Button/Button";
-import {useMemo} from "react";
+import {useMemo, useEffect} from "react";
 import {useShallow} from "zustand/react/shallow";
+import { trackEvent } from '@/utils/amplitude';
 
 interface HistoryProps {
   showHistory: boolean;
@@ -62,13 +63,28 @@ const History: React.FC<HistoryProps> = ({
     return sortArrayByDate(history)
   }, [history])
 
+  useEffect(() => {
+    trackEvent('hl_chat_history_visibility_changed', { 
+      isVisible: showHistory,
+      historyItemCount: history.length
+    });
+  }, [showHistory, history.length]);
+
+  const toggleHistory = () => {
+    setShowHistory(!showHistory);
+    trackEvent('hl_chat_history_toggled', { 
+      newState: !showHistory ? 'visible' : 'hidden',
+      historyItemCount: history.length
+    });
+  };
+
   return (
     <div
       className={`${styles.history} ${showHistory ? styles.show : styles.hide}`}
     >
       <div className={styles.header}>
         <Tooltip tooltip="Hide chats" position="right">
-          <Button size={'medium'} variant={'ghost-neutral'} onClick={() => setShowHistory(!showHistory)}>
+          <Button size={'medium'} variant={'ghost-neutral'} onClick={toggleHistory}>
             <Clock size={20} variant={'Bold'}/>
             History
           </Button>
@@ -130,8 +146,11 @@ const HistoryItem = ({chat}: {chat: ChatHistoryItem}) => {
   const onSelectChat = async (chat: ChatHistoryItem) => {
     const response = await get(`history/${chat.id}/messages`)
     if (!response.ok) {
-      // @TODO Error handling
       console.error('Failed to select chat')
+      trackEvent('hl_chat_select_chat_error', { 
+        chatId: chat.id,
+        error: 'Failed to fetch messages'
+      });
       return
     }
     const { messages } = await response.json()
@@ -153,32 +172,55 @@ const HistoryItem = ({chat}: {chat: ChatHistoryItem}) => {
         return baseMessage as AssistantMessage;
       }
     }))
+    trackEvent('hl_chat_selected', { 
+      chatId: chat.id,
+      messageCount: messages.length
+    });
   }
 
   const onDeleteChat = async (chat: ChatHistoryItem) => {
     openModal('delete-chat', chat)
+    trackEvent('hl_chat_delete_initiated', { 
+      chatId: chat.id
+    });
   }
 
   return (
     <ContextMenu
       key={`menu-${chat.id}`}
       items={[
-        {label: 'Open Chat', onClick: () => onSelectChat(chat)},
+        {
+          label: 'Open Chat', 
+          onClick: () => {
+            onSelectChat(chat);
+            trackEvent('hl_chat_opened_from_context_menu', { 
+              chatId: chat.id
+            });
+          }
+        },
         {divider: true},
-        {label: <span className="text-red-400">Delete Chat</span>, onClick: () => onDeleteChat(chat)},
+        {
+          label: <span className="text-red-400">Delete Chat</span>, 
+          onClick: () => onDeleteChat(chat)
+        },
       ]}
       position={'bottom'}
       triggerId={`chat-${chat.id}`}
       wrapperStyle={{width: '100%'}}
     >
-      <div key={chat.id} id={`chat-${chat.id}`} className={styles.chat} onClick={() => onSelectChat(chat)}>
-                <span className={styles.chatText}>
-                  {
-                    chat.title.charAt(0) === '"' && chat.title.charAt(chat.title.length - 1) === '"'
-                      ? chat.title.substring(1, chat.title.length - 1)
-                      : chat.title
-                  }
-                </span>
+      <div 
+        key={chat.id} 
+        id={`chat-${chat.id}`} 
+        className={styles.chat} 
+        onClick={() => onSelectChat(chat)}
+      >
+        <span className={styles.chatText}>
+          {
+            chat.title.charAt(0) === '"' && chat.title.charAt(chat.title.length - 1) === '"'
+              ? chat.title.substring(1, chat.title.length - 1)
+              : chat.title
+          }
+        </span>
       </div>
     </ContextMenu>
   )

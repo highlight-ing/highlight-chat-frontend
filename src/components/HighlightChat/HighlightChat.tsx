@@ -12,6 +12,7 @@ import { useStore } from "@/providers/store-provider";
 import ChatHome from "@/components/ChatHome/ChatHome";
 import ChatHeader from "@/components/ChatHeader/ChatHeader";
 import {useShallow} from "zustand/react/shallow";
+import { trackEvent } from '@/utils/amplitude';
 
 /**
  * Hook that handles pasting from the clipboard.
@@ -39,14 +40,20 @@ function useHandleClipboardPaste() {
                 value: URL.createObjectURL(file),
                 file: file,
               });
+              trackEvent('hl_chat_image_pasted', { fileType: file.type });
             } else if (file.type === "application/pdf") {
               console.log("Pasted PDF");
               addAttachment({
                 type: "pdf",
                 value: file,
               });
+              trackEvent('hl_chat_pdf_pasted', {});
+            } else {
+              trackEvent('hl_chat_unsupported_file_pasted', { fileType: file.type });
             }
           }
+        } else if (item.kind === "string") {
+          trackEvent('hl_chat_text_pasted', {});
         }
       }
     };
@@ -77,6 +84,15 @@ const HighlightChat = () => {
 
   // HOOKS
   useHandleClipboardPaste();
+
+  useEffect(() => {
+    trackEvent('hl_chat_state_changed', { 
+      isChatting,
+      messageCount: messages.length,
+      inputIsDisabled,
+      hasPrompt: !!promptName
+    });
+  }, [isChatting, messages.length, inputIsDisabled, promptName]);
 
   return (
     <div className={styles.page}>

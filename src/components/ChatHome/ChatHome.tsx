@@ -12,6 +12,7 @@ import Highlight from '@highlight-ai/app-runtime'
 import Hotkey from "@/components/Hotkey/Hotkey";
 import ExpandableVideo from "@/components/ExpandableVideo/ExpandableVideo";
 import {useShallow} from "zustand/react/shallow";
+import { trackEvent } from '@/utils/amplitude';
 
 const ChatHome = ({isShowing}: {isShowing: boolean}) => {
   const openModal = useStore((state) => state.openModal)
@@ -20,10 +21,12 @@ const ChatHome = ({isShowing}: {isShowing: boolean}) => {
   useEffect(() => {
     if (isShowing) {
       setVisible(true)
+      trackEvent('hl_chat_home_shown', {});
     } else {
       setTimeout(() => {
         setVisible(false)
       }, 500)
+      trackEvent('hl_chat_home_hidden', {});
     }
   }, [isShowing])
 
@@ -41,19 +44,28 @@ const ChatHome = ({isShowing}: {isShowing: boolean}) => {
           icon={<Setting color={variables.primary100} variant={"Bold"}/>}
           title={"Play with Highlight"}
           description={"Check out what you can do with Highlight Chat."}
-          onClick={() => openModal('prompts-modal')}
+          onClick={() => {
+            openModal('prompts-modal')
+            trackEvent('hl_chat_prompts_modal_opened', {});
+          }}
         />
         <Callout
           icon={<Setting color={variables.green100} variant={"Bold"}/>}
           title={"Explore Apps"}
           description={"Try other Highlight apps created by the community."}
-          onClick={() => window.open('highlight://appstore', '_blank')}
+          onClick={() => {
+            window.open('highlight://appstore', '_blank')
+            trackEvent('hl_chat_app_store_opened', {});
+          }}
         />
         <Callout
           icon={<Setting color={variables.pink100} variant={"Bold"}/>}
           title={"Create Chat Apps"}
           description={"Make your own Highlight Chat apps and publish them."}
-          onClick={() => openModal('create-prompt')}
+          onClick={() => {
+            openModal('create-prompt')
+            trackEvent('hl_chat_create_prompt_modal_opened', {});
+          }}
         />
       </div>
       <Prompts/>
@@ -109,11 +121,13 @@ const Prompts = () => {
     const fetchHotkey = async () => {
       const hotkey = await Highlight.app.getHotkey()
       setHotkey(hotkey)
+      trackEvent('hl_chat_hotkey_fetched', { hotkey });
     }
     fetchHotkey()
   }, [])
 
   if (isLoadingPrompts) {
+    trackEvent('hl_chat_prompts_loading', {});
     return (
       <div className={`${styles.prompts} ${mainStyles.loadingGradient}`}>
         <div className={'w-full h-20 p-16'}/>
@@ -122,9 +136,11 @@ const Prompts = () => {
   }
 
   if (!myPrompts.length) {
+    trackEvent('hl_chat_tutorial_shown', {});
     return <HighlightTutorial hotkey={hotkey}/>
   }
 
+  trackEvent('hl_chat_prompts_list_shown', { promptCount: myPrompts.length });
   return (
     <div className={styles.prompts}>
       {myPrompts.map((prompt: any) => {
@@ -133,7 +149,10 @@ const Prompts = () => {
             key={prompt.slug}
             prompt={prompt}
             type={'self'}
-            onClick={() => selectPrompt(prompt)}
+            onClick={() => {
+              selectPrompt(prompt)
+              trackEvent('hl_chat_prompt_selected', { promptSlug: prompt.slug });
+            }}
           />
         )
       })}
@@ -143,7 +162,10 @@ const Prompts = () => {
         prompt={{slug: 'create', description: 'Create your own chat app'}}
         icon={<AddCircle variant={"Bold"} color={variables.light60}/>}
         type={'default'}
-        onClick={() => openModal('create-prompt')}
+        onClick={() => {
+          openModal('create-prompt')
+          trackEvent('hl_chat_create_prompt_from_list', {});
+        }}
       />
     </div>
   )
@@ -174,6 +196,7 @@ const HighlightTutorial = ({hotkey}: {hotkey: string}) => {
         style={{
           maxWidth: '148px',
         }}
+        onPlay={() => trackEvent('hl_chat_tutorial_video_played', {})}
       />
     </div>
   )

@@ -15,6 +15,8 @@ import useAuth from "@/hooks/useAuth";
 import { useStore } from "@/providers/store-provider";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import usePromptApps from "@/hooks/usePromptApps";
+import { trackEvent } from '@/utils/amplitude';
+import { useEffect } from 'react';
 
 interface CreatePromptFormProps {
   onCreate: () => void
@@ -26,6 +28,7 @@ export default function CreatePromptForm(props: CreatePromptFormProps) {
     handleSubmit,
     control,
     formState: { errors },
+    watch,
   } = useForm<CreatePromptData>({
     defaultValues: {
       visibility: "unlisted",
@@ -36,17 +39,34 @@ export default function CreatePromptForm(props: CreatePromptFormProps) {
 
   const { getAccessToken } = useAuth();
 
+  useEffect(() => {
+    trackEvent('hl_chat_create_prompt_form_appeared', {});
+  }, []);
+
   const onSubmit: SubmitHandler<CreatePromptData> = async (data) => {
     const accessToken = await getAccessToken();
     const { error } = await createPrompt(data, accessToken);
     if (error) {
       openErrorModal(error);
+      trackEvent('hl_chat_create_prompt_error', { error });
       return;
     }
+
+    trackEvent('hl_chat_prompt_created', { 
+      promptVisibility: data.visibility,
+    });
 
     refreshPrompts()
     props.onCreate()
   };
+
+  // Watch for changes in the visibility field
+  const visibility = watch('visibility');
+  useEffect(() => {
+    trackEvent('hl_chat_prompt_visibility_changed', { 
+      newVisibility: visibility,
+    });
+  }, [visibility]);
 
   return (
     <div className="">
@@ -126,7 +146,12 @@ export default function CreatePromptForm(props: CreatePromptFormProps) {
             )}
           </Field>
         </div>
-        <Button type="submit" color="cyan" className="h-10 mt-5 cursor-pointer">
+        <Button 
+          type="submit" 
+          color="cyan" 
+          className="h-10 mt-5 cursor-pointer"
+          onClick={() => trackEvent('hl_chat_create_prompt_button_clicked', {})}
+        >
           Create
         </Button>
       </form>

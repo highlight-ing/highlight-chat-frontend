@@ -12,11 +12,13 @@
     "gen:supabase-types": "supabase gen types --lang=typescript --project-id ykwkqpmethjmpimvftix > src/types/supabase.ts"
   },
   "dependencies": {
+    "@amplitude/analytics-browser": "^2.10.0",
     "@headlessui/react": "^2.1.2",
     "@highlight-ai/app-runtime": "^0.0.44",
     "@supabase/supabase-js": "^2.44.4",
     "@tailwindcss/line-clamp": "^0.4.4",
     "ai": "^3.2.15",
+    "amplitude-js": "^8.21.9",
     "browser-image-compression": "^2.0.2",
     "framer-motion": "^11.3.8",
     "iconsax-react": "^0.0.8",

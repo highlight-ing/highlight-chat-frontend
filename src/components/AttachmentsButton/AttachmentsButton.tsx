@@ -9,6 +9,7 @@ import { useStore } from '@/providers/store-provider'
 import { getDurationUnit } from '@/utils/string'
 import { ScreenshotAttachmentPicker } from '../ScreenshotAttachmentPicker/ScrenshotAttachmentPicker'
 import {useShallow} from "zustand/react/shallow";
+import { trackEvent } from '@/utils/amplitude';
 
 interface AudioDurationProps {
   duration: number
@@ -43,11 +44,13 @@ export const AttachmentsButton = () => {
 
   const handleAttachmentClick = () => {
     fileInputRef?.current?.click()
+    trackEvent('hl_chat_attachments_button_clicked', {});
   }
 
   const onAddAudio = async (durationInMinutes: number) => {
     const audio = await Highlight.user.getAudioForDuration(durationInMinutes * 60)
     addAttachment({ type: 'audio', value: audio, duration: durationInMinutes })
+    trackEvent('hl_chat_audio_attachment_added', { durationInMinutes });
   }
 
   const onAddFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,16 +62,19 @@ export const AttachmentsButton = () => {
           value: URL.createObjectURL(file),
           file: file
         })
+        trackEvent('hl_chat_image_attachment_added', { fileType: file.type });
       } else if (file.type === 'application/pdf') {
         addAttachment({
           type: 'pdf',
           value: file
         })
+        trackEvent('hl_chat_pdf_attachment_added', {});
       } else if (file.type === 'text/csv' || file.type === 'application/vnd.ms-excel' || file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
         addAttachment({
           type: 'spreadsheet',
           value: file
         })
+        trackEvent('hl_chat_spreadsheet_attachment_added', { fileType: file.type });
       }
     }
   }
@@ -78,10 +84,12 @@ export const AttachmentsButton = () => {
 
     if (!hasClipboardReadPermissions) {
       console.log('Screenshot permission denied')
+      trackEvent('hl_chat_screenshot_permission_denied', {});
       return
     }
 
     setScreenshotPickerVisible(true)
+    trackEvent('hl_chat_screenshot_picker_opened', {});
   }
 
   const onAddClipboard = async () => {
@@ -89,6 +97,7 @@ export const AttachmentsButton = () => {
 
     if (!hasClipboardReadPermissions) {
       console.log('Clipboard read permission denied')
+      trackEvent('hl_chat_clipboard_permission_denied', {});
       return
     }
 
@@ -100,11 +109,13 @@ export const AttachmentsButton = () => {
         type: 'image',
         value: clipboard.value
       })
+      trackEvent('hl_chat_clipboard_image_added', {});
     } else {
       addAttachment({
         type: 'clipboard',
         value: clipboard.value
       })
+      trackEvent('hl_chat_clipboard_text_added', {});
     }
   }
 
@@ -186,7 +197,10 @@ export const AttachmentsButton = () => {
       </ContextMenu>
       <ScreenshotAttachmentPicker
         isVisible={screenshotPickerVisible}
-        onClose={() => setScreenshotPickerVisible(false)}
+        onClose={() => {
+          setScreenshotPickerVisible(false)
+          trackEvent('hl_chat_screenshot_picker_closed', {});
+        }}
       />
     </>
   )

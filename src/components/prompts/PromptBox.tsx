@@ -5,7 +5,8 @@ import { useStore } from "@/providers/store-provider";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/catalyst/button";
 import clsx from "clsx";
-import {useShallow} from "zustand/react/shallow";
+import { useShallow } from "zustand/react/shallow";
+import { trackEvent } from '@/utils/amplitude';
 
 interface PromptBoxProps {
   slug: string;
@@ -37,6 +38,7 @@ export default function PromptBox({
     if (name === "Highlight Chat") {
       clearPrompt();
       router.push("/");
+      trackEvent('hl_chat_default_chat_selected', { promptName: name });
       return;
     }
 
@@ -51,6 +53,7 @@ export default function PromptBox({
     });
 
     router.push(`/`);
+    trackEvent('hl_chat_prompt_selected', { promptName: name, promptSlug: slug });
   };
 
   const BaseElement = ({ children }: { children: React.ReactNode }) => {
@@ -71,16 +74,28 @@ export default function PromptBox({
     );
   };
 
+  const onViewClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    onClick();
+    trackEvent('hl_chat_prompt_viewed', { promptName: name, promptSlug: slug });
+  };
+
+  const onEditClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    trackEvent('hl_chat_prompt_edit_initiated', { promptName: name, promptSlug: slug });
+    router.push(`/prompts/${slug}/edit`);
+  };
+
   return (
     <BaseElement>
       <h3>{name}</h3>
       <p className="text-sm text-light-60 line-clamp-4">{description}</p>
       {editable && (
         <div className="mt-2 flex flex-row space-x-3">
-          <Button plain onClick={onClick}>
+          <Button plain onClick={onViewClick}>
             View
           </Button>
-          <Button plain href={`/prompts/${slug}/edit`}>
+          <Button plain onClick={onEditClick}>
             Edit
           </Button>
         </div>

@@ -2,6 +2,7 @@ import styles from "@/presentations/modals/modals.module.scss";
 import Button, {ButtonVariantType} from "@/components/Button/Button";
 import Modal from "@/components/modals/Modal";
 import React, {type PropsWithChildren, type ReactElement} from "react";
+import { trackEvent } from '@/utils/amplitude';
 
 interface ConfirmationModalProps {
   header?: string
@@ -28,11 +29,25 @@ const ConfirmationModal = ({ children, id, header, primaryAction, secondaryActio
       <div className="flex gap-4">
         {
           secondaryAction &&
-          <Button size={'medium'} variant={secondaryAction.variant ?? 'ghost-neutral'} onClick={secondaryAction.onClick}>
+          <Button 
+            size={'medium'} 
+            variant={secondaryAction.variant ?? 'ghost-neutral'} 
+            onClick={(e) => {
+              secondaryAction.onClick(e);
+              trackEvent('hl_chat_confirmation_modal_secondary_action', { modalId: id });
+            }}
+          >
             {secondaryAction.label}
           </Button>
         }
-        <Button size={'medium'} variant={primaryAction.variant ?? 'danger'} onClick={primaryAction.onClick}>
+        <Button 
+          size={'medium'} 
+          variant={primaryAction.variant ?? 'danger'} 
+          onClick={(e) => {
+            primaryAction.onClick(e);
+            trackEvent('hl_chat_confirmation_modal_primary_action', { modalId: id });
+          }}
+        >
           {primaryAction.label}
         </Button>
       </div>

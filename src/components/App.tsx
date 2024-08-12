@@ -9,6 +9,7 @@ import { useStore } from "@/providers/store-provider";
 import Modals from "./modals/Modals";
 import { ModalContainer } from "@/components/modals/ModalContainer";
 import {useShallow} from "zustand/react/shallow";
+import { initAmplitude, trackEvent } from "@/utils/amplitude";
 
 function useContextReceivedHandler(navigateToNewChat: () => void) {
   const { addAttachment, setHighlightContext, setInput, promptApp } = useStore(
@@ -82,6 +83,7 @@ function useAboutMeRegister() {
         const aboutMeString = aboutMe.join("\n");
         console.log("About Me:", aboutMeString);
         setAboutMe(aboutMeString);
+        trackEvent('hl_chat_about_me_loaded', { length: aboutMe.length });
       }
     };
     getAboutMe();
@@ -100,6 +102,7 @@ export default function App({ children }: { children: React.ReactNode }) {
   const navigateToNewChat = useCallback(() => {
     if (pathname !== "/") {
       router.push("/");
+      trackEvent('hl_chat_new_chat_navigated', {});
     }
   }, [pathname, router]);
 
@@ -107,6 +110,11 @@ export default function App({ children }: { children: React.ReactNode }) {
     if (typeof window !== "undefined" && !Highlight.isRunningInHighlight()) {
       window.location.href = "https://highlight.ing/apps/highlightchat";
     }
+  }, []);
+
+  useEffect(() => {
+    initAmplitude();
+    trackEvent('hl_chat_app_initialized', {});
   }, []);
 
   useContextReceivedHandler(navigateToNewChat);

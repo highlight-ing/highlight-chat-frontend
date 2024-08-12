@@ -16,6 +16,7 @@ import 'katex/dist/katex.min.css';
 // @ts-ignore
 import { BlockMath, InlineMath } from 'react-katex'
 
+
 const hasAttachment = (message: UserMessage) => {
   return (
     message.screenshot ||
