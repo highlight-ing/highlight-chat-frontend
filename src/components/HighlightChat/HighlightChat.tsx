@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {useEffect, useMemo, useState} from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/Input/Input";
 
 import styles from "@/main.module.scss";
@@ -11,7 +11,7 @@ import History from "@/components/History/History";
 import { useStore } from "@/providers/store-provider";
 import ChatHome from "@/components/ChatHome/ChatHome";
 import ChatHeader from "@/components/ChatHeader/ChatHeader";
-import {useShallow} from "zustand/react/shallow";
+import { useShallow } from "zustand/react/shallow";
 
 /**
  * Hook that handles pasting from the clipboard.
@@ -72,8 +72,8 @@ const HighlightChat = () => {
   const [showHistory, setShowHistory] = useState(false);
 
   const isChatting = useMemo(() => {
-    return inputIsDisabled || messages.length > 0
-  }, [inputIsDisabled, messages])
+    return inputIsDisabled || messages.length > 0;
+  }, [inputIsDisabled, messages]);
 
   // HOOKS
   useHandleClipboardPaste();
@@ -87,13 +87,10 @@ const HighlightChat = () => {
           showHistory ? styles.partial : styles.full
         }`}
       >
-        <ChatHeader isShowing={!!promptName && messages.length === 0}/>
-        {isChatting && <Messages/>}
-        {
-          (isChatting || promptName) &&
-          <Input sticky={true} />
-        }
-        <ChatHome isShowing={!isChatting && !promptName}/>
+        <ChatHeader isShowing={!!promptName && messages.length === 0} />
+        {isChatting && <Messages />}
+        {(isChatting || promptName) && <Input sticky={true} />}
+        <ChatHome isShowing={!isChatting && !promptName} />
       </div>
     </div>
   );
