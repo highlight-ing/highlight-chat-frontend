@@ -76,7 +76,7 @@ export default async function addAttachmentsToFormData(
               `file.${imageNameFromMimeType}`,
               mime
             );
-            if (!imageFile) return;
+            if (!imageFile) continue;
             const compressedFile = await compressImageIfNeeded(imageFile);
             const base64data = await readFileAsBase64(compressedFile);
             const mimeType = compressedFile.type || "image/png";
