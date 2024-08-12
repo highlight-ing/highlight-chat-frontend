@@ -100,7 +100,14 @@ export const Attachment = ({
       case "window":
         return <Keyboard className="text-white" />;
       case "text_file":
-        return <Document className="text-white" />;
+        return (
+          <div className="flex w-full justify-center align-center gap-2 p-2">
+            <Document className="text-white min-w-5" />
+            <span className="inline-block align-middle text-sm text-white truncate max-w-40">
+              {value}
+            </span>
+          </div>
+        );
       default:
         return null;
     }

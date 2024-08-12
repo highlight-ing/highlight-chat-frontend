@@ -70,6 +70,7 @@ export interface FileAttachment {
 export interface TextFileAttachment {
   type: "text_file";
   value: string;
+  fileName: string;
 }
 export interface SpreadsheetAttachment {
   type: "spreadsheet";

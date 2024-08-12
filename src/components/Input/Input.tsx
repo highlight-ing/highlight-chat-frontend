@@ -12,7 +12,9 @@ import { useShallow } from "zustand/react/shallow";
 
 const MAX_INPUT_HEIGHT = 160;
 
-function prepareFileAttachments(atts: AttachmentType[]): AttachmentType[] {
+function prepareFileAttachmentsForRender(
+  atts: AttachmentType[]
+): AttachmentType[] {
   const processedAttachments: AttachmentType[] = atts.map((attachment) => {
     if (attachment.type !== "file") {
       return attachment;
@@ -65,6 +67,7 @@ function prepareFileAttachments(atts: AttachmentType[]): AttachmentType[] {
       return {
         type: "text_file",
         value: attachment.value,
+        fileName: attachment.fileName,
       };
     } else {
       return attachment;
@@ -138,12 +141,14 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
         return attachment.value.name;
       case "file":
         return attachment.fileName;
+      case "text_file":
+        return attachment.fileName;
       default:
         return attachment.value;
     }
   };
 
-  const preparedAttachments = prepareFileAttachments(attachments);
+  const preparedAttachments = prepareFileAttachmentsForRender(attachments);
 
   return (
     <div
