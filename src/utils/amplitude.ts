@@ -6,9 +6,6 @@ import * as amplitude from '@amplitude/analytics-browser';
    [key: string]: any;
  }
 
- // Debug mode constant
- export const IS_DEBUG = process.env.NEXT_PUBLIC_AMPLITUDE_DEBUG_MODE === 'true';
-
  export const initAmplitude = (): void => {
    if (typeof window !== 'undefined') {
      amplitude.init(process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY as string, {
