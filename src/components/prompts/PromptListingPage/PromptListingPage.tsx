@@ -39,7 +39,7 @@ export default function PromptListingPage({
 }: PromptListingPageProps) {
   return (
     <div>
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-flow-col gap-4">
         <div className="flex flex-col justify-center gap-3">
           <div className="flex gap-3">
             <IconPlaceholder />
@@ -55,20 +55,18 @@ export default function PromptListingPage({
             </Button>
           </div>
         </div>
-        {videoUrl && (
-          <div className="flex justify-center items-center aspect-w-16 aspect-h-9">
-            {/* Video rectangle */}
-            <iframe
-              width="640"
-              height="360"
-              src="https://www.youtube.com/embed/tgbNymZ7vqY"
-            ></iframe>
-          </div>
-        )}
+        <div className="flex justify-center items-center aspect-w-16 aspect-h-9">
+          {/* Video rectangle */}
+          <iframe
+            width="640"
+            height="360"
+            src="https://www.youtube.com/embed/tgbNymZ7vqY"
+          ></iframe>
+        </div>
       </div>
       <hr className="h-px my-10 border-0 bg-light-5" />
       <div className="flex flex-col lg:flex-row gap-10">
-        <div className="flex flex-col gap-4 basis-2/3">
+        <div className="flex flex-col gap-4 basis-1/2">
           <div className="space-y-2">
             <h4 className="text-light-20">Features</h4>
             <p className="text-light-60">
@@ -101,7 +99,7 @@ export default function PromptListingPage({
             </p>
           </div>
         </div>
-        <div className="flex flex-col gap-3 basis-1/3">
+        <div className="flex flex-col gap-3 basis-1/2">
           <h4 className="text-light-20">Related Apps</h4>
           {relatedApps.map((app) => (
             <RelatedApp key={app.slug} {...app} />
