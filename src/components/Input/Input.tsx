@@ -62,7 +62,9 @@ function prepareFileAttachmentsForRender(
       mimeType.startsWith("text/") ||
       mimeType === "application/json" ||
       mimeType === "application/xml" ||
-      mimeType === "application/javascript"
+      mimeType === "application/javascript" ||
+      mimeType ===
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     ) {
       return {
         type: "text_file",
