@@ -85,7 +85,6 @@ function useAboutMeRegister() {
         const aboutMeString = aboutMe.join("\n");
         console.log("About Me:", aboutMeString);
         setAboutMe(aboutMeString);
-        trackEvent('HL Chat User About Me Loaded', { length: aboutMe.length });
       }
     };
     getAboutMe();
