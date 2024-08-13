@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {useEffect, useMemo, useState} from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/Input/Input";
 
 import styles from "@/main.module.scss";
@@ -79,8 +79,8 @@ const HighlightChat = () => {
   const [showHistory, setShowHistory] = useState(false);
 
   const isChatting = useMemo(() => {
-    return inputIsDisabled || messages.length > 0
-  }, [inputIsDisabled, messages])
+    return inputIsDisabled || messages.length > 0;
+  }, [inputIsDisabled, messages]);
 
   // HOOKS
   useHandleClipboardPaste();
@@ -103,13 +103,10 @@ const HighlightChat = () => {
           showHistory ? styles.partial : styles.full
         }`}
       >
-        <ChatHeader isShowing={!!promptName && messages.length === 0}/>
-        {isChatting && <Messages/>}
-        {
-          (isChatting || promptName) &&
-          <Input sticky={true} />
-        }
-        <ChatHome isShowing={!isChatting && !promptName}/>
+        <ChatHeader isShowing={!!promptName && messages.length === 0} />
+        {isChatting && <Messages />}
+        {(isChatting || promptName) && <Input sticky={true} />}
+        <ChatHome isShowing={!isChatting && !promptName} />
       </div>
     </div>
   );
