@@ -64,15 +64,16 @@ const History: React.FC<HistoryProps> = ({
   }, [history])
 
   useEffect(() => {
-    trackEvent('hl_chat_history_visibility_changed', { 
-      isVisible: showHistory,
-      historyItemCount: history.length
-    });
-  }, [showHistory, history.length]);
+    trackEvent('HL Chat History Viewed', {});
+  }, []);
+
+  useEffect(() => {
+    trackEvent('HL Chat Conversation Selected', { conversationId: history.length });
+  }, [history.length]);
 
   const toggleHistory = () => {
     setShowHistory(!showHistory);
-    trackEvent('hl_chat_history_toggled', { 
+    trackEvent('HL Chat History Toggled', { 
       newState: !showHistory ? 'visible' : 'hidden',
       historyItemCount: history.length
     });
@@ -147,7 +148,7 @@ const HistoryItem = ({chat}: {chat: ChatHistoryItem}) => {
     const response = await get(`history/${chat.id}/messages`)
     if (!response.ok) {
       console.error('Failed to select chat')
-      trackEvent('hl_chat_select_chat_error', { 
+      trackEvent('HL Chat Select Chat Error', { 
         chatId: chat.id,
         error: 'Failed to fetch messages'
       });
@@ -172,7 +173,7 @@ const HistoryItem = ({chat}: {chat: ChatHistoryItem}) => {
         return baseMessage as AssistantMessage;
       }
     }))
-    trackEvent('hl_chat_selected', { 
+    trackEvent('HL Chat Selected', { 
       chatId: chat.id,
       messageCount: messages.length
     });
@@ -180,7 +181,7 @@ const HistoryItem = ({chat}: {chat: ChatHistoryItem}) => {
 
   const onDeleteChat = async (chat: ChatHistoryItem) => {
     openModal('delete-chat', chat)
-    trackEvent('hl_chat_delete_initiated', { 
+    trackEvent('HL Chat Delete Initiated', { 
       chatId: chat.id
     });
   }
@@ -193,7 +194,7 @@ const HistoryItem = ({chat}: {chat: ChatHistoryItem}) => {
           label: 'Open Chat', 
           onClick: () => {
             onSelectChat(chat);
-            trackEvent('hl_chat_opened_from_context_menu', { 
+            trackEvent('HL Chat Opened From Context Menu', { 
               chatId: chat.id
             });
           }

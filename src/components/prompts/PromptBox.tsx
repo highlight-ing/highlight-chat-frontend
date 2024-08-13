@@ -38,7 +38,7 @@ export default function PromptBox({
     if (name === "Highlight Chat") {
       clearPrompt();
       router.push("/");
-      trackEvent('hl_chat_default_chat_selected', { promptName: name });
+      trackEvent('HL Chat Default Chat Selected', { promptName: name });
       return;
     }
 
@@ -53,7 +53,7 @@ export default function PromptBox({
     });
 
     router.push(`/`);
-    trackEvent('hl_chat_prompt_selected', { promptName: name, promptSlug: slug });
+    trackEvent('HL Chat Prompt Selected', { promptName: name, promptSlug: slug });
   };
 
   const BaseElement = ({ children }: { children: React.ReactNode }) => {
@@ -77,12 +77,12 @@ export default function PromptBox({
   const onViewClick = (e: React.MouseEvent) => {
     e.preventDefault();
     onClick();
-    trackEvent('hl_chat_prompt_viewed', { promptName: name, promptSlug: slug });
+    trackEvent('HL Chat Prompt Viewed', { promptName: name, promptSlug: slug });
   };
 
   const onEditClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    trackEvent('hl_chat_prompt_edit_initiated', { promptName: name, promptSlug: slug });
+    trackEvent('HL Chat Prompt Edit Initiated', { promptName: name, promptSlug: slug });
     router.push(`/prompts/${slug}/edit`);
   };
 

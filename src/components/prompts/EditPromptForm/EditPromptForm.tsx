@@ -72,7 +72,7 @@ export default function EditPromptForm({
   const { getAccessToken } = useAuth();
 
   useEffect(() => {
-    trackEvent('hl_chat_edit_prompt_form_appeared', { promptSlug: slug });
+    trackEvent('HL Chat Edit Prompt Form Viewed', { promptSlug: slug });
   }, [slug]);
 
   const onSubmit: SubmitHandler<UpdatePromptData> = async (data) => {
@@ -81,11 +81,11 @@ export default function EditPromptForm({
 
     if (response && response.error) {
       openErrorModal(response.error);
-      trackEvent('hl_chat_edit_prompt_error', { promptSlug: slug, error: response.error });
+      trackEvent('HL Chat Edit Prompt Error', { promptSlug: slug, error: response.error });
       return;
     }
 
-    trackEvent('hl_chat_prompt_updated', { 
+    trackEvent('HL Chat Prompt Updated', { 
       promptSlug: slug,
       promptVisibility: data.visibility,
     });
@@ -101,11 +101,11 @@ export default function EditPromptForm({
 
     if (response && response.error) {
       openErrorModal(response.error);
-      trackEvent('hl_chat_delete_prompt_error', { promptSlug: slug, error: response.error });
+      trackEvent('HL Chat Delete Prompt Error', { promptSlug: slug, error: response.error });
       return;
     }
 
-    trackEvent('hl_chat_prompt_deleted', { promptSlug: slug });
+    trackEvent('HL Chat Prompt Deleted', { promptSlug: slug });
 
     if (promptAppName === slug) {
       clearPrompt()
@@ -118,7 +118,7 @@ export default function EditPromptForm({
   // Watch for changes in the visibility field
   const visibility = watch('visibility');
   useEffect(() => {
-    trackEvent('hl_chat_prompt_visibility_changed', { 
+    trackEvent('HL Chat Prompt Visibility Changed', { 
       promptSlug: slug,
       newVisibility: visibility,
     });
@@ -199,7 +199,9 @@ export default function EditPromptForm({
             type="submit" 
             color="cyan" 
             className="h-10"
-            onClick={() => trackEvent('hl_chat_edit_prompt_update_clicked', { promptSlug: slug })}
+            onClick={() => {
+              trackEvent('HL Chat Edit Prompt Update Clicked', { promptSlug: slug });
+            }}
           >
             Update
           </Button>
@@ -209,7 +211,7 @@ export default function EditPromptForm({
             className="h-10"
             onClick={() => {
               setIsDeleteModalOpen(true);
-              trackEvent('hl_chat_delete_prompt_initiated', { promptSlug: slug });
+              trackEvent('HL Chat Delete Prompt Initiated', { promptSlug: slug });
             }}
           >
             Delete
@@ -229,7 +231,7 @@ export default function EditPromptForm({
             label: 'Nevermind', 
             onClick: () => {
               setIsDeleteModalOpen(false);
-              trackEvent('hl_chat_delete_prompt_cancelled', { promptSlug: slug });
+              trackEvent('HL Chat Delete Prompt Cancelled', { promptSlug: slug });
             }
           }}
         >

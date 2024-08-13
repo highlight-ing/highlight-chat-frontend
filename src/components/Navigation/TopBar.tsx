@@ -39,19 +39,19 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
     startNewConversation();
     clearPrompt()
     router.push("/");
-    trackEvent('hl_chat_new_conversation_started', {});
+    trackEvent('HL Chat New Conversation Started', {});
   };
 
   const onShowHistoryClick = () => {
     if (setShowHistory) {
       setShowHistory(!showHistory);
-      trackEvent('hl_chat_history_toggled', { newState: !showHistory });
+      trackEvent('HL Chat History Toggled', { newState: !showHistory });
     }
   };
 
   const onSwitchChatAppClick = () => {
     openModal('prompts-modal');
-    trackEvent('hl_chat_switch_app_modal_opened', {});
+    trackEvent('HL Chat Switch App Modal Opened', {});
   };
 
   const promptType = promptApp ? getPromptAppType(promptUserId, promptApp) : undefined

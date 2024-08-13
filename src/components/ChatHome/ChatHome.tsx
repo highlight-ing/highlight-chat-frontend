@@ -21,12 +21,12 @@ const ChatHome = ({isShowing}: {isShowing: boolean}) => {
   useEffect(() => {
     if (isShowing) {
       setVisible(true)
-      trackEvent('hl_chat_home_shown', {});
+      trackEvent('HL Chat Home Viewed', {});
     } else {
       setTimeout(() => {
         setVisible(false)
       }, 500)
-      trackEvent('hl_chat_home_hidden', {});
+      trackEvent('HL Chat Home Hidden', {});
     }
   }, [isShowing])
 
@@ -46,7 +46,7 @@ const ChatHome = ({isShowing}: {isShowing: boolean}) => {
           description={"Check out what you can do with Highlight Chat."}
           onClick={() => {
             openModal('prompts-modal')
-            trackEvent('hl_chat_prompts_modal_opened', {});
+            trackEvent('HL Chat Prompts Modal Opened', {});
           }}
         />
         <Callout
@@ -55,7 +55,7 @@ const ChatHome = ({isShowing}: {isShowing: boolean}) => {
           description={"Try other Highlight apps created by the community."}
           onClick={() => {
             window.open('highlight://appstore', '_blank')
-            trackEvent('hl_chat_app_store_opened', {});
+            trackEvent('HL Chat App Store Opened', {});
           }}
         />
         <Callout
@@ -64,7 +64,7 @@ const ChatHome = ({isShowing}: {isShowing: boolean}) => {
           description={"Make your own Highlight Chat apps and publish them."}
           onClick={() => {
             openModal('create-prompt')
-            trackEvent('hl_chat_create_prompt_modal_opened', {});
+            trackEvent('HL Chat Create Prompt Modal Opened', {});
           }}
         />
       </div>
@@ -121,13 +121,13 @@ const Prompts = () => {
     const fetchHotkey = async () => {
       const hotkey = await Highlight.app.getHotkey()
       setHotkey(hotkey)
-      trackEvent('hl_chat_hotkey_fetched', { hotkey });
+      trackEvent('HL Chat Hotkey Fetched', { hotkey });
     }
     fetchHotkey()
   }, [])
 
   if (isLoadingPrompts) {
-    trackEvent('hl_chat_prompts_loading', {});
+    trackEvent('HL Chat Prompts Loading', {});
     return (
       <div className={`${styles.prompts} ${mainStyles.loadingGradient}`}>
         <div className={'w-full h-20 p-16'}/>
@@ -136,11 +136,11 @@ const Prompts = () => {
   }
 
   if (!myPrompts.length) {
-    trackEvent('hl_chat_tutorial_shown', {});
+    trackEvent('HL Chat Tutorial Shown', {});
     return <HighlightTutorial hotkey={hotkey}/>
   }
 
-  trackEvent('hl_chat_prompts_list_shown', { promptCount: myPrompts.length });
+  trackEvent('HL Chat Prompts List Shown', { promptCount: myPrompts.length });
   return (
     <div className={styles.prompts}>
       {myPrompts.map((prompt: any) => {
@@ -151,7 +151,7 @@ const Prompts = () => {
             type={'self'}
             onClick={() => {
               selectPrompt(prompt)
-              trackEvent('hl_chat_prompt_selected', { promptSlug: prompt.slug });
+              trackEvent('HL Chat Prompt Selected', { promptSlug: prompt.slug });
             }}
           />
         )
@@ -164,7 +164,7 @@ const Prompts = () => {
         type={'default'}
         onClick={() => {
           openModal('create-prompt')
-          trackEvent('hl_chat_create_prompt_from_list', {});
+          trackEvent('HL Chat Create Prompt From List', {});
         }}
       />
     </div>
@@ -196,7 +196,7 @@ const HighlightTutorial = ({hotkey}: {hotkey: string}) => {
         style={{
           maxWidth: '148px',
         }}
-        onPlay={() => trackEvent('hl_chat_tutorial_video_played', {})}
+        onPlay={() => trackEvent('HL Chat Tutorial Video Played', {})}
       />
     </div>
   )

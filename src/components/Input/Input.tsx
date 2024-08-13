@@ -38,17 +38,13 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
       e.preventDefault();
       handleSubmit(promptApp);
       setInput("");
-      trackEvent('hl_chat_query_submitted', { 
-        promptName, 
-        promptApp,
-        hasAttachments: attachments.length > 0
-      });
+      trackEvent('HL Chat Message Sent', { messageLength: input.length });
     }
   };
 
   const onClickContainer = (e: React.MouseEvent) => {
     inputRef.current?.focus();
-    trackEvent('hl_chat_input_focused', {});
+    trackEvent('HL Chat Input Focused', {});
   };
 
   useEffect(() => {
@@ -64,7 +60,7 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
 
   useEffect(() => {
     if (attachments.length > 0) {
-      trackEvent('hl_chat_attachments_present', { 
+      trackEvent('HL Chat Attachments Present', { 
         attachmentCount: attachments.length,
         attachmentTypes: attachments.map(a => a.type)
       });
@@ -117,7 +113,7 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
         rows={1}
         onInput={(e) => setInput(e.currentTarget.value)}
         onKeyDown={handleKeyDown}
-        onFocus={() => trackEvent('hl_chat_input_focused', {})}
+        onFocus={() => trackEvent('HL Chat Input Focused', {})}
       />
     </div>
   );

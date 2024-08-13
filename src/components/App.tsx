@@ -85,7 +85,7 @@ function useAboutMeRegister() {
         const aboutMeString = aboutMe.join("\n");
         console.log("About Me:", aboutMeString);
         setAboutMe(aboutMeString);
-        trackEvent('hl_chat_about_me_loaded', { length: aboutMe.length });
+        trackEvent('HL Chat User About Me Loaded', { length: aboutMe.length });
       }
     };
     getAboutMe();
@@ -105,7 +105,7 @@ export default function App({ children }: { children: React.ReactNode }) {
   const navigateToNewChat = useCallback(() => {
     if (pathname !== "/") {
       router.push("/");
-      trackEvent('hl_chat_new_chat_navigated', {});
+      trackEvent('HL Chat New Conversation Started', {});
     }
   }, [pathname, router]);
 
@@ -135,14 +135,14 @@ export default function App({ children }: { children: React.ReactNode }) {
         initAmplitude(userId);
         
         // Track the app initialization event
-        trackEvent('hl_chat_app_initialized', { userId });
+        trackEvent('HL Chat App Initialized', { userId });
       } catch (error) {
         console.error('Failed to initialize Amplitude:', error);
         
         // Fallback to a random ID if token retrieval or decoding fails
         const fallbackId = `anonymous_${Math.random().toString(36).substr(2, 9)}`;
         initAmplitude(fallbackId);
-        trackEvent('hl_chat_app_initialized', { fallbackId, error: 'Failed to get userId' });
+        trackEvent('HL Chat App Initialized', { fallbackId, error: 'Failed to get userId' });
       }
     };
 

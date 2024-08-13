@@ -34,7 +34,7 @@ const ConfirmationModal = ({ children, id, header, primaryAction, secondaryActio
             variant={secondaryAction.variant ?? 'ghost-neutral'} 
             onClick={(e) => {
               secondaryAction.onClick(e);
-              trackEvent('hl_chat_confirmation_modal_secondary_action', { modalId: id });
+              trackEvent('HL Chat Confirmation Modal Action', { modalId: id, action: 'secondary' });
             }}
           >
             {secondaryAction.label}
@@ -45,7 +45,7 @@ const ConfirmationModal = ({ children, id, header, primaryAction, secondaryActio
           variant={primaryAction.variant ?? 'danger'} 
           onClick={(e) => {
             primaryAction.onClick(e);
-            trackEvent('hl_chat_confirmation_modal_primary_action', { modalId: id });
+            trackEvent('HL Chat Confirmation Modal Action', { modalId: id, action: 'primary' });
           }}
         >
           {primaryAction.label}

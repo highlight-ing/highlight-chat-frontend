@@ -32,6 +32,7 @@ function useHandleClipboardPaste() {
         if (item.kind === "file") {
           const file = item.getAsFile();
           if (file) {
+            let pasteType = "unsupported";
             if (file.type.startsWith("image/")) {
               console.log("Pasted image");
               console.log("Image data URL:", URL.createObjectURL(file));
@@ -40,20 +41,19 @@ function useHandleClipboardPaste() {
                 value: URL.createObjectURL(file),
                 file: file,
               });
-              trackEvent('hl_chat_image_pasted', { fileType: file.type });
+              pasteType = "image";
             } else if (file.type === "application/pdf") {
               console.log("Pasted PDF");
               addAttachment({
                 type: "pdf",
                 value: file,
               });
-              trackEvent('hl_chat_pdf_pasted', {});
-            } else {
-              trackEvent('hl_chat_unsupported_file_pasted', { fileType: file.type });
+              pasteType = "pdf";
             }
+            trackEvent('HL Chat Paste', { type: pasteType, fileType: file.type });
           }
         } else if (item.kind === "string") {
-          trackEvent('hl_chat_text_pasted', {});
+          trackEvent('HL Chat Paste', { type: "text" });
         }
       }
     };
@@ -86,13 +86,8 @@ const HighlightChat = () => {
   useHandleClipboardPaste();
 
   useEffect(() => {
-    trackEvent('hl_chat_state_changed', { 
-      isChatting,
-      messageCount: messages.length,
-      inputIsDisabled,
-      hasPrompt: !!promptName
-    });
-  }, [isChatting, messages.length, inputIsDisabled, promptName]);
+    trackEvent('HL Chat Initialized', {});
+  }, []);
 
   return (
     <div className={styles.page}>

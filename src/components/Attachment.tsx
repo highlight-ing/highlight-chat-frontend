@@ -1,11 +1,12 @@
 import { ClipboardText, Document, Keyboard, Sound, GallerySlash } from 'iconsax-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { CloseIcon } from '../icons/icons'
 import Tooltip from './Tooltip'
 import { useStore } from '@/providers/store-provider'
 import { AttachmentType } from '@/types'
 import { useImageDownload } from '@/hooks/useImageDownload'
 import {useShallow} from "zustand/react/shallow";
+import { trackEvent } from '@/utils/amplitude';
 
 interface AttachmentProps {
   type: AttachmentType
@@ -30,7 +31,13 @@ export const Attachment = ({ type, value, isFile = false, removeEnabled = false 
     if (fileInputRef?.current && isFile) {
       fileInputRef.current.value = ''
     }
+    trackEvent('HL Chat Attachment Removed', { type });
   }
+
+  useEffect(() => {
+    // Track the attachment addition when the component mounts
+    trackEvent('HL Chat Attachment Added', { type });
+  }, []);
 
   const renderAttachmentContent = () => {
     switch (type) {

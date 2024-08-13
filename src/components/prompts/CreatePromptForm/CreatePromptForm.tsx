@@ -40,7 +40,7 @@ export default function CreatePromptForm(props: CreatePromptFormProps) {
   const { getAccessToken } = useAuth();
 
   useEffect(() => {
-    trackEvent('hl_chat_create_prompt_form_appeared', {});
+    trackEvent('HL Chat Create Prompt Form Viewed', {});
   }, []);
 
   const onSubmit: SubmitHandler<CreatePromptData> = async (data) => {
@@ -48,11 +48,11 @@ export default function CreatePromptForm(props: CreatePromptFormProps) {
     const { error } = await createPrompt(data, accessToken);
     if (error) {
       openErrorModal(error);
-      trackEvent('hl_chat_create_prompt_error', { error });
+      trackEvent('HL Chat Create Prompt Error', { error });
       return;
     }
 
-    trackEvent('hl_chat_prompt_created', { 
+    trackEvent('HL Chat Prompt Created', { 
       promptVisibility: data.visibility,
     });
 
@@ -63,7 +63,7 @@ export default function CreatePromptForm(props: CreatePromptFormProps) {
   // Watch for changes in the visibility field
   const visibility = watch('visibility');
   useEffect(() => {
-    trackEvent('hl_chat_prompt_visibility_changed', { 
+    trackEvent('HL Chat Prompt Visibility Changed', { 
       newVisibility: visibility,
     });
   }, [visibility]);
@@ -150,7 +150,7 @@ export default function CreatePromptForm(props: CreatePromptFormProps) {
           type="submit" 
           color="cyan" 
           className="h-10 mt-5 cursor-pointer"
-          onClick={() => trackEvent('hl_chat_create_prompt_button_clicked', {})}
+          onClick={() => trackEvent('HL Chat Create Prompt Button Clicked', {})}
         >
           Create
         </Button>

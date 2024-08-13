@@ -17,7 +17,7 @@ interface PromptListRowProps {
 
 const PromptListRow = ({prompt, icon, type, isCta, onClick, onClickEdit}: PromptListRowProps) => {
   const handleClick = (e: React.MouseEvent) => {
-    trackEvent('hl_chat_prompt_selected_from_list', {
+    trackEvent('HL Chat Prompt Selected From List', {
       promptName: prompt.name,
       promptSlug: prompt.slug,
       promptType: type,
@@ -28,7 +28,7 @@ const PromptListRow = ({prompt, icon, type, isCta, onClick, onClickEdit}: Prompt
 
   const handleEditClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    trackEvent('hl_chat_prompt_edit_initiated_from_list', {
+    trackEvent('HL Chat Prompt Edit Initiated From List', {
       promptName: prompt.name,
       promptSlug: prompt.slug,
       promptType: type

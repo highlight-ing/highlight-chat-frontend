@@ -22,7 +22,7 @@ const CodeBlock = ({children, language}: PropsWithChildren<CodeBlockProps>) => {
       setCopied(false)
       timeoutRef.current = undefined
     }, 2000)
-    trackEvent('hl_chat_code_copied', { language });
+    trackEvent('HL Chat Code Copied', { language });
   }
 
   useEffect(() => {

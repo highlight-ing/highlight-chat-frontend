@@ -23,7 +23,7 @@ export const ScreenshotAttachmentPicker = ({ isVisible, onClose }: ScreenshotAtt
 
   useEffect(() => {
     if (isVisible) {
-      trackEvent('hl_chat_screenshot_picker_opened', {})
+      trackEvent('HL Chat Screenshot Picker Opened', {})
     }
   }, [isVisible])
 
@@ -46,7 +46,7 @@ export const ScreenshotAttachmentPicker = ({ isVisible, onClose }: ScreenshotAtt
   }, [onClose])
 
   const handleClose = () => {
-    trackEvent('hl_chat_screenshot_picker_closed', {})
+    trackEvent('HL Chat Screenshot Picker Closed', {})
     onClose()
   }
 
@@ -56,7 +56,7 @@ export const ScreenshotAttachmentPicker = ({ isVisible, onClose }: ScreenshotAtt
         type: 'image',
         value: screenshot
       })
-      trackEvent('hl_chat_screenshot_attached', { source })
+      trackEvent('HL Chat Screenshot Attached', { source })
     }
   }
 
