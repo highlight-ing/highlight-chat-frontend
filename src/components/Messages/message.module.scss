@@ -41,9 +41,9 @@
 }
 
 .messageBody {
-  font-size: 16px;
+  font-size: 15px;
   color: $light-80;
-  font-weight: 200;
+  font-weight: 300;
   line-height: 1.6;
   //display: flex;
   //flex-direction: column;
@@ -143,6 +143,6 @@
   background-color: $light-5;
   color: $light-40;
   font-size: 13px;
-  font-family: "Public Sans", sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: normal;
 }
