@@ -50,7 +50,7 @@ export const AttachmentsButton = () => {
   const onAddAudio = async (durationInMinutes: number) => {
     const audio = await Highlight.user.getAudioForDuration(durationInMinutes * 60)
     addAttachment({ type: 'audio', value: audio, duration: durationInMinutes })
-    trackEvent('HL Chat Audio Attachment Added', { durationInMinutes });
+    trackEvent('HL Chat Attachment Added', { type: 'audio', durationInMinutes });
   }
 
   const onAddFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,19 +62,19 @@ export const AttachmentsButton = () => {
           value: URL.createObjectURL(file),
           file: file
         })
-        trackEvent('HL Chat Image Attachment Added', { fileType: file.type });
+        trackEvent('HL Chat Attachment Added', { type: 'image', fileType: file.type });
       } else if (file.type === 'application/pdf') {
         addAttachment({
           type: 'pdf',
           value: file
         })
-        trackEvent('HL Chat PDF Attachment Added', {});
+        trackEvent('HL Chat Attachment Added', { type: 'pdf' });
       } else if (file.type === 'text/csv' || file.type === 'application/vnd.ms-excel' || file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
         addAttachment({
           type: 'spreadsheet',
           value: file
         })
-        trackEvent('HL Chat Spreadsheet Attachment Added', { fileType: file.type });
+        trackEvent('HL Chat Attachment Added', { type: 'spreadsheet', fileType: file.type });
       }
     }
   }
@@ -109,13 +109,13 @@ export const AttachmentsButton = () => {
         type: 'image',
         value: clipboard.value
       })
-      trackEvent('HL Chat Clipboard Image Added', {});
+      trackEvent('HL Chat Attachment Added', { type: 'clipboard_image' });
     } else {
       addAttachment({
         type: 'clipboard',
         value: clipboard.value
       })
-      trackEvent('HL Chat Clipboard Text Added', {});
+      trackEvent('HL Chat Attachment Added', { type: 'clipboard_text' });
     }
   }
 
