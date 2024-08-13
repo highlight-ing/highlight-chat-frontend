@@ -73,10 +73,6 @@ const History: React.FC<HistoryProps> = ({
 
   const toggleHistory = () => {
     setShowHistory(!showHistory);
-    trackEvent('HL Chat History Toggled', { 
-      newState: !showHistory ? 'visible' : 'hidden',
-      historyItemCount: history.length
-    });
   };
 
   return (
@@ -173,9 +169,10 @@ const HistoryItem = ({chat}: {chat: ChatHistoryItem}) => {
         return baseMessage as AssistantMessage;
       }
     }))
-    trackEvent('HL Chat Selected', { 
+    trackEvent('HL Chat Opened', { 
       chatId: chat.id,
-      messageCount: messages.length
+      messageCount: messages.length,
+      source: 'history_item'
     });
   }
 
@@ -194,8 +191,9 @@ const HistoryItem = ({chat}: {chat: ChatHistoryItem}) => {
           label: 'Open Chat', 
           onClick: () => {
             onSelectChat(chat);
-            trackEvent('HL Chat Opened From Context Menu', { 
-              chatId: chat.id
+            trackEvent('HL Chat Opened', { 
+              chatId: chat.id,
+              source: 'context_menu'
             });
           }
         },

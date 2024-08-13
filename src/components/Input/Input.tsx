@@ -4,6 +4,7 @@ import { AttachmentsButton } from "../AttachmentsButton/AttachmentsButton";
 import { Attachment as AttachmentType } from "@/types";
 import { useSubmitQuery } from "../../hooks/useSubmitQuery";
 import { useStore } from "@/providers/store-provider";
+import { PromptApp } from "@/types"; // Added this import
 
 import styles from "./chatinput.module.scss";
 import * as React from "react";
@@ -29,16 +30,26 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
       }))
     );
 
-  const { handleSubmit } = useSubmitQuery();
-
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
+  const handleSubmit = (promptApp: PromptApp) => {
+    if (attachments.length > 0) {
+      trackEvent('HL Chat Message Sent with Attachments', { 
+        messageLength: input.length,
+        attachmentCount: attachments.length,
+        attachmentTypes: attachments.map(a => a.type)
+      });
+    } else {
+      trackEvent('HL Chat Message Sent', { messageLength: input.length });
+    }
+    useSubmitQuery().handleSubmit(promptApp);
+    setInput("");
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (!inputIsDisabled && e.key === "Enter" && !e.shiftKey) {
+    if (!inputIsDisabled && e.key === "Enter" && !e.shiftKey && promptApp) {
       e.preventDefault();
       handleSubmit(promptApp);
-      setInput("");
-      trackEvent('HL Chat Message Sent', { messageLength: input.length });
     }
   };
 
@@ -57,15 +68,6 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
       inputRef.current.style.height = newHeight + "px";
     }
   }, [inputRef, input]);
-
-  useEffect(() => {
-    if (attachments.length > 0) {
-      trackEvent('HL Chat Attachments Present', { 
-        attachmentCount: attachments.length,
-        attachmentTypes: attachments.map(a => a.type)
-      });
-    }
-  }, [attachments]);
 
   const getValue = (attachment: AttachmentType) => {
     switch (attachment.type) {

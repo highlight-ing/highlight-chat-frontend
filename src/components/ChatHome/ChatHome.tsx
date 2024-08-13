@@ -164,7 +164,7 @@ const Prompts = () => {
         type={'default'}
         onClick={() => {
           openModal('create-prompt')
-          trackEvent('HL Chat Create Prompt From List', {});
+          trackEvent('HL Chat Start Create Chat App', { context: 'Chat Home List' });
         }}
       />
     </div>
