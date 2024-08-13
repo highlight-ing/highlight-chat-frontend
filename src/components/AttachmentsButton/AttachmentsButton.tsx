@@ -80,11 +80,11 @@ export const AttachmentsButton = () => {
   }
 
   const onClickScreenshot = async () => {
-    const hasClipboardReadPermissions = await Highlight.permissions.requestScreenshotPermission()
+    const hasScreenshotPermission = await Highlight.permissions.requestScreenshotPermission()
 
-    if (!hasClipboardReadPermissions) {
+    if (!hasScreenshotPermission) {
       console.log('Screenshot permission denied')
-      trackEvent('HL Chat Screenshot Permission Denied', {});
+      trackEvent('HL Chat Permission Denied', { type: 'screenshot' });
       return
     }
 
@@ -93,11 +93,11 @@ export const AttachmentsButton = () => {
   }
 
   const onAddClipboard = async () => {
-    const hasClipboardReadPermissions = await Highlight.permissions.requestClipboardReadPermission()
+    const hasClipboardReadPermission = await Highlight.permissions.requestClipboardReadPermission()
 
-    if (!hasClipboardReadPermissions) {
+    if (!hasClipboardReadPermission) {
       console.log('Clipboard read permission denied')
-      trackEvent('HL Chat Clipboard Permission Denied', {});
+      trackEvent('HL Chat Permission Denied', { type: 'clipboard' });
       return
     }
 
