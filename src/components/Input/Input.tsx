@@ -33,15 +33,12 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSubmit = (promptApp: PromptApp) => {
-    if (attachments.length > 0) {
-      trackEvent('HL Chat Message Sent with Attachments', { 
-        messageLength: input.length,
-        attachmentCount: attachments.length,
-        attachmentTypes: attachments.map(a => a.type)
-      });
-    } else {
-      trackEvent('HL Chat Message Sent', { messageLength: input.length });
-    }
+    trackEvent('HL Chat Message Sent', { 
+      messageLength: input.length,
+      hasAttachments: attachments.length > 0,
+      attachmentCount: attachments.length,
+      attachmentTypes: attachments.length > 0 ? attachments.map(a => a.type) : undefined
+    });
     useSubmitQuery().handleSubmit(promptApp);
     setInput("");
   };
