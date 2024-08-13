@@ -10,6 +10,8 @@ import Modals from "./modals/Modals";
 import { ModalContainer } from "@/components/modals/ModalContainer";
 import {useShallow} from "zustand/react/shallow";
 import { initAmplitude, trackEvent } from "@/utils/amplitude";
+import useAuth from '@/hooks/useAuth';
+import { decodeJwt } from 'jose';
 
 function useContextReceivedHandler(navigateToNewChat: () => void) {
   const { addAttachment, setHighlightContext, setInput, promptApp } = useStore(
@@ -98,6 +100,7 @@ function useAboutMeRegister() {
 export default function App({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { getAccessToken } = useAuth();
 
   const navigateToNewChat = useCallback(() => {
     if (pathname !== "/") {
@@ -113,9 +116,38 @@ export default function App({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    initAmplitude();
-    trackEvent('hl_chat_app_initialized', {});
-  }, []);
+    const initializeAmplitude = async () => {
+      try {
+        // Get the access token using the useAuth hook
+        const accessToken = await getAccessToken();
+        
+        // Decode the token to get the payload
+        const payload = decodeJwt(accessToken);
+        
+        // Extract the user ID from the 'sub' field
+        const userId = payload.sub as string;
+        
+        if (!userId) {
+          throw new Error('User ID not found in token');
+        }
+        
+        // Initialize Amplitude with the user ID
+        initAmplitude(userId);
+        
+        // Track the app initialization event
+        trackEvent('hl_chat_app_initialized', { userId });
+      } catch (error) {
+        console.error('Failed to initialize Amplitude:', error);
+        
+        // Fallback to a random ID if token retrieval or decoding fails
+        const fallbackId = `anonymous_${Math.random().toString(36).substr(2, 9)}`;
+        initAmplitude(fallbackId);
+        trackEvent('hl_chat_app_initialized', { fallbackId, error: 'Failed to get userId' });
+      }
+    };
+
+    initializeAmplitude();
+  }, [getAccessToken]);
 
   useContextReceivedHandler(navigateToNewChat);
   useAboutMeRegister();

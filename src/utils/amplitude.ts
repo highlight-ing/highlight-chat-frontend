@@ -6,10 +6,11 @@ import * as amplitude from '@amplitude/analytics-browser';
    [key: string]: any;
  }
 
- export const initAmplitude = (): void => {
+ export const initAmplitude = (userId: string): void => {
    if (typeof window !== 'undefined') {
      amplitude.init(process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY as string, {
        defaultTracking: true,
+       userId: userId,
      });
    }
  };
