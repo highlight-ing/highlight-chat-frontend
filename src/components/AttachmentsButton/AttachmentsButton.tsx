@@ -44,13 +44,13 @@ export const AttachmentsButton = () => {
 
   const handleAttachmentClick = () => {
     fileInputRef?.current?.click()
-    trackEvent('hl_chat_attachments_button_clicked', {});
+    trackEvent('HL Chat Attachments Button Clicked', {});
   }
 
   const onAddAudio = async (durationInMinutes: number) => {
     const audio = await Highlight.user.getAudioForDuration(durationInMinutes * 60)
     addAttachment({ type: 'audio', value: audio, duration: durationInMinutes })
-    trackEvent('hl_chat_audio_attachment_added', { durationInMinutes });
+    trackEvent('HL Chat Audio Attachment Added', { durationInMinutes });
   }
 
   const onAddFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,19 +62,19 @@ export const AttachmentsButton = () => {
           value: URL.createObjectURL(file),
           file: file
         })
-        trackEvent('hl_chat_image_attachment_added', { fileType: file.type });
+        trackEvent('HL Chat Image Attachment Added', { fileType: file.type });
       } else if (file.type === 'application/pdf') {
         addAttachment({
           type: 'pdf',
           value: file
         })
-        trackEvent('hl_chat_pdf_attachment_added', {});
+        trackEvent('HL Chat PDF Attachment Added', {});
       } else if (file.type === 'text/csv' || file.type === 'application/vnd.ms-excel' || file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
         addAttachment({
           type: 'spreadsheet',
           value: file
         })
-        trackEvent('hl_chat_spreadsheet_attachment_added', { fileType: file.type });
+        trackEvent('HL Chat Spreadsheet Attachment Added', { fileType: file.type });
       }
     }
   }
@@ -84,12 +84,12 @@ export const AttachmentsButton = () => {
 
     if (!hasClipboardReadPermissions) {
       console.log('Screenshot permission denied')
-      trackEvent('hl_chat_screenshot_permission_denied', {});
+      trackEvent('HL Chat Screenshot Permission Denied', {});
       return
     }
 
     setScreenshotPickerVisible(true)
-    trackEvent('hl_chat_screenshot_picker_opened', {});
+    trackEvent('HL Chat Screenshot Picker Opened', {});
   }
 
   const onAddClipboard = async () => {
@@ -97,7 +97,7 @@ export const AttachmentsButton = () => {
 
     if (!hasClipboardReadPermissions) {
       console.log('Clipboard read permission denied')
-      trackEvent('hl_chat_clipboard_permission_denied', {});
+      trackEvent('HL Chat Clipboard Permission Denied', {});
       return
     }
 
@@ -109,13 +109,13 @@ export const AttachmentsButton = () => {
         type: 'image',
         value: clipboard.value
       })
-      trackEvent('hl_chat_clipboard_image_added', {});
+      trackEvent('HL Chat Clipboard Image Added', {});
     } else {
       addAttachment({
         type: 'clipboard',
         value: clipboard.value
       })
-      trackEvent('hl_chat_clipboard_text_added', {});
+      trackEvent('HL Chat Clipboard Text Added', {});
     }
   }
 
@@ -199,7 +199,7 @@ export const AttachmentsButton = () => {
         isVisible={screenshotPickerVisible}
         onClose={() => {
           setScreenshotPickerVisible(false)
-          trackEvent('hl_chat_screenshot_picker_closed', {});
+          trackEvent('HL Chat Screenshot Picker Closed', {});
         }}
       />
     </>
