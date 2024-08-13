@@ -29,6 +29,7 @@ const config: Config = {
         light: "#FFFFFF",
         dark: "#000000",
         "dark-90": "rgba(0,0,0,0.90)",
+        "bg-layer-1": "#0f0f0f",
       },
     },
   },

@@ -1,6 +1,8 @@
 import { Metadata } from "next";
 import { Public_Sans } from "next/font/google";
 
+import "./globals.css";
+
 export const metadata: Metadata = {
   title: "Highlight Chat",
   description: "Chat with Highlight",
