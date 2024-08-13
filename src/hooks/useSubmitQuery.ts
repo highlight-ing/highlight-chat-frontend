@@ -168,11 +168,31 @@ export const useSubmitQuery = () => {
         if (done) break;
         const chunk = new TextDecoder().decode(value);
 
-        // Directly append the chunk to the accumulated response
-        accumulatedResponse += chunk;
+        // Split the chunk into individual JSON objects
+        const jsonObjects = chunk.split(/(?<=})\s*(?=\{)/);
 
-        // Update the UI with the accumulated response
-        updateLastMessage({ role: "assistant", content: accumulatedResponse });
+        for (const jsonStr of jsonObjects) {
+          try {
+            const jsonChunk = JSON.parse(jsonStr);
+            console.log("jsonChunk: ", jsonChunk);
+
+            if (jsonChunk.type === "text" && jsonChunk.content) {
+              accumulatedResponse += jsonChunk.content;
+              updateLastMessage({ role: "assistant", content: accumulatedResponse });
+            } else if (jsonChunk.type === "tool_use") {
+              // Handle tool use if needed
+              console.log("Tool use:", jsonChunk);
+            } else if (jsonChunk.type === "error") {
+              console.error("Error from backend:", jsonChunk.content);
+              updateLastMessage({ role: "assistant", content: "Sorry, an error occurred: " + jsonChunk.content });
+            }
+          } catch (parseError) {
+            console.error("Error parsing JSON:", parseError);
+            // If parsing fails, treat the chunk as plain text
+            accumulatedResponse += jsonStr;
+            updateLastMessage({ role: "assistant", content: accumulatedResponse });
+          }
+        }
       }
     } catch (error) {
       console.error("Error fetching response:", error);
