@@ -182,6 +182,10 @@ export const useSubmitQuery = () => {
             } else if (jsonChunk.type === "tool_use") {
               // Handle tool use if needed
               console.log("Tool use:", jsonChunk);
+              // You can handle tool use here if needed
+            } else if (jsonChunk.type === "tool_use_input") {
+              console.log("Tool use input:", jsonChunk.content);
+              // You can handle tool use input here if needed
             } else if (jsonChunk.type === "error") {
               console.error("Error from backend:", jsonChunk.content);
               updateLastMessage({ role: "assistant", content: "Sorry, an error occurred: " + jsonChunk.content });
