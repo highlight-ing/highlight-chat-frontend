@@ -8,18 +8,16 @@ import { useSubmitQuery } from "@/hooks/useSubmitQuery";
 import { useStore } from "@/providers/store-provider";
 import Modals from "./modals/Modals";
 import { ModalContainer } from "@/components/modals/ModalContainer";
-import {useShallow} from "zustand/react/shallow";
+import { useShallow } from "zustand/react/shallow";
 
 function useContextReceivedHandler(navigateToNewChat: () => void) {
   const { addAttachment, setHighlightContext, setInput, promptApp } = useStore(
-    useShallow(
-      (state) => ({
-        addAttachment: state.addAttachment,
-        setHighlightContext: state.setHighlightContext,
-        setInput: state.setInput,
-        promptApp: state.promptApp,
-      })
-    )
+    useShallow((state) => ({
+      addAttachment: state.addAttachment,
+      setHighlightContext: state.setHighlightContext,
+      setInput: state.setInput,
+      promptApp: state.promptApp,
+    }))
   );
 
   const { handleIncomingContext } = useSubmitQuery();

@@ -4,8 +4,9 @@ import imageCompression from "browser-image-compression";
 import { useStore } from "@/providers/store-provider";
 import useAuth from "./useAuth";
 import { useApi } from "@/hooks/useApi";
-import { PromptApp } from "@/types";
+import { FileAttachment, PromptApp } from "@/types";
 import { useShallow } from "zustand/react/shallow";
+import { base64ToFile } from "@/utils/attachments";
 
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024; // 1MB in bytes
@@ -41,6 +42,13 @@ async function readFileAsBase64(file: File): Promise<string> {
   });
 }
 
+// TODO: Handle .docx and .pptx
+const textBasedTypes = [
+  "application/json",
+  "application/xml",
+  "application/javascript",
+];
+
 export default async function addAttachmentsToFormData(
   formData: FormData,
   attachments: any[]
@@ -50,6 +58,46 @@ export default async function addAttachmentsToFormData(
   for (const attachment of attachments) {
     if (attachment?.value) {
       switch (attachment.type) {
+        case "file":
+          const mime = attachment?.mimeType;
+          if (mime === "application/json") {
+            let pdfFile = base64ToFile(
+              attachment.value,
+              "file.pdf",
+              "application/pdf"
+            );
+            if (pdfFile) {
+              formData.append("pdf", pdfFile);
+            }
+          } else if (mime.startsWith("image/")) {
+            const imageNameFromMimeType = mime.replace("image/", "");
+            let imageFile = base64ToFile(
+              attachment.value,
+              `file.${imageNameFromMimeType}`,
+              mime
+            );
+            if (!imageFile) continue;
+            const compressedFile = await compressImageIfNeeded(imageFile);
+            const base64data = await readFileAsBase64(compressedFile);
+            const mimeType = compressedFile.type || "image/png";
+            const base64WithMimeType = `data:${mimeType};base64,${
+              base64data.split(",")[1]
+            }`;
+            formData.append("base64_image", base64WithMimeType);
+          } else if (
+            mime === "application/vnd.ms-excel" ||
+            mime ===
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          ) {
+            formData.append("spreadsheet", attachment.value);
+          } else if (
+            mime.startsWith("text/") ||
+            textBasedTypes.includes(attachment.mimeType)
+          ) {
+            formData.append("text_file", attachment.value);
+          } else {
+            console.error("Unsupported file type:", attachment.mimeType);
+          }
         case "image":
         case "screenshot":
           screenshot = attachment.value;
@@ -72,6 +120,7 @@ export default async function addAttachmentsToFormData(
           break;
         case "pdf":
           fileTitle = attachment.value.name;
+
           formData.append("pdf", attachment.value);
           break;
         case "audio":
@@ -89,6 +138,9 @@ export default async function addAttachmentsToFormData(
         case "ocr":
           ocrText = attachment.value;
           formData.append("ocr_text", attachment.value);
+          break;
+        case "text":
+          formData.append("text_file", attachment.value);
           break;
         default:
           console.warn("Unknown attachment type:", attachment.type);
@@ -191,6 +243,10 @@ export const useSubmitQuery = () => {
     promptApp?: PromptApp
   ) => {
     console.log("Received context inside handleIncomingContext: ", context);
+    console.log("Got attachment count: ", context.attachments?.length);
+    context.attachments?.map((attachment) => {
+      console.log("Attachment: ", JSON.stringify(attachment));
+    });
     if (!context.suggestion || context.suggestion.trim() === "") {
       console.log("No context received, ignoring.");
       return;
