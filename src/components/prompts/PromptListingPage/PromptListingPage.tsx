@@ -1,5 +1,6 @@
 import Button from "@/components/Button/Button";
 import RelatedApp, { RelatedAppProps } from "./RelatedApp";
+import Video from "./Video";
 
 function IconPlaceholder() {
   return (
@@ -57,11 +58,7 @@ export default function PromptListingPage({
         </div>
         <div className="flex justify-center items-center aspect-w-16 aspect-h-9">
           {/* Video rectangle */}
-          <iframe
-            width="640"
-            height="360"
-            src="https://www.youtube.com/embed/tgbNymZ7vqY"
-          ></iframe>
+          {videoUrl && <Video url={videoUrl} />}
         </div>
       </div>
       <hr className="h-px my-10 border-0 bg-light-5" />
