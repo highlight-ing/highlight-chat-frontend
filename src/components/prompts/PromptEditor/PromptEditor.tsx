@@ -1,31 +1,37 @@
-import { useState } from "react";
-import AppScreen from "./AppScreen";
-import SettingsScreen from "./SettingsScreen";
-import StartWithTemplateScreen from "./StartWithTemplateScreen";
+import AppScreen from "./screens/AppScreen";
+import SettingsScreen from "./screens/SettingsScreen";
+import StartWithTemplateScreen from "./screens/StartWithTemplateScreen";
+import {
+  PromptEditorScreen,
+  usePromptEditorStore,
+} from "@/stores/prompt-editor";
+import SuggestionsScreen from "./screens/SuggestionsScreen";
 
 function ScreenSelector({
   active,
-  onSelect,
   name,
+  title,
 }: {
   active: boolean;
-  onSelect: () => void;
-  name: string;
+  name: PromptEditorScreen;
+  title: string;
 }) {
+  const { setSelectedScreen } = usePromptEditorStore();
+
   return (
     <div
       className={`hover:text-light-40 hover:cursor-pointer ${
         active ? "text-white" : "text-light-60"
       }`}
-      onClick={onSelect}
+      onClick={() => setSelectedScreen(name)}
     >
-      {name}
+      {title}
     </div>
   );
 }
 
 export default function PromptEditor() {
-  const [selectedScreen, setSelectedScreen] = useState("startWithTemplate");
+  const { selectedScreen } = usePromptEditorStore();
 
   return (
     <div>
@@ -33,24 +39,25 @@ export default function PromptEditor() {
         <div className="flex flex-row space-x-8 border-b border-light-20 pb-3 px-6">
           <ScreenSelector
             active={selectedScreen === "app"}
-            onSelect={() => setSelectedScreen("app")}
-            name="App"
+            name="app"
+            title="App"
           />
           <ScreenSelector
             active={selectedScreen === "suggestions"}
-            onSelect={() => setSelectedScreen("suggestions")}
-            name="Suggestions"
+            name="suggestions"
+            title="Suggestions"
           />
           <ScreenSelector
             active={selectedScreen === "settings"}
-            onSelect={() => setSelectedScreen("settings")}
-            name="Settings"
+            name="settings"
+            title="Settings"
           />
         </div>
       )}
       <div className="px-6">
         {selectedScreen === "startWithTemplate" && <StartWithTemplateScreen />}
         {selectedScreen === "app" && <AppScreen />}
+        {selectedScreen === "suggestions" && <SuggestionsScreen />}
         {selectedScreen === "settings" && <SettingsScreen />}
       </div>
     </div>

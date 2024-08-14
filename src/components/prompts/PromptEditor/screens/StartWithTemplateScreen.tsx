@@ -1,3 +1,4 @@
+import { usePromptEditorStore } from "@/stores/prompt-editor";
 import clsx from "clsx";
 import { EmojiHappy, Personalcard, Setting, User } from "iconsax-react";
 
@@ -35,8 +36,10 @@ function TemplateCard({
 }
 
 export default function StartWithTemplateScreen() {
+  const { setSelectedScreen } = usePromptEditorStore();
+
   function onSelectTemplate(template: string) {
-    console.log(template);
+    setSelectedScreen("app");
   }
 
   return (

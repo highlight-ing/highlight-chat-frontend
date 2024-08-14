@@ -1,6 +1,4 @@
 import Button from "@/components/Button/Button";
-import { Field } from "@/components/catalyst/fieldset";
-import { Input } from "@/components/catalyst/input";
 
 function AppIcon() {
   return (
