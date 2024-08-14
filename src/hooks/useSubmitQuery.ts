@@ -201,6 +201,38 @@ export const useSubmitQuery = () => {
 
   const { getAccessToken } = useAuth();
 
+  const { openModal, closeModal } = useStore(
+    useShallow((state) => ({
+      openModal: state.openModal,
+      closeModal: state.closeModal,
+    }))
+  );
+
+  const showConfirmationModal = (message: string): Promise<boolean> => {
+    return new Promise((resolve) => {
+      openModal("confirmation-modal", {
+        header: "Additional Context Requested",
+        children: message,
+        primaryAction: {
+          label: "Allow",
+          onClick: () => {
+            closeModal("confirmation-modal");
+            resolve(true);
+          },
+          variant: "primary",
+        },
+        secondaryAction: {
+          label: "Deny",
+          onClick: () => {
+            closeModal("confirmation-modal");
+            resolve(false);
+          },
+          variant: "ghost-neutral",
+        },
+      });
+    });
+  };
+
   const fetchResponse = async (formData: FormData, token: string) => {
     setIsDisabled(true);
 
@@ -221,6 +253,8 @@ export const useSubmitQuery = () => {
       let accumulatedResponse = "";
       addMessage({ role: "assistant", content: "" });
 
+      let contextConfirmed = null;
+
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -240,24 +274,69 @@ export const useSubmitQuery = () => {
                 role: "assistant",
                 content: accumulatedResponse,
               });
-            } else if (jsonChunk.type === "tool_use") {
-              // Handle tool use if needed
-              console.log("Tool use:", jsonChunk);
-              // You can handle tool use here if needed
-            } else if (jsonChunk.type === "tool_use_input") {
-              console.log("Tool use input:", jsonChunk.content);
-              // Handle tool use input here if needed
-              const screenshot = await Highlight.user.getWindowScreenshot(
-                jsonChunk.content.window
-              );
-              console.log("screenshot: ", screenshot);
-              // formData.append("screenshot", screenshot);
+            } else if (
+              jsonChunk.type === "tool_use" ||
+              jsonChunk.type === "tool_use_input"
+            ) {
+              console.log(`${jsonChunk.type}:`, jsonChunk);
 
-              // Add screenshot to attachments
-              addAttachment({
-                type: "image",
-                value: screenshot,
-              });
+              if (contextConfirmed === null) {
+                contextConfirmed = await showConfirmationModal(
+                  "The assistant is requesting additional context. Do you want to allow this?"
+                );
+              }
+
+              if (contextConfirmed) {
+                console.log("Additional context request allowed");
+                if (jsonChunk.content) {
+                  if (jsonChunk.content.window) {
+                    const screenshot = await Highlight.user.getWindowScreenshot(
+                      jsonChunk.content.window
+                    );
+                    console.log("screenshot: ", screenshot);
+                    addAttachment({
+                      type: "image",
+                      value: screenshot,
+                    });
+                  } else if (jsonChunk.content.windows) {
+                    // Handle multiple windows if available
+                    for (const window of jsonChunk.content.windows) {
+                      const screenshot =
+                        await Highlight.user.getWindowScreenshot(window);
+                      console.log("screenshot for window:", window, screenshot);
+                      addAttachment({
+                        type: "image",
+                        value: screenshot,
+                      });
+                    }
+                  } else {
+                    console.log(
+                      "No specific window information available in the request"
+                    );
+                  }
+
+                  // Handle other potential content types
+                  if (jsonChunk.content.clipboard) {
+                    addAttachment({
+                      type: "clipboard",
+                      value: jsonChunk.content.clipboard,
+                    });
+                  }
+                  // Add more conditions for other content types as needed
+                } else {
+                  console.log("No content available in the request");
+                }
+              } else {
+                console.log("Additional context request denied");
+                if (jsonChunk.type === "tool_use") {
+                  updateLastMessage({
+                    role: "assistant",
+                    content:
+                      accumulatedResponse +
+                      "\n\nI'm sorry, but I wasn't able to access the additional context I requested.",
+                  });
+                }
+              }
             } else if (jsonChunk.type === "error") {
               console.error("Error from backend:", jsonChunk.content);
               updateLastMessage({
@@ -267,7 +346,6 @@ export const useSubmitQuery = () => {
             }
           } catch (parseError) {
             console.error("Error parsing JSON:", parseError);
-            // If parsing fails, treat the chunk as plain text
             accumulatedResponse += jsonStr;
             updateLastMessage({
               role: "assistant",
