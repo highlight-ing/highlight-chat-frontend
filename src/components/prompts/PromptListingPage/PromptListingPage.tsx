@@ -56,10 +56,11 @@ export default function PromptListingPage({
             </Button>
           </div>
         </div>
-        <div className="flex justify-center items-center aspect-w-16 aspect-h-9">
-          {/* Video rectangle */}
-          {videoUrl && <Video url={videoUrl} />}
-        </div>
+        {videoUrl && (
+          <div className="flex justify-center items-center aspect-w-16 aspect-h-9">
+            <Video url={videoUrl} />
+          </div>
+        )}
       </div>
       <hr className="h-px my-10 border-0 bg-light-5" />
       <div className="flex flex-col lg:flex-row gap-10">
