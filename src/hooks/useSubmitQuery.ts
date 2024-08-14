@@ -117,6 +117,12 @@ const prepareHighlightContext = (highlightContext: any) => {
 export const useSubmitQuery = () => {
   const { post } = useApi();
 
+  const { addAttachment } = useStore(
+    useShallow((state) => ({
+      addAttachment: state.addAttachment,
+    }))
+  );
+
   const {
     getOrCreateConversationId,
     attachments,
@@ -178,23 +184,43 @@ export const useSubmitQuery = () => {
 
             if (jsonChunk.type === "text" && jsonChunk.content) {
               accumulatedResponse += jsonChunk.content;
-              updateLastMessage({ role: "assistant", content: accumulatedResponse });
+              updateLastMessage({
+                role: "assistant",
+                content: accumulatedResponse,
+              });
             } else if (jsonChunk.type === "tool_use") {
               // Handle tool use if needed
               console.log("Tool use:", jsonChunk);
               // You can handle tool use here if needed
             } else if (jsonChunk.type === "tool_use_input") {
               console.log("Tool use input:", jsonChunk.content);
-              // You can handle tool use input here if needed
+              // Handle tool use input here if needed
+              const screenshot = await Highlight.user.getWindowScreenshot(
+                jsonChunk.content.window
+              );
+              console.log("screenshot: ", screenshot);
+              // formData.append("screenshot", screenshot);
+
+              // Add screenshot to attachments
+              addAttachment({
+                type: "image",
+                value: screenshot,
+              });
             } else if (jsonChunk.type === "error") {
               console.error("Error from backend:", jsonChunk.content);
-              updateLastMessage({ role: "assistant", content: "Sorry, an error occurred: " + jsonChunk.content });
+              updateLastMessage({
+                role: "assistant",
+                content: "Sorry, an error occurred: " + jsonChunk.content,
+              });
             }
           } catch (parseError) {
             console.error("Error parsing JSON:", parseError);
             // If parsing fails, treat the chunk as plain text
             accumulatedResponse += jsonStr;
-            updateLastMessage({ role: "assistant", content: accumulatedResponse });
+            updateLastMessage({
+              role: "assistant",
+              content: accumulatedResponse,
+            });
           }
         }
       }
