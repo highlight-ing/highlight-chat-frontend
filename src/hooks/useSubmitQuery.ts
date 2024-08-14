@@ -140,9 +140,6 @@ export default async function addAttachmentsToFormData(
           ocrText = attachment.value;
           formData.append("ocr_text", attachment.value);
           break;
-        case "text":
-          formData.append("text_file", attachment.value);
-          break;
         default:
           console.warn("Unknown attachment type:", attachment.type);
       }

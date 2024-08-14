@@ -10,6 +10,8 @@ import Modals from "./modals/Modals";
 import { ModalContainer } from "@/components/modals/ModalContainer";
 import { useShallow } from "zustand/react/shallow";
 
+
+
 function useContextReceivedHandler(navigateToNewChat: () => void) {
   const { addAttachment, setHighlightContext, setInput, promptApp } = useStore(
     useShallow((state) => ({
@@ -34,6 +36,7 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
     const contextDestroyer = Highlight.app.addListener(
       "onContext",
       (context: HighlightContext) => {
+      
         setHighlightContext(context);
         debouncedHandleSubmit(context);
       }
