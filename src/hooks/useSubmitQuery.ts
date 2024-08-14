@@ -4,7 +4,7 @@ import imageCompression from "browser-image-compression";
 import { useStore } from "@/providers/store-provider";
 import useAuth from "./useAuth";
 import { useApi } from "@/hooks/useApi";
-import { FileAttachment, PromptApp } from "@/types";
+import { PromptApp } from "@/types";
 import { useShallow } from "zustand/react/shallow";
 import { base64ToFile } from "@/utils/attachments";
 
@@ -49,6 +49,8 @@ const textBasedTypes = [
   "application/javascript",
 ];
 
+// TODO: Consolidate the two attachment types
+// Should just remove the HLC-specific code and use the Highlight API
 export default async function addAttachmentsToFormData(
   formData: FormData,
   attachments: any[]
@@ -60,20 +62,19 @@ export default async function addAttachmentsToFormData(
       switch (attachment.type) {
         case "file":
           const mime = attachment?.mimeType;
-          if (mime === "application/json") {
+          if (mime === "application/pdf") {
             let pdfFile = base64ToFile(
               attachment.value,
-              "file.pdf",
+              attachment.fileName,
               "application/pdf"
             );
             if (pdfFile) {
               formData.append("pdf", pdfFile);
             }
           } else if (mime.startsWith("image/")) {
-            const imageNameFromMimeType = mime.replace("image/", "");
             let imageFile = base64ToFile(
               attachment.value,
-              `file.${imageNameFromMimeType}`,
+              attachment.fileName,
               mime
             );
             if (!imageFile) continue;
@@ -98,6 +99,7 @@ export default async function addAttachmentsToFormData(
           } else {
             console.error("Unsupported file type:", attachment.mimeType);
           }
+          break
         case "image":
         case "screenshot":
           screenshot = attachment.value;
@@ -120,7 +122,6 @@ export default async function addAttachmentsToFormData(
           break;
         case "pdf":
           fileTitle = attachment.value.name;
-
           formData.append("pdf", attachment.value);
           break;
         case "audio":
