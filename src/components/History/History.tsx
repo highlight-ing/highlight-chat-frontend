@@ -64,10 +64,6 @@ const History: React.FC<HistoryProps> = ({
   }, [history])
 
   useEffect(() => {
-    trackEvent('HL Chat History Viewed', {});
-  }, []);
-
-  useEffect(() => {
     trackEvent('HL Chat Conversation Selected', { conversationId: history.length });
   }, [history.length]);
 

@@ -34,11 +34,6 @@ export const Attachment = ({ type, value, isFile = false, removeEnabled = false 
     trackEvent('HL Chat Attachment Removed', { type });
   }
 
-  useEffect(() => {
-    // Track the attachment addition when the component mounts
-    trackEvent('HL Chat Attachment Added', { type });
-  }, []);
-
   const renderAttachmentContent = () => {
     switch (type) {
       case 'image':

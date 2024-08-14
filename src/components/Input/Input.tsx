@@ -32,7 +32,7 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleSubmit = (promptApp: PromptApp) => {
+  const handleSubmit = (promptApp?: PromptApp) => {
     trackEvent('HL Chat Message Sent', { 
       messageLength: input.length,
       hasAttachments: attachments.length > 0,
@@ -44,7 +44,7 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (!inputIsDisabled && e.key === "Enter" && !e.shiftKey && promptApp) {
+    if (!inputIsDisabled && e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(promptApp);
     }
@@ -112,7 +112,6 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
         rows={1}
         onInput={(e) => setInput(e.currentTarget.value)}
         onKeyDown={handleKeyDown}
-        onFocus={() => trackEvent('HL Chat Input Focused', {})}
       />
     </div>
   );

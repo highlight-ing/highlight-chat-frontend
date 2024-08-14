@@ -104,7 +104,6 @@ export default function App({ children }: { children: React.ReactNode }) {
   const navigateToNewChat = useCallback(() => {
     if (pathname !== "/") {
       router.push("/");
-      trackEvent('HL Chat New Conversation Started', {});
     }
   }, [pathname, router]);
 

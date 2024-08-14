@@ -127,7 +127,6 @@ const Prompts = () => {
   }, [])
 
   if (isLoadingPrompts) {
-    trackEvent('HL Chat Prompts Loading', {});
     return (
       <div className={`${styles.prompts} ${mainStyles.loadingGradient}`}>
         <div className={'w-full h-20 p-16'}/>
@@ -136,11 +135,9 @@ const Prompts = () => {
   }
 
   if (!myPrompts.length) {
-    trackEvent('HL Chat Tutorial Shown', {});
     return <HighlightTutorial hotkey={hotkey}/>
   }
 
-  trackEvent('HL Chat Prompts List Shown', { promptCount: myPrompts.length });
   return (
     <div className={styles.prompts}>
       {myPrompts.map((prompt: any) => {

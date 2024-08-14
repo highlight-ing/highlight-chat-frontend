@@ -85,10 +85,6 @@ const HighlightChat = () => {
   // HOOKS
   useHandleClipboardPaste();
 
-  useEffect(() => {
-    trackEvent('HL Chat Initialized', {});
-  }, []);
-
   return (
     <div className={styles.page}>
       <History showHistory={showHistory} setShowHistory={setShowHistory} />
