@@ -15,14 +15,12 @@ import { decodeJwt } from 'jose';
 
 function useContextReceivedHandler(navigateToNewChat: () => void) {
   const { addAttachment, setHighlightContext, setInput, promptApp } = useStore(
-    useShallow(
-      (state) => ({
-        addAttachment: state.addAttachment,
-        setHighlightContext: state.setHighlightContext,
-        setInput: state.setInput,
-        promptApp: state.promptApp,
-      })
-    )
+    useShallow((state) => ({
+      addAttachment: state.addAttachment,
+      setHighlightContext: state.setHighlightContext,
+      setInput: state.setInput,
+      promptApp: state.promptApp,
+    }))
   );
 
   const { handleIncomingContext } = useSubmitQuery();

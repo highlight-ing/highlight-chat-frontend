@@ -8,45 +8,114 @@ import { PromptApp } from "@/types"; // Added this import
 
 import styles from "./chatinput.module.scss";
 import * as React from "react";
-import { getAudioAttachmentPreview } from "@/utils/attachments";
+import { base64ToFile, getAudioAttachmentPreview } from "@/utils/attachments";
 import { useShallow } from "zustand/react/shallow";
 import { trackEvent } from '@/utils/amplitude';
 
 const MAX_INPUT_HEIGHT = 160;
 
+function prepareFileAttachmentsForRender(
+  atts: AttachmentType[]
+): AttachmentType[] {
+  const processedAttachments: AttachmentType[] = atts.map((attachment) => {
+    if (attachment.type !== "file") {
+      return attachment;
+    }
+
+    const mimeType = attachment.mimeType.toLowerCase();
+
+    if (mimeType.startsWith("image/")) {
+      return {
+        type: "image",
+        value: attachment.value,
+      };
+    } else if (mimeType === "application/pdf") {
+      const file = base64ToFile(
+        attachment.value,
+        attachment.fileName,
+        mimeType
+      );
+      if (!file) {
+        return attachment;
+      }
+      return {
+        type: "pdf",
+        value: file,
+      };
+    } else if (
+      mimeType.includes("spreadsheetml") ||
+      mimeType.includes("excel") ||
+      attachment.fileName.endsWith(".xlsx")
+    ) {
+      const file = base64ToFile(
+        attachment.value,
+        attachment.fileName,
+        mimeType
+      );
+      if (!file) {
+        return attachment;
+      }
+
+      return {
+        type: "spreadsheet",
+        value: file,
+      };
+    } else if (
+      mimeType.startsWith("text/") ||
+      mimeType === "application/json" ||
+      mimeType === "application/xml" ||
+      mimeType === "application/javascript" ||
+      mimeType ===
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ) {
+      return {
+        type: "text_file",
+        value: attachment.value,
+        fileName: attachment.fileName,
+      };
+    } else {
+      return attachment;
+    }
+  });
+
+  // Remove any unhandled attachments
+  const filteredAttachments = processedAttachments.filter(
+    (att) => att.type !== "file"
+  );
+
+  return filteredAttachments;
+}
+
 /**
  * This is the main Highlight Chat input box, not a reusable Input component.
  */
 export const Input = ({ sticky }: { sticky: boolean }) => {
-  const { attachments, input, setInput, inputIsDisabled, promptName, promptApp } =
-    useStore(
-      useShallow((state) => ({
-        attachments: state.attachments,
-        input: state.input,
-        setInput: state.setInput,
-        inputIsDisabled: state.inputIsDisabled,
-        promptName: state.promptName,
-        promptApp: state.promptApp,
-      }))
-    );
+  const {
+    attachments,
+    input,
+    setInput,
+    inputIsDisabled,
+    promptName,
+    promptApp,
+  } = useStore(
+    useShallow((state) => ({
+      attachments: state.attachments,
+      input: state.input,
+      setInput: state.setInput,
+      inputIsDisabled: state.inputIsDisabled,
+      promptName: state.promptName,
+      promptApp: state.promptApp,
+    }))
+  );
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleSubmit = (promptApp?: PromptApp) => {
-    trackEvent('HL Chat Message Sent', { 
-      messageLength: input.length,
-      hasAttachments: attachments.length > 0,
-      attachmentCount: attachments.length,
-      attachmentTypes: attachments.length > 0 ? attachments.map(a => a.type) : undefined
-    });
-    useSubmitQuery().handleSubmit(promptApp);
-    setInput("");
-  };
+  const { handleSubmit } = useSubmitQuery();
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (!inputIsDisabled && e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(promptApp);
+      handleSubmit();
     }
   };
 
@@ -74,31 +143,40 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
         return getAudioAttachmentPreview(attachment);
       case "spreadsheet":
         return attachment.value.name;
+      case "file":
+        return attachment.fileName;
+      case "text_file":
+        return attachment.fileName;
       default:
         return attachment.value;
     }
   };
+
+  const preparedAttachments = prepareFileAttachmentsForRender(attachments);
 
   return (
     <div
       className={`${styles.inputContainer} ${sticky ? styles.sticky : ""}`}
       onClick={onClickContainer}
     >
-      {attachments.length > 0 && (
+      {preparedAttachments.length > 0 && (
         <div className="flex gap-2">
-          {attachments.map((attachment: AttachmentType, index: number) => (
-            <Attachment
-              type={attachment.type}
-              value={getValue(attachment)}
-              isFile={
-                attachment.type === "pdf" ||
-                (attachment.type === "image" && !!attachment.file) ||
-                attachment.type === "spreadsheet"
-              }
-              removeEnabled
-              key={index}
-            />
-          ))}
+          {preparedAttachments.map(
+            (attachment: AttachmentType, index: number) => (
+              <Attachment
+                type={attachment.type}
+                value={getValue(attachment)}
+                isFile={
+                  attachment.type === "pdf" ||
+                  (attachment.type === "image" && !!attachment.file) ||
+                  attachment.type === "spreadsheet" ||
+                  attachment.type === "text_file"
+                }
+                removeEnabled
+                key={index}
+              />
+            )
+          )}
         </div>
       )}
       <div className={styles.attachmentsButtonContainer}>
