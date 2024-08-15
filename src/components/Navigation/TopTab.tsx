@@ -31,7 +31,7 @@ const TopTab = ({isActive, conversation, onOpen}: TopTabProps) => {
       className={`${styles.tab} ${isActive ? styles.active : ''}`}
       onClick={() => onOpen(conversation)}
     >
-      <MessageText size={20} variant={'Bold'}/>
+      <MessageText size={17} variant={'Bold'}/>
       {
         initialTitleRef.current === title
           ? <span className={'overflow-ellipsis whitespace-nowrap overflow-hidden max-w-full'}>
