@@ -45,7 +45,7 @@ export function dataURItoFile(dataURI: string, fileName: string, mimeType: strin
 
     return new File([u8arr], fileName, { type: mimeType })
   } catch (error) {
-    console.error('Error converting dataURI to File:', fileName, JSON.stringify(error))
+    console.error('Error converting dataURI to File:', fileName, mimeType, JSON.stringify(error))
     return null
   }
 }
