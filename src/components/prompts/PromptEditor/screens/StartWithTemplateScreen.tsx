@@ -1,6 +1,6 @@
 import { usePromptEditorStore } from '@/stores/prompt-editor'
-import clsx from 'clsx'
 import { EmojiHappy, Personalcard, Setting, User } from 'iconsax-react'
+import { Squircle } from "@squircle-js/react"
 import styles from '../prompteditor.module.scss'
 
 function TemplateCard({
@@ -17,14 +17,16 @@ function TemplateCard({
   onClick?: () => void
 }) {
   return (
-    <div
+    <Squircle
+      cornerRadius={32}
+      cornerSmoothing={1}
       className={`${styles.templateCard} ${styles[color]}`}
       onClick={onClick}
     >
       {icon}
       <h6>{title}</h6>
       <p>{description}</p>
-    </div>
+    </Squircle>
   )
 }
 

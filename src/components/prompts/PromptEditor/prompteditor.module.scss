@@ -46,7 +46,8 @@
 }
 
 .templateCard {
-  border-radius: 32px;
+  //border-radius: 32px;
+  border-radius: 50% / 30%;
   cursor: pointer;
   padding: 24px;
   display: flex;
@@ -67,7 +68,7 @@
   }
 
   &.default {
-    border: 1px solid $light-20;
+    background-color: $light-5;
     &:hover {
       background-color: $light-10;
     }

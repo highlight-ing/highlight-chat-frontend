@@ -17,7 +17,7 @@
   background-color: $bg-second-layer;
   border: 1px solid $light-10;
   cursor: text;
-  border-radius: 8px;
+  border-radius: 12px;
   width: 100%;
   flex-shrink: 0;
   bottom: 16px;
@@ -46,6 +46,7 @@
 
     &::placeholder {
       color: $light-40;
+      user-select: none;
     }
   }
 }
