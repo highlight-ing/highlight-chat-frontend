@@ -137,9 +137,14 @@ export const AttachmentsButton = () => {
   }
 
   const menuItems = [
-    audioMenuItem,
     {
-      divider: true
+      label: (
+        <div className={styles.menuItem}>
+          <DocumentUpload size={24} color="#fff" />
+          Upload from computer
+        </div>
+      ),
+      onClick: handleAttachmentClick
     },
     {
       label: (
@@ -160,14 +165,10 @@ export const AttachmentsButton = () => {
       onClick: onClickScreenshot
     },
     {
-      label: (
-        <div className={styles.menuItem}>
-          <DocumentUpload size={24} color="#fff" />
-          Upload from computer
-        </div>
-      ),
-      onClick: handleAttachmentClick
-    }
+      divider: true
+    },
+    audioMenuItem,
+
   ].filter(Boolean) as MenuItemType[]
 
   return (
