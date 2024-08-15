@@ -257,7 +257,7 @@ export const useSubmitQuery = () => {
 
     if (query || clipboardText || ocrScreenContents || screenshotUrl || rawContents || audio || hasTextFiles) {
       const text_files = context.attachments
-        ?.filter((a) => a.type === 'text_file')
+        ?.filter((a: any) => a.type === 'text_file')
         .map((a) => (a as TextFileAttachment).fileName)
 
       addMessage({
