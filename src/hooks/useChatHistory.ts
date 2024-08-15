@@ -56,7 +56,7 @@ export const useChatHistory = (): {history: ChatHistoryItem[], refreshChatHistor
       return null;
     }
   }
-  
+
 
   useEffect(() => {
     if (!initialFetchDone.current) {
@@ -64,13 +64,24 @@ export const useChatHistory = (): {history: ChatHistoryItem[], refreshChatHistor
       fetchResponse();
       initialFetchDone.current = true;
     } else if (conversationId && !history.some(chat => chat.id === conversationId)) {
-      // New conversation found after initial fetch
-      console.log('Fetching new conversation');
-      fetchNewConversation(conversationId).then(newConversation => {
+      const fetchAndSafeRetry = async (retries: number) => {
+        // New conversation found after initial fetch
+        console.log('Fetching new conversation and adding it to history');
+        const newConversation = await fetchNewConversation(conversationId)
         if (newConversation) {
-          setHistory([newConversation, ...history]);
+          setHistory([newConversation, ...history])
+          return
         }
-      });
+        if (retries > 0) {
+          console.log('Failed to fetch new conversation, retrying in 1s')
+          setTimeout(() => {
+            fetchAndSafeRetry(--retries)
+          }, 1000)
+        } else {
+          console.error('Repeatedly failed to fetch new conversation, giving up')
+        }
+      }
+      fetchAndSafeRetry(5)
     } else if (conversationId) {
       // Existing code for updating "New Conversation" title
       const chat = history.find(chat => chat.id === conversationId)
@@ -81,7 +92,7 @@ export const useChatHistory = (): {history: ChatHistoryItem[], refreshChatHistor
         fetchRetryRef.current = setTimeout(async () => {
           const updatedConversation = await fetchNewConversation(conversationId);
           if (updatedConversation && updatedConversation.title !== 'New Conversation') {
-            const updatedHistory = history.map(chat => 
+            const updatedHistory = history.map(chat =>
               chat.id === conversationId ? updatedConversation : chat
             );
             setHistory(updatedHistory);
