@@ -79,8 +79,7 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
               isFile={
                 attachment.type === 'pdf' ||
                 (attachment.type === 'image' && !!attachment.file) ||
-                attachment.type === 'spreadsheet' ||
-                attachment.type === 'text_file'
+                attachment.type === 'spreadsheet'
               }
               removeEnabled
               key={index}
