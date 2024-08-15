@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { Public_Sans } from "next/font/google";
+import { Inter } from "next/font/google";
 
 import "./globals.css";
 
@@ -8,10 +8,10 @@ export const metadata: Metadata = {
   description: "Chat with Highlight",
 };
 
-const publicSans = Public_Sans({
+const inter = Inter({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-public-sans",
+  variable: "--font-inter",
 });
 
 export default function RootLayout({
@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${publicSans.variable} dark`}>
+    <html lang="en" className={`${inter.variable} dark`}>
       <body>{children}</body>
     </html>
   );

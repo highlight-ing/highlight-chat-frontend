@@ -2,11 +2,10 @@ import styles from "./history.module.scss";
 import * as React from "react";
 import {useChatHistory} from "@/hooks/useChatHistory";
 import Tooltip from "@/components/Tooltip";
-import CircleButton from "@/components/CircleButton/CircleButton";
-import {Category, Clock} from "iconsax-react";
+import {Clock} from "iconsax-react";
 import {useStore} from "@/providers/store-provider";
 import {useApi} from "@/hooks/useApi";
-import {ChatHistoryItem, Message} from "@/types";
+import {ChatHistoryItem} from "@/types";
 import ContextMenu from "@/components/ContextMenu/ContextMenu";
 import { BaseMessage, UserMessage, AssistantMessage } from "@/types";
 import Button from "@/components/Button/Button";
@@ -172,13 +171,13 @@ const HistoryItem = ({chat}: {chat: ChatHistoryItem}) => {
       wrapperStyle={{width: '100%'}}
     >
       <div key={chat.id} id={`chat-${chat.id}`} className={styles.chat} onClick={() => onSelectChat(chat)}>
-                <span className={styles.chatText}>
-                  {
-                    chat.title.charAt(0) === '"' && chat.title.charAt(chat.title.length - 1) === '"'
-                      ? chat.title.substring(1, chat.title.length - 1)
-                      : chat.title
-                  }
-                </span>
+        <span className={styles.chatText}>
+          {
+            chat.title.charAt(0) === '"' && chat.title.charAt(chat.title.length - 1) === '"'
+              ? chat.title.substring(1, chat.title.length - 1)
+              : chat.title
+          }
+        </span>
       </div>
     </ContextMenu>
   )

@@ -234,10 +234,13 @@
 }
 
 .promptName {
-  font-weight: 500;
+  font-weight: 450;
+  font-size: 14px;
 }
 
 .promptDescription {
+  font-weight: 300;
+  font-size: 14px;
   max-width: calc(100% - 32px);
   display: -webkit-box;
   -webkit-line-clamp: 2;

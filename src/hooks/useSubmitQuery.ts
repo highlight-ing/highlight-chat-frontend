@@ -6,6 +6,7 @@ import useAuth from "./useAuth";
 import { useApi } from "@/hooks/useApi";
 import { PromptApp } from "@/types";
 import { useShallow } from "zustand/react/shallow";
+import { base64ToFile } from "@/utils/attachments";
 
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024; // 1MB in bytes
@@ -41,6 +42,15 @@ async function readFileAsBase64(file: File): Promise<string> {
   });
 }
 
+// TODO: Handle .docx and .pptx
+const textBasedTypes = [
+  "application/json",
+  "application/xml",
+  "application/javascript",
+];
+
+// TODO: Consolidate the two attachment types
+// Should just remove the HLC-specific code and use the Highlight API
 export default async function addAttachmentsToFormData(
   formData: FormData,
   attachments: any[]
@@ -50,6 +60,46 @@ export default async function addAttachmentsToFormData(
   for (const attachment of attachments) {
     if (attachment?.value) {
       switch (attachment.type) {
+        case "file":
+          const mime = attachment?.mimeType;
+          if (mime === "application/pdf") {
+            let pdfFile = base64ToFile(
+              attachment.value,
+              attachment.fileName,
+              "application/pdf"
+            );
+            if (pdfFile) {
+              formData.append("pdf", pdfFile);
+            }
+          } else if (mime.startsWith("image/")) {
+            let imageFile = base64ToFile(
+              attachment.value,
+              attachment.fileName,
+              mime
+            );
+            if (!imageFile) continue;
+            const compressedFile = await compressImageIfNeeded(imageFile);
+            const base64data = await readFileAsBase64(compressedFile);
+            const mimeType = compressedFile.type || "image/png";
+            const base64WithMimeType = `data:${mimeType};base64,${
+              base64data.split(",")[1]
+            }`;
+            formData.append("base64_image", base64WithMimeType);
+          } else if (
+            mime === "application/vnd.ms-excel" ||
+            mime ===
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          ) {
+            formData.append("spreadsheet", attachment.value);
+          } else if (
+            mime.startsWith("text/") ||
+            textBasedTypes.includes(attachment.mimeType)
+          ) {
+            formData.append("text_file", attachment.value);
+          } else {
+            console.error("Unsupported file type:", attachment.mimeType);
+          }
+          break
         case "image":
         case "screenshot":
           screenshot = attachment.value;
@@ -191,6 +241,10 @@ export const useSubmitQuery = () => {
     promptApp?: PromptApp
   ) => {
     console.log("Received context inside handleIncomingContext: ", context);
+    console.log("Got attachment count: ", context.attachments?.length);
+    context.attachments?.map((attachment) => {
+      console.log("Attachment: ", JSON.stringify(attachment));
+    });
     if (!context.suggestion || context.suggestion.trim() === "") {
       console.log("No context received, ignoring.");
       return;

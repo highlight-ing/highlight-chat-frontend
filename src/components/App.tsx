@@ -8,16 +8,19 @@ import { useSubmitQuery } from "@/hooks/useSubmitQuery";
 import { useStore } from "@/providers/store-provider";
 import Modals from "./modals/Modals";
 import { ModalContainer } from "@/components/modals/ModalContainer";
-import {useShallow} from "zustand/react/shallow";
+import { useShallow } from "zustand/react/shallow";
+
+
 
 function useContextReceivedHandler(navigateToNewChat: () => void) {
-  const { addAttachment, setHighlightContext, setInput, promptApp } = useStore(
+  const { addAttachment, setHighlightContext, setInput, promptApp, startNewConversation } = useStore(
     useShallow(
       (state) => ({
         addAttachment: state.addAttachment,
         setHighlightContext: state.setHighlightContext,
         setInput: state.setInput,
         promptApp: state.promptApp,
+        startNewConversation: state.startNewConversation
       })
     )
   );
@@ -36,6 +39,7 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
     const contextDestroyer = Highlight.app.addListener(
       "onContext",
       (context: HighlightContext) => {
+        startNewConversation()
         setHighlightContext(context);
         debouncedHandleSubmit(context);
       }

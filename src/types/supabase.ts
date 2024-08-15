@@ -11,6 +11,7 @@ export type Database = {
     Tables: {
       conversation: {
         Row: {
+          app_id: string | null
           created_at: string
           id: string
           title: string
@@ -18,6 +19,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          app_id?: string | null
           created_at?: string
           id?: string
           title: string
@@ -25,6 +27,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          app_id?: string | null
           created_at?: string
           id?: string
           title?: string
@@ -56,26 +59,41 @@ export type Database = {
       }
       message: {
         Row: {
+          audio: string | null
+          clipboard_text: string | null
           content: string
+          context: string | null
           conversation_id: string
           created_at: string
           id: number
+          image_url: string | null
+          ocr_text: string | null
           role: string
           user_id: string
         }
         Insert: {
+          audio?: string | null
+          clipboard_text?: string | null
           content: string
+          context?: string | null
           conversation_id?: string
           created_at?: string
           id?: number
+          image_url?: string | null
+          ocr_text?: string | null
           role: string
           user_id: string
         }
         Update: {
+          audio?: string | null
+          clipboard_text?: string | null
           content?: string
+          context?: string | null
           conversation_id?: string
           created_at?: string
           id?: number
+          image_url?: string | null
+          ocr_text?: string | null
           role?: string
           user_id?: string
         }
@@ -100,6 +118,7 @@ export type Database = {
           prompt_url: string | null
           public: boolean
           slug: string | null
+          suggestion_prompt_text: string | null
           user_id: string
         }
         Insert: {
@@ -112,6 +131,7 @@ export type Database = {
           prompt_url?: string | null
           public?: boolean
           slug?: string | null
+          suggestion_prompt_text?: string | null
           user_id: string
         }
         Update: {
@@ -124,6 +144,7 @@ export type Database = {
           prompt_url?: string | null
           public?: boolean
           slug?: string | null
+          suggestion_prompt_text?: string | null
           user_id?: string
         }
         Relationships: []
@@ -136,7 +157,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      HLChatDBAttachment: "screenshot" | "voice" | "clipboard" | "ocr"
     }
     CompositeTypes: {
       [_ in never]: never
