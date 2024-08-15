@@ -224,7 +224,6 @@ export const useSubmitQuery = () => {
         for (const jsonStr of jsonObjects) {
           try {
             const jsonChunk = JSON.parse(jsonStr);
-            console.log("jsonChunk: ", jsonChunk);
 
             if (jsonChunk.type === "text" && jsonChunk.content) {
               accumulatedResponse += jsonChunk.content;
