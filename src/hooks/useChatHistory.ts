@@ -14,11 +14,17 @@ const RETRY_INTERVAL = 10000
 
 export const useChatHistory = (): {history: ChatHistoryItem[], refreshChatHistory: () => Promise<ChatHistoryItem[]>} => {
   const {get} = useApi()
-  const {conversationId, history, setHistory} = useStore(
+  const {
+    conversationId,
+    history,
+    setHistory,
+    addOrUpdateOpenConversation
+  } = useStore(
     useShallow((state) => ({
       conversationId: state.conversationId,
       history: state.history,
-      setHistory: state.setHistory
+      setHistory: state.setHistory,
+      addOrUpdateOpenConversation: state.addOrUpdateOpenConversation
     }))
   );
   const initialFetchDone = useRef(false);
@@ -50,6 +56,7 @@ export const useChatHistory = (): {history: ChatHistoryItem[], refreshChatHistor
         throw new Error("Network response was not ok");
       }
       const data = await response.json();
+      addOrUpdateOpenConversation(data.conversation)
       return data.conversation;
     } catch (error) {
       console.error("Error fetching conversation:", error);

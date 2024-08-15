@@ -61,6 +61,10 @@ const History: React.FC<HistoryProps> = ({
     return sortArrayByDate(history)
   }, [history])
 
+  const onOpenChat = () => {
+    setShowHistory(false)
+  }
+
   return (
     <div
       className={`${styles.history} ${showHistory ? styles.show : styles.hide}`}
@@ -83,28 +87,28 @@ const History: React.FC<HistoryProps> = ({
                   today.length > 0 &&
                   <>
                     <h1>Today</h1>
-                    {today.map((chat) => <HistoryItem key={chat.id} chat={chat}/>)}
+                    {today.map((chat) => <HistoryItem key={chat.id} chat={chat} onOpenChat={onOpenChat}/>)}
                   </>
                 }
                 {
                   lastWeek.length > 0 &&
                   <>
                     <h1>Past 7 days</h1>
-                    {lastWeek.map((chat) => <HistoryItem key={chat.id} chat={chat}/>)}
+                    {lastWeek.map((chat) => <HistoryItem key={chat.id} chat={chat} onOpenChat={onOpenChat}/>)}
                   </>
                 }
                 {
                   lastMonth.length > 0 &&
                   <>
                     <h1>Past 30 days</h1>
-                    {lastMonth.map((chat) => <HistoryItem key={chat.id} chat={chat}/>)}
+                    {lastMonth.map((chat) => <HistoryItem key={chat.id} chat={chat} onOpenChat={onOpenChat}/>)}
                   </>
                 }
                 {
                   older.length > 0 &&
                   <>
                     <h1>Older than 30 days</h1>
-                    {older.map((chat) => <HistoryItem key={chat.id} chat={chat}/>)}
+                    {older.map((chat) => <HistoryItem key={chat.id} chat={chat} onOpenChat={onOpenChat}/>)}
                   </>
                 }
               </>
@@ -117,16 +121,25 @@ const History: React.FC<HistoryProps> = ({
 
 export default History;
 
-const HistoryItem = ({chat}: {chat: ChatHistoryItem}) => {
+const HistoryItem = ({chat, onOpenChat}: {chat: ChatHistoryItem, onOpenChat?: () => void}) => {
   const {get} = useApi()
-  const {loadConversation, openModal} = useStore(
+  const {
+    loadConversation,
+    openModal,
+    addOrUpdateOpenConversation
+  } = useStore(
     useShallow((state) => ({
       loadConversation: state.loadConversation,
-      openModal: state.openModal
+      openModal: state.openModal,
+      addOrUpdateOpenConversation: state.addOrUpdateOpenConversation
     }))
   );
 
   const onSelectChat = async (chat: ChatHistoryItem) => {
+    if (typeof onOpenChat === 'function') {
+      onOpenChat()
+    }
+
     const response = await get(`history/${chat.id}/messages`)
     if (!response.ok) {
       // @TODO Error handling
@@ -134,6 +147,8 @@ const HistoryItem = ({chat}: {chat: ChatHistoryItem}) => {
       return
     }
     const { messages } = await response.json()
+
+    addOrUpdateOpenConversation(chat)
     loadConversation(chat.id, messages.map((message: any) => {
       const baseMessage: BaseMessage = {
         role: message.role,

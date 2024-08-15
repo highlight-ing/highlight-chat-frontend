@@ -9,8 +9,19 @@ interface TypedTextProps {
   onClick?: (e: React.MouseEvent) => void
   onComplete?: () => void
   onReset?: () => void
+  className?: string
 }
-const TypedText = ({ text, cursor = false, delay, speed = 1, onClick, onComplete, onReset }: TypedTextProps) => {
+
+const TypedText = ({
+  className,
+  text,
+  cursor = false,
+  delay,
+  speed = 1,
+  onClick,
+  onComplete,
+  onReset,
+}: TypedTextProps) => {
   const [isTyping, setIsTyping] = useState(false)
   const [visibleCharacters, setVisibleCharacters] = useState(0)
   const [showCursor, setShowCursor] = useState(!!cursor)
@@ -76,9 +87,9 @@ const TypedText = ({ text, cursor = false, delay, speed = 1, onClick, onComplete
   }, [isTyping, visibleCharacters])
 
   return (
-    <span className={styles.shadowText}>
+    <span className={`${styles.shadowText} ${className ?? ''}`}>
       {text}
-      <span className={styles.visibleText} onClick={onClick}>
+      <span className={`${styles.visibleText} ${className ?? ''}`} onClick={onClick}>
         {text.substring(0, visibleCharacters)}
         {cursor !== false && (visibleCharacters < text.length || showCursor) && visibleCharacters > 0 && (
           <div className={styles.cursor}>|</div>

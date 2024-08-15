@@ -1,7 +1,7 @@
 import { StateCreator } from "zustand";
 import { v4 as uuidv4 } from "uuid";
 import { Store } from ".";
-import {Message} from "@/types";
+import {ChatHistoryItem, Message} from "@/types";
 
 /**
  * Store that deals with the current conversation.
@@ -9,6 +9,7 @@ import {Message} from "@/types";
 
 export interface ConversationState {
   conversationId: string | undefined;
+  openConversations: ChatHistoryItem[];
 }
 
 export type ConversationSlice = ConversationState & {
@@ -16,10 +17,13 @@ export type ConversationSlice = ConversationState & {
   getOrCreateConversationId: () => string;
   startNewConversation: () => void;
   loadConversation: (conversationId: string, messages: Message[]) => void
+  setOpenConversations: (conversations: ChatHistoryItem[]) => void
+  addOrUpdateOpenConversation: (conversation: ChatHistoryItem) => void
 };
 
 export const initialConversationState: ConversationState = {
   conversationId: undefined,
+  openConversations: []
 };
 
 export const createConversationSlice: StateCreator<
@@ -46,4 +50,22 @@ export const createConversationSlice: StateCreator<
     get().clearInput();
     get().clearAttachments();
   },
+  setOpenConversations: (conversations: ChatHistoryItem[]) => {
+    set({ openConversations: conversations })
+  },
+  addOrUpdateOpenConversation: (conversation: ChatHistoryItem) => {
+    const conversations = get().openConversations
+    const conversationIndex = conversations?.findIndex(c => c.id === conversation.id)
+    if (conversationIndex === -1) {
+      set({ openConversations: [...conversations, conversation] })
+    } else {
+      const updatedConversations = [...conversations]
+      updatedConversations[conversationIndex] = conversation
+      set({ openConversations: updatedConversations })
+    }
+  },
+  removeOpenConversation: (conversationId: string) => {
+    const conversations = get().openConversations
+    set({ openConversations: conversations.filter(c => c.id !== conversationId) })
+  }
 });
