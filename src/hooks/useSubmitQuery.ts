@@ -4,7 +4,7 @@ import imageCompression from 'browser-image-compression'
 import { useStore } from '@/providers/store-provider'
 import useAuth from './useAuth'
 import { useApi } from '@/hooks/useApi'
-import { PromptApp } from '@/types'
+import { PromptApp, TextFileAttachment } from '@/types'
 import { useShallow } from 'zustand/react/shallow'
 import { base64ToFile } from '@/utils/attachments'
 
@@ -250,11 +250,16 @@ export const useSubmitQuery = () => {
     let rawContents = context.application?.focusedWindow?.rawContents
     let audio = context.attachments?.find((a) => a.type === 'audio')?.value
     let windowTitle = context.application?.focusedWindow?.title
+    let hasTextFiles = context.attachments?.filter((a) => a.type === 'text_file').length > 0
 
     // Fetch windows information
     const windows = await fetchWindows()
 
-    if (query || clipboardText || ocrScreenContents || screenshotUrl || rawContents || audio) {
+    if (query || clipboardText || ocrScreenContents || screenshotUrl || rawContents || audio || hasTextFiles) {
+      const text_files = context.attachments
+        ?.filter((a) => a.type === 'text_file')
+        .map((a) => (a as TextFileAttachment).fileName)
+
       addMessage({
         role: 'user',
         content: query,
@@ -263,6 +268,7 @@ export const useSubmitQuery = () => {
         audio,
         window: windowTitle ? { title: windowTitle } : undefined,
         windows: windows, // Add windows information to the message
+        text_files,
       })
 
       setInput('')
