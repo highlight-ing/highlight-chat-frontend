@@ -238,7 +238,7 @@ export const useSubmitQuery = () => {
       const conversationId = getOrCreateConversationId();
       formData.append("conversation_id", conversationId);
 
-      const response = await post("chat/", formData);
+      const response = await post("chat_v2/", formData);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
