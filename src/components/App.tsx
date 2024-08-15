@@ -37,8 +37,7 @@ function processAttachments(attachments: any[]): Attachment[] {
     } else if (
       mimeType.includes('spreadsheetml') ||
       mimeType.includes('excel') ||
-      attachment.fileName.endsWith('.xlsx') ||
-      attachment.fileName.endsWith('.csv')
+      attachment.fileName.endsWith('.xlsx')
     ) {
       return {
         type: 'spreadsheet',

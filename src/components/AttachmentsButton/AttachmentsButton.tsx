@@ -8,7 +8,7 @@ import styles from './attachments-button.module.scss'
 import { useStore } from '@/providers/store-provider'
 import { getDurationUnit } from '@/utils/string'
 import { ScreenshotAttachmentPicker } from '../ScreenshotAttachmentPicker/ScrenshotAttachmentPicker'
-import {useShallow} from "zustand/react/shallow";
+import { useShallow } from 'zustand/react/shallow'
 
 interface AudioDurationProps {
   duration: number
@@ -33,8 +33,8 @@ export const AttachmentsButton = () => {
   const { setFileInputRef, addAttachment } = useStore(
     useShallow((state) => ({
       addAttachment: state.addAttachment,
-      setFileInputRef: state.setFileInputRef
-    }))
+      setFileInputRef: state.setFileInputRef,
+    })),
   )
 
   useEffect(() => {
@@ -57,17 +57,21 @@ export const AttachmentsButton = () => {
         addAttachment({
           type: 'image',
           value: URL.createObjectURL(file),
-          file: file
+          file: file,
         })
       } else if (file.type === 'application/pdf') {
         addAttachment({
           type: 'pdf',
-          value: file
+          value: file,
         })
-      } else if (file.type === 'text/csv' || file.type === 'application/vnd.ms-excel' || file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+      } else if (
+        file.type === 'text/csv' ||
+        file.type === 'application/vnd.ms-excel' ||
+        file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      ) {
         addAttachment({
           type: 'spreadsheet',
-          value: file
+          value: file,
         })
       }
     }
@@ -98,12 +102,12 @@ export const AttachmentsButton = () => {
     if (clipboard.type === 'image') {
       addAttachment({
         type: 'image',
-        value: clipboard.value
+        value: clipboard.value,
       })
     } else {
       addAttachment({
         type: 'clipboard',
-        value: clipboard.value
+        value: clipboard.value,
       })
     }
   }
@@ -112,7 +116,7 @@ export const AttachmentsButton = () => {
     { duration: 5, unit: 'minutes' },
     { duration: 30, unit: 'minutes' },
     { duration: 1, unit: 'hours' },
-    { duration: 2, unit: 'hours' }
+    { duration: 2, unit: 'hours' },
   ]
 
   const audioMenuItem = {
@@ -133,7 +137,7 @@ export const AttachmentsButton = () => {
           ))}
         </div>
       </div>
-    )
+    ),
   }
 
   const menuItems = [
@@ -144,7 +148,7 @@ export const AttachmentsButton = () => {
           Upload from computer
         </div>
       ),
-      onClick: handleAttachmentClick
+      onClick: handleAttachmentClick,
     },
     {
       label: (
@@ -153,7 +157,7 @@ export const AttachmentsButton = () => {
           Clipboard
         </div>
       ),
-      onClick: onAddClipboard
+      onClick: onAddClipboard,
     },
     {
       label: (
@@ -162,14 +166,16 @@ export const AttachmentsButton = () => {
           Screenshot
         </div>
       ),
-      onClick: onClickScreenshot
+      onClick: onClickScreenshot,
     },
     {
-      divider: true
+      divider: true,
     },
     audioMenuItem,
-
   ].filter(Boolean) as MenuItemType[]
+
+  const acceptTypes =
+    'text/*,image/*,application/pdf,application/json,application/xml,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.presentationml.presentation'
 
   return (
     <>
@@ -180,7 +186,7 @@ export const AttachmentsButton = () => {
             type="file"
             ref={fileInputRef}
             onChange={onAddFile}
-            accept="image/*,application/pdf,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            accept={acceptTypes}
             className={styles.hiddenInput}
           />
         </button>
