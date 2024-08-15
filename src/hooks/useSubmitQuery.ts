@@ -250,7 +250,7 @@ export const useSubmitQuery = () => {
     let rawContents = context.application?.focusedWindow?.rawContents
     let audio = context.attachments?.find((a) => a.type === 'audio')?.value
     let windowTitle = context.application?.focusedWindow?.title
-    let hasTextFiles = context.attachments?.filter((a) => a.type === 'text_file').length > 0
+    let hasTextFiles = context.attachments && context.attachments.filter((a) => a.type === 'text_file').length > 0
 
     // Fetch windows information
     const windows = await fetchWindows()
