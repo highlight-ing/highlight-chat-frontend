@@ -8,7 +8,7 @@ import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
 const SavePromptSchema = z.object({
-  externalId: z.string().optional(),
+  externalId: z.string().optional().nullable(),
   name: z.string(),
   description: z.string(),
   appPrompt: z.string(),
@@ -19,17 +19,39 @@ const SavePromptSchema = z.object({
 
 export type SavePromptData = z.infer<typeof SavePromptSchema>
 
-export async function savePrompt(data: SavePromptData) {
-  const validatedData = SavePromptSchema.safeParse(data)
+export async function savePrompt(formData: FormData) {
+  console.log('formData', formData)
 
-  if (!validatedData.success) {
+  const validated = SavePromptSchema.safeParse({
+    externalId: formData.get('externalId'),
+    name: formData.get('name'),
+    description: formData.get('description'),
+    appPrompt: formData.get('appPrompt'),
+    suggestionsPrompt: formData.get('suggestionsPrompt'),
+    visibility: formData.get('visibility'),
+    videoUrl: formData.get('videoUrl'),
+  })
+
+  if (!validated.success) {
+    console.warn('Invalid prompt data recieved.', validated.error)
     return { error: 'Invalid prompt data.' }
   }
 
-  if (data.externalId) {
+  // console.log('Saving prompt data...', data)
+
+  if (validated.data.externalId) {
     // Update an existing prompt
   } else {
     // Create a new prompt
+    const { data: prompt, error } = await supabaseAdmin.from('prompts').insert({
+      name: validated.data.name,
+      description: validated.data.description,
+      prompt_text: validated.data.appPrompt,
+      suggestion_prompt_text: validated.data.suggestionsPrompt,
+      public: validated.data.visibility === 'public',
+      video_url: validated.data.videoUrl,
+      // user_id: userId,
+    })
   }
 }
 

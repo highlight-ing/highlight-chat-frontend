@@ -120,6 +120,7 @@ export type Database = {
           slug: string | null
           suggestion_prompt_text: string | null
           user_id: string
+          video_url: string | null
         }
         Insert: {
           created_at?: string
@@ -133,6 +134,7 @@ export type Database = {
           slug?: string | null
           suggestion_prompt_text?: string | null
           user_id: string
+          video_url?: string | null
         }
         Update: {
           created_at?: string
@@ -146,6 +148,7 @@ export type Database = {
           slug?: string | null
           suggestion_prompt_text?: string | null
           user_id?: string
+          video_url?: string | null
         }
         Relationships: []
       }

@@ -5,19 +5,22 @@ import { useShallow } from 'zustand/react/shallow'
 export type PromptEditorScreen = 'startWithTemplate' | 'app' | 'suggestions' | 'settings'
 
 export interface PromptEditorData {
-  externalId: string
+  externalId?: string
   name: string
   description: string
   appPrompt: string
   suggestionsPrompt: string
   visibility: 'public' | 'private'
-  videoUrl: string
+  videoUrl?: string
+  imageUrl?: string
+  uploadingImage?: File
 }
 
 export interface PromptEditorState {
   selectedScreen: PromptEditorScreen
   promptEditorData: PromptEditorData
   needSave: boolean
+  saving: boolean
 }
 
 export type PromptEditorSlice = PromptEditorState & {
@@ -25,20 +28,20 @@ export type PromptEditorSlice = PromptEditorState & {
   setPromptEditorData: (data: Partial<PromptEditorData>) => void
   clearPromptEditorData: () => void
   setNeedSave: (needSave: boolean) => void
+  setSaving: (saving: boolean) => void
 }
 
 export const initialPromptEditorState: PromptEditorState = {
   selectedScreen: 'startWithTemplate',
   promptEditorData: {
-    externalId: '',
     appPrompt: '',
     suggestionsPrompt: '',
     name: '',
     description: '',
-    visibility: 'public',
-    videoUrl: '',
+    visibility: 'private',
   },
   needSave: false,
+  saving: false,
 }
 
 export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, get) => ({
@@ -48,6 +51,7 @@ export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, ge
     set({ promptEditorData: { ...get().promptEditorData, ...data }, needSave: true }),
   clearPromptEditorData: () => set({ promptEditorData: initialPromptEditorState.promptEditorData }),
   setNeedSave: (needSave: boolean) => set({ needSave }),
+  setSaving: (saving: boolean) => set({ saving }),
 })
 
 export const usePromptEditorStore = () =>
@@ -60,5 +64,7 @@ export const usePromptEditorStore = () =>
       clearPromptEditorData: state.clearPromptEditorData,
       needSave: state.needSave,
       setNeedSave: state.setNeedSave,
+      saving: state.saving,
+      setSaving: state.setSaving,
     })),
   )

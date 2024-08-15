@@ -1,10 +1,13 @@
+'use client'
+
 import Button from '@/components/Button/Button'
 import InputField from '@/components/TextInput/InputField'
 import styles from '../prompteditor.module.scss'
-import { PropsWithChildren, ReactElement } from 'react'
+import { PropsWithChildren, ReactElement, useEffect, useRef, useState } from 'react'
 import TextArea from '@/components/TextInput/TextArea'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { Switch } from '@/components/catalyst/switch'
+import Image from 'next/image'
 
 function AppIcon() {
   return (
@@ -18,17 +21,67 @@ function AppIcon() {
   )
 }
 
+function ImageUpload() {
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [imageSrc, setImageSrc] = useState<string | undefined>()
+  const { promptEditorData, setPromptEditorData } = usePromptEditorStore()
+
+  useEffect(() => {
+    setImageSrc(promptEditorData.imageUrl)
+  }, [promptEditorData.imageUrl])
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const file = e.target.files[0]
+
+      if (file) {
+        setPromptEditorData({ uploadingImage: file })
+
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          setImageSrc(e.target?.result as string)
+        }
+        reader.readAsDataURL(file)
+      }
+    }
+  }
+
+  return (
+    <>
+      {imageSrc ? (
+        <Image src={imageSrc} alt="Prompt image" className="h-16 w-16 rounded-full" width={64} height={64} />
+      ) : (
+        <AppIcon />
+      )}
+      <Button size="medium" variant="tertiary" onClick={() => fileInputRef.current?.click()}>
+        Upload Image
+      </Button>
+      <input
+        ref={fileInputRef}
+        type="file"
+        name="photo"
+        className="hidden"
+        onChange={handleFileChange}
+        // disabled={pending}
+      />
+    </>
+  )
+}
+
 export default function SettingsScreen() {
   const { promptEditorData, setPromptEditorData } = usePromptEditorStore()
+
+  const isNewPrompt = !promptEditorData.externalId
+
+  function onCopyLinkClick() {
+    navigator.clipboard.writeText(`https://chat.highlight.ing/prompt/${promptEditorData.externalId}`)
+  }
 
   return (
     <div className={styles.settingsPage}>
       <div className={'flex flex-1 flex-col gap-8'}>
         <div className="flex items-center space-x-6">
-          <AppIcon />
-          <Button size="medium" variant="tertiary">
-            Upload Image
-          </Button>
+          <ImageUpload />
         </div>
         <div className="flex flex-col gap-6">
           <InputField
@@ -55,9 +108,21 @@ export default function SettingsScreen() {
         />
         <SettingOption
           label={'Share Link'}
-          description={<span className={'text-sm'}>https://chat.highlight.ing/prompt/123</span>}
+          description={
+            <span className={'text-sm'}>
+              {isNewPrompt
+                ? 'Save your prompt to generate a share link'
+                : `https://chat.highlight.ing/prompt/${promptEditorData.externalId}`}
+            </span>
+          }
         >
-          <Button size={'medium'} variant={'tertiary'} style={{ marginRight: '6px' }}>
+          <Button
+            onClick={onCopyLinkClick}
+            size={'medium'}
+            variant={'tertiary'}
+            style={{ marginRight: '6px' }}
+            disabled={isNewPrompt}
+          >
             Copy Link
           </Button>
         </SettingOption>

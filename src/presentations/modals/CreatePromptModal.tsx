@@ -5,15 +5,23 @@ import { useEffect } from 'react'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import styles from './modals.module.scss'
 import Button from '@/components/Button/Button'
+import useSavePromptEditor from '@/hooks/useSavePromptEditor'
 
 const CreatePromptModal = ({ id, context }: ModalObjectProps) => {
-  const { clearPromptEditorData, setSelectedScreen, needSave } = usePromptEditorStore()
+  const { clearPromptEditorData, setSelectedScreen, needSave, saving, setSaving } = usePromptEditorStore()
+  const { save } = useSavePromptEditor()
 
   useEffect(() => {
     // Create a new prompt
     setSelectedScreen('startWithTemplate')
     clearPromptEditorData()
   }, [])
+
+  async function handleSave() {
+    setSaving(true)
+    await save()
+    setSaving(false)
+  }
 
   return (
     <Modal
@@ -24,7 +32,7 @@ const CreatePromptModal = ({ id, context }: ModalObjectProps) => {
         <div className={'flex w-full items-center justify-between'} style={{ marginRight: '-100px' }}>
           <div />
           <span>Create New Highlight App</span>
-          <Button size={'large'} variant={'tertiary'} disabled={!needSave}>
+          <Button size={'large'} variant={'tertiary'} onClick={handleSave} disabled={!needSave}>
             Save
           </Button>
         </div>
