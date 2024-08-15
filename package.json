@@ -27,6 +27,7 @@
     "jose": "^5.6.3",
     "js-video-url-parser": "^0.5.1",
     "lucide-react": "^0.397.0",
+    "mime-types": "^2.1.35",
     "next": "14.2.4",
     "react": "^18",
     "react-dom": "^18",
@@ -45,6 +46,7 @@
     "zustand": "^4.5.4"
   },
   "devDependencies": {
+    "@types/mime-types": "^2.1.4",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

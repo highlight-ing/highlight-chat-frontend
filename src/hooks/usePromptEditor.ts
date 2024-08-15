@@ -1,10 +1,14 @@
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { savePrompt } from '@/utils/prompts'
+import useAuth from './useAuth'
 
-export default function useSavePromptEditor() {
+export function useSavePromptEditor() {
   const { promptEditorData, setPromptEditorData, needSave, setNeedSave } = usePromptEditorStore()
+  const { getAccessToken } = useAuth()
 
   async function save() {
+    const accessToken = await getAccessToken()
+
     console.log('Saving prompt editor data...')
 
     if (!needSave) {
@@ -27,11 +31,18 @@ export default function useSavePromptEditor() {
       formData.append('uploadingImage', promptEditorData.uploadingImage)
     }
 
-    const res = await savePrompt(formData)
+    const res = await savePrompt(formData, accessToken)
 
     if (res && res.error) {
       console.error('Error saving prompt:', res.error)
     }
+
+    if (res?.newId) {
+      setPromptEditorData({
+        externalId: res.newId,
+      })
+    }
+    setNeedSave(false)
   }
 
   return { save }

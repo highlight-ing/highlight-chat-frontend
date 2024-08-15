@@ -12,7 +12,7 @@ export interface PromptEditorData {
   suggestionsPrompt: string
   visibility: 'public' | 'private'
   videoUrl?: string
-  imageUrl?: string
+  image?: string
   uploadingImage?: File
 }
 

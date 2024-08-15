@@ -8,6 +8,7 @@ import TextArea from '@/components/TextInput/TextArea'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { Switch } from '@/components/catalyst/switch'
 import Image from 'next/image'
+import supabaseLoader from '@/lib/supabase'
 
 function AppIcon() {
   return (
@@ -23,12 +24,8 @@ function AppIcon() {
 
 function ImageUpload() {
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [imageSrc, setImageSrc] = useState<string | undefined>()
+  const [tempImageSrc, setTempImageSrc] = useState<string | undefined>()
   const { promptEditorData, setPromptEditorData } = usePromptEditorStore()
-
-  useEffect(() => {
-    setImageSrc(promptEditorData.imageUrl)
-  }, [promptEditorData.imageUrl])
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -39,20 +36,35 @@ function ImageUpload() {
 
         const reader = new FileReader()
         reader.onload = (e) => {
-          setImageSrc(e.target?.result as string)
+          setTempImageSrc(e.target?.result as string)
         }
         reader.readAsDataURL(file)
       }
     }
   }
 
+  let image
+
+  if (tempImageSrc) {
+    image = <Image src={tempImageSrc} alt="Prompt image" className="h-16 w-16 rounded-full" width={64} height={64} />
+  } else if (promptEditorData.image) {
+    image = (
+      <Image
+        src={'/user_content/8079c718-648d-435f-b037-d794e0ae7f54.png'}
+        alt="Prompt image"
+        className="h-16 w-16 rounded-full"
+        width={64}
+        height={64}
+        loader={supabaseLoader}
+      />
+    )
+  } else {
+    image = <AppIcon />
+  }
+
   return (
     <>
-      {imageSrc ? (
-        <Image src={imageSrc} alt="Prompt image" className="h-16 w-16 rounded-full" width={64} height={64} />
-      ) : (
-        <AppIcon />
-      )}
+      {image}
       <Button size="medium" variant="tertiary" onClick={() => fileInputRef.current?.click()}>
         Upload Image
       </Button>
@@ -98,7 +110,14 @@ export default function SettingsScreen() {
             value={promptEditorData.videoUrl}
             onChange={(e) => setPromptEditorData({ videoUrl: e.target.value })}
           />
-          <TextArea size={'xxlarge'} label={'Description'} placeholder={'Describe what your app does...'} rows={3} />
+          <TextArea
+            size={'xxlarge'}
+            label={'Description'}
+            placeholder={'Describe what your app does...'}
+            rows={3}
+            value={promptEditorData.description}
+            onChange={(e) => setPromptEditorData({ description: e.target.value })}
+          />
         </div>
       </div>
       <div className={'flex flex-1 flex-col gap-4'}>
