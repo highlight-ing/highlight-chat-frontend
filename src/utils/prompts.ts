@@ -2,6 +2,7 @@
 
 import { validateHighlightJWT } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
+import { videoUrlSchema } from "@/lib/zod";
 import { JWTPayload, JWTVerifyResult } from "jose";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -13,6 +14,7 @@ const SavePromptSchema = z.object({
   appPrompt: z.string(),
   suggestionsPrompt: z.string(),
   visibility: z.enum(["public", "private"]),
+  videoUrl: videoUrlSchema,
 });
 
 export type SavePromptData = z.infer<typeof SavePromptSchema>;
