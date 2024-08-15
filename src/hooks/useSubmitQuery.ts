@@ -256,9 +256,9 @@ export const useSubmitQuery = () => {
     const windows = await fetchWindows()
 
     if (query || clipboardText || ocrScreenContents || screenshotUrl || rawContents || audio || hasTextFiles) {
-      const text_files = context.attachments
-        ?.filter((a: any) => a.type === 'text_file')
-        .map((a) => (a as TextFileAttachment).fileName)
+      const textFiles = context.attachments?.filter((a: any) => a.type === 'text_file')
+
+      const textFileNames = textFiles?.map((a: any) => a.fileName)
 
       addMessage({
         role: 'user',
@@ -268,7 +268,7 @@ export const useSubmitQuery = () => {
         audio,
         window: windowTitle ? { title: windowTitle } : undefined,
         windows: windows, // Add windows information to the message
-        text_files,
+        text_files: textFileNames,
       })
 
       setInput('')
