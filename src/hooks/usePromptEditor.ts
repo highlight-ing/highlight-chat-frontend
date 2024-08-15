@@ -1,9 +1,17 @@
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { savePrompt } from '@/utils/prompts'
 import useAuth from './useAuth'
+import { useStore } from '@/providers/store-provider'
+import { useShallow } from 'zustand/react/shallow'
 
-export function useSavePromptEditor() {
+export function usePromptEditor() {
   const { promptEditorData, setPromptEditorData, needSave, setNeedSave } = usePromptEditorStore()
+  const { updatePrompt } = useStore(
+    useShallow((state) => ({
+      updatePrompt: state.updatePrompt,
+    })),
+  )
+
   const { getAccessToken } = useAuth()
 
   async function save() {
@@ -43,6 +51,8 @@ export function useSavePromptEditor() {
       })
     }
     setNeedSave(false)
+
+    // Update the prompts store
   }
 
   return { save }

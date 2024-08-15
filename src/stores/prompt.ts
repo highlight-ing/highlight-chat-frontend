@@ -1,30 +1,30 @@
-import { StateCreator } from "zustand";
-import {PromptApp} from "@/types";
+import { StateCreator } from 'zustand'
+import { Prompt } from '@/types/supabase-helpers'
 
 export interface PromptState {
   /**
    * Stores the actual prompt that is used to generate the response
    */
-  prompt?: string;
+  prompt?: string
   /**
    * The selected prompt app object.
    */
-  promptApp?: PromptApp;
+  promptApp?: Prompt
   /**
    * The friendly name of the prompt, displayed to the user.
    */
-  promptName?: string;
-  promptDescription?: string;
+  promptName?: string
+  promptDescription?: string
   /**
    * The same as the app slug or ID
    */
-  promptAppName?: string;
+  promptAppName?: string
 }
 
 export type PromptSlice = PromptState & {
-  setPrompt: (prompt: PromptState) => void;
-  clearPrompt: () => void;
-};
+  setPrompt: (prompt: PromptState) => void
+  clearPrompt: () => void
+}
 
 export const initialPromptState: PromptState = {
   prompt: undefined,
@@ -32,7 +32,7 @@ export const initialPromptState: PromptState = {
   promptName: undefined,
   promptDescription: undefined,
   promptAppName: undefined,
-};
+}
 
 export const createPromptSlice: StateCreator<PromptSlice> = (set, get) => ({
   ...initialPromptState,
@@ -42,4 +42,4 @@ export const createPromptSlice: StateCreator<PromptSlice> = (set, get) => ({
       ...prompt,
     }),
   clearPrompt: () => set(initialPromptState),
-});
+})

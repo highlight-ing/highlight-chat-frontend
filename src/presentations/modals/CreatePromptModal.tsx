@@ -5,11 +5,11 @@ import { useEffect } from 'react'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import styles from './modals.module.scss'
 import Button from '@/components/Button/Button'
-import { useSavePromptEditor } from '@/hooks/usePromptEditor'
+import { usePromptEditor } from '@/hooks/usePromptEditor'
 
 const CreatePromptModal = ({ id, context }: ModalObjectProps) => {
   const { clearPromptEditorData, setSelectedScreen, needSave, saving, setSaving } = usePromptEditorStore()
-  const { save } = useSavePromptEditor()
+  const { save } = usePromptEditor()
 
   useEffect(() => {
     // Create a new prompt

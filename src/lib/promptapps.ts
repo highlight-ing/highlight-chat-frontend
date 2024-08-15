@@ -1,6 +1,6 @@
-import {PromptApp} from "@/types";
+import { Prompt } from '@/types/supabase-helpers'
 
-export const getPromptAppType = (selfUserId?: string, prompt?: PromptApp) => {
+export const getPromptAppType = (selfUserId?: string, prompt?: Prompt) => {
   if (selfUserId && prompt && selfUserId === prompt?.user_id) {
     return 'self'
   }

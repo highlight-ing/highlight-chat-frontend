@@ -166,10 +166,10 @@ export async function savePrompt(formData: FormData, authToken: string) {
 /**
  * Fetches the raw prompt text from the database.
  */
-export async function fetchPromptText(slug: string) {
+export async function fetchPromptText(externalId: string) {
   const supabase = supabaseAdmin()
 
-  const { data: prompt, error } = await supabase.from('prompts').select('*').eq('slug', slug).maybeSingle()
+  const { data: prompt, error } = await supabase.from('prompts').select('*').eq('external_id', externalId).maybeSingle()
 
   if (error) {
     throw new Error('Error fetching prompt from Supabase')
@@ -330,19 +330,12 @@ export async function updatePrompt(slug: string, data: UpdatePromptData, authTok
  * Fetches all prompts from the database and returns them along with the user ID.
  */
 export async function fetchPrompts(authToken: string) {
-  let jwt: JWTVerifyResult<JWTPayload>
+  let userId: string
 
   try {
-    jwt = await validateHighlightJWT(authToken)
+    userId = await validateUserAuth(authToken)
   } catch (error) {
     return { error: 'Invalid auth token' }
-  }
-
-  // Get the user ID from the sub of the JWT
-  const userId = jwt.payload.sub
-
-  if (!userId) {
-    return { error: "'sub' was missing from auth token" }
   }
 
   const supabase = supabaseAdmin()
