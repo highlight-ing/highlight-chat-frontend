@@ -19,6 +19,7 @@ export type UserMessage = BaseMessage & {
   window?: WindowAttachment
   file_title?: string
   windows?: string[]
+  text_files?: string[]
 }
 
 export type AssistantMessage = BaseMessage & {
