@@ -1,0 +1,17 @@
+@import '@/variables.module';
+
+.settingOption {
+  background-color: $bg-second-layer;
+  border: 1px solid $light-10;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 15px;
+  font-weight: 350;
+
+  h1 {
+    font-weight: 450;
+  }
+}
