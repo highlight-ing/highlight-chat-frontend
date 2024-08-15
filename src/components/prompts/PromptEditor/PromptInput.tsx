@@ -56,7 +56,7 @@ export default function PromptInput({
           About Me
         </Button>
       </div>
-      <div>
+      <div className={'h-full'}>
         <CodeEditor
           value={value}
           onChange={(e) => onChange?.(e.target.value)}
@@ -65,6 +65,8 @@ export default function PromptInput({
           style={{
             backgroundColor: 'inherit',
             fontSize: '16px',
+            height: '100%',
+            overflowY: 'auto'
           }}
         />
       </div>

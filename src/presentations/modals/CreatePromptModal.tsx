@@ -17,7 +17,7 @@ const CreatePromptModal = ({ id, context }: ModalObjectProps) => {
   }, [])
 
   return (
-    <Modal id={id} size={'fullscreen'} header={'Create New Highlight App'}>
+    <Modal id={id} size={'fullscreen'} header={'Create New Highlight App'} closeButtonAlignment={'left'}>
       <PromptEditor />
     </Modal>
   )

@@ -34,7 +34,7 @@ export default function PromptEditor() {
   const { selectedScreen } = usePromptEditorStore();
 
   return (
-    <div>
+    <>
       {selectedScreen !== "startWithTemplate" && (
         <div className="flex flex-row space-x-8 border-b border-light-20 pb-3 px-6">
           <ScreenSelector
@@ -58,6 +58,6 @@ export default function PromptEditor() {
       {selectedScreen === "app" && <AppScreen />}
       {selectedScreen === "suggestions" && <SuggestionsScreen />}
       {selectedScreen === "settings" && <SettingsScreen />}
-    </div>
+    </>
   );
 }
