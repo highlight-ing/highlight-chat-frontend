@@ -6,6 +6,7 @@ import {
   usePromptEditorStore,
 } from "@/stores/prompt-editor";
 import SuggestionsScreen from "./screens/SuggestionsScreen";
+import styles from './prompteditor.module.scss'
 
 function ScreenSelector({
   active,
@@ -20,9 +21,7 @@ function ScreenSelector({
 
   return (
     <div
-      className={`hover:text-light-40 hover:cursor-pointer ${
-        active ? "text-white" : "text-light-60"
-      }`}
+      className={`${styles.tab} ${active ? styles.active : ''}`}
       onClick={() => setSelectedScreen(name)}
     >
       {title}
@@ -36,28 +35,32 @@ export default function PromptEditor() {
   return (
     <>
       {selectedScreen !== "startWithTemplate" && (
-        <div className="flex flex-row space-x-8 border-b border-light-20 pb-3 px-6">
-          <ScreenSelector
-            active={selectedScreen === "app"}
-            name="app"
-            title="App"
-          />
-          <ScreenSelector
-            active={selectedScreen === "suggestions"}
-            name="suggestions"
-            title="Suggestions"
-          />
-          <ScreenSelector
-            active={selectedScreen === "settings"}
-            name="settings"
-            title="Settings"
-          />
+        <div className={styles.editorTabs}>
+          <div className={styles.tabRow}>
+            <ScreenSelector
+              active={selectedScreen === "app"}
+              name="app"
+              title="App"
+            />
+            <ScreenSelector
+              active={selectedScreen === "suggestions"}
+              name="suggestions"
+              title="Suggestions"
+            />
+            <ScreenSelector
+              active={selectedScreen === "settings"}
+              name="settings"
+              title="Settings"
+            />
+          </div>
         </div>
       )}
-      {selectedScreen === "startWithTemplate" && <StartWithTemplateScreen />}
-      {selectedScreen === "app" && <AppScreen />}
-      {selectedScreen === "suggestions" && <SuggestionsScreen />}
-      {selectedScreen === "settings" && <SettingsScreen />}
+      <div className={'flex flex-col items-center max-h-full min-h-0'}>
+        {selectedScreen === "startWithTemplate" && <StartWithTemplateScreen />}
+        {selectedScreen === "app" && <AppScreen />}
+        {selectedScreen === "suggestions" && <SuggestionsScreen />}
+        {selectedScreen === "settings" && <SettingsScreen />}
+      </div>
     </>
   );
 }

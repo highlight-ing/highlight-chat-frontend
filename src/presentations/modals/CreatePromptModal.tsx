@@ -1,13 +1,11 @@
 import { ModalObjectProps } from '@/types'
 import Modal from '@/components/modals/Modal'
-import { useStore } from '@/providers/store-provider'
 import PromptEditor from '@/components/prompts/PromptEditor/PromptEditor'
 import { useEffect } from 'react'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
+import styles from './modals.module.scss'
 
 const CreatePromptModal = ({ id, context }: ModalObjectProps) => {
-  const closeModal = useStore((state) => state.closeModal)
-
   const { clearPromptEditorData, setSelectedScreen } = usePromptEditorStore()
 
   useEffect(() => {
@@ -17,7 +15,13 @@ const CreatePromptModal = ({ id, context }: ModalObjectProps) => {
   }, [])
 
   return (
-    <Modal id={id} size={'fullscreen'} header={'Create New Highlight App'} closeButtonAlignment={'left'}>
+    <Modal
+      id={id}
+      size={'fullscreen'}
+      bodyClassName={styles.createPromptModal}
+      header={'Create New Highlight App'}
+      closeButtonAlignment={'left'}
+    >
       <PromptEditor />
     </Modal>
   )

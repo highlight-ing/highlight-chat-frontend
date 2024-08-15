@@ -12,7 +12,6 @@ export interface ModalProps {
   size: SizeType
   exitOnClick?: boolean
   exitOnEscape?: boolean
-  bodyPadding?: string
   gap?: string
   header?: string | ReactElement | ReactNode
   zIndex?: number

@@ -1,20 +1,6 @@
 @import '@/variables.module';
 
-.settingOption {
-  background-color: $bg-second-layer;
-  border: 1px solid $light-10;
-  border-radius: 10px;
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 15px;
-  font-weight: 350;
-
-  h1 {
-    font-weight: 450;
-  }
-}
+// Templates styles
 
 @keyframes growIn {
   from {
@@ -96,4 +82,72 @@
   font-size: 16px;
   font-weight: 350;
   color: $light-100;
+}
+
+// Settings styles
+
+.settingOption {
+  background-color: $bg-second-layer;
+  border: 1px solid $light-10;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 15px;
+  font-weight: 350;
+
+  h1 {
+    font-weight: 450;
+  }
+}
+
+// Editor styles
+.editorTabs {
+  display: flex;
+  justify-content: center;
+  height: 48px;
+  flex-shrink: 0;
+  border-bottom: 1px solid $light-5;
+}
+
+.tabRow {
+  width: $editor-width;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  gap: 32px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  font-size: 15px;
+  font-weight: 350;
+  color: $light-20;
+  cursor: pointer;
+  margin-bottom: -1px;
+  border-bottom: 1px solid transparent;
+
+  &:hover, &.active {
+    color: $light-100;
+  }
+  &.active {
+    border-bottom: 1px solid $light-100;
+  }
+}
+
+.editorPage {
+  width: $editor-width;
+  //height: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.codeEditor {
+  width: $editor-width;
+  background-color: inherit;
+  font-size: 16px;
 }
