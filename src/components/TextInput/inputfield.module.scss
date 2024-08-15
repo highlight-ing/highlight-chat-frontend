@@ -4,6 +4,24 @@
   font-size: 15px;
   font-weight: 400;
   color: $light-100;
+
+
+  &.inline {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 10px;
+    left: 20px;
+    font-size: 13px;
+    color: $light-20;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 200ms ease-in-out;
+
+    &.visible {
+      opacity: 1;
+    }
+  }
 }
 
 .inputField {
@@ -49,5 +67,31 @@
     padding: 20px;
     font-size: 16px;
     height: 64px;
+    transition: padding 200ms ease-in-out;
+
+    &:focus, &.label {
+      padding-top: 40px;
+    }
+  }
+}
+
+.textArea {
+  @extend .inputField;
+  resize: none;
+
+  &.small, &.medium, &.large, &.xlarge, &.xxlarge {
+    height: fit-content !important;
+  }
+
+  &.xxlarge {
+    padding: 20px;
+    font-size: 16px;
+    height: 64px;
+    transition: padding 200ms ease-in-out;
+
+    &:focus, &.label {
+      padding-top: 32px;
+      padding-bottom: 8px;
+    }
   }
 }

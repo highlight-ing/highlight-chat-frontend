@@ -57,7 +57,7 @@ export default function StartWithTemplateScreen() {
   }
 
   return (
-    <div className={'flex flex-col w-full gap-6 mt-1'}>
+    <div className={styles.templatesPage}>
       <h4 className="font-medium text-white">Start with a template</h4>
       <div className={styles.templateCardGrid}>
         <TemplateCard

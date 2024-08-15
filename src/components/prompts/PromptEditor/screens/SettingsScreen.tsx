@@ -1,7 +1,8 @@
 import Button from "@/components/Button/Button";
-import InputField from "@/components/InputField/InputField";
+import InputField from "@/components/TextInput/InputField";
 import styles from '../prompteditor.module.scss'
 import {PropsWithChildren, ReactElement} from "react";
+import TextArea from "@/components/TextInput/TextArea";
 
 function AppIcon() {
   return (
@@ -17,15 +18,15 @@ function AppIcon() {
 
 export default function SettingsScreen() {
   return (
-    <div className="pt-8 flex gap-8">
-      <div className={'flex flex-col grow gap-8'}>
+    <div className={styles.settingsPage}>
+      <div className={'flex flex-col flex-1 gap-8'}>
         <div className="flex items-center space-x-6">
           <AppIcon />
           <Button size="medium" variant="tertiary">
             Upload Image
           </Button>
         </div>
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-6">
           <InputField
             size={'xxlarge'}
             label={'Name'}
@@ -33,17 +34,18 @@ export default function SettingsScreen() {
           />
           <InputField
             size={'xxlarge'}
-            label={'Description'}
-            placeholder={'Describe what your app does...'}
-          />
-          <InputField
-            size={'xxlarge'}
             label={'Video Link'}
             placeholder={'Provide a video demo for your app (optional)'}
           />
+          <TextArea
+            size={'xxlarge'}
+            label={'Description'}
+            placeholder={'Describe what your app does...'}
+            rows={3}
+          />
         </div>
       </div>
-      <div className={'flex flex-col grow gap-4'}>
+      <div className={'flex flex-col flex-1 gap-4'}>
         <VisibilityToggle
           visibility={'private'}
           onToggle={() => {}}
