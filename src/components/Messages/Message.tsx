@@ -78,7 +78,7 @@ export const Message = ({ message, isThinking }: MessageProps) => {
                 <Attachment type="audio" value={message.audio} />
               )}
               {message.window && message.window?.title && (
-                <Attachment type="window" value={message.window.title} />
+                <Attachment type="window" value={message.window.title} appIcon={message.window.appIcon} />
               )}
               {message.clipboard_text && (
                 <Attachment type="clipboard" value={message.clipboard_text} />

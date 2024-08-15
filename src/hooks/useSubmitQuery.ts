@@ -298,8 +298,9 @@ export const useSubmitQuery = () => {
     let rawContents = context.application?.focusedWindow?.rawContents;
     let audio = context.attachments?.find((a) => a.type === "audio")?.value;
     let windowTitle = context.application?.focusedWindow?.title;
-
-    // Fetch windows information
+    let appIcon = context.application?.appIcon;
+    
+    // Fetch windows information.
     const windows = await fetchWindows();
 
     if (
@@ -316,7 +317,7 @@ export const useSubmitQuery = () => {
         clipboard_text: clipboardText,
         screenshot: screenshotUrl,
         audio,
-        window: windowTitle ? { title: windowTitle } : undefined,
+        window: windowTitle ? { title: windowTitle, appIcon: appIcon} : undefined,
         windows: windows, // Add windows information to the message
       });
 
