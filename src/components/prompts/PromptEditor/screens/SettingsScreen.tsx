@@ -1,8 +1,10 @@
-import Button from "@/components/Button/Button";
-import InputField from "@/components/TextInput/InputField";
+import Button from '@/components/Button/Button'
+import InputField from '@/components/TextInput/InputField'
 import styles from '../prompteditor.module.scss'
-import {PropsWithChildren, ReactElement} from "react";
-import TextArea from "@/components/TextInput/TextArea";
+import { PropsWithChildren, ReactElement } from 'react'
+import TextArea from '@/components/TextInput/TextArea'
+import { usePromptEditorStore } from '@/stores/prompt-editor'
+import { Switch } from '@/components/catalyst/switch'
 
 function AppIcon() {
   return (
@@ -17,9 +19,11 @@ function AppIcon() {
 }
 
 export default function SettingsScreen() {
+  const { promptEditorData, setPromptEditorData } = usePromptEditorStore()
+
   return (
     <div className={styles.settingsPage}>
-      <div className={'flex flex-col flex-1 gap-8'}>
+      <div className={'flex flex-1 flex-col gap-8'}>
         <div className="flex items-center space-x-6">
           <AppIcon />
           <Button size="medium" variant="tertiary">
@@ -31,30 +35,29 @@ export default function SettingsScreen() {
             size={'xxlarge'}
             label={'Name'}
             placeholder={'Name your app'}
+            value={promptEditorData.name}
+            onChange={(e) => setPromptEditorData({ name: e.target.value })}
           />
           <InputField
             size={'xxlarge'}
             label={'Video Link'}
             placeholder={'Provide a video demo for your app (optional)'}
+            value={promptEditorData.videoUrl}
+            onChange={(e) => setPromptEditorData({ videoUrl: e.target.value })}
           />
-          <TextArea
-            size={'xxlarge'}
-            label={'Description'}
-            placeholder={'Describe what your app does...'}
-            rows={3}
-          />
+          <TextArea size={'xxlarge'} label={'Description'} placeholder={'Describe what your app does...'} rows={3} />
         </div>
       </div>
-      <div className={'flex flex-col flex-1 gap-4'}>
+      <div className={'flex flex-1 flex-col gap-4'}>
         <VisibilityToggle
-          visibility={'private'}
-          onToggle={() => {}}
+          visibility={promptEditorData.visibility}
+          onToggle={(visibility) => setPromptEditorData({ visibility })}
         />
         <SettingOption
           label={'Share Link'}
           description={<span className={'text-sm'}>https://chat.highlight.ing/prompt/123</span>}
         >
-          <Button size={'medium'} variant={'tertiary'} style={{marginRight: '6px'}}>
+          <Button size={'medium'} variant={'tertiary'} style={{ marginRight: '6px' }}>
             Copy Link
           </Button>
         </SettingOption>
@@ -64,7 +67,11 @@ export default function SettingsScreen() {
 }
 
 //{visibility: 'public' | 'private', onToggle: (visibility: 'public' | 'private') => void}
-const SettingOption = ({children, label, description}: PropsWithChildren<{label: string | ReactElement, description: string | ReactElement}>) => {
+const SettingOption = ({
+  children,
+  label,
+  description,
+}: PropsWithChildren<{ label: string | ReactElement; description: string | ReactElement }>) => {
   return (
     <div className={styles.settingOption}>
       <div className={'flex flex-col gap-1'}>
@@ -76,13 +83,19 @@ const SettingOption = ({children, label, description}: PropsWithChildren<{label:
   )
 }
 
-const VisibilityToggle = ({visibility, onToggle}: {visibility: 'public' | 'private', onToggle: (visibility: 'public' | 'private') => void}) => {
+const VisibilityToggle = ({
+  visibility,
+  onToggle,
+}: {
+  visibility: 'public' | 'private'
+  onToggle: (visibility: 'public' | 'private') => void
+}) => {
   return (
-    <SettingOption
-      label={'Visibility'}
-      description={'Share your app with the community'}
-    >
-      {/* @TODO toggle component */}
+    <SettingOption label={'Visibility'} description={'Share your app with the community'}>
+      <div className="flex items-center gap-2">
+        <p className="text-xs opacity-40">{visibility === 'public' ? 'Public' : 'Private'}</p>
+        <Switch checked={visibility === 'public'} onChange={(checked) => onToggle(checked ? 'public' : 'private')} />
+      </div>
     </SettingOption>
   )
 }
