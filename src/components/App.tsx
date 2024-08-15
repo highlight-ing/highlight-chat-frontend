@@ -10,6 +10,8 @@ import Modals from "./modals/Modals";
 import { ModalContainer } from "@/components/modals/ModalContainer";
 import { useShallow } from "zustand/react/shallow";
 
+
+
 function useContextReceivedHandler(navigateToNewChat: () => void) {
   const { addAttachment, setHighlightContext, setInput, promptApp, startNewConversation } = useStore(
     useShallow(
