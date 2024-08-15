@@ -54,12 +54,10 @@ export default function PromptEditor() {
           />
         </div>
       )}
-      <div className="px-6">
-        {selectedScreen === "startWithTemplate" && <StartWithTemplateScreen />}
-        {selectedScreen === "app" && <AppScreen />}
-        {selectedScreen === "suggestions" && <SuggestionsScreen />}
-        {selectedScreen === "settings" && <SettingsScreen />}
-      </div>
+      {selectedScreen === "startWithTemplate" && <StartWithTemplateScreen />}
+      {selectedScreen === "app" && <AppScreen />}
+      {selectedScreen === "suggestions" && <SuggestionsScreen />}
+      {selectedScreen === "settings" && <SettingsScreen />}
     </div>
   );
 }

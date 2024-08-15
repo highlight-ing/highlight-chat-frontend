@@ -1,6 +1,7 @@
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import clsx from 'clsx'
 import { EmojiHappy, Personalcard, Setting, User } from 'iconsax-react'
+import styles from '../prompteditor.module.scss'
 
 function TemplateCard({
   title,
@@ -12,25 +13,17 @@ function TemplateCard({
   title: string
   description: string
   icon: React.ReactNode
-  color: 'purple' | 'blue' | 'pink' | 'inherit'
+  color: 'purple' | 'blue' | 'pink' | 'default'
   onClick?: () => void
 }) {
   return (
     <div
-      className={clsx(
-        `flex flex-col items-center rounded-3xl px-2.5 py-4 text-center text-white hover:cursor-pointer`,
-        'transition-all duration-150',
-        'basis-1/4',
-        color === 'inherit' && 'border border-light-10',
-        color === 'purple' && 'bg-[#712FFF]/20 hover:bg-[#712FFF]/30',
-        color === 'blue' && 'bg-[#00F0FF]/20 hover:bg-[#00F0FF]/30',
-        color === 'pink' && 'bg-[#FF2099]/20 hover:bg-[#FF2099]/30',
-      )}
+      className={`${styles.templateCard} ${styles[color]}`}
       onClick={onClick}
     >
-      <div>{icon}</div>
-      <h6 className="mt-2 text-[16px]/[20px]">{title}</h6>
-      <p className="text-[13px]/[20px] font-[350]">{description}</p>
+      {icon}
+      <h6>{title}</h6>
+      <p>{description}</p>
     </div>
   )
 }
@@ -64,9 +57,9 @@ export default function StartWithTemplateScreen() {
   }
 
   return (
-    <>
+    <div className={'flex flex-col w-full gap-6 mt-1'}>
       <h4 className="font-medium text-white">Start with a template</h4>
-      <div className="mt-8 flex gap-3">
+      <div className={styles.templateCardGrid}>
         <TemplateCard
           title="Code Reviewer"
           description="Create any kind of personality to have conversations with"
@@ -92,10 +85,10 @@ export default function StartWithTemplateScreen() {
           title="Custom"
           description="Start from scratch"
           icon={<Setting variant="Bold" />}
-          color="inherit"
+          color="default"
           onClick={() => onSelectTemplate('custom')}
         />
       </div>
-    </>
+    </div>
   )
 }

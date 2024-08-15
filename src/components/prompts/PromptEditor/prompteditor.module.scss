@@ -15,3 +15,85 @@
     font-weight: 450;
   }
 }
+
+@keyframes growIn {
+  from {
+    transform: scale(0.5);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.templateCardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  justify-content: center;
+}
+
+.templateCard {
+  border-radius: 32px;
+  cursor: pointer;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: background-color 100ms ease;
+  animation: growIn 100ms forwards;
+
+  &:nth-child(2) {
+    animation-duration: 175ms;
+  }
+  &:nth-child(3) {
+    animation-duration: 250ms;
+  }
+  &:nth-child(4) {
+    animation-duration: 325ms;
+  }
+
+  &.default {
+    border: 1px solid $light-20;
+    &:hover {
+      background-color: $light-10;
+    }
+  }
+  &.purple {
+    background-color: $purple-20;
+    &:hover {
+      background-color: $purple-40;
+    }
+  }
+  &.blue {
+    background-color: $primary-20;
+    &:hover {
+      background-color: $primary-40;
+    }
+  }
+  &.pink {
+    background-color: $pink-20;
+    &:hover {
+      background-color: $pink-40;
+    }
+  }
+
+  h6 {
+    margin-top: 12px;
+    margin-bottom: 2px;
+    font-size: 16px;
+    font-weight: 350;
+    color: $light-100;
+  }
+  p {
+    font-size: 13px;
+    font-weight: 250;
+    color: $light-80;
+  }
+}
+
+.templateName {
+  font-size: 16px;
+  font-weight: 350;
+  color: $light-100;
+}
