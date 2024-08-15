@@ -1,0 +1,53 @@
+@import '@/variables.module';
+
+.inputLabel {
+  font-size: 15px;
+  font-weight: 400;
+  color: $light-100;
+}
+
+.inputField {
+  background-color: $light-5;
+  border: 1px solid $light-10;
+  border-radius: 10px;
+  font-weight: 350;
+
+  &::placeholder {
+    color: $light-40;
+  }
+
+  &:hover {
+    border-color: $light-20;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $light-40;
+  }
+
+  &.small {
+    padding: 12px;
+    font-size: 12px;
+    height: 32px;
+  }
+  &.medium {
+    padding: 12px;
+    font-size: 14px;
+    height: 36px;
+  }
+  &.large {
+    padding: 16px;
+    font-size: 14px;
+    height: 42px;
+  }
+  &.xlarge {
+    padding: 16px;
+    font-size: 16px;
+    height: 48px;
+  }
+  &.xxlarge {
+    padding: 20px;
+    font-size: 16px;
+    height: 64px;
+  }
+}
