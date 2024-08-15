@@ -2,6 +2,17 @@
 
 // Higher order styles
 
+@keyframes fadeAndGrowIn {
+  from {
+    opacity: 0;
+    transform: scale(0.75);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .editorPage {
   width: $editor-width;
   max-height: 100%;
@@ -29,20 +40,20 @@
 
 // Templates styles
 
-@keyframes growIn {
-  from {
-    transform: scale(0.5);
-  }
-  to {
-    transform: scale(1);
-  }
-}
-
 .templateCardGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 24px;
   justify-content: center;
+
+  > .templateCard {
+    @for $i from 1 through 10 {
+      &:nth-child(#{$i}) {
+        animation: fadeAndGrowIn forwards;
+        animation-duration: #{100 + ($i - 1) * 75}ms;
+      }
+    }
+  }
 }
 
 .templateCard {
@@ -56,16 +67,6 @@
   text-align: center;
   transition: background-color 100ms ease;
   animation: growIn 100ms forwards;
-
-  &:nth-child(2) {
-    animation-duration: 175ms;
-  }
-  &:nth-child(3) {
-    animation-duration: 250ms;
-  }
-  &:nth-child(4) {
-    animation-duration: 325ms;
-  }
 
   &.default {
     background-color: $light-5;
@@ -163,6 +164,21 @@
   }
   &.active {
     border-bottom: 1px solid $light-100;
+  }
+}
+
+.editorActions {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0;
+
+  > button {
+    @for $i from 1 through 10 {
+      &:nth-child(#{$i}) {
+        animation: fadeAndGrowIn forwards;
+        animation-duration: #{50 + ($i - 1) * 50}ms;
+      }
+    }
   }
 }
 

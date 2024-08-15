@@ -24,7 +24,7 @@ export default function PromptInput({
   return (
     <>
       <div className={styles.editorPage}>
-        <div className="flex flex-row gap-2 mt-4 mb-4">
+        <div className={styles.editorActions}>
           <Button
             size={'medium'}
             variant={'ghost-neutral'}
