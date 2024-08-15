@@ -2,6 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { ClipboardText, DocumentUpload, GalleryAdd, Sound } from 'iconsax-react'
 import Highlight from '@highlight-ai/app-runtime'
 
+import * as XLSX from 'xlsx'
+import mammoth from 'mammoth'
+import * as pptxtojson from 'pptxtojson'
+
 import { PaperclipIcon } from '../../icons/icons'
 import ContextMenu, { MenuItemType } from '../ContextMenu/ContextMenu'
 import styles from './attachments-button.module.scss'
@@ -50,7 +54,15 @@ export const AttachmentsButton = () => {
     addAttachment({ type: 'audio', value: audio, duration: durationInMinutes })
   }
 
-  const onAddFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const textBasedTypes = [
+    'application/json',
+    'application/xml',
+    'application/javascript',
+    'application/typescript',
+    'application/x-sh',
+  ]
+
+  const onAddFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
       if (file.type.startsWith('image/')) {
@@ -73,8 +85,71 @@ export const AttachmentsButton = () => {
           type: 'spreadsheet',
           value: file,
         })
+      } else if (
+        file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+        file.type === 'application/msword'
+      ) {
+        const arrayBuffer = await file.arrayBuffer()
+        const result = await mammoth.extractRawText({ arrayBuffer })
+        addAttachment({
+          type: 'text_file',
+          value: result.value,
+          fileName: file.name,
+        })
+      } else if (textBasedTypes.includes(file.type) || file.type.includes('text/')) {
+        const value = await readTextFile(file)
+        addAttachment({
+          type: 'text_file',
+          value,
+          fileName: file.name,
+        })
+      } else if (file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
+        const value = await extractTextFromPowerPoint(file)
+        addAttachment({
+          type: 'text_file',
+          value,
+          fileName: file.name,
+        })
       }
     }
+  }
+
+  const readTextFile = async (file: File): Promise<string> => {
+    return await new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = (e) => resolve(e.target?.result as string)
+      reader.onerror = (e) => reject(e)
+      reader.readAsText(file)
+    })
+  }
+
+  const extractTextFromPowerPoint = async (file: File): Promise<string> => {
+    const arrayBuffer = await file.arrayBuffer()
+    const json = await pptxtojson.parse(arrayBuffer)
+
+    const cleanText = (text: string): string => {
+      return text
+        .replace(/&nbsp;/g, ' ')
+        .replace(/<\/?[^>]+(>|$)/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+    }
+
+    const slideText = json.slides
+      .map((slide, index) => {
+        const slideNumber = index + 1
+        const slideContent = slide.elements
+          .filter((e) => e.type === 'text')
+          .map((e) => cleanText(e.content))
+          .filter((text) => text.length > 0)
+          .join('\n')
+
+        return slideContent.length > 0 ? `[Slide ${slideNumber}]\n${slideContent}` : ''
+      })
+      .filter((text) => text.length > 0)
+      .join('\n\n')
+
+    return slideText
   }
 
   const onClickScreenshot = async () => {
