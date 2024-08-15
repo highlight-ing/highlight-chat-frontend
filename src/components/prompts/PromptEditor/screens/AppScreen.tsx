@@ -8,6 +8,7 @@ export default function AppScreen() {
     <PromptInput
       value={promptEditorData.appPrompt}
       onChange={(e) => setPromptEditorData({ appPrompt: e })}
+      placeholder="Describe what you want your app to do in detail."
     />
   );
 }

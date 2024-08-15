@@ -8,6 +8,7 @@ export default function SuggestionsScreen() {
     <PromptInput
       value={promptEditorData.suggestionsPrompt}
       onChange={(e) => setPromptEditorData({ suggestionsPrompt: e })}
+      placeholder="Write a prompt that will generate suggestions in the floating Highlight interface."
     />
   );
 }

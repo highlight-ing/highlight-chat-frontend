@@ -28,9 +28,11 @@ function PromptVariableButton({
 export default function PromptInput({
   value,
   onChange,
+  placeholder,
 }: {
   value?: string;
   onChange?: (prompt: string) => void;
+  placeholder?: string;
 }) {
   const onVariableClick = (variable: string) => {
     onChange?.(value + variable);
@@ -69,7 +71,7 @@ export default function PromptInput({
           value={value}
           onChange={(e) => onChange?.(e.target.value)}
           language="handlebars"
-          placeholder="Describe what you want your app to do in detail."
+          placeholder={placeholder}
           className="bg-transparent text-white text-lg"
         />
       </div>

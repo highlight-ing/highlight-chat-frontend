@@ -6,6 +6,25 @@ import { JWTPayload, JWTVerifyResult } from "jose";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
+const SavePromptSchema = z.object({
+  externalId: z.string().optional(),
+  name: z.string(),
+  description: z.string(),
+  appPrompt: z.string(),
+  suggestionsPrompt: z.string(),
+  visibility: z.enum(["public", "private"]),
+});
+
+export type SavePromptData = z.infer<typeof SavePromptSchema>;
+
+export async function savePrompt(data: SavePromptData) {
+  const validatedData = SavePromptSchema.safeParse(data);
+
+  if (!validatedData.success) {
+    return { error: "Invalid prompt data." };
+  }
+}
+
 /**
  * Fetches the raw prompt text from the database.
  */
@@ -64,6 +83,7 @@ export type CreatePromptData = z.infer<typeof CreatePromptSchema>;
 
 /**
  * Creates a new prompt in the database.
+ * @deprecated Use savePrompt instead.
  */
 export async function createPrompt(data: CreatePromptData, authToken: string) {
   let jwt: JWTVerifyResult<JWTPayload>;
@@ -116,6 +136,7 @@ export type UpdatePromptData = z.infer<typeof UpdatePromptSchema>;
 
 /**
  * Updates a prompt in the database.
+ * @deprecated Use savePrompt instead.
  */
 export async function updatePrompt(
   slug: string,
