@@ -43,7 +43,8 @@ function prepareFileAttachmentsForRender(
     } else if (
       mimeType.includes("spreadsheetml") ||
       mimeType.includes("excel") ||
-      attachment.fileName.endsWith(".xlsx")
+      attachment.fileName.endsWith(".xlsx") ||
+      attachment.fileName.endsWith(".csv")
     ) {
       const file = base64ToFile(
         attachment.value,
@@ -64,7 +65,9 @@ function prepareFileAttachmentsForRender(
       mimeType === "application/xml" ||
       mimeType === "application/javascript" ||
       mimeType ===
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+      mimeType === "application/msword" ||
+      mimeType === "application/vnd.openxmlformats-officedocument.presentationml.presentation"
     ) {
       return {
         type: "text_file",
@@ -75,13 +78,17 @@ function prepareFileAttachmentsForRender(
       return attachment;
     }
   });
+  
+  // Check if any file attachments still file type, log if so
+  processedAttachments.forEach((attachment) => {
+    if (attachment.type === "file") {
+      console.error(
+        `Unhandled file type: ${attachment.mimeType} for ${attachment.fileName}`
+      );
+    }
+  });
 
-  // Remove any unhandled attachments
-  const filteredAttachments = processedAttachments.filter(
-    (att) => att.type !== "file"
-  );
-
-  return filteredAttachments;
+  return processedAttachments;
 }
 
 /**

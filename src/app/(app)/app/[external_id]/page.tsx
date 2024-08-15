@@ -1,4 +1,3 @@
-import HighlightChat from "@/components/HighlightChat/HighlightChat";
 import PromptHelper from "@/components/HighlightChat/PromptHelper";
 import { supabaseAdmin } from "@/lib/supabase";
 
