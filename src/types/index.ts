@@ -73,7 +73,7 @@ export interface SpreadsheetAttachment {
 
 export type FileAttachment = PdfAttachment | ImageAttachment | SpreadsheetAttachment | TextFileAttachment
 
-export type Attachment = ImageAttachment | PdfAttachment | SpreadsheetAttachment | TextFileAttachment | FileAttachment
+export type Attachment = AudioAttachment | ClipboardAttachment | WindowAttachment | FileAttachment
 
 export type FileAttachmentType = 'image' | 'pdf' | 'spreadsheet' | 'text_file'
 export type AttachmentType = 'audio' | 'clipboard' | 'window' | FileAttachmentType
