@@ -88,7 +88,7 @@ export default function PromptListingPage({
         <div className="flex basis-1/2 flex-col gap-3">
           <h4 className="text-light-20">Related Apps</h4>
           {relatedApps.map((app) => (
-            <RelatedApp key={app.slug} {...app} />
+            <RelatedApp key={app.externalId} {...app} />
           ))}
         </div>
       </div>
