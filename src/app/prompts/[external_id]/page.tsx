@@ -7,16 +7,16 @@ import { supabaseAdmin } from '@/lib/supabase'
 import { Metadata, ResolvingMetadata } from 'next'
 
 interface PromptPageProps {
-  params: { slug: string }
+  params: { external_id: string }
 }
 
-async function getPrompt(slug: string) {
+async function getPrompt(external_id: string) {
   const supabase = supabaseAdmin()
-  return await supabase.from('prompts').select('*').eq('slug', slug).maybeSingle()
+  return await supabase.from('prompts').select('*').eq('external_id', external_id).maybeSingle()
 }
 
 export async function generateMetadata({ params }: PromptPageProps, parent: ResolvingMetadata): Promise<Metadata> {
-  const { data: prompt, error } = await getPrompt(params.slug)
+  const { data: prompt, error } = await getPrompt(params.external_id)
 
   if (error) {
     throw error
@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: PromptPageProps, parent: Reso
 export default async function PromptPage({ params }: PromptPageProps) {
   // Look up the prompt by slug
 
-  const { data: prompt, error } = await getPrompt(params.slug)
+  const { data: prompt, error } = await getPrompt(params.external_id)
 
   if (error) {
     return <div>Error fetching prompt: {error.message}</div>
@@ -51,7 +51,7 @@ export default async function PromptPage({ params }: PromptPageProps) {
   const supabase = supabaseAdmin()
 
   // Fetch "related" prompts
-  const { data: relatedPrompts, error: relatedPromptsError } = await supabase
+  const { data: relatedPrompts } = await supabase
     .from('prompts')
     .select('*')
     .neq('id', prompt.id)
@@ -77,10 +77,10 @@ export default async function PromptPage({ params }: PromptPageProps) {
 
   return (
     <div className="min-h-screen bg-bg-layer-1">
-      <div className="flex flex-row justify-between border-b border-b-light-5 p-4">
-        <div></div>
-        <h3>Highlight Apps</h3>
-        <div>
+      <div className="flex flex-row items-center border-b border-b-light-5 p-4">
+        <div className="basis-1/3"></div>
+        <h3 className="basis-1/3 text-center">Highlight Apps</h3>
+        <div className="flex basis-1/3 justify-end">
           <PromptShareButton />
         </div>
       </div>

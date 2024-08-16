@@ -80,14 +80,67 @@ function ImageUpload() {
   )
 }
 
-export default function SettingsScreen() {
+function ShareLinkButton() {
+  const timeout = useRef<NodeJS.Timeout | null>(null)
+  const { promptEditorData } = usePromptEditorStore()
+
+  const externalId = promptEditorData.externalId
+
+  const [copied, setCopied] = useState(false)
+
+  function onCopyLinkClick() {
+    if (timeout.current) {
+      clearTimeout(timeout.current)
+    }
+
+    navigator.clipboard.writeText(`https://chat.highlight.ing/prompt/${externalId}`)
+    setCopied(true)
+
+    timeout.current = setTimeout(() => {
+      setCopied(false)
+    }, 1000)
+  }
+
+  return (
+    <SettingOption
+      label={'Share Link'}
+      description={
+        <span className={'text-sm'}>
+          {externalId ? `https://chat.highlight.ing/prompt/${externalId}` : 'Save your prompt to generate a share link'}
+        </span>
+      }
+    >
+      <Button
+        onClick={onCopyLinkClick}
+        size={'medium'}
+        variant={'tertiary'}
+        style={{ marginRight: '6px' }}
+        disabled={!externalId || copied}
+      >
+        {copied ? 'Copied' : 'Copy Link'}
+      </Button>
+    </SettingOption>
+  )
+}
+
+function DeletePromptButton() {
   const { promptEditorData, setPromptEditorData } = usePromptEditorStore()
 
   const isNewPrompt = !promptEditorData.externalId
 
-  function onCopyLinkClick() {
-    navigator.clipboard.writeText(`https://chat.highlight.ing/prompt/${promptEditorData.externalId}`)
-  }
+  return (
+    <SettingOption label={'Delete Prompt'} description={<></>}>
+      <Button size={'medium'} variant={'danger'} style={{ marginRight: '6px' }} disabled={isNewPrompt}>
+        Delete Prompt
+      </Button>
+    </SettingOption>
+  )
+}
+
+export default function SettingsScreen() {
+  const { promptEditorData, setPromptEditorData } = usePromptEditorStore()
+
+  const isNewPrompt = !promptEditorData.externalId
 
   return (
     <div className={styles.settingsPage}>
@@ -125,26 +178,8 @@ export default function SettingsScreen() {
           visibility={promptEditorData.visibility}
           onToggle={(visibility) => setPromptEditorData({ visibility })}
         />
-        <SettingOption
-          label={'Share Link'}
-          description={
-            <span className={'text-sm'}>
-              {isNewPrompt
-                ? 'Save your prompt to generate a share link'
-                : `https://chat.highlight.ing/prompt/${promptEditorData.externalId}`}
-            </span>
-          }
-        >
-          <Button
-            onClick={onCopyLinkClick}
-            size={'medium'}
-            variant={'tertiary'}
-            style={{ marginRight: '6px' }}
-            disabled={isNewPrompt}
-          >
-            Copy Link
-          </Button>
-        </SettingOption>
+        <ShareLinkButton />
+        <DeletePromptButton />
       </div>
     </div>
   )

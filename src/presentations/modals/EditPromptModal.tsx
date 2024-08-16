@@ -15,11 +15,14 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
   useEffect(() => {
     setSelectedScreen('app')
     setPromptEditorData({
-      ...prompt,
+      externalId: prompt.external_id,
+      name: prompt.name,
       description: prompt.description ?? undefined,
-      image: prompt.image ?? undefined,
       appPrompt: prompt.prompt_text ?? undefined,
       suggestionsPrompt: prompt.suggestion_prompt_text ?? undefined,
+      visibility: prompt.public ? 'public' : 'private',
+      videoUrl: prompt.video_url ?? undefined,
+      image: prompt.image ?? undefined,
     })
   }, [prompt])
 
