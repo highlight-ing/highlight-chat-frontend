@@ -19,6 +19,7 @@ export type UserMessage = BaseMessage & {
   window?: WindowAttachment
   file_title?: string
   windows?: string[]
+  text_files?: string[]
 }
 
 export type AssistantMessage = BaseMessage & {
@@ -83,10 +84,9 @@ export type Attachment =
   | AudioAttachment
   | ClipboardAttachment
   | SpreadsheetAttachment
-  | FileAttachment
   | TextFileAttachment
 
-export type AttachmentType = 'audio' | 'clipboard' | 'image' | 'pdf' | 'window' | 'spreadsheet' | 'file' | 'text_file'
+export type AttachmentType = 'audio' | 'clipboard' | 'image' | 'pdf' | 'window' | 'spreadsheet' | 'text_file'
 
 export interface ChatHistoryItem {
   id: string
