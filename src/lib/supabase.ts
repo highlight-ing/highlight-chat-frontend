@@ -1,7 +1,8 @@
 import { Database } from '@/types/supabase'
 import { createClient } from '@supabase/supabase-js'
 
-export const PROMPTS_TABLE_SELECT_FIELDS = 'external_id, name, description, prompt_text, created_at, slug, user_id'
+export const PROMPTS_TABLE_SELECT_FIELDS =
+  'external_id, name, description, prompt_text, created_at, slug, user_id, image, user_images(file_extension)'
 
 const SUPABASE_URL = 'https://ykwkqpmethjmpimvftix.supabase.co'
 
