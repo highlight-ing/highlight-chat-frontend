@@ -64,6 +64,7 @@ export default () => {
       await globalThis.highlight.internal.installApp(prompt.slug)
       await Highlight.app.openApp(prompt.slug)
     } catch (err) {
+      console.error(err)
       installed = false
     }
 

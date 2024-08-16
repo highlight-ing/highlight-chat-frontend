@@ -5,7 +5,8 @@ import { PROMPTS_TABLE_SELECT_FIELDS, supabaseAdmin } from '@/lib/supabase'
  */
 export async function GET(request: Request) {
   const supabase = supabaseAdmin()
-  const { data: prompts, error } = await supabase.from('prompts').select(PROMPTS_TABLE_SELECT_FIELDS).eq('public', true)
+  const { data: prompts, error } = await supabase.from('prompts').select(PROMPTS_TABLE_SELECT_FIELDS)
+  // .eq('public', true)
 
   if (error) {
     return Response.json({ error: error.message }, { status: 500 })

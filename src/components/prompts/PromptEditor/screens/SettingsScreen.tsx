@@ -196,7 +196,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
             size={'xxlarge'}
             label={'Video Link'}
             placeholder={'Provide a video demo for your app (optional)'}
-            value={promptEditorData.videoUrl}
+            value={promptEditorData.videoUrl ?? ''}
             onChange={(e) => setPromptEditorData({ videoUrl: e.target.value })}
           />
           <TextArea

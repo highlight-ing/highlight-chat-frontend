@@ -8,7 +8,7 @@ export async function GET(request: Request, { params }: { params: { external_id:
   const { data: prompt, error } = await supabase
     .from('prompts')
     .select(PROMPTS_TABLE_SELECT_FIELDS)
-    .eq('public', true)
+    // .eq('public', true)
     .eq('external_id', params.external_id)
     .maybeSingle()
 

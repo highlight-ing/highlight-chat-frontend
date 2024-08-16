@@ -11,7 +11,11 @@ interface PromptPageProps {
 
 async function getPrompt(external_id: string) {
   const supabase = supabaseAdmin()
-  return await supabase.from('prompts').select('*').eq('external_id', external_id).maybeSingle()
+  return await supabase
+    .from('prompts')
+    .select('*, user_images(file_extension)')
+    .eq('external_id', external_id)
+    .maybeSingle()
 }
 
 export async function generateMetadata({ params }: PromptPageProps, parent: ResolvingMetadata): Promise<Metadata> {
@@ -86,10 +90,14 @@ export default async function PromptPage({ params }: PromptPageProps) {
       </div>
       <div className="p-20">
         <PromptListingPage
+          image={prompt.image ?? undefined}
+          imageExtension={prompt.user_images?.file_extension ?? undefined}
+          slug={prompt.slug ?? ''}
           name={prompt.name}
           author={'Unknown'}
           description={prompt.description ?? ''}
           relatedApps={relatedApps}
+          videoUrl={prompt.video_url ?? undefined}
         />
       </div>
     </div>

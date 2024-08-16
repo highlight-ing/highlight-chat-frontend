@@ -31,6 +31,10 @@ export function usePromptEditor() {
     formData.append('suggestionsPrompt', promptEditorData.suggestionsPrompt)
     formData.append('visibility', promptEditorData.visibility)
 
+    if (promptEditorData.videoUrl) {
+      formData.append('videoUrl', promptEditorData.videoUrl)
+    }
+
     if (promptEditorData.uploadingImage) {
       formData.append('uploadingImage', promptEditorData.uploadingImage)
     }

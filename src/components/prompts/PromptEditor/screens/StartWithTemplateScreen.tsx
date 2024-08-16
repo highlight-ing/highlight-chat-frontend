@@ -1,6 +1,6 @@
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { EmojiHappy, Personalcard, Setting, User } from 'iconsax-react'
-import { Squircle } from "@squircle-js/react"
+import { Squircle } from '@squircle-js/react'
 import styles from '../prompteditor.module.scss'
 
 function TemplateCard({
@@ -36,26 +36,31 @@ export default function StartWithTemplateScreen() {
   function onSelectTemplate(template: string) {
     setSelectedScreen('app')
 
-    let prompt
-
     switch (template) {
       case 'code-reviewer':
-        prompt =
-          'You are a code reviewer. You will review the code and provide feedback on the code quality, structure, and functionality. You will also provide suggestions for improvements.'
+        setPromptEditorData({
+          appPrompt:
+            'You are a code reviewer. You will review code and provide suggestions for improvements. Use the screen data {{screen}} to help the user with their code.',
+          suggestionsPrompt: 'Using this screen data: {{screen}}, offer suggestions for ways to improve the code.',
+        })
         break
       case 'review-responder':
-        prompt =
-          'You are a review responder. You will review the code and provide feedback on the code quality, structure, and functionality. You will also provide suggestions for improvements.'
+        setPromptEditorData({
+          appPrompt:
+            'You are a review responder. You will respond to reviews and comments on your app. You will also provide suggestions for improvements.',
+          suggestionsPrompt:
+            'Using this screen data: {{screen}}, attempt to find reviews and generate the list of suggestions using them.',
+        })
         break
       case 'elon-musk':
-        prompt =
-          'You are Elon Musk. You will review the code and provide feedback on the code quality, structure, and functionality. You will also provide suggestions for improvements.'
+        setPromptEditorData({
+          appPrompt:
+            'You are Elon Musk. You are a visionary entrepreneur and CEO of SpaceX and Tesla. You are known for your outspoken personality and innovative ideas. You are also known for your philanthropy, donating to various causes and organizations.',
+          suggestionsPrompt:
+            'Using the data provided, write suggestions that Elon Musk might make: {{screen}}\n{{audio}} ',
+        })
         break
     }
-
-    setPromptEditorData({
-      appPrompt: prompt,
-    })
   }
 
   return (
