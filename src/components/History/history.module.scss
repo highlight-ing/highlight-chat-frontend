@@ -8,20 +8,22 @@
   width: $chat-history-width;
   display: flex;
   flex-direction: column;
-  background-color: $dark-20;
-  border-right: 1px solid $light-5;
+  background-color: #121212;
+  border-right: 1px solid $dark-40;
   overflow-x: hidden;
-  transition: transform 250ms ease;
+  transition: transform 250ms, opacity 250ms;
   z-index: 2;
 
   &.show {
     pointer-events: initial;
     transform: translateX(0);
+    opacity: 1;
   }
 
   &.hide {
     pointer-events: none;
     transform: translateX(-$chat-history-width);
+    opacity: 0;
   }
 }
 
@@ -31,7 +33,7 @@
   align-items: center;
   line-height: 1;
   padding: 6px;
-  border-bottom: 1px solid $light-10;
+  border-bottom: 1px solid $dark-40;
   font-size: 15px;
   gap: 8px;
   color: $light-60;
@@ -47,7 +49,8 @@
 
   h1 {
     font-size: 13px;
-    color: $light-80;
+    color: $light-20;
+    font-weight: normal;
     padding: 8px 8px 2px;
   }
 
@@ -60,27 +63,28 @@
   display: block;
   padding: 8px;
   border-radius: 8px;
-  font-size: 15px;
-  font-weight: 200;
+  font-size: 14px;
+  font-weight: normal;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: $light-60;
+  color: $light-20;
   flex-shrink: 0;
+  margin: 0 8px;
+  line-height: 1.3;
 }
 
 .chat {
   @extend .baseHistoryItem;
   position: relative;
   cursor: pointer;
+  transition: background-color 100ms, color 100ms;
 
   &:hover {
-    background-color: $light-10;
-    color: $light-100;
+    background-color: $light-5;
+    color: $light-80;
   }
 }
 
 .chatText {
-  font-size: 14px;
-  font-weight: 350;
 }

@@ -3,7 +3,7 @@ import {ArrowRight, Edit2, MessageProgramming, MessageText, Setting} from "icons
 import React from "react";
 import {PromptApp} from "@/types";
 import CircleButton from "@/components/CircleButton/CircleButton";
-import Tooltip from "@/components/Tooltip";
+import Tooltip from "@/components/Tooltip/Tooltip";
 
 interface PromptListRowProps {
   prompt: PromptApp

@@ -7,7 +7,7 @@ import {
   Clock,
 } from "iconsax-react";
 import CircleButton from "@/components/CircleButton/CircleButton";
-import Tooltip from "@/components/Tooltip";
+import Tooltip from "@/components/Tooltip/Tooltip";
 import { useStore } from "@/providers/store-provider";
 import { useRouter } from "next/navigation";
 import {getPromptAppType} from "@/lib/promptapps";
@@ -116,7 +116,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
       <div className={'flex items-center gap-1 max-w-full'}>
         <Tooltip
           tooltip="View chat history"
-          position="right"
+          position="bottom"
           wrapperStyle={
             showHistory || !setShowHistory ? { visibility: "hidden", paddingInlineStart: `calc(${variables.chatHistoryWidth} - 36px)`, transition: 'padding 250ms ease' } : { transition: 'padding 250ms ease' }
           }

@@ -1,7 +1,7 @@
 import styles from "./history.module.scss";
 import * as React from "react";
 import {useChatHistory} from "@/hooks/useChatHistory";
-import Tooltip from "@/components/Tooltip";
+import Tooltip from "@/components/Tooltip/Tooltip";
 import {Clock} from "iconsax-react";
 import {useStore} from "@/providers/store-provider";
 import {useApi} from "@/hooks/useApi";
@@ -11,6 +11,7 @@ import { BaseMessage, UserMessage, AssistantMessage } from "@/types";
 import Button from "@/components/Button/Button";
 import {useMemo} from "react";
 import {useShallow} from "zustand/react/shallow";
+import CircleButton from "@/components/CircleButton/CircleButton";
 
 interface HistoryProps {
   showHistory: boolean;
@@ -70,11 +71,11 @@ const History: React.FC<HistoryProps> = ({
       className={`${styles.history} ${showHistory ? styles.show : styles.hide}`}
     >
       <div className={styles.header}>
-        <Tooltip tooltip="Hide chats" position="right">
-          <Button size={'medium'} variant={'ghost-neutral'} onClick={() => setShowHistory(!showHistory)}>
+        <Tooltip tooltip="Hide chat history" position="bottom">
+          <CircleButton fitContents={true} onClick={() => setShowHistory(!showHistory)}>
             <Clock size={20} variant={'Bold'}/>
-            History
-          </Button>
+            <span className={'text-sm'}>Chat History</span>
+          </CircleButton>
         </Tooltip>
       </div>
       <div className={styles.chats}>
