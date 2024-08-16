@@ -41,18 +41,6 @@ async function readFileAsBase64(file: File): Promise<string> {
   })
 }
 
-// TODO: Handle .docx and .pptx
-const textBasedTypes = [
-  'application/json',
-  'application/xml',
-  'application/javascript',
-  'application/typescript',
-  'application/x-sh',
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-]
-
 // TODO: Consolidate the two attachment types
 // Should just remove the HLC-specific code and use the Highlight API
 export default async function addAttachmentsToFormData(formData: FormData, attachments: any[]) {
