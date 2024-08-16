@@ -252,7 +252,10 @@ export const useSubmitQuery = () => {
 
     const fileAttachmentTypes = Object.keys({} as Record<FileAttachmentType, null>)
 
+    console.log('File attachment types: ', fileAttachmentTypes)
+
     const hasFileAttachment = context.attachments?.some((a: { type: string }) => fileAttachmentTypes.includes(a.type))
+    console.log('Has file attachment: ', hasFileAttachment)
 
     // Fetch windows information
     const windows = await fetchWindows()
@@ -261,6 +264,7 @@ export const useSubmitQuery = () => {
       // TODO: Clean this up when the runtime API is updated and attachments types are no longer overloaded
       const att = context.attachments || ([] as unknown)
       const fileAttachments = (att as FileAttachment[]).filter((a) => a.type && fileAttachmentTypes.includes(a.type))
+      console.log('File attachments: ', JSON.stringify(fileAttachments))
 
       addMessage({
         role: 'user',
