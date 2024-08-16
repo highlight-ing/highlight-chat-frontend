@@ -17,10 +17,10 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
   const closeModal = useStore((state) => state.closeModal)
 
   useEffect(() => {
-    console.log('prompt image', `${prompt.image}.${prompt.user_images?.file_extension}`)
     setSelectedScreen('app')
     setPromptEditorData({
       externalId: prompt.external_id,
+      slug: prompt.slug ?? undefined,
       name: prompt.name,
       description: prompt.description ?? undefined,
       appPrompt: prompt.prompt_text ?? undefined,

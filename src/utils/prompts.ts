@@ -135,6 +135,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
     video_url: validated.data.videoUrl,
     user_id: userId,
     image: newImageId ?? undefined,
+    is_handlebar_prompt: true,
   }
 
   const supabase = supabaseAdmin()

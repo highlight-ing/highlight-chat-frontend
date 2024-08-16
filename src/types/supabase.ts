@@ -114,6 +114,7 @@ export type Database = {
           external_id: string
           id: number
           image: string | null
+          is_handlebar_prompt: boolean
           name: string
           prompt_text: string | null
           prompt_url: string | null
@@ -129,6 +130,7 @@ export type Database = {
           external_id?: string
           id?: number
           image?: string | null
+          is_handlebar_prompt?: boolean
           name: string
           prompt_text?: string | null
           prompt_url?: string | null
@@ -144,6 +146,7 @@ export type Database = {
           external_id?: string
           id?: number
           image?: string | null
+          is_handlebar_prompt?: boolean
           name?: string
           prompt_text?: string | null
           prompt_url?: string | null
