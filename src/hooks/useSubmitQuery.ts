@@ -258,9 +258,9 @@ export const useSubmitQuery = () => {
     const windows = await fetchWindows()
 
     if (query || clipboardText || ocrScreenContents || screenshotUrl || rawContents || audio || hasFileAttachment) {
-      const fileAttachments = context.attachments?.filter(
+      const fileAttachments = (context.attachments as FileAttachment[]).filter(
         (a) => a.type && fileAttachmentTypes.includes(a.type),
-      ) as FileAttachment[]
+      )
 
       addMessage({
         role: 'user',
