@@ -1,4 +1,4 @@
-import { Attachment, AttachmentType, AudioAttachment } from '@/types'
+import { Attachment, AudioAttachment } from '@/types'
 import { getDurationUnit } from './string'
 
 export const getAudioAttachmentPreview = (attachment: AudioAttachment): string => {
@@ -43,6 +43,8 @@ export const getDisplayValue = (attachment: Attachment): string => {
       return attachment.value.name
     case 'text_file':
       return attachment.fileName
+    case 'window':
+      return attachment.title
     default:
       return attachment.value
   }

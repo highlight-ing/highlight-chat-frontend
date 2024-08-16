@@ -268,7 +268,7 @@ export const useSubmitQuery = () => {
         clipboard_text: clipboardText,
         screenshot: screenshotUrl,
         audio,
-        window: windowTitle ? { title: windowTitle } : undefined,
+        window: windowTitle ? { title: windowTitle, type: 'window' } : undefined,
         windows: windows, // Add windows information to the message
         file_attachments: fileAttachments,
       })
