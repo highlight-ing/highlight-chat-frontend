@@ -7,7 +7,7 @@ import { useStore } from '@/providers/store-provider'
 
 import styles from './chatinput.module.scss'
 import * as React from 'react'
-import { getAudioAttachmentPreview } from '@/utils/attachments'
+import { getAudioAttachmentPreview, getDisplayValue } from '@/utils/attachments'
 import { useShallow } from 'zustand/react/shallow'
 
 const MAX_INPUT_HEIGHT = 160
@@ -53,21 +53,6 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
     }
   }, [inputRef, input])
 
-  const getValue = (attachment: AttachmentType) => {
-    switch (attachment.type) {
-      case 'pdf':
-        return attachment.value.name
-      case 'audio':
-        return getAudioAttachmentPreview(attachment)
-      case 'spreadsheet':
-        return attachment.value.name
-      case 'text_file':
-        return attachment.fileName
-      default:
-        return attachment.value
-    }
-  }
-
   return (
     <div className={`${styles.inputContainer} ${sticky ? styles.sticky : ''}`} onClick={onClickContainer}>
       {attachments.length > 0 && (
@@ -75,7 +60,7 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
           {attachments.map((attachment: AttachmentType, index: number) => (
             <Attachment
               type={attachment.type}
-              value={getValue(attachment)}
+              value={getDisplayValue(attachment)}
               isFile={
                 attachment.type === 'pdf' ||
                 (attachment.type === 'image' && !!attachment.file) ||
