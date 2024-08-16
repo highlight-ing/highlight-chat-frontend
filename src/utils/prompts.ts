@@ -340,7 +340,7 @@ export async function fetchPrompts(authToken: string) {
 
   const supabase = supabaseAdmin()
 
-  const { data: prompts, error } = await supabase.from('prompts').select('*')
+  const { data: prompts, error } = await supabase.from('prompts').select('*, user_images(file_extension)')
 
   if (error) {
     return { error: 'Error fetching prompts from Supabase' }
@@ -364,25 +364,17 @@ export async function fetchPrompt(slug: string) {
   return { prompt }
 }
 
-export async function deletePrompt(slug: string, authToken: string) {
-  let jwt: JWTVerifyResult<JWTPayload>
-
+export async function deletePrompt(externalId: string, authToken: string) {
+  let userId: string
   try {
-    jwt = await validateHighlightJWT(authToken)
+    userId = await validateUserAuth(authToken)
   } catch (error) {
     return { error: 'Invalid auth token' }
   }
 
-  // Get the user ID from the sub of the JWT
-  const userId = jwt.payload.sub
-
-  if (!userId) {
-    return { error: "'sub' was missing from auth token" }
-  }
-
   const supabase = supabaseAdmin()
 
-  const { error } = await supabase.from('prompts').delete().eq('slug', slug).eq('user_id', userId)
+  const { error } = await supabase.from('prompts').delete().eq('external_id', externalId).eq('user_id', userId)
 
   if (error) {
     return { error: 'Error deleting prompt from our database.' }

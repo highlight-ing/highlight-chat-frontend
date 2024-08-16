@@ -9,6 +9,9 @@ import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { Switch } from '@/components/catalyst/switch'
 import Image from 'next/image'
 import supabaseLoader from '@/lib/supabase'
+import { deletePrompt } from '@/utils/prompts'
+import useAuth from '@/hooks/useAuth'
+import { usePromptsStore } from '@/stores/prompts'
 
 function AppIcon() {
   return (
@@ -50,7 +53,7 @@ function ImageUpload() {
   } else if (promptEditorData.image) {
     image = (
       <Image
-        src={'/user_content/8079c718-648d-435f-b037-d794e0ae7f54.png'}
+        src={`/user_content/${promptEditorData.image}`}
         alt="Prompt image"
         className="h-16 w-16 rounded-full"
         width={64}
@@ -123,24 +126,51 @@ function ShareLinkButton() {
   )
 }
 
-function DeletePromptButton() {
-  const { promptEditorData, setPromptEditorData } = usePromptEditorStore()
+function DeletePromptButton({ onDelete }: { onDelete?: () => void }) {
+  const { removePrompt } = usePromptsStore()
+  const { promptEditorData } = usePromptEditorStore()
+  const { getAccessToken } = useAuth()
 
   const isNewPrompt = !promptEditorData.externalId
 
+  async function _onDelete() {
+    if (!promptEditorData.externalId) {
+      return
+    }
+
+    const authToken = await getAccessToken()
+    const res = await deletePrompt(promptEditorData.externalId, authToken)
+
+    if (res && res.error) {
+      console.error('Error while calling deletePrompt', res.error)
+      return
+    }
+
+    removePrompt(promptEditorData.externalId)
+    onDelete?.()
+  }
+
   return (
     <SettingOption label={'Delete Prompt'} description={<></>}>
-      <Button size={'medium'} variant={'danger'} style={{ marginRight: '6px' }} disabled={isNewPrompt}>
+      <Button
+        onClick={_onDelete}
+        size={'medium'}
+        variant={'danger'}
+        style={{ marginRight: '6px' }}
+        disabled={isNewPrompt}
+      >
         Delete Prompt
       </Button>
     </SettingOption>
   )
 }
 
-export default function SettingsScreen() {
+export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
   const { promptEditorData, setPromptEditorData } = usePromptEditorStore()
 
-  const isNewPrompt = !promptEditorData.externalId
+  function onDelete() {
+    onClose?.()
+  }
 
   return (
     <div className={styles.settingsPage}>
@@ -179,7 +209,7 @@ export default function SettingsScreen() {
           onToggle={(visibility) => setPromptEditorData({ visibility })}
         />
         <ShareLinkButton />
-        <DeletePromptButton />
+        <DeletePromptButton onDelete={onDelete} />
       </div>
     </div>
   )

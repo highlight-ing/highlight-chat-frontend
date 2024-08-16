@@ -1,5 +1,12 @@
 import { StateCreator } from 'zustand'
 import { Prompt } from '@/types/supabase-helpers'
+import { useStore } from '@/providers/store-provider'
+import { useShallow } from 'zustand/react/shallow'
+
+/**
+ * Stores all the prompts available to the user,
+ * including ones that they own.
+ */
 
 export interface PromptsState {
   promptUserId?: string | undefined
@@ -10,6 +17,7 @@ export type PromptsSlice = PromptsState & {
   setPrompts: (prompts: Prompt[]) => void
   setPromptUserId: (userId: string | undefined) => void
   updatePrompt: (prompt: Prompt) => void
+  removePrompt: (externalId: string) => void
 }
 
 export const initialPromptsState: PromptsState = {
@@ -41,4 +49,21 @@ export const createPromptsSlice: StateCreator<PromptsSlice> = (set, get) => ({
       ),
     })
   },
+  removePrompt: (externalId: string) => {
+    set({
+      prompts: get().prompts.filter((p) => p.external_id !== externalId),
+    })
+  },
 })
+
+export const usePromptsStore = () =>
+  useStore(
+    useShallow((state) => ({
+      prompts: state.prompts,
+      setPrompts: state.setPrompts,
+      promptUserId: state.promptUserId,
+      setPromptUserId: state.setPromptUserId,
+      updatePrompt: state.updatePrompt,
+      removePrompt: state.removePrompt,
+    })),
+  )

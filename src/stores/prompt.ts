@@ -1,6 +1,10 @@
 import { StateCreator } from 'zustand'
 import { Prompt } from '@/types/supabase-helpers'
 
+/**
+ * The state of the current prompt being used in the editor.
+ */
+
 export interface PromptState {
   /**
    * Stores the actual prompt that is used to generate the response
