@@ -1,8 +1,6 @@
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { savePrompt } from '@/utils/prompts'
 import useAuth from './useAuth'
-import { useStore } from '@/providers/store-provider'
-import { useShallow } from 'zustand/react/shallow'
 import { usePromptsStore } from '@/stores/prompts'
 
 export function usePromptEditor() {
@@ -26,6 +24,7 @@ export function usePromptEditor() {
       formData.append('externalId', promptEditorData.externalId)
     }
 
+    formData.append('slug', promptEditorData.slug)
     formData.append('name', promptEditorData.name)
     formData.append('description', promptEditorData.description)
     formData.append('appPrompt', promptEditorData.appPrompt)

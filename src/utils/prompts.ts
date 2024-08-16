@@ -4,7 +4,6 @@ import { validateHighlightJWT } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 import { videoUrlSchema } from '@/lib/zod'
 import { JWTPayload, JWTVerifyResult } from 'jose'
-import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import mime from 'mime-types'
 
@@ -28,6 +27,7 @@ async function validateUserAuth(authToken: string) {
 
 const SavePromptSchema = z.object({
   externalId: z.string().optional().nullable(),
+  slug: z.string(),
   name: z.string(),
   description: z.string(),
   appPrompt: z.string(),
@@ -111,6 +111,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
 
   const validated = SavePromptSchema.safeParse({
     externalId: formData.get('externalId'),
+    slug: formData.get('slug'),
     name: formData.get('name'),
     description: formData.get('description'),
     appPrompt: formData.get('appPrompt'),
@@ -126,6 +127,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
 
   const promptData = {
     name: validated.data.name,
+    slug: validated.data.slug,
     description: validated.data.description,
     prompt_text: validated.data.appPrompt,
     suggestion_prompt_text: validated.data.suggestionsPrompt,
@@ -208,127 +210,6 @@ export async function fetchPromptText(externalId: string) {
   const promptText = await appResponse.text()
 
   return promptText
-}
-
-const CreatePromptSchema = z.object({
-  name: z.string(),
-  description: z.string(),
-  instructions: z.string(),
-  slug: z.string(),
-  visibility: z.enum(['public', 'unlisted']),
-})
-
-export type CreatePromptData = z.infer<typeof CreatePromptSchema>
-
-/**
- * Creates a new prompt in the database.
- * @deprecated Use savePrompt instead.
- */
-export async function createPrompt(data: CreatePromptData, authToken: string) {
-  let jwt: JWTVerifyResult<JWTPayload>
-
-  try {
-    jwt = await validateHighlightJWT(authToken)
-  } catch (error) {
-    return { error: 'Invalid auth token' }
-  }
-
-  // Get the user ID from the sub of the JWT
-  const userId = jwt.payload.sub
-
-  if (!userId) {
-    return { error: "'sub' was missing from auth token" }
-  }
-
-  const validatedData = CreatePromptSchema.safeParse(data)
-
-  if (!validatedData.success) {
-    return { error: 'Invalid prompt data' }
-  }
-
-  const supabase = supabaseAdmin()
-
-  const { data: prompt, error } = await supabase.from('prompts').insert({
-    name: validatedData.data.name,
-    description: validatedData.data.description,
-    prompt_text: validatedData.data.instructions,
-    user_id: userId,
-    slug: validatedData.data.slug,
-    public: validatedData.data.visibility === 'public',
-  })
-
-  if (error) {
-    return { error: 'Error creating prompt in our database.' }
-  }
-
-  revalidatePath('/prompts')
-
-  return { prompt: prompt }
-}
-
-const UpdatePromptSchema = z.object({
-  name: z.string(),
-  description: z.string(),
-  instructions: z.string(),
-  visibility: z.enum(['public', 'unlisted']),
-})
-
-export type UpdatePromptData = z.infer<typeof UpdatePromptSchema>
-
-/**
- * Updates a prompt in the database.
- * @deprecated Use savePrompt instead.
- */
-export async function updatePrompt(slug: string, data: UpdatePromptData, authToken: string) {
-  let jwt: JWTVerifyResult<JWTPayload>
-
-  try {
-    jwt = await validateHighlightJWT(authToken)
-  } catch (error) {
-    return { error: 'Invalid auth token' }
-  }
-
-  const validatedData = UpdatePromptSchema.safeParse(data)
-
-  if (!validatedData.success) {
-    return { error: 'Invalid prompt data' }
-  }
-
-  // Get the user ID from the sub of the JWT
-  const userId = jwt.payload.sub
-
-  if (!userId) {
-    return { error: "'sub' was missing from auth token" }
-  }
-
-  const supabase = supabaseAdmin()
-
-  const { data: prompt, error } = await supabase
-    .from('prompts')
-    .update({
-      name: data.name,
-      description: data.description,
-      prompt_text: data.instructions,
-      public: data.visibility === 'public',
-    })
-    .eq('slug', slug)
-    .eq('user_id', userId)
-    .select()
-    .maybeSingle()
-
-  if (error) {
-    return { error: 'Error updating prompt in our database.' }
-  }
-
-  if (!prompt) {
-    return {
-      error: 'Something went wrong while updating your prompt. (nothing was returned)',
-    }
-  }
-
-  revalidatePath('/prompts')
-
-  return { prompt }
 }
 
 /**

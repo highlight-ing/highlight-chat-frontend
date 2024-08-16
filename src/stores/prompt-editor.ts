@@ -11,6 +11,7 @@ export type PromptEditorScreen = 'startWithTemplate' | 'app' | 'suggestions' | '
 
 export interface PromptEditorData {
   externalId?: string
+  slug: string
   name: string
   description: string
   appPrompt: string
@@ -39,6 +40,7 @@ export type PromptEditorSlice = PromptEditorState & {
 export const initialPromptEditorState: PromptEditorState = {
   selectedScreen: 'startWithTemplate',
   promptEditorData: {
+    slug: '',
     appPrompt: '',
     suggestionsPrompt: '',
     name: '',

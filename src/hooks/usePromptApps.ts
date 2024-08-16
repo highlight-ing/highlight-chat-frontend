@@ -5,6 +5,7 @@ import useAuth from '@/hooks/useAuth'
 import { Prompt } from '@/types/supabase-helpers'
 import { useRouter } from 'next/navigation'
 import { useShallow } from 'zustand/react/shallow'
+import Highlight from '@highlight-ai/app-runtime'
 
 export default () => {
   const { getAccessToken } = useAuth()
@@ -44,9 +45,29 @@ export default () => {
   }
 
   const selectPrompt = async (prompt: Prompt) => {
+    if (!prompt.slug) {
+      return
+    }
+
     if (prompt.slug === 'hlchat') {
-      clearPrompt()
-      router.push('/')
+      await Highlight.app.openApp('highlightchat')
+
+      // clearPrompt()
+      // router.push('/')
+      return
+    }
+
+    let installed = true
+
+    try {
+      //@ts-expect-error
+      await globalThis.highlight.internal.installApp(prompt.slug)
+      await Highlight.app.openApp(prompt.slug)
+    } catch (err) {
+      installed = false
+    }
+
+    if (!installed) {
       return
     }
 
