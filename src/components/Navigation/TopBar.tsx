@@ -2,25 +2,21 @@
 
 import * as React from "react";
 import {AssistantMessage, BaseMessage, ChatHistoryItem, TopBarProps, UserMessage} from "@/types";
-import styles from "./top-bar.module.scss";
 import {
   Add,
-  AddCircle,
-  ArrowDown2,
   Clock,
-  MessageText,
 } from "iconsax-react";
 import CircleButton from "@/components/CircleButton/CircleButton";
 import Tooltip from "@/components/Tooltip";
 import { useStore } from "@/providers/store-provider";
 import { useRouter } from "next/navigation";
-import Button from "@/components/Button/Button";
-import {HighlightIcon} from "@/icons/icons";
-import variables from '@/variables.module.scss'
 import {getPromptAppType} from "@/lib/promptapps";
 import {useShallow} from "zustand/react/shallow";
 import {useApi} from "@/hooks/useApi";
 import TopTab from "@/components/Navigation/TopTab";
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import styles from "./top-bar.module.scss";
+import variables from '@/variables.module.scss'
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const router = useRouter();
@@ -36,7 +32,9 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
     clearPrompt,
     conversationId,
     openConversations,
-    loadConversation
+    loadConversation,
+    setOpenConversations,
+    removeOpenConversation,
   } = useStore(
     useShallow((state) => ({
       startNewConversation: state.startNewConversation,
@@ -48,7 +46,9 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
       clearPrompt: state.clearPrompt,
       conversationId: state.conversationId,
       loadConversation: state.loadConversation,
-      openConversations: state.openConversations
+      openConversations: state.openConversations,
+      setOpenConversations: state.setOpenConversations,
+      removeOpenConversation: state.removeOpenConversation
     }))
   );
 
@@ -93,33 +93,78 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
     }))
   }
 
+  const onDragTabEnd = (result: any) => {
+    if (!result.destination) {
+      return
+    }
+    const updated = openConversations.slice()
+    const [removed] = updated.splice(result.source.index, 1)
+    updated.splice(result.destination.index, 0, removed)
+    setOpenConversations(updated)
+  }
+
+  const onCloseTab = (conversation: ChatHistoryItem) => {
+    removeOpenConversation(conversation.id)
+    startNewConversation()
+    clearPrompt()
+  }
+
   const promptType = promptApp ? getPromptAppType(promptUserId, promptApp) : undefined
 
   return (
     <div className={styles.topBar}>
-      <div className={'flex items-center gap-1'}>
+      <div className={'flex items-center gap-1 max-w-full'}>
         <Tooltip
           tooltip="View chat history"
           position="right"
           wrapperStyle={
-            showHistory || !setShowHistory ? { visibility: "hidden" } : undefined
+            showHistory || !setShowHistory ? { visibility: "hidden", paddingInlineStart: `calc(${variables.chatHistoryWidth} - 36px)`, transition: 'padding 250ms ease' } : { transition: 'padding 250ms ease' }
           }
         >
           <CircleButton onClick={onShowHistoryClick}>
             <Clock size={20} variant={'Bold'}/>
           </CircleButton>
         </Tooltip>
-        {
-          openConversations.map(conversation => {
-            return (
-              <TopTab
-                conversation={conversation}
-                onOpen={_ => onSelectChat(conversation)}
-                isActive={conversation.id === conversationId}
-              />
-            )
-          })
-        }
+        <DragDropContext onDragEnd={onDragTabEnd}>
+          <Droppable droppableId="droppable" direction={'horizontal'}>
+            {(provided) => (
+              <div
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                className={`${styles.tabsContainer} ${showHistory ? styles.offset : ''}`}
+              >
+                {
+                  openConversations.map((conversation, index) => {
+                    return (
+                      <Draggable key={conversation.id} draggableId={conversation.id} index={index}>
+                        {(provided, snapshot) => (
+                          <TopTab
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            conversation={conversation}
+                            onOpen={_ => onSelectChat(conversation)}
+                            onClose={_ => onCloseTab(conversation)}
+                            isActive={conversation.id === conversationId}
+                            isDragging={snapshot.isDragging}
+                            style={{
+                              ...provided.draggableProps.style,
+                              transition: snapshot.isDropAnimating
+                                ? 'all 200ms ease-out'
+                                : provided.draggableProps.style?.transition,
+                              cursor: "pointer"
+                            }}
+                          />
+                        )}
+                      </Draggable>
+                    )
+                  })
+                }
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
         {
           // (promptName || !!messages.length) &&
           <Tooltip tooltip="Start new chat" position="bottom">

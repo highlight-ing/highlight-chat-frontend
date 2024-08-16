@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.1.2",
+    "@hello-pangea/dnd": "^16.6.0",
     "@highlight-ai/app-runtime": "^0.0.44",
     "@supabase/supabase-js": "^2.44.4",
     "@tailwindcss/line-clamp": "^0.4.4",

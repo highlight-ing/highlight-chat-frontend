@@ -19,6 +19,7 @@ export type ConversationSlice = ConversationState & {
   loadConversation: (conversationId: string, messages: Message[]) => void
   setOpenConversations: (conversations: ChatHistoryItem[]) => void
   addOrUpdateOpenConversation: (conversation: ChatHistoryItem) => void
+  removeOpenConversation: (conversationId: string) => void
 };
 
 export const initialConversationState: ConversationState = {
