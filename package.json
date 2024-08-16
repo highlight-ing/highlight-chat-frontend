@@ -9,7 +9,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "gen:supabase-types": "supabase gen types --lang=typescript --project-id ykwkqpmethjmpimvftix > src/types/supabase.ts"
+    "gen:supabase-types": "supabase gen types --lang=typescript --project-id ykwkqpmethjmpimvftix > src/types/supabase.ts",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "prepare": "husky"
   },
   "dependencies": {
     "@headlessui/react": "^2.1.2",
@@ -54,6 +56,8 @@
     "@types/uuid": "^10.0.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.4",
+    "husky": "^9.1.4",
+    "lint-staged": "^15.2.9",
     "postcss": "^8",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.6",

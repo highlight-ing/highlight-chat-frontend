@@ -92,7 +92,7 @@ export function Listbox<T>({
           // Shadows
           'shadow-lg ring-1 ring-zinc-950/10 dark:ring-inset dark:ring-white/10',
           // Transitions
-          'transition-opacity duration-100 ease-in data-[transition]:pointer-events-none data-[closed]:data-[leave]:opacity-0'
+          'transition-opacity duration-100 ease-in data-[transition]:pointer-events-none data-[closed]:data-[leave]:opacity-0',
         )}
       >
         {options}
@@ -114,7 +114,7 @@ export function ListboxOption<T>({
     '[&>[data-slot=icon]]:text-zinc-500 [&>[data-slot=icon]]:group-data-[focus]/option:text-white [&>[data-slot=icon]]:dark:text-zinc-400',
     'forced-colors:[&>[data-slot=icon]]:text-[CanvasText] forced-colors:[&>[data-slot=icon]]:group-data-[focus]/option:text-[Canvas]',
     // Avatars
-    '[&>[data-slot=avatar]]:-mx-0.5 [&>[data-slot=avatar]]:size-6 sm:[&>[data-slot=avatar]]:size-5'
+    '[&>[data-slot=avatar]]:-mx-0.5 [&>[data-slot=avatar]]:size-6 sm:[&>[data-slot=avatar]]:size-5',
   )
 
   return (
@@ -136,7 +136,7 @@ export function ListboxOption<T>({
               // Forced colors mode
               'forced-color-adjust-none forced-colors:data-[focus]:bg-[Highlight] forced-colors:data-[focus]:text-[HighlightText]',
               // Disabled
-              'data-[disabled]:opacity-50'
+              'data-[disabled]:opacity-50',
             )}
           >
             <svg
@@ -165,7 +165,7 @@ export function ListboxDescription({ className, children, ...props }: React.Comp
       {...props}
       className={clsx(
         className,
-        'flex flex-1 overflow-hidden text-zinc-500 before:w-2 before:min-w-0 before:shrink group-data-[focus]/option:text-white dark:text-zinc-400'
+        'flex flex-1 overflow-hidden text-zinc-500 before:w-2 before:min-w-0 before:shrink group-data-[focus]/option:text-white dark:text-zinc-400',
       )}
     >
       <span className="flex-1 truncate">{children}</span>

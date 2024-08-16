@@ -32,7 +32,7 @@ const ContextMenu = ({
   items,
   offset = 0,
   wrapperStyle,
-  onOpen
+  onOpen,
 }: PropsWithChildren<ContextMenuProps>) => {
   const [isOpen, setOpen] = useState(false)
   const [appliedStyle, setAppliedStyle] = useState<React.CSSProperties>({})
@@ -48,7 +48,7 @@ const ContextMenu = ({
 
     // This will be used to set styles of the tooltip.
     const styles: React.CSSProperties = {
-      position: 'fixed'
+      position: 'fixed',
     }
 
     // Determine styles based on desired position.
@@ -114,7 +114,7 @@ const ContextMenu = ({
     (_e: MouseEvent) => {
       setOpen(!isOpen)
     },
-    [isOpen]
+    [isOpen],
   )
 
   const onClickOutsideListener = useCallback(
@@ -125,7 +125,7 @@ const ContextMenu = ({
         setOpen(false)
       }
     },
-    [isOpen]
+    [isOpen],
   )
 
   useEffect(() => {
@@ -156,18 +156,18 @@ const ContextMenu = ({
   }, [isOpen])
 
   return (
-    <div className="relative w-fit h-fit" ref={containerRef} style={wrapperStyle}>
+    <div className="relative h-fit w-fit" ref={containerRef} style={wrapperStyle}>
       {children}
       {isOpen && (
         <Portal>
           <div
-            className="fixed bg-[#000] rounded-xl border border-light-20 z-10 w-fit h-fit overflow-hidden"
+            className="fixed z-10 h-fit w-fit overflow-hidden rounded-xl border border-light-20 bg-[#000]"
             ref={elemRef}
             style={appliedStyle}
           >
             {items.map((item, index) => {
               if (item.divider) {
-                return <div className="w-full min-h-[1px] bg-light-16" key={`divider-${index}`} />
+                return <div className="min-h-[1px] w-full bg-light-16" key={`divider-${index}`} />
               }
               return (
                 <div
