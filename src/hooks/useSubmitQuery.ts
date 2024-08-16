@@ -6,7 +6,6 @@ import useAuth from './useAuth'
 import { useApi } from '@/hooks/useApi'
 import { FileAttachment, FileAttachmentType, PromptApp, TextFileAttachment } from '@/types'
 import { useShallow } from 'zustand/react/shallow'
-import { base64ToFile, getDisplayValue } from '@/utils/attachments'
 
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024 // 1MB in bytes

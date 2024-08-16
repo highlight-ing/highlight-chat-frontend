@@ -15,23 +15,6 @@ export const getAudioAttachmentPreview = (attachment: AudioAttachment): string =
   return `Last ${durationString}:\n${attachment.value}`
 }
 
-export function base64ToFile(base64String: string, fileName: string, mimeType: string): File | null {
-  try {
-    const base64Data = base64String.replace(/^data:[^;]+;base64,/, '')
-
-    // Decode the base64 string
-    const binaryString = Buffer.from(base64Data, 'base64')
-
-    // Create a Uint8Array from the Buffer
-    const bytes = new Uint8Array(binaryString)
-
-    return new File([bytes], fileName, { type: mimeType })
-  } catch (error) {
-    console.error('Error converting base64 to File:', fileName, JSON.stringify(error))
-    return null
-  }
-}
-
 export function dataURItoFile(dataURI: string, fileName: string, mimeType: string): File | null {
   try {
     const arr = dataURI.split(',')
