@@ -21,7 +21,7 @@ const Tooltip = ({
   tooltip,
   disabled,
   wrapperStyle = emptyObj,
-  tooltipContainerStyle = emptyObj
+  tooltipContainerStyle = emptyObj,
 }: PropsWithChildren<TooltipProps>) => {
   const [tooltipVisible, setTooltipVisible] = useState(false)
   const [tooltipStyle, setTooltipStyle] = useState({})
@@ -34,7 +34,7 @@ const Tooltip = ({
 
     // This will be used to set styles of the tooltip.
     const styles: CSSProperties = {
-      position: 'fixed'
+      position: 'fixed',
     }
 
     // Determine styles based on desired position.
@@ -98,7 +98,7 @@ const Tooltip = ({
 
   return (
     <div
-      className="group flex relative"
+      className="group relative flex"
       onClick={() => setTooltipVisible(false)}
       onMouseEnter={() => !disabled && setTooltipVisible(true)}
       onMouseLeave={() => setTooltipVisible(false)}
@@ -107,18 +107,17 @@ const Tooltip = ({
       style={wrapperStyle}
     >
       {children}
-      {
-        tooltipVisible &&
+      {tooltipVisible && (
         <Portal>
           <div
             ref={tooltipRef}
             style={{ ...tooltipStyle, ...tooltipContainerStyle, visibility: tooltipVisible ? 'visible' : 'hidden' }}
-            className="group-hover:flex bg-dark border border-light-10 rounded-lg text-light-80 p-3 fixed min-w-min min-h-min w-fit h-fit whitespace-pre-wrap z-10"
+            className="fixed z-10 h-fit min-h-min w-fit min-w-min whitespace-pre-wrap rounded-lg border border-light-10 bg-dark p-3 text-light-80 group-hover:flex"
           >
             {tooltip}
           </div>
         </Portal>
-      }
+      )}
     </div>
   )
 }

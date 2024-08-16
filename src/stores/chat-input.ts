@@ -20,7 +20,7 @@ export type ChatInputSlice = ChatInputState & {
 export const initialChatInputState: ChatInputState = {
   input: '',
   inputIsDisabled: false,
-  fileInputRef: undefined
+  fileInputRef: undefined,
 }
 
 export const createChatInputSlice: StateCreator<ChatInputSlice> = (set) => ({
@@ -28,5 +28,5 @@ export const createChatInputSlice: StateCreator<ChatInputSlice> = (set) => ({
   setInput: (input: string) => set({ input }),
   clearInput: () => set({ input: '' }),
   setInputIsDisabled: (isDisabled: boolean) => set({ inputIsDisabled: isDisabled }),
-  setFileInputRef: (ref: React.RefObject<HTMLInputElement>) => set({ fileInputRef: ref })
+  setFileInputRef: (ref: React.RefObject<HTMLInputElement>) => set({ fileInputRef: ref }),
 })
