@@ -152,14 +152,16 @@ export const useSubmitQuery = () => {
 
   const { getAccessToken } = useAuth()
 
-  const fetchResponse = async (formData: FormData, token: string) => {
+  const fetchResponse = async (formData: FormData, token: string, isPromptApp: boolean) => {
     setIsDisabled(true)
 
     try {
       const conversationId = getOrCreateConversationId()
       formData.append('conversation_id', conversationId)
 
-      const response = await post('chat_v2/', formData)
+      const endpoint = isPromptApp ? 'chat/prompt-as-app' : 'chat_v2/'
+      const response = await post(endpoint, formData)
+      
       if (!response.ok) {
         throw new Error('Network response was not ok')
       }
@@ -277,13 +279,14 @@ export const useSubmitQuery = () => {
       setInput('')
       clearAttachments() // Clear the attachment immediately
 
-      const formData = new FormData()
-      formData.append('prompt', query)
-      formData.append('windows', JSON.stringify(windows)) // Add windows to formData
+      const formData = new FormData();
+      formData.append("prompt", query);
+      formData.append("windows", JSON.stringify(windows)); // Add windows to formData
+      // formData.append("llm_provider", "openai")
 
-      console.log('prompt app: ', promptApp)
-      if (promptApp) {
-        formData.append('app_id', promptApp.id.toString())
+      const isPromptApp = !!promptApp
+      if (isPromptApp) {
+        formData.append('app_id', promptApp!.id.toString())
       }
 
       // Add about_me to form data
@@ -301,7 +304,7 @@ export const useSubmitQuery = () => {
       }
 
       const accessToken = await getAccessToken()
-      await fetchResponse(formData, accessToken)
+      await fetchResponse(formData, accessToken, isPromptApp)
     }
   }
 
@@ -316,18 +319,21 @@ export const useSubmitQuery = () => {
     if (query) {
       const formData = new FormData()
       formData.append('prompt', query)
-      if (promptApp) {
-        formData.append('app_id', promptApp.id.toString())
+      
+      const isPromptApp = !!promptApp
+      if (isPromptApp) {
+        formData.append('app_id', promptApp!.id.toString())
       }
+
+      // Fetch windows information
+      const windows = await fetchWindows();
+      formData.append("windows", JSON.stringify(windows));
+      // formData.append("llm_provider", "openai")
 
       // Add about_me to form data
       if (aboutMe) {
         formData.append('about_me', JSON.stringify(aboutMe))
       }
-
-      // Fetch windows information
-      const windows = await fetchWindows()
-      formData.append('windows', JSON.stringify(windows))
 
       const { screenshot, audio, fileTitle, clipboardText, ocrText } = await addAttachmentsToFormData(
         formData,
@@ -348,7 +354,7 @@ export const useSubmitQuery = () => {
       clearAttachments() // Clear the attachment immediately
 
       const accessToken = await getAccessToken()
-      await fetchResponse(formData, accessToken)
+      await fetchResponse(formData, accessToken, isPromptApp)
     }
   }
 
