@@ -4,9 +4,8 @@ import imageCompression from 'browser-image-compression'
 import { useStore } from '@/providers/store-provider'
 import useAuth from './useAuth'
 import { useApi } from '@/hooks/useApi'
-import { Prompt } from '@/types/supabase-helpers'
 import { useShallow } from 'zustand/react/shallow'
-import { base64ToFile } from '@/utils/attachments'
+import { Prompt } from '@/types/supabase-helpers'
 
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024 // 1MB in bytes
@@ -43,7 +42,16 @@ async function readFileAsBase64(file: File): Promise<string> {
 }
 
 // TODO: Handle .docx and .pptx
-const textBasedTypes = ['application/json', 'application/xml', 'application/javascript']
+const textBasedTypes = [
+  'application/json',
+  'application/xml',
+  'application/javascript',
+  'application/typescript',
+  'application/x-sh',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+]
 
 // TODO: Consolidate the two attachment types
 // Should just remove the HLC-specific code and use the Highlight API
@@ -53,31 +61,8 @@ export default async function addAttachmentsToFormData(formData: FormData, attac
   for (const attachment of attachments) {
     if (attachment?.value) {
       switch (attachment.type) {
-        case 'file':
-          const mime = attachment?.mimeType
-          if (mime === 'application/pdf') {
-            let pdfFile = base64ToFile(attachment.value, attachment.fileName, 'application/pdf')
-            if (pdfFile) {
-              formData.append('pdf', pdfFile)
-            }
-          } else if (mime.startsWith('image/')) {
-            let imageFile = base64ToFile(attachment.value, attachment.fileName, mime)
-            if (!imageFile) continue
-            const compressedFile = await compressImageIfNeeded(imageFile)
-            const base64data = await readFileAsBase64(compressedFile)
-            const mimeType = compressedFile.type || 'image/png'
-            const base64WithMimeType = `data:${mimeType};base64,${base64data.split(',')[1]}`
-            formData.append('base64_image', base64WithMimeType)
-          } else if (
-            mime === 'application/vnd.ms-excel' ||
-            mime === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-          ) {
-            formData.append('spreadsheet', attachment.value)
-          } else if (mime.startsWith('text/') || textBasedTypes.includes(attachment.mimeType)) {
-            formData.append('text_file', attachment.value)
-          } else {
-            console.error('Unsupported file type:', attachment.mimeType)
-          }
+        case 'text_file':
+          formData.append('text_file', attachment.value)
           break
         case 'image':
         case 'screenshot':
@@ -173,8 +158,9 @@ export const useSubmitQuery = () => {
       const conversationId = getOrCreateConversationId()
       formData.append('conversation_id', conversationId)
 
-      const endpoint = isPromptApp ? 'chat/prompt-as-app' : 'chat/'
+      const endpoint = isPromptApp ? 'chat/prompt-as-app' : 'chat_v2/'
       const response = await post(endpoint, formData)
+      
       if (!response.ok) {
         throw new Error('Network response was not ok')
       }
@@ -192,11 +178,35 @@ export const useSubmitQuery = () => {
         if (done) break
         const chunk = new TextDecoder().decode(value)
 
-        // Directly append the chunk to the accumulated response
-        accumulatedResponse += chunk
+        // Split the chunk into individual JSON objects
+        const jsonObjects = chunk.split(/(?<=})\s*(?=\{)/)
 
-        // Update the UI with the accumulated response
-        updateLastMessage({ role: 'assistant', content: accumulatedResponse })
+        for (const jsonStr of jsonObjects) {
+          try {
+            const jsonChunk = JSON.parse(jsonStr)
+
+            if (jsonChunk.type === 'text' && jsonChunk.content) {
+              accumulatedResponse += jsonChunk.content
+              updateLastMessage({
+                role: 'assistant',
+                content: accumulatedResponse,
+              })
+            } else if (jsonChunk.type === 'error') {
+              console.error('Error from backend:', jsonChunk.content)
+              updateLastMessage({
+                role: 'assistant',
+                content: 'Sorry, an error occurred: ' + jsonChunk.content,
+              })
+            }
+          } catch (parseError) {
+            console.error('Error parsing JSON:', parseError)
+            accumulatedResponse += jsonStr
+            updateLastMessage({
+              role: 'assistant',
+              content: accumulatedResponse,
+            })
+          }
+        }
       }
     } catch (error) {
       console.error('Error fetching response:', error)
@@ -241,11 +251,16 @@ export const useSubmitQuery = () => {
     let rawContents = context.application?.focusedWindow?.rawContents
     let audio = context.attachments?.find((a) => a.type === 'audio')?.value
     let windowTitle = context.application?.focusedWindow?.title
+    let hasTextFiles = context.attachments && context.attachments.filter((a: any) => a.type === 'text_file').length > 0
 
     // Fetch windows information
     const windows = await fetchWindows()
 
-    if (query || clipboardText || ocrScreenContents || screenshotUrl || rawContents || audio) {
+    if (query || clipboardText || ocrScreenContents || screenshotUrl || rawContents || audio || hasTextFiles) {
+      const textFiles = context.attachments?.filter((a: any) => a.type === 'text_file')
+
+      const textFileNames = textFiles?.map((a: any) => a.fileName)
+
       addMessage({
         role: 'user',
         content: query,
@@ -254,6 +269,7 @@ export const useSubmitQuery = () => {
         audio,
         window: windowTitle ? { title: windowTitle } : undefined,
         windows: windows, // Add windows information to the message
+        text_files: textFileNames,
       })
 
       setInput('')

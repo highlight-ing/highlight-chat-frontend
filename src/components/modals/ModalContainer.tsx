@@ -1,13 +1,13 @@
 'use client'
 
-import React, {Fragment, useEffect} from "react";
-import DeleteChatModal from "@/presentations/modals/DeleteChatModal";
-import {useStore} from "@/providers/store-provider";
-import {ModalObjectProps} from "@/types";
-import PromptsModal from "@/presentations/modals/PromptsModal";
-import CreatePromptModal from "@/presentations/modals/CreatePromptModal";
-import EditPromptModal from "@/presentations/modals/EditPromptModal";
-import {useShallow} from "zustand/react/shallow";
+import React, { Fragment, useEffect } from 'react'
+import DeleteChatModal from '@/presentations/modals/DeleteChatModal'
+import { useStore } from '@/providers/store-provider'
+import { ModalObjectProps } from '@/types'
+import PromptsModal from '@/presentations/modals/PromptsModal'
+import CreatePromptModal from '@/presentations/modals/CreatePromptModal'
+import EditPromptModal from '@/presentations/modals/EditPromptModal'
+import { useShallow } from 'zustand/react/shallow'
 
 type FunctionalComponent = (props: ModalObjectProps) => JSX.Element
 
@@ -16,7 +16,7 @@ const ModalMap: Record<string, FunctionalComponent> = {
   'create-prompt': CreatePromptModal,
   'edit-prompt': EditPromptModal,
   'delete-chat': DeleteChatModal,
-  'prompts-modal': PromptsModal
+  'prompts-modal': PromptsModal,
 }
 
 export const ModalContainer = () => {
@@ -24,8 +24,8 @@ export const ModalContainer = () => {
     useShallow((state) => ({
       modals: state.modals,
       openModal: state.openModal,
-      closeModal: state.closeModal
-    }))
+      closeModal: state.closeModal,
+    })),
   )
 
   useEffect(() => {

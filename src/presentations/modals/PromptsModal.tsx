@@ -67,7 +67,7 @@ const PromptsModal = ({ id, context }: ModalObjectProps) => {
           {myPrompts.map((prompt) => {
             return (
               <PromptListRow
-                key={prompt.slug}
+                key={prompt.external_id}
                 prompt={prompt}
                 type={'self'}
                 onClick={() => onSelectPrompt(prompt)}
@@ -87,7 +87,7 @@ const PromptsModal = ({ id, context }: ModalObjectProps) => {
           {communityPrompts.map((prompt: Prompt) => {
             return (
               <PromptListRow
-                key={prompt.slug}
+                key={prompt.external_id}
                 type={'community'}
                 prompt={prompt}
                 onClick={() => onSelectPrompt(prompt)}

@@ -8,7 +8,10 @@ import TextArea from '@/components/TextInput/TextArea'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { Switch } from '@/components/catalyst/switch'
 import Image from 'next/image'
-import supabaseLoader from '@/lib/supabase'
+import { supabaseLoader } from '@/lib/supabase'
+import { deletePrompt } from '@/utils/prompts'
+import useAuth from '@/hooks/useAuth'
+import { usePromptsStore } from '@/stores/prompts'
 
 function AppIcon() {
   return (
@@ -50,7 +53,7 @@ function ImageUpload() {
   } else if (promptEditorData.image) {
     image = (
       <Image
-        src={'/user_content/8079c718-648d-435f-b037-d794e0ae7f54.png'}
+        src={`/user_content/${promptEditorData.image}`}
         alt="Prompt image"
         className="h-16 w-16 rounded-full"
         width={64}
@@ -84,6 +87,9 @@ function ShareLinkButton() {
   const timeout = useRef<NodeJS.Timeout | null>(null)
   const { promptEditorData } = usePromptEditorStore()
 
+  const host = window.location.protocol + '//' + window.location.host
+  const url = `${host}/prompts/${promptEditorData.externalId}`
+
   const externalId = promptEditorData.externalId
 
   const [copied, setCopied] = useState(false)
@@ -93,7 +99,7 @@ function ShareLinkButton() {
       clearTimeout(timeout.current)
     }
 
-    navigator.clipboard.writeText(`https://chat.highlight.ing/prompt/${externalId}`)
+    navigator.clipboard.writeText(url)
     setCopied(true)
 
     timeout.current = setTimeout(() => {
@@ -104,11 +110,7 @@ function ShareLinkButton() {
   return (
     <SettingOption
       label={'Share Link'}
-      description={
-        <span className={'text-sm'}>
-          {externalId ? `https://chat.highlight.ing/prompt/${externalId}` : 'Save your prompt to generate a share link'}
-        </span>
-      }
+      description={<span className={'text-sm'}>{externalId ? url : 'Save your prompt to generate a share link'}</span>}
     >
       <Button
         onClick={onCopyLinkClick}
@@ -123,24 +125,51 @@ function ShareLinkButton() {
   )
 }
 
-function DeletePromptButton() {
-  const { promptEditorData, setPromptEditorData } = usePromptEditorStore()
+function DeletePromptButton({ onDelete }: { onDelete?: () => void }) {
+  const { removePrompt } = usePromptsStore()
+  const { promptEditorData } = usePromptEditorStore()
+  const { getAccessToken } = useAuth()
 
   const isNewPrompt = !promptEditorData.externalId
 
+  async function _onDelete() {
+    if (!promptEditorData.externalId) {
+      return
+    }
+
+    const authToken = await getAccessToken()
+    const res = await deletePrompt(promptEditorData.externalId, authToken)
+
+    if (res && res.error) {
+      console.error('Error while calling deletePrompt', res.error)
+      return
+    }
+
+    removePrompt(promptEditorData.externalId)
+    onDelete?.()
+  }
+
   return (
     <SettingOption label={'Delete Prompt'} description={<></>}>
-      <Button size={'medium'} variant={'danger'} style={{ marginRight: '6px' }} disabled={isNewPrompt}>
+      <Button
+        onClick={_onDelete}
+        size={'medium'}
+        variant={'danger'}
+        style={{ marginRight: '6px' }}
+        disabled={isNewPrompt}
+      >
         Delete Prompt
       </Button>
     </SettingOption>
   )
 }
 
-export default function SettingsScreen() {
+export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
   const { promptEditorData, setPromptEditorData } = usePromptEditorStore()
 
-  const isNewPrompt = !promptEditorData.externalId
+  function onDelete() {
+    onClose?.()
+  }
 
   return (
     <div className={styles.settingsPage}>
@@ -149,6 +178,13 @@ export default function SettingsScreen() {
           <ImageUpload />
         </div>
         <div className="flex flex-col gap-6">
+          <InputField
+            size={'xxlarge'}
+            label={'App ID'}
+            placeholder={'Give your app a unique ID'}
+            value={promptEditorData.slug}
+            onChange={(e) => setPromptEditorData({ slug: e.target.value })}
+          />
           <InputField
             size={'xxlarge'}
             label={'Name'}
@@ -179,7 +215,7 @@ export default function SettingsScreen() {
           onToggle={(visibility) => setPromptEditorData({ visibility })}
         />
         <ShareLinkButton />
-        <DeletePromptButton />
+        <DeletePromptButton onDelete={onDelete} />
       </div>
     </div>
   )

@@ -2,10 +2,16 @@ import { StateCreator } from 'zustand'
 import { useStore } from '@/providers/store-provider'
 import { useShallow } from 'zustand/react/shallow'
 
+/**
+ * Holds the state for the prompt editor,
+ * when the user is creating or editing a prompt.
+ */
+
 export type PromptEditorScreen = 'startWithTemplate' | 'app' | 'suggestions' | 'settings'
 
 export interface PromptEditorData {
   externalId?: string
+  slug: string
   name: string
   description: string
   appPrompt: string
@@ -34,6 +40,7 @@ export type PromptEditorSlice = PromptEditorState & {
 export const initialPromptEditorState: PromptEditorState = {
   selectedScreen: 'startWithTemplate',
   promptEditorData: {
+    slug: '',
     appPrompt: '',
     suggestionsPrompt: '',
     name: '',

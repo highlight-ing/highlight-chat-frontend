@@ -4,6 +4,7 @@ import React from 'react'
 import { Prompt } from '@/types/supabase-helpers'
 import CircleButton from '@/components/CircleButton/CircleButton'
 import Tooltip from '@/components/Tooltip'
+import PromptAppIcon from '../PromptAppIcon/PromptAppIcon'
 
 interface PromptListRowProps {
   prompt: Prompt
@@ -16,7 +17,19 @@ interface PromptListRowProps {
 const PromptListRow = ({ prompt, icon, type, isCta, onClick, onClickEdit }: PromptListRowProps) => {
   return (
     <div key={prompt.slug} className={`${styles.promptOption} ${styles[type]}`} onClick={onClick}>
-      <div className={styles.promptIcon}>{icon ?? <MessageText variant={'Bold'} />}</div>
+      <div>
+        {prompt.image ? (
+          <PromptAppIcon
+            className={styles.promptIcon}
+            imageId={prompt.image}
+            imageExtension={prompt.user_images?.file_extension ?? ''}
+          />
+        ) : (
+          <div className={styles.promptIcon}>
+            <MessageText variant={'Bold'} />
+          </div>
+        )}
+      </div>
       <div className="mt-0.5 flex flex-1 flex-col">
         {prompt.name && <span className={styles.promptName}>{prompt.name}</span>}
         {prompt.description && (

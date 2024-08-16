@@ -4,7 +4,6 @@ import { validateHighlightJWT } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 import { videoUrlSchema } from '@/lib/zod'
 import { JWTPayload, JWTVerifyResult } from 'jose'
-import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import mime from 'mime-types'
 
@@ -28,6 +27,7 @@ async function validateUserAuth(authToken: string) {
 
 const SavePromptSchema = z.object({
   externalId: z.string().optional().nullable(),
+  slug: z.string(),
   name: z.string(),
   description: z.string(),
   appPrompt: z.string(),
@@ -111,6 +111,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
 
   const validated = SavePromptSchema.safeParse({
     externalId: formData.get('externalId'),
+    slug: formData.get('slug'),
     name: formData.get('name'),
     description: formData.get('description'),
     appPrompt: formData.get('appPrompt'),
@@ -126,13 +127,15 @@ export async function savePrompt(formData: FormData, authToken: string) {
 
   const promptData = {
     name: validated.data.name,
+    slug: validated.data.slug,
     description: validated.data.description,
     prompt_text: validated.data.appPrompt,
     suggestion_prompt_text: validated.data.suggestionsPrompt,
     public: validated.data.visibility === 'public',
     video_url: validated.data.videoUrl,
     user_id: userId,
-    image: newImageId,
+    image: newImageId ?? undefined,
+    is_handlebar_prompt: true,
   }
 
   const supabase = supabaseAdmin()
@@ -140,26 +143,31 @@ export async function savePrompt(formData: FormData, authToken: string) {
   if (validated.data.externalId) {
     // Update an existing prompt
 
-    const { error } = await supabase.from('prompts').update(promptData).eq('external_id', validated.data.externalId)
+    const { data: prompt, error } = await supabase
+      .from('prompts')
+      .update(promptData)
+      .eq('external_id', validated.data.externalId)
+      .select('*, user_images(file_extension)')
+      .maybeSingle()
 
     if (error) {
       return { error: 'Error updating prompt in our database.' }
     }
 
-    return
+    return { prompt }
   } else {
     // Create a new prompt
     const { data: prompt, error } = await supabase
       .from('prompts')
       .insert(promptData)
-      .select('external_id')
+      .select('*, user_images(file_extension)')
       .maybeSingle()
 
     if (error || !prompt) {
       return { error: 'Error creating prompt in our database.' }
     }
 
-    return { newId: prompt.external_id }
+    return { prompt, new: true }
   }
 }
 
@@ -205,127 +213,6 @@ export async function fetchPromptText(externalId: string) {
   return promptText
 }
 
-const CreatePromptSchema = z.object({
-  name: z.string(),
-  description: z.string(),
-  instructions: z.string(),
-  slug: z.string(),
-  visibility: z.enum(['public', 'unlisted']),
-})
-
-export type CreatePromptData = z.infer<typeof CreatePromptSchema>
-
-/**
- * Creates a new prompt in the database.
- * @deprecated Use savePrompt instead.
- */
-export async function createPrompt(data: CreatePromptData, authToken: string) {
-  let jwt: JWTVerifyResult<JWTPayload>
-
-  try {
-    jwt = await validateHighlightJWT(authToken)
-  } catch (error) {
-    return { error: 'Invalid auth token' }
-  }
-
-  // Get the user ID from the sub of the JWT
-  const userId = jwt.payload.sub
-
-  if (!userId) {
-    return { error: "'sub' was missing from auth token" }
-  }
-
-  const validatedData = CreatePromptSchema.safeParse(data)
-
-  if (!validatedData.success) {
-    return { error: 'Invalid prompt data' }
-  }
-
-  const supabase = supabaseAdmin()
-
-  const { data: prompt, error } = await supabase.from('prompts').insert({
-    name: validatedData.data.name,
-    description: validatedData.data.description,
-    prompt_text: validatedData.data.instructions,
-    user_id: userId,
-    slug: validatedData.data.slug,
-    public: validatedData.data.visibility === 'public',
-  })
-
-  if (error) {
-    return { error: 'Error creating prompt in our database.' }
-  }
-
-  revalidatePath('/prompts')
-
-  return { prompt: prompt }
-}
-
-const UpdatePromptSchema = z.object({
-  name: z.string(),
-  description: z.string(),
-  instructions: z.string(),
-  visibility: z.enum(['public', 'unlisted']),
-})
-
-export type UpdatePromptData = z.infer<typeof UpdatePromptSchema>
-
-/**
- * Updates a prompt in the database.
- * @deprecated Use savePrompt instead.
- */
-export async function updatePrompt(slug: string, data: UpdatePromptData, authToken: string) {
-  let jwt: JWTVerifyResult<JWTPayload>
-
-  try {
-    jwt = await validateHighlightJWT(authToken)
-  } catch (error) {
-    return { error: 'Invalid auth token' }
-  }
-
-  const validatedData = UpdatePromptSchema.safeParse(data)
-
-  if (!validatedData.success) {
-    return { error: 'Invalid prompt data' }
-  }
-
-  // Get the user ID from the sub of the JWT
-  const userId = jwt.payload.sub
-
-  if (!userId) {
-    return { error: "'sub' was missing from auth token" }
-  }
-
-  const supabase = supabaseAdmin()
-
-  const { data: prompt, error } = await supabase
-    .from('prompts')
-    .update({
-      name: data.name,
-      description: data.description,
-      prompt_text: data.instructions,
-      public: data.visibility === 'public',
-    })
-    .eq('slug', slug)
-    .eq('user_id', userId)
-    .select()
-    .maybeSingle()
-
-  if (error) {
-    return { error: 'Error updating prompt in our database.' }
-  }
-
-  if (!prompt) {
-    return {
-      error: 'Something went wrong while updating your prompt. (nothing was returned)',
-    }
-  }
-
-  revalidatePath('/prompts')
-
-  return { prompt }
-}
-
 /**
  * Fetches all prompts from the database and returns them along with the user ID.
  */
@@ -340,7 +227,7 @@ export async function fetchPrompts(authToken: string) {
 
   const supabase = supabaseAdmin()
 
-  const { data: prompts, error } = await supabase.from('prompts').select('*')
+  const { data: prompts, error } = await supabase.from('prompts').select('*, user_images(file_extension)')
 
   if (error) {
     return { error: 'Error fetching prompts from Supabase' }
@@ -364,25 +251,17 @@ export async function fetchPrompt(slug: string) {
   return { prompt }
 }
 
-export async function deletePrompt(slug: string, authToken: string) {
-  let jwt: JWTVerifyResult<JWTPayload>
-
+export async function deletePrompt(externalId: string, authToken: string) {
+  let userId: string
   try {
-    jwt = await validateHighlightJWT(authToken)
+    userId = await validateUserAuth(authToken)
   } catch (error) {
     return { error: 'Invalid auth token' }
   }
 
-  // Get the user ID from the sub of the JWT
-  const userId = jwt.payload.sub
-
-  if (!userId) {
-    return { error: "'sub' was missing from auth token" }
-  }
-
   const supabase = supabaseAdmin()
 
-  const { error } = await supabase.from('prompts').delete().eq('slug', slug).eq('user_id', userId)
+  const { error } = await supabase.from('prompts').delete().eq('external_id', externalId).eq('user_id', userId)
 
   if (error) {
     return { error: 'Error deleting prompt from our database.' }
