@@ -42,7 +42,7 @@ export const ScreenshotAttachmentPicker = ({ isVisible, onClose }: ScreenshotAtt
     if (screenshot.length > 0) {
       addAttachment({
         type: 'image',
-        value: screenshot
+        value: screenshot,
       })
     }
   }
@@ -112,7 +112,7 @@ export const ScreenshotAttachmentPicker = ({ isVisible, onClose }: ScreenshotAtt
               </div>
             </div>
           </div>,
-          document.body
+          document.body,
         )}
     </>
   )

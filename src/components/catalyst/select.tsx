@@ -4,7 +4,7 @@ import React, { forwardRef } from 'react'
 
 export const Select = forwardRef(function Select(
   { className, multiple, ...props }: { className?: string } & Omit<Headless.SelectProps, 'className'>,
-  ref: React.ForwardedRef<HTMLSelectElement>
+  ref: React.ForwardedRef<HTMLSelectElement>,
 ) {
   return (
     <span

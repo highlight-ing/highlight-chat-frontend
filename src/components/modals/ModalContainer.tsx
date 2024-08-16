@@ -1,29 +1,27 @@
-"use client";
+'use client'
 
-import React, { Fragment, useEffect } from "react";
-import DeleteChatModal from "@/presentations/modals/DeleteChatModal";
-import { useStore } from "@/providers/store-provider";
-import { ModalObjectProps } from "@/types";
-import PromptsModal from "@/presentations/modals/PromptsModal";
-import CreatePromptModal from "@/presentations/modals/CreatePromptModal";
-import EditPromptModal from "@/presentations/modals/EditPromptModal";
-import ConfirmationModal, {
-  ConfirmationModalProps,
-} from "@/components/modals/ConfirmationModal";
-import { useShallow } from "zustand/react/shallow";
+import React, { Fragment, useEffect } from 'react'
+import DeleteChatModal from '@/presentations/modals/DeleteChatModal'
+import { useStore } from '@/providers/store-provider'
+import { ModalObjectProps } from '@/types'
+import PromptsModal from '@/presentations/modals/PromptsModal'
+import CreatePromptModal from '@/presentations/modals/CreatePromptModal'
+import EditPromptModal from '@/presentations/modals/EditPromptModal'
+import ConfirmationModal, { ConfirmationModalProps } from '@/components/modals/ConfirmationModal'
+import { useShallow } from 'zustand/react/shallow'
 
-type FunctionalComponent = (props: ModalObjectProps) => JSX.Element;
+type FunctionalComponent = (props: ModalObjectProps) => JSX.Element
 
 // Register the modal components by ID here
 const ModalMap: Record<string, FunctionalComponent> = {
-  "create-prompt": CreatePromptModal,
-  "edit-prompt": EditPromptModal,
-  "delete-chat": DeleteChatModal,
-  "prompts-modal": PromptsModal,
-  "confirmation-modal": ({ context }: ModalObjectProps) => (
+  'create-prompt': CreatePromptModal,
+  'edit-prompt': EditPromptModal,
+  'delete-chat': DeleteChatModal,
+  'prompts-modal': PromptsModal,
+  'confirmation-modal': ({ context }: ModalObjectProps) => (
     <ConfirmationModal {...(context as ConfirmationModalProps)} />
   ),
-};
+}
 
 export const ModalContainer = () => {
   const { modals, openModal, closeModal } = useStore(
@@ -31,17 +29,17 @@ export const ModalContainer = () => {
       modals: state.modals,
       openModal: state.openModal,
       closeModal: state.closeModal,
-    }))
-  );
+    })),
+  )
 
   useEffect(() => {
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === 'development') {
       // @ts-ignore
-      window._openModal = openModal;
+      window._openModal = openModal
       // @ts-ignore
-      window._closeModal = closeModal;
+      window._closeModal = closeModal
     }
-  }, []);
+  }, [])
 
   return (
     <Fragment>
@@ -49,17 +47,14 @@ export const ModalContainer = () => {
         <Fragment key={modal.id}>{renderModal(modal)}</Fragment>
       ))}
     </Fragment>
-  );
-};
+  )
+}
 
-const renderModal = ({
-  id,
-  context,
-}: ModalObjectProps): React.ReactNode | null => {
-  const ModalComponent = ModalMap[id];
+const renderModal = ({ id, context }: ModalObjectProps): React.ReactNode | null => {
+  const ModalComponent = ModalMap[id]
   if (!ModalComponent) {
-    console.warn("Unsupported modal id:", id);
-    return null;
+    console.warn('Unsupported modal id:', id)
+    return null
   }
-  return <ModalComponent id={id} context={context} />;
-};
+  return <ModalComponent id={id} context={context} />
+}
