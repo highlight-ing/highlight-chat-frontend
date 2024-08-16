@@ -86,8 +86,9 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
     const contextDestroyer = Highlight.app.addListener('onContext', (context: HighlightContext) => {
       startNewConversation()
       const attachments = processAttachments(context.attachments || [])
-      setHighlightContext({ ...context, attachments })
-      debouncedHandleSubmit(context)
+      const newContext = { ...context, attachments }
+      setHighlightContext(newContext)
+      debouncedHandleSubmit(newContext)
     })
 
     const attachmentDestroyer = Highlight.app.addListener('onConversationAttachment', (attachment: string) => {
