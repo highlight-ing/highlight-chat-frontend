@@ -258,9 +258,9 @@ export const useSubmitQuery = () => {
     const windows = await fetchWindows()
 
     if (query || clipboardText || ocrScreenContents || screenshotUrl || rawContents || audio || hasFileAttachment) {
-      const fileAttachments = (context.attachments as FileAttachment[]).filter(
-        (a) => a.type && fileAttachmentTypes.includes(a.type),
-      )
+      // TODO: Clean this up when the runtime API is updated and attachments types are no longer overloaded
+      const att = context.attachments || ([] as unknown)
+      const fileAttachments = (att as FileAttachment[]).filter((a) => a.type && fileAttachmentTypes.includes(a.type))
 
       addMessage({
         role: 'user',
