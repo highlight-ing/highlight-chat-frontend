@@ -1,8 +1,8 @@
-"use client";
+'use client'
 
-import React from "react";
-import { StoreProvider } from "@/providers/store-provider";
-import App from "@/components/App";
+import React from 'react'
+import { StoreProvider } from '@/providers/store-provider'
+import App from '@/components/App'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -11,5 +11,5 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <App>{children}</App>
       </StoreProvider>
     </div>
-  );
+  )
 }

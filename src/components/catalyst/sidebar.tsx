@@ -17,7 +17,7 @@ export function SidebarHeader({ className, ...props }: React.ComponentPropsWitho
       {...props}
       className={clsx(
         className,
-        'flex flex-col border-b border-zinc-950/5 p-4 dark:border-white/5 [&>[data-slot=section]+[data-slot=section]]:mt-2.5'
+        'flex flex-col border-b border-zinc-950/5 p-4 dark:border-white/5 [&>[data-slot=section]+[data-slot=section]]:mt-2.5',
       )}
     />
   )
@@ -29,7 +29,7 @@ export function SidebarBody({ className, ...props }: React.ComponentPropsWithout
       {...props}
       className={clsx(
         className,
-        'flex flex-1 flex-col overflow-y-auto p-4 [&>[data-slot=section]+[data-slot=section]]:mt-8'
+        'flex flex-1 flex-col overflow-y-auto p-4 [&>[data-slot=section]+[data-slot=section]]:mt-8',
       )}
     />
   )
@@ -41,7 +41,7 @@ export function SidebarFooter({ className, ...props }: React.ComponentPropsWitho
       {...props}
       className={clsx(
         className,
-        'flex flex-col border-t border-zinc-950/5 p-4 dark:border-white/5 [&>[data-slot=section]+[data-slot=section]]:mt-2.5'
+        'flex flex-col border-t border-zinc-950/5 p-4 dark:border-white/5 [&>[data-slot=section]+[data-slot=section]]:mt-2.5',
       )}
     />
   )
@@ -81,7 +81,7 @@ export const SidebarItem = forwardRef(function SidebarItem(
     | Omit<Headless.ButtonProps, 'className'>
     | Omit<React.ComponentPropsWithoutRef<typeof Link>, 'type' | 'className'>
   ),
-  ref: React.ForwardedRef<HTMLAnchorElement | HTMLButtonElement>
+  ref: React.ForwardedRef<HTMLAnchorElement | HTMLButtonElement>,
 ) {
   let classes = clsx(
     // Base
@@ -102,7 +102,7 @@ export const SidebarItem = forwardRef(function SidebarItem(
     'dark:text-white dark:data-[slot=icon]:*:fill-zinc-400',
     'dark:data-[hover]:bg-white/5 dark:data-[slot=icon]:*:data-[hover]:fill-white',
     'dark:data-[active]:bg-white/5 dark:data-[slot=icon]:*:data-[active]:fill-white',
-    'dark:data-[slot=icon]:*:data-[current]:fill-white'
+    'dark:data-[slot=icon]:*:data-[current]:fill-white',
   )
 
   return (

@@ -1,66 +1,26 @@
-import { createStore as create } from "zustand/vanilla";
+import { createStore as create } from 'zustand/vanilla'
 
-import {
-  MessagesSlice,
-  MessagesState,
-  createMessagesSlice,
-  initialMessagesState,
-} from "./messages";
-import {
-  AuthSlice,
-  AuthState,
-  createAuthSlice,
-  initialAuthState,
-} from "./auth";
-import {
-  ChatInputSlice,
-  ChatInputState,
-  createChatInputSlice,
-  initialChatInputState,
-} from "./chat-input";
+import { MessagesSlice, MessagesState, createMessagesSlice, initialMessagesState } from './messages'
+import { AuthSlice, AuthState, createAuthSlice, initialAuthState } from './auth'
+import { ChatInputSlice, ChatInputState, createChatInputSlice, initialChatInputState } from './chat-input'
 import {
   ChatAttachmentsSlice,
   ChatAttachmentsState,
   createChatAttachmentsSlice,
   initialChatAttachmentsState,
-} from "./chat-attachments";
-import {
-  ConversationSlice,
-  ConversationState,
-  createConversationSlice,
-  initialConversationState,
-} from "./conversation";
-import {
-  PromptSlice,
-  PromptState,
-  createPromptSlice,
-  initialPromptState,
-} from "./prompt";
-import {
-  PromptsSlice,
-  PromptsState,
-  createPromptsSlice,
-  initialPromptsState,
-} from "./prompts";
-import {
-  AboutMeSlice,
-  AboutMeState,
-  createAboutMeSlice,
-  initialAboutMeState,
-} from "./about-me";
+} from './chat-attachments'
+import { ConversationSlice, ConversationState, createConversationSlice, initialConversationState } from './conversation'
+import { PromptSlice, PromptState, createPromptSlice, initialPromptState } from './prompt'
+import { PromptsSlice, PromptsState, createPromptsSlice, initialPromptsState } from './prompts'
+import { AboutMeSlice, AboutMeState, createAboutMeSlice, initialAboutMeState } from './about-me'
 import {
   HighlightContextSlice,
   HighlightContextState,
   createHighlightContextSlice,
   initialHighlightContextState,
-} from "./highlight-context";
-import {
-  ModalsSlice,
-  ModalsState,
-  createModalsSlice,
-  initialModalsState,
-} from "./modals";
-import {createHistorySlice, HistorySlice, HistoryState, initialHistoryState} from "@/stores/history";
+} from './highlight-context'
+import { ModalsSlice, ModalsState, createModalsSlice, initialModalsState } from './modals'
+import { createHistorySlice, HistorySlice, HistoryState, initialHistoryState } from '@/stores/history'
 
 /**
  * To add a new store, create a new file and reference messages.ts
@@ -78,7 +38,7 @@ export type StoreState = MessagesState &
   AboutMeState &
   HighlightContextState &
   ModalsState &
-  HistoryState;
+  HistoryState
 
 export type Store = MessagesSlice &
   AuthSlice &
@@ -90,7 +50,7 @@ export type Store = MessagesSlice &
   AboutMeSlice &
   HighlightContextSlice &
   ModalsSlice &
-  HistorySlice;
+  HistorySlice
 
 const defaultState: StoreState = {
   ...initialMessagesState,
@@ -103,12 +63,12 @@ const defaultState: StoreState = {
   ...initialAboutMeState,
   ...initialHighlightContextState,
   ...initialModalsState,
-  ...initialHistoryState
-};
+  ...initialHistoryState,
+}
 
 export const initStore: () => StoreState = () => {
-  return defaultState;
-};
+  return defaultState
+}
 
 export const createStore = (initState: StoreState = defaultState) => {
   return create<Store>()((...a) => ({
@@ -124,5 +84,5 @@ export const createStore = (initState: StoreState = defaultState) => {
     ...createAboutMeSlice(...a),
     ...createHighlightContextSlice(...a),
     ...createModalsSlice(...a),
-  }));
-};
+  }))
+}
