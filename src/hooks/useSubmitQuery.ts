@@ -260,6 +260,8 @@ export const useSubmitQuery = () => {
 
       const textFileNames = textFiles?.map((a: any) => a.fileName)
 
+      console.log('Got text file names: ', textFileNames)
+
       addMessage({
         role: 'user',
         content: query,

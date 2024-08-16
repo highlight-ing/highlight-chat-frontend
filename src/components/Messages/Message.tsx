@@ -23,7 +23,8 @@ const hasAttachment = (message: UserMessage) => {
     message.window ||
     message.file_title ||
     message.audio ||
-    message.image_url
+    message.image_url ||
+    message.text_files
   )
 }
 
@@ -69,6 +70,7 @@ export const Message = ({ message, isThinking }: MessageProps) => {
               {message.image_url && <Attachment type="image" value={message.image_url} />}
               {message.text_files &&
                 message.text_files.map((name) => {
+                  console.log('Text file name', name)
                   return <Attachment type="text_file" value={name} />
                 })}
             </div>
