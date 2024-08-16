@@ -1,4 +1,5 @@
 type WindowAttachment = {
+  type: 'window'
   title: string
   thumbnailUrl?: string
 }
@@ -19,7 +20,7 @@ export type UserMessage = BaseMessage & {
   window?: WindowAttachment
   file_title?: string
   windows?: string[]
-  text_files?: string[]
+  file_attachments?: Attachment[]
 }
 
 export type AssistantMessage = BaseMessage & {
@@ -78,15 +79,12 @@ export interface SpreadsheetAttachment {
   value: File
 }
 
-export type Attachment =
-  | ImageAttachment
-  | PdfAttachment
-  | AudioAttachment
-  | ClipboardAttachment
-  | SpreadsheetAttachment
-  | TextFileAttachment
+export type FileAttachment = PdfAttachment | ImageAttachment | SpreadsheetAttachment | TextFileAttachment
 
-export type AttachmentType = 'audio' | 'clipboard' | 'image' | 'pdf' | 'window' | 'spreadsheet' | 'text_file'
+export type Attachment = AudioAttachment | ClipboardAttachment | WindowAttachment | FileAttachment
+
+export type FileAttachmentType = 'image' | 'pdf' | 'spreadsheet' | 'text_file'
+export type AttachmentType = 'audio' | 'clipboard' | 'window' | FileAttachmentType
 
 export interface ChatHistoryItem {
   id: string

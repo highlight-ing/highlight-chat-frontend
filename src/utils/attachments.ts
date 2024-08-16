@@ -1,4 +1,4 @@
-import { AudioAttachment } from '@/types'
+import { Attachment, AudioAttachment } from '@/types'
 import { getDurationUnit } from './string'
 
 export const getAudioAttachmentPreview = (attachment: AudioAttachment): string => {
@@ -13,23 +13,6 @@ export const getAudioAttachmentPreview = (attachment: AudioAttachment): string =
   }
 
   return `Last ${durationString}:\n${attachment.value}`
-}
-
-export function base64ToFile(base64String: string, fileName: string, mimeType: string): File | null {
-  try {
-    const base64Data = base64String.replace(/^data:[^;]+;base64,/, '')
-
-    // Decode the base64 string
-    const binaryString = Buffer.from(base64Data, 'base64')
-
-    // Create a Uint8Array from the Buffer
-    const bytes = new Uint8Array(binaryString)
-
-    return new File([bytes], fileName, { type: mimeType })
-  } catch (error) {
-    console.error('Error converting base64 to File:', fileName, JSON.stringify(error))
-    return null
-  }
 }
 
 export function dataURItoFile(dataURI: string, fileName: string, mimeType: string): File | null {
@@ -47,5 +30,22 @@ export function dataURItoFile(dataURI: string, fileName: string, mimeType: strin
   } catch (error) {
     console.error('Error converting dataURI to File:', fileName, mimeType, JSON.stringify(error))
     return null
+  }
+}
+
+export const getDisplayValue = (attachment: Attachment): string => {
+  switch (attachment.type) {
+    case 'pdf':
+      return attachment.value.name
+    case 'audio':
+      return getAudioAttachmentPreview(attachment)
+    case 'spreadsheet':
+      return attachment.value.name
+    case 'text_file':
+      return attachment.fileName
+    case 'window':
+      return attachment.title
+    default:
+      return attachment.value
   }
 }
