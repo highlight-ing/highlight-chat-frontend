@@ -1,4 +1,4 @@
-import { ClipboardText, Document, Keyboard, Sound, GallerySlash } from 'iconsax-react'
+import { ClipboardText, Document, Keyboard, Sound, GallerySlash, DocumentText1 } from 'iconsax-react'
 import { useState } from 'react'
 import { CloseIcon } from '../icons/icons'
 import Tooltip from './Tooltip'
@@ -85,7 +85,7 @@ export const Attachment = ({ type, value, isFile = false, removeEnabled = false 
       case 'text_file':
         return (
           <div className="align-center flex w-full justify-center gap-2 p-2">
-            <Document className="min-w-5 text-white" />
+            <DocumentText1 className="min-w-5 text-white" />
             <span className="inline-block max-w-40 truncate align-middle text-sm text-white">{value}</span>
           </div>
         )

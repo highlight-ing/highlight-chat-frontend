@@ -4,7 +4,7 @@ import imageCompression from 'browser-image-compression'
 import { useStore } from '@/providers/store-provider'
 import useAuth from './useAuth'
 import { useApi } from '@/hooks/useApi'
-import { FileAttachment, FileAttachmentType, PromptApp, TextFileAttachment } from '@/types'
+import { FileAttachment, PromptApp } from '@/types'
 import { useShallow } from 'zustand/react/shallow'
 
 async function compressImageIfNeeded(file: File): Promise<File> {
@@ -253,10 +253,7 @@ export const useSubmitQuery = () => {
     // TODO: Shouldn't have to redeclare this
     const fileAttachmentTypes = ['pdf', 'spreadsheet', 'text_file', 'image']
 
-    console.log('File attachment types: ', fileAttachmentTypes)
-
     const hasFileAttachment = context.attachments?.some((a: { type: string }) => fileAttachmentTypes.includes(a.type))
-    console.log('Has file attachment: ', hasFileAttachment)
 
     // Fetch windows information
     const windows = await fetchWindows()
@@ -265,7 +262,6 @@ export const useSubmitQuery = () => {
       // TODO: Clean this up when the runtime API is updated and attachments types are no longer overloaded
       const att = context.attachments || ([] as unknown)
       const fileAttachments = (att as FileAttachment[]).filter((a) => a.type && fileAttachmentTypes.includes(a.type))
-      console.log('File attachments: ', JSON.stringify(fileAttachments))
 
       addMessage({
         role: 'user',
