@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase'
+import { corsHeaders } from '@/utils/cors'
 import Handlebars from 'handlebars'
 
 /**
@@ -39,6 +40,7 @@ export async function GET(request: Request, { params }: { params: { external_id:
   return new Response(`{{#system}}\n${translated}\n{{/system}}`, {
     headers: {
       'Content-Type': 'text/plain',
+      ...corsHeaders,
     },
   })
 }

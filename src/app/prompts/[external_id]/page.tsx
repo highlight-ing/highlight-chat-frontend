@@ -1,4 +1,3 @@
-import Button from '@/components/Button/Button'
 import NotFoundPage from '@/components/NotFoundPage/NotFoundPage'
 import PromptListingPage from '@/components/prompts/PromptListingPage/PromptListingPage'
 import PromptShareButton from '@/components/prompts/PromptListingPage/PromptShareButton'
@@ -68,6 +67,7 @@ export default async function PromptPage({ params }: PromptPageProps) {
       }
 
       relatedApps.push({
+        externalId: relatedPrompt.external_id,
         name: relatedPrompt.name,
         description: relatedPrompt.description ?? '',
         slug: relatedPrompt.slug,

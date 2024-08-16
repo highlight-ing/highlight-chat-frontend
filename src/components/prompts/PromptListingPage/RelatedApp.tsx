@@ -9,12 +9,13 @@ function RelatedAppIcon() {
 }
 
 export interface RelatedAppProps {
+  externalId: string
   name: string
   description: string
   slug: string
 }
 
-export default function RelatedApp({ name, description, slug }: RelatedAppProps) {
+export default function RelatedApp({ externalId, name, description, slug }: RelatedAppProps) {
   const router = useRouter()
 
   return (
@@ -29,7 +30,7 @@ export default function RelatedApp({ name, description, slug }: RelatedAppProps)
         </div>
       </div>
       <div className="ml-auto">
-        <Button onClick={() => router.push(`/prompts/${slug}`)} size="small" variant="tertiary">
+        <Button onClick={() => router.push(`/prompts/${externalId}`)} size="small" variant="tertiary">
           Get
         </Button>
       </div>

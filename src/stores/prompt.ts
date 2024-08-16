@@ -1,5 +1,7 @@
 import { StateCreator } from 'zustand'
 import { Prompt } from '@/types/supabase-helpers'
+import { useStore } from '@/providers/store-provider'
+import { useShallow } from 'zustand/react/shallow'
 
 /**
  * The state of the current prompt being used in the editor.
@@ -23,11 +25,14 @@ export interface PromptState {
    * The same as the app slug or ID
    */
   promptAppName?: string
+
+  isPromptApp?: boolean
 }
 
 export type PromptSlice = PromptState & {
   setPrompt: (prompt: PromptState) => void
   clearPrompt: () => void
+  setIsPromptApp: (isPromptApp: boolean) => void
 }
 
 export const initialPromptState: PromptState = {
@@ -36,6 +41,7 @@ export const initialPromptState: PromptState = {
   promptName: undefined,
   promptDescription: undefined,
   promptAppName: undefined,
+  isPromptApp: false,
 }
 
 export const createPromptSlice: StateCreator<PromptSlice> = (set, get) => ({
@@ -46,4 +52,14 @@ export const createPromptSlice: StateCreator<PromptSlice> = (set, get) => ({
       ...prompt,
     }),
   clearPrompt: () => set(initialPromptState),
+  setIsPromptApp: (isPromptApp: boolean) => set({ isPromptApp }),
 })
+
+export const usePromptStore = () =>
+  useStore(
+    useShallow((state) => ({
+      setPrompt: state.setPrompt,
+      clearPrompt: state.clearPrompt,
+      setIsPromptApp: state.setIsPromptApp,
+    })),
+  )

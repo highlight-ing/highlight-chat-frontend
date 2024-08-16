@@ -71,18 +71,18 @@ export default () => {
       return
     }
 
-    // Fetch the prompt
-    const text = await fetchPromptText(prompt.external_id)
+    // // Fetch the prompt
+    // const text = await fetchPromptText(prompt.external_id)
 
-    setPrompt({
-      promptApp: prompt,
-      promptName: prompt.name,
-      promptDescription: prompt.description!,
-      promptAppName: prompt.slug!,
-      prompt: text,
-    })
+    // setPrompt({
+    //   promptApp: prompt,
+    //   promptName: prompt.name,
+    //   promptDescription: prompt.description!,
+    //   promptAppName: prompt.slug!,
+    //   prompt: text,
+    // })
 
-    router.push(`/`)
+    // router.push(`/`)
   }
 
   useEffect(() => {
