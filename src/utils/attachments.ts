@@ -1,4 +1,4 @@
-import { AudioAttachment } from '@/types'
+import { Attachment, AttachmentType, AudioAttachment } from '@/types'
 import { getDurationUnit } from './string'
 
 export const getAudioAttachmentPreview = (attachment: AudioAttachment): string => {
@@ -47,5 +47,20 @@ export function dataURItoFile(dataURI: string, fileName: string, mimeType: strin
   } catch (error) {
     console.error('Error converting dataURI to File:', fileName, mimeType, JSON.stringify(error))
     return null
+  }
+}
+
+export const getDisplayValue = (attachment: Attachment): string => {
+  switch (attachment.type) {
+    case 'pdf':
+      return attachment.value.name
+    case 'audio':
+      return getAudioAttachmentPreview(attachment)
+    case 'spreadsheet':
+      return attachment.value.name
+    case 'text_file':
+      return attachment.fileName
+    default:
+      return attachment.value
   }
 }

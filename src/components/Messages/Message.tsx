@@ -15,6 +15,7 @@ import 'katex/dist/katex.min.css'
 
 // @ts-ignore
 import { BlockMath, InlineMath } from 'react-katex'
+import { getDisplayValue } from '@/utils/attachments'
 
 const hasAttachment = (message: UserMessage) => {
   return (
@@ -24,7 +25,7 @@ const hasAttachment = (message: UserMessage) => {
     message.file_title ||
     message.audio ||
     message.image_url ||
-    message.text_files
+    (message.file_attachments && message.file_attachments.length > 0)
   )
 }
 
@@ -68,10 +69,9 @@ export const Message = ({ message, isThinking }: MessageProps) => {
               {message.clipboard_text && <Attachment type="clipboard" value={message.clipboard_text} />}
               {message.file_title && <Attachment type="pdf" value={message.file_title} />}
               {message.image_url && <Attachment type="image" value={message.image_url} />}
-              {message.text_files &&
-                message.text_files.map((name) => {
-                  console.log('Text file name', name)
-                  return <Attachment type="text_file" value={name} />
+              {message.file_attachments &&
+                message.file_attachments.map((a) => {
+                  return <Attachment type={a.type} value={getDisplayValue(a)} />
                 })}
             </div>
           )}
