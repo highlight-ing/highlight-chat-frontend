@@ -26,6 +26,11 @@
   &.sticky {
     position: absolute;
     max-width: $chat-body-width;
+
+    .attachmentsButtonContainer {
+      margin-top: auto;
+      margin-bottom: 0;
+    }
   }
 
   &:hover {
@@ -36,7 +41,7 @@
     flex: 1;
     background-color: transparent;
     font-weight: 400;
-    font-size: 14px;
+    font-size: 15px;
     resize: none;
     outline: none;
 
@@ -52,8 +57,7 @@
 
 .attachmentsButtonContainer {
   display: flex;
-  align-items: flex-end;
-  height: 100%;
+  margin-bottom: auto;
 }
 
 .empty {
