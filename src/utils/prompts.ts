@@ -132,7 +132,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
     public: validated.data.visibility === 'public',
     video_url: validated.data.videoUrl,
     user_id: userId,
-    image: newImageId,
+    image: newImageId ?? undefined,
   }
 
   const supabase = supabaseAdmin()
@@ -140,26 +140,31 @@ export async function savePrompt(formData: FormData, authToken: string) {
   if (validated.data.externalId) {
     // Update an existing prompt
 
-    const { error } = await supabase.from('prompts').update(promptData).eq('external_id', validated.data.externalId)
+    const { data: prompt, error } = await supabase
+      .from('prompts')
+      .update(promptData)
+      .eq('external_id', validated.data.externalId)
+      .select('*, user_images(file_extension)')
+      .maybeSingle()
 
     if (error) {
       return { error: 'Error updating prompt in our database.' }
     }
 
-    return
+    return { prompt }
   } else {
     // Create a new prompt
     const { data: prompt, error } = await supabase
       .from('prompts')
       .insert(promptData)
-      .select('external_id')
+      .select('*, user_images(file_extension)')
       .maybeSingle()
 
     if (error || !prompt) {
       return { error: 'Error creating prompt in our database.' }
     }
 
-    return { newId: prompt.external_id }
+    return { prompt, new: true }
   }
 }
 

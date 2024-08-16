@@ -8,7 +8,7 @@ import TextArea from '@/components/TextInput/TextArea'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { Switch } from '@/components/catalyst/switch'
 import Image from 'next/image'
-import supabaseLoader from '@/lib/supabase'
+import { supabaseLoader } from '@/lib/supabase'
 import { deletePrompt } from '@/utils/prompts'
 import useAuth from '@/hooks/useAuth'
 import { usePromptsStore } from '@/stores/prompts'
@@ -87,6 +87,9 @@ function ShareLinkButton() {
   const timeout = useRef<NodeJS.Timeout | null>(null)
   const { promptEditorData } = usePromptEditorStore()
 
+  const host = window.location.protocol + '//' + window.location.host
+  const url = `${host}/prompts/${promptEditorData.externalId}`
+
   const externalId = promptEditorData.externalId
 
   const [copied, setCopied] = useState(false)
@@ -96,7 +99,7 @@ function ShareLinkButton() {
       clearTimeout(timeout.current)
     }
 
-    navigator.clipboard.writeText(`https://chat.highlight.ing/prompt/${externalId}`)
+    navigator.clipboard.writeText(url)
     setCopied(true)
 
     timeout.current = setTimeout(() => {
@@ -107,11 +110,7 @@ function ShareLinkButton() {
   return (
     <SettingOption
       label={'Share Link'}
-      description={
-        <span className={'text-sm'}>
-          {externalId ? `https://chat.highlight.ing/prompt/${externalId}` : 'Save your prompt to generate a share link'}
-        </span>
-      }
+      description={<span className={'text-sm'}>{externalId ? url : 'Save your prompt to generate a share link'}</span>}
     >
       <Button
         onClick={onCopyLinkClick}

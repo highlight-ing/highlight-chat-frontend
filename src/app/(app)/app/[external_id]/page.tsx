@@ -7,7 +7,7 @@ export default async function Home({ params }: { params: { external_id: string }
   // fetch the prompt app from supabase
   const { data: prompt, error } = await supabase
     .from('prompts')
-    .select('*')
+    .select('*, user_images(file_extension)')
     .eq('external_id', params.external_id)
     .maybeSingle()
 

@@ -4,9 +4,7 @@ import imageCompression from 'browser-image-compression'
 import { useStore } from '@/providers/store-provider'
 import useAuth from './useAuth'
 import { useApi } from '@/hooks/useApi'
-import { TextFileAttachment } from '@/types'
 import { useShallow } from 'zustand/react/shallow'
-import { base64ToFile } from '@/utils/attachments'
 import { Prompt } from '@/types/supabase-helpers'
 
 async function compressImageIfNeeded(file: File): Promise<File> {

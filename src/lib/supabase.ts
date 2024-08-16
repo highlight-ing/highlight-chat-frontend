@@ -11,6 +11,6 @@ const SUPABASE_URL = 'https://ykwkqpmethjmpimvftix.supabase.co'
  */
 export const supabaseAdmin = () => createClient<Database>(SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
-export default function supabaseLoader({ src, width, quality }: { src: string; width: number; quality?: number }) {
+export function supabaseLoader({ src, width, quality }: { src: string; width: number; quality?: number }) {
   return `${SUPABASE_URL}/storage/v1/render/image/public/${src}?width=${width}&height=${width}&quality=${quality || 75}`
 }

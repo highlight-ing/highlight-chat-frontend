@@ -9,14 +9,15 @@ import Button from '@/components/Button/Button'
 import { Prompt } from '@/types/supabase-helpers'
 import CloseButton from '@/components/CloseButton/CloseButton'
 import { useStore } from '@/providers/store-provider'
-import { useShallow } from 'zustand/react/shallow'
 
 const EditPromptModal = ({ id, context }: ModalObjectProps) => {
   const prompt = context?.prompt as Prompt
+
   const { setPromptEditorData, setSelectedScreen, needSave, saving, setSaving } = usePromptEditorStore()
   const closeModal = useStore((state) => state.closeModal)
 
   useEffect(() => {
+    console.log('prompt image', `${prompt.image}.${prompt.user_images?.file_extension}`)
     setSelectedScreen('app')
     setPromptEditorData({
       externalId: prompt.external_id,

@@ -2,6 +2,7 @@ import { StateCreator } from 'zustand'
 import { Prompt } from '@/types/supabase-helpers'
 import { useStore } from '@/providers/store-provider'
 import { useShallow } from 'zustand/react/shallow'
+import { Store } from '.'
 
 /**
  * Stores all the prompts available to the user,
@@ -18,6 +19,7 @@ export type PromptsSlice = PromptsState & {
   setPromptUserId: (userId: string | undefined) => void
   updatePrompt: (prompt: Prompt) => void
   removePrompt: (externalId: string) => void
+  addPrompt: (prompt: Prompt) => void
 }
 
 export const initialPromptsState: PromptsState = {
@@ -25,7 +27,7 @@ export const initialPromptsState: PromptsState = {
   prompts: [],
 }
 
-export const createPromptsSlice: StateCreator<PromptsSlice> = (set, get) => ({
+export const createPromptsSlice: StateCreator<Store, [], [], PromptsSlice> = (set, get) => ({
   ...initialPromptsState,
   setPrompts: (prompts: Prompt[]) => {
     set({
@@ -38,6 +40,11 @@ export const createPromptsSlice: StateCreator<PromptsSlice> = (set, get) => ({
     })
   },
   updatePrompt: (prompt: Prompt) => {
+    if (get().promptApp?.external_id === prompt.external_id) {
+      set({
+        promptApp: prompt,
+      })
+    }
     set({
       prompts: get().prompts.map((p) =>
         p.external_id === prompt.external_id
@@ -47,6 +54,11 @@ export const createPromptsSlice: StateCreator<PromptsSlice> = (set, get) => ({
             }
           : p,
       ),
+    })
+  },
+  addPrompt: (prompt: Prompt) => {
+    set({
+      prompts: [...get().prompts, prompt],
     })
   },
   removePrompt: (externalId: string) => {
@@ -65,5 +77,6 @@ export const usePromptsStore = () =>
       setPromptUserId: state.setPromptUserId,
       updatePrompt: state.updatePrompt,
       removePrompt: state.removePrompt,
+      addPrompt: state.addPrompt,
     })),
   )

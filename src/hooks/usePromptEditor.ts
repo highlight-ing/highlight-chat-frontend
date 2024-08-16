@@ -3,14 +3,11 @@ import { savePrompt } from '@/utils/prompts'
 import useAuth from './useAuth'
 import { useStore } from '@/providers/store-provider'
 import { useShallow } from 'zustand/react/shallow'
+import { usePromptsStore } from '@/stores/prompts'
 
 export function usePromptEditor() {
   const { promptEditorData, setPromptEditorData, needSave, setNeedSave } = usePromptEditorStore()
-  const { updatePrompt } = useStore(
-    useShallow((state) => ({
-      updatePrompt: state.updatePrompt,
-    })),
-  )
+  const { updatePrompt, addPrompt } = usePromptsStore()
 
   const { getAccessToken } = useAuth()
 
@@ -43,13 +40,18 @@ export function usePromptEditor() {
 
     if (res && res.error) {
       console.error('Error saving prompt:', res.error)
+      return
     }
 
-    if (res?.newId) {
+    if (res?.new) {
       setPromptEditorData({
-        externalId: res.newId,
+        externalId: res.prompt.external_id,
       })
+      addPrompt(res.prompt)
+    } else if (res?.prompt) {
+      updatePrompt(res.prompt)
     }
+
     setNeedSave(false)
 
     // Update the prompts store
