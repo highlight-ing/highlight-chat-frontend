@@ -10,7 +10,6 @@ export default function useHandleConversationLoad() {
 
   useEffect(() => {
     const loadConversationMessages = async () => {
-      console.log('load conversation messages:', conversationId)
       if (!conversationId) {
         return
       }

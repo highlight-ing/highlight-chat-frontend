@@ -1,15 +1,14 @@
 'use client'
 
 import * as React from 'react'
-import { AssistantMessage, BaseMessage, ChatHistoryItem, TopBarProps, UserMessage } from '@/types'
+import { ChatHistoryItem, TopBarProps } from '@/types'
 import { Add, Clock } from 'iconsax-react'
 import CircleButton from '@/components/CircleButton/CircleButton'
 import Tooltip from '@/components/Tooltip/Tooltip'
 import { useStore } from '@/providers/store-provider'
 import { useRouter } from 'next/navigation'
-import { getPromptAppType } from '@/lib/promptapps'
+// import { getPromptAppType } from '@/lib/promptapps'
 import { useShallow } from 'zustand/react/shallow'
-import { useApi } from '@/hooks/useApi'
 import TopTab from '@/components/Navigation/TopTab'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import styles from './top-bar.module.scss'
@@ -17,19 +16,17 @@ import variables from '@/variables.module.scss'
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const router = useRouter()
-  const { get } = useApi()
 
   const {
     startNewConversation,
-    promptName,
-    openModal,
-    messages,
-    promptApp,
-    promptUserId,
+    // promptName,
+    // openModal,
+    // messages,
+    // promptApp,
+    // promptUserId,
     clearPrompt,
     conversationId,
     openConversations,
-    loadConversation,
     setConversationId,
     setOpenConversations,
     removeOpenConversation,
@@ -84,7 +81,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
     clearPrompt()
   }
 
-  const promptType = promptApp ? getPromptAppType(promptUserId, promptApp) : undefined
+  // const promptType = promptApp ? getPromptAppType(promptUserId, promptApp) : undefined
 
   return (
     <div className={styles.topBar}>
