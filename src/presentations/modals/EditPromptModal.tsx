@@ -26,7 +26,7 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
       suggestionsPrompt: prompt.suggestion_prompt_text ?? undefined,
       visibility: prompt.public ? 'public' : 'private',
       videoUrl: prompt.video_url ?? undefined,
-      image: prompt.image ?? undefined,
+      image: `${prompt.image}.${prompt.user_images?.file_extension}`,
     })
   }, [prompt])
 
