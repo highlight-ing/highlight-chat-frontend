@@ -17,7 +17,7 @@
   background-color: $bg-second-layer;
   border: 1px solid $light-10;
   cursor: text;
-  border-radius: 8px;
+  border-radius: 12px;
   width: 100%;
   flex-shrink: 0;
   bottom: 16px;
@@ -35,8 +35,8 @@
   textarea {
     flex: 1;
     background-color: transparent;
-    font-weight: 350;
-    font-size: 15px;
+    font-weight: 400;
+    font-size: 14px;
     resize: none;
     outline: none;
 

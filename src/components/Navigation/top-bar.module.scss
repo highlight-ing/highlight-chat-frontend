@@ -140,10 +140,13 @@
 
   &.active {
     color: $light-100;
+    &:hover {
+      color: $light-100;
+    }
   }
 
   &:hover {
-    color: $light-80;
+    color: $light-40;
   }
 }
 
