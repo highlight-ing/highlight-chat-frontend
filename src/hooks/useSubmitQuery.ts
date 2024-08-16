@@ -250,7 +250,8 @@ export const useSubmitQuery = () => {
     let audio = context.attachments?.find((a) => a.type === 'audio')?.value
     let windowTitle = context.application?.focusedWindow?.title
 
-    const fileAttachmentTypes = Object.keys({} as Record<FileAttachmentType, null>)
+    // TODO: Shouldn't have to redeclare this
+    const fileAttachmentTypes = ['pdf', 'spreadsheet', 'text_file', 'image']
 
     console.log('File attachment types: ', fileAttachmentTypes)
 
