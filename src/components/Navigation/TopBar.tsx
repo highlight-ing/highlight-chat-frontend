@@ -1,26 +1,23 @@
-"use client";
+'use client'
 
-import * as React from "react";
-import {AssistantMessage, BaseMessage, ChatHistoryItem, TopBarProps, UserMessage} from "@/types";
-import {
-  Add,
-  Clock,
-} from "iconsax-react";
-import CircleButton from "@/components/CircleButton/CircleButton";
-import Tooltip from "@/components/Tooltip/Tooltip";
-import { useStore } from "@/providers/store-provider";
-import { useRouter } from "next/navigation";
-import {getPromptAppType} from "@/lib/promptapps";
-import {useShallow} from "zustand/react/shallow";
-import {useApi} from "@/hooks/useApi";
-import TopTab from "@/components/Navigation/TopTab";
+import * as React from 'react'
+import { AssistantMessage, BaseMessage, ChatHistoryItem, TopBarProps, UserMessage } from '@/types'
+import { Add, Clock } from 'iconsax-react'
+import CircleButton from '@/components/CircleButton/CircleButton'
+import Tooltip from '@/components/Tooltip/Tooltip'
+import { useStore } from '@/providers/store-provider'
+import { useRouter } from 'next/navigation'
+import { getPromptAppType } from '@/lib/promptapps'
+import { useShallow } from 'zustand/react/shallow'
+import { useApi } from '@/hooks/useApi'
+import TopTab from '@/components/Navigation/TopTab'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
-import styles from "./top-bar.module.scss";
+import styles from './top-bar.module.scss'
 import variables from '@/variables.module.scss'
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
-  const router = useRouter();
-  const {get} = useApi()
+  const router = useRouter()
+  const { get } = useApi()
 
   const {
     startNewConversation,
@@ -48,22 +45,22 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
       loadConversation: state.loadConversation,
       openConversations: state.openConversations,
       setOpenConversations: state.setOpenConversations,
-      removeOpenConversation: state.removeOpenConversation
-    }))
-  );
+      removeOpenConversation: state.removeOpenConversation,
+    })),
+  )
 
   const onNewChatClick = () => {
-    startNewConversation();
+    startNewConversation()
     clearPrompt()
 
-    router.push("/");
-  };
+    router.push('/')
+  }
 
   const onShowHistoryClick = () => {
     if (setShowHistory) {
-      setShowHistory(!showHistory);
+      setShowHistory(!showHistory)
     }
-  };
+  }
 
   const onSelectChat = async (chat: ChatHistoryItem) => {
     const response = await get(`history/${chat.id}/messages`)
@@ -73,24 +70,27 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
       return
     }
     const { messages } = await response.json()
-    loadConversation(chat.id, messages.map((message: any) => {
-      const baseMessage: BaseMessage = {
-        role: message.role,
-        content: message.content,
-      };
+    loadConversation(
+      chat.id,
+      messages.map((message: any) => {
+        const baseMessage: BaseMessage = {
+          role: message.role,
+          content: message.content,
+        }
 
-      if (message.role === 'user') {
-        return {
-          ...baseMessage,
-          context: message.context,
-          ocr_text: message.ocr_text,
-          clipboard_text: message.clipboard_text,
-          image_url: message.image_url
-        } as UserMessage;
-      } else {
-        return baseMessage as AssistantMessage;
-      }
-    }))
+        if (message.role === 'user') {
+          return {
+            ...baseMessage,
+            context: message.context,
+            ocr_text: message.ocr_text,
+            clipboard_text: message.clipboard_text,
+            image_url: message.image_url,
+          } as UserMessage
+        } else {
+          return baseMessage as AssistantMessage
+        }
+      }),
+    )
   }
 
   const onDragTabEnd = (result: any) => {
@@ -113,16 +113,22 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
 
   return (
     <div className={styles.topBar}>
-      <div className={'flex items-center gap-1 max-w-full'}>
+      <div className={'flex max-w-full items-center gap-1'}>
         <Tooltip
           tooltip="View chat history"
           position="bottom"
           wrapperStyle={
-            showHistory || !setShowHistory ? { visibility: "hidden", paddingInlineStart: `calc(${variables.chatHistoryWidth} - 36px)`, transition: 'padding 250ms ease' } : { transition: 'padding 250ms ease' }
+            showHistory || !setShowHistory
+              ? {
+                  visibility: 'hidden',
+                  paddingInlineStart: `calc(${variables.chatHistoryWidth} - 36px)`,
+                  transition: 'padding 250ms ease',
+                }
+              : { transition: 'padding 250ms ease' }
           }
         >
           <CircleButton onClick={onShowHistoryClick}>
-            <Clock size={20} variant={'Bold'}/>
+            <Clock size={20} variant={'Bold'} />
           </CircleButton>
         </Tooltip>
         <DragDropContext onDragEnd={onDragTabEnd}>
@@ -133,33 +139,31 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
                 ref={provided.innerRef}
                 className={`${styles.tabsContainer} ${showHistory ? styles.offset : ''}`}
               >
-                {
-                  openConversations.map((conversation, index) => {
-                    return (
-                      <Draggable key={conversation.id} draggableId={conversation.id} index={index}>
-                        {(provided, snapshot) => (
-                          <TopTab
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            conversation={conversation}
-                            onOpen={_ => onSelectChat(conversation)}
-                            onClose={_ => onCloseTab(conversation)}
-                            isActive={conversation.id === conversationId}
-                            isDragging={snapshot.isDragging}
-                            style={{
-                              ...provided.draggableProps.style,
-                              transition: snapshot.isDropAnimating
-                                ? 'all 200ms ease-out'
-                                : provided.draggableProps.style?.transition,
-                              cursor: "pointer"
-                            }}
-                          />
-                        )}
-                      </Draggable>
-                    )
-                  })
-                }
+                {openConversations.map((conversation, index) => {
+                  return (
+                    <Draggable key={conversation.id} draggableId={conversation.id} index={index}>
+                      {(provided, snapshot) => (
+                        <TopTab
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          conversation={conversation}
+                          onOpen={(_) => onSelectChat(conversation)}
+                          onClose={(_) => onCloseTab(conversation)}
+                          isActive={conversation.id === conversationId}
+                          isDragging={snapshot.isDragging}
+                          style={{
+                            ...provided.draggableProps.style,
+                            transition: snapshot.isDropAnimating
+                              ? 'all 200ms ease-out'
+                              : provided.draggableProps.style?.transition,
+                            cursor: 'pointer',
+                          }}
+                        />
+                      )}
+                    </Draggable>
+                  )
+                })}
                 {provided.placeholder}
               </div>
             )}
@@ -169,7 +173,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
           // (promptName || !!messages.length) &&
           <Tooltip tooltip="Start new chat" position="bottom">
             <CircleButton onClick={onNewChatClick}>
-              <Add variant={"Linear"} size={20} />
+              <Add variant={'Linear'} size={20} />
             </CircleButton>
           </Tooltip>
         }
@@ -208,7 +212,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
       {/*  </div>*/}
       {/*}*/}
     </div>
-  );
-};
+  )
+}
 
-export default TopBar;
+export default TopBar

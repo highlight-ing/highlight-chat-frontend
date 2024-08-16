@@ -9,7 +9,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "gen:supabase-types": "supabase gen types --lang=typescript --project-id ykwkqpmethjmpimvftix > src/types/supabase.ts"
+    "gen:supabase-types": "supabase gen types --lang=typescript --project-id ykwkqpmethjmpimvftix > src/types/supabase.ts",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "prepare": "husky"
   },
   "dependencies": {
     "@headlessui/react": "^2.1.2",
@@ -25,7 +27,9 @@
     "jose": "^5.6.3",
     "js-video-url-parser": "^0.5.1",
     "lucide-react": "^0.397.0",
+    "mammoth": "^1.8.0",
     "next": "14.2.4",
+    "pptxtojson": "^0.1.8",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.52.1",
@@ -39,6 +43,7 @@
     "remark-math": "^6.0.0",
     "throttle-debounce": "^5.0.2",
     "uuid": "^10.0.0",
+    "xlsx": "^0.18.5",
     "zod": "^3.23.8",
     "zustand": "^4.5.4"
   },
@@ -52,6 +57,8 @@
     "@types/uuid": "^10.0.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.4",
+    "husky": "^9.1.4",
+    "lint-staged": "^15.2.9",
     "postcss": "^8",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.6",

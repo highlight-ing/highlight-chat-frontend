@@ -2,7 +2,7 @@ import React, { PropsWithChildren, ReactElement, ReactNode, useEffect } from 're
 import CloseButton from '@/components/CloseButton/CloseButton'
 
 import styles from './modals.module.scss'
-import {useStore} from "@/providers/store-provider";
+import { useStore } from '@/providers/store-provider'
 
 type SizeType = 'xsmall' | 'small' | 'medium' | 'large' | 'xlarge' | 'fullscreen' | string
 
@@ -116,4 +116,3 @@ const BaseModal = ({
 }
 
 export default BaseModal
-

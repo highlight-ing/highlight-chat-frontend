@@ -1,33 +1,30 @@
-import {useEffect, useRef} from "react";
-import {useApi} from "@/hooks/useApi";
-import {useStore} from "@/providers/store-provider";
-import {ChatHistoryItem} from "@/types";
-import {useShallow} from "zustand/react/shallow";
+import { useEffect, useRef } from 'react'
+import { useApi } from '@/hooks/useApi'
+import { useStore } from '@/providers/store-provider'
+import { ChatHistoryItem } from '@/types'
+import { useShallow } from 'zustand/react/shallow'
 
 interface ChatHistoryResponse {
-  conversations: ChatHistoryItem[];
+  conversations: ChatHistoryItem[]
 }
 
-const MAX_RETRIES = 3;
+const MAX_RETRIES = 3
 const RETRY_INTERVAL = 10000
 
-
-export const useChatHistory = (): {history: ChatHistoryItem[], refreshChatHistory: () => Promise<ChatHistoryItem[]>} => {
-  const {get} = useApi()
-  const {
-    conversationId,
-    history,
-    setHistory,
-    addOrUpdateOpenConversation
-  } = useStore(
+export const useChatHistory = (): {
+  history: ChatHistoryItem[]
+  refreshChatHistory: () => Promise<ChatHistoryItem[]>
+} => {
+  const { get } = useApi()
+  const { conversationId, history, setHistory, addOrUpdateOpenConversation } = useStore(
     useShallow((state) => ({
       conversationId: state.conversationId,
       history: state.history,
       setHistory: state.setHistory,
-      addOrUpdateOpenConversation: state.addOrUpdateOpenConversation
-    }))
-  );
-  const initialFetchDone = useRef(false);
+      addOrUpdateOpenConversation: state.addOrUpdateOpenConversation,
+    })),
+  )
+  const initialFetchDone = useRef(false)
   const fetchRetryRef = useRef<NodeJS.Timeout>()
   const fetchRetryCountRef = useRef(0)
 
@@ -35,45 +32,44 @@ export const useChatHistory = (): {history: ChatHistoryItem[], refreshChatHistor
     try {
       const response = await get('history/')
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error('Network response was not ok')
       }
-      const data: ChatHistoryResponse = await response.json();
-      setHistory(data.conversations);
+      const data: ChatHistoryResponse = await response.json()
+      setHistory(data.conversations)
       return data.conversations
     } catch (error) {
-      console.error("Error fetching response:", error);
+      console.error('Error fetching response:', error)
       if (history.length > 0) {
-        setHistory([]);
+        setHistory([])
       }
       return []
     }
-  };
+  }
 
   const fetchNewConversation = async (conversationId: string): Promise<ChatHistoryItem | null> => {
     try {
-      const response = await get(`history/${conversationId}`);
+      const response = await get(`history/${conversationId}`)
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error('Network response was not ok')
       }
-      const data = await response.json();
+      const data = await response.json()
       addOrUpdateOpenConversation(data.conversation)
-      return data.conversation;
+      return data.conversation
     } catch (error) {
-      console.error("Error fetching conversation:", error);
-      return null;
+      console.error('Error fetching conversation:', error)
+      return null
     }
   }
-
 
   useEffect(() => {
     if (!initialFetchDone.current) {
       // Initial fetch
-      fetchResponse();
-      initialFetchDone.current = true;
-    } else if (conversationId && !history.some(chat => chat.id === conversationId)) {
+      fetchResponse()
+      initialFetchDone.current = true
+    } else if (conversationId && !history.some((chat) => chat.id === conversationId)) {
       const fetchAndSafeRetry = async (retries: number) => {
         // New conversation found after initial fetch
-        console.log('Fetching new conversation and adding it to history');
+        console.log('Fetching new conversation and adding it to history')
         const newConversation = await fetchNewConversation(conversationId)
         if (newConversation) {
           setHistory([newConversation, ...history])
@@ -91,37 +87,35 @@ export const useChatHistory = (): {history: ChatHistoryItem[], refreshChatHistor
       fetchAndSafeRetry(5)
     } else if (conversationId) {
       // Existing code for updating "New Conversation" title
-      const chat = history.find(chat => chat.id === conversationId)
+      const chat = history.find((chat) => chat.id === conversationId)
       if (chat?.title === 'New Conversation' && fetchRetryCountRef.current < MAX_RETRIES) {
         console.log(`Fetching updated conversation, ${MAX_RETRIES - fetchRetryCountRef.current} tries remaining`)
 
         // Retry until title is assigned
         fetchRetryRef.current = setTimeout(async () => {
-          const updatedConversation = await fetchNewConversation(conversationId);
+          const updatedConversation = await fetchNewConversation(conversationId)
           if (updatedConversation && updatedConversation.title !== 'New Conversation') {
-            const updatedHistory = history.map(chat =>
-              chat.id === conversationId ? updatedConversation : chat
-            );
-            setHistory(updatedHistory);
-            fetchRetryCountRef.current = 0;
-            console.log('Updated conversation');
+            const updatedHistory = history.map((chat) => (chat.id === conversationId ? updatedConversation : chat))
+            setHistory(updatedHistory)
+            fetchRetryCountRef.current = 0
+            console.log('Updated conversation')
           } else {
-            fetchRetryCountRef.current++;
+            fetchRetryCountRef.current++
           }
-          fetchRetryRef.current = undefined;
+          fetchRetryRef.current = undefined
         }, RETRY_INTERVAL)
       }
     }
 
     return () => {
       if (fetchRetryRef.current) {
-        clearTimeout(fetchRetryRef.current);
+        clearTimeout(fetchRetryRef.current)
       }
     }
-  }, [history, conversationId]);
+  }, [history, conversationId])
 
   return {
     history,
-    refreshChatHistory: fetchResponse
-  };
-};
+    refreshChatHistory: fetchResponse,
+  }
+}

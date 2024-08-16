@@ -6,9 +6,12 @@ import ContextMenu, { MenuItemType } from '../ContextMenu/ContextMenu'
 import { useStore } from '@/providers/store-provider'
 import { getDurationUnit } from '@/utils/string'
 import { ScreenshotAttachmentPicker } from '../ScreenshotAttachmentPicker/ScrenshotAttachmentPicker'
-import {useShallow} from "zustand/react/shallow";
+import { useShallow } from 'zustand/react/shallow'
 import styles from './attachments-button.module.scss'
-import Tooltip from "@/components/Tooltip/Tooltip";
+import Tooltip from '@/components/Tooltip/Tooltip'
+import * as XLSX from 'xlsx'
+import mammoth from 'mammoth'
+import * as pptxtojson from 'pptxtojson'
 
 interface AudioDurationProps {
   duration: number
@@ -33,8 +36,8 @@ export const AttachmentsButton = () => {
   const { setFileInputRef, addAttachment } = useStore(
     useShallow((state) => ({
       addAttachment: state.addAttachment,
-      setFileInputRef: state.setFileInputRef
-    }))
+      setFileInputRef: state.setFileInputRef,
+    })),
   )
 
   useEffect(() => {
@@ -50,27 +53,102 @@ export const AttachmentsButton = () => {
     addAttachment({ type: 'audio', value: audio, duration: durationInMinutes })
   }
 
-  const onAddFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const textBasedTypes = [
+    'application/json',
+    'application/xml',
+    'application/javascript',
+    'application/typescript',
+    'application/x-sh',
+  ]
+
+  const onAddFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
       if (file.type.startsWith('image/')) {
         addAttachment({
           type: 'image',
           value: URL.createObjectURL(file),
-          file: file
+          file: file,
         })
       } else if (file.type === 'application/pdf') {
         addAttachment({
           type: 'pdf',
-          value: file
+          value: file,
         })
-      } else if (file.type === 'text/csv' || file.type === 'application/vnd.ms-excel' || file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+      } else if (
+        file.type === 'text/csv' ||
+        file.type === 'application/vnd.ms-excel' ||
+        file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      ) {
         addAttachment({
           type: 'spreadsheet',
-          value: file
+          value: file,
+        })
+      } else if (
+        file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+        file.type === 'application/msword'
+      ) {
+        const arrayBuffer = await file.arrayBuffer()
+        const result = await mammoth.extractRawText({ arrayBuffer })
+        addAttachment({
+          type: 'text_file',
+          value: result.value,
+          fileName: file.name,
+        })
+      } else if (textBasedTypes.includes(file.type) || file.type.includes('text/')) {
+        const value = await readTextFile(file)
+        addAttachment({
+          type: 'text_file',
+          value,
+          fileName: file.name,
+        })
+      } else if (file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
+        const value = await extractTextFromPowerPoint(file)
+        addAttachment({
+          type: 'text_file',
+          value,
+          fileName: file.name,
         })
       }
     }
+  }
+
+  const readTextFile = async (file: File): Promise<string> => {
+    return await new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = (e) => resolve(e.target?.result as string)
+      reader.onerror = (e) => reject(e)
+      reader.readAsText(file)
+    })
+  }
+
+  const extractTextFromPowerPoint = async (file: File): Promise<string> => {
+    const arrayBuffer = await file.arrayBuffer()
+    const json = await pptxtojson.parse(arrayBuffer)
+
+    const cleanText = (text: string): string => {
+      return text
+        .replace(/&nbsp;/g, ' ')
+        .replace(/<\/?[^>]+(>|$)/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+    }
+
+    const slideText = json.slides
+      .map((slide, index) => {
+        const slideNumber = index + 1
+        const slideContent = slide.elements
+          .filter((e) => e.type === 'text')
+          .map((e) => cleanText(e.content))
+          .filter((text) => text.length > 0)
+          .join('\n')
+
+        return slideContent.length > 0 ? `[Slide ${slideNumber}]\n${slideContent}` : ''
+      })
+      .filter((text) => text.length > 0)
+      .join('\n\n')
+
+    return slideText
   }
 
   const onClickScreenshot = async () => {
@@ -98,12 +176,12 @@ export const AttachmentsButton = () => {
     if (clipboard.type === 'image') {
       addAttachment({
         type: 'image',
-        value: clipboard.value
+        value: clipboard.value,
       })
     } else {
       addAttachment({
         type: 'clipboard',
-        value: clipboard.value
+        value: clipboard.value,
       })
     }
   }
@@ -112,7 +190,7 @@ export const AttachmentsButton = () => {
     { duration: 5, unit: 'minutes' },
     { duration: 30, unit: 'minutes' },
     { duration: 1, unit: 'hours' },
-    { duration: 2, unit: 'hours' }
+    { duration: 2, unit: 'hours' },
   ]
 
   const audioMenuItem = {
@@ -133,22 +211,27 @@ export const AttachmentsButton = () => {
           ))}
         </div>
       </div>
-    )
+    ),
   }
 
   const menuItems = [
-    audioMenuItem,
     {
-      divider: true
+      label: (
+        <div className={styles.menuItem}>
+          <DocumentUpload size={20} variant={'Bold'} />
+          Upload from computer
+        </div>
+      ),
+      onClick: handleAttachmentClick,
     },
     {
       label: (
         <div className={styles.menuItem}>
-          <ClipboardText size={20} variant={'Bold'}/>
+          <ClipboardText size={20} variant={'Bold'} />
           Clipboard
         </div>
       ),
-      onClick: onAddClipboard
+      onClick: onAddClipboard,
     },
     {
       label: (
@@ -157,25 +240,23 @@ export const AttachmentsButton = () => {
           Screenshot
         </div>
       ),
-      onClick: onClickScreenshot
+      onClick: onClickScreenshot,
     },
     {
-      label: (
-        <div className={styles.menuItem}>
-          <DocumentUpload size={20} variant={'Bold'}/>
-          Upload from computer
-        </div>
-      ),
-      onClick: handleAttachmentClick
-    }
+      divider: true,
+    },
+    audioMenuItem,
   ].filter(Boolean) as MenuItemType[]
+
+  const acceptTypes =
+    'text/*,image/*,application/pdf,application/json,application/xml,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.presentationml.presentation'
 
   return (
     <>
       <ContextMenu position="top" triggerId="attachments-button" leftClick={true} items={menuItems}>
         {
           // @ts-ignore
-          ({isOpen}) => (
+          ({ isOpen }) => (
             <Tooltip tooltip={isOpen ? '' : 'Attach files & context'} position={'top'}>
               <button type="button" className={styles.button} id="attachments-button">
                 <PaperclipIcon />
@@ -183,7 +264,7 @@ export const AttachmentsButton = () => {
                   type="file"
                   ref={fileInputRef}
                   onChange={onAddFile}
-                  accept="image/*,application/pdf,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                  accept={acceptTypes}
                   className={styles.hiddenInput}
                 />
               </button>

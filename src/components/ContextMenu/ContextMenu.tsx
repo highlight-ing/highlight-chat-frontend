@@ -2,7 +2,7 @@ import { PropsWithChildren, ReactElement, ReactHTMLElement, useCallback, useEffe
 import { Portal } from 'react-portal'
 
 import styles from './contextmenu.module.scss'
-import {calculatePositionedStyle} from "@/utils/components";
+import { calculatePositionedStyle } from '@/utils/components'
 
 const PIXEL_SPACING = 4
 
@@ -33,7 +33,7 @@ const ContextMenu = ({
   items,
   offset = 0,
   wrapperStyle,
-  onOpen
+  onOpen,
 }: PropsWithChildren<ContextMenuProps>) => {
   const [isOpen, setOpen] = useState(false)
   const [appliedStyle, setAppliedStyle] = useState<React.CSSProperties>({})
@@ -52,7 +52,7 @@ const ContextMenu = ({
     (_e: MouseEvent) => {
       setOpen(!isOpen)
     },
-    [isOpen]
+    [isOpen],
   )
 
   const onClickOutsideListener = useCallback(
@@ -63,7 +63,7 @@ const ContextMenu = ({
         setOpen(false)
       }
     },
-    [isOpen]
+    [isOpen],
   )
 
   useEffect(() => {
@@ -94,23 +94,17 @@ const ContextMenu = ({
   }, [isOpen])
 
   return (
-    <div className="relative w-fit h-fit" ref={containerRef} style={wrapperStyle}>
-      {
-        typeof children === 'function'
-          ? // @ts-ignore
+    <div className="relative h-fit w-fit" ref={containerRef} style={wrapperStyle}>
+      {typeof children === 'function'
+        ? // @ts-ignore
           children({ isOpen })
-          : children
-      }
+        : children}
       {isOpen && (
         <Portal>
-          <div
-            className={styles.contextMenu}
-            ref={elemRef}
-            style={appliedStyle}
-          >
+          <div className={styles.contextMenu} ref={elemRef} style={appliedStyle}>
             {items.map((item, index) => {
               if (item.divider) {
-                return <div className="w-full min-h-[1px] bg-light-16" key={`divider-${index}`} />
+                return <div className="min-h-[1px] w-full bg-light-16" key={`divider-${index}`} />
               }
               return (
                 <div
