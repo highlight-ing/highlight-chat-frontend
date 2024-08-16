@@ -4,9 +4,10 @@ import imageCompression from 'browser-image-compression'
 import { useStore } from '@/providers/store-provider'
 import useAuth from './useAuth'
 import { useApi } from '@/hooks/useApi'
-import { PromptApp, TextFileAttachment } from '@/types'
+import { TextFileAttachment } from '@/types'
 import { useShallow } from 'zustand/react/shallow'
 import { base64ToFile } from '@/utils/attachments'
+import { Prompt } from '@/types/supabase-helpers'
 
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024 // 1MB in bytes
@@ -221,7 +222,7 @@ export const useSubmitQuery = () => {
   const handleIncomingContext = async (
     context: HighlightContext,
     navigateToNewChat: () => void,
-    promptApp?: PromptApp,
+    promptApp?: Prompt,
   ) => {
     console.log('Received context inside handleIncomingContext: ', context)
     console.log('Got attachment count: ', context.attachments?.length)
@@ -302,7 +303,7 @@ export const useSubmitQuery = () => {
     }
   }
 
-  const handleSubmit = async (promptApp?: PromptApp) => {
+  const handleSubmit = async (promptApp?: Prompt) => {
     const query = input.trim()
 
     if (!query) {
