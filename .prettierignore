@@ -1,0 +1,21 @@
+# Ignore everything by default
+*
+
+# Negation patterns for files we want to format
+!*.js
+!*.jsx
+!*.ts
+!*.tsx
+!*.mjs
+!*.cjs
+
+# Check subdirectories too
+!*/
+
+# Exclude node_modules and build directories even if they contain .js files
+node_modules
+.next
+dist
+build
+out
+
