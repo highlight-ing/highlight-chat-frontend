@@ -12,6 +12,7 @@ import { useStore } from '@/providers/store-provider'
 import ChatHome from '@/components/ChatHome/ChatHome'
 import ChatHeader from '@/components/ChatHeader/ChatHeader'
 import { useShallow } from 'zustand/react/shallow'
+import useHandleConversationLoad from '@/hooks/useHandleConversationLoad'
 
 /**
  * Hook that handles pasting from the clipboard.
@@ -77,6 +78,7 @@ const HighlightChat = () => {
 
   // HOOKS
   useHandleClipboardPaste()
+  useHandleConversationLoad()
 
   return (
     <div className={styles.page}>

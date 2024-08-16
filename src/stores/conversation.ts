@@ -16,6 +16,7 @@ export type ConversationSlice = ConversationState & {
   resetConversationId: () => void
   getOrCreateConversationId: () => string
   startNewConversation: () => void
+  setConversationId: (conversationId: string) => void
   loadConversation: (conversationId: string, messages: Message[]) => void
   setOpenConversations: (conversations: ChatHistoryItem[]) => void
   addOrUpdateOpenConversation: (conversation: ChatHistoryItem) => void
@@ -39,6 +40,9 @@ export const createConversationSlice: StateCreator<Store, [], [], ConversationSl
   },
   loadConversation: (conversationId: string, messages: Message[]) => {
     set({ conversationId, messages })
+  },
+  setConversationId: (conversationId: string) => {
+    set({ conversationId })
   },
   startNewConversation: () => {
     get().resetConversationId()

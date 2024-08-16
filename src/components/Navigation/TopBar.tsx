@@ -30,6 +30,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
     conversationId,
     openConversations,
     loadConversation,
+    setConversationId,
     setOpenConversations,
     removeOpenConversation,
   } = useStore(
@@ -43,6 +44,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
       clearPrompt: state.clearPrompt,
       conversationId: state.conversationId,
       loadConversation: state.loadConversation,
+      setConversationId: state.setConversationId,
       openConversations: state.openConversations,
       setOpenConversations: state.setOpenConversations,
       removeOpenConversation: state.removeOpenConversation,
@@ -63,34 +65,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   }
 
   const onSelectChat = async (chat: ChatHistoryItem) => {
-    const response = await get(`history/${chat.id}/messages`)
-    if (!response.ok) {
-      // @TODO Error handling
-      console.error('Failed to select chat')
-      return
-    }
-    const { messages } = await response.json()
-    loadConversation(
-      chat.id,
-      messages.map((message: any) => {
-        const baseMessage: BaseMessage = {
-          role: message.role,
-          content: message.content,
-        }
-
-        if (message.role === 'user') {
-          return {
-            ...baseMessage,
-            context: message.context,
-            ocr_text: message.ocr_text,
-            clipboard_text: message.clipboard_text,
-            image_url: message.image_url,
-          } as UserMessage
-        } else {
-          return baseMessage as AssistantMessage
-        }
-      }),
-    )
+    setConversationId(chat.id)
   }
 
   const onDragTabEnd = (result: any) => {

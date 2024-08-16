@@ -120,8 +120,9 @@ export default History
 
 const HistoryItem = ({ chat, onOpenChat }: { chat: ChatHistoryItem; onOpenChat?: () => void }) => {
   const { get } = useApi()
-  const { loadConversation, openModal, addOrUpdateOpenConversation } = useStore(
+  const { addOrUpdateOpenConversation, openModal, setConversationId } = useStore(
     useShallow((state) => ({
+      setConversationId: state.setConversationId,
       loadConversation: state.loadConversation,
       openModal: state.openModal,
       addOrUpdateOpenConversation: state.addOrUpdateOpenConversation,
@@ -132,37 +133,8 @@ const HistoryItem = ({ chat, onOpenChat }: { chat: ChatHistoryItem; onOpenChat?:
     if (typeof onOpenChat === 'function') {
       onOpenChat()
     }
-
-    const response = await get(`history/${chat.id}/messages`)
-    if (!response.ok) {
-      // @TODO Error handling
-      console.error('Failed to select chat')
-      return
-    }
-    const { messages } = await response.json()
-
     addOrUpdateOpenConversation(chat)
-    loadConversation(
-      chat.id,
-      messages.map((message: any) => {
-        const baseMessage: BaseMessage = {
-          role: message.role,
-          content: message.content,
-        }
-
-        if (message.role === 'user') {
-          return {
-            ...baseMessage,
-            context: message.context,
-            ocr_text: message.ocr_text,
-            clipboard_text: message.clipboard_text,
-            image_url: message.image_url,
-          } as UserMessage
-        } else {
-          return baseMessage as AssistantMessage
-        }
-      }),
-    )
+    setConversationId(chat.id)
   }
 
   const onDeleteChat = async (chat: ChatHistoryItem) => {
