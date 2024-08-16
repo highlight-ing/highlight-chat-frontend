@@ -25,11 +25,13 @@ function processAttachments(attachments: any[]): Attachment[] {
         value,
       } as ImageAttachment
     } else if (mimeType === 'application/pdf') {
+      console.log('Processing PDF:', fileName, mimeType, value)
       const file = dataURItoFile(attachment.value, fileName, mimeType)
       if (!file) {
         console.error('Could not convert data URI to file for PDF:', fileName, value)
         return attachment
       }
+      console.log('Converted PDF to file:', file, file.size, file.type, file.name)
       return {
         type: 'pdf',
         value: file,
