@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useCallback } from 'react'
-import Highlight, { Attachment, type HighlightContext } from '@highlight-ai/app-runtime'
+import Highlight, { Attachment as RuntimeAttachmentType, type HighlightContext } from '@highlight-ai/app-runtime'
 import { usePathname, useRouter } from 'next/navigation'
 import { debounce } from 'throttle-debounce'
 import { useSubmitQuery } from '@/hooks/useSubmitQuery'
@@ -10,7 +10,7 @@ import Modals from './modals/Modals'
 import { ModalContainer } from '@/components/modals/ModalContainer'
 import { useShallow } from 'zustand/react/shallow'
 import { dataURItoFile } from '@/utils/attachments'
-import { ImageAttachment, PdfAttachment, SpreadsheetAttachment, TextFileAttachment } from '@/types'
+import { Attachment, ImageAttachment, PdfAttachment, SpreadsheetAttachment, TextFileAttachment } from '@/types'
 
 function processAttachments(attachments: any[]): Attachment[] {
   return attachments.map((attachment) => {
@@ -87,7 +87,7 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
 
     const contextDestroyer = Highlight.app.addListener('onContext', (context: HighlightContext) => {
       startNewConversation()
-      const attachments = processAttachments(context.attachments || [])
+      const attachments = processAttachments(context.attachments || []) as RuntimeAttachmentType[]
       const newContext = { ...context, attachments }
       setHighlightContext(newContext)
       debouncedHandleSubmit(newContext)

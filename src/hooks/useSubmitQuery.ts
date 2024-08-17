@@ -4,9 +4,8 @@ import imageCompression from 'browser-image-compression'
 import { useStore } from '@/providers/store-provider'
 import useAuth from './useAuth'
 import { useApi } from '@/hooks/useApi'
-import { PromptApp, TextFileAttachment } from '@/types'
+import { FileAttachment, PromptApp } from '@/types'
 import { useShallow } from 'zustand/react/shallow'
-import { base64ToFile } from '@/utils/attachments'
 
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024 // 1MB in bytes
@@ -41,18 +40,6 @@ async function readFileAsBase64(file: File): Promise<string> {
     reader.readAsDataURL(file)
   })
 }
-
-// TODO: Handle .docx and .pptx
-const textBasedTypes = [
-  'application/json',
-  'application/xml',
-  'application/javascript',
-  'application/typescript',
-  'application/x-sh',
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-]
 
 // TODO: Consolidate the two attachment types
 // Should just remove the HLC-specific code and use the Highlight API
@@ -346,15 +333,19 @@ export const useSubmitQuery = () => {
     let rawContents = context.application?.focusedWindow?.rawContents
     let audio = context.attachments?.find((a) => a.type === 'audio')?.value
     let windowTitle = context.application?.focusedWindow?.title
-    let hasTextFiles = context.attachments && context.attachments.filter((a: any) => a.type === 'text_file').length > 0
+
+    // TODO: Shouldn't have to redeclare this
+    const fileAttachmentTypes = ['pdf', 'spreadsheet', 'text_file', 'image']
+
+    const hasFileAttachment = context.attachments?.some((a: { type: string }) => fileAttachmentTypes.includes(a.type))
 
     // Fetch windows information
     const windows = await fetchWindows()
 
-    if (query || clipboardText || ocrScreenContents || screenshotUrl || rawContents || audio || hasTextFiles) {
-      const textFiles = context.attachments?.filter((a: any) => a.type === 'text_file')
-
-      const textFileNames = textFiles?.map((a: any) => a.fileName)
+    if (query || clipboardText || ocrScreenContents || screenshotUrl || rawContents || audio || hasFileAttachment) {
+      // TODO: Clean this up when the runtime API is updated and attachments types are no longer overloaded
+      const att = context.attachments || ([] as unknown)
+      const fileAttachments = (att as FileAttachment[]).filter((a) => a.type && fileAttachmentTypes.includes(a.type))
 
       addMessage({
         role: 'user',
@@ -362,9 +353,9 @@ export const useSubmitQuery = () => {
         clipboard_text: clipboardText,
         screenshot: screenshotUrl,
         audio,
-        window: windowTitle ? { title: windowTitle } : undefined,
+        window: windowTitle ? { title: windowTitle, type: 'window' } : undefined,
         windows: windows, // Add windows information to the message
-        text_files: textFileNames,
+        file_attachments: fileAttachments,
       })
 
       setInput('')
