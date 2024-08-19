@@ -2,6 +2,7 @@ import { StateCreator } from 'zustand'
 import { v4 as uuidv4 } from 'uuid'
 import { Store } from '.'
 import { ChatHistoryItem, Message } from '@/types'
+import Highlight from '@highlight-ai/app-runtime'
 
 /**
  * Store that deals with the current conversation.
@@ -17,6 +18,7 @@ export type ConversationSlice = ConversationState & {
   getOrCreateConversationId: () => string
   startNewConversation: () => void
   setConversationId: (conversationId: string) => void
+  setMessages: (messages: Message[]) => void
   loadConversation: (conversationId: string, messages: Message[]) => void
   setOpenConversations: (conversations: ChatHistoryItem[]) => void
   addOrUpdateOpenConversation: (conversation: ChatHistoryItem) => void
@@ -43,6 +45,9 @@ export const createConversationSlice: StateCreator<Store, [], [], ConversationSl
   },
   setConversationId: (conversationId: string) => {
     set({ conversationId })
+  },
+  setMessages: (messages: Message[]) => {
+    set({ messages })
   },
   startNewConversation: () => {
     get().resetConversationId()
