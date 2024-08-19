@@ -7,12 +7,12 @@ import CircleButton from '@/components/CircleButton/CircleButton'
 import Tooltip from '@/components/Tooltip/Tooltip'
 import { useStore } from '@/providers/store-provider'
 import { useRouter } from 'next/navigation'
-// import { getPromptAppType } from '@/lib/promptapps'
 import { useShallow } from 'zustand/react/shallow'
 import TopTab from '@/components/Navigation/TopTab'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import styles from './top-bar.module.scss'
 import variables from '@/variables.module.scss'
+import { useOpenConverationsPersistence } from '@/hooks/useOpenConverationsPersistence'
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const router = useRouter()
@@ -80,6 +80,8 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
     startNewConversation()
     clearPrompt()
   }
+
+  useOpenConverationsPersistence()
 
   // const promptType = promptApp ? getPromptAppType(promptUserId, promptApp) : undefined
 

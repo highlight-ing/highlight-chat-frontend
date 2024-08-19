@@ -6,6 +6,7 @@ import useAuth from './useAuth'
 import { useApi } from '@/hooks/useApi'
 import { FileAttachment, PromptApp } from '@/types'
 import { useShallow } from 'zustand/react/shallow'
+import { useEffect, useRef } from 'react'
 
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024 // 1MB in bytes
@@ -137,7 +138,10 @@ export const useSubmitQuery = () => {
     })),
   )
 
+  const abortControllerRef = useRef<AbortController>()
   const { getAccessToken } = useAuth()
+  const conversationId = useStore((state) => state.conversationId)
+  const conversationIdRef = useRef(conversationId)
 
   const fetchResponse = async (formData: FormData, token: string) => {
     setIsDisabled(true)
@@ -145,6 +149,15 @@ export const useSubmitQuery = () => {
     try {
       const conversationId = getOrCreateConversationId()
       formData.append('conversation_id', conversationId)
+
+      const abortController = new AbortController()
+      abortControllerRef.current = abortController
+
+      const checkAbortSignal = () => {
+        if (abortController.signal.aborted) {
+          throw new Error('Chat message request aborted')
+        }
+      }
 
       const response = await post('chat_v2/', formData)
       if (!response.ok) {
@@ -156,10 +169,12 @@ export const useSubmitQuery = () => {
         throw new Error('No reader available')
       }
 
+      checkAbortSignal()
+
       let accumulatedResponse = ''
       addMessage({ role: 'assistant', content: '' })
 
-      while (true) {
+      while (!abortController.signal.aborted) {
         const { done, value } = await reader.read()
         if (done) break
         const chunk = new TextDecoder().decode(value)
@@ -168,6 +183,8 @@ export const useSubmitQuery = () => {
         const jsonObjects = chunk.split(/(?<=})\s*(?=\{)/)
 
         for (const jsonStr of jsonObjects) {
+          checkAbortSignal()
+
           try {
             const jsonChunk = JSON.parse(jsonStr)
 
@@ -195,13 +212,20 @@ export const useSubmitQuery = () => {
         }
       }
     } catch (error) {
-      console.error('Error fetching response:', error)
-      addMessage({
-        role: 'assistant',
-        content: 'Sorry, there was an error processing your request.',
-      })
+      // @ts-ignore
+      if (error.message.includes('aborted')) {
+        console.log('Skipping message request, aborted')
+      } else {
+        // @ts-ignore
+        console.error('Error fetching response:', error.stack ?? error.message)
+        addMessage({
+          role: 'assistant',
+          content: 'Sorry, there was an error processing your request.',
+        })
+      }
     } finally {
       setIsDisabled(false)
+      abortControllerRef.current = undefined
     }
   }
 
@@ -339,6 +363,17 @@ export const useSubmitQuery = () => {
       await fetchResponse(formData, accessToken)
     }
   }
+
+  useEffect(() => {
+    console.log('conversationIdRef:', conversationIdRef.current)
+    console.log('conversationId', conversationId)
+    console.log('abortControllerRef', typeof abortControllerRef.current)
+    if (conversationIdRef.current && conversationIdRef.current !== conversationId && abortControllerRef.current) {
+      console.log("Aborting previous chat's message stream")
+      abortControllerRef.current.abort('Aborted, conversation ID changed, stop streaming messages')
+    }
+    conversationIdRef.current = conversationId
+  }, [conversationId])
 
   return { handleSubmit, handleIncomingContext }
 }
