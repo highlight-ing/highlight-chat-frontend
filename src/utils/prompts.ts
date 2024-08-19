@@ -6,6 +6,7 @@ import { videoUrlSchema } from '@/lib/zod'
 import { JWTPayload, JWTVerifyResult } from 'jose'
 import { z } from 'zod'
 import mime from 'mime-types'
+import slugify from 'slugify'
 
 async function validateUserAuth(authToken: string) {
   let jwt: JWTVerifyResult<JWTPayload>
@@ -111,7 +112,6 @@ export async function savePrompt(formData: FormData, authToken: string) {
 
   const validated = SavePromptSchema.safeParse({
     externalId: formData.get('externalId'),
-    slug: formData.get('slug'),
     name: formData.get('name'),
     description: formData.get('description'),
     appPrompt: formData.get('appPrompt'),
@@ -127,7 +127,6 @@ export async function savePrompt(formData: FormData, authToken: string) {
 
   const promptData = {
     name: validated.data.name,
-    slug: validated.data.slug,
     description: validated.data.description,
     prompt_text: validated.data.appPrompt,
     suggestion_prompt_text: validated.data.suggestionsPrompt,
@@ -156,10 +155,13 @@ export async function savePrompt(formData: FormData, authToken: string) {
 
     return { prompt }
   } else {
+    // Generate the slug from the name
+    const slug = slugify(validated.data.name)
+
     // Create a new prompt
     const { data: prompt, error } = await supabase
       .from('prompts')
-      .insert(promptData)
+      .insert({ ...promptData, slug })
       .select('*, user_images(file_extension)')
       .maybeSingle()
 

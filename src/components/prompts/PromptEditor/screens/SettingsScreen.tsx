@@ -180,13 +180,6 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
         <div className="flex flex-col gap-6">
           <InputField
             size={'xxlarge'}
-            label={'App ID'}
-            placeholder={'Give your app a unique ID'}
-            value={promptEditorData.slug}
-            onChange={(e) => setPromptEditorData({ slug: e.target.value })}
-          />
-          <InputField
-            size={'xxlarge'}
             label={'Name'}
             placeholder={'Name your app'}
             value={promptEditorData.name}
