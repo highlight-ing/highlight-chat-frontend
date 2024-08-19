@@ -59,10 +59,6 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
     return sortArrayByDate(history)
   }, [history])
 
-  useEffect(() => {
-    trackEvent('HL Chat Conversation Selected', { conversationId: history.length })
-  }, [history.length])
-
   const toggleHistory = () => {
     setShowHistory(!showHistory)
   }
