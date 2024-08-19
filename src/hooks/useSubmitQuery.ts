@@ -42,18 +42,6 @@ async function readFileAsBase64(file: File): Promise<string> {
   })
 }
 
-// TODO: Handle .docx and .pptx
-const textBasedTypes = [
-  'application/json',
-  'application/xml',
-  'application/javascript',
-  'application/typescript',
-  'application/x-sh',
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-]
-
 // TODO: Consolidate the two attachment types
 // Should just remove the HLC-specific code and use the Highlight API
 export default async function addAttachmentsToFormData(formData: FormData, attachments: any[]) {
@@ -161,7 +149,7 @@ export const useSubmitQuery = () => {
 
       const endpoint = isPromptApp ? 'chat/prompt-as-app' : 'chat_v2/'
       const response = await post(endpoint, formData)
-      
+
       if (!response.ok) {
         throw new Error('Network response was not ok')
       }
@@ -230,6 +218,7 @@ export const useSubmitQuery = () => {
     context.attachments?.map((attachment) => {
       console.log('Attachment: ', JSON.stringify(attachment))
     })
+
     if (!context.suggestion || context.suggestion.trim() === '') {
       console.log('No context received, ignoring.')
       return
@@ -248,20 +237,23 @@ export const useSubmitQuery = () => {
     let query = context.suggestion || ''
     let screenshotUrl = context.attachments?.find((a) => a.type === 'screenshot')?.value
     let clipboardText = context.attachments?.find((a) => a.type === 'clipboard')?.value
-    let ocrScreenContents = context.environment?.ocrScreenContents
-    let rawContents = context.application?.focusedWindow?.rawContents
     let audio = context.attachments?.find((a) => a.type === 'audio')?.value
     let windowTitle = context.application?.focusedWindow?.title
+    let rawContents = context.application?.focusedWindow?.rawContents
 
-    const fileAttachmentTypes = Object.keys({} as Record<FileAttachmentType, null>)
+    // Extract OCR content
+    let ocrText = context.environment?.ocrScreenContents
 
+    // Use rawContents if available, otherwise use ocrText
+    let contentToUse = rawContents || ocrText
+
+    const fileAttachmentTypes = ['pdf', 'spreadsheet', 'text_file', 'image']
     const hasFileAttachment = context.attachments?.some((a: { type: string }) => fileAttachmentTypes.includes(a.type))
 
     // Fetch windows information
     const windows = await fetchWindows()
 
-    if (query || clipboardText || ocrScreenContents || screenshotUrl || rawContents || audio || hasFileAttachment) {
-      // TODO: Clean this up when the runtime API is updated and attachments types are no longer overloaded
+    if (query || clipboardText || contentToUse || screenshotUrl || audio || hasFileAttachment) {
       const att = context.attachments || ([] as unknown)
       const fileAttachments = (att as FileAttachment[]).filter((a) => a.type && fileAttachmentTypes.includes(a.type))
 
@@ -272,24 +264,21 @@ export const useSubmitQuery = () => {
         screenshot: screenshotUrl,
         audio,
         window: windowTitle ? { title: windowTitle, type: 'window' } : undefined,
-        windows: windows, // Add windows information to the message
+        windows: windows,
         file_attachments: fileAttachments,
       })
 
       setInput('')
-      clearAttachments() // Clear the attachment immediately
+      clearAttachments()
 
-      const formData = new FormData();
-      formData.append("prompt", query);
-      formData.append("windows", JSON.stringify(windows)); // Add windows to formData
-      // formData.append("llm_provider", "openai")
+      const formData = new FormData()
+      formData.append('prompt', query)
+      formData.append('windows', JSON.stringify(windows))
 
-      const isPromptApp = !!promptApp
-      if (isPromptApp) {
-        formData.append('app_id', promptApp!.id.toString())
+      if (promptApp) {
+        formData.append('app_id', promptApp.id.toString())
       }
 
-      // Add about_me to form data
       if (aboutMe) {
         formData.append('about_me', JSON.stringify(aboutMe))
       }
@@ -297,14 +286,13 @@ export const useSubmitQuery = () => {
       const contextAttachments = context.attachments || []
       await addAttachmentsToFormData(formData, contextAttachments)
 
-      let contextString = prepareHighlightContext(context)
-
-      if (contextString.trim() !== '') {
-        formData.append('context', contextString)
+      // Add OCR text or raw contents to form data
+      if (contentToUse) {
+        formData.append('ocr_text', contentToUse)
       }
 
       const accessToken = await getAccessToken()
-      await fetchResponse(formData, accessToken, isPromptApp)
+      await fetchResponse(formData, accessToken, !!promptApp)
     }
   }
 
@@ -319,15 +307,15 @@ export const useSubmitQuery = () => {
     if (query) {
       const formData = new FormData()
       formData.append('prompt', query)
-      
+
       const isPromptApp = !!promptApp
       if (isPromptApp) {
         formData.append('app_id', promptApp!.id.toString())
       }
 
       // Fetch windows information
-      const windows = await fetchWindows();
-      formData.append("windows", JSON.stringify(windows));
+      const windows = await fetchWindows()
+      formData.append('windows', JSON.stringify(windows))
       // formData.append("llm_provider", "openai")
 
       // Add about_me to form data
