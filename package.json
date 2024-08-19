@@ -16,6 +16,7 @@
   "dependencies": {
     "@headlessui/react": "^2.1.2",
     "@highlight-ai/app-runtime": "^0.0.44",
+    "@hookform/resolvers": "^3.9.0",
     "@squircle-js/react": "^1.2.0",
     "@supabase/supabase-js": "^2.44.4",
     "@tailwindcss/line-clamp": "^0.4.4",

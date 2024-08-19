@@ -12,6 +12,10 @@ import { supabaseLoader } from '@/lib/supabase'
 import { deletePrompt } from '@/utils/prompts'
 import useAuth from '@/hooks/useAuth'
 import { usePromptsStore } from '@/stores/prompts'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { videoUrlSchema } from '@/lib/zod'
 
 function AppIcon() {
   return (
@@ -164,8 +168,41 @@ function DeletePromptButton({ onDelete }: { onDelete?: () => void }) {
   )
 }
 
+const SettingsSchema = z.object({
+  name: z.string().min(1, { message: 'Name is required' }),
+  videoUrl: videoUrlSchema,
+  description: z.string().min(1, { message: 'Description is required' }),
+})
+
 export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
   const { promptEditorData, setPromptEditorData } = usePromptEditorStore()
+
+  const {
+    register,
+    watch,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      name: promptEditorData.name,
+      videoUrl: promptEditorData.videoUrl,
+      description: promptEditorData.description,
+    },
+    resolver: zodResolver(SettingsSchema),
+    mode: 'onChange',
+  })
+
+  // Hook to update the prompt editor data when the form changes
+  useEffect(() => {
+    const subscription = watch((value, { name, type }) => {
+      if (!name) {
+        return
+      }
+      console.log('setting prompt editor data', { [name]: value.name })
+
+      setPromptEditorData({ [name]: value.name })
+    })
+    return () => subscription.unsubscribe()
+  }, [watch])
 
   function onDelete() {
     onClose?.()
@@ -182,23 +219,24 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
             size={'xxlarge'}
             label={'Name'}
             placeholder={'Name your app'}
-            value={promptEditorData.name}
-            onChange={(e) => setPromptEditorData({ name: e.target.value })}
+            {...register('name')}
+            error={errors.name?.message}
           />
+
           <InputField
             size={'xxlarge'}
             label={'Video Link'}
             placeholder={'Provide a video demo for your app (optional)'}
-            value={promptEditorData.videoUrl ?? ''}
-            onChange={(e) => setPromptEditorData({ videoUrl: e.target.value })}
+            {...register('videoUrl')}
+            error={errors.videoUrl?.message}
           />
           <TextArea
             size={'xxlarge'}
             label={'Description'}
             placeholder={'Describe what your app does...'}
             rows={3}
-            value={promptEditorData.description}
-            onChange={(e) => setPromptEditorData({ description: e.target.value })}
+            {...register('description')}
+            error={errors.description?.message}
           />
         </div>
       </div>

@@ -25,8 +25,6 @@ export default function PromptInput({
     onChange?.(value?.slice(0, cursorPosition) + variable + value?.slice(cursorPosition))
   }
 
-  console.log()
-
   return (
     <>
       <div className={styles.editorPage}>
