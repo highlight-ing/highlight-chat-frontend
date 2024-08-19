@@ -50,7 +50,7 @@ export default async function addAttachmentsToFormData(formData: FormData, attac
     if (attachment?.value) {
       switch (attachment.type) {
         case 'text_file':
-          formData.append('text_file', attachment.value)
+          formData.append('text_file', attachment.fileName + '\n' + attachment.value)
           break
         case 'image':
         case 'screenshot':
