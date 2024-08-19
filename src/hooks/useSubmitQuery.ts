@@ -44,7 +44,7 @@ async function readFileAsBase64(file: File): Promise<string> {
 // TODO: Consolidate the two attachment types
 // Should just remove the HLC-specific code and use the Highlight API
 export default async function addAttachmentsToFormData(formData: FormData, attachments: any[]) {
-  let screenshot, audio, fileTitle, clipboardText, ocrText
+  let screenshot, audio, fileTitle, clipboardText, ocrText, windowContext
 
   for (const attachment of attachments) {
     if (attachment?.value) {
@@ -87,13 +87,17 @@ export default async function addAttachmentsToFormData(formData: FormData, attac
           ocrText = attachment.value
           formData.append('ocr_text', attachment.value)
           break
+        case 'window_context':
+          windowContext = attachment.value
+          formData.append('window_context', attachment.value)
+          break
         default:
           console.warn('Unknown attachment type:', attachment.type)
       }
     }
   }
 
-  return { screenshot, audio, fileTitle, clipboardText, ocrText }
+  return { screenshot, audio, fileTitle, clipboardText, ocrText, windowContext }
 }
 
 const prepareHighlightContext = (highlightContext: any) => {
@@ -199,6 +203,8 @@ export const useSubmitQuery = () => {
 
       let contextConfirmed = null
 
+      let accumulatedToolUseInput = ''
+
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
@@ -212,66 +218,49 @@ export const useSubmitQuery = () => {
             const jsonChunk = JSON.parse(jsonStr)
             console.log('jsonChunk: ', jsonChunk)
 
-            if (jsonChunk.type === 'text' && jsonChunk.content) {
+            if (jsonChunk.type === 'text') {
               accumulatedResponse += jsonChunk.content
               updateLastMessage({
                 role: 'assistant',
                 content: accumulatedResponse,
               })
-            } else if (jsonChunk.type === 'tool_use' || jsonChunk.type === 'tool_use_input') {
+            } else if (jsonChunk.type === 'tool_use') {
               console.log(`${jsonChunk.type}:`, jsonChunk)
-
               if (contextConfirmed === null) {
                 contextConfirmed = await showConfirmationModal(
                   'The assistant is requesting additional context. Do you want to allow this?',
                 )
               }
+            } else if (jsonChunk.type === 'tool_use_input') {
+              console.log(`${jsonChunk.type}:`, jsonChunk)
+              accumulatedToolUseInput += jsonChunk.content
 
-              if (contextConfirmed) {
-                console.log('Additional context request allowed')
-                if (jsonChunk.content) {
-                  if (jsonChunk.content.window) {
-                    const screenshot = await Highlight.user.getWindowScreenshot(jsonChunk.content.window)
-                    console.log('screenshot: ', screenshot)
-                    addAttachment({
-                      type: 'image',
-                      value: screenshot,
-                    })
-                  } else if (jsonChunk.content.windows) {
-                    // Handle multiple windows if available
-                    for (const window of jsonChunk.content.windows) {
-                      const screenshot = await Highlight.user.getWindowScreenshot(window)
-                      console.log('screenshot for window:', window, screenshot)
-                      addAttachment({
-                        type: 'image',
-                        value: screenshot,
-                      })
-                    }
-                  } else {
-                    console.log('No specific window information available in the request')
-                  }
-
-                  // Handle other potential content types
-                  if (jsonChunk.content.clipboard) {
-                    addAttachment({
-                      type: 'clipboard',
-                      value: jsonChunk.content.clipboard,
-                    })
-                  }
-                  // Add more conditions for other content types as needed
-                } else {
-                  console.log('No content available in the request')
-                }
-              } else {
-                console.log('Additional context request denied')
-                if (jsonChunk.type === 'tool_use') {
-                  updateLastMessage({
-                    role: 'assistant',
-                    content:
-                      accumulatedResponse +
-                      "\n\nI'm sorry, but I wasn't able to access the additional context I requested.",
+              // Try to parse the accumulated tool use input
+              try {
+                const content = JSON.parse(accumulatedToolUseInput)
+                if (contextConfirmed && content.window) {
+                  const screenshot = await Highlight.user.getWindowScreenshot(content.window)
+                  addAttachment({
+                    type: 'image',
+                    value: screenshot,
                   })
+                  // Ask for permission on getting extra window context
+                  const granted = await Highlight.permissions.requestWindowContextPermission()
+                  if (granted) {
+                    const windowContext = await Highlight.user.getWindowContext(content.window)
+                    const ocrScreenContents = windowContext.environment.ocrScreenContents || ''
+                    addAttachment({
+                      type: 'window_context',
+                      value: ocrScreenContents,
+                    })
+                    formData.append('window_context', ocrScreenContents)
+                  }
                 }
+                // Reset accumulated tool use input after successful parsing
+                accumulatedToolUseInput = ''
+              } catch (parseError) {
+                // If parsing fails, it means we don't have the complete JSON yet
+                console.log('Incomplete tool use input, waiting for more data')
               }
             } else if (jsonChunk.type === 'error') {
               console.error('Error from backend:', jsonChunk.content)
@@ -282,11 +271,6 @@ export const useSubmitQuery = () => {
             }
           } catch (parseError) {
             console.error('Error parsing JSON:', parseError)
-            accumulatedResponse += jsonStr
-            updateLastMessage({
-              role: 'assistant',
-              content: accumulatedResponse,
-            })
           }
         }
       }
@@ -351,6 +335,7 @@ export const useSubmitQuery = () => {
         role: 'user',
         content: query,
         clipboard_text: clipboardText,
+
         screenshot: screenshotUrl,
         audio,
         window: windowTitle ? { title: windowTitle, type: 'window' } : undefined,
@@ -413,7 +398,7 @@ export const useSubmitQuery = () => {
       const windows = await fetchWindows()
       formData.append('windows', JSON.stringify(windows))
 
-      const { screenshot, audio, fileTitle, clipboardText, ocrText } = await addAttachmentsToFormData(
+      const { screenshot, audio, fileTitle, clipboardText, ocrText, windowContext } = await addAttachmentsToFormData(
         formData,
         attachments,
       )
@@ -426,6 +411,7 @@ export const useSubmitQuery = () => {
         file_title: fileTitle,
         clipboard_text: clipboardText,
         windows: windows, // Add windows information to the message
+        window_context: windowContext,
       })
 
       setInput('')
