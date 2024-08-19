@@ -11,6 +11,9 @@ import { ModalContainer } from '@/components/modals/ModalContainer'
 import { useShallow } from 'zustand/react/shallow'
 import { dataURItoFile } from '@/utils/attachments'
 import { Attachment, ImageAttachment, PdfAttachment, SpreadsheetAttachment, TextFileAttachment } from '@/types'
+import { initAmplitude, trackEvent } from '@/utils/amplitude'
+import useAuth from '@/hooks/useAuth'
+import { decodeJwt } from 'jose'
 
 function processAttachments(attachments: any[]): Attachment[] {
   return attachments.map((attachment) => {
