@@ -1,4 +1,4 @@
-import {PromptApp} from "@/types";
+import { PromptApp } from '@/types'
 
 export const getPromptAppType = (selfUserId?: string, prompt?: PromptApp) => {
   if (selfUserId && prompt && selfUserId === prompt?.user_id) {
