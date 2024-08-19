@@ -1,16 +1,16 @@
-"use client";
+'use client'
 
-import { PromptApp } from "@/types";
-import HighlightChat from "./HighlightChat";
-import usePromptApps from "@/hooks/usePromptApps";
-import { useEffect } from "react";
+import { PromptApp } from '@/types'
+import HighlightChat from './HighlightChat'
+import usePromptApps from '@/hooks/usePromptApps'
+import { useEffect } from 'react'
 
 export default function PromptHelper({ prompt }: { prompt: PromptApp }) {
-  const { selectPrompt } = usePromptApps();
+  const { selectPrompt } = usePromptApps()
 
   useEffect(() => {
-    selectPrompt(prompt);
-  }, [prompt]);
+    selectPrompt(prompt)
+  }, [prompt])
 
-  return <HighlightChat />;
+  return <HighlightChat />
 }

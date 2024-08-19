@@ -6,10 +6,9 @@ interface SpinnerProps {
 
 const Spinner = ({ size = 32 }: SpinnerProps) => {
   return (
-    <div className="flex justify-center items-center">
+    <div className="flex items-center justify-center">
       <div
-        className={`border-light-60 h-[${size + 'px'}] w-[${size + 'px'}] animate-spin rounded-full border-2
-        border-t-light`}
+        className={`border-light-60 h-[${size + 'px'}] w-[${size + 'px'}] animate-spin rounded-full border-2 border-t-light`}
       />
     </div>
   )

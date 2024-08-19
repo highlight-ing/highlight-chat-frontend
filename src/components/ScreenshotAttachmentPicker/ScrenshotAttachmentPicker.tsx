@@ -54,7 +54,7 @@ export const ScreenshotAttachmentPicker = ({ isVisible, onClose }: ScreenshotAtt
     if (screenshot.length > 0) {
       addAttachment({
         type: 'image',
-        value: screenshot
+        value: screenshot,
       })
       trackEvent('HL Chat Screenshot Attached', { source })
     }
@@ -125,7 +125,7 @@ export const ScreenshotAttachmentPicker = ({ isVisible, onClose }: ScreenshotAtt
               </div>
             </div>
           </div>,
-          document.body
+          document.body,
         )}
     </>
   )

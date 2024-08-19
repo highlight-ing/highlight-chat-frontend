@@ -1,21 +1,21 @@
 import Markdown from 'react-markdown'
-import remarkGfm from "remark-gfm";
-import {Fragment} from "react";
+import remarkGfm from 'remark-gfm'
+import { Fragment } from 'react'
 
-import { AssistantIcon } from "@/icons/icons";
-import { Message as MessageType, UserMessage } from "../../types";
-import { Attachment } from "../Attachment";
+import { AssistantIcon } from '@/icons/icons'
+import { Message as MessageType, UserMessage } from '../../types'
+import { Attachment } from '../Attachment'
 
-import styles from "./message.module.scss";
-import TypedText from "@/components/TypedText/TypedText";
-import CodeBlock from "@/components/Messages/CodeBlock";
-import remarkMath from "remark-math";
-import rehypeKatex from "rehype-katex";
-import 'katex/dist/katex.min.css';
+import styles from './message.module.scss'
+import TypedText from '@/components/TypedText/TypedText'
+import CodeBlock from '@/components/Messages/CodeBlock'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
+import 'katex/dist/katex.min.css'
 
 // @ts-ignore
 import { BlockMath, InlineMath } from 'react-katex'
-
+import { getDisplayValue } from '@/utils/attachments'
 
 const hasAttachment = (message: UserMessage) => {
   return (
@@ -24,13 +24,14 @@ const hasAttachment = (message: UserMessage) => {
     message.window ||
     message.file_title ||
     message.audio ||
-    message.image_url
-  );
-};
+    message.image_url ||
+    (message.file_attachments && message.file_attachments.length > 0)
+  )
+}
 
 interface MessageProps {
-  isThinking?: boolean;
-  message: MessageType;
+  isThinking?: boolean
+  message: MessageType
 }
 
 /**
@@ -44,52 +45,34 @@ interface MessageProps {
  */
 const preprocessLaTeX = (content: string) => {
   // Replace block-level LaTeX delimiters \[ \] with $$ $$
-  const blockProcessedContent = content.replace(
-    /\\\[(.*?)\\\]/g,
-    (_, equation) => `$$${equation}$$`,
-  );
+  const blockProcessedContent = content.replace(/\\\[(.*?)\\\]/g, (_, equation) => `$$${equation}$$`)
   // Replace inline LaTeX delimiters \( \) with $ $
-  const inlineProcessedContent = blockProcessedContent.replace(
-    /\\\((.*?)\\\)/g,
-    (_, equation) => `$${equation}$`,
-  );
-  return inlineProcessedContent;
-};
+  const inlineProcessedContent = blockProcessedContent.replace(/\\\((.*?)\\\)/g, (_, equation) => `$${equation}$`)
+  return inlineProcessedContent
+}
 
 export const Message = ({ message, isThinking }: MessageProps) => {
   return (
-    <div
-      className={`${styles.messageContainer} ${
-        message.role === "user" ? styles.self : ""
-      }`}
-    >
-      {message.role === "assistant" && (
+    <div className={`${styles.messageContainer} ${message.role === 'user' ? styles.self : ''}`}>
+      {message.role === 'assistant' && (
         <div className={styles.avatar}>
           <AssistantIcon />
         </div>
       )}
       {!isThinking ? (
         <div className={styles.message}>
-          {message.role === "user" && hasAttachment(message as UserMessage) && (
+          {message.role === 'user' && hasAttachment(message as UserMessage) && (
             <div className={`flex gap-2`}>
-              {message.screenshot && (
-                <Attachment type="image" value={message.screenshot} />
-              )}
-              {message.audio && (
-                <Attachment type="audio" value={message.audio} />
-              )}
-              {message.window && message.window?.title && (
-                <Attachment type="window" value={message.window.title} />
-              )}
-              {message.clipboard_text && (
-                <Attachment type="clipboard" value={message.clipboard_text} />
-              )}
-              {message.file_title && (
-                <Attachment type="pdf" value={message.file_title} />
-              )}
-              {message.image_url && (
-                <Attachment type="image" value={message.image_url} />
-              )}
+              {message.screenshot && <Attachment type="image" value={message.screenshot} />}
+              {message.audio && <Attachment type="audio" value={message.audio} />}
+              {message.window && message.window?.title && <Attachment type="window" value={message.window.title} />}
+              {message.clipboard_text && <Attachment type="clipboard" value={message.clipboard_text} />}
+              {message.file_title && <Attachment type="pdf" value={message.file_title} />}
+              {message.image_url && <Attachment type="image" value={message.image_url} />}
+              {message.file_attachments &&
+                message.file_attachments.map((a) => {
+                  return <Attachment type={a.type} value={getDisplayValue(a)} />
+                })}
             </div>
           )}
           <div className={styles.messageBody}>
@@ -98,21 +81,17 @@ export const Message = ({ message, isThinking }: MessageProps) => {
               rehypePlugins={[rehypeKatex]}
               components={{
                 // @ts-ignore
-                code({node, inline, className, children, ...props}) {
-                  const match = /language-(\w+)/.exec(className || '');
+                code({ node, inline, className, children, ...props }) {
+                  const match = /language-(\w+)/.exec(className || '')
                   return !inline && match ? (
-                    <CodeBlock
-                      language={match[1]}
-                    >
-                      {children}
-                    </CodeBlock>
+                    <CodeBlock language={match[1]}>{children}</CodeBlock>
                   ) : (
                     <code className={className} {...props}>
                       {children}
                     </code>
-                  );
+                  )
                 },
-                td({children}) {
+                td({ children }) {
                   if (typeof children === 'string') {
                     return <td>{children}</td>
                   }
@@ -121,19 +100,13 @@ export const Message = ({ message, isThinking }: MessageProps) => {
                       <td>
                         {/*// @ts-ignore*/}
                         {children.map((child, index) => (
-                          <Fragment key={index}>
-                            {child === '<br>' ? <br/> : child}
-                          </Fragment>
+                          <Fragment key={index}>{child === '<br>' ? <br /> : child}</Fragment>
                         ))}
                       </td>
                     )
                   }
-                  return (
-                    <td>
-                      {children}
-                    </td>
-                  )
-                }
+                  return <td>{children}</td>
+                },
               }}
               // remarkToRehypeOptions={{
               //   allowDangerousHtml: true
@@ -153,7 +126,7 @@ export const Message = ({ message, isThinking }: MessageProps) => {
               //     }
               // }}}
             >
-              {typeof message.content === "string" ? preprocessLaTeX(message.content) : ""}
+              {typeof message.content === 'string' ? preprocessLaTeX(message.content) : ''}
             </Markdown>
           </div>
         </div>
@@ -163,5 +136,5 @@ export const Message = ({ message, isThinking }: MessageProps) => {
         </span>
       )}
     </div>
-  );
-};
+  )
+}

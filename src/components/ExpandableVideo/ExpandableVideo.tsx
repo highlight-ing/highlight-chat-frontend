@@ -2,7 +2,7 @@ import { CSSProperties, ReactElement, useEffect, useRef, useState } from 'react'
 import { ExportSquare, VideoCircle } from 'iconsax-react'
 import styles from './expandablevideo.module.scss'
 import variables from '@/variables.module.scss'
-import CloseButton from "@/components/CloseButton/CloseButton";
+import CloseButton from '@/components/CloseButton/CloseButton'
 
 interface ExampleVideoProps {
   src: string
@@ -56,25 +56,25 @@ const ExpandableVideo = (props: ExampleVideoProps) => {
     <div
       className={styles.example}
       // @ts-ignore
-      style={{'--is-fullscreen': large, ...style}}
+      style={{ '--is-fullscreen': large, ...style }}
       onMouseEnter={() => (videoRef.current?.paused ? videoRef.current.play() : {})}
       onMouseLeave={() => (!large && videoRef.current?.paused === false ? videoRef.current.pause() : {})}
       onClick={() => (!large ? setLarge(true) : {})}
     >
-      {large && <div className={styles.largeOverlay} onClick={() => setLarge(false)}/>}
+      {large && <div className={styles.largeOverlay} onClick={() => setLarge(false)} />}
       <div
         className={'relative'}
         style={
           large
             ? {
-              position: 'fixed',
-              top: '10%',
-              left: '10%',
-              right: '10%',
-              zIndex: '3',
-              height: 'fit-content',
-              cursor: 'normal',
-            }
+                position: 'fixed',
+                top: '10%',
+                left: '10%',
+                right: '10%',
+                zIndex: '3',
+                height: 'fit-content',
+                cursor: 'normal',
+              }
             : undefined
         }
       >
@@ -87,14 +87,14 @@ const ExpandableVideo = (props: ExampleVideoProps) => {
           style={
             large
               ? {
-                opacity: '1',
-                aspectRatio: 'initial',
-                borderRadius: '12px',
-                boxShadow: '0 0 128px 32px rgba(0, 0, 0, 1)',
-                maxHeight: '80vh',
-                backgroundColor: 'black',
-                border: `1px solid ${variables.light20}`,
-              }
+                  opacity: '1',
+                  aspectRatio: 'initial',
+                  borderRadius: '12px',
+                  boxShadow: '0 0 128px 32px rgba(0, 0, 0, 1)',
+                  maxHeight: '80vh',
+                  backgroundColor: 'black',
+                  border: `1px solid ${variables.light20}`,
+                }
               : undefined
           }
         >

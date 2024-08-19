@@ -1,19 +1,19 @@
-import {PropsWithChildren, useEffect, useRef, useState} from "react";
+import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import SyntaxHighlighter from 'react-syntax-highlighter'
-import {darcula} from "react-syntax-highlighter/dist/esm/styles/hljs";
-import Button from "@/components/Button/Button";
+import { darcula } from 'react-syntax-highlighter/dist/esm/styles/hljs'
+import Button from '@/components/Button/Button'
 import styles from './message.module.scss'
-import {Copy, TickCircle} from "iconsax-react";
-import { trackEvent } from '@/utils/amplitude';
+import { Copy, TickCircle } from 'iconsax-react'
+import { trackEvent } from '@/utils/amplitude'
 
 interface CodeBlockProps {
   language: string
 }
 
-const CodeBlock = ({children, language}: PropsWithChildren<CodeBlockProps>) => {
+const CodeBlock = ({ children, language }: PropsWithChildren<CodeBlockProps>) => {
   const [isCopied, setCopied] = useState(false)
   const timeoutRef = useRef<NodeJS.Timeout>()
-  const code = children as (string | string[])
+  const code = children as string | string[]
 
   const onCopy = () => {
     setCopied(true)
@@ -22,7 +22,7 @@ const CodeBlock = ({children, language}: PropsWithChildren<CodeBlockProps>) => {
       setCopied(false)
       timeoutRef.current = undefined
     }, 2000)
-    trackEvent('HL Chat Code Copied', { language });
+    trackEvent('HL Chat Code Copied', { language })
   }
 
   useEffect(() => {
@@ -38,15 +38,23 @@ const CodeBlock = ({children, language}: PropsWithChildren<CodeBlockProps>) => {
       <div className={styles.codeBlockHeader}>
         {language}
         <Button size={'small'} variant={'ghost-neutral'} onClick={onCopy}>
-          {
-            isCopied
-              ? <><TickCircle variant={"Linear"} size={16}/> Copied!</>
-              : <><Copy variant={"Linear"} size={16}/> Copy Code</>
-          }
+          {isCopied ? (
+            <>
+              <TickCircle variant={'Linear'} size={16} /> Copied!
+            </>
+          ) : (
+            <>
+              <Copy variant={'Linear'} size={16} /> Copy Code
+            </>
+          )}
         </Button>
       </div>
-      <div className="overflow-x-auto" style={{width: '100%'}}>
-        <SyntaxHighlighter language={language} style={darcula} customStyle={{backgroundColor: 'rgba(0, 0, 0, 0.6)', padding: '12px', boxSizing: 'border-box'}}>
+      <div className="overflow-x-auto" style={{ width: '100%' }}>
+        <SyntaxHighlighter
+          language={language}
+          style={darcula}
+          customStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.6)', padding: '12px', boxSizing: 'border-box' }}
+        >
           {code}
         </SyntaxHighlighter>
       </div>
