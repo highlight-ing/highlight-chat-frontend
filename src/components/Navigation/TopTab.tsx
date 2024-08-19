@@ -44,12 +44,18 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
           onClick: () => onClose(conversation),
         },
         {
-          label: 'Close All Others',
+          label: 'Close all others',
           onClick: () => {
             if (conversationId !== conversation.id) {
               setConversationId(conversation.id)
             }
             setOpenConversations([conversation])
+          },
+        },
+        {
+          label: 'Close all',
+          onClick: () => {
+            setOpenConversations([])
           },
         },
       ]
