@@ -50,7 +50,7 @@ export default async function addAttachmentsToFormData(formData: FormData, attac
     if (attachment?.value) {
       switch (attachment.type) {
         case 'text_file':
-          formData.append('text_file', attachment.value)
+          formData.append('text_file', attachment.fileName + '\n' + attachment.value)
           break
         case 'image':
         case 'screenshot':
@@ -215,7 +215,6 @@ export const useSubmitQuery = () => {
     context.attachments?.map((attachment) => {
       console.log('Attachment: ', JSON.stringify(attachment))
     })
-
     if (!context.suggestion || context.suggestion.trim() === '') {
       console.log('No context received, ignoring.')
       return
@@ -234,23 +233,21 @@ export const useSubmitQuery = () => {
     let query = context.suggestion || ''
     let screenshotUrl = context.attachments?.find((a) => a.type === 'screenshot')?.value
     let clipboardText = context.attachments?.find((a) => a.type === 'clipboard')?.value
+    let ocrScreenContents = context.environment?.ocrScreenContents
+    let rawContents = context.application?.focusedWindow?.rawContents
     let audio = context.attachments?.find((a) => a.type === 'audio')?.value
     let windowTitle = context.application?.focusedWindow?.title
-    let rawContents = context.application?.focusedWindow?.rawContents
 
-    // Extract OCR content
-    let ocrText = context.environment?.ocrScreenContents
-
-    // Use rawContents if available, otherwise use ocrText
-    let contentToUse = rawContents || ocrText
-
+    // TODO: Shouldn't have to redeclare this
     const fileAttachmentTypes = ['pdf', 'spreadsheet', 'text_file', 'image']
+
     const hasFileAttachment = context.attachments?.some((a: { type: string }) => fileAttachmentTypes.includes(a.type))
 
     // Fetch windows information
     const windows = await fetchWindows()
 
-    if (query || clipboardText || contentToUse || screenshotUrl || audio || hasFileAttachment) {
+    if (query || clipboardText || ocrScreenContents || screenshotUrl || rawContents || audio || hasFileAttachment) {
+      // TODO: Clean this up when the runtime API is updated and attachments types are no longer overloaded
       const att = context.attachments || ([] as unknown)
       const fileAttachments = (att as FileAttachment[]).filter((a) => a.type && fileAttachmentTypes.includes(a.type))
 
@@ -261,21 +258,23 @@ export const useSubmitQuery = () => {
         screenshot: screenshotUrl,
         audio,
         window: windowTitle ? { title: windowTitle, type: 'window' } : undefined,
-        windows: windows,
+        windows: windows, // Add windows information to the message
         file_attachments: fileAttachments,
       })
 
       setInput('')
-      clearAttachments()
+      clearAttachments() // Clear the attachment immediately
 
       const formData = new FormData()
       formData.append('prompt', query)
-      formData.append('windows', JSON.stringify(windows))
+      formData.append('windows', JSON.stringify(windows)) // Add windows to formData
 
+      console.log('prompt app: ', promptApp)
       if (promptApp) {
         formData.append('app_id', promptApp.id.toString())
       }
 
+      // Add about_me to form data
       if (aboutMe) {
         formData.append('about_me', JSON.stringify(aboutMe))
       }
@@ -283,9 +282,10 @@ export const useSubmitQuery = () => {
       const contextAttachments = context.attachments || []
       await addAttachmentsToFormData(formData, contextAttachments)
 
-      // Add OCR text or raw contents to form data
-      if (contentToUse) {
-        formData.append('ocr_text', contentToUse)
+      let contextString = prepareHighlightContext(context)
+
+      if (contextString.trim() !== '') {
+        formData.append('context', contextString)
       }
 
       const accessToken = await getAccessToken()
