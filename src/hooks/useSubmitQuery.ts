@@ -365,9 +365,9 @@ export const useSubmitQuery = () => {
   }
 
   useEffect(() => {
-    console.log('conversationIdRef:', conversationIdRef.current)
-    console.log('conversationId', conversationId)
-    console.log('abortControllerRef', typeof abortControllerRef.current)
+    // console.log('conversationIdRef:', conversationIdRef.current)
+    // console.log('conversationId', conversationId)
+    // console.log('abortControllerRef', typeof abortControllerRef.current)
     if (conversationIdRef.current && conversationIdRef.current !== conversationId && abortControllerRef.current) {
       console.log("Aborting previous chat's message stream")
       abortControllerRef.current.abort('Aborted, conversation ID changed, stop streaming messages')
