@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { ChatHistoryItem, TopBarProps } from '@/types'
-import { Add, Clock } from 'iconsax-react'
+import { Add, Clock, ExportCurve } from 'iconsax-react'
 import CircleButton from '@/components/CircleButton/CircleButton'
 import Tooltip from '@/components/Tooltip/Tooltip'
 import { useStore } from '@/providers/store-provider'
@@ -87,70 +87,85 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
 
   return (
     <div className={styles.topBar}>
-      <div className={'flex max-w-full items-center gap-1'}>
-        <Tooltip
-          tooltip="View chat history"
-          position="bottom"
-          wrapperStyle={
-            showHistory || !setShowHistory
-              ? {
-                  visibility: 'hidden',
-                  paddingInlineStart: `calc(${variables.chatHistoryWidth} - 36px)`,
-                  transition: 'padding 250ms ease',
-                }
-              : { transition: 'padding 250ms ease' }
-          }
-        >
-          <CircleButton onClick={onShowHistoryClick}>
-            <Clock size={20} variant={'Bold'} />
-          </CircleButton>
-        </Tooltip>
-        <DragDropContext onDragEnd={onDragTabEnd}>
-          <Droppable droppableId="droppable" direction={'horizontal'}>
-            {(provided) => (
-              <div
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-                className={`${styles.tabsContainer} ${showHistory ? styles.offset : ''}`}
-              >
-                {openConversations.map((conversation, index) => {
-                  return (
-                    <Draggable key={conversation.id} draggableId={conversation.id} index={index}>
-                      {(provided, snapshot) => (
-                        <TopTab
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          conversation={conversation}
-                          onOpen={(_) => onSelectChat(conversation)}
-                          onClose={(_) => onCloseTab(conversation)}
-                          isActive={conversation.id === conversationId}
-                          isDragging={snapshot.isDragging}
-                          style={{
-                            ...provided.draggableProps.style,
-                            transition: snapshot.isDropAnimating
-                              ? 'all 200ms ease-out'
-                              : provided.draggableProps.style?.transition,
-                            cursor: 'pointer',
-                          }}
-                        />
-                      )}
-                    </Draggable>
-                  )
-                })}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
-        {
-          // (promptName || !!messages.length) &&
-          <Tooltip tooltip="Start new chat" position="bottom">
-            <CircleButton onClick={onNewChatClick}>
-              <Add variant={'Linear'} size={20} />
+      <div className="flex w-full items-center justify-between">
+        <div className="flex items-center gap-1">
+          <Tooltip
+            tooltip="View chat history"
+            position="bottom"
+            wrapperStyle={
+              showHistory || !setShowHistory
+                ? {
+                    visibility: 'hidden',
+                    paddingInlineStart: `calc(${variables.chatHistoryWidth} - 36px)`,
+                    transition: 'padding 250ms ease',
+                  }
+                : { transition: 'padding 250ms ease' }
+            }
+          >
+            <CircleButton onClick={onShowHistoryClick}>
+              <Clock size={20} variant={'Bold'} />
             </CircleButton>
           </Tooltip>
-        }
+        </div>
+
+        <div className="flex-grow overflow-hidden">
+          <DragDropContext onDragEnd={onDragTabEnd}>
+            <Droppable droppableId="droppable" direction={'horizontal'}>
+              {(provided) => (
+                <div
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  className={`${styles.tabsContainer} ${showHistory ? styles.offset : ''} flex items-center`}
+                >
+                  {openConversations.map((conversation, index) => {
+                    return (
+                      <Draggable key={conversation.id} draggableId={conversation.id} index={index}>
+                        {(provided, snapshot) => (
+                          <TopTab
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            conversation={conversation}
+                            onOpen={(_) => onSelectChat(conversation)}
+                            onClose={(_) => onCloseTab(conversation)}
+                            isActive={conversation.id === conversationId}
+                            isDragging={snapshot.isDragging}
+                            style={{
+                              ...provided.draggableProps.style,
+                              transition: snapshot.isDropAnimating
+                                ? 'all 200ms ease-out'
+                                : provided.draggableProps.style?.transition,
+                              cursor: 'pointer',
+                            }}
+                          />
+                        )}
+                      </Draggable>
+                    )
+                  })}
+                  {provided.placeholder}
+                  <Tooltip tooltip="Start new chat" position="bottom">
+                    <CircleButton onClick={onNewChatClick}>
+                      <Add variant={'Linear'} size={20} />
+                    </CircleButton>
+                  </Tooltip>
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
+        </div>
+
+        <div className="flex items-center gap-1">
+          <div className={styles.tabContainer}>
+            <Tooltip tooltip="Share" position="bottom">
+              <div className={`${styles.tab} cursor-pointer`}>
+                <span className="flex max-w-full items-center gap-2 overflow-hidden overflow-ellipsis whitespace-nowrap">
+                  <span>Share</span>
+                  <ExportCurve size={20} variant={'Linear'} />
+                </span>
+              </div>
+            </Tooltip>
+          </div>
+        </div>
       </div>
 
       {/*{*/}
