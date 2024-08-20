@@ -132,7 +132,6 @@ export const useSubmitQuery = () => {
       input: state.input,
       setInput: state.setInput,
       setIsDisabled: state.setInputIsDisabled,
-      updateLastMessage: state.updateLastMessage,
       aboutMe: state.aboutMe,
       addConversationMessage: state.addConversationMessage,
       updateLastConversationMessage: state.updateLastConversationMessage,
