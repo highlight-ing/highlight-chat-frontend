@@ -25,7 +25,7 @@ const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
     } else {
       setTimeout(() => {
         setVisible(false)
-      }, 500)
+      }, 300)
       trackEvent('HL Chat Home Hidden', {})
     }
   }, [isShowing])

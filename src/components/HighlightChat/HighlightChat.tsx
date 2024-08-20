@@ -11,10 +11,10 @@ import { useStore } from '@/providers/store-provider'
 import ChatHome from '@/components/ChatHome/ChatHome'
 import ChatHeader from '@/components/ChatHeader/ChatHeader'
 import { useShallow } from 'zustand/react/shallow'
-import useHandleConversationLoad from '@/hooks/useHandleConversationLoad'
 import MessagesPlaceholder from '@/components/Messages/MessagesPlaceholder'
-import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
 import { trackEvent } from '@/utils/amplitude'
+import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
+import useHandleConversationLoad from '@/hooks/useHandleConversationLoad'
 
 /**
  * Hook that handles pasting from the clipboard.
@@ -94,12 +94,14 @@ const HighlightChat = () => {
     <div className={styles.page}>
       <History showHistory={showHistory} setShowHistory={setShowHistory} />
       <TopBar showHistory={showHistory} setShowHistory={setShowHistory} />
-      <div className={`${styles.contents} ${showHistory ? styles.partial : styles.full}`}>
+      <div
+        className={`${styles.contents} ${showHistory ? styles.partial : styles.full} ${messages.length > 0 || inputIsDisabled || !!promptName ? styles.justifyEnd : ''}`}
+      >
         <ChatHeader isShowing={!!promptName && messages.length === 0} />
         {(isChatting || (isConversationLoading && messages.length > 0)) && <Messages />}
         {isConversationLoading && messages.length === 0 && !inputIsDisabled && <MessagesPlaceholder />}
-        {(isChatting || promptName) && <Input isActiveChat={true} />}
         <ChatHome isShowing={!isChatting && !promptName && !isConversationLoading} />
+        {(isChatting || promptName) && <Input isActiveChat={true} />}
       </div>
     </div>
   )

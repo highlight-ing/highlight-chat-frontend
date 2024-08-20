@@ -18,6 +18,10 @@
   margin-top: $topbar-height;
   height: calc(100% - $topbar-height);
 
+  &.justifyEnd {
+    justify-content: flex-end;
+  }
+
   &.full {
     animation: history-hide 250ms ease forwards;
   }
