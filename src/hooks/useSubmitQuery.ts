@@ -120,7 +120,7 @@ export const useSubmitQuery = () => {
     clearAttachments,
     input,
     setInput,
-    setIsDisabled,
+    setInputIsDisabled,
     aboutMe,
     addConversationMessage,
     updateLastConversationMessage,
@@ -131,7 +131,7 @@ export const useSubmitQuery = () => {
       clearAttachments: state.clearAttachments,
       input: state.input,
       setInput: state.setInput,
-      setIsDisabled: state.setInputIsDisabled,
+      setInputIsDisabled: state.setInputIsDisabled,
       aboutMe: state.aboutMe,
       addConversationMessage: state.addConversationMessage,
       updateLastConversationMessage: state.updateLastConversationMessage,
@@ -144,7 +144,7 @@ export const useSubmitQuery = () => {
   const conversationIdRef = useRef(conversationId)
 
   const fetchResponse = async (conversationId: string, formData: FormData, token: string) => {
-    setIsDisabled(true)
+    setInputIsDisabled(true)
 
     try {
       formData.append('conversation_id', conversationId)
@@ -223,7 +223,7 @@ export const useSubmitQuery = () => {
         })
       }
     } finally {
-      setIsDisabled(false)
+      setInputIsDisabled(false)
       abortControllerRef.current = undefined
     }
   }
@@ -275,6 +275,8 @@ export const useSubmitQuery = () => {
     const windows = await fetchWindows()
 
     if (query || clipboardText || contentToUse || screenshotUrl || audio || hasFileAttachment) {
+      setInputIsDisabled(true)
+
       const att = context.attachments || ([] as unknown)
       const fileAttachments = (att as FileAttachment[]).filter((a) => a.type && fileAttachmentTypes.includes(a.type))
 
@@ -327,6 +329,8 @@ export const useSubmitQuery = () => {
     }
 
     if (query) {
+      setInputIsDisabled(true)
+
       const formData = new FormData()
       formData.append('prompt', query)
       if (promptApp) {

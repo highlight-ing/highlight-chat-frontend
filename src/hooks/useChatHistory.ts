@@ -12,7 +12,7 @@ interface ChatHistoryResponse {
 export const useChatHistory = (): {
   history: ChatHistoryItem[]
   refreshChatHistory: () => Promise<ChatHistoryItem[]>
-  refreshChatItem: (conversationId: string) => Promise<ChatHistoryItem | null>
+  refreshChatItem: (conversationId: string, addOpenConversation?: boolean) => Promise<ChatHistoryItem | null>
 } => {
   const { get } = useApi()
   const { history, setHistory, addOrUpdateOpenConversation, openConversations } = useStore(
@@ -47,7 +47,10 @@ export const useChatHistory = (): {
     }
   }
 
-  const fetchConversation = async (conversationId: string): Promise<ChatHistoryItem | null> => {
+  const fetchConversation = async (
+    conversationId: string,
+    addOpenConversation?: boolean,
+  ): Promise<ChatHistoryItem | null> => {
     try {
       const response = await get(`history/${conversationId}`)
       if (!response.ok) {
@@ -70,7 +73,9 @@ export const useChatHistory = (): {
         newHistory = [data.conversation, ...history]
       }
       setHistory(newHistory)
-      addOrUpdateOpenConversation(data.conversation)
+      if (openConversations.some((chat) => chat.id === conversationId) || addOpenConversation) {
+        addOrUpdateOpenConversation(data.conversation)
+      }
       return data.conversation
     } catch (error) {
       console.error('Error fetching conversation:', error)
