@@ -1,7 +1,7 @@
 type WindowAttachment = {
   type: 'window'
   title: string
-  thumbnailUrl?: string
+  appIcon?: string
 }
 
 export type BaseMessage = {
