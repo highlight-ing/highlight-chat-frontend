@@ -2,8 +2,15 @@ import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { savePrompt } from '@/utils/prompts'
 import useAuth from './useAuth'
 import { usePromptsStore } from '@/stores/prompts'
+import { FormState, useFormContext } from 'react-hook-form'
 
-export function usePromptEditor() {
+export function usePromptEditor({
+  trigger,
+  formState,
+}: {
+  trigger: () => Promise<boolean>
+  formState: FormState<any>
+}) {
   const { promptEditorData, setPromptEditorData, needSave, setNeedSave } = usePromptEditorStore()
   const { updatePrompt, addPrompt } = usePromptsStore()
 
@@ -38,6 +45,8 @@ export function usePromptEditor() {
     if (promptEditorData.uploadingImage) {
       formData.append('uploadingImage', promptEditorData.uploadingImage)
     }
+
+    trigger()
 
     const res = await savePrompt(formData, accessToken)
 

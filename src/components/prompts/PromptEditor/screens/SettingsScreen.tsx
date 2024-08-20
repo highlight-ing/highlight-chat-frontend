@@ -12,7 +12,7 @@ import { supabaseLoader } from '@/lib/supabase'
 import { deletePrompt } from '@/utils/prompts'
 import useAuth from '@/hooks/useAuth'
 import { usePromptsStore } from '@/stores/prompts'
-import { useForm } from 'react-hook-form'
+import { useForm, useFormContext } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { videoUrlSchema } from '@/lib/zod'
@@ -181,15 +181,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
     register,
     watch,
     formState: { errors },
-  } = useForm({
-    defaultValues: {
-      name: promptEditorData.name,
-      videoUrl: promptEditorData.videoUrl,
-      description: promptEditorData.description,
-    },
-    resolver: zodResolver(SettingsSchema),
-    mode: 'onChange',
-  })
+  } = useFormContext()
 
   // Hook to update the prompt editor data when the form changes
   useEffect(() => {

@@ -28,7 +28,6 @@ async function validateUserAuth(authToken: string) {
 
 const SavePromptSchema = z.object({
   externalId: z.string().optional().nullable(),
-  slug: z.string(),
   name: z.string(),
   description: z.string(),
   appPrompt: z.string(),
@@ -166,6 +165,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
       .maybeSingle()
 
     if (error || !prompt) {
+      console.warn('Error creating prompt in our database.', error)
       return { error: 'Error creating prompt in our database.' }
     }
 
