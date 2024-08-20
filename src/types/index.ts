@@ -1,4 +1,5 @@
 type WindowAttachment = {
+  type: 'window'
   title: string
   appIcon?: string
 }
