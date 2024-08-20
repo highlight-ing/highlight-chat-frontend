@@ -120,7 +120,7 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
       const fetchAndSafeRetry = async (retries: number) => {
         // New conversation found after initial fetch
         console.log('Fetching new conversation and adding it to history')
-        const newConversation = await refreshChatItem(conversationId)
+        const newConversation = await refreshChatItem(conversationId, true)
         if (newConversation) {
           console.log('Added conversation to history')
           return
