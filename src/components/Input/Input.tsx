@@ -4,11 +4,13 @@ import { AttachmentsButton } from '../AttachmentsButton/AttachmentsButton'
 import { Attachment as AttachmentType } from '@/types'
 import { useSubmitQuery } from '../../hooks/useSubmitQuery'
 import { useStore } from '@/providers/store-provider'
+import { PromptApp } from '@/types' // Added this import
 
 import styles from './chatinput.module.scss'
 import * as React from 'react'
-import { getAudioAttachmentPreview, getDisplayValue } from '@/utils/attachments'
+import { getDisplayValue } from '@/utils/attachments'
 import { useShallow } from 'zustand/react/shallow'
+import { trackEvent } from '@/utils/amplitude'
 
 const MAX_INPUT_HEIGHT = 160
 
@@ -27,9 +29,8 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
     })),
   )
 
-  const { handleSubmit } = useSubmitQuery()
-
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const { handleSubmit } = useSubmitQuery()
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (!inputIsDisabled && e.key === 'Enter' && !e.shiftKey) {
@@ -41,6 +42,7 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
 
   const onClickContainer = (e: React.MouseEvent) => {
     inputRef.current?.focus()
+    trackEvent('HL Chat Input Focused', {})
   }
 
   useEffect(() => {

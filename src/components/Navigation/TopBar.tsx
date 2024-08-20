@@ -13,6 +13,7 @@ import { HighlightIcon } from '@/icons/icons'
 import variables from '@/variables.module.scss'
 import { getPromptAppType } from '@/lib/promptapps'
 import { useShallow } from 'zustand/react/shallow'
+import { trackEvent } from '@/utils/amplitude'
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const router = useRouter()
@@ -32,14 +33,19 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const onNewChatClick = () => {
     startNewConversation()
     clearPrompt()
-
     router.push('/')
+    trackEvent('HL Chat New Conversation Started', {})
   }
 
   const onShowHistoryClick = () => {
-    if (setShowHistory) {
-      setShowHistory(!showHistory)
-    }
+    setShowHistory(!showHistory)
+    trackEvent('HL Chat History Toggled', { newState: !showHistory })
+    router.push('/')
+  }
+
+  const onSwitchChatAppClick = () => {
+    openModal('prompts-modal')
+    trackEvent('HL Chat Switch App Modal Opened', {})
   }
 
   const promptType = promptApp ? getPromptAppType(promptUserId, promptApp) : undefined
@@ -63,7 +69,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
             <CircleButton
               fitContents={true}
               className={`${styles.promptSwitch} ${promptType ? styles[!promptName || !messages.length ? 'default' : promptType] : ''}`}
-              onClick={() => openModal('prompts-modal')}
+              onClick={onSwitchChatAppClick}
             >
               {promptName ? (
                 <MessageText variant={'Bold'} size={24} />
