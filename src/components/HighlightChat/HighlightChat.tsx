@@ -90,7 +90,7 @@ const HighlightChat = () => {
         <ChatHeader isShowing={!!promptName && messages.length === 0} />
         {(isChatting || (isConversationLoading && messages.length > 0)) && <Messages />}
         {isConversationLoading && messages.length === 0 && !inputIsDisabled && <MessagesPlaceholder />}
-        {(isChatting || promptName) && <Input sticky={true} />}
+        {(isChatting || promptName) && <Input isActiveChat={true} />}
         <ChatHome isShowing={!isChatting && !promptName && !isConversationLoading} />
       </div>
     </div>
