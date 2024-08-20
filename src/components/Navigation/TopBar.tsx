@@ -106,9 +106,14 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   useOpenConverationsPersistence()
 
   const [showShareModal, setShowShareModal] = useState(false)
+  const [isShareModalVisible, setIsShareModalVisible] = useState(false)
 
   const toggleShareModal = () => {
-    setShowShareModal(!showShareModal)
+    setIsShareModalVisible(!isShareModalVisible)
+  }
+
+  const closeShareModal = () => {
+    setIsShareModalVisible(false)
   }
 
   return (
@@ -192,9 +197,12 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
         </div>
       </div>
 
-      {showShareModal && (
-        <ShareModal onClose={() => setShowShareModal(false)} onCopyLink={onCopyLink} onDisableLink={onDisableLink} />
-      )}
+      <ShareModal
+        isVisible={isShareModalVisible}
+        onClose={closeShareModal}
+        onCopyLink={onCopyLink}
+        onDisableLink={onDisableLink}
+      />
     </div>
   )
 }

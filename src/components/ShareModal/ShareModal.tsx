@@ -4,12 +4,13 @@ import styles from './share-modal.module.scss'
 import variables from '@/variables.module.scss'
 
 interface ShareModalProps {
+  isVisible: boolean
   onClose: () => void
   onCopyLink: () => void
   onDisableLink: () => void
 }
 
-const ShareModal: React.FC<ShareModalProps> = ({ onClose, onCopyLink, onDisableLink }) => {
+const ShareModal: React.FC<ShareModalProps> = ({ isVisible, onClose, onCopyLink, onDisableLink }) => {
   const modalRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -27,8 +28,8 @@ const ShareModal: React.FC<ShareModalProps> = ({ onClose, onCopyLink, onDisableL
 
   return (
     <>
-      <div className={styles.modalOverlay} />
-      <div className={styles.shareModalContainer}>
+      <div className={`${styles.modalOverlay} ${isVisible ? styles.visible : ''}`} />
+      <div className={`${styles.shareModalContainer} ${isVisible ? styles.visible : ''}`}>
         <div className={styles.shareModal} ref={modalRef}>
           <div className={`${styles.header} flex flex-col justify-start`}>
             <h3 className="text-md font-regular text-left text-white">Share Chat</h3>
