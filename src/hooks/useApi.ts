@@ -9,54 +9,60 @@ interface FetchOptions {
   body?: FormData
   method: 'GET' | 'POST' | 'DELETE'
   bearerToken: string
+  signal?: AbortSignal
 }
 
 interface RequestOptions {
   version: ApiVersion
+  signal?: AbortSignal
 }
 
-const fetchRequest = async (route: string, { bearerToken, body, version, method }: FetchOptions) => {
+const fetchRequest = async (route: string, { bearerToken, body, version, method, signal }: FetchOptions) => {
   return fetch(`${backendUrl}api/${version ?? 'v1'}/${route}`, {
     method: method,
     body: body,
     headers: {
       Authorization: `Bearer ${bearerToken}`,
     },
+    signal: signal,
   })
 }
 
 export const useApi = () => {
   const { getAccessToken } = useAuth()
 
-  const get = async (route: string, options?: RequestOptions) => {
+  const get = async (route: string, options?: Partial<RequestOptions>) => {
     const accessToken = await getAccessToken()
     return fetchRequest(route, {
       bearerToken: accessToken,
       method: 'GET',
       version: options?.version,
+      signal: options?.signal,
     })
   }
 
-  const post = async (route: string, body: FormData, options?: RequestOptions) => {
+  const post = async (route: string, body: FormData, options?: Partial<RequestOptions>) => {
     const accessToken = await getAccessToken()
     return fetchRequest(route, {
       bearerToken: accessToken,
       body,
       method: 'POST',
       version: options?.version,
+      signal: options?.signal,
     })
   }
 
-  const deleteRequest = async (route: string, options?: RequestOptions) => {
+  const deleteRequest = async (route: string, options?: Partial<RequestOptions>) => {
     const accessToken = await getAccessToken()
     return fetchRequest(route, {
       bearerToken: accessToken,
       method: 'DELETE',
       version: options?.version,
+      signal: options?.signal,
     })
   }
 
-  const getImage = async (imageUrl: string, options?: RequestOptions) => {
+  const getImage = async (imageUrl: string, options?: Partial<RequestOptions>) => {
     const accessToken = await getAccessToken()
     const formData = new FormData()
     formData.append('imageUrl', imageUrl)
@@ -66,6 +72,7 @@ export const useApi = () => {
       method: 'POST',
       body: formData,
       version: options?.version,
+      signal: options?.signal,
     })
 
     if (!response.ok) {

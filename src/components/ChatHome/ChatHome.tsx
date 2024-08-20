@@ -26,7 +26,7 @@ const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
     } else {
       setTimeout(() => {
         setVisible(false)
-      }, 500)
+      }, 300)
       trackEvent('HL Chat Home Hidden', {})
     }
   }, [isShowing])
@@ -35,7 +35,7 @@ const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
     <div className={`${styles.chatHomeContainer} ${isShowing ? styles.show : ''}`}>
       <div className={styles.input}>
         <InputHeading />
-        {isVisible && <Input sticky={false} />}
+        {isVisible && <Input isActiveChat={false} />}
       </div>
       <div className={styles.callouts}>
         <Callout

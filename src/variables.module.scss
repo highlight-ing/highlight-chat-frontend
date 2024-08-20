@@ -81,6 +81,8 @@ $topbar-height: 48px;
 $editor-width: min(1050px, 90%);
 
 :export {
+  chatHistoryWidth: $chat-history-width;
+
   primary5: $primary-5;
   primary10: $primary-10;
   primary20: $primary-20;

@@ -17,7 +17,7 @@ const MAX_INPUT_HEIGHT = 160
 /**
  * This is the main Highlight Chat input box, not a reusable Input component.
  */
-export const Input = ({ sticky }: { sticky: boolean }) => {
+export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   const { attachments, input, setInput, inputIsDisabled, promptName, promptApp } = useStore(
     useShallow((state) => ({
       attachments: state.attachments,
@@ -56,7 +56,7 @@ export const Input = ({ sticky }: { sticky: boolean }) => {
   }, [inputRef, input])
 
   return (
-    <div className={`${styles.inputContainer} ${sticky ? styles.sticky : ''}`} onClick={onClickContainer}>
+    <div className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''}`} onClick={onClickContainer}>
       {attachments.length > 0 && (
         <div className="flex gap-2">
           {attachments.map((attachment: AttachmentType, index: number) => (

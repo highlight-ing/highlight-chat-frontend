@@ -12,12 +12,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-bottom: 64px;
   flex: 1;
   position: relative;
   overflow-y: auto;
-  //top: $topbar-height;
-  //height: calc(100% - $topbar-height);
+  margin-top: $topbar-height;
+  height: calc(100% - $topbar-height);
+
+  &.justifyEnd {
+    justify-content: flex-end;
+  }
 
   &.full {
     animation: history-hide 250ms ease forwards;
