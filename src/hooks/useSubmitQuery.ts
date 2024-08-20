@@ -331,7 +331,7 @@ export const useSubmitQuery = () => {
         file_title: fileTitle,
         clipboard_text: clipboardText,
         windows: windows,
-        file_attachments: attachments,
+        file_attachments: attachments.filter((attachment) => attachment.type === 'text_file'),
       })
 
       setInput('')
