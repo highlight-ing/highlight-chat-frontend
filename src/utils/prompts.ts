@@ -318,3 +318,45 @@ export async function deletePrompt(externalId: string, authToken: string) {
     return { error: 'Error deleting prompt from our database.' }
   }
 }
+
+export async function addPromptToUser(externalId: string, authToken: string) {
+  let userId: string
+  try {
+    userId = await validateUserAuth(authToken)
+  } catch (error) {
+    return { error: 'Invalid auth token' }
+  }
+
+  // Check if the user already has the prompt
+  const supabase = supabaseAdmin()
+
+  const { data: addedPrompt } = await supabase
+    .from('added_prompts')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('prompts.external_id', externalId)
+    .maybeSingle()
+
+  if (addedPrompt) {
+    // Prompt has already been added, no need to do anything
+    return
+  }
+
+  const { data: prompt } = await supabase.from('prompts').select('id').eq('external_id', externalId).maybeSingle()
+
+  if (!prompt) {
+    console.error('Prompt not found in Supabase')
+    throw new Error('Prompt not found in Supabase')
+  }
+
+  // Otherwise, add the prompt to the user
+  const { error: insertError } = await supabase.from('added_prompts').insert({
+    user_id: userId,
+    prompt_id: prompt.id,
+  })
+
+  if (insertError) {
+    console.error('Error adding prompt to user', insertError)
+    throw new Error('Error adding prompt to user')
+  }
+}

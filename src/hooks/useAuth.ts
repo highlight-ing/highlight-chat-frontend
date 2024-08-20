@@ -51,15 +51,19 @@ export default function useAuth() {
 
       console.log('[useAuth] Refreshed tokens from backend.')
 
+      const payload = decodeJwt(refreshTokensResponse.access_token)
+
+      console.log('[useAuth] Decoded payload', payload)
+
       setAuth({
         accessToken: refreshTokensResponse.access_token,
         refreshToken: refreshTokensResponse.refresh_token,
-        authExpiration: refreshTokensResponse.expires_in,
+        authExpiration: payload.exp,
       })
 
       accessToken = refreshTokensResponse.access_token
       refreshToken = refreshTokensResponse.refresh_token
-      authExpiration = refreshTokensResponse.expires_in
+      authExpiration = payload.exp
     } catch (error) {
       // If the refresh fails, get new tokens
       console.log('[useAuth] Refresh failed, getting new tokens.')
@@ -79,6 +83,7 @@ export default function useAuth() {
 
     // Check if the current tokens are expired
     if (authExpiration && Date.now() >= authExpiration * 1000) {
+      console.log('[useAuth] Auth tokens expired, attempting to refresh.', Date.now(), authExpiration * 1000)
       await attemptToRefreshTokens()
     }
 

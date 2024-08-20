@@ -1,15 +1,12 @@
 import { useStore } from '@/providers/store-provider'
 import { useEffect, useMemo, useState } from 'react'
-import { fetchPrompts, fetchPromptText } from '@/utils/prompts'
+import { addPromptToUser, fetchPrompts, fetchPromptText } from '@/utils/prompts'
 import useAuth from '@/hooks/useAuth'
 import { Prompt } from '@/types/supabase-helpers'
-import { useRouter } from 'next/navigation'
 import { useShallow } from 'zustand/react/shallow'
-import Highlight from '@highlight-ai/app-runtime'
 
 export default () => {
   const { getAccessToken } = useAuth()
-  const router = useRouter()
   const [isLoadingPrompts, setLoadingPrompts] = useState(true)
 
   const { prompts, setPrompts, promptUserId, setPromptUserId, setPrompt, clearPrompt, startNewConversation } = useStore(
@@ -54,6 +51,12 @@ export default () => {
       clearPrompt()
       return
     }
+
+    const accessToken = await getAccessToken()
+
+    // Add the app to the user's list of "added" apps
+    // if it's not already there
+    await addPromptToUser(prompt.external_id, accessToken)
 
     try {
       //@ts-expect-error
