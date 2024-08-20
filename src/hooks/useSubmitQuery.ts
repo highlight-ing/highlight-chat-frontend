@@ -140,7 +140,6 @@ export const useSubmitQuery = () => {
   )
 
   const abortControllerRef = useRef<AbortController>()
-  const { getAccessToken } = useAuth()
   const conversationId = useStore((state) => state.conversationId)
   const conversationIdRef = useRef(conversationId)
 
