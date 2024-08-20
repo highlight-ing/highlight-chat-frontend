@@ -2,19 +2,34 @@ import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { savePrompt } from '@/utils/prompts'
 import useAuth from './useAuth'
 import { usePromptsStore } from '@/stores/prompts'
+import { useEffect, useState } from 'react'
 
 export function usePromptEditor() {
-  const { promptEditorData, setPromptEditorData, needSave, setNeedSave } = usePromptEditorStore()
-  const { updatePrompt, addPrompt } = usePromptsStore()
+  // STATE
+  const [saveDisabled, setSaveDisabled] = useState(false)
 
+  // HOOKS
+  const { promptEditorData, setPromptEditorData, needSave, setNeedSave, settingsHasNoErrors, setSaving } =
+    usePromptEditorStore()
+  const { updatePrompt, addPrompt } = usePromptsStore()
   const { getAccessToken } = useAuth()
 
+  // EFFECTS
+  useEffect(() => {
+    console.log('settingsHasNoErrors', settingsHasNoErrors)
+    console.log('needSave', needSave)
+    setSaveDisabled(!(settingsHasNoErrors && needSave))
+  }, [settingsHasNoErrors, needSave])
+
   async function save() {
+    setSaving(true)
+
     const accessToken = await getAccessToken()
 
     console.log('Saving prompt editor data...')
 
     if (!needSave) {
+      setSaving(false)
       return
     }
 
@@ -43,6 +58,7 @@ export function usePromptEditor() {
 
     if (res && res.error) {
       console.error('Error saving prompt:', res.error)
+      setSaving(false)
       return
     }
 
@@ -52,13 +68,13 @@ export function usePromptEditor() {
       })
       addPrompt(res.prompt)
     } else if (res?.prompt) {
+      // Update the prompts store with the updated prompt data
       updatePrompt(res.prompt)
     }
 
     setNeedSave(false)
-
-    // Update the prompts store
+    setSaving(false)
   }
 
-  return { save }
+  return { save, saveDisabled }
 }

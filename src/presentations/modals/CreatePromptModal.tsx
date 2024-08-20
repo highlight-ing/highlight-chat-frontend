@@ -11,7 +11,7 @@ import { useStore } from '@/providers/store-provider'
 
 const CreatePromptModal = ({ id, context }: ModalObjectProps) => {
   const { clearPromptEditorData, setSelectedScreen, needSave, saving, setSaving } = usePromptEditorStore()
-  const { save } = usePromptEditor()
+  const { save, saveDisabled } = usePromptEditor()
   const closeModal = useStore((state) => state.closeModal)
 
   useEffect(() => {
@@ -19,12 +19,6 @@ const CreatePromptModal = ({ id, context }: ModalObjectProps) => {
     setSelectedScreen('startWithTemplate')
     clearPromptEditorData()
   }, [])
-
-  async function handleSave() {
-    setSaving(true)
-    await save()
-    setSaving(false)
-  }
 
   return (
     <Modal
@@ -38,7 +32,7 @@ const CreatePromptModal = ({ id, context }: ModalObjectProps) => {
           </div>
           <div className="basis-1/3">Create New Highlight App</div>
           <div className="flex basis-1/3 justify-end">
-            <Button size={'large'} variant={'tertiary'} onClick={handleSave} disabled={!needSave}>
+            <Button size={'large'} variant={'tertiary'} onClick={save} disabled={saveDisabled}>
               Save
             </Button>
           </div>

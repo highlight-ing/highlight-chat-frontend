@@ -13,7 +13,8 @@ import { useStore } from '@/providers/store-provider'
 const EditPromptModal = ({ id, context }: ModalObjectProps) => {
   const prompt = context?.prompt as Prompt
 
-  const { setPromptEditorData, setSelectedScreen, needSave, saving, setSaving } = usePromptEditorStore()
+  const { setPromptEditorData, setSelectedScreen, needSave, saving, setSaving, setSettingsHasNoErrors } =
+    usePromptEditorStore()
   const closeModal = useStore((state) => state.closeModal)
 
   useEffect(() => {
@@ -29,15 +30,10 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
       videoUrl: prompt.video_url ?? undefined,
       image: prompt.image ? `${prompt.image}.${prompt.user_images?.file_extension}` : undefined,
     })
+    setSettingsHasNoErrors(true)
   }, [prompt])
 
-  const { save } = usePromptEditor()
-
-  async function handleSave() {
-    setSaving(true)
-    await save()
-    setSaving(false)
-  }
+  const { save, saveDisabled } = usePromptEditor()
 
   return (
     <Modal
@@ -51,7 +47,7 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
           </div>
           <div className="basis-1/3">Edit {prompt.name}</div>
           <div className="flex basis-1/3 justify-end">
-            <Button size={'large'} variant={'tertiary'} onClick={handleSave} disabled={!needSave}>
+            <Button size={'large'} variant={'tertiary'} onClick={save} disabled={saveDisabled}>
               Save
             </Button>
           </div>

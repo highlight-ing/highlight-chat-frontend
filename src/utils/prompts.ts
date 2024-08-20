@@ -28,7 +28,7 @@ async function validateUserAuth(authToken: string) {
 
 const SavePromptSchema = z.object({
   externalId: z.string().optional().nullable(),
-  name: z.string(),
+  name: z.string().max(40, { message: 'Name must be less than 40 characters' }),
   description: z.string(),
   appPrompt: z.string(),
   suggestionsPrompt: z.string(),
@@ -171,7 +171,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
 
   if (!validated.success) {
     console.warn('Invalid prompt data recieved.', validated.error)
-    return { error: 'Invalid prompt data.' }
+    return { error: 'Invalid prompt data.', zodErrors: validated.error }
   }
 
   const promptData = {

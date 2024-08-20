@@ -169,27 +169,34 @@ function DeletePromptButton({ onDelete }: { onDelete?: () => void }) {
 }
 
 const SettingsSchema = z.object({
-  name: z.string().min(1, { message: 'Name is required' }),
+  name: z.string().min(1, { message: 'Name is required' }).max(40, { message: 'Name must be less than 40 characters' }),
   videoUrl: videoUrlSchema,
   description: z.string().min(1, { message: 'Description is required' }),
 })
 
 export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
-  const { promptEditorData, setPromptEditorData } = usePromptEditorStore()
+  const { promptEditorData, setPromptEditorData, setSettingsHasNoErrors } = usePromptEditorStore()
 
-  const {
-    register,
-    watch,
-    formState: { errors },
-  } = useForm({
+  const { register, watch, formState, trigger } = useForm({
     defaultValues: {
       name: promptEditorData.name,
       videoUrl: promptEditorData.videoUrl,
       description: promptEditorData.description,
     },
     resolver: zodResolver(SettingsSchema),
-    mode: 'onChange',
+    mode: 'all',
   })
+
+  const errors = formState.errors
+
+  useEffect(() => {
+    // Trigger validation on initial mount
+    trigger()
+  }, [])
+
+  useEffect(() => {
+    setSettingsHasNoErrors(Object.keys(errors).length === 0)
+  }, [formState])
 
   // Hook to update the prompt editor data when the form changes
   useEffect(() => {

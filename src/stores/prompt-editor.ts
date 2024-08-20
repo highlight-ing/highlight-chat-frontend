@@ -27,6 +27,7 @@ export interface PromptEditorState {
   promptEditorData: PromptEditorData
   needSave: boolean
   saving: boolean
+  settingsHasNoErrors: boolean
 }
 
 export type PromptEditorSlice = PromptEditorState & {
@@ -35,6 +36,7 @@ export type PromptEditorSlice = PromptEditorState & {
   clearPromptEditorData: () => void
   setNeedSave: (needSave: boolean) => void
   setSaving: (saving: boolean) => void
+  setSettingsHasNoErrors: (hasSettingsError: boolean) => void
 }
 
 export const initialPromptEditorState: PromptEditorState = {
@@ -49,6 +51,7 @@ export const initialPromptEditorState: PromptEditorState = {
   },
   needSave: false,
   saving: false,
+  settingsHasNoErrors: false,
 }
 
 export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, get) => ({
@@ -59,6 +62,7 @@ export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, ge
   clearPromptEditorData: () => set({ promptEditorData: initialPromptEditorState.promptEditorData }),
   setNeedSave: (needSave: boolean) => set({ needSave }),
   setSaving: (saving: boolean) => set({ saving }),
+  setSettingsHasNoErrors: (settingsHasNoErrors: boolean) => set({ settingsHasNoErrors }),
 })
 
 export const usePromptEditorStore = () =>
@@ -73,5 +77,7 @@ export const usePromptEditorStore = () =>
       setNeedSave: state.setNeedSave,
       saving: state.saving,
       setSaving: state.setSaving,
+      settingsHasNoErrors: state.settingsHasNoErrors,
+      setSettingsHasNoErrors: state.setSettingsHasNoErrors,
     })),
   )
