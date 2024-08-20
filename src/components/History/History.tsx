@@ -65,6 +65,10 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
     setShowHistory(!showHistory)
   }
 
+  const onOpenChat = () => {
+    setShowHistory(false)
+  }
+
   useEffect(() => {
     if (!initialFetchDone.current) {
       // Initial fetch
