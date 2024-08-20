@@ -106,7 +106,7 @@ const BaseModal = ({
       style={overlayStyle}
     >
       <div className={`${styles.modalContainer} ${styles[size]}`} style={style}>
-        {showClose !== false && <CloseButton onClick={(e) => close(e, true)} alignment={closeButtonAlignment}/>}
+        {showClose !== false && <CloseButton onClick={(e) => close(e, true)} alignment={closeButtonAlignment} />}
         {header && <div className={styles.modalHeader}>{header}</div>}
         <div className={`${styles.modalBody} ${bodyClassName ?? ''}`} id={`${id}-body`} style={bodyStyle}>
           {children}

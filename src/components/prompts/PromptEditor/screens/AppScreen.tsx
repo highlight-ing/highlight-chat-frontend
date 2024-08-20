@@ -1,8 +1,8 @@
-import { usePromptEditorStore } from "@/stores/prompt-editor";
-import PromptInput from "../PromptInput";
+import { usePromptEditorStore } from '@/stores/prompt-editor'
+import PromptInput from '../PromptInput'
 
 export default function AppScreen() {
-  const { promptEditorData, setPromptEditorData } = usePromptEditorStore();
+  const { promptEditorData, setPromptEditorData } = usePromptEditorStore()
 
   return (
     <PromptInput
@@ -10,5 +10,5 @@ export default function AppScreen() {
       onChange={(e) => setPromptEditorData({ appPrompt: e })}
       placeholder="Describe what you want your app to do in detail."
     />
-  );
+  )
 }
