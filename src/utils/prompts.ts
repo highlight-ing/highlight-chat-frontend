@@ -82,6 +82,56 @@ async function uploadImage(file: File, userId: string) {
 }
 
 /**
+ * Finds the next available slug for a prompt.
+ * This is to help prevent collisions with slugs.
+ * Note: a race condition exists where in two users try using the same slug at the same time.
+ */
+async function findNextAvailableSlug(slug: string) {
+  slug = slugify(slug)
+
+  const supabase = supabaseAdmin()
+
+  const { data: lastPrompt, error } = await supabase
+    .from('prompts')
+    .select('*')
+    .like('slug', `${slug}%`)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (error) {
+    console.error('Error fetching last avaliable prompt from Supabase', error)
+    throw new Error('Error fetching last avaliable prompt from Supabase')
+  }
+
+  if (!lastPrompt) {
+    // There are no other prompts with this slug
+    return slug
+  }
+
+  const lastPromptSlug = lastPrompt.slug ?? ''
+
+  const lastPromptSplit = lastPromptSlug.split('-')
+  const lastPromptNumberSection = lastPromptSplit[lastPromptSplit.length - 1]
+
+  if (!lastPromptNumberSection) {
+    throw new Error('Last prompt slug is not in the correct format')
+  }
+
+  // Validate that the last prompt number section is a number
+  const lastPromptNumber = parseInt(lastPromptNumberSection)
+
+  if (isNaN(lastPromptNumber)) {
+    // There exists only one other prompt without a number
+    return `${slug}-2`
+  }
+
+  const nextNumber = lastPromptNumber + 1
+
+  return `${lastPromptSplit.slice(0, -1).join('-')}-${nextNumber}`
+}
+
+/**
  * Creates or updates a prompt in the database.
  * @param formData The form data containing the prompt data.
  * @param authToken The authentication token from useAuth()
@@ -155,7 +205,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
     return { prompt }
   } else {
     // Generate the slug from the name
-    const slug = slugify(validated.data.name)
+    const slug = await findNextAvailableSlug(validated.data.name)
 
     // Create a new prompt
     const { data: prompt, error } = await supabase

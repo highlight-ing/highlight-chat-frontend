@@ -10,7 +10,15 @@ const SUPABASE_URL = 'https://ykwkqpmethjmpimvftix.supabase.co'
  * Admin Supabase client, this client is privileged,
  * be careful when using it.
  */
-export const supabaseAdmin = () => createClient<Database>(SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+export const supabaseAdmin = () =>
+  createClient<Database>(SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
+    global: {
+      // Prevent Next.JS from caching Supabase requests
+      fetch: (url: any, options = {}) => {
+        return fetch(url, { ...options, cache: 'no-store' })
+      },
+    },
+  })
 
 export function supabaseLoader({ src, width, quality }: { src: string; width: number; quality?: number }) {
   return `${SUPABASE_URL}/storage/v1/render/image/public/${src}?width=${width}&height=${width}&quality=${quality || 75}`
