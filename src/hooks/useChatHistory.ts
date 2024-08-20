@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useApi } from '@/hooks/useApi'
 import { useStore } from '@/providers/store-provider'
 import { ChatHistoryItem } from '@/types'
@@ -14,6 +14,7 @@ const RETRY_INTERVAL = 10000
 export const useChatHistory = (): {
   history: ChatHistoryItem[]
   refreshChatHistory: () => Promise<ChatHistoryItem[]>
+  isLoadingHistory: boolean
 } => {
   const { get } = useApi()
   const { conversationId, history, setHistory } = useStore(
@@ -26,8 +27,10 @@ export const useChatHistory = (): {
   const initialFetchDone = useRef(false)
   const fetchRetryRef = useRef<NodeJS.Timeout>()
   const fetchRetryCountRef = useRef(0)
+  const [isLoadingHistory, setIsLoadingHistory] = useState(true)
 
   const fetchResponse = async () => {
+    setIsLoadingHistory(true)
     try {
       const response = await get('history/')
       if (!response.ok) {
@@ -42,6 +45,8 @@ export const useChatHistory = (): {
         setHistory([])
       }
       return []
+    } finally {
+      setIsLoadingHistory(false)
     }
   }
 
@@ -115,5 +120,6 @@ export const useChatHistory = (): {
   return {
     history,
     refreshChatHistory: fetchResponse,
+    isLoadingHistory,
   }
 }
