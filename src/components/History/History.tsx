@@ -10,10 +10,9 @@ import { ChatHistoryItem, Message } from '@/types'
 import ContextMenu from '@/components/ContextMenu/ContextMenu'
 import { BaseMessage, UserMessage, AssistantMessage } from '@/types'
 import Button from '@/components/Button/Button'
-import { useMemo, useEffect, useCallback } from 'react'
+import { useMemo, useEffect } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { trackEvent } from '@/utils/amplitude'
-import Spinner from '@/components/Spinner'
 
 interface HistoryProps {
   showHistory: boolean
@@ -54,7 +53,7 @@ function sortArrayByDate(inputArray: ChatHistoryItem[]) {
 }
 
 const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: HistoryProps) => {
-  const { history, isLoadingHistory } = useChatHistory()
+  const { history } = useChatHistory()
 
   const { today, lastWeek, lastMonth, older } = useMemo(() => {
     return sortArrayByDate(history)
@@ -74,12 +73,8 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
           </Button>
         </Tooltip>
       </div>
-      <div className={`${styles.chats} relative flex-grow`}>
-        {isLoadingHistory ? (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Spinner size="medium" />
-          </div>
-        ) : !history?.length ? (
+      <div className={styles.chats}>
+        {!history?.length ? (
           <div className={styles.baseHistoryItem}>No chat history available</div>
         ) : (
           <>
@@ -126,65 +121,63 @@ export default History
 
 const HistoryItem = ({ chat }: { chat: ChatHistoryItem }) => {
   const { get } = useApi()
-  const { loadConversation, openModal, setIsLoadingMessages, resetConversationId, setIsChatting } = useStore(
+  const { loadConversation, openModal, setIsLoadingMessages, resetConversationId } = useStore(
     useShallow((state) => ({
       loadConversation: state.loadConversation,
       openModal: state.openModal,
       setIsLoadingMessages: state.setIsLoadingMessages,
       resetConversationId: state.resetConversationId,
-      setIsChatting: state.setIsChatting,
     })),
   )
 
-  const onSelectChat = useCallback(
-    async (chat: ChatHistoryItem) => {
-      resetConversationId()
-      setIsLoadingMessages(true)
-      setIsChatting(true) // Immediately show Messages component
+  const onSelectChat = async (chat: ChatHistoryItem) => {
+    resetConversationId() // Reset the conversation ID
+    setIsLoadingMessages(true)
 
-      // Fetch messages asynchronously
-      get(`history/${chat.id}/messages`).then(async (response) => {
-        if (!response.ok) {
-          console.error('Failed to select chat')
-          trackEvent('HL Chat Select Chat Error', {
-            chatId: chat.id,
-            error: 'Failed to fetch messages',
-          })
-          setIsLoadingMessages(false)
-          return
-        }
-        const { messages } = await response.json()
-        loadConversation(
-          chat.id,
-          messages.map((message: any) => {
-            const baseMessage: BaseMessage = {
-              role: message.role,
-              content: message.content,
-            }
+    const response = await get(`history/${chat.id}/messages`)
+    if (!response.ok) {
+      console.error('Failed to select chat')
 
-            if (message.role === 'user') {
-              return {
-                ...baseMessage,
-                context: message.context,
-                ocr_text: message.ocr_text,
-                clipboard_text: message.clipboard_text,
-                image_url: message.image_url,
-              } as UserMessage
-            } else {
-              return baseMessage as AssistantMessage
-            }
-          }),
-        )
-        trackEvent('HL Chat Opened', {
-          chatId: chat.id,
-          messageCount: messages.length,
-          source: 'history_item',
-        })
-        setIsLoadingMessages(false)
+      trackEvent('HL Chat Select Chat Error', {
+        chatId: chat.id,
+        error: 'Failed to fetch messages',
       })
-    },
-    [get, loadConversation, resetConversationId, setIsLoadingMessages, setIsChatting],
-  )
+
+      setIsLoadingMessages(false)
+      return
+    }
+    const { messages } = await response.json()
+    loadConversation(
+      chat.id,
+      messages.map((message: any) => {
+        const baseMessage: BaseMessage = {
+          role: message.role,
+          content: message.content,
+        }
+
+        if (message.role === 'user') {
+          return {
+            ...baseMessage,
+            context: message.context,
+            ocr_text: message.ocr_text,
+            clipboard_text: message.clipboard_text,
+            image_url: message.image_url,
+          } as UserMessage
+        } else {
+          return baseMessage as AssistantMessage
+        }
+      }),
+    )
+
+    trackEvent('HL Chat Opened', {
+      chatId: chat.id,
+      messageCount: messages.length,
+      source: 'history_item',
+    })
+
+    setIsLoadingMessages(false)
+
+  }
 
   const onDeleteChat = async (chat: ChatHistoryItem) => {
     openModal('delete-chat', chat)
