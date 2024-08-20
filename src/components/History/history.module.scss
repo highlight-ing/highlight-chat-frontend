@@ -47,15 +47,74 @@
   gap: 1px;
   user-select: none;
 
-  h1 {
-    font-size: 13px;
-    color: $light-20;
-    font-weight: normal;
-    padding: 8px 8px 2px;
+  .chatGroupHeader:not(:first-child) {
+    margin-top: 8px;
+  }
+}
+
+.chatGroupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: $light-20;
+  font-weight: 450;
+  padding: 8px 8px 2px;
+
+  &:hover, &.selecting {
+    .edit {
+      opacity: 1;
+      pointer-events: initial;
+      cursor: pointer;
+    }
+  }
+}
+
+.edit {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 250ms;
+
+  &:hover {
+    color: $light-60;
+    text-decoration: underline;
+  }
+}
+
+@keyframes growInLeft {
+  from {
+    transform: translateX(-8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+$selector-size: 17px;
+.selector {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: $selector-size;
+  height: $selector-size;
+  border-radius: 50%;
+  border: 1px solid $light-20;
+  cursor: pointer;
+  margin-right: 8px;
+  transition: border 100ms;
+  animation: growInLeft 100ms forwards;
+
+  &:hover {
+    border-color: $light-80;
   }
 
-  h1:not(:first-child) {
-    margin-top: 8px;
+  &.selected {
+    border-color: $light-40;
+    background-color: $light-40;
+    outline: 2px solid black;
+    outline-offset: -3px;
   }
 }
 
@@ -78,13 +137,55 @@
   @extend .baseHistoryItem;
   position: relative;
   cursor: pointer;
-  transition: background-color 100ms, color 100ms;
+  transition: background-color 100ms, color 100ms, margin 100ms;
 
   &:hover {
     background-color: $light-5;
     color: $light-80;
   }
+
+  &.selecting {
+    margin-inline-start: calc($selector-size + 8px);
+    background-color: transparent;
+  }
 }
 
 .chatText {
+}
+
+@keyframes fadeInBottom {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.selectionOptions {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  background-color: $dark-40;
+  border: 1px solid $light-5;
+  box-shadow: 0 2px 12px $dark-60;
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  color: $light-40;
+  pointer-events: all;
+  z-index: 1;
+  transition: background-color 200ms, border 100ms;
+  animation: fadeInBottom 200ms forwards;
+
+  //&:hover {
+  //  background-color: $light-5;
+  //}
 }

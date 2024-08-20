@@ -13,14 +13,14 @@ const DeleteChatModal = ({ id, context }: ModalObjectProps) => {
   const chat = context as ChatHistoryItem
   const { deleteRequest } = useApi()
   const { refreshChatHistory } = useChatHistory()
-  const { conversationId, startNewConversation, closeModal, removeOpenConversation, clearOpenConversationMessages } =
+  const { conversationId, startNewConversation, closeModal, removeOpenConversation, clearConversationMessages } =
     useStore(
       useShallow((state) => ({
         conversationId: state.conversationId,
         startNewConversation: state.startNewConversation,
         closeModal: state.closeModal,
         removeOpenConversation: state.removeOpenConversation,
-        clearOpenConversationMessages: state.clearConversationMessages,
+        clearConversationMessages: state.clearConversationMessages,
       })),
     )
 
@@ -35,7 +35,7 @@ const DeleteChatModal = ({ id, context }: ModalObjectProps) => {
       startNewConversation()
     }
     removeOpenConversation(chat.id)
-    clearOpenConversationMessages(chat.id)
+    clearConversationMessages(chat.id)
     await refreshChatHistory()
     closeModal(id)
   }
