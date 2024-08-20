@@ -261,7 +261,7 @@ export const useSubmitQuery = () => {
         clipboard_text: clipboardText,
         screenshot: screenshotUrl,
         audio,
-        window: windowTitle ? { title: windowTitle, appIcon: appIcon } : undefined,
+        window: windowTitle ? { title: windowTitle, appIcon: appIcon, type: 'window' } : undefined,
         windows: windows,
         file_attachments: fileAttachments,
       })
