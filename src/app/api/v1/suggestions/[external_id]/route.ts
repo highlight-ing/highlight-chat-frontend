@@ -1,16 +1,22 @@
 import { supabaseAdmin } from '@/lib/supabase'
+import { corsHeaders } from '@/utils/cors'
 import Handlebars from 'handlebars'
+
+export const revalidate = 0
 
 /**
  * API route that returns a single prompt by its slug
  */
 export async function GET(request: Request, { params }: { params: { external_id: string } }) {
-  const { data: prompt, error } = await supabaseAdmin
+  const supabase = supabaseAdmin()
+  const { data: prompt, error } = await supabase
     .from('prompts')
     .select('suggestion_prompt_text')
-    .eq('public', true)
+    // .eq('public', true)
     .eq('external_id', params.external_id)
     .maybeSingle()
+
+  console.log('prompt', prompt)
 
   if (error) {
     return Response.json({ error: error.message }, { status: 500 })
@@ -29,15 +35,20 @@ export async function GET(request: Request, { params }: { params: { external_id:
   // Transform the prompt editor format into the suggestions format
 
   const translated = translatedPrompt({
-    image: '{{environment.ocrScreenContents}}',
+    image: '',
     clipboard: '{{environment.clipboardText}}',
     about_me: '{{factsAboutMe}}',
     screen: '{{environment.ocrScreenContents}}',
   })
 
-  return new Response(`{{#system}}\n${translated}\n{{/system}}`, {
+  const systemPrompt = `{{#system}}
+  You will be given a prompt that explains what the user can do using the data provided. Use this prompt to generate a list of tasks 5 tasks. Format the tasks in a JSON array like this: ["task1", "task2", "task3", "task4", "task5"].
+  {{/system}}`
+
+  return new Response(`${systemPrompt}\n{{#user}}\n${translated}\n{{/user}}`, {
     headers: {
       'Content-Type': 'text/plain',
+      ...corsHeaders,
     },
   })
 }

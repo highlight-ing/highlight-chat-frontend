@@ -1,6 +1,8 @@
 import Button from '@/components/Button/Button'
 import RelatedApp, { RelatedAppProps } from './RelatedApp'
 import Video from './Video'
+import TryButton from './TryButton'
+import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
 
 function IconPlaceholder() {
   return (
@@ -16,10 +18,13 @@ function IconPlaceholder() {
 
 export interface PromptListingPageProps {
   name: string
+  slug: string
   author: string
   description: string
   videoUrl?: string
   relatedApps: RelatedAppProps[]
+  image?: string
+  imageExtension?: string
 }
 
 /**
@@ -27,17 +32,24 @@ export interface PromptListingPageProps {
  */
 export default function PromptListingPage({
   name,
+  slug,
   author,
   description,
   videoUrl,
   relatedApps,
+  image,
+  imageExtension,
 }: PromptListingPageProps) {
   return (
     <div>
       <div className="grid grid-flow-col gap-4">
         <div className="flex flex-col justify-center gap-3">
           <div className="flex gap-3">
-            <IconPlaceholder />
+            {image && imageExtension ? (
+              <PromptAppIcon className="h-16 w-16 rounded-full" imageId={image} imageExtension={imageExtension} />
+            ) : (
+              <IconPlaceholder />
+            )}
             <div className="flex flex-col gap-1">
               <h1 className="text-2xl">{name}</h1>
               <h6 className="text-light-60">Created by {author}</h6>
@@ -45,9 +57,7 @@ export default function PromptListingPage({
           </div>
           <p>{description}</p>
           <div className="mt-2">
-            <Button size="xlarge" variant="primary">
-              Try for free
-            </Button>
+            <TryButton slug={slug} />
           </div>
         </div>
         {videoUrl && (
@@ -60,35 +70,14 @@ export default function PromptListingPage({
       <div className="flex flex-col gap-10 lg:flex-row">
         <div className="flex basis-1/2 flex-col gap-4">
           <div className="space-y-2">
-            <h4 className="text-light-20">Features</h4>
-            <p className="text-light-60">
-              SmartReply Analysis revolutionizes how businesses handle online reviews. By leveraging AI and screen
-              context, it automatically analyzes customer feedback, generates appropriate responses, and provides
-              actionable insights, saving you time and improving customer satisfaction.
-            </p>
-          </div>
-          <div className="space-y-2">
-            <h4 className="text-light-20">How it works</h4>
-            <p className="text-light-60">
-              View: Open a customer review or comment in your preferred platform (e.g., Yelp, Google Reviews, social
-              media). Capture: Use the Highlight shortcut (usually CMD + .) to capture the review from your screen.
-              Analyze: SmartReply automatically analyzes the review content and context, determining sentiment, main
-              concerns, and validity.
-            </p>
-          </div>
-          <div className="space-y-2">
-            <h4 className="text-light-20">Notes from the creator</h4>
-            <p className="text-light-60">
-              SmartReply Analysis revolutionizes how businesses handle online reviews. By leveraging AI and screen
-              context, it automatically analyzes customer feedback, generates appropriate responses, and provides
-              actionable insights, saving you time and improving customer satisfaction.
-            </p>
+            <h4 className="text-light-20">Description</h4>
+            <p className="text-light-60">{description}</p>
           </div>
         </div>
         <div className="flex basis-1/2 flex-col gap-3">
           <h4 className="text-light-20">Related Apps</h4>
           {relatedApps.map((app) => (
-            <RelatedApp key={app.slug} {...app} />
+            <RelatedApp key={app.externalId} {...app} />
           ))}
         </div>
       </div>

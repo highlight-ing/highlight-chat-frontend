@@ -1,4 +1,3 @@
-import Button from '@/components/Button/Button'
 import NotFoundPage from '@/components/NotFoundPage/NotFoundPage'
 import PromptListingPage from '@/components/prompts/PromptListingPage/PromptListingPage'
 import PromptShareButton from '@/components/prompts/PromptListingPage/PromptShareButton'
@@ -7,15 +6,20 @@ import { supabaseAdmin } from '@/lib/supabase'
 import { Metadata, ResolvingMetadata } from 'next'
 
 interface PromptPageProps {
-  params: { slug: string }
+  params: { external_id: string }
 }
 
-async function getPrompt(slug: string) {
-  return await supabaseAdmin.from('prompts').select('*').eq('slug', slug).maybeSingle()
+async function getPrompt(external_id: string) {
+  const supabase = supabaseAdmin()
+  return await supabase
+    .from('prompts')
+    .select('*, user_images(file_extension)')
+    .eq('external_id', external_id)
+    .maybeSingle()
 }
 
 export async function generateMetadata({ params }: PromptPageProps, parent: ResolvingMetadata): Promise<Metadata> {
-  const { data: prompt, error } = await getPrompt(params.slug)
+  const { data: prompt, error } = await getPrompt(params.external_id)
 
   if (error) {
     throw error
@@ -37,7 +41,7 @@ export async function generateMetadata({ params }: PromptPageProps, parent: Reso
 export default async function PromptPage({ params }: PromptPageProps) {
   // Look up the prompt by slug
 
-  const { data: prompt, error } = await getPrompt(params.slug)
+  const { data: prompt, error } = await getPrompt(params.external_id)
 
   if (error) {
     return <div>Error fetching prompt: {error.message}</div>
@@ -47,8 +51,10 @@ export default async function PromptPage({ params }: PromptPageProps) {
     return <NotFoundPage />
   }
 
+  const supabase = supabaseAdmin()
+
   // Fetch "related" prompts
-  const { data: relatedPrompts, error: relatedPromptsError } = await supabaseAdmin
+  const { data: relatedPrompts } = await supabase
     .from('prompts')
     .select('*')
     .neq('id', prompt.id)
@@ -65,6 +71,7 @@ export default async function PromptPage({ params }: PromptPageProps) {
       }
 
       relatedApps.push({
+        externalId: relatedPrompt.external_id,
         name: relatedPrompt.name,
         description: relatedPrompt.description ?? '',
         slug: relatedPrompt.slug,
@@ -74,19 +81,23 @@ export default async function PromptPage({ params }: PromptPageProps) {
 
   return (
     <div className="min-h-screen bg-bg-layer-1">
-      <div className="flex flex-row justify-between border-b border-b-light-5 p-4">
-        <div></div>
-        <h3>Highlight Apps</h3>
-        <div>
+      <div className="flex flex-row items-center border-b border-b-light-5 p-4">
+        <div className="basis-1/3"></div>
+        <h3 className="basis-1/3 text-center">Highlight Apps</h3>
+        <div className="flex basis-1/3 justify-end">
           <PromptShareButton />
         </div>
       </div>
       <div className="p-20">
         <PromptListingPage
+          image={prompt.image ?? undefined}
+          imageExtension={prompt.user_images?.file_extension ?? undefined}
+          slug={prompt.slug ?? ''}
           name={prompt.name}
           author={'Unknown'}
           description={prompt.description ?? ''}
           relatedApps={relatedApps}
+          videoUrl={prompt.video_url ?? undefined}
         />
       </div>
     </div>

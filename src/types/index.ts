@@ -62,6 +62,13 @@ export interface ClipboardAttachment {
   value: string
 }
 
+export interface FileAttachment {
+  type: 'file'
+  value: string
+  fileName: string
+  mimeType: string
+}
+
 export interface TextFileAttachment {
   type: 'text_file'
   value: string
@@ -91,17 +98,4 @@ export interface ChatHistoryItem {
 export interface ModalObjectProps {
   id: string
   context?: Record<string, any>
-}
-
-export interface PromptApp {
-  created_at: string
-  description: string | null
-  external_id: string
-  id: number
-  name: string
-  prompt_text: string | null
-  prompt_url: string | null
-  public: boolean
-  slug: string | null
-  user_id: string
 }

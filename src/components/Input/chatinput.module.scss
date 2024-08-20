@@ -51,6 +51,7 @@
 
     &::placeholder {
       color: $light-40;
+      user-select: none;
     }
   }
 }

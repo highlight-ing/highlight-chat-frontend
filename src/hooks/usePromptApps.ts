@@ -2,9 +2,10 @@ import { useStore } from '@/providers/store-provider'
 import { useEffect, useMemo, useState } from 'react'
 import { fetchPrompts, fetchPromptText } from '@/utils/prompts'
 import useAuth from '@/hooks/useAuth'
-import { PromptApp } from '@/types'
+import { Prompt } from '@/types/supabase-helpers'
 import { useRouter } from 'next/navigation'
 import { useShallow } from 'zustand/react/shallow'
+import Highlight from '@highlight-ai/app-runtime'
 
 export default () => {
   const { getAccessToken } = useAuth()
@@ -43,25 +44,46 @@ export default () => {
     setLoadingPrompts(false)
   }
 
-  const selectPrompt = async (prompt: PromptApp) => {
-    if (prompt.slug === 'hlchat') {
-      clearPrompt()
-      router.push('/')
+  const selectPrompt = async (prompt: Prompt) => {
+    if (!prompt.slug) {
       return
     }
 
-    // Fetch the prompt
-    const text = await fetchPromptText(prompt.slug!)
+    if (prompt.slug === 'hlchat') {
+      await Highlight.app.openApp('highlightchat')
 
-    setPrompt({
-      promptApp: prompt,
-      promptName: prompt.name,
-      promptDescription: prompt.description!,
-      promptAppName: prompt.slug!,
-      prompt: text,
-    })
+      // clearPrompt()
+      // router.push('/')
+      return
+    }
 
-    router.push(`/`)
+    let installed = true
+
+    try {
+      //@ts-expect-error
+      await globalThis.highlight.internal.installApp(prompt.slug)
+      await Highlight.app.openApp(prompt.slug)
+    } catch (err) {
+      console.error(err)
+      installed = false
+    }
+
+    if (!installed) {
+      return
+    }
+
+    // // Fetch the prompt
+    // const text = await fetchPromptText(prompt.external_id)
+
+    // setPrompt({
+    //   promptApp: prompt,
+    //   promptName: prompt.name,
+    //   promptDescription: prompt.description!,
+    //   promptAppName: prompt.slug!,
+    //   prompt: text,
+    // })
+
+    // router.push(`/`)
   }
 
   useEffect(() => {

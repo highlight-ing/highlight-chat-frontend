@@ -4,15 +4,16 @@ interface CloseButtonProps {
   className?: string
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void
   position?: string
+  alignment?: 'left' | 'right'
   size?: string | number
 }
 
-const CloseButton = ({ size = '22', position, className, onClick = () => {} }: CloseButtonProps) => {
+const CloseButton = ({ size = '22', alignment, position, className, onClick = () => {} }: CloseButtonProps) => {
   return (
+    // @ts-ignore
     <button
-      className={`${styles.closeButton} ${className ?? ''}`}
+      className={`${styles.closeButton} ${alignment === 'left' ? styles.left : ''} ${className ?? ''}`}
       onClick={onClick}
-      // @ts-ignore
       style={{ '--size': size, '--position': position }}
     >
       <svg width={`${size}`} height={`${size}`} viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">

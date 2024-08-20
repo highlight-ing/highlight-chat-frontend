@@ -4,7 +4,8 @@ import imageCompression from 'browser-image-compression'
 import { useStore } from '@/providers/store-provider'
 import useAuth from './useAuth'
 import { useApi } from '@/hooks/useApi'
-import { FileAttachment, PromptApp } from '@/types'
+import { Prompt } from '@/types/supabase-helpers'
+import { FileAttachment, FileAttachmentType, TextFileAttachment } from '@/types'
 import { useShallow } from 'zustand/react/shallow'
 import { useEffect, useRef } from 'react'
 
@@ -143,7 +144,7 @@ export const useSubmitQuery = () => {
   const conversationId = useStore((state) => state.conversationId)
   const conversationIdRef = useRef(conversationId)
 
-  const fetchResponse = async (formData: FormData, token: string) => {
+  const fetchResponse = async (formData: FormData, token: string, isPromptApp: boolean) => {
     setIsDisabled(true)
 
     try {
@@ -159,7 +160,8 @@ export const useSubmitQuery = () => {
         }
       }
 
-      const response = await post('chat_v2/', formData)
+      const endpoint = isPromptApp ? 'chat/prompt-as-app' : 'chat_v2/'
+      const response = await post(endpoint, formData)
       if (!response.ok) {
         throw new Error('Network response was not ok')
       }
@@ -232,7 +234,7 @@ export const useSubmitQuery = () => {
   const handleIncomingContext = async (
     context: HighlightContext,
     navigateToNewChat: () => void,
-    promptApp?: PromptApp,
+    promptApp?: Prompt,
   ) => {
     console.log('Received context inside handleIncomingContext: ', context)
     console.log('Got attachment count: ', context.attachments?.length)
@@ -313,11 +315,11 @@ export const useSubmitQuery = () => {
       }
 
       const accessToken = await getAccessToken()
-      await fetchResponse(formData, accessToken)
+      await fetchResponse(formData, accessToken, !!promptApp)
     }
   }
 
-  const handleSubmit = async (promptApp?: PromptApp) => {
+  const handleSubmit = async (promptApp?: Prompt) => {
     const query = input.trim()
 
     if (!query) {
@@ -328,18 +330,21 @@ export const useSubmitQuery = () => {
     if (query) {
       const formData = new FormData()
       formData.append('prompt', query)
-      if (promptApp) {
-        formData.append('app_id', promptApp.id.toString())
-      }
 
-      // Add about_me to form data
-      if (aboutMe) {
-        formData.append('about_me', JSON.stringify(aboutMe))
+      const isPromptApp = !!promptApp
+      if (isPromptApp) {
+        formData.append('app_id', promptApp!.id.toString())
       }
 
       // Fetch windows information
       const windows = await fetchWindows()
       formData.append('windows', JSON.stringify(windows))
+      // formData.append("llm_provider", "openai")
+
+      // Add about_me to form data
+      if (aboutMe) {
+        formData.append('about_me', JSON.stringify(aboutMe))
+      }
 
       const { screenshot, audio, fileTitle, clipboardText, ocrText } = await addAttachmentsToFormData(
         formData,
@@ -360,7 +365,7 @@ export const useSubmitQuery = () => {
       clearAttachments() // Clear the attachment immediately
 
       const accessToken = await getAccessToken()
-      await fetchResponse(formData, accessToken)
+      await fetchResponse(formData, accessToken, isPromptApp)
     }
   }
 

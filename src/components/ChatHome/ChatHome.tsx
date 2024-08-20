@@ -12,6 +12,7 @@ import Highlight from '@highlight-ai/app-runtime'
 import Hotkey from '@/components/Hotkey/Hotkey'
 import ExpandableVideo from '@/components/ExpandableVideo/ExpandableVideo'
 import { useShallow } from 'zustand/react/shallow'
+import { Prompt } from '@/types/supabase-helpers'
 
 const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
   const openModal = useStore((state) => state.openModal)
@@ -137,8 +138,10 @@ const Prompts = () => {
 
   return (
     <div className={styles.prompts}>
-      {myPrompts.map((prompt: any) => {
-        return <PromptListRow key={prompt.slug} prompt={prompt} type={'self'} onClick={() => selectPrompt(prompt)} />
+      {myPrompts.map((prompt: Prompt) => {
+        return (
+          <PromptListRow key={prompt.external_id} prompt={prompt} type={'self'} onClick={() => selectPrompt(prompt)} />
+        )
       })}
 
       <PromptListRow

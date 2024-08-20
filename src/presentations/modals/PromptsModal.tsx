@@ -1,4 +1,5 @@
-import { ModalObjectProps, PromptApp } from '@/types'
+import { ModalObjectProps } from '@/types'
+import { Prompt } from '@/types/supabase-helpers'
 import Modal from '@/components/modals/Modal'
 import { useStore } from '@/providers/store-provider'
 import React, { useMemo } from 'react'
@@ -29,7 +30,7 @@ const PromptsModal = ({ id, context }: ModalObjectProps) => {
     return prompts.find((prompt) => prompt.id === context?.prompt?.id) ?? context?.prompt
   }, [context, prompts])
 
-  const onSelectPrompt = async (prompt: PromptApp) => {
+  const onSelectPrompt = async (prompt: Prompt) => {
     await selectPrompt(prompt)
     closeModal(id)
   }
@@ -66,7 +67,7 @@ const PromptsModal = ({ id, context }: ModalObjectProps) => {
           {myPrompts.map((prompt) => {
             return (
               <PromptListRow
-                key={prompt.slug}
+                key={prompt.external_id}
                 prompt={prompt}
                 type={'self'}
                 onClick={() => onSelectPrompt(prompt)}
@@ -83,10 +84,10 @@ const PromptsModal = ({ id, context }: ModalObjectProps) => {
           />
           <Divider style={{ margin: '8px 0 16px 0' }} />
           <h1>Made by the Community</h1>
-          {communityPrompts.map((prompt: PromptApp) => {
+          {communityPrompts.map((prompt: Prompt) => {
             return (
               <PromptListRow
-                key={prompt.slug}
+                key={prompt.external_id}
                 type={'community'}
                 prompt={prompt}
                 onClick={() => onSelectPrompt(prompt)}
