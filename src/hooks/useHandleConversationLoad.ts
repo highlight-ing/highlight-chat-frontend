@@ -6,9 +6,7 @@ import { useApi } from '@/hooks/useApi'
 export default function useHandleConversationLoad() {
   const { get } = useApi()
   const conversationId = useStore((state) => state.conversationId)
-  const setMessages = useStore((state) => state.setMessages)
-  const openConversationMessages = useStore((state) => state.openConversationMessages)
-  const setOpenConversationMessages = useStore((state) => state.updateOpenConversationMessages)
+  const setOpenConversationMessages = useStore((state) => state.updateConversationMessages)
   const setConversationLoading = useStore((state) => state.setConversationLoading)
 
   useEffect(() => {
@@ -26,12 +24,6 @@ export default function useHandleConversationLoad() {
         return
       }
       try {
-        if (openConversationMessages[conversationId]?.length) {
-          setMessages(openConversationMessages[conversationId])
-        } else {
-          setMessages([])
-        }
-
         setConversationLoading(true)
         const response = await get(`history/${conversationId}/messages`, {
           signal: abortController.signal,
@@ -66,7 +58,6 @@ export default function useHandleConversationLoad() {
             return baseMessage as AssistantMessage
           }
         })
-        setMessages(mappedMessages)
         setOpenConversationMessages(conversationId, mappedMessages)
       } catch (err) {
         console.error(err)

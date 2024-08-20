@@ -9,7 +9,7 @@ import { ChatHistoryItem } from '@/types'
 import ContextMenu from '@/components/ContextMenu/ContextMenu'
 import { BaseMessage, UserMessage, AssistantMessage } from '@/types'
 import Button from '@/components/Button/Button'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import CircleButton from '@/components/CircleButton/CircleButton'
 
@@ -52,7 +52,9 @@ function sortArrayByDate(inputArray: ChatHistoryItem[]) {
 }
 
 const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: HistoryProps) => {
-  const { history } = useChatHistory()
+  const initialFetchDone = useRef(false)
+  const conversationId = useStore((state) => state.conversationId)
+  const { history, refreshChatHistory, refreshChatItem } = useChatHistory()
 
   const { today, lastWeek, lastMonth, older } = useMemo(() => {
     return sortArrayByDate(history)
@@ -61,6 +63,34 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
   const onOpenChat = () => {
     setShowHistory(false)
   }
+
+  useEffect(() => {
+    if (!initialFetchDone.current) {
+      // Initial fetch
+      console.log('Fetching chat history')
+      refreshChatHistory()
+      initialFetchDone.current = true
+    } else if (conversationId && !history.some((chat) => chat.id === conversationId)) {
+      const fetchAndSafeRetry = async (retries: number) => {
+        // New conversation found after initial fetch
+        console.log('Fetching new conversation and adding it to history')
+        const newConversation = await refreshChatItem(conversationId)
+        if (newConversation) {
+          console.log('Added conversation to history')
+          return
+        }
+        if (retries > 0) {
+          console.log('Failed to fetch new conversation, retrying in 1s')
+          setTimeout(() => {
+            fetchAndSafeRetry(--retries)
+          }, 1000)
+        } else {
+          console.error('Repeatedly failed to fetch new conversation, giving up')
+        }
+      }
+      fetchAndSafeRetry(5)
+    }
+  }, [history, conversationId])
 
   return (
     <div className={`${styles.history} ${showHistory ? styles.show : styles.hide}`}>
@@ -118,8 +148,14 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
 
 export default History
 
+// Title retry logic
+const MAX_RETRIES = 3
+const RETRY_INTERVAL = 10000
+
 const HistoryItem = ({ chat, onOpenChat }: { chat: ChatHistoryItem; onOpenChat?: () => void }) => {
-  const { get } = useApi()
+  const fetchRetryRef = useRef<NodeJS.Timeout>()
+  const [fetchRetryCount, setFetchRetryCount] = useState(0)
+  const { refreshChatItem } = useChatHistory()
   const { addOrUpdateOpenConversation, openModal, setConversationId } = useStore(
     useShallow((state) => ({
       setConversationId: state.setConversationId,
@@ -140,6 +176,24 @@ const HistoryItem = ({ chat, onOpenChat }: { chat: ChatHistoryItem; onOpenChat?:
   const onDeleteChat = async (chat: ChatHistoryItem) => {
     openModal('delete-chat', chat)
   }
+
+  useEffect(() => {
+    if (chat.title === 'New Conversation' && fetchRetryCount < MAX_RETRIES && !fetchRetryRef.current) {
+      console.log(`Fetching updated conversation, ${MAX_RETRIES - fetchRetryCount} tries remaining`)
+
+      // Retry until title is assigned
+      fetchRetryRef.current = setTimeout(async () => {
+        const updatedConversation = await refreshChatItem(chat.id)
+        if (updatedConversation && updatedConversation.title !== 'New Conversation') {
+          setFetchRetryCount(0)
+          console.log('Updated conversation:', updatedConversation.title)
+        } else {
+          setFetchRetryCount(fetchRetryCount + 1)
+        }
+        fetchRetryRef.current = undefined
+      }, RETRY_INTERVAL)
+    }
+  }, [chat, fetchRetryCount])
 
   return (
     <ContextMenu

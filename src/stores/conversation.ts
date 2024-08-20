@@ -49,7 +49,6 @@ export const createConversationSlice: StateCreator<Store, [], [], ConversationSl
   },
   startNewConversation: () => {
     get().resetConversationId()
-    get().clearMessages()
     get().clearInput()
     get().clearAttachments()
   },
@@ -69,7 +68,7 @@ export const createConversationSlice: StateCreator<Store, [], [], ConversationSl
   },
   removeOpenConversation: (conversationId: string) => {
     const conversations = get().openConversations
-    get().clearOpenConversationMessages(conversationId)
+    get().clearConversationMessages(conversationId)
     set({
       openConversations: conversations.filter((c) => c.id !== conversationId),
     })

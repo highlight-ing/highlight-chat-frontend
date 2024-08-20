@@ -23,8 +23,8 @@
   bottom: 16px;
   animation: fadeIn 400ms forwards;
 
-  &.sticky {
-    position: absolute;
+  &.active {
+    margin-bottom: 20px;
     max-width: $chat-body-width;
 
     .attachmentsButtonContainer {

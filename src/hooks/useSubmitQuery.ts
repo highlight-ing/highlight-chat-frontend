@@ -122,9 +122,9 @@ export const useSubmitQuery = () => {
     input,
     setInput,
     setIsDisabled,
-    addMessage,
-    updateLastMessage,
     aboutMe,
+    addConversationMessage,
+    updateLastConversationMessage,
   } = useStore(
     useShallow((state) => ({
       getOrCreateConversationId: state.getOrCreateConversationId,
@@ -133,9 +133,9 @@ export const useSubmitQuery = () => {
       input: state.input,
       setInput: state.setInput,
       setIsDisabled: state.setInputIsDisabled,
-      addMessage: state.addMessage,
-      updateLastMessage: state.updateLastMessage,
       aboutMe: state.aboutMe,
+      addConversationMessage: state.addConversationMessage,
+      updateLastConversationMessage: state.updateLastConversationMessage,
     })),
   )
 
@@ -144,11 +144,10 @@ export const useSubmitQuery = () => {
   const conversationId = useStore((state) => state.conversationId)
   const conversationIdRef = useRef(conversationId)
 
-  const fetchResponse = async (formData: FormData, token: string, isPromptApp: boolean) => {
+  const fetchResponse = async (conversationId: string, formData: FormData, isPromptApp: boolean) => {
     setIsDisabled(true)
 
     try {
-      const conversationId = getOrCreateConversationId()
       formData.append('conversation_id', conversationId)
 
       const abortController = new AbortController()
@@ -174,7 +173,7 @@ export const useSubmitQuery = () => {
       checkAbortSignal()
 
       let accumulatedResponse = ''
-      addMessage({ role: 'assistant', content: '' })
+      addConversationMessage(conversationId!, { role: 'assistant', content: '' })
 
       while (!abortController.signal.aborted) {
         const { done, value } = await reader.read()
@@ -192,13 +191,13 @@ export const useSubmitQuery = () => {
 
             if (jsonChunk.type === 'text' && jsonChunk.content) {
               accumulatedResponse += jsonChunk.content
-              updateLastMessage({
+              updateLastConversationMessage(conversationId, {
                 role: 'assistant',
                 content: accumulatedResponse,
               })
             } else if (jsonChunk.type === 'error') {
               console.error('Error from backend:', jsonChunk.content)
-              updateLastMessage({
+              updateLastConversationMessage(conversationId, {
                 role: 'assistant',
                 content: 'Sorry, an error occurred: ' + jsonChunk.content,
               })
@@ -206,7 +205,7 @@ export const useSubmitQuery = () => {
           } catch (parseError) {
             console.error('Error parsing JSON:', parseError)
             accumulatedResponse += jsonStr
-            updateLastMessage({
+            updateLastConversationMessage(conversationId!, {
               role: 'assistant',
               content: accumulatedResponse,
             })
@@ -220,7 +219,7 @@ export const useSubmitQuery = () => {
       } else {
         // @ts-ignore
         console.error('Error fetching response:', error.stack ?? error.message)
-        addMessage({
+        addConversationMessage(conversationId!, {
           role: 'assistant',
           content: 'Sorry, there was an error processing your request.',
         })
@@ -280,7 +279,8 @@ export const useSubmitQuery = () => {
       const att = context.attachments || ([] as unknown)
       const fileAttachments = (att as FileAttachment[]).filter((a) => a.type && fileAttachmentTypes.includes(a.type))
 
-      addMessage({
+      const conversationId = getOrCreateConversationId()
+      addConversationMessage(conversationId!, {
         role: 'user',
         content: query,
         clipboard_text: clipboardText,
@@ -314,8 +314,7 @@ export const useSubmitQuery = () => {
         formData.append('ocr_text', contentToUse)
       }
 
-      const accessToken = await getAccessToken()
-      await fetchResponse(formData, accessToken, !!promptApp)
+      await fetchResponse(conversationId, formData, !!promptApp)
     }
   }
 
@@ -351,7 +350,8 @@ export const useSubmitQuery = () => {
         attachments,
       )
 
-      addMessage({
+      const conversationId = getOrCreateConversationId()
+      addConversationMessage(conversationId!, {
         role: 'user',
         content: query,
         screenshot,
@@ -364,8 +364,7 @@ export const useSubmitQuery = () => {
       setInput('')
       clearAttachments() // Clear the attachment immediately
 
-      const accessToken = await getAccessToken()
-      await fetchResponse(formData, accessToken, isPromptApp)
+      await fetchResponse(conversationId, formData, isPromptApp)
     }
   }
 
@@ -373,10 +372,10 @@ export const useSubmitQuery = () => {
     // console.log('conversationIdRef:', conversationIdRef.current)
     // console.log('conversationId', conversationId)
     // console.log('abortControllerRef', typeof abortControllerRef.current)
-    if (conversationIdRef.current && conversationIdRef.current !== conversationId && abortControllerRef.current) {
-      console.log("Aborting previous chat's message stream")
-      abortControllerRef.current.abort('Aborted, conversation ID changed, stop streaming messages')
-    }
+    // if (conversationIdRef.current && conversationIdRef.current !== conversationId && abortControllerRef.current) {
+    //   console.log("Aborting previous chat's message stream")
+    //   abortControllerRef.current.abort('Aborted, conversation ID changed, stop streaming messages')
+    // }
     conversationIdRef.current = conversationId
   }, [conversationId])
 
