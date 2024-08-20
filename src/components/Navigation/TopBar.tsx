@@ -15,7 +15,7 @@ import variables from '@/variables.module.scss'
 import { useOpenConverationsPersistence } from '@/hooks/useOpenConverationsPersistence'
 import { useState } from 'react'
 import ShareModal from '@/components/ShareModal/ShareModal'
-import { createShareLink } from '@/services/shareLink'
+import { useShareConversation } from '@/hooks/useShareConversation'
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const router = useRouter()
@@ -53,6 +53,8 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
 
   const [selectedConversation, setSelectedConversation] = useState<ChatHistoryItem | null>(null)
 
+  const { getShareLink, isLoading, error } = useShareConversation()
+
   const onNewChatClick = () => {
     startNewConversation()
     clearPrompt()
@@ -89,11 +91,14 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
 
   const onCopyLink = async () => {
     try {
-      const shareLink = await createShareLink()
-      navigator.clipboard.writeText(shareLink)
+      if (!selectedConversation) {
+        console.error('No conversation selected')
+        return
+      }
+      const shareLink = await getShareLink(selectedConversation.id)
+      await navigator.clipboard.writeText(shareLink)
       setIsShareModalVisible(false)
     } catch (error) {
-      // Handle error (e.g., show error message)
       console.error('Failed to copy link:', error)
     }
   }
@@ -103,7 +108,6 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
       // await disableShareLink(); // Implement this function
       setIsShareModalVisible(false)
     } catch (error) {
-      // Handle error (e.g., show error message)
       console.error('Failed to disable link:', error)
     }
   }

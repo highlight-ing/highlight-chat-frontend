@@ -43,8 +43,8 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
             {conversation ? (
               <div className={styles.previewBox}>
                 <p className="text-sm font-light text-light-60">
-                  This is where quoted messages or highlighted text from a chat is placed as a way to make sharing more
-                  useful.
+                  {`This is where quoted messages or highlighted text from a chat is placed as a way to make sharing more
+                  useful.`}
                 </p>
                 <div className={`${styles.separator} my-2`}></div>
                 <div className="flex items-center gap-3">
