@@ -86,7 +86,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const onCopyLink = async () => {
     try {
       // await copyLinkToClipboard(); // Implement this function
-      setShowShareModal(false)
+      setIsShareModalVisible(false)
     } catch (error) {
       // Handle error (e.g., show error message)
       console.error('Failed to copy link:', error)
@@ -96,25 +96,24 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const onDisableLink = async () => {
     try {
       // await disableShareLink(); // Implement this function
-      setShowShareModal(false)
+      setIsShareModalVisible(false)
     } catch (error) {
       // Handle error (e.g., show error message)
       console.error('Failed to disable link:', error)
     }
   }
 
-  useOpenConverationsPersistence()
-
-  const [showShareModal, setShowShareModal] = useState(false)
-  const [isShareModalVisible, setIsShareModalVisible] = useState(false)
-
-  const toggleShareModal = () => {
+  const onToggleShareModal = () => {
     setIsShareModalVisible(!isShareModalVisible)
   }
 
-  const closeShareModal = () => {
+  const onCloseShareModal = () => {
     setIsShareModalVisible(false)
   }
+
+  const [isShareModalVisible, setIsShareModalVisible] = useState(false)
+
+  useOpenConverationsPersistence()
 
   return (
     <div className={styles.topBar}>
@@ -187,7 +186,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
 
         <div className="flex items-center gap-1">
           <div className={styles.tabContainer}>
-            <div className={`${styles.tab} cursor-pointer`} onClick={toggleShareModal}>
+            <div className={`${styles.tab} cursor-pointer`} onClick={onToggleShareModal}>
               <span className="flex max-w-full items-center gap-2 overflow-hidden overflow-ellipsis whitespace-nowrap">
                 <span>Share</span>
                 <ExportCurve size={20} variant={'Linear'} />
@@ -199,7 +198,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
 
       <ShareModal
         isVisible={isShareModalVisible}
-        onClose={closeShareModal}
+        onClose={onCloseShareModal}
         onCopyLink={onCopyLink}
         onDisableLink={onDisableLink}
       />
