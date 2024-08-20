@@ -28,7 +28,6 @@ async function validateUserAuth(authToken: string) {
 
 const SavePromptSchema = z.object({
   externalId: z.string().optional().nullable(),
-  slug: z.string(),
   name: z.string(),
   description: z.string(),
   appPrompt: z.string(),
