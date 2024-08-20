@@ -5,6 +5,8 @@ import { PROMPTS_TABLE_SELECT_FIELDS, supabaseAdmin } from '@/lib/supabase'
  * API route that returns all prompts for the calling user (based on the authorization token)
  */
 export async function GET(request: Request) {
+  const supabase = supabaseAdmin()
+
   const token = extractBearerToken(request.headers)
 
   if (!token) {
@@ -27,7 +29,7 @@ export async function GET(request: Request) {
   }
 
   // Select all prompts that the user has added
-  const { data: selectResult, error } = await supabaseAdmin
+  const { data: selectResult, error } = await supabase
     .from('added_prompts')
     .select(`prompts(${PROMPTS_TABLE_SELECT_FIELDS})`)
     .eq('user_id', userId)
@@ -41,7 +43,7 @@ export async function GET(request: Request) {
     .map((prompt) => prompt.prompts)
 
   // Select all prompts that the user owns
-  const { data: ownedPrompts, error: ownedPromptsError } = await supabaseAdmin
+  const { data: ownedPrompts, error: ownedPromptsError } = await supabase
     .from('prompts')
     .select(`${PROMPTS_TABLE_SELECT_FIELDS}`)
     .eq('user_id', userId)
