@@ -51,6 +51,8 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
     })),
   )
 
+  const [selectedConversation, setSelectedConversation] = useState<ChatHistoryItem | null>(null)
+
   const onNewChatClick = () => {
     startNewConversation()
     clearPrompt()
@@ -66,6 +68,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
 
   const onSelectChat = async (chat: ChatHistoryItem) => {
     setConversationId(chat.id)
+    setSelectedConversation(chat)
   }
 
   const onDragTabEnd = (result: any) => {
@@ -187,19 +190,22 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
         </div>
 
         <div className="flex items-center gap-1">
-          <div className={styles.tabContainer}>
-            <div className={`${styles.tab} cursor-pointer`} onClick={onToggleShareModal}>
-              <span className="flex max-w-full items-center gap-2 overflow-hidden overflow-ellipsis whitespace-nowrap">
-                <span>Share</span>
-                <ExportCurve size={20} variant={'Linear'} />
-              </span>
+          {selectedConversation && (
+            <div className={styles.tabContainer}>
+              <div className={`${styles.tab} cursor-pointer`} onClick={onToggleShareModal}>
+                <span className="flex max-w-full items-center gap-2 overflow-hidden overflow-ellipsis whitespace-nowrap">
+                  <span>Share</span>
+                  <ExportCurve size={20} variant={'Linear'} />
+                </span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
       <ShareModal
         isVisible={isShareModalVisible}
+        conversation={selectedConversation}
         onClose={onCloseShareModal}
         onCopyLink={onCopyLink}
         onDisableLink={onDisableLink}
