@@ -12,11 +12,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  //padding-bottom: 64px;
   flex: 1;
   position: relative;
   overflow-y: auto;
-  //top: $topbar-height;
   margin-top: $topbar-height;
   height: calc(100% - $topbar-height);
 

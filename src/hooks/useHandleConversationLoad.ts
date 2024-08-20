@@ -6,7 +6,8 @@ import { useApi } from '@/hooks/useApi'
 export default function useHandleConversationLoad() {
   const { get } = useApi()
   const conversationId = useStore((state) => state.conversationId)
-  const setOpenConversationMessages = useStore((state) => state.updateConversationMessages)
+  const conversationMessages = useStore((state) => state.conversationMessages)
+  const updateConversationMessages = useStore((state) => state.updateConversationMessages)
   const setConversationLoading = useStore((state) => state.setConversationLoading)
 
   useEffect(() => {
@@ -58,7 +59,15 @@ export default function useHandleConversationLoad() {
             return baseMessage as AssistantMessage
           }
         })
-        setOpenConversationMessages(conversationId, mappedMessages)
+
+        const lastExistingMessage =
+          conversationMessages[conversationId]?.[conversationMessages[conversationId]?.length - 1]
+        const lastNewMessage = mappedMessages[mappedMessages.length - 1]
+        if (lastExistingMessage?.role === 'assistant' && lastNewMessage?.role === 'user') {
+          updateConversationMessages(conversationId, [...mappedMessages, lastExistingMessage])
+        } else {
+          updateConversationMessages(conversationId, mappedMessages)
+        }
       } catch (err) {
         console.error(err)
       } finally {

@@ -34,6 +34,12 @@ export const createMessagesSlice: StateCreator<MessagesSlice> = (set, get) => ({
     if (!openConversationMessages[conversationId]?.length) {
       return
     }
+    const lastMessageIndex = openConversationMessages[conversationId].findLastIndex((msg) => msg.role === message.role)
+    if (lastMessageIndex === -1) {
+      get().addConversationMessage(conversationId, message)
+    } else {
+      openConversationMessages
+    }
     openConversationMessages[conversationId] = [...openConversationMessages[conversationId].slice(0, -1), message]
     set({ conversationMessages: openConversationMessages })
   },
