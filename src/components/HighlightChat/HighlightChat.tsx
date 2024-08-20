@@ -3,7 +3,6 @@
 import * as React from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { Input } from '@/components/Input/Input'
-
 import styles from '@/main.module.scss'
 import TopBar from '@/components/Navigation/TopBar'
 import Messages from '@/components/Messages/Messages'
@@ -12,6 +11,7 @@ import { useStore } from '@/providers/store-provider'
 import ChatHome from '@/components/ChatHome/ChatHome'
 import ChatHeader from '@/components/ChatHeader/ChatHeader'
 import { useShallow } from 'zustand/react/shallow'
+import { trackEvent } from '@/utils/amplitude'
 
 /**
  * Hook that handles pasting from the clipboard.
@@ -31,6 +31,7 @@ function useHandleClipboardPaste() {
         if (item.kind === 'file') {
           const file = item.getAsFile()
           if (file) {
+            let pasteType = 'unsupported'
             if (file.type.startsWith('image/')) {
               console.log('Pasted image')
               console.log('Image data URL:', URL.createObjectURL(file))
@@ -39,14 +40,20 @@ function useHandleClipboardPaste() {
                 value: URL.createObjectURL(file),
                 file: file,
               })
+              pasteType = 'image'
             } else if (file.type === 'application/pdf') {
               console.log('Pasted PDF')
+
               addAttachment({
                 type: 'pdf',
                 value: file,
               })
+              pasteType = 'pdf'
             }
+            trackEvent('HL Chat Paste', { type: pasteType, fileType: file.type })
           }
+        } else if (item.kind === 'string') {
+          trackEvent('HL Chat Paste', { type: 'text' })
         }
       }
     }

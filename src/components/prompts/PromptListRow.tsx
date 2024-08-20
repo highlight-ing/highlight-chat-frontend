@@ -5,6 +5,7 @@ import { Prompt } from '@/types/supabase-helpers'
 import CircleButton from '@/components/CircleButton/CircleButton'
 import Tooltip from '@/components/Tooltip'
 import PromptAppIcon from '../PromptAppIcon/PromptAppIcon'
+import { trackEvent } from '@/utils/amplitude'
 
 interface PromptListRowProps {
   prompt: Prompt
@@ -14,9 +15,21 @@ interface PromptListRowProps {
   onClickEdit?: (e: React.MouseEvent) => void
   isCta?: boolean
 }
+
 const PromptListRow = ({ prompt, icon, type, isCta, onClick, onClickEdit }: PromptListRowProps) => {
+  const handleClick = (e: React.MouseEvent) => {
+    onClick(e)
+  }
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (onClickEdit) {
+      onClickEdit(e)
+    }
+  }
+
   return (
-    <div key={prompt.slug} className={`${styles.promptOption} ${styles[type]}`} onClick={onClick}>
+    <div key={prompt.slug} className={`${styles.promptOption} ${styles[type]}`} onClick={handleClick}>
       <div>
         {prompt.image ? (
           <PromptAppIcon

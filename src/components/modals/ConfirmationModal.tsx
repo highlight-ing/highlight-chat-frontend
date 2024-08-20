@@ -2,6 +2,7 @@ import styles from '@/presentations/modals/modals.module.scss'
 import Button, { ButtonVariantType } from '@/components/Button/Button'
 import Modal from '@/components/modals/Modal'
 import React, { type PropsWithChildren, type ReactElement } from 'react'
+import { trackEvent } from '@/utils/amplitude'
 
 interface ConfirmationModalProps {
   header?: string
@@ -34,12 +35,22 @@ const ConfirmationModal = ({
           <Button
             size={'medium'}
             variant={secondaryAction.variant ?? 'ghost-neutral'}
-            onClick={secondaryAction.onClick}
+            onClick={(e) => {
+              secondaryAction.onClick(e)
+              trackEvent('HL Chat Confirmation Modal Action', { modalId: id, action: 'secondary' })
+            }}
           >
             {secondaryAction.label}
           </Button>
         )}
-        <Button size={'medium'} variant={primaryAction.variant ?? 'danger'} onClick={primaryAction.onClick}>
+        <Button
+          size={'medium'}
+          variant={primaryAction.variant ?? 'danger'}
+          onClick={(e) => {
+            primaryAction.onClick(e)
+            trackEvent('HL Chat Confirmation Modal Action', { modalId: id, action: 'primary' })
+          }}
+        >
           {primaryAction.label}
         </Button>
       </div>

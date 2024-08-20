@@ -3,6 +3,35 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      added_prompts: {
+        Row: {
+          created_at: string
+          id: number
+          prompt_id: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          prompt_id: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          prompt_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'added_prompts_prompt_id_fkey'
+            columns: ['prompt_id']
+            isOneToOne: false
+            referencedRelation: 'prompts'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       conversation: {
         Row: {
           app_id: string | null
@@ -152,11 +181,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "prompts_image_fkey"
-            columns: ["image"]
+            foreignKeyName: 'prompts_image_fkey'
+            columns: ['image']
             isOneToOne: false
-            referencedRelation: "user_images"
-            referencedColumns: ["external_id"]
+            referencedRelation: 'user_images'
+            referencedColumns: ['external_id']
           },
         ]
       }

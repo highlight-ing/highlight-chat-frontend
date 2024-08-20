@@ -9,27 +9,29 @@ interface ExampleVideoProps {
   description?: string | ReactElement
   icon?: ReactElement | string
   style?: CSSProperties
+  onPlay?: () => void
 }
 const ExpandableVideo = (props: ExampleVideoProps) => {
-  const { src, description, icon, style } = props
+  const { src, description, icon, style, onPlay } = props
   const videoRef = useRef<HTMLVideoElement>(null)
   const [paused, setPaused] = useState(true)
   const [large, setLarge] = useState(false)
 
   useEffect(() => {
-    const onPlay = () => {
+    const onPlayHandler = () => {
       setPaused(false)
+      onPlay?.()
     }
     const onPause = () => {
       setPaused(true)
     }
-    videoRef.current?.addEventListener('play', onPlay)
+    videoRef.current?.addEventListener('play', onPlayHandler)
     videoRef.current?.addEventListener('pause', onPause)
     return () => {
-      videoRef.current?.removeEventListener('play', onPlay)
+      videoRef.current?.removeEventListener('play', onPlayHandler)
       videoRef.current?.removeEventListener('pause', onPause)
     }
-  }, [])
+  }, [onPlay])
 
   useEffect(() => {
     if (!large && !videoRef.current?.paused) {

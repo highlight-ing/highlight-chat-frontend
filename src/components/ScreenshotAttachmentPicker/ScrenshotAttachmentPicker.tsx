@@ -5,6 +5,7 @@ import Highlight from '@highlight-ai/app-runtime'
 import styles from './screenshot-attachment-picker.module.scss'
 import { useEffect, useRef, useState } from 'react'
 import { CloseIcon } from '@/icons/icons'
+import { trackEvent } from '@/utils/amplitude'
 
 interface ScreenshotAttachmentPickerProps {
   isVisible: boolean
@@ -21,6 +22,12 @@ export const ScreenshotAttachmentPicker = ({ isVisible, onClose }: ScreenshotAtt
   const innerContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    if (isVisible) {
+      trackEvent('HL Chat Screenshot Picker Opened', {})
+    }
+  }, [isVisible])
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         outerContainerRef.current &&
@@ -28,7 +35,7 @@ export const ScreenshotAttachmentPicker = ({ isVisible, onClose }: ScreenshotAtt
         !innerContainerRef.current.contains(event.target as Node) &&
         outerContainerRef.current.contains(event.target as Node)
       ) {
-        onClose()
+        handleClose()
       }
     }
 
@@ -38,12 +45,18 @@ export const ScreenshotAttachmentPicker = ({ isVisible, onClose }: ScreenshotAtt
     }
   }, [onClose])
 
-  const onAddScreenshot = async (screenshot: string) => {
+  const handleClose = () => {
+    trackEvent('HL Chat Screenshot Picker Closed', {})
+    onClose()
+  }
+
+  const onAddScreenshot = async (screenshot: string, source: 'display' | 'window') => {
     if (screenshot.length > 0) {
       addAttachment({
         type: 'image',
         value: screenshot,
       })
+      trackEvent('HL Chat Screenshot Attached', { source })
     }
   }
 
@@ -51,14 +64,14 @@ export const ScreenshotAttachmentPicker = ({ isVisible, onClose }: ScreenshotAtt
     const screenshot = await Highlight.user.getWindowScreenshot(windowTitle)
 
     if (screenshot.length > 0) {
-      onAddScreenshot(screenshot)
+      onAddScreenshot(screenshot, 'window')
     }
-    onClose()
+    handleClose()
   }
 
   const onClickDisplay = (thumbnail: string) => {
-    onAddScreenshot(thumbnail)
-    onClose()
+    onAddScreenshot(thumbnail, 'display')
+    handleClose()
   }
 
   useEffect(() => {
@@ -84,7 +97,7 @@ export const ScreenshotAttachmentPicker = ({ isVisible, onClose }: ScreenshotAtt
         createPortal(
           <div ref={outerContainerRef} className={styles.outerContainer}>
             <div ref={innerContainerRef} className={styles.innerContainer}>
-              <div className={styles.closeButton} onClick={onClose}>
+              <div className={styles.closeButton} onClick={handleClose}>
                 <CloseIcon size={16} />
               </div>
               <div className={styles.displays}>

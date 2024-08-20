@@ -13,6 +13,7 @@ import { useStore } from '@/providers/store-provider'
 import { getDurationUnit } from '@/utils/string'
 import { ScreenshotAttachmentPicker } from '../ScreenshotAttachmentPicker/ScrenshotAttachmentPicker'
 import { useShallow } from 'zustand/react/shallow'
+import { trackEvent } from '@/utils/amplitude'
 
 interface AudioDurationProps {
   duration: number
@@ -47,11 +48,13 @@ export const AttachmentsButton = () => {
 
   const handleAttachmentClick = () => {
     fileInputRef?.current?.click()
+    trackEvent('HL Chat Attachments Button Clicked', {})
   }
 
   const onAddAudio = async (durationInMinutes: number) => {
     const audio = await Highlight.user.getAudioForDuration(durationInMinutes * 60)
     addAttachment({ type: 'audio', value: audio, duration: durationInMinutes })
+    trackEvent('HL Chat Attachment Added', { type: 'audio', durationInMinutes })
   }
 
   const textBasedTypes = [
@@ -71,11 +74,13 @@ export const AttachmentsButton = () => {
           value: URL.createObjectURL(file),
           file: file,
         })
+        trackEvent('HL Chat Attachment Added', { type: 'image', fileType: file.type })
       } else if (file.type === 'application/pdf') {
         addAttachment({
           type: 'pdf',
           value: file,
         })
+        trackEvent('HL Chat Attachment Added', { type: 'pdf' })
       } else if (
         file.type === 'text/csv' ||
         file.type === 'application/vnd.ms-excel' ||
@@ -85,6 +90,7 @@ export const AttachmentsButton = () => {
           type: 'spreadsheet',
           value: file,
         })
+        trackEvent('HL Chat Attachment Added', { type: 'spreadsheet', fileType: file.type })
       } else if (
         file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
         file.type === 'application/msword'
@@ -96,6 +102,7 @@ export const AttachmentsButton = () => {
           value: result.value,
           fileName: file.name,
         })
+        trackEvent('HL Chat Attachment Added', { type: 'text_file', fileType: file.type })
       } else if (textBasedTypes.includes(file.type) || file.type.includes('text/')) {
         const value = await readTextFile(file)
         addAttachment({
@@ -103,6 +110,7 @@ export const AttachmentsButton = () => {
           value,
           fileName: file.name,
         })
+        trackEvent('HL Chat Attachment Added', { type: 'text_file', fileType: file.type })
       } else if (file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
         const value = await extractTextFromPowerPoint(file)
         addAttachment({
@@ -110,6 +118,7 @@ export const AttachmentsButton = () => {
           value,
           fileName: file.name,
         })
+        trackEvent('HL Chat Attachment Added', { type: 'power_point', fileType: file.type })
       }
     }
   }
@@ -153,21 +162,24 @@ export const AttachmentsButton = () => {
   }
 
   const onClickScreenshot = async () => {
-    const hasClipboardReadPermissions = await Highlight.permissions.requestScreenshotPermission()
+    const hasScreenshotPermission = await Highlight.permissions.requestScreenshotPermission()
 
-    if (!hasClipboardReadPermissions) {
+    if (!hasScreenshotPermission) {
       console.log('Screenshot permission denied')
+      trackEvent('HL Chat Permission Denied', { type: 'screenshot' })
       return
     }
 
     setScreenshotPickerVisible(true)
+    trackEvent('HL Chat Screenshot Picker Opened', {})
   }
 
   const onAddClipboard = async () => {
-    const hasClipboardReadPermissions = await Highlight.permissions.requestClipboardReadPermission()
+    const hasClipboardReadPermission = await Highlight.permissions.requestClipboardReadPermission()
 
-    if (!hasClipboardReadPermissions) {
+    if (!hasClipboardReadPermission) {
       console.log('Clipboard read permission denied')
+      trackEvent('HL Chat Permission Denied', { type: 'clipboard' })
       return
     }
 
@@ -179,11 +191,13 @@ export const AttachmentsButton = () => {
         type: 'image',
         value: clipboard.value,
       })
+      trackEvent('HL Chat Attachment Added', { type: 'clipboard_image' })
     } else {
       addAttachment({
         type: 'clipboard',
         value: clipboard.value,
       })
+      trackEvent('HL Chat Attachment Added', { type: 'clipboard_text' })
     }
   }
 
@@ -268,7 +282,10 @@ export const AttachmentsButton = () => {
       </ContextMenu>
       <ScreenshotAttachmentPicker
         isVisible={screenshotPickerVisible}
-        onClose={() => setScreenshotPickerVisible(false)}
+        onClose={() => {
+          setScreenshotPickerVisible(false)
+          trackEvent('HL Chat Screenshot Picker Closed', {})
+        }}
       />
     </>
   )
