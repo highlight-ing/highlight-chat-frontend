@@ -121,21 +121,29 @@ export default History
 
 const HistoryItem = ({ chat }: { chat: ChatHistoryItem }) => {
   const { get } = useApi()
-  const { loadConversation, openModal } = useStore(
+  const { loadConversation, openModal, setIsLoadingMessages, resetConversationId } = useStore(
     useShallow((state) => ({
       loadConversation: state.loadConversation,
       openModal: state.openModal,
+      setIsLoadingMessages: state.setIsLoadingMessages,
+      resetConversationId: state.resetConversationId,
     })),
   )
 
   const onSelectChat = async (chat: ChatHistoryItem) => {
+    resetConversationId() // Reset the conversation ID
+    setIsLoadingMessages(true)
+
     const response = await get(`history/${chat.id}/messages`)
     if (!response.ok) {
       console.error('Failed to select chat')
+
       trackEvent('HL Chat Select Chat Error', {
         chatId: chat.id,
         error: 'Failed to fetch messages',
       })
+
+      setIsLoadingMessages(false)
       return
     }
     const { messages } = await response.json()
@@ -160,11 +168,15 @@ const HistoryItem = ({ chat }: { chat: ChatHistoryItem }) => {
         }
       }),
     )
+
     trackEvent('HL Chat Opened', {
       chatId: chat.id,
       messageCount: messages.length,
       source: 'history_item',
     })
+
+    setIsLoadingMessages(false)
+
   }
 
   const onDeleteChat = async (chat: ChatHistoryItem) => {

@@ -1,15 +1,19 @@
 import React from 'react'
 
-interface SpinnerProps {
-  size?: number
+export interface SpinnerProps {
+  size: 'small' | 'medium' | 'large'
 }
 
-const Spinner = ({ size = 32 }: SpinnerProps) => {
+const Spinner = ({ size = 'medium' }: SpinnerProps) => {
+  const sizeClasses = {
+    small: 'h-4 w-4',
+    medium: 'h-8 w-8',
+    large: 'h-12 w-12',
+  }
+
   return (
     <div className="flex items-center justify-center">
-      <div
-        className={`border-light-60 h-[${size + 'px'}] w-[${size + 'px'}] animate-spin rounded-full border-2 border-t-light`}
-      />
+      <div className={`border-light-60 ${sizeClasses[size]} animate-spin rounded-full border-2 border-t-light`} />
     </div>
   )
 }
