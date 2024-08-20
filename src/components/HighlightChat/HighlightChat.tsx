@@ -68,19 +68,16 @@ function useHandleClipboardPaste() {
 
 const HighlightChat = () => {
   // STATE
-  const { messages, inputIsDisabled, promptName } = useStore(
+  const { messages, inputIsDisabled, promptName, isChatting } = useStore(
     useShallow((state) => ({
       messages: state.messages,
       inputIsDisabled: state.inputIsDisabled,
       promptName: state.promptName,
+      isChatting: state.isChatting,
     })),
   )
 
   const [showHistory, setShowHistory] = useState(false)
-
-  const isChatting = useMemo(() => {
-    return inputIsDisabled || messages.length > 0
-  }, [inputIsDisabled, messages])
 
   // HOOKS
   useHandleClipboardPaste()
