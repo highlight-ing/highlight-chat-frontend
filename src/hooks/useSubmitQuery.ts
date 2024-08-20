@@ -236,6 +236,7 @@ export const useSubmitQuery = () => {
     let clipboardText = context.attachments?.find((a) => a.type === 'clipboard')?.value
     let audio = context.attachments?.find((a) => a.type === 'audio')?.value
     let windowTitle = context.application?.focusedWindow?.title
+    let appIcon = context.application?.appIcon
     let rawContents = context.application?.focusedWindow?.rawContents
 
     // Extract OCR content
@@ -260,7 +261,7 @@ export const useSubmitQuery = () => {
         clipboard_text: clipboardText,
         screenshot: screenshotUrl,
         audio,
-        window: windowTitle ? { title: windowTitle, type: 'window' } : undefined,
+        window: windowTitle ? { title: windowTitle, appIcon: appIcon, type: 'window' } : undefined,
         windows: windows,
         file_attachments: fileAttachments,
       })

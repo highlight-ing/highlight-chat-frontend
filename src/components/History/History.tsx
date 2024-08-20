@@ -176,7 +176,6 @@ const HistoryItem = ({ chat }: { chat: ChatHistoryItem }) => {
     })
 
     setIsLoadingMessages(false)
-
   }
 
   const onDeleteChat = async (chat: ChatHistoryItem) => {

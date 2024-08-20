@@ -65,7 +65,9 @@ export const Message = ({ message, isThinking }: MessageProps) => {
             <div className={`flex gap-2`}>
               {message.screenshot && <Attachment type="image" value={message.screenshot} />}
               {message.audio && <Attachment type="audio" value={message.audio} />}
-              {message.window && message.window?.title && <Attachment type="window" value={message.window.title} />}
+              {message.window && message.window?.title && (
+                <Attachment type="window" value={message.window.title} appIcon={message.window.appIcon} />
+              )}
               {message.clipboard_text && <Attachment type="clipboard" value={message.clipboard_text} />}
               {message.file_title && <Attachment type="pdf" value={message.file_title} />}
               {message.image_url && <Attachment type="image" value={message.image_url} />}
