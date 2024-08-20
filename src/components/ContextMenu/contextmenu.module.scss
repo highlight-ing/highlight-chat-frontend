@@ -1,7 +1,6 @@
 @import '@/variables.module';
 
 .contextMenu {
-  //fixed bg-[#000] rounded-xl border border-light-20 z-10 w-fit h-fit overflow-hidden
   position: fixed;
   border-radius: 12px;
   border: 1px solid $light-20;
