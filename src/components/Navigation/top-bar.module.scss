@@ -8,6 +8,7 @@
   justify-content: space-between;
   padding: 6px;
   background-color: rgba(16, 16, 16, 0.5);
+  border-bottom: 1px solid $dark-40;
   backdrop-filter: blur(16px);
   width: 100%;
   height: $topbar-height;
@@ -59,4 +60,116 @@
       color: $purple-100 !important;
     }
   }
+}
+
+@keyframes tabFadeIn {
+  from {
+    transform: translateX(-15px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes clip-fade {
+  100% {
+    mask-position: right;
+    mask-size: 100% 100%;
+  }
+}
+
+.tabsContainer {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(50px, 200px);
+  width: 100%; /* Ensures the grid takes up full width of its container */
+}
+
+.tabContainer {
+  position: relative;
+
+  &.loading, &:hover {
+    .tab {
+      animation: clip-fade 200ms forwards;
+    }
+    .tabActions {
+      pointer-events: all;
+      opacity: 1;
+      transform: translateX(0);
+
+      > button {
+        opacity: 0.35;
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+    .tabClose {
+      opacity: 1;
+      pointer-events: initial;
+      transform: scale(1);
+    }
+  }
+}
+
+.tab {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 10px 0 8px;
+  height: 24px;
+  gap: 8px;
+  font-weight: 500;
+  font-size: 13px;
+  color: $light-20;
+  cursor: pointer;
+  user-select: none;
+  transition: color 200ms, width 200ms ease-out, mask-image 1000ms ease;
+  width: 100%;
+  flex-shrink: 1;
+  min-width: 0;
+  max-width: max(50px, 20vw);
+  line-height: 1;
+  position: relative;
+  mask-image: linear-gradient(to right, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 90%);
+  mask-size: 125% 100%;
+
+  &.isAnimating {
+    animation: tabFadeIn 200ms forwards;
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  &.active {
+    color: $light-100;
+    &:hover {
+      color: $light-100;
+    }
+  }
+
+  &:hover {
+    color: $light-60;
+  }
+}
+
+.tabActions {
+  opacity: 0;
+  transform: translateX(10px);
+  transition: opacity 100ms, transform 100ms;
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.tabClose {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.75);
 }

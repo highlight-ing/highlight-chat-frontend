@@ -3,29 +3,26 @@ import { useApi } from '@/hooks/useApi'
 import { useStore } from '@/providers/store-provider'
 import { ChatHistoryItem } from '@/types'
 import { useShallow } from 'zustand/react/shallow'
+import equal from 'fast-deep-equal'
 
 interface ChatHistoryResponse {
   conversations: ChatHistoryItem[]
 }
 
-const MAX_RETRIES = 3
-const RETRY_INTERVAL = 10000
-
 export const useChatHistory = (): {
   history: ChatHistoryItem[]
   refreshChatHistory: () => Promise<ChatHistoryItem[]>
+  refreshChatItem: (conversationId: string) => Promise<ChatHistoryItem | null>
 } => {
   const { get } = useApi()
-  const { conversationId, history, setHistory } = useStore(
+  const { history, setHistory, addOrUpdateOpenConversation, openConversations } = useStore(
     useShallow((state) => ({
-      conversationId: state.conversationId,
       history: state.history,
       setHistory: state.setHistory,
+      openConversations: state.openConversations,
+      addOrUpdateOpenConversation: state.addOrUpdateOpenConversation,
     })),
   )
-  const initialFetchDone = useRef(false)
-  const fetchRetryRef = useRef<NodeJS.Timeout>()
-  const fetchRetryCountRef = useRef(0)
 
   const fetchResponse = async () => {
     try {
@@ -35,6 +32,11 @@ export const useChatHistory = (): {
       }
       const data: ChatHistoryResponse = await response.json()
       setHistory(data.conversations)
+      for (const chat of data.conversations) {
+        if (openConversations.find((conv) => conv.id === chat.id)) {
+          addOrUpdateOpenConversation(chat)
+        }
+      }
       return data.conversations
     } catch (error) {
       console.error('Error fetching response:', error)
@@ -45,13 +47,30 @@ export const useChatHistory = (): {
     }
   }
 
-  const fetchNewConversation = async (conversationId: string): Promise<ChatHistoryItem | null> => {
+  const fetchConversation = async (conversationId: string): Promise<ChatHistoryItem | null> => {
     try {
       const response = await get(`history/${conversationId}`)
       if (!response.ok) {
         throw new Error('Network response was not ok')
       }
       const data = await response.json()
+      if (
+        equal(
+          history.find((item) => item.id === conversationId),
+          data.conversation,
+        )
+      ) {
+        return data.conversation
+      }
+      let newHistory = [...history]
+      const existingIndex = newHistory.findIndex((chat) => chat.id === conversationId)
+      if (existingIndex !== -1) {
+        newHistory[existingIndex] = data.conversation
+      } else {
+        newHistory = [data.conversation, ...history]
+      }
+      setHistory(newHistory)
+      addOrUpdateOpenConversation(data.conversation)
       return data.conversation
     } catch (error) {
       console.error('Error fetching conversation:', error)
@@ -59,61 +78,9 @@ export const useChatHistory = (): {
     }
   }
 
-  useEffect(() => {
-    if (!initialFetchDone.current) {
-      // Initial fetch
-      fetchResponse()
-      initialFetchDone.current = true
-    } else if (conversationId && !history.some((chat) => chat.id === conversationId)) {
-      const fetchAndSafeRetry = async (retries: number) => {
-        // New conversation found after initial fetch
-        console.log('Fetching new conversation and adding it to history')
-        const newConversation = await fetchNewConversation(conversationId)
-        if (newConversation) {
-          setHistory([newConversation, ...history])
-          return
-        }
-        if (retries > 0) {
-          console.log('Failed to fetch new conversation, retrying in 1s')
-          setTimeout(() => {
-            fetchAndSafeRetry(--retries)
-          }, 1000)
-        } else {
-          console.error('Repeatedly failed to fetch new conversation, giving up')
-        }
-      }
-      fetchAndSafeRetry(5)
-    } else if (conversationId) {
-      // Existing code for updating "New Conversation" title
-      const chat = history.find((chat) => chat.id === conversationId)
-      if (chat?.title === 'New Conversation' && fetchRetryCountRef.current < MAX_RETRIES) {
-        console.log(`Fetching updated conversation, ${MAX_RETRIES - fetchRetryCountRef.current} tries remaining`)
-
-        // Retry until title is assigned
-        fetchRetryRef.current = setTimeout(async () => {
-          const updatedConversation = await fetchNewConversation(conversationId)
-          if (updatedConversation && updatedConversation.title !== 'New Conversation') {
-            const updatedHistory = history.map((chat) => (chat.id === conversationId ? updatedConversation : chat))
-            setHistory(updatedHistory)
-            fetchRetryCountRef.current = 0
-            console.log('Updated conversation')
-          } else {
-            fetchRetryCountRef.current++
-          }
-          fetchRetryRef.current = undefined
-        }, RETRY_INTERVAL)
-      }
-    }
-
-    return () => {
-      if (fetchRetryRef.current) {
-        clearTimeout(fetchRetryRef.current)
-      }
-    }
-  }, [history, conversationId])
-
   return {
     history,
+    refreshChatItem: fetchConversation,
     refreshChatHistory: fetchResponse,
   }
 }

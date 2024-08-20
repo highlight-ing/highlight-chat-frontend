@@ -6,13 +6,16 @@ interface CircleButtonProps {
   fitContents?: boolean
   className?: string
   onClick: React.MouseEventHandler
+  size?: string
 }
 
-const CircleButton = ({ children, className, fitContents, onClick }: PropsWithChildren<CircleButtonProps>) => {
+const CircleButton = ({ children, className, fitContents, onClick, size }: PropsWithChildren<CircleButtonProps>) => {
   return (
     <button
       className={`${styles.circleButton} ${fitContents ? styles.fitContents : ''} ${className ?? ''}`}
       onClick={onClick}
+      // @ts-ignore
+      style={{ '--size': size }}
     >
       {children}
     </button>

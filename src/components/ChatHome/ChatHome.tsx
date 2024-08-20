@@ -34,7 +34,7 @@ const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
     <div className={`${styles.chatHomeContainer} ${isShowing ? styles.show : ''}`}>
       <div className={styles.input}>
         <InputHeading />
-        {isVisible && <Input sticky={false} />}
+        {isVisible && <Input isActiveChat={false} />}
       </div>
       <div className={styles.callouts}>
         <Callout

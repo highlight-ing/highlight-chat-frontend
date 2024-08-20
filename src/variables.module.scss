@@ -78,6 +78,8 @@ $chat-history-width: 250px;
 $topbar-height: 48px;
 
 :export {
+  chatHistoryWidth: $chat-history-width;
+
   primary5: $primary-5;
   primary10: $primary-10;
   primary20: $primary-20;

@@ -1,7 +1,7 @@
 import { ClipboardText, Document, Keyboard, Sound, GallerySlash, DocumentText1 } from 'iconsax-react'
 import { useState } from 'react'
 import { CloseIcon } from '../icons/icons'
-import Tooltip from './Tooltip'
+import Tooltip from './Tooltip/Tooltip'
 import { useStore } from '@/providers/store-provider'
 import { AttachmentType } from '@/types'
 import { useImageDownload } from '@/hooks/useImageDownload'

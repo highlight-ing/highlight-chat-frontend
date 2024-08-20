@@ -2,6 +2,7 @@ import { PropsWithChildren, ReactElement, ReactHTMLElement, useCallback, useEffe
 import { Portal } from 'react-portal'
 
 import styles from './contextmenu.module.scss'
+import { calculatePositionedStyle } from '@/utils/components'
 
 const PIXEL_SPACING = 4
 
@@ -43,70 +44,7 @@ const ContextMenu = ({
     if (!containerRef.current || !elemRef.current) {
       return
     }
-    const targetRect = containerRef.current.getBoundingClientRect()
-    const elem = elemRef.current
-
-    // This will be used to set styles of the tooltip.
-    const styles: React.CSSProperties = {
-      position: 'fixed',
-    }
-
-    // Determine styles based on desired position.
-    switch (position) {
-      case 'top':
-        styles.bottom = window.innerHeight - targetRect.top + PIXEL_SPACING + offset
-        styles.left = targetRect.left + targetRect.width / 2 - elem.offsetWidth / 2
-
-        if (elem.offsetHeight - styles.bottom < 0) {
-          styles.top = targetRect.bottom + PIXEL_SPACING + offset
-          styles.left = targetRect.left + targetRect.width / 2 - elem.offsetWidth / 2
-        }
-        break
-      case 'bottom':
-        styles.top = targetRect.bottom + PIXEL_SPACING + offset
-        styles.left = targetRect.left + targetRect.width / 2 - elem.offsetWidth / 2
-
-        if (elem.offsetHeight + styles.top > window.innerHeight) {
-          styles.bottom = window.innerHeight - targetRect.top + PIXEL_SPACING + offset
-          styles.left = targetRect.left + targetRect.width / 2 - elem.offsetWidth / 2
-        }
-        break
-      case 'left':
-        styles.top = targetRect.top
-        styles.right = window.innerWidth - targetRect.left + PIXEL_SPACING + offset
-        styles.maxWidth = targetRect.left - PIXEL_SPACING * 2
-
-        // if positioned left is too small, position right instead
-        if (styles.maxWidth < 200) {
-          const maxWidth = window.innerWidth - (targetRect.right + PIXEL_SPACING * 2)
-          if (maxWidth > styles.maxWidth) {
-            styles.right = undefined
-            styles.left = targetRect.right + PIXEL_SPACING
-            styles.maxWidth = maxWidth
-          }
-        }
-        break
-      case 'right':
-        styles.top = targetRect.top
-        styles.left = targetRect.right + PIXEL_SPACING + offset
-        styles.maxWidth = window.innerWidth - (targetRect.right + PIXEL_SPACING * 2)
-
-        // if positioned right is too small, position left instead
-        if (styles.maxWidth < 200) {
-          const maxWidth = targetRect.left - PIXEL_SPACING * 2
-          if (maxWidth > styles.maxWidth) {
-            styles.left = undefined
-            styles.right = window.innerWidth - targetRect.left + PIXEL_SPACING
-            styles.maxWidth = maxWidth
-          }
-        }
-        break
-      default:
-        break
-    }
-
-    console.log('applied style:', position, styles)
-
+    const styles = calculatePositionedStyle(containerRef.current, elemRef.current, position, offset)
     setAppliedStyle(styles)
   }
 
@@ -157,14 +95,13 @@ const ContextMenu = ({
 
   return (
     <div className="relative h-fit w-fit" ref={containerRef} style={wrapperStyle}>
-      {children}
+      {typeof children === 'function'
+        ? // @ts-ignore
+          children({ isOpen })
+        : children}
       {isOpen && (
         <Portal>
-          <div
-            className="fixed z-10 h-fit w-fit overflow-hidden rounded-xl border border-light-20 bg-[#000]"
-            ref={elemRef}
-            style={appliedStyle}
-          >
+          <div className={styles.contextMenu} ref={elemRef} style={appliedStyle}>
             {items.map((item, index) => {
               if (item.divider) {
                 return <div className="min-h-[1px] w-full bg-light-16" key={`divider-${index}`} />

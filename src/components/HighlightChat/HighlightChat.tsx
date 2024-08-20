@@ -11,6 +11,9 @@ import { useStore } from '@/providers/store-provider'
 import ChatHome from '@/components/ChatHome/ChatHome'
 import ChatHeader from '@/components/ChatHeader/ChatHeader'
 import { useShallow } from 'zustand/react/shallow'
+import useHandleConversationLoad from '@/hooks/useHandleConversationLoad'
+import MessagesPlaceholder from '@/components/Messages/MessagesPlaceholder'
+import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
 import { trackEvent } from '@/utils/amplitude'
 
 /**
@@ -68,13 +71,14 @@ function useHandleClipboardPaste() {
 
 const HighlightChat = () => {
   // STATE
-  const { messages, inputIsDisabled, promptName } = useStore(
+  const { inputIsDisabled, promptName, isConversationLoading } = useStore(
     useShallow((state) => ({
-      messages: state.messages,
       inputIsDisabled: state.inputIsDisabled,
       promptName: state.promptName,
+      isConversationLoading: state.isConversationLoading,
     })),
   )
+  const messages = useCurrentChatMessages()
 
   const [showHistory, setShowHistory] = useState(false)
 
@@ -84,6 +88,7 @@ const HighlightChat = () => {
 
   // HOOKS
   useHandleClipboardPaste()
+  useHandleConversationLoad()
 
   return (
     <div className={styles.page}>
@@ -91,9 +96,10 @@ const HighlightChat = () => {
       <TopBar showHistory={showHistory} setShowHistory={setShowHistory} />
       <div className={`${styles.contents} ${showHistory ? styles.partial : styles.full}`}>
         <ChatHeader isShowing={!!promptName && messages.length === 0} />
-        {isChatting && <Messages />}
-        {(isChatting || promptName) && <Input sticky={true} />}
-        <ChatHome isShowing={!isChatting && !promptName} />
+        {(isChatting || (isConversationLoading && messages.length > 0)) && <Messages />}
+        {isConversationLoading && messages.length === 0 && !inputIsDisabled && <MessagesPlaceholder />}
+        {(isChatting || promptName) && <Input isActiveChat={true} />}
+        <ChatHome isShowing={!isChatting && !promptName && !isConversationLoading} />
       </div>
     </div>
   )

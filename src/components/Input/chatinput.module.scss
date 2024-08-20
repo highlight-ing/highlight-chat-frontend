@@ -17,15 +17,20 @@
   background-color: $bg-second-layer;
   border: 1px solid $light-10;
   cursor: text;
-  border-radius: 8px;
+  border-radius: 12px;
   width: 100%;
   flex-shrink: 0;
   bottom: 16px;
   animation: fadeIn 400ms forwards;
 
-  &.sticky {
-    position: absolute;
+  &.active {
+    margin-bottom: 20px;
     max-width: $chat-body-width;
+
+    .attachmentsButtonContainer {
+      margin-top: auto;
+      margin-bottom: 0;
+    }
   }
 
   &:hover {
@@ -35,7 +40,7 @@
   textarea {
     flex: 1;
     background-color: transparent;
-    font-weight: 300;
+    font-weight: 400;
     font-size: 15px;
     resize: none;
     outline: none;
@@ -52,8 +57,7 @@
 
 .attachmentsButtonContainer {
   display: flex;
-  align-items: flex-end;
-  height: 100%;
+  margin-bottom: auto;
 }
 
 .empty {

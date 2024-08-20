@@ -1,9 +1,9 @@
 import styles from '@/components/ChatHome/chathome.module.scss'
-import { ArrowRight, Edit2, MessageProgramming, MessageText, Setting } from 'iconsax-react'
+import { ArrowRight, Edit2, MessageText } from 'iconsax-react'
 import React from 'react'
 import { PromptApp } from '@/types'
 import CircleButton from '@/components/CircleButton/CircleButton'
-import Tooltip from '@/components/Tooltip'
+import Tooltip from '@/components/Tooltip/Tooltip'
 import { trackEvent } from '@/utils/amplitude'
 
 interface PromptListRowProps {

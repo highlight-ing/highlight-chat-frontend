@@ -1,18 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
 import { ClipboardText, DocumentUpload, GalleryAdd, Sound } from 'iconsax-react'
 import Highlight from '@highlight-ai/app-runtime'
-
-import * as XLSX from 'xlsx'
-import mammoth from 'mammoth'
-import * as pptxtojson from 'pptxtojson'
-
-import { PaperclipIcon } from '../../icons/icons'
+import { PaperclipIcon } from '@/icons/icons'
 import ContextMenu, { MenuItemType } from '../ContextMenu/ContextMenu'
-import styles from './attachments-button.module.scss'
 import { useStore } from '@/providers/store-provider'
 import { getDurationUnit } from '@/utils/string'
 import { ScreenshotAttachmentPicker } from '../ScreenshotAttachmentPicker/ScrenshotAttachmentPicker'
 import { useShallow } from 'zustand/react/shallow'
+import styles from './attachments-button.module.scss'
+import Tooltip from '@/components/Tooltip/Tooltip'
+import * as XLSX from 'xlsx'
+import mammoth from 'mammoth'
+import * as pptxtojson from 'pptxtojson'
 import { trackEvent } from '@/utils/amplitude'
 
 interface AudioDurationProps {
@@ -212,7 +211,7 @@ export const AttachmentsButton = () => {
     label: (
       <div className={styles.audioMenuItem}>
         <div className={styles.menuItem}>
-          <Sound size={24} color="#fff" />
+          <Sound size={20} variant={'Bold'} />
           Audio Memory
         </div>
         <div className={styles.audioDurationsContainer}>
@@ -233,7 +232,7 @@ export const AttachmentsButton = () => {
     {
       label: (
         <div className={styles.menuItem}>
-          <DocumentUpload size={24} color="#fff" />
+          <DocumentUpload size={20} variant={'Bold'} />
           Upload from computer
         </div>
       ),
@@ -242,7 +241,7 @@ export const AttachmentsButton = () => {
     {
       label: (
         <div className={styles.menuItem}>
-          <ClipboardText size={24} color="#fff" />
+          <ClipboardText size={20} variant={'Bold'} />
           Clipboard
         </div>
       ),
@@ -251,7 +250,7 @@ export const AttachmentsButton = () => {
     {
       label: (
         <div className={styles.menuItem}>
-          <GalleryAdd variant="Bold" size={24} color="#fff" />
+          <GalleryAdd variant="Bold" size={20} />
           Screenshot
         </div>
       ),
@@ -269,16 +268,23 @@ export const AttachmentsButton = () => {
   return (
     <>
       <ContextMenu position="top" triggerId="attachments-button" leftClick={true} items={menuItems}>
-        <button type="button" className={styles.button} id="attachments-button">
-          <PaperclipIcon />
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={onAddFile}
-            accept={acceptTypes}
-            className={styles.hiddenInput}
-          />
-        </button>
+        {
+          // @ts-ignore
+          ({ isOpen }) => (
+            <Tooltip tooltip={isOpen ? '' : 'Attach files & context'} position={'top'}>
+              <button type="button" className={styles.button} id="attachments-button">
+                <PaperclipIcon />
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={onAddFile}
+                  accept={acceptTypes}
+                  className={styles.hiddenInput}
+                />
+              </button>
+            </Tooltip>
+          )
+        }
       </ContextMenu>
       <ScreenshotAttachmentPicker
         isVisible={screenshotPickerVisible}

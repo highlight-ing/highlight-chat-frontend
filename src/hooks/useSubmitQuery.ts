@@ -6,6 +6,7 @@ import useAuth from './useAuth'
 import { useApi } from '@/hooks/useApi'
 import { FileAttachment, PromptApp } from '@/types'
 import { useShallow } from 'zustand/react/shallow'
+import { useEffect, useRef } from 'react'
 
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024 // 1MB in bytes
@@ -120,9 +121,9 @@ export const useSubmitQuery = () => {
     input,
     setInput,
     setIsDisabled,
-    addMessage,
-    updateLastMessage,
     aboutMe,
+    addConversationMessage,
+    updateLastConversationMessage,
   } = useStore(
     useShallow((state) => ({
       getOrCreateConversationId: state.getOrCreateConversationId,
@@ -131,20 +132,31 @@ export const useSubmitQuery = () => {
       input: state.input,
       setInput: state.setInput,
       setIsDisabled: state.setInputIsDisabled,
-      addMessage: state.addMessage,
-      updateLastMessage: state.updateLastMessage,
       aboutMe: state.aboutMe,
+      addConversationMessage: state.addConversationMessage,
+      updateLastConversationMessage: state.updateLastConversationMessage,
     })),
   )
 
+  const abortControllerRef = useRef<AbortController>()
   const { getAccessToken } = useAuth()
+  const conversationId = useStore((state) => state.conversationId)
+  const conversationIdRef = useRef(conversationId)
 
-  const fetchResponse = async (formData: FormData, token: string) => {
+  const fetchResponse = async (conversationId: string, formData: FormData, token: string) => {
     setIsDisabled(true)
 
     try {
-      const conversationId = getOrCreateConversationId()
       formData.append('conversation_id', conversationId)
+
+      const abortController = new AbortController()
+      abortControllerRef.current = abortController
+
+      const checkAbortSignal = () => {
+        if (abortController.signal.aborted) {
+          throw new Error('Chat message request aborted')
+        }
+      }
 
       const response = await post('chat_v2/', formData)
       if (!response.ok) {
@@ -156,10 +168,12 @@ export const useSubmitQuery = () => {
         throw new Error('No reader available')
       }
 
-      let accumulatedResponse = ''
-      addMessage({ role: 'assistant', content: '' })
+      checkAbortSignal()
 
-      while (true) {
+      let accumulatedResponse = ''
+      addConversationMessage(conversationId!, { role: 'assistant', content: '' })
+
+      while (!abortController.signal.aborted) {
         const { done, value } = await reader.read()
         if (done) break
         const chunk = new TextDecoder().decode(value)
@@ -168,18 +182,20 @@ export const useSubmitQuery = () => {
         const jsonObjects = chunk.split(/(?<=})\s*(?=\{)/)
 
         for (const jsonStr of jsonObjects) {
+          checkAbortSignal()
+
           try {
             const jsonChunk = JSON.parse(jsonStr)
 
             if (jsonChunk.type === 'text' && jsonChunk.content) {
               accumulatedResponse += jsonChunk.content
-              updateLastMessage({
+              updateLastConversationMessage(conversationId, {
                 role: 'assistant',
                 content: accumulatedResponse,
               })
             } else if (jsonChunk.type === 'error') {
               console.error('Error from backend:', jsonChunk.content)
-              updateLastMessage({
+              updateLastConversationMessage(conversationId, {
                 role: 'assistant',
                 content: 'Sorry, an error occurred: ' + jsonChunk.content,
               })
@@ -187,7 +203,7 @@ export const useSubmitQuery = () => {
           } catch (parseError) {
             console.error('Error parsing JSON:', parseError)
             accumulatedResponse += jsonStr
-            updateLastMessage({
+            updateLastConversationMessage(conversationId!, {
               role: 'assistant',
               content: accumulatedResponse,
             })
@@ -195,13 +211,20 @@ export const useSubmitQuery = () => {
         }
       }
     } catch (error) {
-      console.error('Error fetching response:', error)
-      addMessage({
-        role: 'assistant',
-        content: 'Sorry, there was an error processing your request.',
-      })
+      // @ts-ignore
+      if (error.message.includes('aborted')) {
+        console.log('Skipping message request, aborted')
+      } else {
+        // @ts-ignore
+        console.error('Error fetching response:', error.stack ?? error.message)
+        addConversationMessage(conversationId!, {
+          role: 'assistant',
+          content: 'Sorry, there was an error processing your request.',
+        })
+      }
     } finally {
       setIsDisabled(false)
+      abortControllerRef.current = undefined
     }
   }
 
@@ -255,7 +278,8 @@ export const useSubmitQuery = () => {
       const att = context.attachments || ([] as unknown)
       const fileAttachments = (att as FileAttachment[]).filter((a) => a.type && fileAttachmentTypes.includes(a.type))
 
-      addMessage({
+      const conversationId = getOrCreateConversationId()
+      addConversationMessage(conversationId!, {
         role: 'user',
         content: query,
         clipboard_text: clipboardText,
@@ -290,7 +314,7 @@ export const useSubmitQuery = () => {
       }
 
       const accessToken = await getAccessToken()
-      await fetchResponse(formData, accessToken)
+      await fetchResponse(conversationId, formData, accessToken)
     }
   }
 
@@ -323,7 +347,8 @@ export const useSubmitQuery = () => {
         attachments,
       )
 
-      addMessage({
+      const conversationId = getOrCreateConversationId()
+      addConversationMessage(conversationId!, {
         role: 'user',
         content: query,
         screenshot,
@@ -339,9 +364,20 @@ export const useSubmitQuery = () => {
       clearAttachments() // Clear the attachment immediately
 
       const accessToken = await getAccessToken()
-      await fetchResponse(formData, accessToken)
+      await fetchResponse(conversationId, formData, accessToken)
     }
   }
+
+  useEffect(() => {
+    // console.log('conversationIdRef:', conversationIdRef.current)
+    // console.log('conversationId', conversationId)
+    // console.log('abortControllerRef', typeof abortControllerRef.current)
+    // if (conversationIdRef.current && conversationIdRef.current !== conversationId && abortControllerRef.current) {
+    //   console.log("Aborting previous chat's message stream")
+    //   abortControllerRef.current.abort('Aborted, conversation ID changed, stop streaming messages')
+    // }
+    conversationIdRef.current = conversationId
+  }, [conversationId])
 
   return { handleSubmit, handleIncomingContext }
 }
