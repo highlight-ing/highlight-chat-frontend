@@ -12,7 +12,7 @@ export default () => {
   const router = useRouter()
   const [isLoadingPrompts, setLoadingPrompts] = useState(true)
 
-  const { prompts, setPrompts, promptUserId, setPromptUserId, setPrompt, clearPrompt } = useStore(
+  const { prompts, setPrompts, promptUserId, setPromptUserId, setPrompt, clearPrompt, startNewConversation } = useStore(
     useShallow((state) => ({
       prompts: state.prompts,
       setPrompts: state.setPrompts,
@@ -20,6 +20,7 @@ export default () => {
       setPromptUserId: state.setPromptUserId,
       setPrompt: state.setPrompt,
       clearPrompt: state.clearPrompt,
+      startNewConversation: state.startNewConversation,
     })),
   )
 
@@ -50,38 +51,29 @@ export default () => {
     }
 
     if (prompt.slug === 'hlchat') {
-      await Highlight.app.openApp('highlightchat')
-
-      // clearPrompt()
-      // router.push('/')
+      clearPrompt()
       return
     }
-
-    let installed = true
 
     try {
       //@ts-expect-error
-      await globalThis.highlight.internal.installApp(prompt.slug)
-      await Highlight.app.openApp(prompt.slug)
+      globalThis.highlight.internal.installApp(prompt.slug)
     } catch (err) {
-      console.error(err)
-      installed = false
+      console.error('Error installing app', err)
     }
 
-    if (!installed) {
-      return
-    }
+    // Fetch the prompt
+    const text = await fetchPromptText(prompt.external_id)
 
-    // // Fetch the prompt
-    // const text = await fetchPromptText(prompt.external_id)
+    setPrompt({
+      promptApp: prompt,
+      promptName: prompt.name,
+      promptDescription: prompt.description!,
+      promptAppName: prompt.slug!,
+      prompt: text,
+    })
 
-    // setPrompt({
-    //   promptApp: prompt,
-    //   promptName: prompt.name,
-    //   promptDescription: prompt.description!,
-    //   promptAppName: prompt.slug!,
-    //   prompt: text,
-    // })
+    startNewConversation()
 
     // router.push(`/`)
   }

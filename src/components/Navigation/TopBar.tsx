@@ -51,7 +51,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const onNewChatClick = () => {
     startNewConversation()
 
-    // clearPrompt()
+    clearPrompt()
 
     router.push('/')
     trackEvent('HL Chat New Conversation Started', {})

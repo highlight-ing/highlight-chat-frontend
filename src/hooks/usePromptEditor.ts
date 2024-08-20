@@ -26,8 +26,6 @@ export function usePromptEditor() {
 
     const accessToken = await getAccessToken()
 
-    console.log('Saving prompt editor data...')
-
     if (!needSave) {
       setSaving(false)
       return
