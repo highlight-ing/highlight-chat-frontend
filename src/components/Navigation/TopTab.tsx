@@ -1,12 +1,14 @@
 import styles from '@/components/Navigation/top-bar.module.scss'
+import variables from '@/variables.module.scss'
 import { MessageText } from 'iconsax-react'
 import * as React from 'react'
 import { ChatHistoryItem } from '@/types'
-import { CSSProperties, PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
+import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
 import TypedText from '@/components/TypedText/TypedText'
 import CircleButton from '@/components/CircleButton/CircleButton'
 import ContextMenu, { MenuItemType } from '@/components/ContextMenu/ContextMenu'
 import { useStore } from '@/providers/store-provider'
+import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 
 interface TopTabProps {
   isActive?: boolean
@@ -26,9 +28,13 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
     const [title, setTitle] = useState(filteredTitle)
     const [isAnimating, setIsAnimating] = useState(true)
 
+    const isConversationLoading = useStore((state) => state.isConversationLoading)
     const conversationId = useStore((state) => state.conversationId)
+    const openConversationMessages = useStore((state) => state.openConversationMessages)
     const setConversationId = useStore((state) => state.setConversationId)
     const setOpenConversations = useStore((state) => state.setOpenConversations)
+    const setAllOpenConversationMessages = useStore((state) => state.setAllOpenConversationMessages)
+    const clearAllOpenConversationMessages = useStore((state) => state.clearAllOpenConversationMessages)
 
     const menuOptions = useMemo<MenuItemType[]>(() => {
       return [
@@ -50,12 +56,18 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
               setConversationId(conversation.id)
             }
             setOpenConversations([conversation])
+            if (openConversationMessages[conversationId!]) {
+              setAllOpenConversationMessages({ [conversationId!]: openConversationMessages[conversationId!] })
+            } else {
+              clearAllOpenConversationMessages()
+            }
           },
         },
         {
           label: 'Close all',
           onClick: () => {
             setOpenConversations([])
+            clearAllOpenConversationMessages()
           },
         },
       ]
@@ -72,7 +84,11 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
     }, [conversation.title, title])
 
     return (
-      <div ref={ref} {...props} className={styles.tabContainer}>
+      <div
+        ref={ref}
+        {...props}
+        className={`${styles.tabContainer} ${isConversationLoading && isActive ? styles.loading : ''}`}
+      >
         <ContextMenu
           items={menuOptions}
           position={'bottom'}
@@ -111,10 +127,14 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
               />
             )}
           </div>
-          <div className={styles.tabClose}>
-            <CircleButton onClick={() => onClose(conversation)} size={'20px'}>
-              <TabCloseIcon size={20.5} />
-            </CircleButton>
+          <div className={styles.tabActions}>
+            {isConversationLoading && isActive ? (
+              <LoadingSpinner color={variables.light60} size={'16px'} />
+            ) : (
+              <CircleButton onClick={() => onClose(conversation)} size={'20px'} className={styles.tabClose}>
+                <TabCloseIcon size={20.5} />
+              </CircleButton>
+            )}
           </div>
         </ContextMenu>
       </div>

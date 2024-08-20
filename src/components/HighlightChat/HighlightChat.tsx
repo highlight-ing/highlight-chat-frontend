@@ -13,6 +13,7 @@ import ChatHome from '@/components/ChatHome/ChatHome'
 import ChatHeader from '@/components/ChatHeader/ChatHeader'
 import { useShallow } from 'zustand/react/shallow'
 import useHandleConversationLoad from '@/hooks/useHandleConversationLoad'
+import MessagesPlaceholder from '@/components/Messages/MessagesPlaceholder'
 
 /**
  * Hook that handles pasting from the clipboard.
@@ -62,11 +63,12 @@ function useHandleClipboardPaste() {
 
 const HighlightChat = () => {
   // STATE
-  const { messages, inputIsDisabled, promptName } = useStore(
+  const { messages, inputIsDisabled, promptName, isConversationLoading } = useStore(
     useShallow((state) => ({
       messages: state.messages,
       inputIsDisabled: state.inputIsDisabled,
       promptName: state.promptName,
+      isConversationLoading: state.isConversationLoading,
     })),
   )
 
@@ -86,9 +88,10 @@ const HighlightChat = () => {
       <TopBar showHistory={showHistory} setShowHistory={setShowHistory} />
       <div className={`${styles.contents} ${showHistory ? styles.partial : styles.full}`}>
         <ChatHeader isShowing={!!promptName && messages.length === 0} />
-        {isChatting && <Messages />}
+        {(isChatting || (isConversationLoading && messages.length > 0)) && <Messages />}
+        {isConversationLoading && messages.length === 0 && <MessagesPlaceholder />}
         {(isChatting || promptName) && <Input sticky={true} />}
-        <ChatHome isShowing={!isChatting && !promptName} />
+        <ChatHome isShowing={!isChatting && !promptName && !isConversationLoading} />
       </div>
     </div>
   )
