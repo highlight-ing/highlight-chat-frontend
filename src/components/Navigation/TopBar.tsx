@@ -15,6 +15,7 @@ import variables from '@/variables.module.scss'
 import { useOpenConverationsPersistence } from '@/hooks/useOpenConverationsPersistence'
 import { useState } from 'react'
 import ShareModal from '@/components/ShareModal/ShareModal'
+import { createShareLink } from '@/services/shareLink'
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const router = useRouter()
@@ -85,7 +86,8 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
 
   const onCopyLink = async () => {
     try {
-      // await copyLinkToClipboard(); // Implement this function
+      const shareLink = await createShareLink()
+      navigator.clipboard.writeText(shareLink)
       setIsShareModalVisible(false)
     } catch (error) {
       // Handle error (e.g., show error message)
