@@ -326,10 +326,12 @@ export const useSubmitQuery = () => {
         role: 'user',
         content: query,
         screenshot,
+        ocr_text: ocrText,
         audio,
         file_title: fileTitle,
         clipboard_text: clipboardText,
-        windows: windows, // Add windows information to the message
+        windows: windows,
+        file_attachments: attachments,
       })
 
       setInput('')
