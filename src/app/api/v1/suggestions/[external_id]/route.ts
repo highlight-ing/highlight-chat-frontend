@@ -2,8 +2,6 @@ import { supabaseAdmin } from '@/lib/supabase'
 import { corsHeaders } from '@/utils/cors'
 import Handlebars from 'handlebars'
 
-export const revalidate = 0
-
 /**
  * API route that returns a single prompt by its slug
  */

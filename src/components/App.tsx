@@ -14,6 +14,7 @@ import { Attachment, ImageAttachment, PdfAttachment, SpreadsheetAttachment, Text
 import { initAmplitude, trackEvent } from '@/utils/amplitude'
 import useAuth from '@/hooks/useAuth'
 import { decodeJwt } from 'jose'
+import { getPromptAppBySlug } from '@/utils/prompts'
 
 function processAttachments(attachments: any[]): Attachment[] {
   return attachments.map((attachment) => {
@@ -70,13 +71,14 @@ function processAttachments(attachments: any[]): Attachment[] {
 }
 
 function useContextReceivedHandler(navigateToNewChat: () => void) {
-  const { addAttachment, setHighlightContext, setInput, promptApp, startNewConversation } = useStore(
+  const { addAttachment, setHighlightContext, setInput, promptApp, startNewConversation, setPrompt } = useStore(
     useShallow((state) => ({
       addAttachment: state.addAttachment,
       setHighlightContext: state.setHighlightContext,
       setInput: state.setInput,
       promptApp: state.promptApp,
       startNewConversation: state.startNewConversation,
+      setPrompt: state.setPrompt,
     })),
   )
 
@@ -88,7 +90,25 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
       await handleIncomingContext(context, navigateToNewChat, promptApp)
     })
 
-    const contextDestroyer = Highlight.app.addListener('onContext', (context: HighlightContext) => {
+    const contextDestroyer = Highlight.app.addListener('onContext', async (context: HighlightContext) => {
+      // Check if it's a prompt app, if so, we should set the prompt store
+      // so that the newest conversation is set to use the prompt app
+      //@ts-expect-error
+      if (context.promptSlug) {
+        // @ts-expect-error
+        const res = await getPromptAppBySlug(context.promptSlug)
+
+        if (res && res.promptApp) {
+          setPrompt({
+            promptApp: res.promptApp,
+            promptName: res.promptApp.name,
+            promptDescription: res.promptApp.description ?? '',
+            promptAppName: res.promptApp.slug ?? '',
+            prompt: res.promptApp.prompt_text ?? '',
+          })
+        }
+      }
+
       startNewConversation()
       const attachments = processAttachments(context.attachments || []) as RuntimeAttachmentType[]
       const newContext = { ...context, attachments }

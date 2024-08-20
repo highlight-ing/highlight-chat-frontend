@@ -360,3 +360,20 @@ export async function addPromptToUser(externalId: string, authToken: string) {
     throw new Error('Error adding prompt to user')
   }
 }
+
+export async function getPromptAppBySlug(slug: string) {
+  const supabase = supabaseAdmin()
+
+  const { data: promptApp, error } = await supabase
+    .from('prompts')
+    .select('*, user_images(file_extension)')
+    .eq('slug', slug)
+    .maybeSingle()
+
+  if (error) {
+    console.error('Error fetching prompt app from Supabase', error)
+    return { error: 'Error fetching prompt app from Supabase' }
+  }
+
+  return { promptApp }
+}
