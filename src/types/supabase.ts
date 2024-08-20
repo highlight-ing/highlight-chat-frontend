@@ -3,6 +3,35 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      added_prompts: {
+        Row: {
+          created_at: string
+          id: number
+          prompt_id: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          prompt_id: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          prompt_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'added_prompts_prompt_id_fkey'
+            columns: ['prompt_id']
+            isOneToOne: false
+            referencedRelation: 'prompts'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       conversation: {
         Row: {
           app_id: string | null
@@ -107,6 +136,8 @@ export type Database = {
           description: string | null
           external_id: string
           id: number
+          image: string | null
+          is_handlebar_prompt: boolean
           name: string
           prompt_text: string | null
           prompt_url: string | null
@@ -114,12 +145,15 @@ export type Database = {
           slug: string | null
           suggestion_prompt_text: string | null
           user_id: string
+          video_url: string | null
         }
         Insert: {
           created_at?: string
           description?: string | null
           external_id?: string
           id?: number
+          image?: string | null
+          is_handlebar_prompt?: boolean
           name: string
           prompt_text?: string | null
           prompt_url?: string | null
@@ -127,12 +161,15 @@ export type Database = {
           slug?: string | null
           suggestion_prompt_text?: string | null
           user_id: string
+          video_url?: string | null
         }
         Update: {
           created_at?: string
           description?: string | null
           external_id?: string
           id?: number
+          image?: string | null
+          is_handlebar_prompt?: boolean
           name?: string
           prompt_text?: string | null
           prompt_url?: string | null
@@ -140,6 +177,42 @@ export type Database = {
           slug?: string | null
           suggestion_prompt_text?: string | null
           user_id?: string
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'prompts_image_fkey'
+            columns: ['image']
+            isOneToOne: false
+            referencedRelation: 'user_images'
+            referencedColumns: ['external_id']
+          },
+        ]
+      }
+      user_images: {
+        Row: {
+          created_at: string
+          external_id: string
+          file_extension: string
+          id: number
+          public: boolean
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          external_id?: string
+          file_extension: string
+          id?: number
+          public?: boolean
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          external_id?: string
+          file_extension?: string
+          id?: number
+          public?: boolean
+          user_id?: string | null
         }
         Relationships: []
       }

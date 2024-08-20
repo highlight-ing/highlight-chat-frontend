@@ -2,15 +2,17 @@ import styles from './history.module.scss'
 import * as React from 'react'
 import { useChatHistory } from '@/hooks/useChatHistory'
 import Tooltip from '@/components/Tooltip'
-import { Clock } from 'iconsax-react'
+import CircleButton from '@/components/CircleButton/CircleButton'
+import { Category, Clock } from 'iconsax-react'
 import { useStore } from '@/providers/store-provider'
 import { useApi } from '@/hooks/useApi'
-import { ChatHistoryItem } from '@/types'
+import { ChatHistoryItem, Message } from '@/types'
 import ContextMenu from '@/components/ContextMenu/ContextMenu'
 import { BaseMessage, UserMessage, AssistantMessage } from '@/types'
 import Button from '@/components/Button/Button'
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { useShallow } from 'zustand/react/shallow'
+import { trackEvent } from '@/utils/amplitude'
 
 interface HistoryProps {
   showHistory: boolean
@@ -57,11 +59,15 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
     return sortArrayByDate(history)
   }, [history])
 
+  const toggleHistory = () => {
+    setShowHistory(!showHistory)
+  }
+
   return (
     <div className={`${styles.history} ${showHistory ? styles.show : styles.hide}`}>
       <div className={styles.header}>
         <Tooltip tooltip="Hide chats" position="right">
-          <Button size={'medium'} variant={'ghost-neutral'} onClick={() => setShowHistory(!showHistory)}>
+          <Button size={'medium'} variant={'ghost-neutral'} onClick={toggleHistory}>
             <Clock size={20} variant={'Bold'} />
             History
           </Button>
@@ -115,18 +121,29 @@ export default History
 
 const HistoryItem = ({ chat }: { chat: ChatHistoryItem }) => {
   const { get } = useApi()
-  const { loadConversation, openModal } = useStore(
+  const { loadConversation, openModal, setIsLoadingMessages, resetConversationId } = useStore(
     useShallow((state) => ({
       loadConversation: state.loadConversation,
       openModal: state.openModal,
+      setIsLoadingMessages: state.setIsLoadingMessages,
+      resetConversationId: state.resetConversationId,
     })),
   )
 
   const onSelectChat = async (chat: ChatHistoryItem) => {
+    resetConversationId() // Reset the conversation ID
+    setIsLoadingMessages(true)
+
     const response = await get(`history/${chat.id}/messages`)
     if (!response.ok) {
-      // @TODO Error handling
       console.error('Failed to select chat')
+
+      trackEvent('HL Chat Select Chat Error', {
+        chatId: chat.id,
+        error: 'Failed to fetch messages',
+      })
+
+      setIsLoadingMessages(false)
       return
     }
     const { messages } = await response.json()
@@ -151,19 +168,42 @@ const HistoryItem = ({ chat }: { chat: ChatHistoryItem }) => {
         }
       }),
     )
+
+    trackEvent('HL Chat Opened', {
+      chatId: chat.id,
+      messageCount: messages.length,
+      source: 'history_item',
+    })
+
+    setIsLoadingMessages(false)
   }
 
   const onDeleteChat = async (chat: ChatHistoryItem) => {
     openModal('delete-chat', chat)
+    trackEvent('HL Chat Delete Initiated', {
+      chatId: chat.id,
+    })
   }
 
   return (
     <ContextMenu
       key={`menu-${chat.id}`}
       items={[
-        { label: 'Open Chat', onClick: () => onSelectChat(chat) },
+        {
+          label: 'Open Chat',
+          onClick: () => {
+            onSelectChat(chat)
+            trackEvent('HL Chat Opened', {
+              chatId: chat.id,
+              source: 'context_menu',
+            })
+          },
+        },
         { divider: true },
-        { label: <span className="text-red-400">Delete Chat</span>, onClick: () => onDeleteChat(chat) },
+        {
+          label: <span className="text-red-400">Delete Chat</span>,
+          onClick: () => onDeleteChat(chat),
+        },
       ]}
       position={'bottom'}
       triggerId={`chat-${chat.id}`}

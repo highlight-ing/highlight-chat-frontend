@@ -50,7 +50,7 @@ export default async function addAttachmentsToFormData(formData: FormData, attac
     if (attachment?.value) {
       switch (attachment.type) {
         case 'text_file':
-          formData.append('text_file', attachment.value)
+          formData.append('text_file', attachment.fileName + '\n' + attachment.value)
           break
         case 'image':
         case 'screenshot':
@@ -215,6 +215,7 @@ export const useSubmitQuery = () => {
     context.attachments?.map((attachment) => {
       console.log('Attachment: ', JSON.stringify(attachment))
     })
+
     if (!context.suggestion || context.suggestion.trim() === '') {
       console.log('No context received, ignoring.')
       return
@@ -233,22 +234,24 @@ export const useSubmitQuery = () => {
     let query = context.suggestion || ''
     let screenshotUrl = context.attachments?.find((a) => a.type === 'screenshot')?.value
     let clipboardText = context.attachments?.find((a) => a.type === 'clipboard')?.value
-    let ocrScreenContents = context.environment?.ocrScreenContents
-    let rawContents = context.application?.focusedWindow?.rawContents
     let audio = context.attachments?.find((a) => a.type === 'audio')?.value
     let windowTitle = context.application?.focusedWindow?.title
     let appIcon = context.application?.appIcon
+    let rawContents = context.application?.focusedWindow?.rawContents
 
-    // TODO: Shouldn't have to redeclare this
+    // Extract OCR content
+    let ocrText = context.environment?.ocrScreenContents
+
+    // Use rawContents if available, otherwise use ocrText
+    let contentToUse = rawContents || ocrText
+
     const fileAttachmentTypes = ['pdf', 'spreadsheet', 'text_file', 'image']
-
     const hasFileAttachment = context.attachments?.some((a: { type: string }) => fileAttachmentTypes.includes(a.type))
 
     // Fetch windows information
     const windows = await fetchWindows()
 
-    if (query || clipboardText || ocrScreenContents || screenshotUrl || rawContents || audio || hasFileAttachment) {
-      // TODO: Clean this up when the runtime API is updated and attachments types are no longer overloaded
+    if (query || clipboardText || contentToUse || screenshotUrl || audio || hasFileAttachment) {
       const att = context.attachments || ([] as unknown)
       const fileAttachments = (att as FileAttachment[]).filter((a) => a.type && fileAttachmentTypes.includes(a.type))
 
@@ -259,23 +262,21 @@ export const useSubmitQuery = () => {
         screenshot: screenshotUrl,
         audio,
         window: windowTitle ? { title: windowTitle, appIcon: appIcon } : undefined,
-        windows: windows, // Add windows information to the message
+        windows: windows,
         file_attachments: fileAttachments,
       })
 
       setInput('')
-      clearAttachments() // Clear the attachment immediately
+      clearAttachments()
 
       const formData = new FormData()
       formData.append('prompt', query)
-      formData.append('windows', JSON.stringify(windows)) // Add windows to formData
+      formData.append('windows', JSON.stringify(windows))
 
-      console.log('prompt app: ', promptApp)
       if (promptApp) {
         formData.append('app_id', promptApp.id.toString())
       }
 
-      // Add about_me to form data
       if (aboutMe) {
         formData.append('about_me', JSON.stringify(aboutMe))
       }
@@ -283,10 +284,9 @@ export const useSubmitQuery = () => {
       const contextAttachments = context.attachments || []
       await addAttachmentsToFormData(formData, contextAttachments)
 
-      let contextString = prepareHighlightContext(context)
-
-      if (contextString.trim() !== '') {
-        formData.append('context', contextString)
+      // Add OCR text or raw contents to form data
+      if (contentToUse) {
+        formData.append('ocr_text', contentToUse)
       }
 
       const accessToken = await getAccessToken()
@@ -327,10 +327,12 @@ export const useSubmitQuery = () => {
         role: 'user',
         content: query,
         screenshot,
+        ocr_text: ocrText,
         audio,
         file_title: fileTitle,
         clipboard_text: clipboardText,
-        windows: windows, // Add windows information to the message
+        windows: windows,
+        file_attachments: attachments.filter((attachment) => attachment.type === 'text_file'),
       })
 
       setInput('')

@@ -14,8 +14,9 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@amplitude/analytics-browser": "^2.10.0",
     "@headlessui/react": "^2.1.2",
-    "@highlight-ai/app-runtime": "^0.0.44",
+    "@highlight-ai/app-runtime": "^0.0.47",
     "@supabase/supabase-js": "^2.44.4",
     "@tailwindcss/line-clamp": "^0.4.4",
     "ai": "^3.2.15",

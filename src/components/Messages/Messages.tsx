@@ -4,15 +4,17 @@ import styles from '@/main.module.scss'
 import ThinkingMessage from '@/components/Messages/ThinkingMessage'
 import { useStore } from '@/providers/store-provider'
 import { useShallow } from 'zustand/react/shallow'
+import Spinner from '@/components/Spinner'
 
 // The threshold in pixels to consider chat "scrolled up" by the user.
 const IS_SCROLLED_THRESHOLD_PX = 10
 
 const Messages = () => {
-  const { messages, inputIsDisabled } = useStore(
+  const { messages, inputIsDisabled, isLoadingMessages } = useStore(
     useShallow((state) => ({
       messages: state.messages,
       inputIsDisabled: state.inputIsDisabled,
+      isLoadingMessages: state.isLoadingMessages,
     })),
   )
 
@@ -56,20 +58,27 @@ const Messages = () => {
   }, [])
 
   return (
-    <div className={styles.messagesContainer} ref={scrollContainerRef} onScroll={handleScroll}>
-      <div className={styles.messages}>
-        {messages.length > 0 &&
-          messages.map((message, index) => {
-            if (message.role === 'assistant' && !message.content?.trim()?.length) {
-              return ''
-            }
-            return <Message key={index} message={message} />
-          })}
-        {inputIsDisabled &&
-          (!messages.length ||
-            messages[messages.length - 1].role !== 'assistant' ||
-            !messages[messages.length - 1].content?.trim()?.length) && <ThinkingMessage />}
-      </div>
+    <div className={`${styles.messagesContainer} flex flex-col`} ref={scrollContainerRef} onScroll={handleScroll}>
+      {isLoadingMessages ? (
+        <div className="flex flex-grow items-center justify-center">
+          <div className="flex flex-col items-center space-y-2">
+            <Spinner size="medium" />
+            <p className="text-light-60">Loading conversation...</p>
+          </div>
+        </div>
+      ) : (
+        <div className={styles.messages}>
+          {messages.length > 0
+            ? messages.map((message, index) => {
+                if (message.role === 'assistant' && !message.content?.trim()?.length) {
+                  return null
+                }
+                return <Message key={index} message={message} />
+              })
+            : null}
+          {inputIsDisabled && messages.length > 0 && <ThinkingMessage />}
+        </div>
+      )}
     </div>
   )
 }

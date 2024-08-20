@@ -5,6 +5,7 @@ import Tooltip from './Tooltip'
 import { useStore } from '@/providers/store-provider'
 import { AttachmentType } from '@/types'
 import { useImageDownload } from '@/hooks/useImageDownload'
+import { trackEvent } from '@/utils/amplitude'
 import { useShallow } from 'zustand/react/shallow'
 
 interface BaseAttachmentProps {
@@ -44,6 +45,7 @@ export const Attachment = ({ type, value, removeEnabled = false, ...props }: Att
     if (fileInputRef?.current && isFile) {
       fileInputRef.current.value = ''
     }
+    trackEvent('HL Chat Attachment Removed', { type })
   }
 
   const renderAttachmentContent = () => {

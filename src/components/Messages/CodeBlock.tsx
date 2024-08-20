@@ -4,6 +4,7 @@ import { darcula } from 'react-syntax-highlighter/dist/esm/styles/hljs'
 import Button from '@/components/Button/Button'
 import styles from './message.module.scss'
 import { Copy, TickCircle } from 'iconsax-react'
+import { trackEvent } from '@/utils/amplitude'
 
 interface CodeBlockProps {
   language: string
@@ -21,6 +22,7 @@ const CodeBlock = ({ children, language }: PropsWithChildren<CodeBlockProps>) =>
       setCopied(false)
       timeoutRef.current = undefined
     }, 2000)
+    trackEvent('HL Chat Code Copied', { language })
   }
 
   useEffect(() => {
