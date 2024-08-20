@@ -11,6 +11,9 @@ import { ModalContainer } from '@/components/modals/ModalContainer'
 import { useShallow } from 'zustand/react/shallow'
 import { dataURItoFile } from '@/utils/attachments'
 import { Attachment, ImageAttachment, PdfAttachment, SpreadsheetAttachment, TextFileAttachment } from '@/types'
+import { initAmplitude, trackEvent } from '@/utils/amplitude'
+import useAuth from '@/hooks/useAuth'
+import { decodeJwt } from 'jose'
 
 function processAttachments(attachments: any[]): Attachment[] {
   return attachments.map((attachment) => {
@@ -139,6 +142,7 @@ function useAboutMeRegister() {
 export default function App({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
+  const { getAccessToken } = useAuth()
 
   const navigateToNewChat = useCallback(() => {
     if (pathname !== '/') {
@@ -151,6 +155,40 @@ export default function App({ children }: { children: React.ReactNode }) {
       window.location.href = 'https://highlight.ing/apps/highlightchat'
     }
   }, [])
+
+  useEffect(() => {
+    const initializeAmplitude = async () => {
+      try {
+        // Get the access token using the useAuth hook
+        const accessToken = await getAccessToken()
+
+        // Decode the token to get the payload
+        const payload = decodeJwt(accessToken)
+
+        // Extract the user ID from the 'sub' field
+        const userId = payload.sub as string
+
+        if (!userId) {
+          throw new Error('User ID not found in token')
+        }
+
+        // Initialize Amplitude with the user ID
+        initAmplitude(userId)
+
+        // Track the app initialization event
+        trackEvent('HL Chat App Initialized', { userId })
+      } catch (error) {
+        console.error('Failed to initialize Amplitude:', error)
+
+        // Fallback to a random ID if token retrieval or decoding fails
+        const fallbackId = `anonymous_${Math.random().toString(36).substr(2, 9)}`
+        initAmplitude(fallbackId)
+        trackEvent('HL Chat App Initialized', { fallbackId, error: 'Failed to get userId' })
+      }
+    }
+
+    initializeAmplitude()
+  }, [getAccessToken])
 
   useContextReceivedHandler(navigateToNewChat)
   useAboutMeRegister()

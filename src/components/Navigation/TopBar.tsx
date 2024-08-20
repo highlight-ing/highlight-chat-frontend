@@ -13,6 +13,7 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import styles from './top-bar.module.scss'
 import variables from '@/variables.module.scss'
 import { useOpenConverationsPersistence } from '@/hooks/useOpenConverationsPersistence'
+import { trackEvent } from '@/utils/amplitude'
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const router = useRouter()
@@ -49,14 +50,14 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const onNewChatClick = () => {
     startNewConversation()
     clearPrompt()
-
     router.push('/')
+    trackEvent('HL Chat New Conversation Started', {})
   }
 
   const onShowHistoryClick = () => {
-    if (setShowHistory) {
-      setShowHistory(!showHistory)
-    }
+    setShowHistory(!showHistory)
+    trackEvent('HL Chat History Toggled', { newState: !showHistory })
+    router.push('/')
   }
 
   const onSelectChat = async (chat: ChatHistoryItem) => {

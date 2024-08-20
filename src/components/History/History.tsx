@@ -2,16 +2,17 @@ import styles from './history.module.scss'
 import * as React from 'react'
 import { useChatHistory } from '@/hooks/useChatHistory'
 import Tooltip from '@/components/Tooltip/Tooltip'
-import { Clock } from 'iconsax-react'
+import { Category, Clock } from 'iconsax-react'
 import { useStore } from '@/providers/store-provider'
 import { useApi } from '@/hooks/useApi'
-import { ChatHistoryItem } from '@/types'
+import { ChatHistoryItem, Message } from '@/types'
 import ContextMenu from '@/components/ContextMenu/ContextMenu'
 import { BaseMessage, UserMessage, AssistantMessage } from '@/types'
 import Button from '@/components/Button/Button'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import CircleButton from '@/components/CircleButton/CircleButton'
+import { trackEvent } from '@/utils/amplitude'
 
 interface HistoryProps {
   showHistory: boolean
@@ -60,8 +61,8 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
     return sortArrayByDate(history)
   }, [history])
 
-  const onOpenChat = () => {
-    setShowHistory(false)
+  const toggleHistory = () => {
+    setShowHistory(!showHistory)
   }
 
   useEffect(() => {
@@ -96,7 +97,7 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
     <div className={`${styles.history} ${showHistory ? styles.show : styles.hide}`}>
       <div className={styles.header}>
         <Tooltip tooltip="Hide chat history" position="bottom">
-          <CircleButton fitContents={true} onClick={() => setShowHistory(!showHistory)}>
+          <CircleButton fitContents={true} onClick={toggleHistory}>
             <Clock size={20} variant={'Bold'} />
             <span className={'text-sm'}>Chat History</span>
           </CircleButton>
@@ -171,10 +172,20 @@ const HistoryItem = ({ chat, onOpenChat }: { chat: ChatHistoryItem; onOpenChat?:
     }
     addOrUpdateOpenConversation(chat)
     setConversationId(chat.id)
+
+    // @TODO move to use chat loading hook
+    trackEvent('HL Chat Opened', {
+      chatId: chat.id,
+      // messageCount: messages.length,
+      source: 'history_item',
+    })
   }
 
   const onDeleteChat = async (chat: ChatHistoryItem) => {
     openModal('delete-chat', chat)
+    trackEvent('HL Chat Delete Initiated', {
+      chatId: chat.id,
+    })
   }
 
   useEffect(() => {
@@ -199,9 +210,21 @@ const HistoryItem = ({ chat, onOpenChat }: { chat: ChatHistoryItem; onOpenChat?:
     <ContextMenu
       key={`menu-${chat.id}`}
       items={[
-        { label: 'Open Chat', onClick: () => onSelectChat(chat) },
+        {
+          label: 'Open Chat',
+          onClick: () => {
+            onSelectChat(chat)
+            trackEvent('HL Chat Opened', {
+              chatId: chat.id,
+              source: 'context_menu',
+            })
+          },
+        },
         { divider: true },
-        { label: <span className="text-red-400">Delete Chat</span>, onClick: () => onDeleteChat(chat) },
+        {
+          label: <span className="text-red-400">Delete Chat</span>,
+          onClick: () => onDeleteChat(chat),
+        },
       ]}
       position={'bottom'}
       triggerId={`chat-${chat.id}`}
