@@ -164,7 +164,6 @@ const HistoryItem = ({ chat, onOpenChat }: { chat: ChatHistoryItem; onOpenChat?:
   const { addOrUpdateOpenConversation, openModal, setConversationId } = useStore(
     useShallow((state) => ({
       setConversationId: state.setConversationId,
-      loadConversation: state.loadConversation,
       openModal: state.openModal,
       addOrUpdateOpenConversation: state.addOrUpdateOpenConversation,
     })),

@@ -39,7 +39,6 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
       promptUserId: state.promptUserId,
       clearPrompt: state.clearPrompt,
       conversationId: state.conversationId,
-      loadConversation: state.loadConversation,
       setConversationId: state.setConversationId,
       openConversations: state.openConversations,
       setOpenConversations: state.setOpenConversations,
