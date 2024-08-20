@@ -2,52 +2,64 @@ import { StateCreator } from 'zustand'
 import { Message } from '@/types'
 
 export interface MessagesState {
-  messages: Message[]
-  openConversationMessages: Record<string, Message[]>
+  conversationMessages: Record<string, Message[]>
 }
 
 export type MessagesSlice = MessagesState & {
-  addMessage: (message: Message) => void
-  updateLastMessage: (message: Message) => void
-  clearMessages: () => void
-  setMessages: (messages: Message[]) => void
-  updateOpenConversationMessages: (conversationId: string, messages: Message[]) => void
-  clearOpenConversationMessages: (conversationId: string) => void
-  setAllOpenConversationMessages: (conversationMessages: Record<string, Message[]>) => void
-  clearAllOpenConversationMessages: () => void
+  addConversationMessage: (conversationId: string, messages: Message) => void
+  updateLastConversationMessage: (conversationId: string, messages: Message) => void
+  updateConversationMessages: (conversationId: string, messages: Message[]) => void
+  clearConversationMessages: (conversationId: string) => void
+  setAllConversationMessages: (conversationMessages: Record<string, Message[]>) => void
+  clearAllConversationMessages: () => void
+  clearAllOtherConversationMessages: (conversationId: string) => void
 }
 
 export const initialMessagesState: MessagesState = {
-  messages: [],
-  openConversationMessages: {},
+  conversationMessages: {},
 }
 
 export const createMessagesSlice: StateCreator<MessagesSlice> = (set, get) => ({
   ...initialMessagesState,
-  addMessage: (message: Message) => set((state) => ({ messages: [...state.messages, message] })),
-  updateLastMessage: (message: Message) => set((state) => ({ messages: [...state.messages.slice(0, -1), message] })),
-  clearMessages: () => set({ messages: [] }),
-  setMessages: (messages: Message[]) => {
-    set({ messages })
+  addConversationMessage: (conversationId, message) => {
+    const openConversationMessages = { ...get().conversationMessages }
+    if (!openConversationMessages[conversationId]) {
+      openConversationMessages[conversationId] = []
+    }
+    openConversationMessages[conversationId].push(message)
+    set({ conversationMessages: openConversationMessages })
   },
-  updateOpenConversationMessages: (conversationId, messages) => {
-    const openConversationMessages = { ...get().openConversationMessages }
+  updateLastConversationMessage: (conversationId, message) => {
+    const openConversationMessages = { ...get().conversationMessages }
+    if (!openConversationMessages[conversationId]?.length) {
+      return
+    }
+    openConversationMessages[conversationId] = [...openConversationMessages[conversationId].slice(0, -1), message]
+    set({ conversationMessages: openConversationMessages })
+  },
+  updateConversationMessages: (conversationId, messages) => {
+    const openConversationMessages = { ...get().conversationMessages }
     openConversationMessages[conversationId] = messages
-    set({ openConversationMessages })
+    set({ conversationMessages: openConversationMessages })
   },
-  clearOpenConversationMessages: (conversationId) => {
-    const conversations = get().openConversationMessages
+  clearConversationMessages: (conversationId) => {
+    const conversations = get().conversationMessages
     if (!conversations[conversationId]) {
       return
     }
     const openConversationMessages = { ...conversations }
     delete openConversationMessages[conversationId]
-    set({ openConversationMessages })
+    set({ conversationMessages: openConversationMessages })
   },
-  setAllOpenConversationMessages: (conversationMessages) => {
-    set({ openConversationMessages: conversationMessages })
+  setAllConversationMessages: (conversationMessages) => {
+    set({ conversationMessages: conversationMessages })
   },
-  clearAllOpenConversationMessages: () => {
-    set({ openConversationMessages: {} })
+  clearAllConversationMessages: () => {
+    set({ conversationMessages: {} })
+  },
+  clearAllOtherConversationMessages: (conversationId) => {
+    const conversationMessages: Record<string, Message[]> = {}
+    conversationMessages[conversationId] = get().conversationMessages[conversationId]
+    set({ conversationMessages })
   },
 })

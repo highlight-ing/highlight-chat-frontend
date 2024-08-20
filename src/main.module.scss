@@ -17,7 +17,8 @@
   position: relative;
   overflow-y: auto;
   //top: $topbar-height;
-  //height: calc(100% - $topbar-height);
+  margin-top: $topbar-height;
+  height: calc(100% - $topbar-height);
 
   &.full {
     animation: history-hide 250ms ease forwards;

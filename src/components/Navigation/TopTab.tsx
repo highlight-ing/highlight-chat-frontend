@@ -30,11 +30,12 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
 
     const isConversationLoading = useStore((state) => state.isConversationLoading)
     const conversationId = useStore((state) => state.conversationId)
-    const openConversationMessages = useStore((state) => state.openConversationMessages)
+    const openConversations = useStore((state) => state.openConversations)
+    const openConversationMessages = useStore((state) => state.conversationMessages)
     const setConversationId = useStore((state) => state.setConversationId)
     const setOpenConversations = useStore((state) => state.setOpenConversations)
-    const setAllOpenConversationMessages = useStore((state) => state.setAllOpenConversationMessages)
-    const clearAllOpenConversationMessages = useStore((state) => state.clearAllOpenConversationMessages)
+    const clearAllConversationMessages = useStore((state) => state.clearAllConversationMessages)
+    const clearAllOtherConversationMessages = useStore((state) => state.clearAllOtherConversationMessages)
     const startNewConversation = useStore((state) => state.startNewConversation)
 
     const menuOptions = useMemo<MenuItemType[]>(() => {
@@ -50,32 +51,32 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
           label: 'Close',
           onClick: () => onClose(conversation),
         },
-        {
-          label: 'Close all others',
-          onClick: () => {
-            if (conversationId !== conversation.id) {
-              setConversationId(conversation.id)
-            }
-            setOpenConversations([conversation])
-            if (openConversationMessages[conversationId!]) {
-              setAllOpenConversationMessages({ [conversationId!]: openConversationMessages[conversationId!] })
-            } else {
-              clearAllOpenConversationMessages()
-            }
-          },
-        },
-        {
-          label: 'Close all',
-          onClick: () => {
-            setOpenConversations([])
-            clearAllOpenConversationMessages()
-            if (conversationId) {
-              startNewConversation()
-            }
-          },
-        },
+        ...(openConversations.length > 1
+          ? [
+              {
+                label: 'Close all others',
+                onClick: () => {
+                  if (conversationId !== conversation.id) {
+                    setConversationId(conversation.id)
+                  }
+                  setOpenConversations([conversation])
+                  clearAllOtherConversationMessages(conversation.id)
+                },
+              },
+              {
+                label: 'Close all',
+                onClick: () => {
+                  setOpenConversations([])
+                  clearAllConversationMessages()
+                  if (conversationId) {
+                    startNewConversation()
+                  }
+                },
+              },
+            ]
+          : []),
       ]
-    }, [conversation, conversationId])
+    }, [openConversations, conversation, conversationId, openConversationMessages])
 
     useEffect(() => {
       const filteredTitle =

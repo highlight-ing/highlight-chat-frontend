@@ -20,7 +20,7 @@ const DeleteChatModal = ({ id, context }: ModalObjectProps) => {
         startNewConversation: state.startNewConversation,
         closeModal: state.closeModal,
         removeOpenConversation: state.removeOpenConversation,
-        clearOpenConversationMessages: state.clearOpenConversationMessages,
+        clearOpenConversationMessages: state.clearConversationMessages,
       })),
     )
 
