@@ -1,0 +1,70 @@
+@import '@/variables.module';
+
+.shareModalContainer {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 8px;
+  z-index: 50;
+}
+
+.shareModal {
+  width: 320px;
+  background-color: $chat-share-modal-background;
+  border: 1px solid $light-5;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.header {
+  padding: 16px 16px 0 16px;
+  text-align: left;
+}
+
+.content {
+  padding: 16px;
+}
+
+.previewBox {
+  background-color: $dark-20;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border-top: 1px solid $light-10;
+}
+
+.disableButton, .copyButton {
+  width: 100%;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.disableButton {
+  background-color: $light-5;
+  color: $light-80;
+
+  &:hover {
+    background-color: $light-10;
+  }
+}
+
+.copyButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  background-color: $primary-100;
+  color: $dark-100;
+
+  &:hover {
+    background-color: $primary-80;
+  }
+}

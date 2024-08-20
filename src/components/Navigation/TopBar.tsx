@@ -13,6 +13,8 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import styles from './top-bar.module.scss'
 import variables from '@/variables.module.scss'
 import { useOpenConverationsPersistence } from '@/hooks/useOpenConverationsPersistence'
+import { useState } from 'react'
+import ShareModal from '@/components/ShareModal/ShareModal'
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const router = useRouter()
@@ -83,7 +85,11 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
 
   useOpenConverationsPersistence()
 
-  // const promptType = promptApp ? getPromptAppType(promptUserId, promptApp) : undefined
+  const [showShareModal, setShowShareModal] = useState(false)
+
+  const toggleShareModal = () => {
+    setShowShareModal(!showShareModal)
+  }
 
   return (
     <div className={styles.topBar}>
@@ -156,50 +162,17 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
 
         <div className="flex items-center gap-1">
           <div className={styles.tabContainer}>
-            <Tooltip tooltip="Share" position="bottom">
-              <div className={`${styles.tab} cursor-pointer`}>
-                <span className="flex max-w-full items-center gap-2 overflow-hidden overflow-ellipsis whitespace-nowrap">
-                  <span>Share</span>
-                  <ExportCurve size={20} variant={'Linear'} />
-                </span>
-              </div>
-            </Tooltip>
+            <div className={`${styles.tab} cursor-pointer`} onClick={toggleShareModal}>
+              <span className="flex max-w-full items-center gap-2 overflow-hidden overflow-ellipsis whitespace-nowrap">
+                <span>Share</span>
+                <ExportCurve size={20} variant={'Linear'} />
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/*{*/}
-      {/*  (promptName || !!messages.length) &&*/}
-      {/*  <div className={styles.middle}>*/}
-      {/*    <Tooltip tooltip="Switch chat app" position="bottom">*/}
-      {/*      <CircleButton*/}
-      {/*        fitContents={true}*/}
-      {/*        className={`${styles.promptSwitch} ${promptType ? styles[(!promptName || !messages.length) ? 'default' : promptType] : ''}`}*/}
-      {/*        onClick={() => openModal('prompts-modal')}*/}
-      {/*      >*/}
-      {/*        {*/}
-      {/*          promptName*/}
-      {/*            ? <MessageText variant={"Bold"} size={24}/>*/}
-      {/*            : <HighlightIcon size={20} color={variables.light40}/>*/}
-      {/*        }*/}
-      {/*        {promptName ?? 'Highlight'}*/}
-      {/*        <ArrowDown2 size={20} variant={'Bold'}/>*/}
-      {/*      </CircleButton>*/}
-      {/*    </Tooltip>*/}
-      {/*  </div>*/}
-      {/*}*/}
-
-      {/*{*/}
-      {/*  (promptName || messages.length > 0) &&*/}
-      {/*  <div className="flex gap-1">*/}
-      {/*    <Tooltip tooltip="Start new chat" position="left">*/}
-      {/*      <Button size={'medium'} variant={'ghost-neutral'} onClick={onNewChatClick}>*/}
-      {/*        New*/}
-      {/*        <AddCircle variant={"Bold"} size={20} />*/}
-      {/*      </Button>*/}
-      {/*    </Tooltip>*/}
-      {/*  </div>*/}
-      {/*}*/}
+      {showShareModal && <ShareModal onClose={() => setShowShareModal(false)} />}
     </div>
   )
 }
