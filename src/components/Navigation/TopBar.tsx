@@ -83,6 +83,26 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
     clearPrompt()
   }
 
+  const onCopyLink = async () => {
+    try {
+      // await copyLinkToClipboard(); // Implement this function
+      setShowShareModal(false)
+    } catch (error) {
+      // Handle error (e.g., show error message)
+      console.error('Failed to copy link:', error)
+    }
+  }
+
+  const onDisableLink = async () => {
+    try {
+      // await disableShareLink(); // Implement this function
+      setShowShareModal(false)
+    } catch (error) {
+      // Handle error (e.g., show error message)
+      console.error('Failed to disable link:', error)
+    }
+  }
+
   useOpenConverationsPersistence()
 
   const [showShareModal, setShowShareModal] = useState(false)
@@ -172,7 +192,9 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
         </div>
       </div>
 
-      {showShareModal && <ShareModal onClose={() => setShowShareModal(false)} />}
+      {showShareModal && (
+        <ShareModal onClose={() => setShowShareModal(false)} onCopyLink={onCopyLink} onDisableLink={onDisableLink} />
+      )}
     </div>
   )
 }

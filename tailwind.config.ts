@@ -23,6 +23,7 @@ const config: Config = {
         'light-16': 'rgba(255,255,255,0.16)',
         'light-10': 'rgba(255,255,255,0.10)',
         'light-20': 'rgba(255,255,255,0.20)',
+        'light-40': 'rgba(255,255,255,0.40)',
         'light-60': 'rgba(255,255,255,0.60)',
         'light-80': 'rgba(255,255,255,0.80)',
         light: '#FFFFFF',
