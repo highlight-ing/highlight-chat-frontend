@@ -74,9 +74,9 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
           </Button>
         </Tooltip>
       </div>
-      <div className={styles.chats}>
+      <div className={`${styles.chats} relative flex-grow`}>
         {isLoadingHistory ? (
-          <div className="flex flex-grow items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center">
             <Spinner size="medium" />
           </div>
         ) : !history?.length ? (
