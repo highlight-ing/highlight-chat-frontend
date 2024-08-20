@@ -35,6 +35,7 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
     const setOpenConversations = useStore((state) => state.setOpenConversations)
     const setAllOpenConversationMessages = useStore((state) => state.setAllOpenConversationMessages)
     const clearAllOpenConversationMessages = useStore((state) => state.clearAllOpenConversationMessages)
+    const startNewConversation = useStore((state) => state.startNewConversation)
 
     const menuOptions = useMemo<MenuItemType[]>(() => {
       return [
@@ -68,6 +69,9 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
           onClick: () => {
             setOpenConversations([])
             clearAllOpenConversationMessages()
+            if (conversationId) {
+              startNewConversation()
+            }
           },
         },
       ]
