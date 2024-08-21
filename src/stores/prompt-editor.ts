@@ -32,7 +32,7 @@ export interface PromptEditorState {
 
 export type PromptEditorSlice = PromptEditorState & {
   setSelectedScreen: (screen: PromptEditorScreen) => void
-  setPromptEditorData: (data: Partial<PromptEditorData>) => void
+  setPromptEditorData: (data: Partial<PromptEditorData>, skipNeedSave?: boolean) => void
   clearPromptEditorData: () => void
   setNeedSave: (needSave: boolean) => void
   setSaving: (saving: boolean) => void
@@ -57,8 +57,8 @@ export const initialPromptEditorState: PromptEditorState = {
 export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, get) => ({
   ...initialPromptEditorState,
   setSelectedScreen: (screen: PromptEditorScreen) => set({ selectedScreen: screen }),
-  setPromptEditorData: (data: Partial<PromptEditorData>) =>
-    set({ promptEditorData: { ...get().promptEditorData, ...data }, needSave: true }),
+  setPromptEditorData: (data: Partial<PromptEditorData>, skipNeedSave?: boolean) =>
+    set({ promptEditorData: { ...get().promptEditorData, ...data }, needSave: !skipNeedSave }),
   clearPromptEditorData: () => set({ promptEditorData: initialPromptEditorState.promptEditorData }),
   setNeedSave: (needSave: boolean) => set({ needSave }),
   setSaving: (saving: boolean) => set({ saving }),
