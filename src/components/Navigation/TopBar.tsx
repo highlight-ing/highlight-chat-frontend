@@ -14,6 +14,7 @@ import styles from './top-bar.module.scss'
 import variables from '@/variables.module.scss'
 import { useOpenConverationsPersistence } from '@/hooks/useOpenConverationsPersistence'
 import { trackEvent } from '@/utils/amplitude'
+import { useTabHotkeys } from '@/hooks/useTabHotkeys'
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const router = useRouter()
@@ -30,6 +31,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
     setConversationId,
     setOpenConversations,
     removeOpenConversation,
+    clearConversationMessages,
   } = useStore(
     useShallow((state) => ({
       startNewConversation: state.startNewConversation,
@@ -43,6 +45,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
       openConversations: state.openConversations,
       setOpenConversations: state.setOpenConversations,
       removeOpenConversation: state.removeOpenConversation,
+      clearConversationMessages: state.clearConversationMessages,
     })),
   )
 
@@ -84,6 +87,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   }
 
   useOpenConverationsPersistence()
+  useTabHotkeys()
 
   // const promptType = promptApp ? getPromptAppType(promptUserId, promptApp) : undefined
 

@@ -4,8 +4,6 @@ import { Portal } from 'react-portal'
 import styles from './contextmenu.module.scss'
 import { calculatePositionedStyle } from '@/utils/components'
 
-const PIXEL_SPACING = 4
-
 type Position = 'top' | 'bottom' | 'left' | 'right'
 
 export interface MenuItemType {
@@ -22,7 +20,6 @@ interface ContextMenuProps {
   position: Position
   triggerId: string
   wrapperStyle?: React.CSSProperties
-  onOpen?: () => void
 }
 
 const ContextMenu = ({
@@ -33,7 +30,6 @@ const ContextMenu = ({
   items,
   offset = 0,
   wrapperStyle,
-  onOpen,
 }: PropsWithChildren<ContextMenuProps>) => {
   const [isOpen, setOpen] = useState(false)
   const [appliedStyle, setAppliedStyle] = useState<React.CSSProperties>({})
@@ -48,13 +44,6 @@ const ContextMenu = ({
     setAppliedStyle(styles)
   }
 
-  const onClickListener = useCallback(
-    (_e: MouseEvent) => {
-      setOpen(!isOpen)
-    },
-    [isOpen],
-  )
-
   const onClickOutsideListener = useCallback(
     (e: MouseEvent) => {
       const el = containerRef.current
@@ -67,15 +56,20 @@ const ContextMenu = ({
   )
 
   useEffect(() => {
-    const el = document.getElementById(triggerId)
-    if (!el) {
-      return
+    const onTrigger = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      const triggerContainsTarget = document.getElementById(triggerId)?.contains(target)
+      const targetContainsTrigger = false //!triggerContainsTarget && target.contains(document.getElementById(triggerId))
+      if (triggerContainsTarget || targetContainsTrigger) {
+        setOpen(!isOpen)
+      }
     }
-    el.addEventListener(leftClick ? 'click' : 'contextmenu', onClickListener)
+
+    document.addEventListener(leftClick ? 'click' : 'contextmenu', onTrigger)
     return () => {
-      el.removeEventListener(leftClick ? 'click' : 'contextmenu', onClickListener)
+      document.removeEventListener(leftClick ? 'click' : 'contextmenu', onTrigger)
     }
-  }, [leftClick, onClickListener])
+  }, [isOpen, triggerId, leftClick])
 
   useEffect(() => {
     document.addEventListener('click', onClickOutsideListener)
@@ -88,7 +82,6 @@ const ContextMenu = ({
 
   useEffect(() => {
     if (isOpen) {
-      if (onOpen) onOpen()
       recalculatePosition()
     }
   }, [isOpen])
