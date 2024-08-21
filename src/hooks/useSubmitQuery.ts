@@ -216,7 +216,6 @@ export const useSubmitQuery = () => {
 
           try {
             const jsonChunk = JSON.parse(jsonStr)
-            console.log('jsonChunk: ', jsonChunk)
 
             if (jsonChunk.type === 'text') {
               accumulatedResponse += jsonChunk.content
@@ -225,14 +224,12 @@ export const useSubmitQuery = () => {
                 content: accumulatedResponse,
               })
             } else if (jsonChunk.type === 'tool_use') {
-              console.log(`${jsonChunk.type}:`, jsonChunk)
               if (contextConfirmed === null) {
                 contextConfirmed = await showConfirmationModal(
                   'The assistant is requesting additional context. Do you want to allow this?',
                 )
               }
             } else if (jsonChunk.type === 'tool_use_input') {
-              console.log(`${jsonChunk.type}:`, jsonChunk)
               accumulatedToolUseInput += jsonChunk.content
 
               // Try to parse the accumulated tool use input
@@ -260,7 +257,7 @@ export const useSubmitQuery = () => {
                 accumulatedToolUseInput = ''
               } catch (parseError) {
                 // If parsing fails, it means we don't have the complete JSON yet
-                console.log('Incomplete tool use input, waiting for more data')
+                console.error('Incomplete tool use input, waiting for more data')
               }
             } else if (jsonChunk.type === 'error') {
               console.error('Error from backend:', jsonChunk.content)
