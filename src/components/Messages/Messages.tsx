@@ -5,6 +5,7 @@ import ThinkingMessage from '@/components/Messages/ThinkingMessage'
 import { useStore } from '@/providers/store-provider'
 import { useShallow } from 'zustand/react/shallow'
 import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
+import Scrollable from '@/components/Scrollable/Scrollable'
 
 // The threshold in pixels to consider chat "scrolled up" by the user.
 const IS_SCROLLED_THRESHOLD_PX = 10
@@ -57,7 +58,7 @@ const Messages = () => {
   }, [])
 
   return (
-    <div className={styles.messagesContainer} ref={scrollContainerRef} onScroll={handleScroll}>
+    <Scrollable className={styles.messagesContainer} ref={scrollContainerRef} onScroll={handleScroll}>
       <div className={styles.messages}>
         {messages.length > 0 &&
           messages.map((message, index) => {
@@ -71,7 +72,7 @@ const Messages = () => {
             messages[messages.length - 1].role !== 'assistant' ||
             !messages[messages.length - 1].content?.trim()?.length) && <ThinkingMessage />}
       </div>
-    </div>
+    </Scrollable>
   )
 }
 
