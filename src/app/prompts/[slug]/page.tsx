@@ -6,20 +6,16 @@ import { supabaseAdmin } from '@/lib/supabase'
 import { Metadata, ResolvingMetadata } from 'next'
 
 interface PromptPageProps {
-  params: { external_id: string }
+  params: { slug: string }
 }
 
-async function getPrompt(external_id: string) {
+async function getPrompt(slug: string) {
   const supabase = supabaseAdmin()
-  return await supabase
-    .from('prompts')
-    .select('*, user_images(file_extension)')
-    .eq('external_id', external_id)
-    .maybeSingle()
+  return await supabase.from('prompts').select('*, user_images(file_extension)').eq('slug', slug).maybeSingle()
 }
 
 export async function generateMetadata({ params }: PromptPageProps, parent: ResolvingMetadata): Promise<Metadata> {
-  const { data: prompt, error } = await getPrompt(params.external_id)
+  const { data: prompt, error } = await getPrompt(params.slug)
 
   if (error) {
     throw error
@@ -41,7 +37,7 @@ export async function generateMetadata({ params }: PromptPageProps, parent: Reso
 export default async function PromptPage({ params }: PromptPageProps) {
   // Look up the prompt by slug
 
-  const { data: prompt, error } = await getPrompt(params.external_id)
+  const { data: prompt, error } = await getPrompt(params.slug)
 
   if (error) {
     return <div>Error fetching prompt: {error.message}</div>
@@ -56,7 +52,7 @@ export default async function PromptPage({ params }: PromptPageProps) {
   // Fetch "related" prompts
   const { data: relatedPrompts } = await supabase
     .from('prompts')
-    .select('*')
+    .select('*, user_images(file_extension)')
     .neq('id', prompt.id)
     .order('created_at', { ascending: false })
     .limit(3)
@@ -71,10 +67,11 @@ export default async function PromptPage({ params }: PromptPageProps) {
       }
 
       relatedApps.push({
-        externalId: relatedPrompt.external_id,
         name: relatedPrompt.name,
         description: relatedPrompt.description ?? '',
         slug: relatedPrompt.slug,
+        imageId: relatedPrompt.image ?? undefined,
+        imageExtension: relatedPrompt.user_images?.file_extension ?? undefined,
       })
     })
   }

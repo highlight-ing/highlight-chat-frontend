@@ -1,4 +1,3 @@
-import Button from '@/components/Button/Button'
 import RelatedApp, { RelatedAppProps } from './RelatedApp'
 import Video from './Video'
 import TryButton from './TryButton'
@@ -77,7 +76,7 @@ export default function PromptListingPage({
         <div className="flex basis-1/2 flex-col gap-3">
           <h4 className="text-light-20">Related Apps</h4>
           {relatedApps.map((app) => (
-            <RelatedApp key={app.externalId} {...app} />
+            <RelatedApp key={app.slug} {...app} />
           ))}
         </div>
       </div>

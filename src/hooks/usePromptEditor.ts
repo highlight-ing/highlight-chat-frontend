@@ -26,8 +26,6 @@ export function usePromptEditor() {
   async function save() {
     setSaving(true)
 
-    const accessToken = await getAccessToken()
-
     if (!needSave) {
       setSaving(false)
       return
@@ -54,6 +52,7 @@ export function usePromptEditor() {
       formData.append('uploadingImage', promptEditorData.uploadingImage)
     }
 
+    const accessToken = await getAccessToken()
     const res = await savePrompt(formData, accessToken)
 
     if (res && res.error) {

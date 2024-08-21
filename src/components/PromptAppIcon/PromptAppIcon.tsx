@@ -9,17 +9,19 @@ export default function PromptAppIcon({
   imageId,
   imageExtension,
   className,
+  name,
 }: {
   height?: number
   width?: number
   imageId: string
   imageExtension: string
   className?: string
+  name?: string
 }) {
   return (
     <Image
       src={`/user_content/${imageId}.${imageExtension}`}
-      alt="Prompt app icon"
+      alt={name ?? 'Prompt app icon'}
       className={className}
       width={width}
       height={height}

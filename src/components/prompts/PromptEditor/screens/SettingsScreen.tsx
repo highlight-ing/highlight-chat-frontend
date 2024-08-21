@@ -91,10 +91,10 @@ function ShareLinkButton() {
   const timeout = useRef<NodeJS.Timeout | null>(null)
   const { promptEditorData } = usePromptEditorStore()
 
-  const host = window.location.protocol + '//' + window.location.host
-  const url = `${host}/prompts/${promptEditorData.externalId}`
+  const slug = promptEditorData.slug
 
-  const externalId = promptEditorData.externalId
+  const host = window.location.protocol + '//' + window.location.host
+  const url = `${host}/prompts/${slug}`
 
   const [copied, setCopied] = useState(false)
 
@@ -114,14 +114,14 @@ function ShareLinkButton() {
   return (
     <SettingOption
       label={'Share Link'}
-      description={<span className={'text-sm'}>{externalId ? url : 'Save your prompt to generate a share link'}</span>}
+      description={<span className={'text-sm'}>{slug ? url : 'Save your prompt to generate a share link'}</span>}
     >
       <Button
         onClick={onCopyLinkClick}
         size={'medium'}
         variant={'tertiary'}
         style={{ marginRight: '6px' }}
-        disabled={!externalId || copied}
+        disabled={!slug || copied}
       >
         {copied ? 'Copied' : 'Copy Link'}
       </Button>
