@@ -1,4 +1,4 @@
-import React, { forwardRef, useRef, useImperativeHandle, useState, useEffect } from 'react'
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import styles from './scrollable.module.scss'
 
 interface ScrollableProps {
@@ -73,11 +73,7 @@ const Scrollable = forwardRef<HTMLDivElement, React.PropsWithChildren<Scrollable
       const container = innerRef.current!
       const deltaY = e.clientY - startYRef.current
       const scrollRatio = container.scrollHeight / container.clientHeight
-      const newScrollTop = startScrollTopRef.current + deltaY * scrollRatio
-
-      console.log('scrollTop:', newScrollTop)
-
-      container.scrollTop = newScrollTop
+      container.scrollTop = startScrollTopRef.current + deltaY * scrollRatio
       updateHandlePosition()
     }
 
