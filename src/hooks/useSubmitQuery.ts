@@ -200,7 +200,7 @@ export const useSubmitQuery = () => {
         }
       }
 
-      const response = await post('chat_v2/', formData)
+      const response = await post('chat/', formData)
       if (!response.ok) {
         throw new Error('Network response was not ok')
       }
