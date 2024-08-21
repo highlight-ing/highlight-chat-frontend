@@ -348,7 +348,8 @@ export const useSubmitQuery = () => {
       const formData = new FormData()
       formData.append('prompt', query)
 
-      const isPromptApp = !!promptApp
+      const isPromptApp = promptApp?.is_handlebar_prompt ?? false
+
       if (isPromptApp) {
         formData.append('app_id', promptApp!.id.toString())
       }
