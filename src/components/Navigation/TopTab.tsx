@@ -9,6 +9,7 @@ import CircleButton from '@/components/CircleButton/CircleButton'
 import ContextMenu, { MenuItemType } from '@/components/ContextMenu/ContextMenu'
 import { useStore } from '@/providers/store-provider'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
+import { trackEvent } from '@/utils/amplitude'
 
 interface TopTabProps {
   isActive?: boolean
@@ -28,22 +29,38 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
     const [title, setTitle] = useState(filteredTitle)
     const [isAnimating, setIsAnimating] = useState(true)
 
+    const openModal = useStore((state) => state.openModal)
     const isConversationLoading = useStore((state) => state.isConversationLoading)
     const conversationId = useStore((state) => state.conversationId)
     const openConversations = useStore((state) => state.openConversations)
     const openConversationMessages = useStore((state) => state.conversationMessages)
     const setConversationId = useStore((state) => state.setConversationId)
     const setOpenConversations = useStore((state) => state.setOpenConversations)
+    const clearConversationMessages = useStore((state) => state.clearConversationMessages)
     const clearAllConversationMessages = useStore((state) => state.clearAllConversationMessages)
     const clearAllOtherConversationMessages = useStore((state) => state.clearAllOtherConversationMessages)
     const startNewConversation = useStore((state) => state.startNewConversation)
 
     const menuOptions = useMemo<MenuItemType[]>(() => {
       return [
-        {
-          label: 'Open',
-          onClick: () => onOpen(conversation),
-        },
+        ...(conversationId !== conversation.id
+          ? [
+              {
+                label: 'Open',
+                onClick: () => onOpen(conversation),
+              },
+            ]
+          : []),
+        ...(openConversationMessages[conversation.id]?.length > 0
+          ? [
+              {
+                label: 'Reload',
+                onClick: () => {
+                  clearConversationMessages(conversation.id)
+                },
+              },
+            ]
+          : []),
         {
           divider: true,
         },
@@ -75,6 +92,19 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
               },
             ]
           : []),
+        {
+          divider: true,
+        },
+        {
+          label: <span className={'text-red-400'}>Delete</span>,
+          onClick: () => {
+            openModal('delete-chat', conversation)
+            trackEvent('HL Chat Delete Initiated', {
+              chatId: conversation.id,
+              source: 'history',
+            })
+          },
+        },
       ]
     }, [openConversations, conversation, conversationId, openConversationMessages])
 

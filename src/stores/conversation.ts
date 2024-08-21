@@ -64,10 +64,10 @@ export const createConversationSlice: StateCreator<Store, [], [], ConversationSl
   },
   removeOpenConversation: (conversationId: string) => {
     const conversations = get().openConversations
-    get().clearConversationMessages(conversationId)
     set({
       openConversations: conversations.filter((c) => c.id !== conversationId),
     })
+    get().clearConversationMessages(conversationId)
   },
   setConversationLoading: (isLoading: boolean) => {
     set({ isConversationLoading: isLoading })

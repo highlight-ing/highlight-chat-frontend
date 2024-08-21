@@ -35,7 +35,6 @@ const DeleteChatModal = ({ id, context }: ModalObjectProps) => {
       startNewConversation()
     }
     removeOpenConversation(chat.id)
-    clearConversationMessages(chat.id)
     await refreshChatHistory()
     closeModal(id)
   }
