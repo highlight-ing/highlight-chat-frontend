@@ -7,6 +7,7 @@ import { ModalObjectProps } from '@/types'
 import PromptsModal from '@/presentations/modals/PromptsModal'
 import CreatePromptModal from '@/presentations/modals/CreatePromptModal'
 import EditPromptModal from '@/presentations/modals/EditPromptModal'
+import ConfirmationModal, { ConfirmationModalProps } from '@/components/modals/ConfirmationModal'
 import { useShallow } from 'zustand/react/shallow'
 
 type FunctionalComponent = (props: ModalObjectProps) => JSX.Element
@@ -17,6 +18,9 @@ const ModalMap: Record<string, FunctionalComponent> = {
   'edit-prompt': EditPromptModal,
   'delete-chat': DeleteChatModal,
   'prompts-modal': PromptsModal,
+  'confirmation-modal': ({ context }: ModalObjectProps) => (
+    <ConfirmationModal {...(context as ConfirmationModalProps)} />
+  ),
 }
 
 export const ModalContainer = () => {

@@ -1,7 +1,7 @@
 import { CSSProperties, PropsWithChildren, ReactElement, useEffect, useRef, useState } from 'react'
 import { Portal } from 'react-portal'
 import styles from './tooltip.module.scss'
-import {calculatePositionedStyle} from "@/utils/components";
+import { calculatePositionedStyle } from '@/utils/components'
 
 // space between tooltip and whatever it's wrapping
 const emptyObj = {}
@@ -22,7 +22,7 @@ const Tooltip = ({
   tooltip,
   disabled,
   wrapperStyle = emptyObj,
-  tooltipContainerStyle = emptyObj
+  tooltipContainerStyle = emptyObj,
 }: PropsWithChildren<TooltipProps>) => {
   const [tooltipVisible, setTooltipVisible] = useState(false)
   const [tooltipStyle, setTooltipStyle] = useState({})
@@ -51,7 +51,7 @@ const Tooltip = ({
 
   return (
     <div
-      className="group flex relative"
+      className="group relative flex"
       onClick={() => setTooltipVisible(false)}
       onMouseEnter={() => !disabled && setTooltipVisible(true)}
       onMouseLeave={() => setTooltipVisible(false)}
@@ -60,8 +60,7 @@ const Tooltip = ({
       style={wrapperStyle}
     >
       {children}
-      {
-        tooltipVisible &&
+      {tooltipVisible && (
         <Portal>
           <div
             ref={tooltipRef}
@@ -71,7 +70,7 @@ const Tooltip = ({
             {tooltip}
           </div>
         </Portal>
-      }
+      )}
     </div>
   )
 }

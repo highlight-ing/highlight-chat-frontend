@@ -32,7 +32,7 @@ const AnimatedLabel = ({ label, transitionMs }: { label: string | ReactElement; 
 
   return (
     // @ts-ignore
-    <div className={styles.label} style={{'--transitionMs': transitionMs}}>
+    <div className={styles.label} style={{ '--transitionMs': transitionMs }}>
       {displayedLabel}
     </div>
   )
