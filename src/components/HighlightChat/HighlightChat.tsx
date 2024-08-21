@@ -97,7 +97,7 @@ const HighlightChat = () => {
       <div
         className={`${styles.contents} ${showHistory ? styles.partial : styles.full} ${messages.length > 0 || inputIsDisabled || !!promptName ? styles.justifyEnd : ''}`}
       >
-        <ChatHeader isShowing={!!promptName && messages.length === 0} />
+        <ChatHeader isShowing={!isConversationLoading && !!promptName && messages.length === 0} />
         {(isChatting || (isConversationLoading && messages.length > 0)) && <Messages />}
         {isConversationLoading && messages.length === 0 && !inputIsDisabled && <MessagesPlaceholder />}
         <ChatHome isShowing={!isChatting && !promptName && !isConversationLoading} />

@@ -94,6 +94,8 @@ export type Database = {
           role: string
           text_file: string | null
           user_id: string
+          window_context: string | null
+          windows: string[] | null
         }
         Insert: {
           audio?: string | null
@@ -108,6 +110,8 @@ export type Database = {
           role: string
           text_file?: string | null
           user_id: string
+          window_context?: string | null
+          windows?: string[] | null
         }
         Update: {
           audio?: string | null
@@ -122,6 +126,8 @@ export type Database = {
           role?: string
           text_file?: string | null
           user_id?: string
+          window_context?: string | null
+          windows?: string[] | null
         }
         Relationships: [
           {

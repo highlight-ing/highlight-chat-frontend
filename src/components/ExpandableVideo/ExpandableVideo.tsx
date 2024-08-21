@@ -1,4 +1,4 @@
-import { CSSProperties, ReactElement, useEffect, useRef, useState } from 'react'
+import React, { CSSProperties, ReactElement, useEffect, useRef, useState } from 'react'
 import { ExportSquare, VideoCircle } from 'iconsax-react'
 import styles from './expandablevideo.module.scss'
 import variables from '@/variables.module.scss'
@@ -55,8 +55,7 @@ const ExpandableVideo = (props: ExampleVideoProps) => {
   return (
     <div
       className={styles.example}
-      // @ts-ignore
-      style={{ '--is-fullscreen': large, ...style }}
+      style={{ '--is-fullscreen': large, ...style } as React.CSSProperties}
       onMouseEnter={() => (videoRef.current?.paused ? videoRef.current.play() : {})}
       onMouseLeave={() => (!large && videoRef.current?.paused === false ? videoRef.current.pause() : {})}
       onClick={() => (!large ? setLarge(true) : {})}

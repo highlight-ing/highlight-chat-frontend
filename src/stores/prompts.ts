@@ -12,6 +12,7 @@ import { Store } from '.'
 export interface PromptsState {
   promptUserId?: string | undefined
   prompts: Prompt[]
+  isPromptsLoaded: boolean
 }
 
 export type PromptsSlice = PromptsState & {
@@ -20,11 +21,13 @@ export type PromptsSlice = PromptsState & {
   updatePrompt: (prompt: Prompt) => void
   removePrompt: (externalId: string) => void
   addPrompt: (prompt: Prompt) => void
+  setIsPromptsLoaded: (isPromptsLoaded: boolean) => void
 }
 
 export const initialPromptsState: PromptsState = {
   promptUserId: undefined,
   prompts: [],
+  isPromptsLoaded: false,
 }
 
 export const createPromptsSlice: StateCreator<Store, [], [], PromptsSlice> = (set, get) => ({
@@ -65,6 +68,9 @@ export const createPromptsSlice: StateCreator<Store, [], [], PromptsSlice> = (se
     set({
       prompts: get().prompts.filter((p) => p.external_id !== externalId),
     })
+  },
+  setIsPromptsLoaded: (isPromptsLoaded) => {
+    set({ isPromptsLoaded })
   },
 })
 

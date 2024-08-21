@@ -14,8 +14,7 @@ const CircleButton = ({ children, className, fitContents, onClick, size }: Props
     <button
       className={`${styles.circleButton} ${fitContents ? styles.fitContents : ''} ${className ?? ''}`}
       onClick={onClick}
-      // @ts-ignore
-      style={{ '--size': size }}
+      style={{ '--size': size } as React.CSSProperties}
     >
       {children}
     </button>

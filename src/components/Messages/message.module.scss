@@ -69,7 +69,8 @@
   white-space: pre-wrap;
 
   strong {
-    color: $light-80;
+    color: $light-100;
+    font-weight: 450;
   }
 
   ol {
@@ -92,8 +93,8 @@
 
   h1, h2, h3, h4 {
     margin-top: 12px;
-    color: $light-80;
-    font-weight: 300;
+    color: $light-100;
+    font-weight: 450;
   }
 
   code {
