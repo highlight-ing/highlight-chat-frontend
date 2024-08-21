@@ -13,8 +13,7 @@ import { useStore } from '@/providers/store-provider'
 const EditPromptModal = ({ id, context }: ModalObjectProps) => {
   const prompt = context?.prompt as Prompt
 
-  const { setPromptEditorData, setSelectedScreen, needSave, saving, setSaving, setSettingsHasNoErrors } =
-    usePromptEditorStore()
+  const { setPromptEditorData, setSelectedScreen, setSettingsHasNoErrors } = usePromptEditorStore()
   const closeModal = useStore((state) => state.closeModal)
 
   useEffect(() => {

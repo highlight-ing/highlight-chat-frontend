@@ -194,9 +194,11 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
     trigger()
   }, [])
 
+  const errorCount = Object.keys(errors).length === 0
+
   useEffect(() => {
-    setSettingsHasNoErrors(Object.keys(errors).length === 0)
-  }, [formState])
+    setSettingsHasNoErrors(errorCount)
+  }, [errorCount])
 
   // Hook to update the prompt editor data when the form changes
   useEffect(() => {
