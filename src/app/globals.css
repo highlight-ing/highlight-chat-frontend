@@ -22,6 +22,10 @@ body {
     box-sizing: border-box;
 }
 
+.shared-chat-container {
+  padding-top: 2rem !important;
+}
+
 /*::-webkit-scrollbar {*/
 /*    width: 9px;*/
 /*    height: 9px;*/

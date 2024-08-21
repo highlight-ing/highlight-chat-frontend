@@ -1,17 +1,21 @@
+'use client'
 import React from 'react'
 import ShareMessage from '@/components/Share/ShareMessage'
-import { Message as MessageType } from '@/types'
+import { Message } from '@/types'
+import styles from '../Messages/message.module.scss'
 
 interface ShareMessagesProps {
-  messages: MessageType[]
+  messages: Message[]
 }
 
 const ShareMessages: React.FC<ShareMessagesProps> = ({ messages }) => {
   return (
-    <div className="space-y-4">
-      {messages.map((message, index) => (
-        <ShareMessage key={index} message={message} />
-      ))}
+    <div className={styles.messagesContainer}>
+      <div className={styles.messages}>
+        {messages.map((message, index) => (
+          <ShareMessage key={index} message={message} />
+        ))}
+      </div>
     </div>
   )
 }

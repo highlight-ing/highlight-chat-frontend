@@ -1,41 +1,48 @@
-// import { notFound } from 'next/navigation';
-// import SharePageComponent from '@/components/Share/SharePageComponent'
-// import { getSharedConversation } from '@/lib/api';
-// import { Metadata } from 'next';
+import { notFound } from 'next/navigation'
+import SharePageComponent from '@/components/Share/SharePageComponent'
+import { getSharedConversation } from '@/services/shareLink'
+import { Metadata } from 'next'
+import { Message } from '@/types'
+import Header from '@/components/Share/Header'
+import Footer from '@/components/Share/Footer'
 
-// interface SharePageProps {
-//   params: {
-//     id: string;
-//   };
-// }
+interface SharePageProps {
+  params: {
+    id: string
+  }
+}
 
-// export async function generateMetadata({ params }: SharePageProps): Promise<Metadata> {
-//   const conversation = await getSharedConversation(params.id);
+export async function generateMetadata({ params }: SharePageProps): Promise<Metadata> {
+  const sharedData = await getSharedConversation(params.id)
 
-//   if (!conversation) {
-//     return {
-//       title: 'Shared Conversation | Your App Name',
-//       description: 'This conversation could not be found.',
-//     };
-//   }
+  if (!sharedData) {
+    return {
+      title: 'Shared Conversation | Your App Name',
+      description: 'This conversation could not be found.',
+    }
+  }
 
-//   return {
-//     title: `${conversation.title} | Your App Name`,
-//     description: conversation.description || 'View a shared conversation',
-//     // Add more metadata as needed (OpenGraph, Twitter, etc.)
-//   };
-// }
+  return {
+    title: `${sharedData.title} | Your App Name`,
+    description: 'View a shared conversation',
+    // Add more metadata as needed (OpenGraph, Twitter, etc.)
+  }
+}
 
-// export default async function SharePage({ params }: SharePageProps) {
-//   const conversation = await getSharedConversation(params.id);
+export default async function SharePage({ params }: SharePageProps) {
+  const sharedData = await getSharedConversation(params.id)
 
-//   if (!conversation) {
-//     notFound();
-//   }
+  if (!sharedData) {
+    notFound()
+  }
 
-//   return (
-//     <div className="min-h-screen bg-background">
-//       <SharePageComponent conversation={conversation} />
-//     </div>
-//   );
-// }
+  return (
+    <div className="flex min-h-screen flex-col">
+      <Header title={sharedData.title} />
+      <main className="flex-grow">
+        <SharePageComponent title={sharedData.title} messages={sharedData.messages} />
+      </main>
+      <Footer />
+    </div>
+  )
+}

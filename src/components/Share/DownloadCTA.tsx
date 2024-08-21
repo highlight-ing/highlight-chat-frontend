@@ -1,16 +1,18 @@
+'use client'
+
 import React from 'react'
+import { Setting } from 'iconsax-react'
+import variables from '@/variables.module.scss'
+import chatHomeStyles from '@/components/ChatHome/chathome.module.scss'
 
 const DownloadCTA: React.FC = () => {
   return (
-    <div className="mt-8 text-center">
-      <h2 className="mb-2 text-xl font-semibold">Want to create your own conversations?</h2>
-      <p className="mb-4">Download our app and start chatting!</p>
-      <a
-        href="/download" // Replace with your actual download link
-        className="bg-primary hover:bg-primary-dark rounded px-4 py-2 font-bold text-white transition-colors"
-      >
-        Download Now
-      </a>
+    <div className={chatHomeStyles.homeCallout} onClick={() => window.open('https://highlight.io', '_blank')}>
+      <div className={chatHomeStyles.header}>
+        <Setting color={variables.primary100} variant={'Bold'} />
+        Download Highlight
+      </div>
+      <p>Experience the full power of Highlight Chat on your desktop.</p>
     </div>
   )
 }

@@ -1,20 +1,29 @@
+'use client'
 import React from 'react'
-import { SharedChat } from '@/types/index'
+import { Message } from '@/types/index'
 import ShareMessages from '@/components/Share/ShareMessages'
 import DownloadCTA from '@/components/Share/DownloadCTA'
+import styles from '@/main.module.scss'
+import chatHomeStyles from '@/components/ChatHome/chathome.module.scss'
 
 interface SharePageComponentProps {
-  chat: SharedChat
+  title: string
+  messages: Message[]
 }
 
-const SharePageComponent: React.FC<SharePageComponentProps> = ({ chat }) => {
+const SharePageComponent: React.FC<SharePageComponentProps> = ({ title, messages }) => {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="mb-4 text-2xl font-bold">{chat.title}</h1>
-      <div className="rounded-lg bg-white p-6 shadow-md">
-        <ShareMessages messages={chat.messages} />
+    <div className={`${styles.contents} ${styles.full} flex flex-col justify-center`}>
+      <div
+        className={`${chatHomeStyles.chatHomeContainer} ${chatHomeStyles.show} shared-chat-container mx-auto w-full max-w-4xl`}
+      >
+        <div className="mb-6 rounded-lg bg-light-5 p-6 shadow-md">
+          <ShareMessages messages={messages} />
+        </div>
+        <div className={chatHomeStyles.callouts}>
+          <DownloadCTA />
+        </div>
       </div>
-      <DownloadCTA />
     </div>
   )
 }
