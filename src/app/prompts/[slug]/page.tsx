@@ -53,8 +53,9 @@ export default async function PromptPage({ params }: PromptPageProps) {
   const { data: relatedPrompts } = await supabase
     .from('prompts')
     .select('*, user_images(file_extension)')
+    .eq('public', true)
+    .eq('is_handlebar_prompt', true)
     .neq('id', prompt.id)
-    .order('created_at', { ascending: false })
     .limit(3)
 
   let relatedApps: RelatedAppProps[] = []
