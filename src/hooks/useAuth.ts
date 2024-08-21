@@ -2,6 +2,7 @@ import { refreshTokens } from '@/app/(app)/actions'
 import { useStore } from '@/providers/store-provider'
 import Highlight from '@highlight-ai/app-runtime'
 import { decodeJwt } from 'jose'
+import { useEffect } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 
 /**
@@ -44,6 +45,19 @@ export default function useAuth() {
     authExpiration = exp
   }
 
+  // Hook that checks if the auth state in Highlight has changed, if so,
+  // we need to update the auth state in the store
+  useEffect(() => {
+    const subscription = Highlight.app.addListener('onAuthUpdate', () => {
+      console.log('[useAuth] onAuthUpdate was fired from HL runtime, requesting new tokens.')
+      getNewTokens()
+
+      // TODO: This should trigger a refetch of all prompts, conversations, etc.
+    })
+
+    return () => subscription()
+  }, [])
+
   async function attemptToRefreshTokens() {
     // Attempt to refresh the tokens
     try {
@@ -82,7 +96,7 @@ export default function useAuth() {
     }
 
     // Check if the current tokens are expired
-    if (authExpiration && Date.now() >= authExpiration * 1000) {
+    if (authExpiration !== undefined && Date.now() >= authExpiration * 1000) {
       console.log('[useAuth] Auth tokens expired, attempting to refresh.', Date.now(), authExpiration * 1000)
       await attemptToRefreshTokens()
     }
@@ -91,6 +105,8 @@ export default function useAuth() {
       // The new access token should be set by now...
       throw new Error("Access token wasn't set after trying to refresh/generate a new one.")
     }
+
+    // console.log('Auth token has not expired', authExpiration * 1000, Date.now(), authExpiration * 1000 > Date.now())
 
     return accessToken
   }

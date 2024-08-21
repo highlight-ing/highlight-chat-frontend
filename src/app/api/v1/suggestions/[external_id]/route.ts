@@ -40,7 +40,7 @@ export async function GET(request: Request, { params }: { params: { external_id:
   })
 
   const systemPrompt = `{{#system}}
-  You will be given a prompt that explains what the user can do using the data provided. Use this prompt to generate a list of tasks 5 tasks. Format the tasks in a JSON array like this: ["task1", "task2", "task3", "task4", "task5"].
+  Generate a list of 5 tasks. Format the tasks in a JSON array like this: ["task1", "task2", "task3", "task4", "task5"].
   {{/system}}`
 
   return new Response(`${systemPrompt}\n{{#user}}\n${translated}\n{{/user}}`, {

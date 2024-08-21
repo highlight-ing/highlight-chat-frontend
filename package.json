@@ -16,7 +16,7 @@
   "dependencies": {
     "@amplitude/analytics-browser": "^2.10.0",
     "@headlessui/react": "^2.1.2",
-    "@highlight-ai/app-runtime": "^0.0.44",
+    "@highlight-ai/app-runtime": "^0.0.47",
     "@hookform/resolvers": "^3.9.0",
     "@squircle-js/react": "^1.2.0",
     "@hello-pangea/dnd": "^16.6.0",

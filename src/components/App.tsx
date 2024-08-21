@@ -72,16 +72,18 @@ function processAttachments(attachments: any[]): Attachment[] {
 }
 
 function useContextReceivedHandler(navigateToNewChat: () => void) {
-  const { addAttachment, setHighlightContext, setInput, promptApp, startNewConversation, setPrompt } = useStore(
-    useShallow((state) => ({
-      addAttachment: state.addAttachment,
-      setHighlightContext: state.setHighlightContext,
-      setInput: state.setInput,
-      promptApp: state.promptApp,
-      startNewConversation: state.startNewConversation,
-      setPrompt: state.setPrompt,
-    })),
-  )
+  const { addAttachment, setHighlightContext, setInput, promptApp, startNewConversation, setPrompt, closeAllModals } =
+    useStore(
+      useShallow((state) => ({
+        addAttachment: state.addAttachment,
+        setHighlightContext: state.setHighlightContext,
+        setInput: state.setInput,
+        promptApp: state.promptApp,
+        startNewConversation: state.startNewConversation,
+        setPrompt: state.setPrompt,
+        closeAllModals: state.closeAllModals,
+      })),
+    )
 
   const { handleIncomingContext } = useSubmitQuery()
 
@@ -109,6 +111,9 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
           })
         }
       }
+
+      // Close all modals
+      closeAllModals()
 
       startNewConversation()
       const attachments = processAttachments(context.attachments || []) as RuntimeAttachmentType[]

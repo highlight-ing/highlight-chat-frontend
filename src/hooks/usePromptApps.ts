@@ -55,7 +55,12 @@ export default () => {
     const accessToken = await getAccessToken()
 
     // Fetch the prompt
-    const text = await fetchPromptText(prompt.external_id)
+
+    let text
+
+    if (!prompt.is_handlebar_prompt) {
+      text = await fetchPromptText(prompt.external_id)
+    }
 
     setPrompt({
       promptApp: prompt,
