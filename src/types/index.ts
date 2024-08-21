@@ -63,13 +63,6 @@ export interface ClipboardAttachment {
   value: string
 }
 
-export interface FileAttachment {
-  type: 'file'
-  value: string
-  fileName: string
-  mimeType: string
-}
-
 export interface TextFileAttachment {
   type: 'text_file'
   value: string
