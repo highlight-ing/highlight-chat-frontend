@@ -67,6 +67,14 @@ export function usePromptEditor() {
     }
 
     if (res?.new) {
+      // Since this is a new prompt, we need to "install" the prompt.
+      try {
+        //@ts-expect-error
+        globalThis.highlight.internal.installApp(res.prompt.slug)
+      } catch (err) {
+        console.error('Error installing app', err)
+      }
+
       setPromptEditorData({
         externalId: res.prompt.external_id,
       })

@@ -74,7 +74,7 @@ export default () => {
 
     // Add the app to the user's list of "added" apps
     // if it's not already there
-    await addPromptToUser(prompt.external_id, accessToken)
+    addPromptToUser(prompt.external_id, accessToken)
 
     try {
       //@ts-expect-error
