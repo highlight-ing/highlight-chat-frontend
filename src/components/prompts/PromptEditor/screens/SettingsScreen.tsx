@@ -206,8 +206,6 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
       if (!name) {
         return
       }
-      console.log('setting prompt editor data', { [name]: value.name })
-
       setPromptEditorData({ [name]: value.name })
     })
     return () => subscription.unsubscribe()
