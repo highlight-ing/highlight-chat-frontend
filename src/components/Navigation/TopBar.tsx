@@ -16,6 +16,7 @@ import { useOpenConverationsPersistence } from '@/hooks/useOpenConverationsPersi
 import { useState } from 'react'
 import ShareModal from '@/components/ShareModal/ShareModal'
 import { useShareConversation } from '@/hooks/useShareConversation'
+import { trackEvent } from '@/utils/amplitude'
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const router = useRouter()
@@ -24,7 +25,6 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
     startNewConversation,
     // promptName,
     // openModal,
-    // messages,
     // promptApp,
     // promptUserId,
     clearPrompt,
@@ -38,12 +38,10 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
       startNewConversation: state.startNewConversation,
       promptName: state.promptName,
       openModal: state.openModal,
-      messages: state.messages,
       promptApp: state.promptApp,
       promptUserId: state.promptUserId,
       clearPrompt: state.clearPrompt,
       conversationId: state.conversationId,
-      loadConversation: state.loadConversation,
       setConversationId: state.setConversationId,
       openConversations: state.openConversations,
       setOpenConversations: state.setOpenConversations,
@@ -58,14 +56,14 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const onNewChatClick = () => {
     startNewConversation()
     clearPrompt()
-
     router.push('/')
+    trackEvent('HL Chat New Conversation Started', {})
   }
 
   const onShowHistoryClick = () => {
-    if (setShowHistory) {
-      setShowHistory(!showHistory)
-    }
+    setShowHistory(!showHistory)
+    trackEvent('HL Chat History Toggled', { newState: !showHistory })
+    router.push('/')
   }
 
   const onSelectChat = async (chat: ChatHistoryItem) => {

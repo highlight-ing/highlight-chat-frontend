@@ -89,11 +89,11 @@
 .tabContainer {
   position: relative;
 
-  &:hover {
+  &.loading, &:hover {
     .tab {
       animation: clip-fade 200ms forwards;
     }
-    .tabClose {
+    .tabActions {
       pointer-events: all;
       opacity: 1;
       transform: translateX(0);
@@ -104,6 +104,11 @@
           opacity: 1;
         }
       }
+    }
+    .tabClose {
+      opacity: 1;
+      pointer-events: initial;
+      transform: scale(1);
     }
   }
 }
@@ -150,7 +155,7 @@
   }
 }
 
-.tabClose {
+.tabActions {
   opacity: 0;
   transform: translateX(10px);
   transition: opacity 100ms, transform 100ms;
@@ -161,4 +166,10 @@
   align-items: center;
   justify-content: center;
   height: 100%;
+}
+
+.tabClose {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.75);
 }

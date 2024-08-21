@@ -2,13 +2,13 @@ import { StateCreator } from 'zustand'
 import { v4 as uuidv4 } from 'uuid'
 import { Store } from '.'
 import { ChatHistoryItem, Message } from '@/types'
-import Highlight from '@highlight-ai/app-runtime'
 
 /**
  * Store that deals with the current conversation.
  */
 
 export interface ConversationState {
+  isConversationLoading: boolean
   conversationId: string | undefined
   openConversations: ChatHistoryItem[]
 }
@@ -18,14 +18,14 @@ export type ConversationSlice = ConversationState & {
   getOrCreateConversationId: () => string
   startNewConversation: () => void
   setConversationId: (conversationId: string) => void
-  setMessages: (messages: Message[]) => void
-  loadConversation: (conversationId: string, messages: Message[]) => void
   setOpenConversations: (conversations: ChatHistoryItem[]) => void
   addOrUpdateOpenConversation: (conversation: ChatHistoryItem) => void
   removeOpenConversation: (conversationId: string) => void
+  setConversationLoading: (isLoading: boolean) => void
 }
 
 export const initialConversationState: ConversationState = {
+  isConversationLoading: false,
   conversationId: undefined,
   openConversations: [],
 }
@@ -40,18 +40,11 @@ export const createConversationSlice: StateCreator<Store, [], [], ConversationSl
     }
     return get().conversationId!
   },
-  loadConversation: (conversationId: string, messages: Message[]) => {
-    set({ conversationId, messages })
-  },
   setConversationId: (conversationId: string) => {
     set({ conversationId })
   },
-  setMessages: (messages: Message[]) => {
-    set({ messages })
-  },
   startNewConversation: () => {
     get().resetConversationId()
-    get().clearMessages()
     get().clearInput()
     get().clearAttachments()
   },
@@ -71,6 +64,12 @@ export const createConversationSlice: StateCreator<Store, [], [], ConversationSl
   },
   removeOpenConversation: (conversationId: string) => {
     const conversations = get().openConversations
-    set({ openConversations: conversations.filter((c) => c.id !== conversationId) })
+    get().clearConversationMessages(conversationId)
+    set({
+      openConversations: conversations.filter((c) => c.id !== conversationId),
+    })
+  },
+  setConversationLoading: (isLoading: boolean) => {
+    set({ isConversationLoading: isLoading })
   },
 })

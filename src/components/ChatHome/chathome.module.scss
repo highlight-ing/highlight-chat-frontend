@@ -4,10 +4,9 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  transition: opacity 100ms ease;
   position: fixed;
   opacity: 0;
-  padding-top: max(90px, 15vh);
+  padding-top: 8vh;
   pointer-events: none;
   min-width: min(800px, 95%);
   max-width: min(800px, 95%);
@@ -16,6 +15,7 @@
     position: relative;
     opacity: 1;
     pointer-events: initial;
+    transition: opacity 200ms ease;
 
     .homeCallout {
       transform: scale(1)
@@ -97,7 +97,7 @@
   gap: 8px;
   border-radius: 24px;
   opacity: 0;
-  transition: opacity 300ms ease, transform 300ms ease;
+  transition: opacity 200ms ease, transform 200ms ease;
   transform: translateY(100px);
 }
 
@@ -281,6 +281,6 @@
   background-color: $light-5;
   font-size: 15px;
   font-weight: 300;
-  transition: opacity 300ms ease, transform 300ms ease;
+  transition: opacity 200ms ease, transform 200ms ease;
   transform: translateY(100px);
 }

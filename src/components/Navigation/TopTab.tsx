@@ -1,12 +1,14 @@
 import styles from '@/components/Navigation/top-bar.module.scss'
+import variables from '@/variables.module.scss'
 import { MessageText } from 'iconsax-react'
 import * as React from 'react'
 import { ChatHistoryItem } from '@/types'
-import { CSSProperties, PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
+import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
 import TypedText from '@/components/TypedText/TypedText'
 import CircleButton from '@/components/CircleButton/CircleButton'
 import ContextMenu, { MenuItemType } from '@/components/ContextMenu/ContextMenu'
 import { useStore } from '@/providers/store-provider'
+import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 
 interface TopTabProps {
   isActive?: boolean
@@ -26,9 +28,15 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
     const [title, setTitle] = useState(filteredTitle)
     const [isAnimating, setIsAnimating] = useState(true)
 
+    const isConversationLoading = useStore((state) => state.isConversationLoading)
     const conversationId = useStore((state) => state.conversationId)
+    const openConversations = useStore((state) => state.openConversations)
+    const openConversationMessages = useStore((state) => state.conversationMessages)
     const setConversationId = useStore((state) => state.setConversationId)
     const setOpenConversations = useStore((state) => state.setOpenConversations)
+    const clearAllConversationMessages = useStore((state) => state.clearAllConversationMessages)
+    const clearAllOtherConversationMessages = useStore((state) => state.clearAllOtherConversationMessages)
+    const startNewConversation = useStore((state) => state.startNewConversation)
 
     const menuOptions = useMemo<MenuItemType[]>(() => {
       return [
@@ -43,23 +51,32 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
           label: 'Close',
           onClick: () => onClose(conversation),
         },
-        {
-          label: 'Close all others',
-          onClick: () => {
-            if (conversationId !== conversation.id) {
-              setConversationId(conversation.id)
-            }
-            setOpenConversations([conversation])
-          },
-        },
-        {
-          label: 'Close all',
-          onClick: () => {
-            setOpenConversations([])
-          },
-        },
+        ...(openConversations.length > 1
+          ? [
+              {
+                label: 'Close all others',
+                onClick: () => {
+                  if (conversationId !== conversation.id) {
+                    setConversationId(conversation.id)
+                  }
+                  setOpenConversations([conversation])
+                  clearAllOtherConversationMessages(conversation.id)
+                },
+              },
+              {
+                label: 'Close all',
+                onClick: () => {
+                  setOpenConversations([])
+                  clearAllConversationMessages()
+                  if (conversationId) {
+                    startNewConversation()
+                  }
+                },
+              },
+            ]
+          : []),
       ]
-    }, [conversation, conversationId])
+    }, [openConversations, conversation, conversationId, openConversationMessages])
 
     useEffect(() => {
       const filteredTitle =
@@ -72,7 +89,11 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
     }, [conversation.title, title])
 
     return (
-      <div ref={ref} {...props} className={styles.tabContainer}>
+      <div
+        ref={ref}
+        {...props}
+        className={`${styles.tabContainer} ${isConversationLoading && isActive ? styles.loading : ''}`}
+      >
         <ContextMenu
           items={menuOptions}
           position={'bottom'}
@@ -111,10 +132,14 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
               />
             )}
           </div>
-          <div className={styles.tabClose}>
-            <CircleButton onClick={() => onClose(conversation)} size={'20px'}>
-              <TabCloseIcon size={20.5} />
-            </CircleButton>
+          <div className={styles.tabActions}>
+            {isConversationLoading && isActive ? (
+              <LoadingSpinner color={variables.light60} size={'16px'} />
+            ) : (
+              <CircleButton onClick={() => onClose(conversation)} size={'20px'} className={styles.tabClose}>
+                <TabCloseIcon size={20.5} />
+              </CircleButton>
+            )}
           </div>
         </ContextMenu>
       </div>
