@@ -7,7 +7,6 @@ export const useTabHotkeys = () => {
   const openConversations = useStore((state) => state.openConversations)
   const startNewConversation = useStore((state) => state.startNewConversation)
   const removeOpenConversation = useStore((state) => state.removeOpenConversation)
-  const clearConversationMessages = useStore((state) => state.clearConversationMessages)
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
