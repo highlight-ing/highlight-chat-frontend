@@ -31,6 +31,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
     setConversationId,
     setOpenConversations,
     removeOpenConversation,
+    clearConversationMessages,
   } = useStore(
     useShallow((state) => ({
       startNewConversation: state.startNewConversation,
@@ -44,6 +45,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
       openConversations: state.openConversations,
       setOpenConversations: state.setOpenConversations,
       removeOpenConversation: state.removeOpenConversation,
+      clearConversationMessages: state.clearConversationMessages,
     })),
   )
 
@@ -76,6 +78,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
 
   const onCloseTab = (conversation: ChatHistoryItem) => {
     removeOpenConversation(conversation.id)
+    clearConversationMessages(conversation.id)
     startNewConversation()
     clearPrompt()
   }

@@ -7,6 +7,7 @@ export const useTabHotkeys = () => {
   const openConversations = useStore((state) => state.openConversations)
   const startNewConversation = useStore((state) => state.startNewConversation)
   const removeOpenConversation = useStore((state) => state.removeOpenConversation)
+  const clearConversationMessages = useStore((state) => state.clearConversationMessages)
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -31,6 +32,7 @@ export const useTabHotkeys = () => {
         }
       } else if (e.key === 'w' && isCtrlOrMeta && conversationId) {
         removeOpenConversation(conversationId)
+        clearConversationMessages(conversationId)
       }
     }
     document.addEventListener('keydown', onKeyDown)
