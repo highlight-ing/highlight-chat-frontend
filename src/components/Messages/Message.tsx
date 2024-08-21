@@ -21,6 +21,7 @@ const hasAttachment = (message: UserMessage) => {
   return (
     message.screenshot ||
     message.clipboard_text ||
+    message.window_context ||
     message.window ||
     message.file_title ||
     message.audio ||
@@ -75,6 +76,7 @@ export const Message = ({ message, isThinking }: MessageProps) => {
                 message.file_attachments.map((a) => {
                   return <Attachment type={a.type} value={getDisplayValue(a)} />
                 })}
+              {message.window_context && <Attachment type="window_context" value={message.window_context} />}
             </div>
           )}
           <div className={styles.messageBody}>

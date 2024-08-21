@@ -101,20 +101,6 @@ export default async function addAttachmentsToFormData(formData: FormData, attac
   return { screenshot, audio, fileTitle, clipboardText, ocrText, windowContext }
 }
 
-const prepareHighlightContext = (highlightContext: any) => {
-  if (!highlightContext) return ''
-
-  const processedContext = { ...highlightContext }
-
-  if (processedContext.attachments) {
-    processedContext.attachments = processedContext.attachments.filter(
-      (attachment: any) => attachment.type !== 'screenshot' && attachment.type !== 'audio',
-    )
-  }
-
-  return JSON.stringify(processedContext)
-}
-
 export const useSubmitQuery = () => {
   const { post } = useApi()
 
