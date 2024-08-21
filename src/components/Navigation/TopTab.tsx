@@ -36,16 +36,31 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
     const openConversationMessages = useStore((state) => state.conversationMessages)
     const setConversationId = useStore((state) => state.setConversationId)
     const setOpenConversations = useStore((state) => state.setOpenConversations)
+    const clearConversationMessages = useStore((state) => state.clearConversationMessages)
     const clearAllConversationMessages = useStore((state) => state.clearAllConversationMessages)
     const clearAllOtherConversationMessages = useStore((state) => state.clearAllOtherConversationMessages)
     const startNewConversation = useStore((state) => state.startNewConversation)
 
     const menuOptions = useMemo<MenuItemType[]>(() => {
       return [
-        {
-          label: 'Open',
-          onClick: () => onOpen(conversation),
-        },
+        ...(conversationId !== conversation.id
+          ? [
+              {
+                label: 'Open',
+                onClick: () => onOpen(conversation),
+              },
+            ]
+          : []),
+        ...(openConversationMessages[conversation.id]?.length > 0
+          ? [
+              {
+                label: 'Reload',
+                onClick: () => {
+                  clearConversationMessages(conversation.id)
+                },
+              },
+            ]
+          : []),
         {
           divider: true,
         },
