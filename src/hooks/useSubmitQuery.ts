@@ -446,7 +446,7 @@ export const useSubmitQuery = () => {
         clipboard_text: clipboardText,
         windows: windows, // Add windows information to the message
         window_context: windowContext,
-        file_attachments: attachments.filter((attachment) => attachment.type === 'file'),
+        file_attachments: attachments.filter((attachment) => attachment.type === 'text_file'),
       })
 
       setInput('')
