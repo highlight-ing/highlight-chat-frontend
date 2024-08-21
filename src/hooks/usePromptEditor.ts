@@ -77,7 +77,10 @@ export function usePromptEditor() {
 
       setPromptEditorData({
         externalId: res.prompt.external_id,
+        slug: res.prompt.slug ?? '',
+        image: res.prompt.image ? `${res.prompt.image}.${res.prompt.user_images?.file_extension}` : undefined,
       })
+
       addPrompt(res.prompt)
     } else if (res?.prompt) {
       // Update the prompts store with the updated prompt data
