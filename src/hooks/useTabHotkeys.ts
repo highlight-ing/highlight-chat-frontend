@@ -32,7 +32,6 @@ export const useTabHotkeys = () => {
         }
       } else if (e.key === 'w' && isCtrlOrMeta && conversationId) {
         removeOpenConversation(conversationId)
-        clearConversationMessages(conversationId)
       }
     }
     document.addEventListener('keydown', onKeyDown)

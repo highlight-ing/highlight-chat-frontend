@@ -101,7 +101,6 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
         startNewConversation()
       }
       removeOpenConversation(chatId)
-      clearConversationMessages(chatId)
     }
     await refreshChatHistory()
     setSelectedHistoryItems([])

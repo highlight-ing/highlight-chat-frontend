@@ -78,7 +78,6 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
 
   const onCloseTab = (conversation: ChatHistoryItem) => {
     removeOpenConversation(conversation.id)
-    clearConversationMessages(conversation.id)
     startNewConversation()
     clearPrompt()
   }
