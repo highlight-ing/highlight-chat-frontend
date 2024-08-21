@@ -1,8 +1,8 @@
 @import '@/variables.module';
 
 .circleButton {
-  width: 36px;
-  height: 36px;
+  width: var(--size, 36px);
+  height: var(--size, 36px);
   display: flex;
   align-items: center;
   justify-content: center;

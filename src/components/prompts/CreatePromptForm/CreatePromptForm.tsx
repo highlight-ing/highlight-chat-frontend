@@ -6,6 +6,8 @@ import { Description, ErrorMessage, Field, Label } from '@/components/catalyst/f
 import { Input } from '@/components/catalyst/input'
 import { Radio, RadioField, RadioGroup } from '@/components/catalyst/radio'
 import { Textarea } from '@/components/catalyst/textarea'
+import { trackEvent } from '@/utils/amplitude'
+import { useEffect } from 'react'
 import useAuth from '@/hooks/useAuth'
 import { useStore } from '@/providers/store-provider'
 import { useForm, SubmitHandler, Controller } from 'react-hook-form'
@@ -21,6 +23,7 @@ export default function CreatePromptForm(props: CreatePromptFormProps) {
     handleSubmit,
     control,
     formState: { errors },
+    watch,
   } = useForm<CreatePromptData>({
     defaultValues: {
       visibility: 'unlisted',
@@ -31,17 +34,34 @@ export default function CreatePromptForm(props: CreatePromptFormProps) {
 
   const { getAccessToken } = useAuth()
 
+  useEffect(() => {
+    trackEvent('HL Chat Create Prompt Form Viewed', {})
+  }, [])
+
   const onSubmit: SubmitHandler<CreatePromptData> = async (data) => {
     const accessToken = await getAccessToken()
     const { error } = await createPrompt(data, accessToken)
     if (error) {
       openErrorModal(error)
+      trackEvent('HL Chat Create Prompt Error', { error })
       return
     }
+
+    trackEvent('HL Chat Prompt Created', {
+      promptVisibility: data.visibility,
+    })
 
     refreshPrompts()
     props.onCreate()
   }
+
+  // Watch for changes in the visibility field
+  const visibility = watch('visibility')
+  useEffect(() => {
+    trackEvent('HL Chat Prompt Visibility Changed', {
+      newVisibility: visibility,
+    })
+  }, [visibility])
 
   return (
     <div className="">
@@ -111,7 +131,12 @@ export default function CreatePromptForm(props: CreatePromptFormProps) {
             {errors.visibility && <ErrorMessage>Prompt visibility is required</ErrorMessage>}
           </Field>
         </div>
-        <Button type="submit" color="cyan" className="mt-5 h-10 cursor-pointer">
+        <Button
+          type="submit"
+          color="cyan"
+          className="mt-5 h-10 cursor-pointer"
+          onClick={() => trackEvent('HL Chat Create Prompt Button Clicked', {})}
+        >
           Create
         </Button>
       </form>

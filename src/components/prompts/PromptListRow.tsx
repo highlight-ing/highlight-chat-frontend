@@ -1,9 +1,10 @@
 import styles from '@/components/ChatHome/chathome.module.scss'
-import { ArrowRight, Edit2, MessageProgramming, MessageText, Setting } from 'iconsax-react'
+import { ArrowRight, Edit2, MessageText } from 'iconsax-react'
 import React from 'react'
 import { PromptApp } from '@/types'
 import CircleButton from '@/components/CircleButton/CircleButton'
-import Tooltip from '@/components/Tooltip'
+import Tooltip from '@/components/Tooltip/Tooltip'
+import { trackEvent } from '@/utils/amplitude'
 
 interface PromptListRowProps {
   prompt: PromptApp
@@ -13,9 +14,21 @@ interface PromptListRowProps {
   onClickEdit?: (e: React.MouseEvent) => void
   isCta?: boolean
 }
+
 const PromptListRow = ({ prompt, icon, type, isCta, onClick, onClickEdit }: PromptListRowProps) => {
+  const handleClick = (e: React.MouseEvent) => {
+    onClick(e)
+  }
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (onClickEdit) {
+      onClickEdit(e)
+    }
+  }
+
   return (
-    <div key={prompt.slug} className={`${styles.promptOption} ${styles[type]}`} onClick={onClick}>
+    <div key={prompt.slug} className={`${styles.promptOption} ${styles[type]}`} onClick={handleClick}>
       <div className={styles.promptIcon}>{icon ?? <MessageText variant={'Bold'} />}</div>
       <div className="mt-0.5 flex flex-1 flex-col">
         {prompt.name && <span className={styles.promptName}>{prompt.name}</span>}

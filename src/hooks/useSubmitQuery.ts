@@ -6,6 +6,7 @@ import useAuth from './useAuth'
 import { useApi } from '@/hooks/useApi'
 import { FileAttachment, PromptApp } from '@/types'
 import { useShallow } from 'zustand/react/shallow'
+import { useEffect, useRef } from 'react'
 
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024 // 1MB in bytes
@@ -50,7 +51,7 @@ export default async function addAttachmentsToFormData(formData: FormData, attac
     if (attachment?.value) {
       switch (attachment.type) {
         case 'text_file':
-          formData.append('text_file', attachment.value)
+          formData.append('text_file', attachment.fileName + '\n' + attachment.value)
           break
         case 'image':
         case 'screenshot':
@@ -129,10 +130,10 @@ export const useSubmitQuery = () => {
     clearAttachments,
     input,
     setInput,
-    setIsDisabled,
-    addMessage,
-    updateLastMessage,
+    setInputIsDisabled,
     aboutMe,
+    addConversationMessage,
+    updateLastConversationMessage,
   } = useStore(
     useShallow((state) => ({
       getOrCreateConversationId: state.getOrCreateConversationId,
@@ -140,14 +141,17 @@ export const useSubmitQuery = () => {
       clearAttachments: state.clearAttachments,
       input: state.input,
       setInput: state.setInput,
-      setIsDisabled: state.setInputIsDisabled,
-      addMessage: state.addMessage,
-      updateLastMessage: state.updateLastMessage,
+      setInputIsDisabled: state.setInputIsDisabled,
       aboutMe: state.aboutMe,
+      addConversationMessage: state.addConversationMessage,
+      updateLastConversationMessage: state.updateLastConversationMessage,
     })),
   )
 
+  const abortControllerRef = useRef<AbortController>()
   const { getAccessToken } = useAuth()
+  const conversationId = useStore((state) => state.conversationId)
+  const conversationIdRef = useRef(conversationId)
 
   const { openModal, closeModal } = useStore(
     useShallow((state) => ({
@@ -181,12 +185,20 @@ export const useSubmitQuery = () => {
     })
   }
 
-  const fetchResponse = async (formData: FormData, token: string) => {
-    setIsDisabled(true)
+  const fetchResponse = async (conversationId: string, formData: FormData, token: string) => {
+    setInputIsDisabled(true)
 
     try {
-      const conversationId = getOrCreateConversationId()
       formData.append('conversation_id', conversationId)
+
+      const abortController = new AbortController()
+      abortControllerRef.current = abortController
+
+      const checkAbortSignal = () => {
+        if (abortController.signal.aborted) {
+          throw new Error('Chat message request aborted')
+        }
+      }
 
       const response = await post('chat_v2/', formData)
       if (!response.ok) {
@@ -198,14 +210,14 @@ export const useSubmitQuery = () => {
         throw new Error('No reader available')
       }
 
-      let accumulatedResponse = ''
-      addMessage({ role: 'assistant', content: '' })
+      checkAbortSignal()
 
       let contextConfirmed = null
-
       let accumulatedToolUseInput = ''
+      let accumulatedResponse = ''
+      addConversationMessage(conversationId!, { role: 'assistant', content: '' })
 
-      while (true) {
+      while (!abortController.signal.aborted) {
         const { done, value } = await reader.read()
         if (done) break
         const chunk = new TextDecoder().decode(value)
@@ -214,13 +226,15 @@ export const useSubmitQuery = () => {
         const jsonObjects = chunk.split(/(?<=})\s*(?=\{)/)
 
         for (const jsonStr of jsonObjects) {
+          checkAbortSignal()
+
           try {
             const jsonChunk = JSON.parse(jsonStr)
             console.log('jsonChunk: ', jsonChunk)
 
             if (jsonChunk.type === 'text') {
               accumulatedResponse += jsonChunk.content
-              updateLastMessage({
+              updateLastConversationMessage(conversationId, {
                 role: 'assistant',
                 content: accumulatedResponse,
               })
@@ -264,24 +278,36 @@ export const useSubmitQuery = () => {
               }
             } else if (jsonChunk.type === 'error') {
               console.error('Error from backend:', jsonChunk.content)
-              updateLastMessage({
+              updateLastConversationMessage(conversationId, {
                 role: 'assistant',
                 content: 'Sorry, an error occurred: ' + jsonChunk.content,
               })
             }
           } catch (parseError) {
             console.error('Error parsing JSON:', parseError)
+            accumulatedResponse += jsonStr
+            updateLastConversationMessage(conversationId!, {
+              role: 'assistant',
+              content: accumulatedResponse,
+            })
           }
         }
       }
     } catch (error) {
-      console.error('Error fetching response:', error)
-      addMessage({
-        role: 'assistant',
-        content: 'Sorry, there was an error processing your request.',
-      })
+      // @ts-ignore
+      if (error.message.includes('aborted')) {
+        console.log('Skipping message request, aborted')
+      } else {
+        // @ts-ignore
+        console.error('Error fetching response:', error.stack ?? error.message)
+        addConversationMessage(conversationId!, {
+          role: 'assistant',
+          content: 'Sorry, there was an error processing your request.',
+        })
+      }
     } finally {
-      setIsDisabled(false)
+      setInputIsDisabled(false)
+      abortControllerRef.current = undefined
     }
   }
 
@@ -295,6 +321,7 @@ export const useSubmitQuery = () => {
     context.attachments?.map((attachment) => {
       console.log('Attachment: ', JSON.stringify(attachment))
     })
+
     if (!context.suggestion || context.suggestion.trim() === '') {
       console.log('No context received, ignoring.')
       return
@@ -313,49 +340,53 @@ export const useSubmitQuery = () => {
     let query = context.suggestion || ''
     let screenshotUrl = context.attachments?.find((a) => a.type === 'screenshot')?.value
     let clipboardText = context.attachments?.find((a) => a.type === 'clipboard')?.value
-    let ocrScreenContents = context.environment?.ocrScreenContents
-    let rawContents = context.application?.focusedWindow?.rawContents
     let audio = context.attachments?.find((a) => a.type === 'audio')?.value
     let windowTitle = context.application?.focusedWindow?.title
+    let appIcon = context.application?.appIcon
+    let rawContents = context.application?.focusedWindow?.rawContents
 
-    // TODO: Shouldn't have to redeclare this
+    // Extract OCR content
+    let ocrText = context.environment?.ocrScreenContents
+
+    // Use rawContents if available, otherwise use ocrText
+    let contentToUse = rawContents || ocrText
+
     const fileAttachmentTypes = ['pdf', 'spreadsheet', 'text_file', 'image']
-
     const hasFileAttachment = context.attachments?.some((a: { type: string }) => fileAttachmentTypes.includes(a.type))
 
     // Fetch windows information
     const windows = await fetchWindows()
 
-    if (query || clipboardText || ocrScreenContents || screenshotUrl || rawContents || audio || hasFileAttachment) {
-      // TODO: Clean this up when the runtime API is updated and attachments types are no longer overloaded
+    if (query || clipboardText || contentToUse || screenshotUrl || audio || hasFileAttachment) {
+      setInputIsDisabled(true)
+
       const att = context.attachments || ([] as unknown)
       const fileAttachments = (att as FileAttachment[]).filter((a) => a.type && fileAttachmentTypes.includes(a.type))
 
-      addMessage({
+      const conversationId = getOrCreateConversationId()
+      addConversationMessage(conversationId!, {
         role: 'user',
         content: query,
         clipboard_text: clipboardText,
 
         screenshot: screenshotUrl,
         audio,
-        window: windowTitle ? { title: windowTitle, type: 'window' } : undefined,
-        windows: windows, // Add windows information to the message
+        window: windowTitle ? { title: windowTitle, appIcon: appIcon, type: 'window' } : undefined,
+        windows: windows,
         file_attachments: fileAttachments,
       })
 
       setInput('')
-      clearAttachments() // Clear the attachment immediately
+      clearAttachments()
 
       const formData = new FormData()
       formData.append('prompt', query)
-      formData.append('windows', JSON.stringify(windows)) // Add windows to formData
+      formData.append('windows', JSON.stringify(windows))
 
-      console.log('prompt app: ', promptApp)
       if (promptApp) {
         formData.append('app_id', promptApp.id.toString())
       }
 
-      // Add about_me to form data
       if (aboutMe) {
         formData.append('about_me', JSON.stringify(aboutMe))
       }
@@ -363,14 +394,13 @@ export const useSubmitQuery = () => {
       const contextAttachments = context.attachments || []
       await addAttachmentsToFormData(formData, contextAttachments)
 
-      let contextString = prepareHighlightContext(context)
-
-      if (contextString.trim() !== '') {
-        formData.append('context', contextString)
+      // Add OCR text or raw contents to form data
+      if (contentToUse) {
+        formData.append('ocr_text', contentToUse)
       }
 
       const accessToken = await getAccessToken()
-      await fetchResponse(formData, accessToken)
+      await fetchResponse(conversationId, formData, accessToken)
     }
   }
 
@@ -383,6 +413,8 @@ export const useSubmitQuery = () => {
     }
 
     if (query) {
+      setInputIsDisabled(true)
+
       const formData = new FormData()
       formData.append('prompt', query)
       if (promptApp) {
@@ -403,24 +435,38 @@ export const useSubmitQuery = () => {
         attachments,
       )
 
-      addMessage({
+      const conversationId = getOrCreateConversationId()
+      addConversationMessage(conversationId!, {
         role: 'user',
         content: query,
         screenshot,
+        ocr_text: ocrText,
         audio,
         file_title: fileTitle,
         clipboard_text: clipboardText,
         windows: windows, // Add windows information to the message
         window_context: windowContext,
+        file_attachments: attachments.filter((attachment) => attachment.type === 'text_file'),
       })
 
       setInput('')
       clearAttachments() // Clear the attachment immediately
 
       const accessToken = await getAccessToken()
-      await fetchResponse(formData, accessToken)
+      await fetchResponse(conversationId, formData, accessToken)
     }
   }
+
+  useEffect(() => {
+    // console.log('conversationIdRef:', conversationIdRef.current)
+    // console.log('conversationId', conversationId)
+    // console.log('abortControllerRef', typeof abortControllerRef.current)
+    // if (conversationIdRef.current && conversationIdRef.current !== conversationId && abortControllerRef.current) {
+    //   console.log("Aborting previous chat's message stream")
+    //   abortControllerRef.current.abort('Aborted, conversation ID changed, stop streaming messages')
+    // }
+    conversationIdRef.current = conversationId
+  }, [conversationId])
 
   return { handleSubmit, handleIncomingContext }
 }

@@ -16,6 +16,8 @@ import { useForm, SubmitHandler, Controller } from 'react-hook-form'
 import ConfirmationModal from '@/components/modals/ConfirmationModal'
 import usePromptApps from '@/hooks/usePromptApps'
 import { useShallow } from 'zustand/react/shallow'
+import { trackEvent } from '@/utils/amplitude'
+import { useEffect } from 'react'
 
 export default function EditPromptForm({
   slug,
@@ -35,6 +37,7 @@ export default function EditPromptForm({
     handleSubmit,
     formState: { errors },
     control,
+    watch,
   } = useForm<UpdatePromptData>({
     defaultValues: {
       name: initialData.name,
@@ -54,14 +57,24 @@ export default function EditPromptForm({
 
   const { getAccessToken } = useAuth()
 
+  useEffect(() => {
+    trackEvent('HL Chat Edit Prompt Form Viewed', { promptSlug: slug })
+  }, [slug])
+
   const onSubmit: SubmitHandler<UpdatePromptData> = async (data) => {
     const accessToken = await getAccessToken()
     const response = await updatePrompt(slug, data, accessToken)
 
     if (response && response.error) {
       openErrorModal(response.error)
+      trackEvent('HL Chat Edit Prompt Error', { promptSlug: slug, error: response.error })
       return
     }
+
+    trackEvent('HL Chat Prompt Updated', {
+      promptSlug: slug,
+      promptVisibility: data.visibility,
+    })
 
     refreshPrompts()
     onUpdate()
@@ -74,8 +87,11 @@ export default function EditPromptForm({
 
     if (response && response.error) {
       openErrorModal(response.error)
+      trackEvent('HL Chat Delete Prompt Error', { promptSlug: slug, error: response.error })
       return
     }
+
+    trackEvent('HL Chat Prompt Deleted', { promptSlug: slug })
 
     if (promptAppName === slug) {
       clearPrompt()
@@ -84,6 +100,15 @@ export default function EditPromptForm({
     refreshPrompts()
     onUpdate()
   }
+
+  // Watch for changes in the visibility field
+  const visibility = watch('visibility')
+  useEffect(() => {
+    trackEvent('HL Chat Prompt Visibility Changed', {
+      promptSlug: slug,
+      newVisibility: visibility,
+    })
+  }, [visibility, slug])
 
   return (
     <>
@@ -145,10 +170,25 @@ export default function EditPromptForm({
           {errors.visibility && <ErrorMessage>Prompt visibility is required</ErrorMessage>}
         </Field>
         <div className="flex flex-row space-x-4">
-          <Button type="submit" color="cyan" className="h-10">
+          <Button
+            type="submit"
+            color="cyan"
+            className="h-10"
+            onClick={() => {
+              trackEvent('HL Chat Edit Prompt Update Clicked', { promptSlug: slug })
+            }}
+          >
             Update
           </Button>
-          <Button type="button" color="red" className="h-10" onClick={() => setIsDeleteModalOpen(true)}>
+          <Button
+            type="button"
+            color="red"
+            className="h-10"
+            onClick={() => {
+              setIsDeleteModalOpen(true)
+              trackEvent('HL Chat Delete Prompt Initiated', { promptSlug: slug })
+            }}
+          >
             Delete
           </Button>
         </div>
@@ -157,8 +197,17 @@ export default function EditPromptForm({
         <ConfirmationModal
           id={'delete-prompt'}
           header={'Delete Prompt?'}
-          primaryAction={{ label: 'Delete Forever', onClick: onDeleteConfirm }}
-          secondaryAction={{ label: 'Nevermind', onClick: () => setIsDeleteModalOpen(false) }}
+          primaryAction={{
+            label: 'Delete Forever',
+            onClick: onDeleteConfirm,
+          }}
+          secondaryAction={{
+            label: 'Nevermind',
+            onClick: () => {
+              setIsDeleteModalOpen(false)
+              trackEvent('HL Chat Delete Prompt Cancelled', { promptSlug: slug })
+            },
+          }}
         >
           <span>Are you sure you want to delete this prompt?</span>
           <span>This action cannot be undone.</span>

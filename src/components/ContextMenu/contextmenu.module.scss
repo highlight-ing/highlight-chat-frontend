@@ -1,9 +1,20 @@
 @import '@/variables.module';
 
+.contextMenu {
+  position: fixed;
+  border-radius: 12px;
+  border: 1px solid $light-20;
+  z-index: 2;
+  width: fit-content;
+  height: fit-content;
+  background-color: $dark-100;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.64);
+}
+
 .contextMenuItem {
-  padding: 12px 16px;
-  font-size: 15px;
-  font-weight: normal;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 500;
   color: $light-60;
   cursor: pointer;
   white-space: nowrap;
@@ -11,9 +22,10 @@
   align-items: center;
   gap: 8px;
   user-select: none;
+  transition: color 100ms, background-color 100ms;
 
   &:hover {
     color: $light-100;
-    background-color: $light-10;
+    background-color: $light-5;
   }
 }

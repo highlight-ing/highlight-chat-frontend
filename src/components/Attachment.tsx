@@ -1,20 +1,33 @@
 import { ClipboardText, Document, Keyboard, Sound, GallerySlash, DocumentText1 } from 'iconsax-react'
 import { useState } from 'react'
 import { CloseIcon } from '../icons/icons'
-import Tooltip from './Tooltip'
+import Tooltip from './Tooltip/Tooltip'
 import { useStore } from '@/providers/store-provider'
 import { AttachmentType } from '@/types'
 import { useImageDownload } from '@/hooks/useImageDownload'
+import { trackEvent } from '@/utils/amplitude'
 import { useShallow } from 'zustand/react/shallow'
 
-interface AttachmentProps {
-  type: AttachmentType
-  value: string
-  isFile?: boolean
+interface BaseAttachmentProps {
   removeEnabled?: boolean
+  value: string
 }
 
-export const Attachment = ({ type, value, isFile = false, removeEnabled = false }: AttachmentProps) => {
+interface WindowAttachmentProps extends BaseAttachmentProps {
+  type: 'window'
+  appIcon?: string
+}
+
+interface OtherAttachmentProps extends BaseAttachmentProps {
+  type: Exclude<AttachmentType, 'window'>
+  isFile?: boolean
+}
+
+type AttachmentProps = WindowAttachmentProps | OtherAttachmentProps
+
+export const Attachment = ({ type, value, removeEnabled = false, ...props }: AttachmentProps) => {
+  const appIcon = (props as WindowAttachmentProps).appIcon
+  const isFile = (props as OtherAttachmentProps).isFile
   const [isImageLoaded, setIsImageLoaded] = useState(false)
   const { removeAttachment, fileInputRef } = useStore(
     useShallow((state) => ({
@@ -32,6 +45,7 @@ export const Attachment = ({ type, value, isFile = false, removeEnabled = false 
     if (fileInputRef?.current && isFile) {
       fileInputRef.current.value = ''
     }
+    trackEvent('HL Chat Attachment Removed', { type })
   }
 
   const renderAttachmentContent = () => {
@@ -81,7 +95,19 @@ export const Attachment = ({ type, value, isFile = false, removeEnabled = false 
           </div>
         )
       case 'window':
-        return <Keyboard className="text-white" />
+        return (
+          <>
+            {appIcon ? (
+              <img
+                src={appIcon}
+                alt="App Icon"
+                className="h-[42px] w-[42px] bg-[url('../assets/window-border.png')] p-[2px]"
+              />
+            ) : (
+              <Keyboard className="text-white" />
+            )}
+          </>
+        )
       case 'text_file':
         return (
           <div className="align-center flex w-full justify-center gap-2 p-2">

@@ -1,25 +1,33 @@
 import { StateCreator } from 'zustand'
 import { v4 as uuidv4 } from 'uuid'
 import { Store } from '.'
-import { Message } from '@/types'
+import { ChatHistoryItem, Message } from '@/types'
 
 /**
  * Store that deals with the current conversation.
  */
 
 export interface ConversationState {
+  isConversationLoading: boolean
   conversationId: string | undefined
+  openConversations: ChatHistoryItem[]
 }
 
 export type ConversationSlice = ConversationState & {
   resetConversationId: () => void
   getOrCreateConversationId: () => string
   startNewConversation: () => void
-  loadConversation: (conversationId: string, messages: Message[]) => void
+  setConversationId: (conversationId: string) => void
+  setOpenConversations: (conversations: ChatHistoryItem[]) => void
+  addOrUpdateOpenConversation: (conversation: ChatHistoryItem) => void
+  removeOpenConversation: (conversationId: string) => void
+  setConversationLoading: (isLoading: boolean) => void
 }
 
 export const initialConversationState: ConversationState = {
+  isConversationLoading: false,
   conversationId: undefined,
+  openConversations: [],
 }
 
 export const createConversationSlice: StateCreator<Store, [], [], ConversationSlice> = (set, get) => ({
@@ -32,13 +40,39 @@ export const createConversationSlice: StateCreator<Store, [], [], ConversationSl
     }
     return get().conversationId!
   },
-  loadConversation: (conversationId: string, messages: Message[]) => {
-    set({ conversationId, messages })
+  setConversationId: (conversationId: string) => {
+    set({ conversationId })
   },
   startNewConversation: () => {
     get().resetConversationId()
-    get().clearMessages()
     get().clearInput()
     get().clearAttachments()
+  },
+  setOpenConversations: (conversations: ChatHistoryItem[]) => {
+    set({ openConversations: conversations })
+  },
+  addOrUpdateOpenConversation: (conversation: ChatHistoryItem) => {
+    const conversations = get().openConversations
+    const conversationIndex = conversations?.findIndex((c) => c.id === conversation.id)
+    if (conversationIndex === -1) {
+      set({ openConversations: [...conversations, conversation] })
+    } else {
+      const updatedConversations = [...conversations]
+      updatedConversations[conversationIndex] = conversation
+      set({ openConversations: updatedConversations })
+    }
+  },
+  removeOpenConversation: (conversationId: string) => {
+    if (get().conversationId === conversationId) {
+      get().startNewConversation()
+    }
+    const conversations = get().openConversations
+    get().clearConversationMessages(conversationId)
+    set({
+      openConversations: conversations.filter((c) => c.id !== conversationId),
+    })
+  },
+  setConversationLoading: (isLoading: boolean) => {
+    set({ isConversationLoading: isLoading })
   },
 })

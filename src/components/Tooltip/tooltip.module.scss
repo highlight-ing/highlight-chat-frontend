@@ -1,0 +1,18 @@
+@import '@/variables.module';
+
+.tooltip {
+  display: flex;
+  background-color: $dark-100;
+  border: 1px solid $light-20;
+  border-radius: 12px;
+  color: $light-80;
+  padding: 8px 12px;
+  position: fixed;
+  width: fit-content;
+  height: fit-content;
+  white-space: pre-wrap;
+  z-index: 5;
+  font-size: 14px;
+  font-weight: 500;
+  overflow: hidden;
+}
