@@ -105,3 +105,24 @@ export interface PromptApp {
   slug: string | null
   user_id: string
 }
+
+export type SharedBaseMessage = {
+  role: 'user' | 'assistant'
+  content: string
+}
+
+export type SharedUserMessage = SharedBaseMessage & {
+  role: 'user'
+}
+
+export type SharedAssistantMessage = SharedBaseMessage & {
+  role: 'assistant'
+}
+
+export type SharedMessage = SharedUserMessage | SharedAssistantMessage
+
+export interface SharedChat {
+  id: string
+  title: string
+  messages: SharedMessage[]
+}
