@@ -15,6 +15,7 @@ import { initAmplitude, trackEvent } from '@/utils/amplitude'
 import useAuth from '@/hooks/useAuth'
 import { decodeJwt } from 'jose'
 import { getPromptAppBySlug } from '@/utils/prompts'
+import ToastContainer from '@/components/Toast/ToastContainer'
 
 function processAttachments(attachments: any[]): Attachment[] {
   return attachments.map((attachment) => {
@@ -217,6 +218,7 @@ export default function App({ children }: { children: React.ReactNode }) {
     <>
       {children}
       <ModalContainer />
+      <ToastContainer />
       <Modals />
     </>
   )

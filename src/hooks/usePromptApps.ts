@@ -54,17 +54,6 @@ export default () => {
 
     const accessToken = await getAccessToken()
 
-    // Add the app to the user's list of "added" apps
-    // if it's not already there
-    await addPromptToUser(prompt.external_id, accessToken)
-
-    try {
-      //@ts-expect-error
-      globalThis.highlight.internal.installApp(prompt.slug)
-    } catch (err) {
-      console.error('Error installing app', err)
-    }
-
     // Fetch the prompt
     const text = await fetchPromptText(prompt.external_id)
 
@@ -78,6 +67,16 @@ export default () => {
 
     startNewConversation()
 
+    // Add the app to the user's list of "added" apps
+    // if it's not already there
+    await addPromptToUser(prompt.external_id, accessToken)
+
+    try {
+      //@ts-expect-error
+      globalThis.highlight.internal.installApp(prompt.slug)
+    } catch (err) {
+      console.error('Error installing app', err)
+    }
     // router.push(`/`)
   }
 

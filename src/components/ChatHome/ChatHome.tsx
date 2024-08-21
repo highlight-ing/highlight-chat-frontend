@@ -161,6 +161,9 @@ const Prompts = () => {
               selectPrompt(prompt)
               trackEvent('HL Chat Prompt Selected', { promptSlug: prompt.slug })
             }}
+            onClickEdit={() => {
+              openModal('edit-prompt', { prompt: prompt })
+            }}
           />
         )
       })}

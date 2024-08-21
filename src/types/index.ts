@@ -99,3 +99,12 @@ export interface ModalObjectProps {
   id: string
   context?: Record<string, any>
 }
+
+export interface Toast {
+  id: string
+  title?: string
+  subtext?: string
+  description?: string
+  timeout?: number
+  type?: 'default' | 'success' | 'error'
+}

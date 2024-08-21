@@ -3,6 +3,7 @@ import { savePrompt } from '@/utils/prompts'
 import useAuth from './useAuth'
 import { usePromptsStore } from '@/stores/prompts'
 import { useEffect, useState } from 'react'
+import { useStore } from '@/providers/store-provider'
 
 export function usePromptEditor() {
   // STATE
@@ -12,6 +13,7 @@ export function usePromptEditor() {
   const { promptEditorData, setPromptEditorData, needSave, setNeedSave, settingsHasNoErrors, setSaving } =
     usePromptEditorStore()
   const { updatePrompt, addPrompt } = usePromptsStore()
+  const addToast = useStore((state) => state.addToast)
   const { getAccessToken } = useAuth()
 
   // EFFECTS
@@ -57,6 +59,11 @@ export function usePromptEditor() {
     if (res && res.error) {
       console.error('Error saving prompt:', res.error)
       setSaving(false)
+      addToast({
+        title: 'Error saving prompt',
+        description: res.error,
+        type: 'error',
+      })
       return
     }
 
@@ -69,6 +76,11 @@ export function usePromptEditor() {
       // Update the prompts store with the updated prompt data
       updatePrompt(res.prompt)
     }
+
+    addToast({
+      title: 'Saved changes',
+      type: 'success',
+    })
 
     setNeedSave(false)
     setSaving(false)

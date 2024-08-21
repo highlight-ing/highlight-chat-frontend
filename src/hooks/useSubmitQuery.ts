@@ -125,6 +125,7 @@ export const useSubmitQuery = () => {
     aboutMe,
     addConversationMessage,
     updateLastConversationMessage,
+    addToast,
   } = useStore(
     useShallow((state) => ({
       getOrCreateConversationId: state.getOrCreateConversationId,
@@ -136,6 +137,7 @@ export const useSubmitQuery = () => {
       aboutMe: state.aboutMe,
       addConversationMessage: state.addConversationMessage,
       updateLastConversationMessage: state.updateLastConversationMessage,
+      addToast: state.addToast,
     })),
   )
 
@@ -199,9 +201,12 @@ export const useSubmitQuery = () => {
               })
             } else if (jsonChunk.type === 'error') {
               console.error('Error from backend:', jsonChunk.content)
-              updateLastConversationMessage(conversationId, {
-                role: 'assistant',
-                content: 'Sorry, an error occurred: ' + jsonChunk.content,
+              addToast({
+                title: 'Unexpected Server Error',
+                // @ts-ignore
+                description: jsonChunk.content,
+                type: 'error',
+                timeout: 15000,
               })
             }
           } catch (parseError) {
@@ -216,14 +221,18 @@ export const useSubmitQuery = () => {
       }
     } catch (error) {
       // @ts-ignore
+      console.error('Error fetching response:', error.stack ?? error.message)
+
+      // @ts-ignore
       if (error.message.includes('aborted')) {
         console.log('Skipping message request, aborted')
       } else {
-        // @ts-ignore
-        console.error('Error fetching response:', error.stack ?? error.message)
-        addConversationMessage(conversationId!, {
-          role: 'assistant',
-          content: 'Sorry, there was an error processing your request.',
+        addToast({
+          title: 'Unexpected Error',
+          // @ts-ignore
+          description: `${error?.message}`,
+          type: 'error',
+          timeout: 15000,
         })
       }
     } finally {
