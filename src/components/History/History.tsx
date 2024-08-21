@@ -316,6 +316,7 @@ const HistoryItem = ({ chat, isSelecting, isSelected, onSelect, onOpenChat }: Hi
     openModal('delete-chat', chat)
     trackEvent('HL Chat Delete Initiated', {
       chatId: chat.id,
+      source: 'history',
     })
   }
 

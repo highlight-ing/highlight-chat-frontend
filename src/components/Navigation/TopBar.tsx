@@ -14,6 +14,7 @@ import styles from './top-bar.module.scss'
 import variables from '@/variables.module.scss'
 import { useOpenConverationsPersistence } from '@/hooks/useOpenConverationsPersistence'
 import { trackEvent } from '@/utils/amplitude'
+import { useTabHotkeys } from '@/hooks/useTabHotkeys'
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const router = useRouter()
@@ -80,6 +81,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   }
 
   useOpenConverationsPersistence()
+  useTabHotkeys()
 
   // const promptType = promptApp ? getPromptAppType(promptUserId, promptApp) : undefined
 
