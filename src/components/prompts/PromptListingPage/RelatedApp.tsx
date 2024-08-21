@@ -33,7 +33,7 @@ export default function RelatedApp({ name, description, slug, imageId, imageExte
       <div className="flex items-center space-x-3">
         <div className="flex-none rounded-full">
           {imageId && imageExtension ? (
-            <PromptAppIcon imageId={imageId} imageExtension={imageExtension} name={name} />
+            <PromptAppIcon className="rounded-full" imageId={imageId} imageExtension={imageExtension} name={name} />
           ) : (
             <AppIcon />
           )}
