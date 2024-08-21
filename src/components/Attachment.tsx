@@ -85,6 +85,8 @@ export const Attachment = ({ type, value, removeEnabled = false, ...props }: Att
         }
       case 'clipboard':
         return <ClipboardText className="text-white" />
+      case 'window_context':
+        return <ClipboardText className="text-white" />
       case 'audio':
         return <Sound className="text-white" />
       case 'pdf':

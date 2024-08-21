@@ -55,6 +55,7 @@ export default function useHandleConversationLoad() {
               ocr_text: message.ocr_text,
               clipboard_text: message.clipboard_text,
               image_url: message.image_url,
+              window_context: message.window_context,
             } as UserMessage
           } else {
             return baseMessage as AssistantMessage

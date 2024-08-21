@@ -46,7 +46,7 @@ async function readFileAsBase64(file: File): Promise<string> {
 // TODO: Consolidate the two attachment types
 // Should just remove the HLC-specific code and use the Highlight API
 export default async function addAttachmentsToFormData(formData: FormData, attachments: any[]) {
-  let screenshot, audio, fileTitle, clipboardText, ocrText
+  let screenshot, audio, fileTitle, clipboardText, ocrText, windowContext
 
   for (const attachment of attachments) {
     if (attachment?.value) {
@@ -89,31 +89,27 @@ export default async function addAttachmentsToFormData(formData: FormData, attac
           ocrText = attachment.value
           formData.append('ocr_text', attachment.value)
           break
+        case 'window_context':
+          windowContext = attachment.value
+          formData.append('window_context', attachment.value)
+          break
         default:
           console.warn('Unknown attachment type:', attachment.type)
       }
     }
   }
 
-  return { screenshot, audio, fileTitle, clipboardText, ocrText }
-}
-
-const prepareHighlightContext = (highlightContext: any) => {
-  if (!highlightContext) return ''
-
-  const processedContext = { ...highlightContext }
-
-  if (processedContext.attachments) {
-    processedContext.attachments = processedContext.attachments.filter(
-      (attachment: any) => attachment.type !== 'screenshot' && attachment.type !== 'audio',
-    )
-  }
-
-  return JSON.stringify(processedContext)
+  return { screenshot, audio, fileTitle, clipboardText, ocrText, windowContext }
 }
 
 export const useSubmitQuery = () => {
   const { post } = useApi()
+
+  const { addAttachment } = useStore(
+    useShallow((state) => ({
+      addAttachment: state.addAttachment,
+    })),
+  )
 
   const {
     getOrCreateConversationId,
@@ -146,13 +142,45 @@ export const useSubmitQuery = () => {
   const conversationId = useStore((state) => state.conversationId)
   const conversationIdRef = useRef(conversationId)
 
+  const { openModal, closeModal } = useStore(
+    useShallow((state) => ({
+      openModal: state.openModal,
+      closeModal: state.closeModal,
+    })),
+  )
+
+  const showConfirmationModal = (message: string): Promise<boolean> => {
+    return new Promise((resolve) => {
+      openModal('confirmation-modal', {
+        header: 'Additional Context Requested',
+        children: message,
+        primaryAction: {
+          label: 'Allow',
+          onClick: () => {
+            closeModal('confirmation-modal')
+            resolve(true)
+          },
+          variant: 'primary',
+        },
+        secondaryAction: {
+          label: 'Deny',
+          onClick: () => {
+            closeModal('confirmation-modal')
+            resolve(false)
+          },
+          variant: 'ghost-neutral',
+        },
+      })
+    })
+  }
+
   const fetchResponse = async (conversationId: string, formData: FormData, token: string, isPromptApp: boolean) => {
     setInputIsDisabled(true)
 
     try {
       formData.append('conversation_id', conversationId)
 
-      const endpoint = isPromptApp ? 'chat/prompt-as-app' : 'chat_v2/'
+      const endpoint = isPromptApp ? 'chat/prompt-as-app' : 'chat/'
 
       const abortController = new AbortController()
       abortControllerRef.current = abortController
@@ -164,7 +192,6 @@ export const useSubmitQuery = () => {
       }
 
       const response = await post(endpoint, formData)
-
       if (!response.ok) {
         throw new Error('Network response was not ok')
       }
@@ -176,6 +203,8 @@ export const useSubmitQuery = () => {
 
       checkAbortSignal()
 
+      let contextConfirmed = null
+      let accumulatedToolUseInput = ''
       let accumulatedResponse = ''
       addConversationMessage(conversationId!, { role: 'assistant', content: '' })
 
@@ -193,12 +222,48 @@ export const useSubmitQuery = () => {
           try {
             const jsonChunk = JSON.parse(jsonStr)
 
-            if (jsonChunk.type === 'text' && jsonChunk.content) {
+            if (jsonChunk.type === 'text') {
               accumulatedResponse += jsonChunk.content
               updateLastConversationMessage(conversationId, {
                 role: 'assistant',
                 content: accumulatedResponse,
               })
+            } else if (jsonChunk.type === 'tool_use') {
+              if (contextConfirmed === null) {
+                contextConfirmed = await showConfirmationModal(
+                  'The assistant is requesting additional context. Do you want to allow this?',
+                )
+              }
+            } else if (jsonChunk.type === 'tool_use_input') {
+              accumulatedToolUseInput += jsonChunk.content
+
+              // Try to parse the accumulated tool use input
+              try {
+                const content = JSON.parse(accumulatedToolUseInput)
+                if (contextConfirmed && content.window) {
+                  const screenshot = await Highlight.user.getWindowScreenshot(content.window)
+                  addAttachment({
+                    type: 'image',
+                    value: screenshot,
+                  })
+                  // Ask for permission on getting extra window context
+                  const granted = await Highlight.permissions.requestWindowContextPermission()
+                  if (granted) {
+                    const windowContext = await Highlight.user.getWindowContext(content.window)
+                    const ocrScreenContents = windowContext.environment.ocrScreenContents || ''
+                    addAttachment({
+                      type: 'window_context',
+                      value: ocrScreenContents,
+                    })
+                    formData.append('window_context', ocrScreenContents)
+                  }
+                }
+                // Reset accumulated tool use input after successful parsing
+                accumulatedToolUseInput = ''
+              } catch (parseError) {
+                // If parsing fails, it means we don't have the complete JSON yet
+                console.error('Incomplete tool use input, waiting for more data')
+              }
             } else if (jsonChunk.type === 'error') {
               console.error('Error from backend:', jsonChunk.content)
               addToast({
@@ -299,6 +364,7 @@ export const useSubmitQuery = () => {
         role: 'user',
         content: query,
         clipboard_text: clipboardText,
+
         screenshot: screenshotUrl,
         audio,
         window: windowTitle ? { title: windowTitle, appIcon: appIcon, type: 'window' } : undefined,
@@ -364,7 +430,7 @@ export const useSubmitQuery = () => {
         formData.append('about_me', JSON.stringify(aboutMe))
       }
 
-      const { screenshot, audio, fileTitle, clipboardText, ocrText } = await addAttachmentsToFormData(
+      const { screenshot, audio, fileTitle, clipboardText, ocrText, windowContext } = await addAttachmentsToFormData(
         formData,
         attachments,
       )
@@ -378,7 +444,8 @@ export const useSubmitQuery = () => {
         audio,
         file_title: fileTitle,
         clipboard_text: clipboardText,
-        windows: windows,
+        windows: windows, // Add windows information to the message
+        window_context: windowContext,
         file_attachments: attachments.filter((attachment) => attachment.type === 'file'),
       })
 
