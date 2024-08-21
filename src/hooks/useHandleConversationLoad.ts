@@ -2,11 +2,9 @@ import { useEffect } from 'react'
 import { AssistantMessage, BaseMessage, UserMessage } from '@/types'
 import { useStore } from '@/providers/store-provider'
 import { useApi } from '@/hooks/useApi'
-import { useChatHistory } from '@/hooks/useChatHistory'
 
 export default function useHandleConversationLoad() {
   const { get } = useApi()
-  const { refreshChatItem } = useChatHistory()
   const conversationId = useStore((state) => state.conversationId)
   const conversationMessages = useStore((state) => state.conversationMessages)
   const updateConversationMessages = useStore((state) => state.updateConversationMessages)
@@ -66,8 +64,6 @@ export default function useHandleConversationLoad() {
         const lastExistingMessage =
           conversationMessages[conversationId]?.[conversationMessages[conversationId]?.length - 1]
         const lastNewMessage = mappedMessages[mappedMessages.length - 1]
-        console.log('last existing message:', lastExistingMessage)
-        console.log('last new message:', lastNewMessage)
         if (lastExistingMessage?.role === 'assistant' && lastNewMessage?.role === 'user') {
           updateConversationMessages(conversationId, [...mappedMessages, lastExistingMessage])
         } else if (lastExistingMessage && lastNewMessage === undefined) {
