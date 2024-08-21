@@ -83,7 +83,7 @@ export default function useHandleConversationLoad() {
     }
 
     return () => {
-      abortController.abort('Conversation ID changed')
+      // abortController.abort('Conversation ID changed')
     }
   }, [conversationId, conversationMessages])
 }
