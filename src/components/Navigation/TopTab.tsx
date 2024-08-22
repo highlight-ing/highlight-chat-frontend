@@ -125,7 +125,6 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
 
     const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
       if (event.button === 1) {
-        // Middle mouse button
         event.preventDefault()
         onClose(conversation)
       }
