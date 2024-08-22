@@ -1,5 +1,5 @@
 import CodeEditor from '@uiw/react-textarea-code-editor'
-import { Gallery, Monitor, Sound, User } from 'iconsax-react'
+import { Gallery, Monitor, Sound, User, Windows } from 'iconsax-react'
 import Button from '@/components/Button/Button'
 import variables from '@/variables.module.scss'
 import styles from './prompteditor.module.scss'
@@ -40,6 +40,10 @@ export default function PromptInput({
           <Button size={'medium'} variant={'ghost-neutral'} onClick={() => onVariableClick('{{audio}}')}>
             <Sound variant="Bold" size={16} color={variables.green60} />
             Audio
+          </Button>
+          <Button size={'medium'} variant={'ghost-neutral'} onClick={() => onVariableClick('{{windows}}')}>
+            <Windows variant="Bold" size={16} color={variables.green60} />
+            Windows
           </Button>
           <Button size={'medium'} variant={'ghost-neutral'} onClick={() => onVariableClick('{{about_me}}')}>
             <User variant="Bold" size={16} color={'#ECFF0C'} />
