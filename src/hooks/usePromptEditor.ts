@@ -45,6 +45,7 @@ export function usePromptEditor() {
     formData.append('visibility', promptEditorData.visibility)
 
     if (promptEditorData.videoUrl) {
+      console.log('appending the video url', promptEditorData.videoUrl)
       formData.append('videoUrl', promptEditorData.videoUrl)
     }
 

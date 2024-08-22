@@ -159,6 +159,8 @@ export async function savePrompt(formData: FormData, authToken: string) {
     }
   }
 
+  console.log('video url', formData.get('videoUrl'))
+
   const validated = SavePromptSchema.safeParse({
     externalId: formData.get('externalId'),
     name: formData.get('name'),

@@ -180,7 +180,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
   const { register, watch, formState, trigger } = useForm({
     defaultValues: {
       name: promptEditorData.name,
-      videoUrl: promptEditorData.videoUrl,
+      videoUrl: promptEditorData.videoUrl ?? '',
       description: promptEditorData.description,
     },
     resolver: zodResolver(SettingsSchema),
@@ -206,7 +206,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
       if (!name) {
         return
       }
-      setPromptEditorData({ [name]: value.name })
+      setPromptEditorData({ [name]: value[name] })
     })
     return () => subscription.unsubscribe()
   }, [watch])
