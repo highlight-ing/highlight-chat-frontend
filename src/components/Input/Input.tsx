@@ -4,7 +4,6 @@ import { AttachmentsButton } from '../AttachmentsButton/AttachmentsButton'
 import { Attachment as AttachmentType } from '@/types'
 import { useSubmitQuery } from '../../hooks/useSubmitQuery'
 import { useStore } from '@/providers/store-provider'
-import { PromptApp } from '@/types' // Added this import
 
 import styles from './chatinput.module.scss'
 import * as React from 'react'
