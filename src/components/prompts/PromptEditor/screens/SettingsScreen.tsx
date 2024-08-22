@@ -93,8 +93,8 @@ function ShareLinkButton() {
 
   const slug = promptEditorData.slug
 
-  const host = window.location.protocol + '//' + window.location.host
-  const url = `${host}/prompts/${slug}`
+  // const host = window.location.protocol + '//' + window.location.host
+  const url = `https://chat.highlight.ing/prompts/${slug}`
 
   const [copied, setCopied] = useState(false)
 
