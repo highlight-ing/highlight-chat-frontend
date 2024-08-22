@@ -123,6 +123,13 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
       }
     }, [conversation.title, title])
 
+    const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+      if (event.button === 1) {
+        event.preventDefault()
+        onClose(conversation)
+      }
+    }
+
     return (
       <div
         ref={ref}
@@ -142,6 +149,7 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
             id={`tab-${conversation.id}`}
             className={`${styles.tab} ${isActive ? styles.active : ''} ${isAnimating && !isDragging ? styles.isAnimating : ''}`}
             onClick={() => onOpen(conversation)}
+            onMouseDown={handleMouseDown}
             onAnimationEnd={() => setIsAnimating(false)}
           >
             {conversationPrompt && conversationPrompt.image && conversationPrompt.user_images?.file_extension ? (
