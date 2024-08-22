@@ -18,7 +18,7 @@ export const useShareConversation = () => {
     try {
       const formData = new FormData()
       formData.append('conversation_id', conversationId)
-      const response = await post('share-conversation/', formData, {
+      const response = await post('share-link/create', formData, {
         signal: abortController.signal,
       })
 
@@ -27,7 +27,7 @@ export const useShareConversation = () => {
       }
 
       const data = await response.json()
-      return `https://chat-new.highlight.ing/share/${data.share_id}`
+      return `https://chat-new.highlight.ing/share/${data.shared_conversation_id}`
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
         console.log('Share conversation request was aborted')
