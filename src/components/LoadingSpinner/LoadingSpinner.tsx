@@ -8,8 +8,12 @@ interface LoadingSpinnerProps {
 }
 
 const LoadingSpinner = ({ size = '25px', color, style }: LoadingSpinnerProps) => {
-  // @ts-ignore
-  return <div className={styles.loadingSpinner} style={{ ...style, '--size': size, '--color': color }} />
+  return (
+    <div
+      className={styles.loadingSpinner}
+      style={{ ...style, '--size': size, '--color': color } as React.CSSProperties}
+    />
+  )
 }
 
 export default LoadingSpinner

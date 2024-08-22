@@ -1,11 +1,12 @@
 import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { Fragment } from 'react'
+import React, { Fragment } from 'react'
 
 import { AssistantIcon } from '@/icons/icons'
 import { Message as MessageType, UserMessage } from '../../types'
 import { Attachment } from '../Attachment'
 
+import globalStyles from '@/global.module.scss'
 import styles from './message.module.scss'
 import TypedText from '@/components/TypedText/TypedText'
 import CodeBlock from '@/components/Messages/CodeBlock'
@@ -16,6 +17,9 @@ import 'katex/dist/katex.min.css'
 // @ts-ignore
 import { BlockMath, InlineMath } from 'react-katex'
 import { getDisplayValue } from '@/utils/attachments'
+import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
+import { MessageText } from 'iconsax-react'
+import { useStore } from '@/providers/store-provider'
 
 const hasAttachment = (message: UserMessage) => {
   return (
@@ -53,11 +57,30 @@ const preprocessLaTeX = (content: string) => {
 }
 
 export const Message = ({ message, isThinking }: MessageProps) => {
+  const promptApp = useStore((state) => state.promptApp)
   return (
     <div className={`${styles.messageContainer} ${message.role === 'user' ? styles.self : ''}`}>
       {message.role === 'assistant' && (
         <div className={styles.avatar}>
-          <AssistantIcon />
+          {/* @todo icon type */}
+          <div
+            className={`${globalStyles.promptIcon} ${promptApp && promptApp.image && promptApp.user_images?.file_extension ? globalStyles.none : globalStyles.self}`}
+            style={{ '--size': '32px' } as React.CSSProperties}
+          >
+            {promptApp && promptApp.image && promptApp.user_images?.file_extension ? (
+              <PromptAppIcon
+                width={32}
+                height={32}
+                className={styles.promptIcon}
+                imageId={promptApp!.image!}
+                imageExtension={promptApp!.user_images?.file_extension ?? ''}
+              />
+            ) : promptApp ? (
+              <MessageText variant={'Bold'} size={16} />
+            ) : (
+              <AssistantIcon />
+            )}
+          </div>
         </div>
       )}
       {!isThinking ? (

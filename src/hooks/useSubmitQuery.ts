@@ -4,7 +4,8 @@ import imageCompression from 'browser-image-compression'
 import { useStore } from '@/providers/store-provider'
 import useAuth from './useAuth'
 import { useApi } from '@/hooks/useApi'
-import { FileAttachment, PromptApp } from '@/types'
+import { Prompt } from '@/types/supabase-helpers'
+import { FileAttachment, FileAttachmentType, TextFileAttachment } from '@/types'
 import { useShallow } from 'zustand/react/shallow'
 import { useEffect, useRef } from 'react'
 
@@ -120,6 +121,7 @@ export const useSubmitQuery = () => {
     aboutMe,
     addConversationMessage,
     updateLastConversationMessage,
+    addToast,
   } = useStore(
     useShallow((state) => ({
       getOrCreateConversationId: state.getOrCreateConversationId,
@@ -131,6 +133,7 @@ export const useSubmitQuery = () => {
       aboutMe: state.aboutMe,
       addConversationMessage: state.addConversationMessage,
       updateLastConversationMessage: state.updateLastConversationMessage,
+      addToast: state.addToast,
     })),
   )
 
@@ -171,11 +174,13 @@ export const useSubmitQuery = () => {
     })
   }
 
-  const fetchResponse = async (conversationId: string, formData: FormData, token: string) => {
+  const fetchResponse = async (conversationId: string, formData: FormData, token: string, isPromptApp: boolean) => {
     setInputIsDisabled(true)
 
     try {
       formData.append('conversation_id', conversationId)
+
+      const endpoint = isPromptApp ? 'chat/prompt-as-app' : 'chat/'
 
       const abortController = new AbortController()
       abortControllerRef.current = abortController
@@ -186,7 +191,7 @@ export const useSubmitQuery = () => {
         }
       }
 
-      const response = await post('chat/', formData)
+      const response = await post(endpoint, formData)
       if (!response.ok) {
         throw new Error('Network response was not ok')
       }
@@ -261,9 +266,12 @@ export const useSubmitQuery = () => {
               }
             } else if (jsonChunk.type === 'error') {
               console.error('Error from backend:', jsonChunk.content)
-              updateLastConversationMessage(conversationId, {
-                role: 'assistant',
-                content: 'Sorry, an error occurred: ' + jsonChunk.content,
+              addToast({
+                title: 'Unexpected Server Error',
+                // @ts-ignore
+                description: jsonChunk.content,
+                type: 'error',
+                timeout: 15000,
               })
             }
           } catch (parseError) {
@@ -278,14 +286,18 @@ export const useSubmitQuery = () => {
       }
     } catch (error) {
       // @ts-ignore
+      console.error('Error fetching response:', error.stack ?? error.message)
+
+      // @ts-ignore
       if (error.message.includes('aborted')) {
         console.log('Skipping message request, aborted')
       } else {
-        // @ts-ignore
-        console.error('Error fetching response:', error.stack ?? error.message)
-        addConversationMessage(conversationId!, {
-          role: 'assistant',
-          content: 'Sorry, there was an error processing your request.',
+        addToast({
+          title: 'Unexpected Error',
+          // @ts-ignore
+          description: `${error?.message}`,
+          type: 'error',
+          timeout: 15000,
         })
       }
     } finally {
@@ -297,7 +309,7 @@ export const useSubmitQuery = () => {
   const handleIncomingContext = async (
     context: HighlightContext,
     navigateToNewChat: () => void,
-    promptApp?: PromptApp,
+    promptApp?: Prompt,
   ) => {
     console.log('Received context inside handleIncomingContext: ', context)
     console.log('Got attachment count: ', context.attachments?.length)
@@ -325,6 +337,7 @@ export const useSubmitQuery = () => {
     let clipboardText = context.attachments?.find((a) => a.type === 'clipboard')?.value
     let audio = context.attachments?.find((a) => a.type === 'audio')?.value
     let windowTitle = context.application?.focusedWindow?.title
+    // @ts-ignore
     let appIcon = context.application?.appIcon
     let rawContents = context.application?.focusedWindow?.rawContents
 
@@ -383,11 +396,11 @@ export const useSubmitQuery = () => {
       }
 
       const accessToken = await getAccessToken()
-      await fetchResponse(conversationId, formData, accessToken)
+      await fetchResponse(conversationId, formData, accessToken, !!promptApp)
     }
   }
 
-  const handleSubmit = async (promptApp?: PromptApp) => {
+  const handleSubmit = async (promptApp?: Prompt) => {
     const query = input.trim()
 
     if (!query) {
@@ -400,18 +413,22 @@ export const useSubmitQuery = () => {
 
       const formData = new FormData()
       formData.append('prompt', query)
-      if (promptApp) {
-        formData.append('app_id', promptApp.id.toString())
-      }
 
-      // Add about_me to form data
-      if (aboutMe) {
-        formData.append('about_me', JSON.stringify(aboutMe))
+      const isPromptApp = promptApp?.is_handlebar_prompt ?? false
+
+      if (isPromptApp) {
+        formData.append('app_id', promptApp!.id.toString())
       }
 
       // Fetch windows information
       const windows = await fetchWindows()
       formData.append('windows', JSON.stringify(windows))
+      // formData.append("llm_provider", "openai")
+
+      // Add about_me to form data
+      if (aboutMe) {
+        formData.append('about_me', JSON.stringify(aboutMe))
+      }
 
       const { screenshot, audio, fileTitle, clipboardText, ocrText, windowContext } = await addAttachmentsToFormData(
         formData,
@@ -436,7 +453,7 @@ export const useSubmitQuery = () => {
       clearAttachments() // Clear the attachment immediately
 
       const accessToken = await getAccessToken()
-      await fetchResponse(conversationId, formData, accessToken)
+      await fetchResponse(conversationId, formData, accessToken, isPromptApp)
     }
   }
 

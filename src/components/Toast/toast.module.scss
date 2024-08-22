@@ -1,0 +1,86 @@
+@import '@/variables.module';
+
+.toastsContainer {
+  position: absolute;
+  top: $topbar-height;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 16px;
+  gap: 16px;
+  height: calc(100% - $topbar-height);
+  overflow: hidden;
+  z-index: 2;
+  pointer-events: none;
+}
+
+@keyframes fadeInRight {
+  from {
+    transform: translateX(100%) scale(0.75);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.toast {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px $dark-40;
+  backdrop-filter: blur(24px);
+  transition: transform 200ms, opacity 200ms, max-height 200ms, padding 200ms;
+  transform: translateX(100%) scale(0.75);
+  padding: 0;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  pointer-events: all;
+
+  &.show {
+    padding: 12px;
+    transform: translateX(0) scale(1);
+    opacity: 1;
+    max-height: 400px;
+  }
+  &.hide {
+    //transform: translateX(100%) scale(0.75);
+    //opacity: 0;
+  }
+
+  &.default {
+    background-color: $light-5;
+    border: 1px solid $light-5;
+  }
+  &.error {
+    background-color: $red-20;
+    border: 1px solid $light-5;
+  }
+  &.success {
+    background-color: $green-10;
+    border: 1px solid $light-5;
+  }
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 450;
+  color: $light-80;
+  margin-right: 48px;
+}
+
+.subtext {
+  font-size: 13px;
+  font-weight: normal;
+  color: $light-40;
+}
+
+.description {
+  font-size: 15px;
+  font-weight: 350;
+  color: $light-60;
+}

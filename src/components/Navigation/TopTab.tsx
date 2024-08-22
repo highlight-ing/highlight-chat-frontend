@@ -10,6 +10,9 @@ import ContextMenu, { MenuItemType } from '@/components/ContextMenu/ContextMenu'
 import { useStore } from '@/providers/store-provider'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 import { trackEvent } from '@/utils/amplitude'
+import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
+import { useShallow } from 'zustand/react/shallow'
+import { usePromptApp } from '@/hooks/usePromptApp'
 
 interface TopTabProps {
   isActive?: boolean
@@ -40,6 +43,8 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
     const clearAllConversationMessages = useStore((state) => state.clearAllConversationMessages)
     const clearAllOtherConversationMessages = useStore((state) => state.clearAllOtherConversationMessages)
     const startNewConversation = useStore((state) => state.startNewConversation)
+
+    const conversationPrompt = usePromptApp(conversation.app_id)
 
     const menuOptions = useMemo<MenuItemType[]>(() => {
       return [
@@ -139,7 +144,17 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
             onClick={() => onOpen(conversation)}
             onAnimationEnd={() => setIsAnimating(false)}
           >
-            <MessageText size={17} variant={'Bold'} />
+            {conversationPrompt && conversationPrompt.image && conversationPrompt.user_images?.file_extension ? (
+              <PromptAppIcon
+                width={17}
+                height={17}
+                className={styles.promptIcon}
+                imageId={conversationPrompt.image}
+                imageExtension={conversationPrompt.user_images.file_extension}
+              />
+            ) : (
+              <MessageText variant={'Bold'} size={17} />
+            )}
             {initialTitleRef.current === title ? (
               <span
                 className={'max-w-full overflow-hidden overflow-ellipsis whitespace-nowrap'}

@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { DM_Mono, Public_Sans } from 'next/font/google'
 
 import './globals.css'
 
@@ -8,10 +8,17 @@ export const metadata: Metadata = {
   description: 'Chat with Highlight',
 }
 
-const inter = Inter({
+const dmMono = DM_Mono({
+  weight: '400',
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-inter',
+  variable: '--font-dm-mono',
+})
+
+const publicSans = Public_Sans({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-public-sans',
 })
 
 export default function RootLayout({
@@ -20,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} dark`}>
+    <html lang="en" className={`${dmMono.variable} ${publicSans.variable} dark`}>
       <body>{children}</body>
     </html>
   )

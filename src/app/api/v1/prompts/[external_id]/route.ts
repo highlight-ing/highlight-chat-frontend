@@ -4,10 +4,11 @@ import { PROMPTS_TABLE_SELECT_FIELDS, supabaseAdmin } from '@/lib/supabase'
  * API route that returns a single prompt by its slug
  */
 export async function GET(request: Request, { params }: { params: { external_id: string } }) {
-  const { data: prompt, error } = await supabaseAdmin
+  const supabase = supabaseAdmin()
+  const { data: prompt, error } = await supabase
     .from('prompts')
     .select(PROMPTS_TABLE_SELECT_FIELDS)
-    .eq('public', true)
+    // .eq('public', true)
     .eq('external_id', params.external_id)
     .maybeSingle()
 
