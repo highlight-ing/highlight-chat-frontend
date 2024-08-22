@@ -16,6 +16,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { videoUrlSchema } from '@/lib/zod'
+import variables from '@/variables.module.scss'
 
 function AppIcon() {
   return (
@@ -114,17 +115,25 @@ function ShareLinkButton() {
   return (
     <SettingOption
       label={'Share Link'}
-      description={<span className={'text-sm'}>{slug ? url : 'Save your prompt to generate a share link'}</span>}
+      description={
+        promptEditorData.visibility === 'public' ? (
+          <span className={'text-md'}>{slug ? url : 'Save your prompt to generate a share link'}</span>
+        ) : (
+          <span className={'text-md'}>Make your app public to share it</span>
+        )
+      }
     >
-      <Button
-        onClick={onCopyLinkClick}
-        size={'medium'}
-        variant={'tertiary'}
-        style={{ marginRight: '6px' }}
-        disabled={!slug || copied}
-      >
-        {copied ? 'Copied' : 'Copy Link'}
-      </Button>
+      {promptEditorData.visibility === 'public' && (
+        <Button
+          onClick={onCopyLinkClick}
+          size={'medium'}
+          variant={'tertiary'}
+          style={{ marginRight: '6px' }}
+          disabled={!slug || copied}
+        >
+          {copied ? 'Copied' : 'Copy Link'}
+        </Button>
+      )}
     </SettingOption>
   )
 }
@@ -287,7 +296,11 @@ const VisibilityToggle = ({
     <SettingOption label={'Visibility'} description={'Share your app with the community'}>
       <div className="flex items-center gap-2">
         <p className="text-xs opacity-40">{visibility === 'public' ? 'Public' : 'Private'}</p>
-        <Switch checked={visibility === 'public'} onChange={(checked) => onToggle(checked ? 'public' : 'private')} />
+        <Switch
+          color={'cyan'}
+          checked={visibility === 'public'}
+          onChange={(checked) => onToggle(checked ? 'public' : 'private')}
+        />
       </div>
     </SettingOption>
   )
