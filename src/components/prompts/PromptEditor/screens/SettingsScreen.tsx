@@ -225,44 +225,46 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
   }
 
   return (
-    <div className={styles.settingsPage}>
-      <div className={'flex flex-1 flex-col gap-8'}>
-        <div className="flex items-center space-x-6">
-          <ImageUpload />
-        </div>
-        <div className="flex flex-col gap-6">
-          <InputField
-            size={'xxlarge'}
-            label={'Name'}
-            placeholder={'Name your app'}
-            {...register('name')}
-            error={errors.name?.message}
-          />
+    <div className="flex max-h-full min-h-0 flex-col items-center">
+      <div className={`${styles.settingsPage} `}>
+        <div className={'flex flex-1 flex-col gap-8'}>
+          <div className="flex items-center space-x-6">
+            <ImageUpload />
+          </div>
+          <div className="flex flex-col gap-6">
+            <InputField
+              size={'xxlarge'}
+              label={'Name'}
+              placeholder={'Name your app'}
+              {...register('name')}
+              error={errors.name?.message}
+            />
 
-          <InputField
-            size={'xxlarge'}
-            label={'Video Link'}
-            placeholder={'Provide a video demo for your app (optional)'}
-            {...register('videoUrl')}
-            error={errors.videoUrl?.message}
-          />
-          <TextArea
-            size={'xxlarge'}
-            label={'Description'}
-            placeholder={'Describe what your app does...'}
-            rows={3}
-            {...register('description')}
-            error={errors.description?.message}
-          />
+            <InputField
+              size={'xxlarge'}
+              label={'Video Link'}
+              placeholder={'Provide a video demo for your app (optional)'}
+              {...register('videoUrl')}
+              error={errors.videoUrl?.message}
+            />
+            <TextArea
+              size={'xxlarge'}
+              label={'Description'}
+              placeholder={'Describe what your app does...'}
+              rows={3}
+              {...register('description')}
+              error={errors.description?.message}
+            />
+          </div>
         </div>
-      </div>
-      <div className={'flex flex-1 flex-col gap-4'}>
-        <VisibilityToggle
-          visibility={promptEditorData.visibility}
-          onToggle={(visibility) => setPromptEditorData({ visibility })}
-        />
-        <ShareLinkButton />
-        <DeletePromptButton onDelete={onDelete} />
+        <div className={'flex flex-1 flex-col gap-4'}>
+          <VisibilityToggle
+            visibility={promptEditorData.visibility}
+            onToggle={(visibility) => setPromptEditorData({ visibility })}
+          />
+          <ShareLinkButton />
+          <DeletePromptButton onDelete={onDelete} />
+        </div>
       </div>
     </div>
   )

@@ -3,7 +3,7 @@ import { Gallery, Monitor, Sound, User, Windows } from 'iconsax-react'
 import Button from '@/components/Button/Button'
 import variables from '@/variables.module.scss'
 import styles from './prompteditor.module.scss'
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 
 /**
  * PromptInput is a component that allows the user to input a prompt with

@@ -29,7 +29,7 @@ export default function PromptEditor({ onClose }: { onClose?: () => void }) {
           </div>
         </div>
       )}
-      <div className={'flex max-h-full min-h-0 flex-col items-center'}>
+      <div className={'h-full'}>
         {selectedScreen === 'startWithTemplate' && <StartWithTemplateScreen />}
         {selectedScreen === 'app' && <AppScreen />}
         {selectedScreen === 'suggestions' && <SuggestionsScreen />}
