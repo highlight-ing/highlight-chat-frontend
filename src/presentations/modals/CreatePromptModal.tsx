@@ -26,12 +26,10 @@ const CreatePromptModal = ({ id, context }: ModalObjectProps) => {
       size={'fullscreen'}
       bodyClassName={styles.createPromptModal}
       header={
-        <div className={'flex w-full items-center justify-between'} style={{ marginRight: '-100px' }}>
-          <div className="basis-1/3">
-            <CloseButton alignment="left" onClick={() => closeModal(id)} />
-          </div>
-          <div className="basis-1/3">Create New Highlight App</div>
-          <div className="flex basis-1/3 justify-end">
+        <div className={'flex w-full items-center justify-between'}>
+          <CloseButton alignment="left" onClick={() => closeModal(id)} />
+          <div className="flex grow justify-center">Create New Highlight App</div>
+          <div className="absolute right-0 p-2">
             <Button size={'large'} variant={'tertiary'} onClick={save} disabled={saveDisabled}>
               Save
             </Button>
