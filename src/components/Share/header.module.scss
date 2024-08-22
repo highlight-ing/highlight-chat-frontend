@@ -3,17 +3,20 @@
 .header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 6px;
   background-color: rgba(16, 16, 16, 0.5);
   border-bottom: 1px solid $dark-40;
   backdrop-filter: blur(16px);
   width: 100%;
   height: $topbar-height;
-  font-size: 14px;
-  font-weight: 500;
-  color: $light-80;
   position: sticky;
   top: 0;
   z-index: 50;
+
+  h1 {
+    font-size: 20px;
+    font-weight: bold;
+    color: $light-100;
+  }
 }

@@ -1,0 +1,203 @@
+@import '@/variables.module';
+@import '@/main.module';
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.messageContainer {
+  display: flex;
+  width: 100%;
+  max-width: $chat-body-width;
+  position: relative;
+  animation: fadeIn 200ms forwards;
+
+  &.placeholder {
+    @extend .loadingGradient;
+    overflow: hidden;
+    border-radius: 12px;
+    height: 64px;
+
+    &:nth-child(1) {
+      height: 64px;
+    }
+    &:nth-child(2) {
+      height: 90px;
+    }
+    &:nth-child(3) {
+      height: 64px;
+    }
+  }
+
+  &.self {
+    .message {
+      background-color: transparent;
+      border: 1px solid $light-10;
+    }
+  }
+
+  .message {
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
+    padding: 16px;
+    background-color: $light-5;
+    gap: 16px;
+    width: 100%;
+  }
+}
+
+.avatar {
+  position: absolute;
+  top: 0;
+  left: -40px;
+}
+
+.messageBody {
+  font-size: 15px;
+  color: $light-80;
+  font-weight: 300;
+  line-height: 1.6;
+  //display: flex;
+  //flex-direction: column;
+  gap: 8px;
+  white-space: pre-wrap;
+
+  strong {
+    color: $light-80;
+  }
+
+  ol {
+    list-style: disc;
+    padding: 0;
+    margin-inline-start: 1.5em;
+    white-space: initial;
+  }
+  ul {
+    list-style: disc;
+    padding: 0;
+    margin-inline-start: 1.5em;
+    white-space: initial;
+  }
+  li {
+    padding: 0;
+    margin: 0.5em 0;
+    white-space: initial;
+  }
+
+  h1, h2, h3, h4 {
+    margin-top: 12px;
+    color: $light-80;
+    font-weight: 300;
+  }
+
+  code {
+    font-size: 13px;
+    background-color: $dark-60;
+    border: 1px solid $light-10;
+    padding: 4px;
+    border-radius: 6px;
+    height: fit-content;
+  }
+
+  pre {
+    font-size: 13px;
+
+    code {
+      background-color: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 0;
+    }
+  }
+
+  table {
+    border-radius: 8px;
+    overflow: hidden;
+    width: 100%;
+  }
+  th {
+    background-color: $light-5;
+  }
+  td, th {
+    border: 1px solid $light-5;
+    padding: 8px;
+  }
+  td {
+    vertical-align: top;
+    font-size: 15px;
+  }
+  tr:nth-child(odd) {
+    background-color: $dark-20;
+  }
+  tr:nth-child(even) {
+    background-color: $dark-10;
+  }
+}
+
+.thinking {
+  color: $light-40;
+  font-size: 15px;
+  font-weight: 300;
+  padding: 5px 0;
+}
+
+.codeBlock {
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid $light-10;
+}
+
+.codeBlockHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 4px 4px 12px;
+  background-color: $light-5;
+  color: $light-40;
+  font-size: 13px;
+  font-family: "Inter", sans-serif;
+  font-weight: normal;
+}
+
+.messagesContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.messages {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: $light-20 transparent;
+  transition: scrollbar-color 0.3s ease;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: $light-20;
+    border-radius: 20px;
+    border: 2px solid transparent;
+  }
+
+  &:hover {
+    scrollbar-color: $light-40 transparent;
+
+    &::-webkit-scrollbar-thumb {
+      background-color: $light-40;
+    }
+  }
+}
