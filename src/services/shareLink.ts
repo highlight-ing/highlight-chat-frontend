@@ -1,17 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 import { v4 as uuidv4 } from 'uuid'
-import { ChatHistoryItem, Message } from '@/types'
+import { ChatHistoryItem, SharedMessage, SharedConversation, Message } from '@/types'
 
-const supabaseUrl = process.env.SUPABASE_URL
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-//TODO: commented out to prevent hydration errors for now
-
-// if (!supabaseUrl || !supabaseServiceRoleKey) {
-//     throw new Error('Supabase URL or Service Role Key is not set');
-//   }
-
-// const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://0.0.0.0:8080'
 
 export async function createShareLink(conversation: ChatHistoryItem): Promise<string> {
   const shareId = uuidv4()
@@ -20,23 +11,39 @@ export async function createShareLink(conversation: ChatHistoryItem): Promise<st
 }
 
 export async function getSharedConversation(id: string): Promise<{ title: string; messages: Message[] } | null> {
-  // Mock data for testing
-  if (id === 'mockUUID') {
-    return {
-      title: 'Mock Shared Conversation',
-      messages: [
-        { role: 'user', content: 'Hello, this is a test message.' },
-        { role: 'assistant', content: 'Hi there! This is a mock response from the assistant.' },
-        { role: 'user', content: 'Can you show me some code?' },
-        {
-          role: 'assistant',
-          content:
-            'Sure! Here\'s a simple Python function:\n\n```python\ndef greet(name):\n    return f"Hello, {name}!"\n\nprint(greet("World"))\n```',
-        },
-      ],
-    }
-  }
+  try {
+    const url = `${API_BASE_URL}/api/v1/share-link/${id}/messages`
+    console.log('Fetching from URL:', url) // Log the full URL
 
-  // TODO: Implement actual data retrieval from Supabase
-  return null
+    const response = await fetch(url)
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('Response not OK:', response.status, errorText)
+      throw new Error(`Failed to fetch shared conversation: ${response.status} ${errorText}`)
+    }
+    const sharedMessages: SharedMessage[] = await response.json()
+
+    // Convert SharedMessage to Message
+    const messages: Message[] = sharedMessages.map((sm) => ({
+      role: sm.role as 'user' | 'assistant',
+      content: sm.content,
+      ...(sm.role === 'user' && {
+        ocr_text: sm.ocr_text,
+        clipboard_text: sm.clipboard_text,
+        image_url: sm.image_url,
+        audio: sm.audio,
+        file_title: sm.text_file,
+        windows: sm.windows,
+        window: sm.window_context,
+      }),
+    }))
+
+    return {
+      title: 'Shared Conversation', // You might want to fetch the title separately or include it in the response
+      messages,
+    }
+  } catch (error) {
+    console.error('Error fetching shared conversation:', error)
+    return null
+  }
 }

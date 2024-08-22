@@ -13,11 +13,11 @@ interface SharePageComponentProps {
 
 const SharePageComponent: React.FC<SharePageComponentProps> = ({ title, messages }) => {
   return (
-    <div className={`${styles.contents} ${styles.full} flex flex-col justify-center`}>
+    <div className={`${styles.contents} ${styles.full} flex flex-col`}>
       <div
-        className={`${chatHomeStyles.chatHomeContainer} ${chatHomeStyles.show} shared-chat-container mx-auto w-full max-w-4xl`}
+        className={`${chatHomeStyles.chatHomeContainer} ${chatHomeStyles.show} shared-chat-container mx-auto w-full max-w-4xl py-6`}
       >
-        <div className="mb-6 rounded-lg bg-light-5 p-6 shadow-md">
+        <div className="bg-dark-80 mb-6 max-h-[calc(100vh-200px)] overflow-y-auto rounded-lg p-6 shadow-md">
           <ShareMessages messages={messages} />
         </div>
         <div className={chatHomeStyles.callouts}>

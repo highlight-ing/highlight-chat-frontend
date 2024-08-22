@@ -2,7 +2,6 @@ import { notFound } from 'next/navigation'
 import SharePageComponent from '@/components/Share/SharePageComponent'
 import { getSharedConversation } from '@/services/shareLink'
 import { Metadata } from 'next'
-import { Message } from '@/types'
 import Header from '@/components/Share/Header'
 import Footer from '@/components/Share/Footer'
 
@@ -37,9 +36,9 @@ export default async function SharePage({ params }: SharePageProps) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="bg-dark-100 flex min-h-screen flex-col">
       <Header title={sharedData.title} />
-      <main className="flex-grow">
+      <main className="flex-grow overflow-auto">
         <SharePageComponent title={sharedData.title} messages={sharedData.messages} />
       </main>
       <Footer />
