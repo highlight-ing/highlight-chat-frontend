@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from 'react'
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import styles from './inputfield.module.scss'
 
 interface InputFieldProps {
@@ -15,7 +15,10 @@ interface InputFieldProps {
 
 const InputField: React.FC<InputFieldProps> = forwardRef<HTMLInputElement, InputFieldProps>(
   ({ label, placeholder, value, size, onBlur, onChange, onFocus, onKeyDown, error, ...props }, ref) => {
-    const [showLabel, setShowLabel] = useState(false)
+    const inputRef = useRef<HTMLInputElement>(null)
+    const [showLabel, setShowLabel] = useState(!!value?.length)
+
+    useImperativeHandle(ref, () => inputRef.current!, [])
 
     const onFocusEvent = (e: React.FocusEvent<HTMLInputElement>) => {
       if (typeof onFocus === 'function') {
@@ -34,7 +37,7 @@ const InputField: React.FC<InputFieldProps> = forwardRef<HTMLInputElement, Input
     const renderInput = () => {
       return (
         <input
-          ref={ref}
+          ref={inputRef}
           {...props}
           className={`${styles.inputField} ${styles[size]} ${size === 'xxlarge' && showLabel ? styles.label : ''}`}
           value={value}
@@ -46,6 +49,15 @@ const InputField: React.FC<InputFieldProps> = forwardRef<HTMLInputElement, Input
         />
       )
     }
+
+    useEffect(() => {
+      const inputValue = inputRef.current?.value
+      if (inputValue?.length && !showLabel) {
+        setShowLabel(true)
+      } else if (!inputValue?.length && showLabel) {
+        setShowLabel(false)
+      }
+    }, [])
 
     return (
       <div className={'relative flex flex-col gap-2'}>
