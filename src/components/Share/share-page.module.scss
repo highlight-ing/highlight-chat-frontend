@@ -1,5 +1,46 @@
 @import '@/variables.module';
 
+.page {
+    display: flex;
+    justify-content: flex-end;
+    width: 100vw;
+    height: 100vh;
+    background-color: $bg-layer-1;
+  }
+
+.sharePageContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    position: fixed;
+    opacity: 0;
+    padding-top: 8vh;
+    pointer-events: none;
+    min-width: min(800px, 95%);
+    max-width: min(800px, 95%);
+
+    &.show {
+      position: relative;
+      opacity: 1;
+      pointer-events: initial;
+      transition: opacity 200ms ease;
+  
+      .homeCallout {
+        transform: scale(1)
+      }
+  
+      .prompts, .highlightTutorial {
+        transform: none;
+        opacity: 1;
+      }
+  
+      .input {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+  }
+
 .container {
   display: flex;
   flex-direction: column;

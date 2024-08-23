@@ -4,15 +4,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  padding: 12px 0 0 0;
   background-color: rgba(16, 16, 16, 0.5);
-  border-top: 1px solid $dark-40;
   backdrop-filter: blur(16px);
   width: 100%;
   height: $topbar-height;
   font-size: 14px;
   font-weight: 500;
-  color: $light-80;
+
 }
 
 .footerContent {
@@ -22,4 +21,5 @@
   width: 100%;
   max-width: 53rem; // This matches the max-w-4xl class
   padding: 0 1.5rem; // Add some padding on the sides
+  color: $light-100;
 }
