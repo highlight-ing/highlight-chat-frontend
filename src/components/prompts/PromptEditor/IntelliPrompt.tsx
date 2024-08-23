@@ -1,8 +1,6 @@
 import Editor, { Monaco } from '@monaco-editor/react'
 import styles from './prompteditor.module.scss'
 import Button from '@/components/Button/Button'
-import { Gallery, Monitor, Sound, User, Windows } from 'iconsax-react'
-import sassVariables from '@/variables.module.scss'
 import { useEffect, useRef, useState } from 'react'
 import { editor, IDisposable } from 'monaco-editor'
 import { buildSuggestions } from '@/lib/IntelliPrompt'

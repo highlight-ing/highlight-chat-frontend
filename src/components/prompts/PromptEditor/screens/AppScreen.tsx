@@ -38,7 +38,7 @@ export default function AppScreen() {
           icon: <Sound variant="Bold" size={16} color={sassVariables.green60} />,
         },
         {
-          label: 'Windows',
+          label: 'Open Windows',
           insertText: 'windows',
           description: "A list of all the windows open on the user's machine.",
           icon: <I3Square variant="Bold" size={16} color={sassVariables.green60} />,
