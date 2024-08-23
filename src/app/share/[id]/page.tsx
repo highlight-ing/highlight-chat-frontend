@@ -1,5 +1,7 @@
 import { notFound } from 'next/navigation'
 import SharePageComponent from '@/components/Share/SharePageComponent'
+import Header from '@/components/Share/Header'
+import Footer from '@/components/Share/Footer'
 import { getSharedConversation } from '@/services/shareLink'
 import { Metadata } from 'next'
 
@@ -32,5 +34,11 @@ export default async function SharePage({ params }: SharePageProps) {
     notFound()
   }
 
-  return <SharePageComponent title={sharedData.title} messages={sharedData.messages} />
+  return (
+    <>
+      <Header title={sharedData.title} />
+      <SharePageComponent messages={sharedData.messages} />
+      <Footer />
+    </>
+  )
 }

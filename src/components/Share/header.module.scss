@@ -1,17 +1,22 @@
 @import '@/variables.module';
 
 .header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: rgba(16, 16, 16, 0.5);
+  backdrop-filter: blur(6px);
+}
+
+.headerContent {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 6px;
-  background-color: rgba(16, 16, 16, 0.5);
-  backdrop-filter: blur(16px);
   width: 100%;
   height: $topbar-height;
-  position: sticky;
-  top: 0;
-  z-index: 50;
 
   h1 {
     font-size: 20px;
