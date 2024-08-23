@@ -1,0 +1,29 @@
+@import '@/variables.module';
+
+.promptIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size, 64px);
+  height: var(--size, 64px);
+  border-radius: 50%;
+  background-color: $light-20;
+  color: $light-100;
+
+  &.none {
+    background-color: transparent;
+    color: $light-100;
+  }
+  &.self {
+    background-color: $purple-20;
+    color: $purple-100;
+  }
+  &.community {
+    background-color: $primary-20;
+    color: $primary-100;
+  }
+  &.official {
+    background-color: $pink-20;
+    color: $pink-100;
+  }
+}

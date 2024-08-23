@@ -2,89 +2,108 @@ import { refreshTokens } from '@/app/(app)/actions'
 import { useStore } from '@/providers/store-provider'
 import Highlight from '@highlight-ai/app-runtime'
 import { decodeJwt } from 'jose'
-import { useShallow } from 'zustand/react/shallow'
+import { useEffect } from 'react'
+
+async function getNewTokens(): Promise<{ accessToken: string; refreshToken: string; authExpiration: number }> {
+  const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await Highlight.auth.signIn()
+
+  const payload = decodeJwt(newAccessToken)
+
+  const exp = payload.exp ?? 0
+
+  if (!payload.sub) {
+    throw new Error('Invalid access token, missing subscriber id (user ID) in the payload.')
+  }
+
+  return { accessToken: newAccessToken, refreshToken: newRefreshToken, authExpiration: exp }
+}
+
+async function attemptToRefreshTokens(oldRefreshToken: string): Promise<{
+  accessToken: string
+  refreshToken: string
+  authExpiration: number
+}> {
+  // Attempt to refresh the tokens
+  try {
+    const refreshTokensResponse = await refreshTokens(oldRefreshToken)
+
+    console.log('[useAuth] Refreshed tokens from backend.')
+
+    const payload = decodeJwt(refreshTokensResponse.access_token)
+
+    return {
+      accessToken: refreshTokensResponse.access_token,
+      refreshToken: refreshTokensResponse.refresh_token,
+      authExpiration: payload.exp ?? 0,
+    }
+  } catch (error) {
+    // If the refresh fails, get new tokens
+    console.log('[useAuth] Refresh failed, getting new tokens.')
+    return await getNewTokens()
+  }
+}
+
+let requestPromise: Promise<string> | null = null
 
 /**
  * Hook that handles automatically fetching tokens, refreshing them, etc.
  * @todo Add persistant store to Zustand, this hook matter that much without persistant storage.
  */
 export default function useAuth() {
-  let { accessToken, refreshToken, authExpiration, setAuth } = useStore(
-    useShallow((state) => ({
-      accessToken: state.accessToken,
-      refreshToken: state.refreshToken,
-      setAuth: state.setAuth,
-      authExpiration: state.authExpiration,
-    })),
-  )
+  let { accessToken, refreshToken, authExpiration, setAuth } = useStore((state) => ({
+    accessToken: state.accessToken,
+    refreshToken: state.refreshToken,
+    setAuth: state.setAuth,
+    authExpiration: state.authExpiration,
+  }))
 
-  async function getNewTokens() {
-    const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await Highlight.auth.signIn()
+  // Keeps track of the promise to fetch/refresh tokens
 
-    const payload = decodeJwt(newAccessToken)
-
-    const exp = payload.exp
-
-    if (!payload.sub) {
-      throw new Error('Invalid access token, missing subscriber id (user ID) in the payload.')
-    }
-
-    const newUserId = payload.sub
-
-    // Store the expiration time in the auth store
-    setAuth({
-      accessToken: newAccessToken,
-      refreshToken: newRefreshToken,
-      userId: newUserId,
-      authExpiration: exp,
-    })
-
-    accessToken = newAccessToken
-    refreshToken = newRefreshToken
-    authExpiration = exp
-  }
-
-  async function attemptToRefreshTokens() {
-    // Attempt to refresh the tokens
-    try {
-      const refreshTokensResponse = await refreshTokens(refreshToken!)
-
-      console.log('[useAuth] Refreshed tokens from backend.')
-
-      setAuth({
-        accessToken: refreshTokensResponse.access_token,
-        refreshToken: refreshTokensResponse.refresh_token,
-        authExpiration: refreshTokensResponse.expires_in,
-      })
-
-      accessToken = refreshTokensResponse.access_token
-      refreshToken = refreshTokensResponse.refresh_token
-      authExpiration = refreshTokensResponse.expires_in
-    } catch (error) {
-      // If the refresh fails, get new tokens
-      console.log('[useAuth] Refresh failed, getting new tokens.')
-      await getNewTokens()
-    }
-  }
+  // Hook that checks if the auth state in Highlight has changed, if so,
+  // we need to update the auth state in the store
+  useEffect(() => {}, [])
 
   /**
    * Fetches tokens from the auth store or fetches new ones if they don't exist.
    */
-  async function getAccessToken() {
+  async function getAccessToken(forceNewTokens: boolean = false) {
+    // if there's an ongoing request, return the promise
+    if (requestPromise) {
+      return requestPromise
+    }
+
     // Check if the store already has tokens
-    if (!accessToken || !refreshToken || !authExpiration) {
+    if (!accessToken || !refreshToken || !authExpiration || forceNewTokens) {
       console.log('[useAuth] No existing auth tokens found, getting new tokens.')
-      await getNewTokens()
+      requestPromise = getNewTokens()
+        .then((tokens) => {
+          setAuth(tokens)
+          return tokens.accessToken
+        })
+        .finally(() => {
+          requestPromise = null
+        })
+
+      return requestPromise
     }
 
     // Check if the current tokens are expired
-    if (authExpiration && Date.now() >= authExpiration * 1000) {
-      await attemptToRefreshTokens()
+    if (authExpiration !== undefined && Date.now() >= authExpiration * 1000) {
+      console.log('[useAuth] Auth tokens expired, attempting to refresh.', Date.now(), authExpiration * 1000)
+      requestPromise = attemptToRefreshTokens(refreshToken!)
+        .then((tokens) => {
+          setAuth(tokens)
+          return tokens.accessToken
+        })
+        .finally(() => {
+          requestPromise = null
+        })
+
+      return requestPromise
     }
 
     if (!accessToken) {
-      // The new access token should be set by now...
-      throw new Error("Access token wasn't set after trying to refresh/generate a new one.")
+      throw new Error('No access token found in the store (this should never happen).')
     }
 
     return accessToken

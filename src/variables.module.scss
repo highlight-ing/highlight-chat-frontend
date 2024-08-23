@@ -79,6 +79,8 @@ $chat-body-width: min(800px, 88%);
 $chat-history-width: 250px;
 $topbar-height: 48px;
 
+// Prompt editor variables
+$editor-width: min(1050px, 90%);
 
 :export {
   chatHistoryWidth: $chat-history-width;

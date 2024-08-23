@@ -12,7 +12,6 @@ export interface ModalProps {
   size: SizeType
   exitOnClick?: boolean
   exitOnEscape?: boolean
-  bodyPadding?: string
   gap?: string
   header?: string | ReactElement | ReactNode
   zIndex?: number
@@ -26,6 +25,7 @@ export interface ModalProps {
   bodyStyle?: React.CSSProperties
   overlayStyle?: React.CSSProperties
   bodyClassName?: string
+  closeButtonAlignment?: 'left' | 'right'
 }
 
 interface BaseModalProps {
@@ -48,6 +48,7 @@ const BaseModal = ({
   bodyStyle,
   overlayStyle,
   showClose,
+  closeButtonAlignment,
   bodyClassName,
 }: PropsWithChildren<ModalProps & BaseModalProps>) => {
   const modals = useStore((state) => state.modals)
@@ -105,7 +106,7 @@ const BaseModal = ({
       style={overlayStyle}
     >
       <div className={`${styles.modalContainer} ${styles[size]}`} style={style}>
-        {showClose !== false && <CloseButton onClick={(e) => close(e, true)} />}
+        {showClose !== false && <CloseButton onClick={(e) => close(e, true)} alignment={closeButtonAlignment} />}
         {header && <div className={styles.modalHeader}>{header}</div>}
         <div className={`${styles.modalBody} ${bodyClassName ?? ''}`} id={`${id}-body`} style={bodyStyle}>
           {children}

@@ -21,6 +21,13 @@ import {
 } from './highlight-context'
 import { ModalsSlice, ModalsState, createModalsSlice, initialModalsState } from './modals'
 import { createHistorySlice, HistorySlice, HistoryState, initialHistoryState } from '@/stores/history'
+import { createToastSlice, ToastSlice, ToastState, initialToastState } from '@/stores/toasts'
+import {
+  createPromptEditorSlice,
+  initialPromptEditorState,
+  PromptEditorSlice,
+  PromptEditorState,
+} from './prompt-editor'
 
 /**
  * To add a new store, create a new file and reference messages.ts
@@ -38,7 +45,9 @@ export type StoreState = MessagesState &
   AboutMeState &
   HighlightContextState &
   ModalsState &
-  HistoryState
+  HistoryState &
+  PromptEditorState &
+  ToastState
 
 export type Store = MessagesSlice &
   AuthSlice &
@@ -50,7 +59,9 @@ export type Store = MessagesSlice &
   AboutMeSlice &
   HighlightContextSlice &
   ModalsSlice &
-  HistorySlice
+  HistorySlice &
+  PromptEditorSlice &
+  ToastSlice
 
 const defaultState: StoreState = {
   ...initialMessagesState,
@@ -64,6 +75,8 @@ const defaultState: StoreState = {
   ...initialHighlightContextState,
   ...initialModalsState,
   ...initialHistoryState,
+  ...initialPromptEditorState,
+  ...initialToastState,
 }
 
 export const initStore: () => StoreState = () => {
@@ -84,5 +97,7 @@ export const createStore = (initState: StoreState = defaultState) => {
     ...createAboutMeSlice(...a),
     ...createHighlightContextSlice(...a),
     ...createModalsSlice(...a),
+    ...createPromptEditorSlice(...a),
+    ...createToastSlice(...a),
   }))
 }

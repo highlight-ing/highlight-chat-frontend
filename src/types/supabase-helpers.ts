@@ -4,4 +4,6 @@
 
 import { Database } from './supabase'
 
-export type Prompt = Database['public']['Tables']['prompts']['Row']
+export type Prompt = Database['public']['Tables']['prompts']['Row'] & {
+  user_images: Pick<Database['public']['Tables']['user_images']['Row'], 'file_extension'> | null
+}

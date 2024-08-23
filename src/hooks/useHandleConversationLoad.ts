@@ -2,13 +2,18 @@ import { useEffect } from 'react'
 import { AssistantMessage, BaseMessage, UserMessage } from '@/types'
 import { useStore } from '@/providers/store-provider'
 import { useApi } from '@/hooks/useApi'
+import usePromptApps from '@/hooks/usePromptApps'
 
 export default function useHandleConversationLoad() {
   const { get } = useApi()
+  const history = useStore((state) => state.history)
+  const promptApp = useStore((state) => state.promptApp)
+  const clearPrompt = useStore((state) => state.clearPrompt)
   const conversationId = useStore((state) => state.conversationId)
   const conversationMessages = useStore((state) => state.conversationMessages)
   const updateConversationMessages = useStore((state) => state.updateConversationMessages)
   const setConversationLoading = useStore((state) => state.setConversationLoading)
+  const { getPrompt, selectPrompt } = usePromptApps(false)
 
   useEffect(() => {
     if (!conversationId) {
@@ -55,6 +60,7 @@ export default function useHandleConversationLoad() {
               ocr_text: message.ocr_text,
               clipboard_text: message.clipboard_text,
               image_url: message.image_url,
+              window_context: message.window_context,
             } as UserMessage
           } else {
             return baseMessage as AssistantMessage
@@ -78,10 +84,41 @@ export default function useHandleConversationLoad() {
       }
     }
 
-    loadConversationMessages()
+    if (!conversationMessages[conversationId]?.length) {
+      loadConversationMessages()
+    }
 
     return () => {
-      abortController.abort('Conversation ID changed')
+      // abortController.abort('Conversation ID changed')
     }
-  }, [conversationId])
+  }, [conversationId, conversationMessages])
+
+  useEffect(() => {
+    if (!conversationId) {
+      return
+    }
+
+    const loadPrompt = async () => {
+      const chat = history.find((c) => c.id === conversationId)
+
+      if (!chat) {
+        return
+      }
+
+      // @ts-ignore
+      if (chat.app_id && chat.app_id != promptApp?.id) {
+        console.log('Resolving prompt app for conversation')
+        const prompt = await getPrompt(chat.app_id)
+        if (prompt) {
+          console.log('Setting prompt app for conversation')
+          await selectPrompt(prompt, false)
+        }
+      } else if (!chat.app_id && promptApp?.id) {
+        console.log('Clearing prompt app for conversation')
+        clearPrompt()
+      }
+    }
+
+    loadPrompt()
+  }, [conversationId, history, promptApp])
 }

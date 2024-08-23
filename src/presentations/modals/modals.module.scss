@@ -1,4 +1,5 @@
 @import '@/variables.module';
+@import '@/components/modals/modals.module';
 
 .confirmationModal {
   display: flex;
@@ -28,4 +29,9 @@
     font-weight: 400;
     color: $light-100;
   }
+}
+
+.createPromptModal {
+  padding: 0 !important;
+  gap: 0 !important;
 }

@@ -17,6 +17,7 @@ import { useState } from 'react'
 import ShareModal from '@/components/ShareModal/ShareModal'
 import { useShareConversation, useDeleteConversation } from '@/hooks/useShareConversation'
 import { trackEvent } from '@/utils/amplitude'
+import { useTabHotkeys } from '@/hooks/useTabHotkeys'
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const router = useRouter()
@@ -33,6 +34,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
     setConversationId,
     setOpenConversations,
     removeOpenConversation,
+    clearConversationMessages,
   } = useStore(
     useShallow((state) => ({
       startNewConversation: state.startNewConversation,
@@ -46,14 +48,18 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
       openConversations: state.openConversations,
       setOpenConversations: state.setOpenConversations,
       removeOpenConversation: state.removeOpenConversation,
+      clearConversationMessages: state.clearConversationMessages,
     })),
   )
 
   const [selectedConversation, setSelectedConversation] = useState<ChatHistoryItem | null>(null)
+  const promptAppName = useStore((state) => state.promptAppName)
 
   const onNewChatClick = () => {
     startNewConversation()
+
     clearPrompt()
+
     router.push('/')
     trackEvent('HL Chat New Conversation Started', {})
   }
@@ -88,6 +94,8 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const onToggleShareModal = () => {
     setIsShareModalVisible(!isShareModalVisible)
   }
+  useOpenConverationsPersistence()
+  useTabHotkeys()
 
   const onCloseShareModal = () => {
     setIsShareModalVisible(false)

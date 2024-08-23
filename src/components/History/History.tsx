@@ -58,7 +58,6 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
   const conversationId = useStore((state) => state.conversationId)
   const startNewConversation = useStore((state) => state.startNewConversation)
   const removeOpenConversation = useStore((state) => state.removeOpenConversation)
-  const clearConversationMessages = useStore((state) => state.clearConversationMessages)
   const setHistory = useStore((state) => state.setHistory)
   const { history, refreshChatHistory, refreshChatItem } = useChatHistory()
   const [isSelecting, setIsSelecting] = useState(false)
@@ -101,7 +100,6 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
         startNewConversation()
       }
       removeOpenConversation(chatId)
-      clearConversationMessages(chatId)
     }
     await refreshChatHistory()
     setSelectedHistoryItems([])
@@ -316,6 +314,7 @@ const HistoryItem = ({ chat, isSelecting, isSelected, onSelect, onOpenChat }: Hi
     openModal('delete-chat', chat)
     trackEvent('HL Chat Delete Initiated', {
       chatId: chat.id,
+      source: 'history',
     })
   }
 

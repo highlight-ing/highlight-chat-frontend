@@ -63,6 +63,9 @@ export const createConversationSlice: StateCreator<Store, [], [], ConversationSl
     }
   },
   removeOpenConversation: (conversationId: string) => {
+    if (get().conversationId === conversationId) {
+      get().startNewConversation()
+    }
     const conversations = get().openConversations
     get().clearConversationMessages(conversationId)
     set({

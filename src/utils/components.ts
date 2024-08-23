@@ -1,14 +1,19 @@
-import {CSSProperties} from "react";
+import { CSSProperties } from 'react'
 
 const PIXEL_SPACING = 4
 
-export const calculatePositionedStyle = (targetElement: HTMLDivElement, positionedElement: HTMLElement, position: 'top' | 'bottom' | 'left' | 'right', offset?: number) => {
+export const calculatePositionedStyle = (
+  targetElement: HTMLDivElement,
+  positionedElement: HTMLElement,
+  position: 'top' | 'bottom' | 'left' | 'right',
+  offset?: number,
+) => {
   const targetRect = targetElement.getBoundingClientRect()
   const positionOffset = offset ?? 0
 
   // This will be used to set styles of the tooltip.
   const styles: CSSProperties = {
-    position: 'fixed'
+    position: 'fixed',
   }
 
   const correctVertical = () => {
@@ -17,7 +22,7 @@ export const calculatePositionedStyle = (targetElement: HTMLDivElement, position
       styles.top = targetRect.bottom + PIXEL_SPACING + positionOffset
     }
     // @ts-ignore
-    else if ((positionedElement.offsetHeight + styles.top) > window.innerHeight) {
+    else if (positionedElement.offsetHeight + styles.top > window.innerHeight) {
       styles.top = window.innerHeight - positionedElement.offsetHeight - PIXEL_SPACING - positionOffset
     }
   }
@@ -30,7 +35,7 @@ export const calculatePositionedStyle = (targetElement: HTMLDivElement, position
     if (styles.left < 0) {
       styles.left = PIXEL_SPACING
       // @ts-ignore
-    } else if ((styles.left + positionedElement.offsetWidth) > window.innerWidth) {
+    } else if (styles.left + positionedElement.offsetWidth > window.innerWidth) {
       styles.left = window.innerWidth - positionedElement.offsetWidth - PIXEL_SPACING
     }
   }

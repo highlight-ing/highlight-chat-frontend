@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useRef, useState } from 'react'
+import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import styles from './animatedlabel.module.scss'
 
 const AnimatedLabel = ({ label, transitionMs }: { label: string | ReactElement; transitionMs: number }) => {
@@ -31,8 +31,7 @@ const AnimatedLabel = ({ label, transitionMs }: { label: string | ReactElement; 
   }, [label, transition])
 
   return (
-    // @ts-ignore
-    <div className={styles.label} style={{'--transitionMs': transitionMs}}>
+    <div className={styles.label} style={{ '--transitionMs': transitionMs } as React.CSSProperties}>
       {displayedLabel}
     </div>
   )

@@ -13,6 +13,7 @@ export type ModalsSlice = ModalsState & {
   closeModal: (id: string) => void
   setErrorModalOpen: (open: boolean) => void
   openErrorModal: (message: string) => void
+  closeAllModals: () => void
 }
 
 export const initialModalsState: ModalsState = {
@@ -39,5 +40,8 @@ export const createModalsSlice: StateCreator<ModalsSlice> = (set, get) => ({
   },
   isModalOpen: (id: string) => {
     return get().modals.some((modal) => modal.id === id)
+  },
+  closeAllModals: () => {
+    set({ modals: [] })
   },
 })

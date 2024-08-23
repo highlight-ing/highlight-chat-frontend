@@ -21,6 +21,7 @@ export type UserMessage = BaseMessage & {
   file_title?: string
   windows?: string[]
   file_attachments?: Attachment[]
+  window_context?: string
 }
 
 export type AssistantMessage = BaseMessage & {
@@ -67,6 +68,10 @@ export interface TextFileAttachment {
   value: string
   fileName: string
 }
+export interface WindowContextAttachment {
+  type: 'window_context'
+  value: string
+}
 export interface SpreadsheetAttachment {
   type: 'spreadsheet'
   value: File
@@ -74,18 +79,23 @@ export interface SpreadsheetAttachment {
 
 export type FileAttachment = PdfAttachment | ImageAttachment | SpreadsheetAttachment | TextFileAttachment
 
-export type Attachment = AudioAttachment | ClipboardAttachment | WindowAttachment | FileAttachment
+export type Attachment =
+  | AudioAttachment
+  | ClipboardAttachment
+  | WindowAttachment
+  | FileAttachment
+  | WindowContextAttachment
 
 export type FileAttachmentType = 'image' | 'pdf' | 'spreadsheet' | 'text_file'
-export type AttachmentType = 'audio' | 'clipboard' | 'window' | FileAttachmentType
+export type AttachmentType = 'audio' | 'clipboard' | 'window' | 'window_context' | FileAttachmentType
 
 export interface ChatHistoryItem {
-  id: string
+  app_id?: string | null
   created_at: string
+  id: string
+  title: string
   updated_at: string
   user_id: string
-  title: string
-  system_prompt: string
 }
 
 export interface ModalObjectProps {
@@ -93,17 +103,13 @@ export interface ModalObjectProps {
   context?: Record<string, any>
 }
 
-export interface PromptApp {
-  created_at: string
-  description: string | null
-  external_id: string
-  id: number
-  name: string
-  prompt_text: string | null
-  prompt_url: string | null
-  public: boolean
-  slug: string | null
-  user_id: string
+export interface Toast {
+  id: string
+  title?: string
+  subtext?: string
+  description?: string
+  timeout?: number
+  type?: 'default' | 'success' | 'error'
 }
 
 export interface SharedMessage {

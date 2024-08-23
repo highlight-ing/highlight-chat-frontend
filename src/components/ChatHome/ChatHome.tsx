@@ -12,6 +12,7 @@ import Highlight from '@highlight-ai/app-runtime'
 import Hotkey from '@/components/Hotkey/Hotkey'
 import ExpandableVideo from '@/components/ExpandableVideo/ExpandableVideo'
 import { useShallow } from 'zustand/react/shallow'
+import { Prompt } from '@/types/supabase-helpers'
 import { trackEvent } from '@/utils/amplitude'
 
 const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
@@ -150,15 +151,18 @@ const Prompts = () => {
 
   return (
     <div className={styles.prompts}>
-      {myPrompts.map((prompt: any) => {
+      {myPrompts.map((prompt: Prompt) => {
         return (
           <PromptListRow
-            key={prompt.slug}
+            key={prompt.external_id}
             prompt={prompt}
             type={'self'}
             onClick={() => {
               selectPrompt(prompt)
               trackEvent('HL Chat Prompt Selected', { promptSlug: prompt.slug })
+            }}
+            onClickEdit={() => {
+              openModal('edit-prompt', { prompt: prompt })
             }}
           />
         )

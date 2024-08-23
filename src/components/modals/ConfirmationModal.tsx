@@ -4,7 +4,7 @@ import Modal from '@/components/modals/Modal'
 import React, { type PropsWithChildren, type ReactElement } from 'react'
 import { trackEvent } from '@/utils/amplitude'
 
-interface ConfirmationModalProps {
+export interface ConfirmationModalProps {
   header?: string
   id: string
   primaryAction: {
