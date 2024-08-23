@@ -119,8 +119,11 @@ export interface SharedMessage {
   created_at: string
 }
 
-export interface SharedConversation {
+export interface SharedChat {
   id: string
   title: string
-  messages: SharedMessage[]
+  created_at: string
+  app_id?: string
+  user_id?: string
+  messages: Message[]
 }

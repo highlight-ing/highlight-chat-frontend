@@ -1,6 +1,8 @@
 import { useApi } from '@/hooks/useApi'
 import { useState, useRef } from 'react'
 
+const SHARE_CONVERSATION_URL = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'
+
 export const useShareConversation = () => {
   const { post } = useApi()
   const [isLoading, setIsLoading] = useState(false)
@@ -27,7 +29,7 @@ export const useShareConversation = () => {
       }
 
       const data = await response.json()
-      return `https://chat-new.highlight.ing/share/${data.shared_conversation_id}`
+      return `${SHARE_CONVERSATION_URL}/share/${data.shared_conversation_id}`
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
         console.log('Share conversation request was aborted')
