@@ -64,37 +64,39 @@ export default function StartWithTemplateScreen() {
   }
 
   return (
-    <div className={styles.templatesPage}>
-      <h4 className="font-medium text-white">Start with a template</h4>
-      <div className={styles.templateCardGrid}>
-        <TemplateCard
-          title="Code Reviewer"
-          description="Create any kind of personality to have conversations with"
-          icon={<User variant="Bold" color="#712FFF" />}
-          color="purple"
-          onClick={() => onSelectTemplate('code-reviewer')}
-        />
-        <TemplateCard
-          title="Review Responder"
-          description="Make the ultimate companion to help you get things done"
-          icon={<Personalcard variant="Bold" color="#00F0FF" />}
-          color="blue"
-          onClick={() => onSelectTemplate('review-responder')}
-        />
-        <TemplateCard
-          title="Elon Musk"
-          description="Bring your imagination to life with an AI you can talk to"
-          icon={<EmojiHappy variant="Bold" color="#FF2099" />}
-          color="pink"
-          onClick={() => onSelectTemplate('elon-musk')}
-        />
-        <TemplateCard
-          title="Custom"
-          description="Start from scratch"
-          icon={<Setting variant="Bold" />}
-          color="default"
-          onClick={() => onSelectTemplate('custom')}
-        />
+    <div className="flex max-h-full min-h-0 flex-col items-center">
+      <div className={styles.templatesPage}>
+        <h4 className="font-medium text-white">Start with a template</h4>
+        <div className={styles.templateCardGrid}>
+          <TemplateCard
+            title="Code Reviewer"
+            description="Create any kind of personality to have conversations with"
+            icon={<User variant="Bold" color="#712FFF" />}
+            color="purple"
+            onClick={() => onSelectTemplate('code-reviewer')}
+          />
+          <TemplateCard
+            title="Review Responder"
+            description="Make the ultimate companion to help you get things done"
+            icon={<Personalcard variant="Bold" color="#00F0FF" />}
+            color="blue"
+            onClick={() => onSelectTemplate('review-responder')}
+          />
+          <TemplateCard
+            title="Elon Musk"
+            description="Bring your imagination to life with an AI you can talk to"
+            icon={<EmojiHappy variant="Bold" color="#FF2099" />}
+            color="pink"
+            onClick={() => onSelectTemplate('elon-musk')}
+          />
+          <TemplateCard
+            title="Custom"
+            description="Start from scratch"
+            icon={<Setting variant="Bold" />}
+            color="default"
+            onClick={() => onSelectTemplate('custom')}
+          />
+        </div>
       </div>
     </div>
   )
