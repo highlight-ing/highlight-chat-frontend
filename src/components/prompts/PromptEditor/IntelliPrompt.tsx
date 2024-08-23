@@ -86,6 +86,8 @@ export default function IntelliPrompt({
 
     editor.updateOptions({
       autoClosingBrackets: 'never',
+      wordWrap: 'on',
+      folding: false,
     })
   }
 
