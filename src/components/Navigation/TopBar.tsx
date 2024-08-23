@@ -51,9 +51,6 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
 
   const [selectedConversation, setSelectedConversation] = useState<ChatHistoryItem | null>(null)
 
-  const { getShareLink, isLoading, error } = useShareConversation()
-  const { deleteSharedConversation, isLoading: deleteLoading, error: deleteError } = useDeleteConversation()
-
   const onNewChatClick = () => {
     startNewConversation()
     clearPrompt()
@@ -86,34 +83,6 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
     removeOpenConversation(conversation.id)
     startNewConversation()
     clearPrompt()
-  }
-
-  const onCopyLink = async () => {
-    try {
-      if (!selectedConversation) {
-        console.error('No conversation selected')
-        return
-      }
-      const shareLink = await getShareLink(selectedConversation.id)
-      await navigator.clipboard.writeText(shareLink)
-      setIsShareModalVisible(false)
-    } catch (error) {
-      console.error('Failed to copy link:', error)
-    }
-  }
-
-  const onDisableLink = async () => {
-    try {
-      if (!selectedConversation) {
-        console.error('No conversation selected')
-        return
-      }
-      await deleteSharedConversation(selectedConversation.id)
-      console.log('Deleted shared conversation')
-      setIsShareModalVisible(false)
-    } catch (error) {
-      console.error('Failed to disable link:', error)
-    }
   }
 
   const onToggleShareModal = () => {
@@ -211,13 +180,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
         </div>
       </div>
 
-      <ShareModal
-        isVisible={isShareModalVisible}
-        conversation={selectedConversation}
-        onClose={onCloseShareModal}
-        onCopyLink={onCopyLink}
-        onDisableLink={onDisableLink}
-      />
+      <ShareModal isVisible={isShareModalVisible} conversation={selectedConversation} onClose={onCloseShareModal} />
     </div>
   )
 }

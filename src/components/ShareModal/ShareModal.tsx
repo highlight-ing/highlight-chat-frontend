@@ -1,19 +1,21 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import { MessageText } from 'iconsax-react'
 import styles from './share-modal.module.scss'
 import variables from '@/variables.module.scss'
 import { ChatHistoryItem } from '@/types'
+import { useShareConversation, useDeleteConversation } from '@/hooks/useShareConversation'
 
 interface ShareModalProps {
   isVisible: boolean
   conversation: ChatHistoryItem | null
   onClose: () => void
-  onCopyLink: () => void
-  onDisableLink: () => void
 }
 
-const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClose, onCopyLink, onDisableLink }) => {
+const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClose }) => {
   const modalRef = useRef<HTMLDivElement>(null)
+  const [isGenerating, setIsGenerating] = useState(false)
+  const { getShareLink } = useShareConversation()
+  const { deleteSharedConversation } = useDeleteConversation()
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -27,6 +29,32 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [onClose])
+
+  const onCopyLink = async () => {
+    if (!conversation) return
+    setIsGenerating(true)
+    try {
+      const shareLink = await getShareLink(conversation.id)
+      await navigator.clipboard.writeText(shareLink)
+      // You might want to show a success message here
+    } catch (error) {
+      console.error('Failed to copy link:', error)
+      // You might want to show an error message here
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
+  const onDisableLink = async () => {
+    if (!conversation) return
+    try {
+      await deleteSharedConversation(conversation.id)
+      // You might want to show a success message here
+    } catch (error) {
+      console.error('Failed to disable link:', error)
+      // You might want to show an error message here
+    }
+  }
 
   return (
     <>
@@ -59,8 +87,15 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
             <button className={styles.disableButton} onClick={onDisableLink} disabled={!conversation}>
               Disable all share links
             </button>
-            <button className={styles.copyButton} onClick={onCopyLink} disabled={!conversation}>
-              <span>Copy link to chat</span>
+            <button className={styles.copyButton} onClick={onCopyLink} disabled={!conversation || isGenerating}>
+              {isGenerating ? (
+                <>
+                  <span>Generating...</span>
+                  <div className="ml-2 h-4 w-4 animate-spin rounded-full border-2 border-dark border-t-transparent"></div>{' '}
+                </>
+              ) : (
+                <span>Copy link to chat</span>
+              )}
             </button>
           </div>
         </div>
