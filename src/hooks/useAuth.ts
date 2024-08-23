@@ -2,10 +2,9 @@ import { refreshTokens } from '@/app/(app)/actions'
 import { useStore } from '@/providers/store-provider'
 import Highlight from '@highlight-ai/app-runtime'
 import { decodeJwt } from 'jose'
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 
 async function getNewTokens(): Promise<{ accessToken: string; refreshToken: string; authExpiration: number }> {
-  console.log('got new tokens')
   const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await Highlight.auth.signIn()
 
   const payload = decodeJwt(newAccessToken)
@@ -62,28 +61,19 @@ export default function useAuth() {
 
   // Hook that checks if the auth state in Highlight has changed, if so,
   // we need to update the auth state in the store
-  useEffect(() => {
-    const subscription = Highlight.app.addListener('onAuthUpdate', () => {
-      console.log('[useAuth] onAuthUpdate was fired from HL runtime, requesting new tokens.')
-      getNewTokens()
-
-      // TODO: This should trigger a refetch of all prompts, conversations, etc.
-    })
-
-    return () => subscription()
-  }, [])
+  useEffect(() => {}, [])
 
   /**
    * Fetches tokens from the auth store or fetches new ones if they don't exist.
    */
-  async function getAccessToken() {
+  async function getAccessToken(forceNewTokens: boolean = false) {
     // if there's an ongoing request, return the promise
     if (requestPromise) {
       return requestPromise
     }
 
     // Check if the store already has tokens
-    if (!accessToken || !refreshToken || !authExpiration) {
+    if (!accessToken || !refreshToken || !authExpiration || forceNewTokens) {
       console.log('[useAuth] No existing auth tokens found, getting new tokens.')
       requestPromise = getNewTokens()
         .then((tokens) => {

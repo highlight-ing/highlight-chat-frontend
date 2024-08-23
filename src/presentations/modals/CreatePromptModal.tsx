@@ -10,7 +10,7 @@ import CloseButton from '@/components/CloseButton/CloseButton'
 import { useStore } from '@/providers/store-provider'
 
 const CreatePromptModal = ({ id, context }: ModalObjectProps) => {
-  const { clearPromptEditorData, setSelectedScreen, needSave, saving, setSaving } = usePromptEditorStore()
+  const { clearPromptEditorData, setSelectedScreen } = usePromptEditorStore()
   const { save, saveDisabled } = usePromptEditor()
   const closeModal = useStore((state) => state.closeModal)
 
