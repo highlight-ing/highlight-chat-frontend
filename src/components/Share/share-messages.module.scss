@@ -166,39 +166,22 @@
 }
 
 .messagesContainer {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden; // Prevent double scrollbars
-}
-
-.messages {
-  flex-grow: 1;
-  overflow-y: auto;
-  padding: 1rem;
-  scrollbar-width: thin;
-  scrollbar-color: $light-20 transparent;
-  transition: scrollbar-color 0.3s ease;
-
-  &::-webkit-scrollbar {
-    width: 8px;
+    display: flex;
+    flex-direction: column-reverse;
+    width: 100%;
+    height: 100%;
+    padding-top: calc($topbar-height + 8px);
+    padding-bottom: 20px;
   }
+  
+  .messages {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
 
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: $light-20;
-    border-radius: 20px;
-    border: 2px solid transparent;
-  }
-
-  &:hover {
-    scrollbar-color: $light-40 transparent;
-
-    &::-webkit-scrollbar-thumb {
-      background-color: $light-40;
+    &.bottomPadding {
+      padding-bottom: 80px !important;
     }
   }
-}
