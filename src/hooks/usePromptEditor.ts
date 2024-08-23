@@ -10,7 +10,7 @@ export function usePromptEditor() {
   const [saveDisabled, setSaveDisabled] = useState(false)
 
   // HOOKS
-  const { promptEditorData, setPromptEditorData, needSave, setNeedSave, settingsHasNoErrors, setSaving } =
+  const { promptEditorData, setPromptEditorData, needSave, saving, setNeedSave, settingsHasNoErrors, setSaving } =
     usePromptEditorStore()
   const { updatePrompt, addPrompt } = usePromptsStore()
   const addToast = useStore((state) => state.addToast)
@@ -20,8 +20,10 @@ export function usePromptEditor() {
   useEffect(() => {
     console.log('settingsHasNoErrors', settingsHasNoErrors)
     console.log('needSave', needSave)
-    setSaveDisabled(!(settingsHasNoErrors && needSave))
-  }, [settingsHasNoErrors, needSave])
+    console.log('saving', saving)
+
+    setSaveDisabled(!(settingsHasNoErrors && needSave && !saving))
+  }, [settingsHasNoErrors, needSave, saving])
 
   async function save() {
     setSaving(true)
