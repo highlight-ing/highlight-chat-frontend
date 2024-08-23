@@ -18,10 +18,6 @@ export function usePromptEditor() {
 
   // EFFECTS
   useEffect(() => {
-    console.log('settingsHasNoErrors', settingsHasNoErrors)
-    console.log('needSave', needSave)
-    console.log('saving', saving)
-
     setSaveDisabled(!(settingsHasNoErrors && needSave && !saving))
   }, [settingsHasNoErrors, needSave, saving])
 

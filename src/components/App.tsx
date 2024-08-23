@@ -16,6 +16,8 @@ import useAuth from '@/hooks/useAuth'
 import { decodeJwt } from 'jose'
 import { getPromptAppBySlug } from '@/utils/prompts'
 import ToastContainer from '@/components/Toast/ToastContainer'
+import usePromptApps from '@/hooks/usePromptApps'
+import { useChatHistory } from '@/hooks/useChatHistory'
 
 function processAttachments(attachments: any[]): Attachment[] {
   return attachments.map((attachment) => {
@@ -161,6 +163,30 @@ function useAboutMeRegister() {
 }
 
 /**
+ * Hook that watches for auth changes and updates the app's state to match
+ * the new user.
+ */
+function useAuthChangeHandler() {
+  const { getAccessToken } = useAuth()
+  const { refreshPrompts } = usePromptApps()
+  const { refreshChatHistory } = useChatHistory()
+
+  useEffect(() => {
+    const subscription = Highlight.app.addListener('onAuthUpdate', async () => {
+      console.log('[useAuth] onAuthUpdate was fired from HL runtime, requesting new tokens.')
+
+      // Force new tokens
+      await getAccessToken(true)
+
+      // Refresh prompts and chat history
+      await Promise.allSettled([refreshPrompts(), refreshChatHistory()])
+    })
+
+    return () => subscription()
+  })
+}
+
+/**
  * The main app component.
  *
  * This should hold all the providers.
@@ -218,6 +244,7 @@ export default function App({ children }: { children: React.ReactNode }) {
 
   useContextReceivedHandler(navigateToNewChat)
   useAboutMeRegister()
+  useAuthChangeHandler()
 
   return (
     <>
