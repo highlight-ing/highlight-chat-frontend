@@ -2,19 +2,35 @@ import Editor, { Monaco } from '@monaco-editor/react'
 import styles from './prompteditor.module.scss'
 import Button from '@/components/Button/Button'
 import { Gallery, Monitor, Sound, User, Windows } from 'iconsax-react'
-import variables from '@/variables.module.scss'
+import sassVariables from '@/variables.module.scss'
 import { useEffect, useRef, useState } from 'react'
 import { editor, IDisposable } from 'monaco-editor'
 import { buildSuggestions } from '@/lib/IntelliPrompt'
+import Tooltip from '@/components/Tooltip/Tooltip'
 
 function Loading() {
   return <span className="text-sm text-gray-500">Loading editor...</span>
 }
 
+interface PromptVariable {
+  icon: React.ReactNode
+  label: string
+  insertText: string
+  description: string
+}
+
 /**
  * The new, improved PromptInput component that uses Monaco Editor.
  */
-export default function IntelliPrompt({ value, onChange }: { value?: string; onChange?: (value: string) => void }) {
+export default function IntelliPrompt({
+  value,
+  onChange,
+  variables,
+}: {
+  value?: string
+  onChange?: (value: string) => void
+  variables?: PromptVariable[]
+}) {
   const monacoRef = useRef<Monaco | undefined>()
   const editorRef = useRef<editor.IStandaloneCodeEditor | undefined>()
 
@@ -49,29 +65,11 @@ export default function IntelliPrompt({ value, onChange }: { value?: string; onC
       provideCompletionItems: (model, position) => {
         const suggestions = buildSuggestions(
           monaco,
-          [
-            {
-              label: 'image',
-              insertText: 'image',
-              description: 'Adds an image variable, which will be replaced with the text extracted from the image',
-            },
-            {
-              label: 'screen',
-              insertText: 'screen',
-              description: 'Adds a screen variable, which will be replaced with the text extracted from the screen',
-            },
-            {
-              label: 'audio',
-              insertText: 'audio',
-              description: 'Adds an audio variable, which will be replaced with the text extracted from the audio',
-            },
-            {
-              label: 'about_me',
-              insertText: 'about_me',
-              description:
-                "Adds an about_me variable, which will be replaced with the about me items configurd in Highlight's settings.",
-            },
-          ],
+          variables?.map((v) => ({
+            label: v.label,
+            insertText: v.insertText,
+            description: v.description,
+          })) ?? [],
           model,
           position,
         )
@@ -94,7 +92,7 @@ export default function IntelliPrompt({ value, onChange }: { value?: string; onC
   }
 
   function onVariableClick(variable: string) {
-    editorRef.current?.trigger('keyboard', 'type', { text: variable })
+    editorRef.current?.trigger('keyboard', 'type', { text: `{{${variable}}}` })
   }
 
   function handleEditorChange(value: string | undefined, ev: editor.IModelContentChangedEvent) {
@@ -107,26 +105,19 @@ export default function IntelliPrompt({ value, onChange }: { value?: string; onC
     <>
       <div className={styles.editorPage}>
         <div className={`${styles.editorActions} px-4`}>
-          <Button size={'medium'} variant={'ghost-neutral'} onClick={() => onVariableClick('{{image}}')}>
-            <Gallery variant="Bold" size={16} color="#FF2099" />
-            Image
-          </Button>
-          <Button size={'medium'} variant={'ghost-neutral'} onClick={() => onVariableClick('{{screen}}')}>
-            <Monitor variant="Bold" size={16} color="#FF2099" />
-            Screen
-          </Button>
-          <Button size={'medium'} variant={'ghost-neutral'} onClick={() => onVariableClick('{{audio}}')}>
-            <Sound variant="Bold" size={16} color={variables.green60} />
-            Audio
-          </Button>
-          <Button size={'medium'} variant={'ghost-neutral'} onClick={() => onVariableClick('{{windows}}')}>
-            <Windows variant="Bold" size={16} color={variables.green60} />
-            Windows
-          </Button>
-          <Button size={'medium'} variant={'ghost-neutral'} onClick={() => onVariableClick('{{about_me}}')}>
-            <User variant="Bold" size={16} color={'#ECFF0C'} />
-            About Me
-          </Button>
+          {variables?.map((variable) => (
+            <Tooltip position="top" tooltip={variable.description}>
+              <Button
+                size={'medium'}
+                variant={'ghost-neutral'}
+                onClick={() => onVariableClick(variable.insertText)}
+                key={variable.label}
+              >
+                {variable.icon}
+                {variable.label}
+              </Button>
+            </Tooltip>
+          ))}
         </div>
       </div>
       <Editor
