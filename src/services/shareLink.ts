@@ -12,7 +12,7 @@ export async function createShareLink(conversation: ChatHistoryItem): Promise<st
 
 export async function getSharedConversation(id: string): Promise<SharedChat | null> {
   try {
-    const url = `${API_BASE_URL}/api/v1/share-link/${id}/messages`
+    const url = `${API_BASE_URL}/api/v1/share-link/${id}`
     console.log('Fetching from URL:', url)
 
     const response = await fetch(url)
