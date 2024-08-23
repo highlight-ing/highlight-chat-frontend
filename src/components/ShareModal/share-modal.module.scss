@@ -94,6 +94,10 @@
   padding: 8px 16px;
   border-radius: 8px;
   transition: background-color 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
 }
 
 .disableButton {
@@ -103,17 +107,23 @@
   &:hover {
     background-color: $light-10;
   }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 
 .copyButton {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
   background-color: $primary-100;
   color: $dark-100;
 
   &:hover {
     background-color: $primary-80;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 }

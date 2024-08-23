@@ -4,6 +4,7 @@ import styles from './share-modal.module.scss'
 import variables from '@/variables.module.scss'
 import { ChatHistoryItem } from '@/types'
 import { useShareConversation, useDeleteConversation } from '@/hooks/useShareConversation'
+import { useStore } from '@/providers/store-provider'
 
 interface ShareModalProps {
   isVisible: boolean
@@ -14,8 +15,10 @@ interface ShareModalProps {
 const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClose }) => {
   const modalRef = useRef<HTMLDivElement>(null)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [isDisabling, setIsDisabling] = useState(false)
   const { getShareLink } = useShareConversation()
   const { deleteSharedConversation } = useDeleteConversation()
+  const addToast = useStore((state) => state.addToast)
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -36,23 +39,48 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
     try {
       const shareLink = await getShareLink(conversation.id)
       await navigator.clipboard.writeText(shareLink)
-      // You might want to show a success message here
+
+      addToast({
+        title: 'Snapshot shared and copied to your clipboard',
+        description: `${shareLink}`,
+        type: 'success',
+        timeout: 4000,
+      })
     } catch (error) {
       console.error('Failed to copy link:', error)
-      // You might want to show an error message here
+
+      addToast({
+        title: 'Failed to Copy Link',
+        description: 'An error occurred while generating the share link.',
+        type: 'error',
+      })
     } finally {
       setIsGenerating(false)
+      onClose()
     }
   }
 
   const onDisableLink = async () => {
     if (!conversation) return
+    setIsDisabling(true)
     try {
       await deleteSharedConversation(conversation.id)
-      // You might want to show a success message here
+      addToast({
+        title: 'Share Link Disabled',
+        description: 'All share links for this conversation have been disabled.',
+        type: 'success',
+        timeout: 4000,
+      })
     } catch (error) {
       console.error('Failed to disable link:', error)
-      // You might want to show an error message here
+      addToast({
+        title: 'Failed to Disable Link',
+        description: 'An error occurred while disabling the share link.',
+        type: 'error',
+      })
+    } finally {
+      setIsDisabling(false)
+      onClose()
     }
   }
 
@@ -64,7 +92,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
           <div className={`${styles.header} flex flex-col justify-start`}>
             <h3 className="text-md font-regular text-left text-white">Share Chat</h3>
             <p className="mt-2 text-sm font-light text-light-20">
-              All contents currently inside of chat will be shared.
+              All contents currently inside the chat will be shared.
             </p>
           </div>
           <div className={styles.content}>
@@ -84,14 +112,21 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
             )}
           </div>
           <div className={styles.footer}>
-            <button className={styles.disableButton} onClick={onDisableLink} disabled={!conversation}>
-              Disable all share links
+            <button className={styles.disableButton} onClick={onDisableLink} disabled={!conversation || isDisabling}>
+              {isDisabling ? (
+                <>
+                  <span>Disabling...</span>
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-dark border-t-transparent"></div>
+                </>
+              ) : (
+                <span>Disable all share links</span>
+              )}
             </button>
             <button className={styles.copyButton} onClick={onCopyLink} disabled={!conversation || isGenerating}>
               {isGenerating ? (
                 <>
                   <span>Generating...</span>
-                  <div className="ml-2 h-4 w-4 animate-spin rounded-full border-2 border-dark border-t-transparent"></div>{' '}
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-dark border-t-transparent"></div>
                 </>
               ) : (
                 <span>Copy link to chat</span>
