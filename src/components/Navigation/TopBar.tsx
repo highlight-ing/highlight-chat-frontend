@@ -15,7 +15,7 @@ import variables from '@/variables.module.scss'
 import { useOpenConverationsPersistence } from '@/hooks/useOpenConverationsPersistence'
 import { useState } from 'react'
 import ShareModal from '@/components/ShareModal/ShareModal'
-import { useShareConversation } from '@/hooks/useShareConversation'
+import { useShareConversation, useDeleteConversation } from '@/hooks/useShareConversation'
 import { trackEvent } from '@/utils/amplitude'
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
@@ -52,6 +52,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const [selectedConversation, setSelectedConversation] = useState<ChatHistoryItem | null>(null)
 
   const { getShareLink, isLoading, error } = useShareConversation()
+  const { deleteSharedConversation, isLoading: deleteLoading, error: deleteError } = useDeleteConversation()
 
   const onNewChatClick = () => {
     startNewConversation()
@@ -103,7 +104,12 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
 
   const onDisableLink = async () => {
     try {
-      // await disableShareLink(); // Implement this function
+      if (!selectedConversation) {
+        console.error('No conversation selected')
+        return
+      }
+      await deleteSharedConversation(selectedConversation.id)
+      console.log('Deleted shared conversation')
       setIsShareModalVisible(false)
     } catch (error) {
       console.error('Failed to disable link:', error)

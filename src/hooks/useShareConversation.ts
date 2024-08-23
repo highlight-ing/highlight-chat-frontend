@@ -52,3 +52,51 @@ export const useShareConversation = () => {
 
   return { getShareLink, isLoading, error, abortShareRequest }
 }
+
+export const useDeleteConversation = () => {
+  const { deleteRequest } = useApi()
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const abortControllerRef = useRef<AbortController>()
+
+  const deleteSharedConversation = async (originalConversationId: string): Promise<void> => {
+    setIsLoading(true)
+    setError(null)
+
+    // Create a new AbortController for this request
+    const abortController = new AbortController()
+    abortControllerRef.current = abortController
+
+    try {
+      const response = await deleteRequest(`share-link/${originalConversationId}`, {
+        signal: abortController.signal,
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete shared conversation')
+      }
+
+      // Optional: You can handle the success message here if needed
+      // const data = await response.json()
+      // console.log(data.message)
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        console.log('Delete shared conversation request was aborted')
+      } else {
+        setError(err instanceof Error ? err.message : 'An unknown error occurred')
+      }
+      throw err
+    } finally {
+      setIsLoading(false)
+      abortControllerRef.current = undefined
+    }
+  }
+
+  const abortDeleteRequest = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+  }
+
+  return { deleteSharedConversation, isLoading, error, abortDeleteRequest }
+}
