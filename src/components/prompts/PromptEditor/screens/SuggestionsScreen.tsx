@@ -1,14 +1,13 @@
 import { usePromptEditorStore } from '@/stores/prompt-editor'
-import PromptInput from '../PromptInput'
+import IntelliPrompt from '../IntelliPrompt'
 
 export default function SuggestionsScreen() {
   const { promptEditorData, setPromptEditorData } = usePromptEditorStore()
 
   return (
-    <PromptInput
+    <IntelliPrompt
       value={promptEditorData.suggestionsPrompt}
       onChange={(e) => setPromptEditorData({ suggestionsPrompt: e })}
-      placeholder="Write a prompt that will generate suggestions in the floating Highlight interface."
     />
   )
 }

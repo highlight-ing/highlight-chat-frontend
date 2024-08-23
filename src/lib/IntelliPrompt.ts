@@ -1,6 +1,12 @@
 import { languages, editor, Position } from 'monaco-editor'
 import { Monaco } from '@monaco-editor/react'
 
+/**
+ * @author athena-chen-chen
+ * @see https://github.com/athena-chen-chen/handlebar-monaco/tree/main
+ * @license MIT
+ */
+
 export interface EditorSuggestion {
   label: string
   description?: string
@@ -67,6 +73,11 @@ export const buildSuggestions = (
     endLineNumber: position.lineNumber,
   })
   const hasBracket = prevChar === '{'
+
+  if (!hasBracket) {
+    // No bracket, no suggestions
+    return []
+  }
 
   const word = model.getWordUntilPosition(position)
   let text = word.word

@@ -7,7 +7,14 @@ import { useEffect, useRef, useState } from 'react'
 import { editor, IDisposable } from 'monaco-editor'
 import { buildSuggestions } from '@/lib/IntelliPrompt'
 
-export default function IntelliPrompt() {
+function Loading() {
+  return <span className="text-sm text-gray-500">Loading editor...</span>
+}
+
+/**
+ * The new, improved PromptInput component that uses Monaco Editor.
+ */
+export default function IntelliPrompt({ value, onChange }: { value?: string; onChange?: (value: string) => void }) {
   const monacoRef = useRef<Monaco | undefined>()
   const editorRef = useRef<editor.IStandaloneCodeEditor | undefined>()
 
@@ -38,7 +45,7 @@ export default function IntelliPrompt() {
     })
 
     const disposer = monaco.languages.registerCompletionItemProvider('handlebars', {
-      triggerCharacters: ['{', '.'],
+      triggerCharacters: ['{'],
       provideCompletionItems: (model, position) => {
         const suggestions = buildSuggestions(
           monaco,
@@ -46,7 +53,23 @@ export default function IntelliPrompt() {
             {
               label: 'image',
               insertText: 'image',
-              description: 'Bruh',
+              description: 'Adds an image variable, which will be replaced with the text extracted from the image',
+            },
+            {
+              label: 'screen',
+              insertText: 'screen',
+              description: 'Adds a screen variable, which will be replaced with the text extracted from the screen',
+            },
+            {
+              label: 'audio',
+              insertText: 'audio',
+              description: 'Adds an audio variable, which will be replaced with the text extracted from the audio',
+            },
+            {
+              label: 'about_me',
+              insertText: 'about_me',
+              description:
+                "Adds an about_me variable, which will be replaced with the about me items configurd in Highlight's settings.",
             },
           ],
           model,
@@ -64,10 +87,20 @@ export default function IntelliPrompt() {
 
   function handleEditorDidMount(editor: editor.IStandaloneCodeEditor, monaco: Monaco) {
     editorRef.current = editor
+
+    editor.updateOptions({
+      autoClosingBrackets: 'never',
+    })
   }
 
   function onVariableClick(variable: string) {
     editorRef.current?.trigger('keyboard', 'type', { text: variable })
+  }
+
+  function handleEditorChange(value: string | undefined, ev: editor.IModelContentChangedEvent) {
+    if (!value) return
+
+    onChange?.(value)
   }
 
   return (
@@ -100,13 +133,15 @@ export default function IntelliPrompt() {
         theme="highlight"
         beforeMount={handleEditorWillMount}
         onMount={handleEditorDidMount}
-        defaultLanguage="handlebars"
-        defaultValue="// some comment"
+        language="handlebars"
+        value={value}
+        onChange={handleEditorChange}
         options={{
           minimap: {
             enabled: false,
           },
         }}
+        loading={<Loading />}
       />
     </>
   )
