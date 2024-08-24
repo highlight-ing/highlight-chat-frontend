@@ -48,19 +48,19 @@ export const ShareAssistantMessage: React.FC<ShareAssistantMessageProps> = ({ me
           </Markdown>
         </div>
         <div className="flex space-x-4">
-          <button className="bg-background-tertiary group flex items-center rounded-full p-2 transition-colors hover:bg-background-secondary">
+          <button className="group flex items-center rounded-full bg-background-secondary p-2 transition-colors hover:bg-background-secondary">
             <Copy variant="Bold" size={16} className="text-text-tertiary transition-colors group-hover:text-primary" />
             <span className="ml-2 text-[13px] font-medium text-text-tertiary transition-colors group-hover:text-primary">
               Copy
             </span>
           </button>
-          <button className="bg-background-tertiary group flex items-center rounded-full p-2 transition-colors hover:bg-background-secondary">
+          <button className="group flex items-center rounded-full bg-background-secondary p-2 transition-colors hover:bg-background-secondary">
             <Send2 variant="Bold" size={16} className="text-text-tertiary transition-colors group-hover:text-primary" />
             <span className="ml-2 text-[13px] font-medium text-text-tertiary transition-colors group-hover:text-primary">
               Share
             </span>
           </button>
-          <button className="bg-background-tertiary group flex items-center rounded-full p-2 transition-colors hover:bg-background-secondary">
+          <button className="group flex items-center rounded-full bg-background-secondary p-2 transition-colors hover:bg-background-secondary">
             <ExportCircle
               variant="Bold"
               size={16}

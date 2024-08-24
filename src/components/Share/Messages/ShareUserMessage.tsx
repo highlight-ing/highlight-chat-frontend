@@ -8,7 +8,6 @@ import { UserMessage } from '@/types'
 import { Attachment } from '@/components/Attachment'
 import CodeBlock from '@/components/Messages/CodeBlock'
 import { getDisplayValue } from '@/utils/attachments'
-import styles from './ShareUserMessage.module.css'
 
 interface ShareUserMessageProps {
   message: UserMessage
@@ -34,10 +33,12 @@ const preprocessLaTeX = (content: string) => {
 
 export const ShareUserMessage: React.FC<ShareUserMessageProps> = ({ message }) => {
   return (
-    <div className={styles.container}>
-      <p className={styles.header}>Created with Highlight. Download to create and share your own chats</p>
-      <div className={styles.body}>
-        <div className={styles.content}>
+    <div className="mx-auto my-4 w-full max-w-[712px]">
+      <p className="mb-4 text-center text-xs text-text-tertiary">
+        Created with Highlight. Download to create and share your own chats
+      </p>
+      <div className="rounded-[16px] border border-border-tertiary bg-background-primary p-4">
+        <div className="mb-4 text-xs font-light leading-[1.6] text-text-primary/90">
           <Markdown
             remarkPlugins={[remarkGfm, remarkMath]}
             rehypePlugins={[rehypeKatex]}
@@ -74,7 +75,7 @@ export const ShareUserMessage: React.FC<ShareUserMessageProps> = ({ message }) =
           </Markdown>
         </div>
         {hasAttachment(message) && (
-          <div className={styles.attachments}>
+          <div className="flex flex-wrap gap-2">
             {message.screenshot && <Attachment type="image" value={message.screenshot} />}
             {message.audio && <Attachment type="audio" value={message.audio} />}
             {message.window && message.window?.title && (
