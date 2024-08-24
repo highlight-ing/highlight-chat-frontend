@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import SharePageComponent from '@/components/Share/SharePageComponent'
-import Header from '@/components/Share/Header'
+import Header from '@/components/Share/Header/ShareHeader'
 import Footer from '@/components/Share/Footer'
 import { getSharedConversation } from '@/services/shareLink'
 import { Metadata } from 'next'
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: SharePageProps): Promise<Meta
   }
 
   return {
-    title: `${sharedData.title} | Your App Name`,
+    title: `${sharedData.title} | Shared Hilight Conversation`,
     description: 'View a shared conversation',
   }
 }
@@ -35,10 +35,12 @@ export default async function SharePage({ params }: SharePageProps) {
   }
 
   return (
-    <>
-      <Header title={sharedData.title} />
-      <SharePageComponent messages={sharedData.messages} />
-      <Footer />
-    </>
+    <div className="flex min-h-screen flex-col">
+      <Header title={sharedData.title} sharedBy={sharedData.user_id} />
+      {/* <main className="flex-grow">
+        <SharePageComponent messages={sharedData.messages} />
+      </main> */}
+      {/* <Footer /> */}
+    </div>
   )
 }

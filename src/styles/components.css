@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .share-button {
+      @apply px-4 py-[6px] inline-flex items-center border border-border-tertiary rounded-[10px] text-xs font-medium text-text-secondary hover:text-text-primary transition-colors;
+    }
+  }
