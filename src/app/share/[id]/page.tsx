@@ -4,6 +4,7 @@ import Header from '@/components/Share/Header/ShareHeader'
 import Footer from '@/components/Share/Footer'
 import { getSharedConversation } from '@/services/shareLink'
 import { Metadata } from 'next'
+import ClientWrapper from '@/app/share/ClientWrapper'
 
 interface SharePageProps {
   params: {
@@ -35,12 +36,15 @@ export default async function SharePage({ params }: SharePageProps) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <Header title={sharedData.title} sharedBy={sharedData.user_id} />
-      {/* <main className="flex-grow">
+    <ClientWrapper>
+      <div className="flex min-h-screen flex-col">
+        <Header title={sharedData.title} sharedBy={sharedData.user_id} />
+        <SharePageComponent messages={sharedData.messages} />
+        {/* <main className="flex-grow">
         <SharePageComponent messages={sharedData.messages} />
       </main> */}
-      {/* <Footer /> */}
-    </div>
+        {/* <Footer /> */}
+      </div>
+    </ClientWrapper>
   )
 }

@@ -1,21 +1,20 @@
 'use client'
-import React from 'react'
-import { Message } from '@/types/index'
-import ShareMessages from '@/components/Share/ShareMessages'
-import DownloadCTA from '@/components/Share/DownloadCTA'
-import sharePageStyles from '@/components/Share/share-page.module.scss'
+import React, { useMemo } from 'react'
+import { Message, UserMessage } from '@/types/index'
+import { ShareUserMessage } from '@/components/Share/Messages/ShareUserMessage'
 
 interface SharePageComponentProps {
   messages: Message[]
 }
 
 const SharePageComponent: React.FC<SharePageComponentProps> = ({ messages }) => {
+  const firstUserMessage = useMemo(() => {
+    return messages.find((message): message is UserMessage => message.role === 'user')
+  }, [messages])
+
   return (
-    <div className={sharePageStyles.page}>
-      <div className={`${sharePageStyles.sharePageContainer} ${sharePageStyles.show} shared-chat-container`}>
-        <ShareMessages messages={messages} />
-      </div>
-      <DownloadCTA />
+    <div className="mx-auto w-full max-w-[--chat-body-width]">
+      {firstUserMessage && <ShareUserMessage message={firstUserMessage} />}
     </div>
   )
 }
