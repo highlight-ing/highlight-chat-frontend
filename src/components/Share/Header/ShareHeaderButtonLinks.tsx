@@ -1,5 +1,4 @@
 import React from 'react'
-import '@/styles/components.css'
 
 const ShareHeaderButtonLinks: React.FC = () => {
   return (

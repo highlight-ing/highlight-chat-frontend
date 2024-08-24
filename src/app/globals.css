@@ -26,6 +26,28 @@ body {
   padding-top: 2rem !important;
 }
 
+@layer components {
+  .share-button {
+    @apply px-4 py-[6px] inline-flex items-center border border-border-tertiary rounded-[10px] text-xs font-medium text-text-secondary hover:text-text-primary hover:border-primary transition-colors
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0
+  }
+  to {
+    opacity: 1
+  }
+}
+
+@layer utilities {
+  .animate-fadeIn {
+    animation: fadeIn 200ms forwards
+  }
+}
+
+
 /*::-webkit-scrollbar {*/
 /*    width: 9px;*/
 /*    height: 9px;*/
