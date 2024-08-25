@@ -108,13 +108,19 @@ export const Message = ({ message, isThinking }: MessageProps) => {
               components={{
                 // @ts-ignore
                 code({ node, inline, className, children, ...props }) {
+                  if (typeof children === 'string' && children.includes('\n')) {
+                    console.log('children:', children)
+                  }
+
                   const match = /language-(\w+)/.exec(className || '')
-                  return !inline && match ? (
-                    <CodeBlock language={match[1]}>{children}</CodeBlock>
-                  ) : (
-                    <CodeBlock language={'text'} {...props}>
+                  const isStringWithNewlines = typeof children === 'string' && children.includes('\n')
+                  if ((!inline && match) || isStringWithNewlines) {
+                    return <CodeBlock language={match?.[1] ?? 'plaintext'}>{children}</CodeBlock>
+                  }
+                  return (
+                    <code className={className} {...props}>
                       {children}
-                    </CodeBlock>
+                    </code>
                   )
                 },
                 td({ children }) {
