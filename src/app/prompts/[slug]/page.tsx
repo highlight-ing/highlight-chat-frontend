@@ -79,7 +79,7 @@ export default async function PromptPage({ params }: PromptPageProps) {
 
   return (
     <div className="min-h-screen bg-bg-layer-1">
-      <div className="flex flex-row items-center border-b border-b-light-5 p-4">
+      <div className="flex flex-row items-center border-b border-b-light-5 p-2">
         <div className="basis-1/3"></div>
         <h3 className="basis-1/3 text-center">Highlight Apps</h3>
         <div className="flex basis-1/3 justify-end">

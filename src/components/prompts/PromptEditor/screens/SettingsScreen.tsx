@@ -115,25 +115,17 @@ function ShareLinkButton() {
   return (
     <SettingOption
       label={'Share Link'}
-      description={
-        promptEditorData.visibility === 'public' ? (
-          <span className={'text-md'}>{slug ? url : 'Save your prompt to generate a share link'}</span>
-        ) : (
-          <span className={'text-md'}>Make your app public to share it</span>
-        )
-      }
+      description={<span className={'text-md'}>{slug ? url : 'Save your prompt to generate a share link'}</span>}
     >
-      {promptEditorData.visibility === 'public' && (
-        <Button
-          onClick={onCopyLinkClick}
-          size={'medium'}
-          variant={'tertiary'}
-          style={{ marginRight: '6px' }}
-          disabled={!slug || copied}
-        >
-          {copied ? 'Copied' : 'Copy Link'}
-        </Button>
-      )}
+      <Button
+        onClick={onCopyLinkClick}
+        size={'medium'}
+        variant={'tertiary'}
+        style={{ marginRight: '6px' }}
+        disabled={!slug || copied}
+      >
+        {copied ? 'Copied' : 'Copy Link'}
+      </Button>
     </SettingOption>
   )
 }
