@@ -112,9 +112,9 @@ export const Message = ({ message, isThinking }: MessageProps) => {
                   return !inline && match ? (
                     <CodeBlock language={match[1]}>{children}</CodeBlock>
                   ) : (
-                    <code className={className} {...props}>
+                    <CodeBlock language={'text'} {...props}>
                       {children}
-                    </code>
+                    </CodeBlock>
                   )
                 },
                 td({ children }) {
