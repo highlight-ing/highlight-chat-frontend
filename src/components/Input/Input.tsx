@@ -54,6 +54,16 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
     }
   }, [inputRef, input])
 
+  useEffect(() => {
+    const onFocus = () => {
+      inputRef.current?.focus()
+    }
+    window.addEventListener('focus', onFocus)
+    return () => {
+      window.removeEventListener('focus', onFocus)
+    }
+  }, [])
+
   return (
     <div className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''}`} onClick={onClickContainer}>
       {attachments.length > 0 && (
