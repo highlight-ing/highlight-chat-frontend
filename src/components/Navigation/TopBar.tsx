@@ -15,6 +15,7 @@ import variables from '@/variables.module.scss'
 import { useOpenConverationsPersistence } from '@/hooks/useOpenConverationsPersistence'
 import { trackEvent } from '@/utils/amplitude'
 import { useTabHotkeys } from '@/hooks/useTabHotkeys'
+import Hotkey from '@/components/Hotkey/Hotkey'
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const router = useRouter()
@@ -151,7 +152,17 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
         </DragDropContext>
         {
           // (promptName || !!messages.length) &&
-          <Tooltip tooltip="Start new chat" position="bottom">
+          <Tooltip
+            tooltip={
+              <div className={'flex flex-col items-center gap-1'}>
+                <span>Start new chat</span>
+                <div className={'flex items-center gap-1 text-sm font-normal text-light-60'}>
+                  <Hotkey hotkey={'cmd + T'} size={'small'} /> or <Hotkey hotkey={'cmd + N'} size={'small'} />
+                </div>
+              </div>
+            }
+            position="bottom"
+          >
             <CircleButton onClick={onNewChatClick}>
               <Add variant={'Linear'} size={20} />
             </CircleButton>

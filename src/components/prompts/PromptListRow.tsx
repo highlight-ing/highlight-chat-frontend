@@ -5,7 +5,6 @@ import { Prompt } from '@/types/supabase-helpers'
 import CircleButton from '@/components/CircleButton/CircleButton'
 import PromptAppIcon from '../PromptAppIcon/PromptAppIcon'
 import Tooltip from '@/components/Tooltip/Tooltip'
-import { trackEvent } from '@/utils/amplitude'
 
 interface PromptListRowProps {
   prompt: Prompt
@@ -33,7 +32,8 @@ const PromptListRow = ({ prompt, icon, type, isCta, onClick, onClickEdit }: Prom
       <div>
         {prompt.image ? (
           <PromptAppIcon
-            className={styles.promptIcon}
+            width={48}
+            height={48}
             imageId={prompt.image}
             imageExtension={prompt.user_images?.file_extension ?? ''}
           />
