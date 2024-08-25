@@ -157,7 +157,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
               <div className={'flex flex-col items-center gap-1'}>
                 <span>Start new chat</span>
                 <div className={'flex items-center gap-1 text-sm font-normal text-light-60'}>
-                  <Hotkey hotkey={'cmd + T'} size={'small'} /> or <Hotkey hotkey={'cmd + N'} size={'small'} />
+                  <Hotkey hotkey={'Cmd + T'} size={'small'} /> or <Hotkey hotkey={'Cmd + N'} size={'small'} />
                 </div>
               </div>
             }
