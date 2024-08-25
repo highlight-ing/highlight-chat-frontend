@@ -141,7 +141,7 @@
 }
 
 .tabRow {
-  width: $editor-width;
+  width: calc(100% - 64px);
   display: flex;
   align-items: center;
   height: 100%;

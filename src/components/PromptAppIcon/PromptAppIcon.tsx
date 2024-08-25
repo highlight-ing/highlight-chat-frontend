@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { supabaseLoader } from '@/lib/supabase'
+import globalStyles from '@/global.module.scss'
 
 export default function PromptAppIcon({
   height = 64,
@@ -19,13 +20,15 @@ export default function PromptAppIcon({
   name?: string
 }) {
   return (
-    <Image
-      src={`/user_content/${imageId}.${imageExtension}`}
-      alt={name ?? 'Prompt app icon'}
-      className={className}
-      width={width}
-      height={height}
-      loader={supabaseLoader}
-    />
+    <div style={{ width, height, overflow: 'hidden', borderRadius: '50%', flexShrink: 0 }}>
+      <Image
+        src={`/user_content/${imageId}.${imageExtension}`}
+        alt={name ?? 'Prompt app icon'}
+        className={className ?? globalStyles.promptIcon}
+        width={width}
+        height={height}
+        loader={supabaseLoader}
+      />
+    </div>
   )
 }

@@ -156,7 +156,6 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
               <PromptAppIcon
                 width={17}
                 height={17}
-                className={styles.promptIcon}
                 imageId={conversationPrompt.image}
                 imageExtension={conversationPrompt.user_images.file_extension}
               />

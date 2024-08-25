@@ -71,7 +71,6 @@ export const Message = ({ message, isThinking }: MessageProps) => {
               <PromptAppIcon
                 width={32}
                 height={32}
-                className={styles.promptIcon}
                 imageId={promptApp!.image!}
                 imageExtension={promptApp!.user_images?.file_extension ?? ''}
               />
