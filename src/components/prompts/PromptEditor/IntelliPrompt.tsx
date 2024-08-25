@@ -111,7 +111,7 @@ export default function IntelliPrompt({
       <div className={styles.editorPage}>
         <div className={`${styles.editorActions} px-4`}>
           {variables?.map((variable) => (
-            <Tooltip position="top" tooltip={variable.description}>
+            <Tooltip key={variable.label} position="top" tooltip={variable.description}>
               <Button
                 size={'medium'}
                 variant={'ghost-neutral'}

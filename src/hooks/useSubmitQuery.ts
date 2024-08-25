@@ -115,8 +115,6 @@ export const useSubmitQuery = () => {
     getOrCreateConversationId,
     attachments,
     clearAttachments,
-    input,
-    setInput,
     setInputIsDisabled,
     aboutMe,
     addConversationMessage,
@@ -127,8 +125,6 @@ export const useSubmitQuery = () => {
       getOrCreateConversationId: state.getOrCreateConversationId,
       attachments: state.attachments,
       clearAttachments: state.clearAttachments,
-      input: state.input,
-      setInput: state.setInput,
       setInputIsDisabled: state.setInputIsDisabled,
       aboutMe: state.aboutMe,
       addConversationMessage: state.addConversationMessage,
@@ -136,6 +132,8 @@ export const useSubmitQuery = () => {
       addToast: state.addToast,
     })),
   )
+
+  const setInput = useStore((state) => state.setInput)
 
   const abortControllerRef = useRef<AbortController>()
   const { getAccessToken } = useAuth()
@@ -400,7 +398,7 @@ export const useSubmitQuery = () => {
     }
   }
 
-  const handleSubmit = async (promptApp?: Prompt) => {
+  const handleSubmit = async (input: string, promptApp?: Prompt) => {
     const query = input.trim()
 
     if (!query) {

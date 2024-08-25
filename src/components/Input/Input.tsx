@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Attachment } from '../Attachment'
 import { AttachmentsButton } from '../AttachmentsButton/AttachmentsButton'
 import { Attachment as AttachmentType } from '@/types'
@@ -17,24 +17,25 @@ const MAX_INPUT_HEIGHT = 160
  * This is the main Highlight Chat input box, not a reusable Input component.
  */
 export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
-  const { attachments, input, setInput, inputIsDisabled, promptName, promptApp } = useStore(
+  const { attachments, inputIsDisabled, promptName, promptApp } = useStore(
     useShallow((state) => ({
       attachments: state.attachments,
-      input: state.input,
-      setInput: state.setInput,
       inputIsDisabled: state.inputIsDisabled,
       promptName: state.promptName,
       promptApp: state.promptApp,
     })),
   )
 
+  const storeInput = useStore((state) => state.input)
+  const [input, setInput] = useState(storeInput ?? '')
+
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const { handleSubmit } = useSubmitQuery()
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (!inputIsDisabled && e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      handleSubmit(promptApp)
+      handleSubmit(input, promptApp)
       setInput('')
     }
   }
@@ -53,6 +54,12 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
       inputRef.current.style.height = newHeight + 'px'
     }
   }, [inputRef, input])
+
+  useEffect(() => {
+    if (storeInput) {
+      setInput(storeInput)
+    }
+  }, [storeInput])
 
   useEffect(() => {
     const onFocus = () => {
@@ -92,7 +99,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
         placeholder={`Ask ${promptName ? promptName : 'Highlight'} anything...`}
         value={input}
         rows={1}
-        onInput={(e) => setInput(e.currentTarget.value)}
+        onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
       />
     </div>
