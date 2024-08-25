@@ -44,7 +44,7 @@ const CodeBlock = ({ children, language }: PropsWithChildren<CodeBlockProps>) =>
             </>
           ) : (
             <>
-              <Copy variant={'Linear'} size={16} /> Copy Code
+              <Copy variant={'Linear'} size={16} /> Copy to clipboard
             </>
           )}
         </Button>

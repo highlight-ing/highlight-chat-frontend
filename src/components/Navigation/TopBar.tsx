@@ -18,6 +18,7 @@ import ShareModal from '@/components/ShareModal/ShareModal'
 import { useShareConversation, useDeleteConversation } from '@/hooks/useShareConversation'
 import { trackEvent } from '@/utils/amplitude'
 import { useTabHotkeys } from '@/hooks/useTabHotkeys'
+import Hotkey from '@/components/Hotkey/Hotkey'
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const router = useRouter()

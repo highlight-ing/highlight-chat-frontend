@@ -46,7 +46,12 @@ export default function IntelliPrompt({
     monaco.editor.defineTheme('highlight', {
       base: 'vs-dark',
       inherit: true,
-      rules: [],
+      rules: [
+        {
+          token: 'comment',
+          foreground: '#808080',
+        },
+      ],
       colors: {
         // 'editor.foreground': '#000000',
         // 'editor.background': '#000000',
@@ -86,6 +91,8 @@ export default function IntelliPrompt({
 
     editor.updateOptions({
       autoClosingBrackets: 'never',
+      wordWrap: 'on',
+      folding: false,
     })
   }
 

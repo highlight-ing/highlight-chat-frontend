@@ -30,7 +30,12 @@ const CreatePromptModal = ({ id, context }: ModalObjectProps) => {
           <CloseButton alignment="left" onClick={() => closeModal(id)} />
           <div className="flex grow justify-center">Create New Highlight App</div>
           <div className="absolute right-0 p-2">
-            <Button size={'large'} variant={'tertiary'} onClick={save} disabled={saveDisabled}>
+            <Button
+              size={'large'}
+              variant={saveDisabled ? 'tertiary' : 'primary'}
+              onClick={save}
+              disabled={saveDisabled}
+            >
               Save
             </Button>
           </div>

@@ -34,9 +34,11 @@ export async function GET(request: Request, { params }: { params: { external_id:
 
   const translated = translatedPrompt({
     image: '',
-    clipboard: '{{environment.clipboardText}}',
+    clipboard_text: '{{environment.clipboardText}}',
     about_me: '{{factsAboutMe}}',
     screen: '{{environment.ocrScreenContents}}',
+    audio: '{{audioRecent}}',
+    user_message: '{{userIntent}}',
   })
 
   const systemPrompt = `{{#system}}

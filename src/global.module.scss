@@ -4,9 +4,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--size, 64px);
-  height: var(--size, 64px);
+  object-fit: cover;
+  width: var(--size, 100%);
+  height: var(--size, 100%);
   border-radius: 50%;
+  overflow: hidden;
   background-color: $light-20;
   color: $light-100;
 
