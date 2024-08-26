@@ -1,3 +1,5 @@
+'use client'
+
 import Highlight from '@highlight-ai/app-runtime'
 import { useEffect } from 'react'
 import { useStore } from '@/providers/store-provider'
