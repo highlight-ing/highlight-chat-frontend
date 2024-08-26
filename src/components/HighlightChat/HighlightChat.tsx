@@ -15,6 +15,7 @@ import MessagesPlaceholder from '@/components/Messages/MessagesPlaceholder'
 import { trackEvent } from '@/utils/amplitude'
 import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
 import useHandleConversationLoad from '@/hooks/useHandleConversationLoad'
+import { useOnAppOpen } from '@/hooks/useOnAppOpen'
 
 /**
  * Hook that handles pasting from the clipboard.
@@ -89,6 +90,7 @@ const HighlightChat = () => {
   // HOOKS
   useHandleClipboardPaste()
   useHandleConversationLoad()
+  useOnAppOpen()
 
   return (
     <div className={styles.page}>
