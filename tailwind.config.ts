@@ -91,6 +91,9 @@ const config: Config = {
         'border-secondary': '#444444',
         'border-tertiary': '#222222',
       },
+      animation: {
+        gentleScale: 'gentleScale 0.3s ease-in-out',
+      },
     },
   },
   plugins: [],

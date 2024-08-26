@@ -29,18 +29,22 @@ const AssistantMessageButton: React.FC<AssistantMessageButtonProps> = ({ type, o
     return type
   }
 
-  const buttonClass = `group flex items-center rounded-full bg-background-secondary p-2 transition-colors hover:bg-background-secondary ${
-    type === 'Copy' && status === 'copied' ? 'animate-pulse' : ''
+  const buttonClass = `group flex items-center rounded-full bg-background-secondary p-2 transition-all duration-300 
+        hover:bg-primary-10 ${type === 'Copy' && status === 'copied' ? 'animate-gentle-scale bg-primary-20' : ''}`
+
+  const iconClass = `text-text-tertiary transition-colors group-hover:text-primary ${
+    type === 'Copy' && status === 'copied' ? 'text-primary' : ''
+  }`
+
+  const textClass = `ml-2 text-[13px] font-medium text-text-tertiary transition-colors group-hover:text-primary ${
+    type === 'Copy' && status === 'copied' ? 'text-primary' : ''
   }`
 
   return (
     <button onClick={onClick} className={buttonClass}>
-      <span className="text-text-tertiary transition-colors group-hover:text-primary">{getIcon()}</span>
-      <span className="ml-2 text-[13px] font-medium text-text-tertiary transition-colors group-hover:text-primary">
-        {getText()}
-      </span>
+      <span className={iconClass}>{getIcon()}</span>
+      <span className={textClass}>{getText()}</span>
     </button>
   )
 }
-
 export default AssistantMessageButton

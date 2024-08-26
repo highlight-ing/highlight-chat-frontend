@@ -76,3 +76,12 @@ body {
     text-wrap: balance;
   }
 }
+
+@keyframes gentleScale {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.animate-gentle-scale {
+  animation: gentleScale 0.3s ease-in-out;
+}
