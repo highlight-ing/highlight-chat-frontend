@@ -3,6 +3,7 @@ import React from 'react'
 import { Message } from '@/types/index'
 import { ShareUserMessage } from '@/components/Share/Messages/User/ShareUserMessage'
 import { ShareAssistantMessage } from '@/components/Share/Messages/Assistant/ShareAssistantMessage'
+import GetHighlightCTA from '@/components/Share/CTA/GetHighlightCTA'
 
 interface SharePageComponentProps {
   messages: Message[]
@@ -23,6 +24,7 @@ const SharePageComponent: React.FC<SharePageComponentProps> = ({ messages }) => 
           )}
         </React.Fragment>
       ))}
+      <GetHighlightCTA />
     </div>
   )
 }

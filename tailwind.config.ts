@@ -87,6 +87,7 @@ const config: Config = {
         'text-secondary': '#B4B4B4',
         'text-tertiary': '#6E6E6E',
         'text-subtle': '#484848',
+        'text-black': '#0F0F0F',
         'border-primary': '#00FAFF',
         'border-secondary': '#444444',
         'border-tertiary': '#222222',
