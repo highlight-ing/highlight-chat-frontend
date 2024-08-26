@@ -36,6 +36,7 @@
     "lucide-react": "^0.397.0",
     "mammoth": "^1.8.0",
     "mime-types": "^2.1.35",
+    "nanoid": "^5.0.7",
     "next": "14.2.4",
     "pptxtojson": "^0.1.8",
     "react": "^18",

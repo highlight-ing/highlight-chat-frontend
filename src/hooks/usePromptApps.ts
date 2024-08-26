@@ -92,6 +92,17 @@ export default (loadPrompts?: boolean) => {
       text = await fetchPromptText(prompt.external_id)
     }
 
+    if (typeof text === 'object' && 'error' in text) {
+      addToast({
+        title: 'Error fetching prompt',
+        description: text.error,
+        type: 'error',
+        timeout: 15000,
+      })
+
+      return
+    }
+
     setPrompt({
       promptApp: prompt,
       promptName: prompt.name,
