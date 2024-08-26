@@ -1,14 +1,13 @@
 import { ModalObjectProps } from '@/types'
 import Modal from '@/components/modals/Modal'
 import PromptEditor from '@/components/prompts/PromptEditor/PromptEditor'
-import { usePromptEditor } from '@/hooks/usePromptEditor'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { useEffect } from 'react'
 import styles from './modals.module.scss'
-import Button from '@/components/Button/Button'
 import { Prompt } from '@/types/supabase-helpers'
 import CloseButton from '@/components/CloseButton/CloseButton'
 import { useStore } from '@/providers/store-provider'
+import PromptSaveButton from '@/components/prompts/PromptEditor/PromptSaveButton'
 
 const EditPromptModal = ({ id, context }: ModalObjectProps) => {
   const prompt = context?.prompt as Prompt
@@ -35,8 +34,6 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
     setSettingsHasNoErrors(true)
   }, [prompt])
 
-  const { save, saveDisabled } = usePromptEditor()
-
   return (
     <Modal
       id={id}
@@ -47,14 +44,7 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
           <CloseButton alignment="left" onClick={() => closeModal(id)} />
           <div className="flex grow justify-center">Edit {prompt.name}</div>
           <div className="absolute right-0 p-2">
-            <Button
-              size={'large'}
-              variant={saveDisabled ? 'tertiary' : 'primary'}
-              onClick={save}
-              disabled={saveDisabled}
-            >
-              Save
-            </Button>
+            <PromptSaveButton />
           </div>
         </div>
       }
