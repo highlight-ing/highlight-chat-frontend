@@ -22,6 +22,7 @@ const ERROR_MESSAGES = {
   INVALID_PROMPT_DATA: 'Invalid prompt data was sent.',
   DATABASE_ERROR: 'Error occurred while making a write to database.',
   DATABASE_READ_ERROR: 'Error occurred while reading from database.',
+  PROMPT_NOT_FOUND: 'Prompt not found in database.',
 }
 
 async function validateUserAuth(authToken: string) {
@@ -346,4 +347,33 @@ export async function getPromptAppBySlug(slug: string) {
   }
 
   return { promptApp }
+}
+
+export async function countPromptView(externalId: string) {
+  const supabase = supabaseAdmin()
+
+  const { data: promptApp, error } = await supabase
+    .from('prompts')
+    .select('id')
+    .eq('external_id', externalId)
+    .maybeSingle()
+
+  if (error) {
+    console.error('countPromptView: Error fetching prompt from Supabase', error)
+    return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
+  }
+
+  if (!promptApp) {
+    console.error('Prompt app not found in Supabase')
+    return { error: ERROR_MESSAGES.PROMPT_NOT_FOUND }
+  }
+
+  const { error: promptUsageError } = await supabase.from('prompt_usages').insert({
+    prompt_id: promptApp.id,
+  })
+
+  if (promptUsageError) {
+    console.error('countPromptView: Error inserting prompt usage', promptUsageError)
+    return { error: ERROR_MESSAGES.DATABASE_ERROR }
+  }
 }

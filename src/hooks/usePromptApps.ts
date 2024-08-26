@@ -1,5 +1,5 @@
 import { useStore } from '@/providers/store-provider'
-import { addPromptToUser, fetchPrompts, fetchPromptText } from '@/utils/prompts'
+import { addPromptToUser, countPromptView, fetchPrompts, fetchPromptText } from '@/utils/prompts'
 import useAuth from '@/hooks/useAuth'
 import { Prompt } from '@/types/supabase-helpers'
 import { useShallow } from 'zustand/react/shallow'
@@ -83,6 +83,9 @@ export default (loadPrompts?: boolean) => {
     }
 
     const accessToken = await getAccessToken()
+
+    // Count the prompt view
+    countPromptView(prompt.external_id)
 
     // Fetch the prompt
 
