@@ -1,24 +1,37 @@
 import { useState } from 'react'
-import { AssistantMessageButtonType, AssistantMessageButtonConfig } from '@/types'
+import { AssistantMessageButtonType, AssistantMessageButtonConfig, AssistantMessageButtonStatus } from '@/types'
 
 type UseAssistantMessageButtonsOptions = {
   message: string
   buttonTypes: AssistantMessageButtonType[]
 }
 
-export const useAssistantMessageButtons = ({ message, buttonTypes }: UseAssistantMessageButtonsOptions) => {
-  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied'>('idle')
+export const useAssistantMessageButtons = ({
+  message,
+  buttonTypes,
+}: UseAssistantMessageButtonsOptions): AssistantMessageButtonConfig[] => {
+  const [buttonStatuses, setButtonStatuses] = useState<
+    Record<AssistantMessageButtonType, AssistantMessageButtonStatus>
+  >(
+    Object.fromEntries(buttonTypes.map((type) => [type, 'idle'])) as Record<
+      AssistantMessageButtonType,
+      AssistantMessageButtonStatus
+    >,
+  )
 
-  //TODO: - What copy do we want here?
+  const updateButtonStatus = (type: AssistantMessageButtonType, status: AssistantMessageButtonStatus) => {
+    setButtonStatuses((prev) => ({ ...prev, [type]: status }))
+    if (status === 'success') {
+      setTimeout(() => setButtonStatuses((prev) => ({ ...prev, [type]: 'idle' })), 1000)
+    }
+  }
+
   const shareMessage = `${message}\n\nCreated with Highlight`
 
   const handleCopy = () => {
     navigator.clipboard
       .writeText(shareMessage)
-      .then(() => {
-        setCopyStatus('copied')
-        setTimeout(() => setCopyStatus('idle'), 1000)
-      })
+      .then(() => updateButtonStatus('Copy', 'success'))
       .catch((err) => console.error('Failed to copy: ', err))
   }
 
@@ -30,33 +43,36 @@ export const useAssistantMessageButtons = ({ message, buttonTypes }: UseAssistan
           text: shareMessage,
           url: window.location.href,
         })
+        .then(() => updateButtonStatus('Share', 'success'))
         .catch((error) => console.error('Error sharing:', error))
     } else {
-      // Fallback for browsers that don't support Web Share API
       console.log('Share functionality not available')
     }
   }
 
   const handleSave = () => {
-    const blob = new Blob([shareMessage], { type: 'text/plain' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'saved_message.txt'
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
+    try {
+      const blob = new Blob([shareMessage], { type: 'text/plain' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'saved_message.txt'
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      updateButtonStatus('Save', 'success')
+    } catch (error) {
+      console.error('Error saving:', error)
+    }
   }
 
-  //TODO: Implement send feedback logic
   const handleSendFeedback = () => {
-    console.log('Send feedback clicked')
-    // You could implement a custom feedback modal or form here
+    setTimeout(() => updateButtonStatus('SendFeedback', 'success'), 500)
   }
 
-  const buttonActions: Record<AssistantMessageButtonType, Omit<AssistantMessageButtonConfig, 'type'>> = {
-    Copy: { onClick: handleCopy, status: copyStatus },
+  const buttonActions: Record<AssistantMessageButtonType, Pick<AssistantMessageButtonConfig, 'onClick'>> = {
+    Copy: { onClick: handleCopy },
     Share: { onClick: handleShare },
     Save: { onClick: handleSave },
     SendFeedback: { onClick: handleSendFeedback },
@@ -64,7 +80,8 @@ export const useAssistantMessageButtons = ({ message, buttonTypes }: UseAssistan
 
   const buttons: AssistantMessageButtonConfig[] = buttonTypes.map((type) => ({
     type,
-    ...buttonActions[type],
+    onClick: buttonActions[type].onClick,
+    status: buttonStatuses[type],
   }))
 
   return buttons

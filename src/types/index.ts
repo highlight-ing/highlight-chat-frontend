@@ -136,8 +136,10 @@ export interface SharedChat {
 
 export type AssistantMessageButtonType = 'Copy' | 'Share' | 'Save' | 'SendFeedback'
 
+export type AssistantMessageButtonStatus = 'idle' | 'success'
+
 export type AssistantMessageButtonConfig = {
   type: AssistantMessageButtonType
   onClick: () => void
-  status?: 'idle' | 'copied'
+  status: AssistantMessageButtonStatus
 }

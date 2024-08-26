@@ -22,16 +22,6 @@ body {
     box-sizing: border-box;
 }
 
-.shared-chat-container {
-  padding-top: 2rem !important;
-}
-
-@layer components {
-  .share-button {
-    @apply px-4 py-[6px] inline-flex items-center border border-border-tertiary rounded-[10px] text-xs font-medium text-text-secondary hover:text-text-primary hover:border-primary transition-colors
-  }
-}
-
 @keyframes fadeIn {
   from {
     opacity: 0

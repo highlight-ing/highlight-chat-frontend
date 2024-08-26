@@ -10,7 +10,7 @@ import 'katex/dist/katex.min.css'
 import CodeBlock from '@/components/Messages/CodeBlock'
 import AssistantMessageButtonRow from './AssistantMessageButtonRow'
 import { useAssistantMessageButtons } from './useAssistantMessageButtons'
-import { AssistantMessageButtonType } from '@/types'
+import { AssistantMessageButtonType, AssistantMessageButtonStatus } from '@/types'
 
 interface ShareAssistantMessageProps {
   message: AssistantMessage
