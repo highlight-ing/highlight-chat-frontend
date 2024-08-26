@@ -3,14 +3,14 @@ import { HighlightIcon } from '@/icons/icons'
 
 export default function GetHighlightCTA() {
   return (
-    <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-[20px] border border-light-10 bg-background-secondary p-4">
-      <div className="flex flex-grow items-center space-x-3 overflow-hidden">
+    <div className="fixed bottom-4 left-1/2 flex w-full max-w-[712px] -translate-x-1/2 items-center justify-between rounded-[20px] border border-light-10 bg-background-secondary p-3">
+      <div className="flex-shrink-0">
         <HighlightIcon size={24} color="white" />
-        <p className="truncate text-sm text-text-tertiary">
-          Highlight is your personal AI for getting answers and doing work
-        </p>
       </div>
-      <button className="ml-4 whitespace-nowrap rounded-[10px] bg-primary px-4 py-2 text-sm font-medium text-text-black">
+      <p className="font-base mx-3 flex-grow truncate text-center text-[16px] text-text-tertiary">
+        Highlight is your personal AI for getting answers and doing work
+      </p>
+      <button className="duration-250 flex-shrink-0 whitespace-nowrap rounded-[8px] bg-primary px-3 py-1.5 text-xs font-medium text-text-black transition-all ease-in-out hover:bg-primary-60">
         Get Highlight
       </button>
     </div>
