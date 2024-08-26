@@ -77,7 +77,12 @@ export interface SpreadsheetAttachment {
   value: File
 }
 
-export type FileAttachment = PdfAttachment | ImageAttachment | SpreadsheetAttachment | TextFileAttachment
+export type FileAttachment =
+  | PdfAttachment
+  | ImageAttachment
+  | SpreadsheetAttachment
+  | TextFileAttachment
+  | WindowContextAttachment
 
 export type Attachment =
   | AudioAttachment
