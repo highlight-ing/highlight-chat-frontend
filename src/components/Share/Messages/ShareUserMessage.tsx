@@ -32,13 +32,12 @@ const preprocessLaTeX = (content: string) => {
 }
 
 export const ShareUserMessage: React.FC<ShareUserMessageProps> = ({ message }) => {
+  const hasAttachments = hasAttachment(message)
+
   return (
     <div className="mx-auto my-4 w-full max-w-[712px]">
-      <p className="mb-4 text-center text-xs text-text-tertiary">
-        Created with Highlight. Download to create and share your own chats
-      </p>
       <div className="rounded-[16px] border border-border-tertiary bg-background-primary p-4">
-        <div className="mb-4 text-xs font-light leading-[1.6] text-text-primary/90">
+        <div className={`text-sm font-light leading-[1.6] text-text-primary/90 ${hasAttachments ? 'mb-4' : ''}`}>
           <Markdown
             remarkPlugins={[remarkGfm, remarkMath]}
             rehypePlugins={[rehypeKatex]}
@@ -74,7 +73,7 @@ export const ShareUserMessage: React.FC<ShareUserMessageProps> = ({ message }) =
             {typeof message.content === 'string' ? preprocessLaTeX(message.content) : ''}
           </Markdown>
         </div>
-        {hasAttachment(message) && (
+        {hasAttachments && (
           <div className="flex flex-wrap gap-2">
             {message.screenshot && <Attachment type="image" value={message.screenshot} />}
             {message.audio && <Attachment type="audio" value={message.audio} />}
