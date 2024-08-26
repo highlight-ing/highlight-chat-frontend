@@ -37,12 +37,11 @@ export default async function SharePage({ params }: SharePageProps) {
 
   return (
     <ClientWrapper>
-      <div className="flex min-h-screen flex-col">
+      <div className="flex h-screen flex-col">
         <Header title={sharedData.title} sharedBy={sharedData.user_id} />
-        <SharePageComponent messages={sharedData.messages} />
-        {/* <main className="flex-grow">
-        <SharePageComponent messages={sharedData.messages} />
-      </main> */}
+        <main className="flex-1 overflow-y-auto">
+          <SharePageComponent messages={sharedData.messages} />
+        </main>
         {/* <Footer /> */}
       </div>
     </ClientWrapper>
