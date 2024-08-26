@@ -15,10 +15,13 @@ export async function parseAndHandleStreamChunk(
   let contextConfirmed: boolean | null = null
   let newContent = ''
 
-  const jsonObjects = chunk.split(/(?<=})\s*(?=\{)/)
+  // Split the chunk into individual JSON objects
+  const jsonObjects = chunk.split(/\n(?={)/)
+
   for (const jsonStr of jsonObjects) {
     try {
-      const jsonChunk = JSON.parse(jsonStr)
+      // Try to parse as JSON
+      const jsonChunk = JSON.parse(jsonStr.trim())
 
       switch (jsonChunk.type) {
         case 'text':
@@ -31,8 +34,11 @@ export async function parseAndHandleStreamChunk(
               'The assistant is requesting additional context. Do you want to allow this?',
             )
           }
-          if (contextConfirmed && jsonChunk.input && jsonChunk.input.window) {
-            await handleWindowContext(jsonChunk.input.window, formData, addAttachment)
+          if (contextConfirmed) {
+            const windowMatch = jsonStr.match(/"window"\s*:\s*"([^"]*)"/)
+            if (windowMatch && windowMatch[1]) {
+              await handleWindowContext(windowMatch[1], formData, addAttachment)
+            }
           }
           break
 
@@ -58,7 +64,24 @@ export async function parseAndHandleStreamChunk(
       }
     } catch (parseError) {
       console.error('Error parsing JSON:', parseError)
-      // Don't add unparseable content to newContent
+
+      // If parsing fails, treat the entire jsonStr as content
+      newContent += jsonStr
+
+      // Check for tool_use even if JSON parsing fails
+      if (jsonStr.includes('"type":"tool_use"')) {
+        if (contextConfirmed === null) {
+          contextConfirmed = await showConfirmationModal(
+            'The assistant is requesting additional context. Do you want to allow this?',
+          )
+        }
+        if (contextConfirmed) {
+          const windowMatch = jsonStr.match(/"window"\s*:\s*"([^"]*)"/)
+          if (windowMatch && windowMatch[1]) {
+            await handleWindowContext(windowMatch[1], formData, addAttachment)
+          }
+        }
+      }
     }
   }
 
