@@ -7,10 +7,9 @@ import { useShallow } from 'zustand/react/shallow'
 import PromptAppIcon from '../PromptAppIcon/PromptAppIcon'
 import Button from '../Button/Button'
 import { useState } from 'react'
-import usePromptApps from '@/hooks/usePromptApps'
 
 const ChatHeader = ({ isShowing }: { isShowing: boolean }) => {
-  const { myPrompts } = usePromptApps()
+  // const { myPrompts } = usePromptApps()
 
   const { promptApp, promptName, promptDescription, promptUserId } = useStore(
     useShallow((state) => ({
@@ -21,7 +20,7 @@ const ChatHeader = ({ isShowing }: { isShowing: boolean }) => {
     })),
   )
 
-  const isMyPrompt = myPrompts.find((p) => p.external_id === promptApp?.external_id)
+  const isMyPrompt = false
 
   const [isCopied, setIsCopied] = useState(false)
 
