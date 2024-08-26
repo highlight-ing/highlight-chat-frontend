@@ -47,6 +47,7 @@ async function readFileAsBase64(file: File): Promise<string> {
 // TODO: Consolidate the two attachment types
 // Should just remove the HLC-specific code and use the Highlight API
 export default async function addAttachmentsToFormData(formData: FormData, attachments: any[]) {
+  console.log('addAttachmentsToFormData')
   let screenshot, audio, fileTitle, clipboardText, ocrText, windowContext
 
   for (const attachment of attachments) {
@@ -218,6 +219,7 @@ export const useSubmitQuery = () => {
           addAttachment,
           showConfirmationModal,
           addToast,
+          handleSubmit,
         })
 
         if (newContent) {
@@ -308,7 +310,6 @@ export const useSubmitQuery = () => {
         role: 'user',
         content: query,
         clipboard_text: clipboardText,
-
         screenshot: screenshotUrl,
         audio,
         window: windowTitle ? { title: windowTitle, appIcon: appIcon, type: 'window' } : undefined,
@@ -345,6 +346,7 @@ export const useSubmitQuery = () => {
   }
 
   const handleSubmit = async (input: string, promptApp?: Prompt) => {
+    console.log('handleSubmit triggered')
     const query = input.trim()
 
     if (!query) {
@@ -378,6 +380,8 @@ export const useSubmitQuery = () => {
         formData,
         attachments,
       )
+
+      console.log('windowContext: ', windowContext)
 
       const conversationId = getOrCreateConversationId()
       addConversationMessage(conversationId!, {

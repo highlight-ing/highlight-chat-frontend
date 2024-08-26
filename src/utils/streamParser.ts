@@ -6,47 +6,57 @@ type StreamParserProps = {
   addAttachment: (attachment: FileAttachment) => void
   showConfirmationModal: (message: string) => Promise<boolean>
   addToast: (toast: Partial<Toast>) => void
+  handleSubmit: (input: string) => Promise<void>
 }
 
 export async function parseAndHandleStreamChunk(
   chunk: string,
-  { formData, addAttachment, showConfirmationModal, addToast }: StreamParserProps,
+  { formData, addAttachment, showConfirmationModal, addToast, handleSubmit }: StreamParserProps,
 ) {
   let contextConfirmed: boolean | null = null
-  let newContent = ''
+  let accumulatedContent = ''
 
-  // Split the chunk into individual JSON objects
-  const jsonObjects = chunk.split(/\n(?={)/)
+  // Split the chunk into individual data objects
+  const dataObjects = chunk.split(/\n(?=data: )/)
 
-  for (const jsonStr of jsonObjects) {
+  for (const dataStr of dataObjects) {
+    if (!dataStr.trim()) continue // Skip empty strings
+
+    // Remove the 'data: ' prefix if it exists
+    const jsonStr = dataStr.replace(/^data: /, '').trim()
+
     try {
       // Try to parse as JSON
-      const jsonChunk = JSON.parse(jsonStr.trim())
+      const jsonChunk = JSON.parse(jsonStr)
 
       switch (jsonChunk.type) {
         case 'text':
-          newContent += jsonChunk.content
+          accumulatedContent += jsonChunk.content
           break
 
+        // We can define each tool use with different names
         case 'tool_use':
-          if (contextConfirmed === null) {
-            contextConfirmed = await showConfirmationModal(
-              'The assistant is requesting additional context. Do you want to allow this?',
-            )
-          }
-          if (contextConfirmed) {
-            const windowMatch = jsonStr.match(/"window"\s*:\s*"([^"]*)"/)
-            if (windowMatch && windowMatch[1]) {
-              await handleWindowContext(windowMatch[1], formData, addAttachment)
+          if (jsonChunk.name === 'get_more_context') {
+            if (contextConfirmed === null) {
+              contextConfirmed = await showConfirmationModal(
+                'The assistant is requesting additional context. Do you want to allow this?',
+              )
+            }
+            if (contextConfirmed) {
+              const window = jsonChunk.input.window
+              if (window) {
+                await handleWindowContext(window, formData, addAttachment, handleSubmit)
+              }
             }
           }
           break
 
         case 'done':
-          // Message is complete we might add something here in the future
-          break
+          // Message is complete, return the accumulated content
+          return accumulatedContent
 
-        case 'tool_use_input':
+        case 'message_delta':
+          // Handle message delta if needed
           break
 
         case 'error':
@@ -63,49 +73,43 @@ export async function parseAndHandleStreamChunk(
           console.warn('Unknown chunk type:', jsonChunk.type)
       }
     } catch (parseError) {
-      console.error('Error parsing JSON:', parseError)
-
-      // If parsing fails, treat the entire jsonStr as content
-      newContent += jsonStr
-
-      // Check for tool_use even if JSON parsing fails
-      if (jsonStr.includes('"type":"tool_use"')) {
-        if (contextConfirmed === null) {
-          contextConfirmed = await showConfirmationModal(
-            'The assistant is requesting additional context. Do you want to allow this?',
-          )
-        }
-        if (contextConfirmed) {
-          const windowMatch = jsonStr.match(/"window"\s*:\s*"([^"]*)"/)
-          if (windowMatch && windowMatch[1]) {
-            await handleWindowContext(windowMatch[1], formData, addAttachment)
-          }
-        }
-      }
+      // If parsing fails, log the error but don't add the content
+      addToast({
+        title: 'Unexpected Parse Error',
+        description: 'Error parsing incoming response from the server.',
+        type: 'error',
+        timeout: 15000,
+      })
+      console.error('Error parsing JSON:', parseError, 'Raw data:', jsonStr)
     }
   }
 
-  return newContent
+  // If we haven't returned yet, return the accumulated content
+  return accumulatedContent
 }
 
 async function handleWindowContext(
   window: string,
   formData: FormData,
   addAttachment: (attachment: FileAttachment) => void,
+  handleSubmit: (input: string) => Promise<void>,
 ) {
-  const screenshot = await Highlight.user.getWindowScreenshot(window)
-  addAttachment({
-    type: 'image',
-    value: screenshot,
-  })
   const granted = await Highlight.permissions.requestWindowContextPermission()
   if (granted) {
+    const screenshot = await Highlight.user.getWindowScreenshot(window)
+    addAttachment({
+      type: 'image',
+      value: screenshot,
+    })
+
     const windowContext = await Highlight.user.getWindowContext(window)
     const ocrScreenContents = windowContext.environment.ocrScreenContents || ''
     addAttachment({
       type: 'window_context',
       value: ocrScreenContents,
     })
-    formData.append('window_context', ocrScreenContents)
+    // await new Promise((resolve) => setTimeout(resolve, 500))
+
+    // await handleSubmit("Here's the context you requested.") // When called it ignores the window context and image wtf?
   }
 }
