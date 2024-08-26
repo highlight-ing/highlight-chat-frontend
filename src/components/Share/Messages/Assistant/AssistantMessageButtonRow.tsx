@@ -1,5 +1,5 @@
 import React from 'react'
-import AssistantMessageButton from './Assistant/AssistantMessageButton'
+import AssistantMessageButton from './AssistantMessageButton'
 import { AssistantMessageButtonConfig } from '@/types'
 
 interface AssistantMessageButtonRowProps {

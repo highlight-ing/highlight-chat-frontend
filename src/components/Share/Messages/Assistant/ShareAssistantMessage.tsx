@@ -8,8 +8,8 @@ import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import 'katex/dist/katex.min.css'
 import CodeBlock from '@/components/Messages/CodeBlock'
-import AssistantMessageButtonRow from './Assistant/AssistantMessageButtonRow'
-import { useAssistantMessageButtons } from './Assistant/useAssistantMessageButtons'
+import AssistantMessageButtonRow from './AssistantMessageButtonRow'
+import { useAssistantMessageButtons } from './useAssistantMessageButtons'
 import { AssistantMessageButtonType, AssistantMessageButtonStatus } from '@/types'
 
 interface ShareAssistantMessageProps {
