@@ -19,7 +19,7 @@ const SharePageComponent: React.FC<SharePageComponentProps> = ({ messages }) => 
           {message.role === 'user' ? (
             <ShareUserMessage message={message} />
           ) : (
-            <ShareAssistantMessage message={message} />
+            <ShareAssistantMessage message={message} buttonTypes={['Copy', 'Share', 'Save']} />
           )}
         </React.Fragment>
       ))}

@@ -8,9 +8,13 @@ import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import 'katex/dist/katex.min.css'
 import CodeBlock from '@/components/Messages/CodeBlock'
+import AssistantMessageButtonRow from './AssistantMessageButtonRow'
+import { useAssistantMessageButtons } from './useAssistantMessageButtons'
+import { AssistantMessageButtonType } from '@/types'
 
 interface ShareAssistantMessageProps {
   message: AssistantMessage
+  buttonTypes: AssistantMessageButtonType[]
 }
 
 const preprocessLaTeX = (content: string) => {
@@ -18,7 +22,9 @@ const preprocessLaTeX = (content: string) => {
   return blockProcessedContent.replace(/\\\((.*?)\\\)/g, (_, equation) => `$${equation}$`)
 }
 
-export const ShareAssistantMessage: React.FC<ShareAssistantMessageProps> = ({ message }) => {
+export const ShareAssistantMessage: React.FC<ShareAssistantMessageProps> = ({ message, buttonTypes }) => {
+  const buttons = useAssistantMessageButtons({ message: message.content, buttonTypes })
+
   return (
     <div className="mx-auto my-4 w-full max-w-[712px]">
       <div className="rounded-[24px] border border-border-tertiary bg-background-secondary p-4">
@@ -49,30 +55,7 @@ export const ShareAssistantMessage: React.FC<ShareAssistantMessageProps> = ({ me
             {typeof message.content === 'string' ? preprocessLaTeX(message.content) : ''}
           </Markdown>
         </div>
-        <div className="flex space-x-4">
-          <button className="group flex items-center rounded-full bg-background-secondary p-2 transition-colors hover:bg-background-secondary">
-            <Copy variant="Bold" size={16} className="text-text-tertiary transition-colors group-hover:text-primary" />
-            <span className="ml-2 text-[13px] font-medium text-text-tertiary transition-colors group-hover:text-primary">
-              Copy
-            </span>
-          </button>
-          <button className="group flex items-center rounded-full bg-background-secondary p-2 transition-colors hover:bg-background-secondary">
-            <Send2 variant="Bold" size={16} className="text-text-tertiary transition-colors group-hover:text-primary" />
-            <span className="ml-2 text-[13px] font-medium text-text-tertiary transition-colors group-hover:text-primary">
-              Share
-            </span>
-          </button>
-          <button className="group flex items-center rounded-full bg-background-secondary p-2 transition-colors hover:bg-background-secondary">
-            <ExportCircle
-              variant="Bold"
-              size={16}
-              className="text-text-tertiary transition-colors group-hover:text-primary"
-            />
-            <span className="ml-2 text-[13px] font-medium text-text-tertiary transition-colors group-hover:text-primary">
-              Save
-            </span>
-          </button>
-        </div>
+        <AssistantMessageButtonRow buttons={buttons} />
       </div>
     </div>
   )

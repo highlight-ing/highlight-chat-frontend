@@ -133,3 +133,11 @@ export interface SharedChat {
   user_id?: string
   messages: Message[]
 }
+
+export type AssistantMessageButtonType = 'Copy' | 'Share' | 'Save' | 'SendFeedback'
+
+export type AssistantMessageButtonConfig = {
+  type: AssistantMessageButtonType
+  onClick: () => void
+  status?: 'idle' | 'copied'
+}
