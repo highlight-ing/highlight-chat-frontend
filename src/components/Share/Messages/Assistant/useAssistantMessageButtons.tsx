@@ -10,6 +10,8 @@ export const useAssistantMessageButtons = ({
   message,
   buttonTypes,
 }: UseAssistantMessageButtonsOptions): AssistantMessageButtonConfig[] => {
+  // Initialize button statuses using Object.fromEntries
+  // This creates an object with each button type as a key and 'idle' as the initial status
   const [buttonStatuses, setButtonStatuses] = useState<
     Record<AssistantMessageButtonType, AssistantMessageButtonStatus>
   >(
@@ -19,6 +21,7 @@ export const useAssistantMessageButtons = ({
     >,
   )
 
+  // Update button status and reset to 'idle' after 1 second if status is 'success'
   const updateButtonStatus = (type: AssistantMessageButtonType, status: AssistantMessageButtonStatus) => {
     setButtonStatuses((prev) => ({ ...prev, [type]: status }))
     if (status === 'success') {
@@ -71,6 +74,7 @@ export const useAssistantMessageButtons = ({
     setTimeout(() => updateButtonStatus('SendFeedback', 'success'), 500)
   }
 
+  // Define button actions for each button type
   const buttonActions: Record<AssistantMessageButtonType, Pick<AssistantMessageButtonConfig, 'onClick'>> = {
     Copy: { onClick: handleCopy },
     Share: { onClick: handleShare },
@@ -78,6 +82,7 @@ export const useAssistantMessageButtons = ({
     SendFeedback: { onClick: handleSendFeedback },
   }
 
+  // Create button configurations by mapping over buttonTypes
   const buttons: AssistantMessageButtonConfig[] = buttonTypes.map((type) => ({
     type,
     onClick: buttonActions[type].onClick,
