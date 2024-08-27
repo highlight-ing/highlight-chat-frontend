@@ -6,6 +6,7 @@
   --foreground-rgb: 255, 255, 255;
   --background-start-rgb: 0, 0, 0;
   --background-end-rgb: 0, 0, 0;
+  --scrollbar-hide-delay: 0.5s;
 }
 
 body {
@@ -35,8 +36,31 @@ body {
   .animate-fadeIn {
     animation: fadeIn 200ms forwards
   }
-}
 
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.background-secondary') theme('colors.background-primary');
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    background: theme('colors.background-primary');
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background-color: theme('colors.background-primary');
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: theme('colors.background-secondary');
+    border-radius: 20px;
+    border: 2px solid theme('colors.background-primary');
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: theme('colors.tertiary-50');
+  }
+}
 
 /*::-webkit-scrollbar {*/
 /*    width: 9px;*/
