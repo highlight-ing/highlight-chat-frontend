@@ -12,6 +12,13 @@ interface FetchOptions {
   signal?: AbortSignal
 }
 
+interface PublicFetchOptions {
+  version?: ApiVersion
+  body?: FormData | string
+  method: 'GET' | 'POST' | 'DELETE'
+  signal?: AbortSignal
+}
+
 interface RequestOptions {
   version: ApiVersion
   signal?: AbortSignal
@@ -24,6 +31,14 @@ const fetchRequest = async (route: string, { bearerToken, body, version, method,
     headers: {
       Authorization: `Bearer ${bearerToken}`,
     },
+    signal: signal,
+  })
+}
+
+const fetchPublicRequest = async (route: string, { body, version, method, signal }: PublicFetchOptions) => {
+  return fetch(`${backendUrl}api/${version ?? 'v1'}/${route}`, {
+    method: method,
+    body: body,
     signal: signal,
   })
 }
@@ -83,10 +98,30 @@ export const useApi = () => {
     return URL.createObjectURL(blob)
   }
 
+  const getSharedImage = async (imageUrl: string, options?: Partial<RequestOptions>) => {
+    const formData = new FormData()
+    formData.append('imageUrl', imageUrl)
+
+    const response = await fetchPublicRequest('image/public', {
+      method: 'POST',
+      body: formData,
+      version: options?.version,
+      signal: options?.signal,
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch shared image')
+    }
+
+    const blob = await response.blob()
+    return URL.createObjectURL(blob)
+  }
+
   return {
     get,
     post,
     deleteRequest: deleteRequest,
     getImage,
+    getSharedImage,
   }
 }

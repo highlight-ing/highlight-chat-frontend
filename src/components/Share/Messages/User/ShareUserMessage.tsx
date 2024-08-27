@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useMemo } from 'react'
 import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
@@ -10,7 +10,7 @@ import CodeBlock from '@/components/Messages/CodeBlock'
 import { getDisplayValue } from '@/utils/attachments'
 
 interface ShareUserMessageProps {
-  message: UserMessage
+  message: UserMessage & { fetchedImage?: string }
 }
 
 const hasAttachment = (message: UserMessage) => {
@@ -31,8 +31,10 @@ const preprocessLaTeX = (content: string) => {
   return blockProcessedContent.replace(/\\\((.*?)\\\)/g, (_, equation) => `$${equation}$`)
 }
 
-export const ShareUserMessage: React.FC<ShareUserMessageProps> = ({ message }) => {
-  const hasAttachments = hasAttachment(message)
+export const ShareUserMessage: React.FC<ShareUserMessageProps> = React.memo(({ message }) => {
+  const hasAttachments = useMemo(() => hasAttachment(message), [message])
+
+  console.log('ShareUserMessage: Rendering')
 
   return (
     <div className="mx-auto my-4 w-full max-w-[712px]">
@@ -75,24 +77,26 @@ export const ShareUserMessage: React.FC<ShareUserMessageProps> = ({ message }) =
         </div>
         {hasAttachments && (
           <div className="flex flex-wrap gap-2">
-            {message.screenshot && <Attachment type="image" value={message.screenshot} />}
+            {/* {message.screenshot && <Attachment type="image" value={message.screenshot} />} */}
             {message.audio && <Attachment type="audio" value={message.audio} />}
             {message.window && message.window?.title && (
               <Attachment type="window" value={message.window.title} appIcon={message.window.appIcon} />
             )}
             {message.clipboard_text && <Attachment type="clipboard" value={message.clipboard_text} />}
             {message.file_title && <Attachment type="pdf" value={message.file_title} />}
-            {message.image_url && <Attachment type="image" value={message.image_url} />}
             {message.file_attachments &&
               message.file_attachments.map((a, index) => (
                 <Attachment key={index} type={a.type} value={getDisplayValue(a)} />
               ))}
             {message.window_context && <Attachment type="window_context" value={message.window_context} />}
+            {message.fetchedImage && <Attachment type="image" value={message.fetchedImage} isSharedImage={true} />}
           </div>
         )}
       </div>
     </div>
   )
-}
+})
+
+ShareUserMessage.displayName = 'ShareUserMessage'
 
 export default ShareUserMessage
