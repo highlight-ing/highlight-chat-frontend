@@ -8,7 +8,7 @@ interface AssistantMessageButtonRowProps {
 
 const AssistantMessageButtonRow: React.FC<AssistantMessageButtonRowProps> = ({ buttons }) => {
   return (
-    <div className="flex space-x-4">
+    <div className="my-2 mt-4 flex space-x-6">
       {buttons.map((button) => (
         <AssistantMessageButton key={button.type} type={button.type} onClick={button.onClick} status={button.status} />
       ))}
