@@ -46,24 +46,23 @@ const SharePageComponent: React.FC<SharePageComponentProps> = ({ messages }) => 
   console.log('SharePageComponent: Rendering')
 
   return (
-    <div
-      ref={containerRef}
-      className="mx-auto w-full max-w-[--chat-body-width] overflow-y-auto"
-      style={{ height: 'calc(100vh - 100px)' }}
-    >
-      <p className="m-4 text-center text-xs text-text-tertiary">
-        Created with Highlight. Download to create and share your own chats
-      </p>
-      {processedMessages.map((message, index) => (
-        <React.Fragment key={index}>
-          {message.role === 'user' ? (
-            <ShareUserMessage message={message as UserMessage} />
-          ) : (
-            <ShareAssistantMessage message={message} buttonTypes={['Copy', 'Share', 'Save']} />
-          )}
-        </React.Fragment>
-      ))}
-      {isAtBottom && <div className="h-20" />}
+    <div className="flex min-h-screen flex-col items-center">
+      <div className="w-full max-w-[712px] flex-grow">
+        <p className="m-4 text-center text-xs text-text-tertiary">
+          Created with Highlight. Download to create and share your own chats
+        </p>
+        <div className="pb-24">
+          {processedMessages.map((message, index) => (
+            <React.Fragment key={index}>
+              {message.role === 'user' ? (
+                <ShareUserMessage message={message as UserMessage} />
+              ) : (
+                <ShareAssistantMessage message={message} buttonTypes={['Copy', 'Share', 'Save']} />
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
       <GetHighlightCTA />
     </div>
   )
