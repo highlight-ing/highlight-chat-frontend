@@ -8,6 +8,7 @@ import { UserMessage } from '@/types'
 import { Attachment } from '@/components/Attachment'
 import CodeBlock from '@/components/Messages/CodeBlock'
 import { getDisplayValue } from '@/utils/attachments'
+import { ProfileCircle } from 'iconsax-react'
 
 interface ShareUserMessageProps {
   message: UserMessage & { fetchedImage?: string }
@@ -39,6 +40,10 @@ export const ShareUserMessage: React.FC<ShareUserMessageProps> = React.memo(({ m
   return (
     <div className="mx-auto my-4 w-full max-w-[712px]">
       <div className="rounded-[16px] border border-border-tertiary bg-background-primary p-4">
+        <div className="mb-4 flex items-center">
+          <ProfileCircle variant="Bold" size={16} className="text-gray-500" />
+          <span className="ml-2 text-xs font-medium text-text-secondary">User</span>
+        </div>
         <div className={`text-sm font-light leading-[1.6] text-text-primary/90 ${hasAttachments ? 'mb-4' : ''}`}>
           <Markdown
             remarkPlugins={[remarkGfm, remarkMath]}
