@@ -21,6 +21,16 @@
     pointer-events: none;
   }
 
+  &.icon {
+    display: flex;
+    width: 24px;
+    height: 24px;
+    padding: 2px 8px;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+  }
+
   &.xsmall {
     padding: 0 8px;
     font-size: 12px;

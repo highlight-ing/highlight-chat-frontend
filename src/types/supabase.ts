@@ -91,6 +91,7 @@ export type Database = {
           id: number
           image_url: string | null
           ocr_text: string | null
+          pdf_chunks: string | null
           role: string
           text_file: string | null
           user_id: string
@@ -107,6 +108,7 @@ export type Database = {
           id?: number
           image_url?: string | null
           ocr_text?: string | null
+          pdf_chunks?: string | null
           role: string
           text_file?: string | null
           user_id: string
@@ -123,6 +125,7 @@ export type Database = {
           id?: number
           image_url?: string | null
           ocr_text?: string | null
+          pdf_chunks?: string | null
           role?: string
           text_file?: string | null
           user_id?: string
@@ -151,7 +154,8 @@ export type Database = {
           prompt_text: string | null
           prompt_url: string | null
           public: boolean
-          slug: string | null
+          public_use_number: number | null
+          slug: string
           suggestion_prompt_text: string | null
           user_id: string
           video_url: string | null
@@ -167,7 +171,8 @@ export type Database = {
           prompt_text?: string | null
           prompt_url?: string | null
           public?: boolean
-          slug?: string | null
+          public_use_number?: number | null
+          slug: string
           suggestion_prompt_text?: string | null
           user_id: string
           video_url?: string | null
@@ -183,7 +188,8 @@ export type Database = {
           prompt_text?: string | null
           prompt_url?: string | null
           public?: boolean
-          slug?: string | null
+          public_use_number?: number | null
+          slug?: string
           suggestion_prompt_text?: string | null
           user_id?: string
           video_url?: string | null
@@ -195,6 +201,97 @@ export type Database = {
             isOneToOne: false
             referencedRelation: 'user_images'
             referencedColumns: ['external_id']
+          },
+        ]
+      }
+      shared_conversation_messages: {
+        Row: {
+          audio: string | null
+          clipboard_text: string | null
+          content: string
+          context: string | null
+          conversation_id: string
+          created_at: string
+          id: number
+          image_url: string | null
+          ocr_text: string | null
+          role: string
+          text_file: string | null
+          window_context: string | null
+          windows: string[] | null
+        }
+        Insert: {
+          audio?: string | null
+          clipboard_text?: string | null
+          content: string
+          context?: string | null
+          conversation_id?: string
+          created_at?: string
+          id?: number
+          image_url?: string | null
+          ocr_text?: string | null
+          role: string
+          text_file?: string | null
+          window_context?: string | null
+          windows?: string[] | null
+        }
+        Update: {
+          audio?: string | null
+          clipboard_text?: string | null
+          content?: string
+          context?: string | null
+          conversation_id?: string
+          created_at?: string
+          id?: number
+          image_url?: string | null
+          ocr_text?: string | null
+          role?: string
+          text_file?: string | null
+          window_context?: string | null
+          windows?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'shared_conversation_messages_conversation_id_fkey'
+            columns: ['conversation_id']
+            isOneToOne: false
+            referencedRelation: 'shared_conversations'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      shared_conversations: {
+        Row: {
+          app_id: string | null
+          created_at: string
+          id: string
+          original_conversation_id: string
+          title: string
+          user_id: string | null
+        }
+        Insert: {
+          app_id?: string | null
+          created_at?: string
+          id?: string
+          original_conversation_id: string
+          title: string
+          user_id?: string | null
+        }
+        Update: {
+          app_id?: string | null
+          created_at?: string
+          id?: string
+          original_conversation_id?: string
+          title?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'shared_conversations_original_conversation_id_fkey'
+            columns: ['original_conversation_id']
+            isOneToOne: false
+            referencedRelation: 'conversation'
+            referencedColumns: ['id']
           },
         ]
       }
