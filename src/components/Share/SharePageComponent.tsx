@@ -47,11 +47,11 @@ const SharePageComponent: React.FC<SharePageComponentProps> = ({ messages }) => 
 
   return (
     <div className="flex min-h-screen flex-col items-center">
-      <div className="w-full max-w-[712px] flex-grow">
+      <div className="w-full max-w-[712px] flex-grow pb-24">
         <p className="m-4 text-center text-xs text-text-tertiary">
           Created with Highlight. Download to create and share your own chats
         </p>
-        <div className="pb-24">
+        <div>
           {processedMessages.map((message, index) => (
             <React.Fragment key={index}>
               {message.role === 'user' ? (
