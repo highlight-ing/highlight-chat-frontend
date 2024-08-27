@@ -8,6 +8,7 @@ import { Prompt } from '@/types/supabase-helpers'
 import { FileAttachment, FileAttachmentType, TextFileAttachment } from '@/types'
 import { useShallow } from 'zustand/react/shallow'
 import { useEffect, useRef } from 'react'
+import { parseAndHandleStreamChunk } from '@/utils/streamParser'
 
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024 // 1MB in bytes
@@ -46,6 +47,7 @@ async function readFileAsBase64(file: File): Promise<string> {
 // TODO: Consolidate the two attachment types
 // Should just remove the HLC-specific code and use the Highlight API
 export default async function addAttachmentsToFormData(formData: FormData, attachments: any[]) {
+  console.log('addAttachmentsToFormData')
   let screenshot, audio, fileTitle, clipboardText, ocrText, windowContext
 
   for (const attachment of attachments) {
@@ -115,8 +117,6 @@ export const useSubmitQuery = () => {
     getOrCreateConversationId,
     attachments,
     clearAttachments,
-    input,
-    setInput,
     setInputIsDisabled,
     aboutMe,
     addConversationMessage,
@@ -127,8 +127,6 @@ export const useSubmitQuery = () => {
       getOrCreateConversationId: state.getOrCreateConversationId,
       attachments: state.attachments,
       clearAttachments: state.clearAttachments,
-      input: state.input,
-      setInput: state.setInput,
       setInputIsDisabled: state.setInputIsDisabled,
       aboutMe: state.aboutMe,
       addConversationMessage: state.addConversationMessage,
@@ -136,6 +134,8 @@ export const useSubmitQuery = () => {
       addToast: state.addToast,
     })),
   )
+
+  const setInput = useStore((state) => state.setInput)
 
   const abortControllerRef = useRef<AbortController>()
   const { getAccessToken } = useAuth()
@@ -203,85 +203,31 @@ export const useSubmitQuery = () => {
 
       checkAbortSignal()
 
-      let contextConfirmed = null
-      let accumulatedToolUseInput = ''
-      let accumulatedResponse = ''
       addConversationMessage(conversationId!, { role: 'assistant', content: '' })
+
+      let accumulatedMessage = ''
 
       while (!abortController.signal.aborted) {
         const { done, value } = await reader.read()
         if (done) break
         const chunk = new TextDecoder().decode(value)
 
-        // Split the chunk into individual JSON objects
-        const jsonObjects = chunk.split(/(?<=})\s*(?=\{)/)
+        checkAbortSignal()
 
-        for (const jsonStr of jsonObjects) {
-          checkAbortSignal()
+        const newContent = await parseAndHandleStreamChunk(chunk, {
+          formData,
+          addAttachment,
+          showConfirmationModal,
+          addToast,
+          handleSubmit,
+        })
 
-          try {
-            const jsonChunk = JSON.parse(jsonStr)
-
-            if (jsonChunk.type === 'text') {
-              accumulatedResponse += jsonChunk.content
-              updateLastConversationMessage(conversationId, {
-                role: 'assistant',
-                content: accumulatedResponse,
-              })
-            } else if (jsonChunk.type === 'tool_use') {
-              if (contextConfirmed === null) {
-                contextConfirmed = await showConfirmationModal(
-                  'The assistant is requesting additional context. Do you want to allow this?',
-                )
-              }
-            } else if (jsonChunk.type === 'tool_use_input') {
-              accumulatedToolUseInput += jsonChunk.content
-
-              // Try to parse the accumulated tool use input
-              try {
-                const content = JSON.parse(accumulatedToolUseInput)
-                if (contextConfirmed && content.window) {
-                  const screenshot = await Highlight.user.getWindowScreenshot(content.window)
-                  addAttachment({
-                    type: 'image',
-                    value: screenshot,
-                  })
-                  // Ask for permission on getting extra window context
-                  const granted = await Highlight.permissions.requestWindowContextPermission()
-                  if (granted) {
-                    const windowContext = await Highlight.user.getWindowContext(content.window)
-                    const ocrScreenContents = windowContext.environment.ocrScreenContents || ''
-                    addAttachment({
-                      type: 'window_context',
-                      value: ocrScreenContents,
-                    })
-                    formData.append('window_context', ocrScreenContents)
-                  }
-                }
-                // Reset accumulated tool use input after successful parsing
-                accumulatedToolUseInput = ''
-              } catch (parseError) {
-                // If parsing fails, it means we don't have the complete JSON yet
-                console.error('Incomplete tool use input, waiting for more data')
-              }
-            } else if (jsonChunk.type === 'error') {
-              console.error('Error from backend:', jsonChunk.content)
-              addToast({
-                title: 'Unexpected Server Error',
-                // @ts-ignore
-                description: jsonChunk.content,
-                type: 'error',
-                timeout: 15000,
-              })
-            }
-          } catch (parseError) {
-            console.error('Error parsing JSON:', parseError)
-            accumulatedResponse += jsonStr
-            updateLastConversationMessage(conversationId!, {
-              role: 'assistant',
-              content: accumulatedResponse,
-            })
-          }
+        if (newContent) {
+          accumulatedMessage += newContent
+          updateLastConversationMessage(conversationId, {
+            role: 'assistant',
+            content: accumulatedMessage,
+          })
         }
       }
     } catch (error) {
@@ -364,7 +310,6 @@ export const useSubmitQuery = () => {
         role: 'user',
         content: query,
         clipboard_text: clipboardText,
-
         screenshot: screenshotUrl,
         audio,
         window: windowTitle ? { title: windowTitle, appIcon: appIcon, type: 'window' } : undefined,
@@ -400,7 +345,8 @@ export const useSubmitQuery = () => {
     }
   }
 
-  const handleSubmit = async (promptApp?: Prompt) => {
+  const handleSubmit = async (input: string, promptApp?: Prompt) => {
+    console.log('handleSubmit triggered')
     const query = input.trim()
 
     if (!query) {
@@ -434,6 +380,8 @@ export const useSubmitQuery = () => {
         formData,
         attachments,
       )
+
+      console.log('windowContext: ', windowContext)
 
       const conversationId = getOrCreateConversationId()
       addConversationMessage(conversationId!, {

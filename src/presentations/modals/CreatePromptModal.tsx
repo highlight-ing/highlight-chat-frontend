@@ -4,14 +4,12 @@ import PromptEditor from '@/components/prompts/PromptEditor/PromptEditor'
 import { useEffect } from 'react'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import styles from './modals.module.scss'
-import Button from '@/components/Button/Button'
-import { usePromptEditor } from '@/hooks/usePromptEditor'
 import CloseButton from '@/components/CloseButton/CloseButton'
 import { useStore } from '@/providers/store-provider'
+import PromptSaveButton from '@/components/prompts/PromptEditor/PromptSaveButton'
 
 const CreatePromptModal = ({ id, context }: ModalObjectProps) => {
   const { clearPromptEditorData, setSelectedScreen } = usePromptEditorStore()
-  const { save, saveDisabled } = usePromptEditor()
   const closeModal = useStore((state) => state.closeModal)
 
   useEffect(() => {
@@ -30,14 +28,7 @@ const CreatePromptModal = ({ id, context }: ModalObjectProps) => {
           <CloseButton alignment="left" onClick={() => closeModal(id)} />
           <div className="flex grow justify-center">Create New Highlight App</div>
           <div className="absolute right-0 p-2">
-            <Button
-              size={'large'}
-              variant={saveDisabled ? 'tertiary' : 'primary'}
-              onClick={save}
-              disabled={saveDisabled}
-            >
-              Save
-            </Button>
+            <PromptSaveButton />
           </div>
         </div>
       }

@@ -7,6 +7,23 @@ import { JWTPayload, JWTVerifyResult } from 'jose'
 import { z } from 'zod'
 import mime from 'mime-types'
 import slugify from 'slugify'
+import { nanoid } from 'nanoid'
+
+/**
+ * This file contains all the server actions for interacting with prompts.
+ */
+
+/**
+ * Error messages for the prompts server actions.
+ */
+const ERROR_MESSAGES = {
+  INVALID_AUTH_TOKEN: 'Invalid authorization token. Try refreshing Highlight Chat.',
+  IMAGE_UPLOAD_ERROR: 'Error uploading image. Try again later.',
+  INVALID_PROMPT_DATA: 'Invalid prompt data was sent.',
+  DATABASE_ERROR: 'Error occurred while making a write to database.',
+  DATABASE_READ_ERROR: 'Error occurred while reading from database.',
+  PROMPT_NOT_FOUND: 'Prompt not found in database.',
+}
 
 async function validateUserAuth(authToken: string) {
   let jwt: JWTVerifyResult<JWTPayload>
@@ -82,56 +99,6 @@ async function uploadImage(file: File, userId: string) {
 }
 
 /**
- * Finds the next available slug for a prompt.
- * This is to help prevent collisions with slugs.
- * Note: a race condition exists where in two users try using the same slug at the same time.
- */
-async function findNextAvailableSlug(slug: string) {
-  slug = slugify(slug)
-
-  const supabase = supabaseAdmin()
-
-  const { data: lastPrompt, error } = await supabase
-    .from('prompts')
-    .select('*')
-    .like('slug', `${slug}%`)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle()
-
-  if (error) {
-    console.error('Error fetching last avaliable prompt from Supabase', error)
-    throw new Error('Error fetching last avaliable prompt from Supabase')
-  }
-
-  if (!lastPrompt) {
-    // There are no other prompts with this slug
-    return slug
-  }
-
-  const lastPromptSlug = lastPrompt.slug ?? ''
-
-  const lastPromptSplit = lastPromptSlug.split('-')
-  const lastPromptNumberSection = lastPromptSplit[lastPromptSplit.length - 1]
-
-  if (!lastPromptNumberSection) {
-    throw new Error('Last prompt slug is not in the correct format')
-  }
-
-  // Validate that the last prompt number section is a number
-  const lastPromptNumber = parseInt(lastPromptNumberSection)
-
-  if (isNaN(lastPromptNumber)) {
-    // There exists only one other prompt without a number
-    return `${slug}-2`
-  }
-
-  const nextNumber = lastPromptNumber + 1
-
-  return `${lastPromptSplit.slice(0, -1).join('-')}-${nextNumber}`
-}
-
-/**
  * Creates or updates a prompt in the database.
  * @param formData The form data containing the prompt data.
  * @param authToken The authentication token from useAuth()
@@ -142,7 +109,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
   try {
     userId = await validateUserAuth(authToken)
   } catch (error) {
-    return { error: 'Invalid auth token' }
+    return { error: ERROR_MESSAGES.INVALID_AUTH_TOKEN }
   }
 
   // Check if an image needs to be uploaded
@@ -155,11 +122,9 @@ export async function savePrompt(formData: FormData, authToken: string) {
       newImageId = await uploadImage(photoFile, userId)
     } catch (error) {
       console.warn('Error uploading image', error)
-      return { error: 'Error uploading image' }
+      return { error: ERROR_MESSAGES.IMAGE_UPLOAD_ERROR }
     }
   }
-
-  console.log('video url', formData.get('videoUrl'))
 
   const validated = SavePromptSchema.safeParse({
     externalId: formData.get('externalId'),
@@ -173,7 +138,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
 
   if (!validated.success) {
     console.warn('Invalid prompt data recieved.', validated.error)
-    return { error: 'Invalid prompt data.', zodErrors: validated.error }
+    return { error: ERROR_MESSAGES.INVALID_PROMPT_DATA, zodErrors: validated.error }
   }
 
   const promptData = {
@@ -201,13 +166,16 @@ export async function savePrompt(formData: FormData, authToken: string) {
       .maybeSingle()
 
     if (error) {
-      return { error: 'Error updating prompt in our database.' }
+      return { error: ERROR_MESSAGES.DATABASE_ERROR }
     }
 
     return { prompt }
   } else {
     // Generate the slug from the name
-    const slug = await findNextAvailableSlug(validated.data.name)
+    let slug = slugify(validated.data.name, { lower: true })
+
+    // Add a nanoid to the end of the slug to make it unique
+    slug += '-' + nanoid(12)
 
     // Create a new prompt
     const { data: prompt, error } = await supabase
@@ -217,7 +185,8 @@ export async function savePrompt(formData: FormData, authToken: string) {
       .maybeSingle()
 
     if (error || !prompt) {
-      return { error: 'Error creating prompt in our database.' }
+      console.error('Error creating prompt in our database.', error)
+      return { error: ERROR_MESSAGES.DATABASE_ERROR }
     }
 
     return { prompt, new: true }
@@ -233,11 +202,11 @@ export async function fetchPromptText(externalId: string) {
   const { data: prompt, error } = await supabase.from('prompts').select('*').eq('external_id', externalId).maybeSingle()
 
   if (error) {
-    throw new Error('Error fetching prompt from Supabase')
+    return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
   }
 
   if (!prompt) {
-    throw new Error('Prompt not found in Supabase')
+    return { error: 'Prompt not found in database.' }
   }
 
   // Check if the prompt is just regular text
@@ -275,7 +244,7 @@ export async function fetchPrompts(authToken: string) {
   try {
     userId = await validateUserAuth(authToken)
   } catch (error) {
-    return { error: 'Invalid auth token' }
+    return { error: ERROR_MESSAGES.INVALID_AUTH_TOKEN }
   }
 
   const supabase = supabaseAdmin()
@@ -283,7 +252,7 @@ export async function fetchPrompts(authToken: string) {
   const { data: prompts, error } = await supabase.from('prompts').select('*, user_images(file_extension)')
 
   if (error) {
-    return { error: 'Error fetching prompts from Supabase' }
+    return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
   }
 
   return { prompts, userId }
@@ -298,7 +267,7 @@ export async function fetchPrompt(slug: string) {
   const { data: prompt, error } = await supabase.from('prompts').select('*').eq('slug', slug).maybeSingle()
 
   if (error) {
-    return { error: 'Error fetching prompt from Supabase' }
+    return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
   }
 
   return { prompt }
@@ -309,7 +278,7 @@ export async function deletePrompt(externalId: string, authToken: string) {
   try {
     userId = await validateUserAuth(authToken)
   } catch (error) {
-    return { error: 'Invalid auth token' }
+    return { error: ERROR_MESSAGES.INVALID_AUTH_TOKEN }
   }
 
   const supabase = supabaseAdmin()
@@ -317,7 +286,7 @@ export async function deletePrompt(externalId: string, authToken: string) {
   const { error } = await supabase.from('prompts').delete().eq('external_id', externalId).eq('user_id', userId)
 
   if (error) {
-    return { error: 'Error deleting prompt from our database.' }
+    return { error: ERROR_MESSAGES.DATABASE_ERROR }
   }
 }
 
@@ -326,7 +295,7 @@ export async function addPromptToUser(externalId: string, authToken: string) {
   try {
     userId = await validateUserAuth(authToken)
   } catch (error) {
-    return { error: 'Invalid auth token' }
+    return { error: ERROR_MESSAGES.INVALID_AUTH_TOKEN }
   }
 
   // Check if the user already has the prompt
@@ -348,7 +317,7 @@ export async function addPromptToUser(externalId: string, authToken: string) {
 
   if (!prompt) {
     console.error('Prompt not found in Supabase')
-    throw new Error('Prompt not found in Supabase')
+    return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
   }
 
   // Otherwise, add the prompt to the user
@@ -359,7 +328,7 @@ export async function addPromptToUser(externalId: string, authToken: string) {
 
   if (insertError) {
     console.error('Error adding prompt to user', insertError)
-    throw new Error('Error adding prompt to user')
+    return { error: ERROR_MESSAGES.DATABASE_ERROR }
   }
 }
 
@@ -374,8 +343,37 @@ export async function getPromptAppBySlug(slug: string) {
 
   if (error) {
     console.error('Error fetching prompt app from Supabase', error)
-    return { error: 'Error fetching prompt app from Supabase' }
+    return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
   }
 
   return { promptApp }
+}
+
+export async function countPromptView(externalId: string) {
+  const supabase = supabaseAdmin()
+
+  const { data: promptApp, error } = await supabase
+    .from('prompts')
+    .select('id')
+    .eq('external_id', externalId)
+    .maybeSingle()
+
+  if (error) {
+    console.error('countPromptView: Error fetching prompt from Supabase', error)
+    return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
+  }
+
+  if (!promptApp) {
+    console.error('Prompt app not found in Supabase')
+    return { error: ERROR_MESSAGES.PROMPT_NOT_FOUND }
+  }
+
+  const { error: promptUsageError } = await supabase.from('prompt_usages').insert({
+    prompt_id: promptApp.id,
+  })
+
+  if (promptUsageError) {
+    console.error('countPromptView: Error inserting prompt usage', promptUsageError)
+    return { error: ERROR_MESSAGES.DATABASE_ERROR }
+  }
 }

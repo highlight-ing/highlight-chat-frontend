@@ -1,5 +1,5 @@
 import { useStore } from '@/providers/store-provider'
-import { addPromptToUser, fetchPrompts, fetchPromptText } from '@/utils/prompts'
+import { addPromptToUser, countPromptView, fetchPrompts, fetchPromptText } from '@/utils/prompts'
 import useAuth from '@/hooks/useAuth'
 import { Prompt } from '@/types/supabase-helpers'
 import { useShallow } from 'zustand/react/shallow'
@@ -84,12 +84,26 @@ export default (loadPrompts?: boolean) => {
 
     const accessToken = await getAccessToken()
 
+    // Count the prompt view
+    countPromptView(prompt.external_id)
+
     // Fetch the prompt
 
     let text
 
     if (!prompt.is_handlebar_prompt) {
       text = await fetchPromptText(prompt.external_id)
+    }
+
+    if (typeof text === 'object' && 'error' in text) {
+      addToast({
+        title: 'Error fetching prompt',
+        description: text.error,
+        type: 'error',
+        timeout: 15000,
+      })
+
+      return
     }
 
     setPrompt({

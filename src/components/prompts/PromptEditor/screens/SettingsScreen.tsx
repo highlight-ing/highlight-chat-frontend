@@ -17,6 +17,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { videoUrlSchema } from '@/lib/zod'
 import variables from '@/variables.module.scss'
+import { useStore } from '@/providers/store-provider'
 
 function AppIcon() {
   return (
@@ -130,10 +131,9 @@ function ShareLinkButton() {
   )
 }
 
-function DeletePromptButton({ onDelete }: { onDelete?: () => void }) {
-  const { removePrompt } = usePromptsStore()
+function DeletePromptButton() {
   const { promptEditorData } = usePromptEditorStore()
-  const { getAccessToken } = useAuth()
+  const openModal = useStore((state) => state.openModal)
 
   const isNewPrompt = !promptEditorData.externalId
 
@@ -142,16 +142,14 @@ function DeletePromptButton({ onDelete }: { onDelete?: () => void }) {
       return
     }
 
-    const authToken = await getAccessToken()
-    const res = await deletePrompt(promptEditorData.externalId, authToken)
+    openModal('confirm-delete-prompt', {
+      externalId: promptEditorData.externalId,
+      name: promptEditorData.name,
+    })
+  }
 
-    if (res && res.error) {
-      console.error('Error while calling deletePrompt', res.error)
-      return
-    }
-
-    removePrompt(promptEditorData.externalId)
-    onDelete?.()
+  if (!promptEditorData.externalId) {
+    return <></>
   }
 
   return (
@@ -212,10 +210,6 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
     return () => subscription.unsubscribe()
   }, [watch])
 
-  function onDelete() {
-    onClose?.()
-  }
-
   return (
     <div className="flex max-h-full min-h-0 flex-col items-center">
       <div className={`${styles.settingsPage} `}>
@@ -255,7 +249,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
             onToggle={(visibility) => setPromptEditorData({ visibility })}
           />
           <ShareLinkButton />
-          <DeletePromptButton onDelete={onDelete} />
+          <DeletePromptButton />
         </div>
       </div>
     </div>
