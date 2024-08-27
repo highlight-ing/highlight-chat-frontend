@@ -44,12 +44,7 @@ const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
         <InputHeading />
         {isVisible && <Input isActiveChat={false} />}
       </div>
-      <div className={styles.callouts}>
-        <Prompts openModal={openModal} />
-      </div>
-      <div className={styles.callouts}>
-        <TPrompts openModal={openModal} />
-      </div>
+      <Prompts openModal={openModal} />
     </div>
   )
 }
@@ -84,7 +79,7 @@ function InputHeading() {
 }
 
 const Prompts = ({ openModal }: { openModal: (modal: string, context?: Record<string, any>) => void }) => {
-  const { isLoadingPrompts, myPrompts, selectPrompt } = usePromptApps()
+  const { isLoadingPrompts, myPrompts, communityPrompts, selectPrompt } = usePromptApps()
 
   if (isLoadingPrompts) {
     return (
@@ -94,24 +89,16 @@ const Prompts = ({ openModal }: { openModal: (modal: string, context?: Record<st
     )
   }
 
-  return <PersonalPrompts prompts={myPrompts} openModal={openModal} selectPrompt={selectPrompt} />
-}
-
-// Trending Prompts
-// TODO(umut): Change this confusing ahh name
-const TPrompts = ({ openModal }: { openModal: (modal: string, context?: Record<string, any>) => void }) => {
-  const { isLoadingPrompts, communityPrompts, selectPrompt } = usePromptApps()
-
-  // Revert this to isLoadingPrompts
-  if (!isLoadingPrompts) {
-    return (
-      <div className={`${styles.prompts} ${mainStyles.loadingGradient} w-full`}>
-        <div className={'h-20 w-full p-16'} />
+  return (
+    <>
+      <div className={styles.callouts}>
+        <PersonalPrompts prompts={myPrompts} openModal={openModal} selectPrompt={selectPrompt} />
       </div>
-    )
-  }
-
-  return <TrendingPrompts prompts={communityPrompts} openModal={openModal} selectPrompt={selectPrompt} />
+      <div className={styles.callouts}>
+        <TrendingPrompts prompts={communityPrompts} openModal={openModal} selectPrompt={selectPrompt} />
+      </div>
+    </>
+  )
 }
 
 const oldPrompts = () => {
