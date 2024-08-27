@@ -36,7 +36,7 @@ export default function GetHighlightCTA() {
 
   const handleDownload = (macType?: 'intel' | 'silicon') => {
     if (platform === 'mobile') {
-      window.location.href = 'https://highlight.ing/'
+      window.open('https://highlight.ing/', '_blank')
       return
     }
 
@@ -47,7 +47,7 @@ export default function GetHighlightCTA() {
       downloadUrl = buildDownloadURL('windows')
     }
 
-    window.location.href = downloadUrl
+    window.open(downloadUrl, '_blank')
   }
 
   const renderButton = () => {
@@ -59,9 +59,20 @@ export default function GetHighlightCTA() {
               Get Highlight
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => handleDownload('intel')}>Download for Intel Mac</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleDownload('silicon')}>Download for Silicon Mac</DropdownMenuItem>
+          <DropdownMenuContent className="border border-light-10 bg-background-secondary">
+            <DropdownMenuItem
+              onClick={() => handleDownload('intel')}
+              className="px-4 py-2 transition-colors duration-150 ease-in-out hover:bg-light-10"
+            >
+              Download for Intel Mac
+            </DropdownMenuItem>
+            <div className="mx-2 my-1 border-t border-light-10"></div>
+            <DropdownMenuItem
+              onClick={() => handleDownload('silicon')}
+              className="px-4 py-2 transition-colors duration-150 ease-in-out hover:bg-light-10"
+            >
+              Download for Silicon Mac
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )
