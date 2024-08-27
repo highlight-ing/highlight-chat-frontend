@@ -68,7 +68,7 @@ export default function GetHighlightCTA() {
   }
 
   return (
-    <div className="fixed bottom-4 left-1/2 w-full max-w-[712px] -translate-x-1/2 transform px-4">
+    <div className="fixed bottom-4 left-1/2 -mr-[3px] w-full max-w-[712px] -translate-x-1/2 transform px-4">
       <div className="flex items-center justify-between rounded-[20px] border border-light-10 bg-background-secondary p-3">
         <div className="flex-shrink-0">
           <HighlightIcon size={24} color="white" />
