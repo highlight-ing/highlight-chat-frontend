@@ -116,3 +116,38 @@ export interface Toast {
   timeout?: number
   type?: 'default' | 'success' | 'error'
 }
+
+export interface SharedMessage {
+  role: 'user' | 'assistant'
+  content: string
+  ocr_text?: string
+  clipboard_text?: string
+  image_url?: string
+  audio?: string
+  text_file?: string
+  windows?: any[]
+  window_context?: any
+  created_at: string
+}
+
+export interface SharedChat {
+  id: string
+  title: string
+  created_at: string
+  app_id?: string
+  user_id?: string
+  messages: Message[]
+}
+
+export type AssistantMessageButtonType = 'Copy' | 'Share' | 'Save' | 'SendFeedback'
+
+export type AssistantMessageButtonStatus = 'idle' | 'success'
+
+export type AssistantMessageButtonConfig = {
+  type: AssistantMessageButtonType
+  onClick: () => void
+  status: AssistantMessageButtonStatus
+}
+
+export type PlatformType = 'windows' | 'mac' | 'mobile' | 'unsupported' | 'unknown'
+export type DownloadPlatformType = 'windows' | 'mac-intel' | 'mac-silicon' | 'unsupported'

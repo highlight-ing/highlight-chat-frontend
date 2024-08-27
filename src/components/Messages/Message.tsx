@@ -40,7 +40,7 @@ interface MessageProps {
 }
 
 /**
- * LLMs spit out formulas with delimiters that katex doesn't recognize.
+ * LLMs spit out formulas with delimiters that LaTeX doesn't recognize.
  * In this case, we try to replace it with `$$` delimiters.
  *
  * Thanks to @prashantbhudwal on GitHub:

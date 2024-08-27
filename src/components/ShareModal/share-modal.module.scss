@@ -1,0 +1,129 @@
+@import '@/variables.module';
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 49;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+
+    &.visible {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+  
+  .shareModalContainer {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 8px;
+    z-index: 50;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+  
+    &.visible {
+      opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+}
+
+.shareModal {
+  width: 400px;
+  background-color: $chat-share-modal-background;
+  border: 1px solid $light-5;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.header {
+  padding: 16px 16px 0 16px;
+  text-align: left;
+}
+
+.content {
+  padding: 16px;
+}
+
+.previewBox {
+    background-color: $dark-20;
+    border-radius: 8px;
+    padding: 12px;
+  
+    > div.separator {
+      height: 1px;
+      background-color: $light-5;
+      margin: 12px -12px;
+      width: calc(100% + 24px);
+    }
+  
+    > div:last-child {
+      display: flex;
+      align-items: center;
+  
+    > svg {
+      flex-shrink: 0;
+    }
+  
+    > div {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+  }
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 16px 16px 16px;
+}
+
+.disableButton, .copyButton {
+  width: 100%;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.disableButton {
+  background-color: $light-5;
+  color: $light-80;
+
+  &:hover {
+    background-color: $light-10;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.copyButton {
+  background-color: $primary-100;
+  color: $dark-100;
+
+  &:hover {
+    background-color: $primary-80;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
