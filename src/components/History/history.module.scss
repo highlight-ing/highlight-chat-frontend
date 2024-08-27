@@ -31,12 +31,16 @@
   height: $topbar-height;
   display: flex;
   align-items: center;
-  line-height: 1;
   padding: 6px;
   border-bottom: 1px solid $dark-40;
-  font-size: 15px;
   gap: 8px;
   color: $light-60;
+
+  .headerButton {
+    line-height: normal;
+    font-size: 14px;
+    font-weight: 500;
+  }
 }
 
 .chats {
@@ -58,7 +62,7 @@
   justify-content: space-between;
   font-size: 13px;
   color: $light-20;
-  font-weight: 450;
+  font-weight: 500;
   padding: 8px 8px 2px;
 
   &:hover, &.selecting {
@@ -122,8 +126,8 @@ $selector-size: 17px;
   display: block;
   padding: 8px;
   border-radius: 8px;
-  font-size: 14px;
-  font-weight: normal;
+  font-size: 13.5px;
+  font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
