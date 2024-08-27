@@ -36,6 +36,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
     setOpenConversations,
     removeOpenConversation,
     clearConversationMessages,
+    history,
   } = useStore(
     useShallow((state) => ({
       startNewConversation: state.startNewConversation,
@@ -45,16 +46,18 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
       promptUserId: state.promptUserId,
       clearPrompt: state.clearPrompt,
       conversationId: state.conversationId,
-      setConversationId: state.setConversationId,
       openConversations: state.openConversations,
+      setConversationId: state.setConversationId,
       setOpenConversations: state.setOpenConversations,
       removeOpenConversation: state.removeOpenConversation,
       clearConversationMessages: state.clearConversationMessages,
+      history: state.history,
     })),
   )
 
   const [selectedConversation, setSelectedConversation] = useState<ChatHistoryItem | null>(null)
   const promptAppName = useStore((state) => state.promptAppName)
+  const [isShareModalVisible, setIsShareModalVisible] = useState(false)
 
   const onNewChatClick = () => {
     startNewConversation()
@@ -73,7 +76,6 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
 
   const onSelectChat = async (chat: ChatHistoryItem) => {
     setConversationId(chat.id)
-    setSelectedConversation(chat)
   }
 
   const onDragTabEnd = (result: any) => {
@@ -90,22 +92,21 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
     removeOpenConversation(conversation.id)
     startNewConversation()
     clearPrompt()
-    setSelectedConversation(null)
   }
 
   const onToggleShareModal = () => {
     setIsShareModalVisible(!isShareModalVisible)
   }
-  useOpenConverationsPersistence()
-  useTabHotkeys()
 
   const onCloseShareModal = () => {
     setIsShareModalVisible(false)
   }
 
-  const [isShareModalVisible, setIsShareModalVisible] = useState(false)
-
   useOpenConverationsPersistence()
+  useTabHotkeys()
+
+  // Find the current conversation in history
+  const currentConversation = history.find((chat) => chat.id === conversationId)
 
   return (
     <div className={styles.topBar}>
@@ -177,7 +178,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
         </div>
 
         <div className="flex items-center gap-1">
-          {selectedConversation && (
+          {conversationId && (
             <div className={styles.tabContainer}>
               <div className={`${styles.tab} cursor-pointer`} onClick={onToggleShareModal}>
                 <span className="flex max-w-full items-center gap-2 overflow-hidden overflow-ellipsis whitespace-nowrap">
@@ -190,7 +191,11 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
         </div>
       </div>
 
-      <ShareModal isVisible={isShareModalVisible} conversation={selectedConversation} onClose={onCloseShareModal} />
+      <ShareModal
+        isVisible={isShareModalVisible}
+        conversation={currentConversation || null}
+        onClose={onCloseShareModal}
+      />
     </div>
   )
 }
