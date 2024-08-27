@@ -78,13 +78,14 @@ export default function GetHighlightCTA() {
   }
 
   return (
-    <div className="fixed bottom-4 w-full max-w-[712px]">
+    <div className="fixed bottom-4 w-full max-w-[712px] px-8 sm:px-4">
       <div className="flex items-center justify-between rounded-[20px] border border-light-10 bg-background-secondary p-3">
         <div className="flex-shrink-0">
           <HighlightIcon size={24} color="white" />
         </div>
-        <p className="font-base mx-3 flex-grow truncate text-center text-[16px] text-text-tertiary">
-          Highlight is your personal AI for getting answers and doing work
+        <p className="font-base mx-3 flex-grow truncate text-center text-[14px] text-text-tertiary sm:text-[16px]">
+          <span className="sm:hidden">Highlight is your personal AI</span>
+          <span className="hidden sm:inline">Highlight is your personal AI for getting answers and doing work</span>
         </p>
         {renderButton()}
       </div>

@@ -25,7 +25,7 @@ export const ShareAssistantMessage: React.FC<ShareAssistantMessageProps> = ({ me
   const buttons = useAssistantMessageButtons({ message: message.content, buttonTypes })
 
   return (
-    <div className="mx-auto my-4 w-full max-w-[712px]">
+    <div className="mx-auto my-4 w-full max-w-[712px] px-6 sm:px-4">
       <div className="rounded-[24px] border border-border-tertiary bg-background-secondary p-4">
         <div className="mb-4 flex items-center">
           <HighlightIcon size={16} color="gray" />
