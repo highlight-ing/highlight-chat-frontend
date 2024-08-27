@@ -40,11 +40,15 @@ export const ShareAssistantMessage: React.FC<ShareAssistantMessageProps> = ({ me
               //@ts-ignore
               code({ node, inline, className, children, ...props }) {
                 const match = /language-(\w+)/.exec(className || '')
-                return !inline && match ? (
-                  <div className="my-4">
-                    <CodeBlock language={match[1]}>{children}</CodeBlock>
-                  </div>
-                ) : (
+                const isStringWithNewlines = typeof children === 'string' && children.includes('\n')
+                if ((!inline && match) || isStringWithNewlines) {
+                  return (
+                    <div className="my-4">
+                      <CodeBlock language={match?.[1] ?? 'plaintext'}>{children}</CodeBlock>
+                    </div>
+                  )
+                }
+                return (
                   <code className={className} {...props}>
                     {children}
                   </code>
