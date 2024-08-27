@@ -90,6 +90,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
     removeOpenConversation(conversation.id)
     startNewConversation()
     clearPrompt()
+    setSelectedConversation(null)
   }
 
   const onToggleShareModal = () => {

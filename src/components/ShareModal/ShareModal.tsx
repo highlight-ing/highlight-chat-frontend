@@ -84,6 +84,8 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
     }
   }
 
+  const processedTitle = conversation?.title.replace(/^["']|["']$/g, '')
+
   return (
     <>
       <div className={`${styles.modalOverlay} ${isVisible ? styles.visible : ''}`} />
@@ -101,7 +103,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
                 <div className="flex items-center gap-3">
                   <MessageText size={20} color={variables.light60} />
                   <div className="flex flex-col pb-2 pt-2">
-                    <p className="text-base text-white">{`${conversation.title}`}</p>
+                    <p className="text-base text-white">{processedTitle}</p>
                   </div>
                 </div>
               </div>
