@@ -94,8 +94,9 @@ async function handleWindowContext(
   addAttachment: (attachment: FileAttachment) => void,
   handleSubmit: (input: string) => Promise<void>,
 ) {
-  const granted = await Highlight.permissions.requestWindowContextPermission()
-  if (granted) {
+  const contextGranted = await Highlight.permissions.requestWindowContextPermission()
+  const screenshotGranted = await Highlight.permissions.requestScreenshotPermission()
+  if (contextGranted && screenshotGranted) {
     const screenshot = await Highlight.user.getWindowScreenshot(window)
     addAttachment({
       type: 'image',
