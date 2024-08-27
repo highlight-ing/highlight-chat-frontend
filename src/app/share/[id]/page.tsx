@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: SharePageProps): Promise<Meta
   }
 
   return {
-    title: `${sharedData.title} | Shared Hilight Conversation`,
+    title: `${sharedData.title} | Shared Highlight Conversation`,
     description: 'View a shared conversation',
   }
 }
