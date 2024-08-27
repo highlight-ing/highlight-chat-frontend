@@ -1,0 +1,61 @@
+@import '@/variables.module';
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  transition: background-color 0.2s, color 0.2s;
+  outline: none;
+
+  &.hidden {
+    display: none;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba($primary-100, 0.5);
+  }
+
+  &.default {
+    border: 1px solid transparent;
+    background-color: $primary-100;
+    color: $light-100;
+
+    &:hover {
+      background-color: $primary-80;
+    }
+  }
+
+  &.secondary {
+    border: 1px solid transparent;
+    background-color: $tertiary-50;
+    color: $light-100;
+
+    &:hover {
+      background-color: $tertiary-70;
+    }
+  }
+
+  &.destructive {
+    border: 1px solid transparent;
+    background-color: $red-100;
+    color: $light-100;
+
+    &:hover {
+      background-color: $red-80;
+    }
+  }
+
+  &.outline {
+    border: 1px solid $light-20;
+    background-color: transparent;
+    color: $light-80;
+
+    &:hover {
+      background-color: $light-5;
+    }
+  }
+}

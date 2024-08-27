@@ -1,6 +1,8 @@
 import styles from './personal-prompts.module.scss'
 import variables from '@/variables.module.scss'
-
+import { useState } from 'react'
+// Components
+import { Badge } from '@/components/Badge/Badge'
 import Button from '@/components/Button/Button'
 import { Setting, Trash, Lock, Edit2 } from 'iconsax-react'
 import { Prompt } from '@/types/supabase-helpers'
@@ -61,8 +63,14 @@ const PersonalPromptsItem = ({
   selectPrompt: (prompt: Prompt) => void
   prompt: Prompt
 }) => {
+  const [isCopied, setIsCopied] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
   return (
-    <div className={styles.personalPromptsItem}>
+    <div
+      className={styles.personalPromptsItem}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div className={styles.personalPromptsItemHeader}>
         <Setting color={color} variant={'Bulk'} />
         <h3>{name}</h3>
@@ -78,18 +86,20 @@ const PersonalPromptsItem = ({
         <div className={styles.personalPromptsItemFooterLeftButtons}>
           <Button
             size="xsmall"
-            variant="tertiary"
+            variant="primary"
             onClick={() => {
               const url = `https://chat.highlight.ing/prompts/${slug}`
               navigator.clipboard.writeText(url)
+              setIsCopied(true)
+              setTimeout(() => setIsCopied(false), 2000)
             }}
           >
-            Share
+            {isCopied ? 'Copied' : 'Share'}
           </Button>
-          <Button size="xsmall" variant="ghost-neutral" disabled>
+          <Badge variant="outline" hidden={isHovered}>
             40,284 Uses
-          </Button>
-          <Button size="xsmall" variant="ghost-neutral" onClick={() => selectPrompt(prompt)}>
+          </Badge>
+          <Button size="xsmall" variant="ghost-neutral" onClick={() => selectPrompt(prompt)} hidden={!isHovered}>
             Use
           </Button>
         </div>

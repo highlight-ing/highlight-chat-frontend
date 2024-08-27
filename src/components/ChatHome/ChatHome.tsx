@@ -15,6 +15,7 @@ import { useShallow } from 'zustand/react/shallow'
 import { Prompt } from '@/types/supabase-helpers'
 import { trackEvent } from '@/utils/amplitude'
 import PersonalPrompts from '@/components/PersonalPrompts/PersonalPrompts'
+import TrendingPrompts from '@/components/TrendingPrompts/TrendingPrompts'
 
 const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
   const openModal = useStore((state) => state.openModal)
@@ -40,6 +41,9 @@ const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
       </div>
       <div className={styles.callouts}>
         <Prompts />
+      </div>
+      <div className={styles.callouts}>
+        <TPrompts />
       </div>
     </div>
   )
@@ -90,13 +94,33 @@ const Prompts = () => {
 
   if (isLoadingPrompts) {
     return (
-      <div className={`${mainStyles.loadingGradient}`}>
+      <div className={`${styles.prompts} ${mainStyles.loadingGradient} w-full`}>
         <div className={'h-20 w-full p-16'} />
       </div>
     )
   }
 
   return <PersonalPrompts prompts={myPrompts} openModal={openModal} selectPrompt={selectPrompt} />
+}
+
+// Trending Prompts
+// TODO(umut): Change this confusing ahh name
+const TPrompts = () => {
+  const openModal = useStore((state) => state.openModal)
+  const { isLoadingPrompts, communityPrompts, selectPrompt } = usePromptApps()
+  console.log('isLoadingPrompts', isLoadingPrompts)
+  console.log('communityPrompts', communityPrompts)
+
+  // Revert this to isLoadingPrompts
+  if (!isLoadingPrompts) {
+    return (
+      <div className={`${styles.prompts} ${mainStyles.loadingGradient} w-full`}>
+        <div className={'h-20 w-full p-16'} />
+      </div>
+    )
+  }
+
+  return <TrendingPrompts prompts={communityPrompts} openModal={openModal} selectPrompt={selectPrompt} />
 }
 
 const oldPrompts = () => {

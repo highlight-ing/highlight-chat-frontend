@@ -7,11 +7,12 @@ export type ButtonVariantType = 'primary' | 'secondary' | 'tertiary' | 'ghost' |
 type ButtonProps = React.ComponentPropsWithoutRef<'button'> & {
   size: SizeType
   variant: ButtonVariantType
+  hidden?: boolean
 }
 
 const Button = forwardRef(
   (
-    { disabled, size, variant, children, className, ...rest }: PropsWithChildren<ButtonProps>,
+    { disabled, size, variant, children, className, hidden, ...rest }: PropsWithChildren<ButtonProps>,
     ref: React.Ref<HTMLButtonElement>,
   ) => {
     return (
@@ -19,7 +20,7 @@ const Button = forwardRef(
         ref={ref}
         className={`${styles.button} ${styles[size]} ${styles[variant]} ${
           disabled ? styles.disabled : ''
-        } ${className}`}
+        } ${className} ${hidden ? styles.hidden : ''}`}
         {...rest}
       >
         {children}

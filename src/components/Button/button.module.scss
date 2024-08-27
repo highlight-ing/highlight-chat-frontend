@@ -16,6 +16,10 @@
   border-radius: 10px;
   user-select: none;
 
+  &.hidden {
+    display: none;
+  }
+
   &.disabled {
     opacity: 0.35;
     pointer-events: none;
