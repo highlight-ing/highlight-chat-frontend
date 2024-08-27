@@ -85,16 +85,6 @@ function InputHeading() {
 
 const Prompts = ({ openModal }: { openModal: (modal: string, context?: Record<string, any>) => void }) => {
   const { isLoadingPrompts, myPrompts, selectPrompt } = usePromptApps()
-  const [hotkey, setHotkey] = useState<string>('alt + .')
-
-  useEffect(() => {
-    const fetchHotkey = async () => {
-      const hotkey = await Highlight.app.getHotkey()
-      setHotkey(hotkey)
-      trackEvent('HL Chat Hotkey Fetched', { hotkey })
-    }
-    fetchHotkey()
-  }, [])
 
   if (isLoadingPrompts) {
     return (
@@ -111,8 +101,6 @@ const Prompts = ({ openModal }: { openModal: (modal: string, context?: Record<st
 // TODO(umut): Change this confusing ahh name
 const TPrompts = ({ openModal }: { openModal: (modal: string, context?: Record<string, any>) => void }) => {
   const { isLoadingPrompts, communityPrompts, selectPrompt } = usePromptApps()
-  console.log('isLoadingPrompts', isLoadingPrompts)
-  console.log('communityPrompts', communityPrompts)
 
   // Revert this to isLoadingPrompts
   if (!isLoadingPrompts) {
