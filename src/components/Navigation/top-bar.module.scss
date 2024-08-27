@@ -120,8 +120,9 @@
   padding: 0 10px 0 8px;
   height: 24px;
   gap: 8px;
-  font-weight: 500;
-  font-size: 13px;
+  font-weight: normal;
+  font-size: 13.5px;
+  line-height: normal;
   color: $light-20;
   cursor: pointer;
   user-select: none;
@@ -130,7 +131,6 @@
   flex-shrink: 1;
   min-width: 0;
   max-width: max(50px, 20vw);
-  line-height: 1;
   position: relative;
   mask-image: linear-gradient(to right, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 90%);
   mask-size: 125% 100%;
