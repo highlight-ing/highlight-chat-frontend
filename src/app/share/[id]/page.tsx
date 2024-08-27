@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation'
 import SharePageComponent from '@/components/Share/SharePageComponent'
 import Header from '@/components/Share/Header/ShareHeader'
-import { getSharedConversation } from '@/services/shareLink'
 import { Metadata } from 'next'
 import ClientWrapper from '@/app/share/ClientWrapper'
+import { getSharedConversation } from '@/lib/api'
 
 interface SharePageProps {
   params: {
