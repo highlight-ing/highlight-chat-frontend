@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { AssistantMessageButtonType, AssistantMessageButtonConfig, AssistantMessageButtonStatus } from '@/types'
+import { trackEvent } from '@/utils/amplitude'
 
 type UseAssistantMessageButtonsOptions = {
   message: string
@@ -34,8 +35,14 @@ export const useAssistantMessageButtons = ({
   const handleCopy = () => {
     navigator.clipboard
       .writeText(shareMessage)
-      .then(() => updateButtonStatus('Copy', 'success'))
-      .catch((err) => console.error('Failed to copy: ', err))
+      .then(() => {
+        updateButtonStatus('Copy', 'success')
+        trackEvent('Share Assistant Message Copied', { status: 'success' })
+      })
+      .catch((err) => {
+        console.error('Failed to copy: ', err)
+        trackEvent('Share Assistant Message Copy Error', { error: err.message })
+      })
   }
 
   const handleShare = () => {
@@ -46,10 +53,17 @@ export const useAssistantMessageButtons = ({
           text: shareMessage,
           url: window.location.href,
         })
-        .then(() => updateButtonStatus('Share', 'success'))
-        .catch((error) => console.error('Error sharing:', error))
+        .then(() => {
+          updateButtonStatus('Share', 'success')
+          trackEvent('Share Assistant Message Shared', { status: 'success' })
+        })
+        .catch((error) => {
+          console.error('Error sharing:', error)
+          trackEvent('Share Assistant Message Share Error', { error: error.message })
+        })
     } else {
       console.log('Share functionality not available')
+      trackEvent('Share Assistant Message Share Unavailable', {})
     }
   }
 
@@ -65,13 +79,18 @@ export const useAssistantMessageButtons = ({
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
       updateButtonStatus('Save', 'success')
+      trackEvent('Share Assistant Message Saved', { status: 'success' })
     } catch (error) {
       console.error('Error saving:', error)
+      trackEvent('Share Assistant Message Save Error', { error: error })
     }
   }
 
   const handleSendFeedback = () => {
-    setTimeout(() => updateButtonStatus('SendFeedback', 'success'), 500)
+    setTimeout(() => {
+      updateButtonStatus('SendFeedback', 'success')
+      trackEvent('Share Assistant Message Feedback Sent', { status: 'success' })
+    }, 500)
   }
 
   // Define button actions for each button type

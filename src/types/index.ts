@@ -148,3 +148,6 @@ export type AssistantMessageButtonConfig = {
   onClick: () => void
   status: AssistantMessageButtonStatus
 }
+
+export type PlatformType = 'windows' | 'mac' | 'mobile' | 'unsupported' | 'unknown'
+export type DownloadPlatformType = 'windows' | 'mac-intel' | 'mac-silicon' | 'unsupported'

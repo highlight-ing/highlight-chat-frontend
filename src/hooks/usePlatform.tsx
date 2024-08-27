@@ -1,26 +1,8 @@
-// import { isDesktop, isMacOs, isWindows } from 'react-device-detect'
-// import { useMemo } from 'react'
-
-// export function usePlatform() {
-//   const platform = useMemo(() => {
-//     if (isDesktop) return 'desktop'
-//     if (isWindows) return 'windows'
-//     if (isMacOs) return 'mac'
-//     return 'other'
-//   }, [])
-
-//   return {
-//     platform,
-//     desktop: isDesktop,
-//     windows: isWindows,
-//     macOs: isMacOs,
-//   }
-// }
-
 import { useState, useEffect } from 'react'
+import { PlatformType } from '@/types'
 
 export function usePlatform() {
-  const [platform, setPlatform] = useState<'windows' | 'mac' | 'mobile' | 'unknown'>('unknown')
+  const [platform, setPlatform] = useState<PlatformType>('unknown')
 
   useEffect(() => {
     const userAgent = window.navigator.userAgent.toLowerCase()
@@ -28,8 +10,12 @@ export function usePlatform() {
       setPlatform('windows')
     } else if (/macintosh|mac os x/.test(userAgent)) {
       setPlatform('mac')
+    } else if (/linux/.test(userAgent)) {
+      setPlatform('unsupported')
     } else if (/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/.test(userAgent)) {
       setPlatform('mobile')
+    } else {
+      setPlatform('unknown')
     }
   }, [])
 

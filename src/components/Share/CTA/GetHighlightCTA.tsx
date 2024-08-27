@@ -8,23 +8,33 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from '@/components/DropdownMenu/dropdown-menu'
+import { trackEvent } from '@/utils/amplitude'
+import { PlatformType, DownloadPlatformType } from '@/types'
 
 export default function GetHighlightCTA() {
   const platform = usePlatform()
   const [showMacOptions, setShowMacOptions] = useState(false)
 
   const handleDownload = (macType?: 'intel' | 'silicon') => {
-    if (platform === 'mobile') {
-      window.open('https://highlight.ing/', '_blank')
-      return
+    let downloadType: DownloadPlatformType
+    let downloadUrl: string
+
+    if (platform === 'mobile' || platform === 'unsupported' || platform === 'unknown') {
+      downloadType = 'unsupported'
+      downloadUrl = 'https://highlight.ing/'
+    } else if (platform === 'mac') {
+      downloadType = macType === 'silicon' ? 'mac-silicon' : 'mac-intel'
+      downloadUrl = buildDownloadURL(downloadType)
+    } else {
+      downloadType = 'windows'
+      downloadUrl = buildDownloadURL(downloadType)
     }
 
-    let downloadUrl: string
-    if (platform === 'mac') {
-      downloadUrl = buildDownloadURL(macType === 'silicon' ? 'mac-silicon' : 'mac-intel')
-    } else {
-      downloadUrl = buildDownloadURL('windows')
-    }
+    // Track the download event
+    trackEvent('Highlight Download Clicked', {
+      platform: platform,
+      downloadType: downloadType,
+    })
 
     window.open(downloadUrl, '_blank')
   }

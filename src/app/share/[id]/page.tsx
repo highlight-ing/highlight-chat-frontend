@@ -40,7 +40,6 @@ export default async function SharePage({ params }: SharePageProps) {
         <main className="custom-scrollbar flex-1 overflow-y-auto">
           <SharePageComponent messages={sharedData.messages} />
         </main>
-        {/* <Footer /> */}
       </div>
     </ClientWrapper>
   )

@@ -5,6 +5,7 @@ import { ShareUserMessage } from '@/components/Share/Messages/User/ShareUserMess
 import { ShareAssistantMessage } from '@/components/Share/Messages/Assistant/ShareAssistantMessage'
 import GetHighlightCTA from '@/components/Share/CTA/GetHighlightCTA'
 import { useApi } from '@/hooks/useApi'
+import { initAmplitudeAnonymous, trackEvent } from '@/utils/amplitude'
 
 interface SharePageComponentProps {
   messages: Message[]
@@ -19,6 +20,14 @@ const SharePageComponent: React.FC<SharePageComponentProps> = ({ messages }) => 
   const memoizedGetSharedImage = useCallback(getSharedImage, [])
 
   const memoizedMessages = useMemo(() => messages, [messages])
+
+  useEffect(() => {
+    // Initialize Amplitude
+    initAmplitudeAnonymous()
+
+    // Track page view
+    trackEvent('HL Chat Share Page Viewed', {})
+  }, [])
 
   useEffect(() => {
     console.log('SharePageComponent: Processing messages')
@@ -42,6 +51,10 @@ const SharePageComponent: React.FC<SharePageComponentProps> = ({ messages }) => 
 
     processMessages()
   }, [memoizedMessages, memoizedGetSharedImage])
+
+  useEffect(() => {
+    trackEvent('Share Page Component Loaded', {})
+  }, [])
 
   console.log('SharePageComponent: Rendering')
 
