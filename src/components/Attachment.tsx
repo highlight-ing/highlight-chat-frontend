@@ -11,6 +11,8 @@ import { useShallow } from 'zustand/react/shallow'
 interface BaseAttachmentProps {
   removeEnabled?: boolean
   value: string
+  isSharedImage?: boolean
+  sharedImageUrl?: string // Add this line
 }
 
 interface WindowAttachmentProps extends BaseAttachmentProps {
@@ -25,7 +27,14 @@ interface OtherAttachmentProps extends BaseAttachmentProps {
 
 type AttachmentProps = WindowAttachmentProps | OtherAttachmentProps
 
-export const Attachment = ({ type, value, removeEnabled = false, ...props }: AttachmentProps) => {
+export const Attachment = ({
+  type,
+  value,
+  removeEnabled = false,
+  isSharedImage = false,
+  sharedImageUrl,
+  ...props
+}: AttachmentProps) => {
   const appIcon = (props as WindowAttachmentProps).appIcon
   const isFile = (props as OtherAttachmentProps).isFile
   const [isImageLoaded, setIsImageLoaded] = useState(false)
@@ -51,6 +60,15 @@ export const Attachment = ({ type, value, removeEnabled = false, ...props }: Att
   const renderAttachmentContent = () => {
     switch (type) {
       case 'image':
+        if (isSharedImage && sharedImageUrl) {
+          return (
+            <img
+              className="transition-padding pointer-events-none flex h-12 w-auto max-w-20 items-center overflow-hidden rounded-sm object-cover transition-opacity duration-150 ease-in-out"
+              src={sharedImageUrl}
+              alt="Shared Attachment"
+            />
+          )
+        }
         const isBase64 = value.startsWith('data:image')
         const isBlob = value.startsWith('blob:')
         if (isBase64 || isBlob) {

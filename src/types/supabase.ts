@@ -142,6 +142,32 @@ export type Database = {
           },
         ]
       }
+      prompt_usages: {
+        Row: {
+          created_at: string
+          id: number
+          prompt_id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          prompt_id: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          prompt_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'prompt_usages_prompt_id_fkey'
+            columns: ['prompt_id']
+            isOneToOne: false
+            referencedRelation: 'prompts'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       prompts: {
         Row: {
           created_at: string

@@ -155,7 +155,7 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
         <Tooltip tooltip="Hide chat history" position="bottom">
           <CircleButton fitContents={true} onClick={toggleHistory}>
             <Clock size={20} variant={'Bold'} />
-            <span className={'text-sm'}>Chat History</span>
+            <span className={styles.headerButton}>Chat History</span>
           </CircleButton>
         </Tooltip>
       </div>

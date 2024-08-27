@@ -77,7 +77,7 @@ function InputHeading() {
 
   return (
     <div className="flex flex-col gap-1 text-center">
-      <h3 className="text-light-40 text-xl">{promptName}</h3>
+      <h3 className="text-xl text-light-40">{promptName}</h3>
       <p className="text-light-60">{promptDescription}</p>
     </div>
   )

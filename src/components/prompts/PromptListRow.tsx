@@ -20,13 +20,6 @@ const PromptListRow = ({ prompt, icon, type, isCta, onClick, onClickEdit }: Prom
     onClick(e)
   }
 
-  const handleEditClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (onClickEdit) {
-      onClickEdit(e)
-    }
-  }
-
   return (
     <div key={prompt.slug} className={`${styles.promptOption} ${styles[type]}`} onClick={handleClick}>
       <div>

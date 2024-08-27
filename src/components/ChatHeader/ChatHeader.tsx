@@ -1,12 +1,16 @@
 import { useStore } from '@/providers/store-provider'
 
 import styles from './chatheader.module.scss'
-import { MessageText } from 'iconsax-react'
+import { Link, MessageText } from 'iconsax-react'
 import { getPromptAppType } from '@/lib/promptapps'
 import { useShallow } from 'zustand/react/shallow'
 import PromptAppIcon from '../PromptAppIcon/PromptAppIcon'
+import Button from '../Button/Button'
+import { useState } from 'react'
 
 const ChatHeader = ({ isShowing }: { isShowing: boolean }) => {
+  // const { myPrompts } = usePromptApps()
+
   const { promptApp, promptName, promptDescription, promptUserId } = useStore(
     useShallow((state) => ({
       promptApp: state.promptApp,
@@ -15,6 +19,27 @@ const ChatHeader = ({ isShowing }: { isShowing: boolean }) => {
       promptUserId: state.promptUserId,
     })),
   )
+
+  const isMyPrompt = false
+
+  const [isCopied, setIsCopied] = useState(false)
+
+  const slug = promptApp?.slug ?? ''
+  const openModal = useStore((state) => state.openModal)
+
+  function onCopyClick() {
+    navigator.clipboard.writeText(`https://chat.highlight.ing/prompts/${slug}`)
+
+    setIsCopied(true)
+
+    setTimeout(() => {
+      setIsCopied(false)
+    }, 1000)
+  }
+
+  function onEditClick() {
+    openModal('edit-prompt', { prompt: isMyPrompt })
+  }
 
   const promptType = getPromptAppType(promptUserId, promptApp)
 
@@ -36,6 +61,17 @@ const ChatHeader = ({ isShowing }: { isShowing: boolean }) => {
       <div className="flex max-w-screen-sm flex-col items-center justify-center gap-0.5 text-center">
         <span className={styles.promptName}>{promptName}</span>
         <span>{promptDescription}</span>
+      </div>
+      <div className="flex flex-row gap-2">
+        <Button disabled={isCopied} onClick={onCopyClick} size={'small'} variant={'ghost'}>
+          <Link size={14} />
+          {isCopied ? 'Copied!' : 'Copy Share Link'}
+        </Button>
+        {isMyPrompt && (
+          <Button onClick={onEditClick} size={'small'} variant={'ghost'}>
+            Edit
+          </Button>
+        )}
       </div>
     </div>
   )

@@ -40,7 +40,7 @@ interface MessageProps {
 }
 
 /**
- * LLMs spit out formulas with delimiters that katex doesn't recognize.
+ * LLMs spit out formulas with delimiters that LaTeX doesn't recognize.
  * In this case, we try to replace it with `$$` delimiters.
  *
  * Thanks to @prashantbhudwal on GitHub:
@@ -106,6 +106,13 @@ export const Message = ({ message, isThinking }: MessageProps) => {
               remarkPlugins={[remarkGfm, remarkMath]}
               rehypePlugins={[rehypeKatex]}
               components={{
+                a({ children, href }) {
+                  return (
+                    <a href={href} target="_blank" rel="noopener noreferrer">
+                      {children}
+                    </a>
+                  )
+                },
                 // @ts-ignore
                 code({ node, inline, className, children, ...props }) {
                   const match = /language-(\w+)/.exec(className || '')

@@ -52,7 +52,7 @@ const DeleteChatModal = ({ id, context }: ModalObjectProps) => {
       }}
     >
       <div>
-        <span className="font-medium text-red-400">Warning:</span> Deleting this chat cannot be undone:
+        <span className="text-red-400 font-medium">Warning:</span> Deleting this chat cannot be undone:
       </div>
       <div className="font-medium">{chat.title}</div>
     </ConfirmationModal>
