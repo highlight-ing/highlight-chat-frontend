@@ -32,6 +32,8 @@ const PersonalPrompts = ({
                 selectPrompt={selectPrompt}
                 prompt={item}
                 openModal={openModal}
+                externalId={item.external_id}
+                publicUseNumber={item.public_use_number}
               />
             ))}
           </div>
@@ -57,6 +59,8 @@ const PersonalPromptsItem = ({
   selectPrompt,
   prompt,
   openModal,
+  externalId,
+  publicUseNumber,
 }: {
   name: string
   description?: string
@@ -65,6 +69,8 @@ const PersonalPromptsItem = ({
   selectPrompt: (prompt: Prompt) => void
   prompt: Prompt
   openModal: (modal: string, context?: Record<string, any>) => void
+  externalId: string
+  publicUseNumber: number
 }) => {
   const [isCopied, setIsCopied] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
@@ -96,24 +102,29 @@ const PersonalPromptsItem = ({
               setIsCopied(true)
               setTimeout(() => setIsCopied(false), 2000)
             }}
+            disabled={isCopied}
           >
             {isCopied ? 'Copied' : 'Share'}
           </Button>
           <Badge variant="outline" hidden={isHovered}>
-            40,284 Uses
+            {publicUseNumber ? `${publicUseNumber} Uses` : 'No uses'}
           </Badge>
           <Button size="xsmall" variant="ghost-neutral" onClick={() => selectPrompt(prompt)} hidden={!isHovered}>
             Use
           </Button>
         </div>
         <div className={styles.personalPromptsItemFooterRightButtons}>
-          <Button size="xsmall" variant="ghost-neutral">
+          <Button
+            size="xsmall"
+            variant="ghost-neutral"
+            onClick={() => openModal('confirm-delete-prompt', { externalId: externalId, name: name })}
+          >
             <Trash color={variables.tertiary} variant={'Bold'} size="16" />
           </Button>
           <Button size="xsmall" variant="ghost-neutral">
             <Lock color={variables.tertiary} variant={'Bold'} size="16" />
           </Button>
-          <Button size="xsmall" variant="ghost-neutral" onClick={(e) => openModal('edit-prompt', { prompt })}>
+          <Button size="xsmall" variant="ghost-neutral" onClick={() => openModal('edit-prompt', { prompt })}>
             <Edit2 color={variables.tertiary} variant={'Bold'} size="16" />
           </Button>
         </div>

@@ -33,6 +33,7 @@ const TrendingPrompts = ({
                 prompt={item}
                 tags={item.tags}
                 lastItem={index === prompts.length - 1}
+                publicUseNumber={item.public_use_number}
               />
             ))}
           </div>
@@ -60,6 +61,7 @@ const TrendingPromptsItem = ({
   tags,
   lastItem,
   openModal,
+  publicUseNumber,
 }: {
   name: string
   description?: string
@@ -70,6 +72,7 @@ const TrendingPromptsItem = ({
   tags?: string[]
   lastItem: boolean
   openModal: (modal: string, context?: Record<string, any>) => void
+  publicUseNumber: number
 }) => {
   const [isCopied, setIsCopied] = useState(false)
   return (
@@ -89,6 +92,7 @@ const TrendingPromptsItem = ({
               setIsCopied(true)
               setTimeout(() => setIsCopied(false), 2000)
             }}
+            disabled={isCopied}
           >
             {isCopied ? 'Copied' : 'Share'}
           </Button>
@@ -105,7 +109,7 @@ const TrendingPromptsItem = ({
         )}
       </div>
       <div className={styles.trendingPromptsItemFooter}>
-        <Badge variant="outline">21,240 Uses</Badge>
+        <Badge variant="outline">{publicUseNumber ? `${publicUseNumber} Uses` : 'No uses'}</Badge>
         {tags && tags.length > 0 && (
           <div className={styles.trendingPromptsItemFooterTags}>
             {tags.map((tag) => (

@@ -180,7 +180,7 @@ export type Database = {
           prompt_text: string | null
           prompt_url: string | null
           public: boolean
-          public_use_number: number | null
+          public_use_number: number
           slug: string
           suggestion_prompt_text: string | null
           user_id: string
@@ -197,7 +197,7 @@ export type Database = {
           prompt_text?: string | null
           prompt_url?: string | null
           public?: boolean
-          public_use_number?: number | null
+          public_use_number?: number
           slug: string
           suggestion_prompt_text?: string | null
           user_id: string
@@ -214,7 +214,7 @@ export type Database = {
           prompt_text?: string | null
           prompt_url?: string | null
           public?: boolean
-          public_use_number?: number | null
+          public_use_number?: number
           slug?: string
           suggestion_prompt_text?: string | null
           user_id?: string
