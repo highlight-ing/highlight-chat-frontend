@@ -194,6 +194,30 @@ export async function savePrompt(formData: FormData, authToken: string) {
 }
 
 /**
+ * Updates the visibility of a prompt in the database.
+ */
+export async function updatePromptVisibility(externalId: string, visibility: boolean, authToken: string) {
+  let userId: string
+  try {
+    userId = await validateUserAuth(authToken)
+  } catch (error) {
+    return { error: ERROR_MESSAGES.INVALID_AUTH_TOKEN }
+  }
+
+  const supabase = supabaseAdmin()
+
+  const { error } = await supabase
+    .from('prompts')
+    .update({ public: visibility })
+    .eq('external_id', externalId)
+    .eq('user_id', userId)
+
+  if (error) {
+    return { error: ERROR_MESSAGES.DATABASE_ERROR }
+  }
+}
+
+/**
  * Fetches the raw prompt text from the database.
  */
 export async function fetchPromptText(externalId: string) {

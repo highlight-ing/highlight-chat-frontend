@@ -10,7 +10,7 @@ import EditPromptModal from '@/presentations/modals/EditPromptModal'
 import ConfirmationModal, { ConfirmationModalProps } from '@/components/modals/ConfirmationModal'
 import { useShallow } from 'zustand/react/shallow'
 import ConfirmDeletePromptModal from '@/presentations/modals/ConfirmDeletePromptModal'
-import PublishPromptModal from '@/presentations/modals/PublishPromptModal'
+import ChangePromptVisibilityModal from '@/presentations/modals/ChangePromptVisibilityModal'
 
 type FunctionalComponent = (props: ModalObjectProps) => JSX.Element
 
@@ -24,7 +24,7 @@ const ModalMap: Record<string, FunctionalComponent> = {
     <ConfirmationModal {...(context as ConfirmationModalProps)} />
   ),
   'confirm-delete-prompt': ConfirmDeletePromptModal,
-  'publish-prompt': PublishPromptModal,
+  'change-prompt-visibility': ChangePromptVisibilityModal,
 }
 
 export const ModalContainer = () => {

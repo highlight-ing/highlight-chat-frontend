@@ -121,7 +121,11 @@ const PersonalPromptsItem = ({
           >
             <Trash color={variables.tertiary} variant={'Bold'} size="16" />
           </Button>
-          <Button size="xsmall" variant="ghost-neutral">
+          <Button
+            size="xsmall"
+            variant="ghost-neutral"
+            onClick={() => openModal('change-prompt-visibility', { prompt })}
+          >
             <Lock color={variables.tertiary} variant={'Bold'} size="16" />
           </Button>
           <Button size="xsmall" variant="ghost-neutral" onClick={() => openModal('edit-prompt', { prompt })}>
