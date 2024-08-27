@@ -35,15 +35,9 @@ const preprocessLaTeX = (content: string) => {
 export const ShareUserMessage: React.FC<ShareUserMessageProps> = React.memo(({ message }) => {
   const hasAttachments = useMemo(() => hasAttachment(message), [message])
 
-  console.log('ShareUserMessage: Rendering')
-
   return (
-    <div className="mx-auto my-4 w-full max-w-[712px]">
+    <div className="mx-auto my-4 w-full max-w-[712px] px-6 sm:px-4">
       <div className="rounded-[16px] border border-border-tertiary bg-background-primary p-4">
-        <div className="mb-4 flex items-center">
-          <ProfileCircle variant="Bold" size={16} className="text-gray-500" />
-          <span className="ml-2 text-xs font-medium text-text-secondary">User</span>
-        </div>
         <div className={`text-sm font-light leading-[1.6] text-text-primary/90 ${hasAttachments ? 'mb-4' : ''}`}>
           <Markdown
             remarkPlugins={[remarkGfm, remarkMath]}

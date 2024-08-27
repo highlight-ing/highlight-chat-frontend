@@ -10,6 +10,7 @@ import CodeBlock from '@/components/Messages/CodeBlock'
 import AssistantMessageButtonRow from './AssistantMessageButtonRow'
 import { useAssistantMessageButtons } from './useAssistantMessageButtons'
 import { AssistantMessageButtonType, AssistantMessageButtonStatus } from '@/types'
+import styles from './share-assistant-message.module.scss'
 
 interface ShareAssistantMessageProps {
   message: AssistantMessage
@@ -25,27 +26,23 @@ export const ShareAssistantMessage: React.FC<ShareAssistantMessageProps> = ({ me
   const buttons = useAssistantMessageButtons({ message: message.content, buttonTypes })
 
   return (
-    <div className="mx-auto my-4 w-full max-w-[712px]">
-      <div className="rounded-[24px] border border-border-tertiary bg-background-secondary p-4">
+    <div className="mx-auto w-full max-w-[712px] px-6 sm:px-4">
+      <div className="rounded-[24px] border border-border-tertiary bg-background-secondary p-4 pb-2">
         <div className="mb-4 flex items-center">
           <HighlightIcon size={16} color="gray" />
           <span className="ml-2 text-xs font-medium text-text-secondary">Highlight</span>
         </div>
-        <div className="mb-4 text-sm font-light leading-[1.6] text-text-primary/90">
+        <div className={styles.messageBody}>
           <Markdown
             remarkPlugins={[remarkGfm, remarkMath]}
             rehypePlugins={[rehypeKatex]}
             components={{
-              //@ts-ignore
+              // @ts-ignore
               code({ node, inline, className, children, ...props }) {
                 const match = /language-(\w+)/.exec(className || '')
                 const isStringWithNewlines = typeof children === 'string' && children.includes('\n')
                 if ((!inline && match) || isStringWithNewlines) {
-                  return (
-                    <div className="my-4">
-                      <CodeBlock language={match?.[1] ?? 'plaintext'}>{children}</CodeBlock>
-                    </div>
-                  )
+                  return <CodeBlock language={match?.[1] ?? 'plaintext'}>{children}</CodeBlock>
                 }
                 return (
                   <code className={className} {...props}>
@@ -53,12 +50,30 @@ export const ShareAssistantMessage: React.FC<ShareAssistantMessageProps> = ({ me
                   </code>
                 )
               },
+              td({ children }) {
+                if (typeof children === 'string') {
+                  return <td>{children}</td>
+                }
+                if (Array.isArray(children)) {
+                  return (
+                    <td>
+                      {/*// @ts-ignore*/}
+                      {children.map((child, index) => (
+                        <React.Fragment key={index}>{child === '<br>' ? <br /> : child}</React.Fragment>
+                      ))}
+                    </td>
+                  )
+                }
+                return <td>{children}</td>
+              },
             }}
           >
             {typeof message.content === 'string' ? preprocessLaTeX(message.content) : ''}
           </Markdown>
         </div>
-        <AssistantMessageButtonRow buttons={buttons} />
+        <div className="mt-1">
+          <AssistantMessageButtonRow buttons={buttons} />
+        </div>
       </div>
     </div>
   )
