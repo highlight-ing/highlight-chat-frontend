@@ -18,7 +18,12 @@ import PersonalPrompts from '@/components/PersonalPrompts/PersonalPrompts'
 import TrendingPrompts from '@/components/TrendingPrompts/TrendingPrompts'
 
 const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
-  const openModal = useStore((state) => state.openModal)
+  const { openModal, closeModal } = useStore(
+    useShallow((state) => ({
+      openModal: state.openModal,
+      closeModal: state.closeModal,
+    })),
+  )
   const [isVisible, setVisible] = useState(isShowing)
 
   useEffect(() => {
@@ -40,10 +45,10 @@ const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
         {isVisible && <Input isActiveChat={false} />}
       </div>
       <div className={styles.callouts}>
-        <Prompts />
+        <Prompts openModal={openModal} />
       </div>
       <div className={styles.callouts}>
-        <TPrompts />
+        <TPrompts openModal={openModal} />
       </div>
     </div>
   )
@@ -78,8 +83,7 @@ function InputHeading() {
   )
 }
 
-const Prompts = () => {
-  const openModal = useStore((state) => state.openModal)
+const Prompts = ({ openModal }: { openModal: (modal: string, context?: Record<string, any>) => void }) => {
   const { isLoadingPrompts, myPrompts, selectPrompt } = usePromptApps()
   const [hotkey, setHotkey] = useState<string>('alt + .')
 
@@ -105,8 +109,7 @@ const Prompts = () => {
 
 // Trending Prompts
 // TODO(umut): Change this confusing ahh name
-const TPrompts = () => {
-  const openModal = useStore((state) => state.openModal)
+const TPrompts = ({ openModal }: { openModal: (modal: string, context?: Record<string, any>) => void }) => {
   const { isLoadingPrompts, communityPrompts, selectPrompt } = usePromptApps()
   console.log('isLoadingPrompts', isLoadingPrompts)
   console.log('communityPrompts', communityPrompts)

@@ -13,7 +13,7 @@ const PersonalPrompts = ({
   selectPrompt,
 }: {
   prompts: Prompt[]
-  openModal: (modal: string) => void
+  openModal: (modal: string, context?: Record<string, any>) => void
   selectPrompt: (prompt: Prompt) => void
 }) => {
   return (
@@ -31,6 +31,7 @@ const PersonalPrompts = ({
                 color={variables.primary100}
                 selectPrompt={selectPrompt}
                 prompt={item}
+                openModal={openModal}
               />
             ))}
           </div>
@@ -55,6 +56,7 @@ const PersonalPromptsItem = ({
   color,
   selectPrompt,
   prompt,
+  openModal,
 }: {
   name: string
   description?: string
@@ -62,6 +64,7 @@ const PersonalPromptsItem = ({
   color?: string
   selectPrompt: (prompt: Prompt) => void
   prompt: Prompt
+  openModal: (modal: string, context?: Record<string, any>) => void
 }) => {
   const [isCopied, setIsCopied] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
@@ -110,7 +113,7 @@ const PersonalPromptsItem = ({
           <Button size="xsmall" variant="ghost-neutral">
             <Lock color={variables.tertiary} variant={'Bold'} size="16" />
           </Button>
-          <Button size="xsmall" variant="ghost-neutral">
+          <Button size="xsmall" variant="ghost-neutral" onClick={(e) => openModal('edit-prompt', { prompt })}>
             <Edit2 color={variables.tertiary} variant={'Bold'} size="16" />
           </Button>
         </div>

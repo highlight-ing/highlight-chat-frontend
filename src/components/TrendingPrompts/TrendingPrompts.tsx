@@ -13,7 +13,7 @@ const TrendingPrompts = ({
   selectPrompt,
 }: {
   prompts: Prompt[]
-  openModal: (modal: string) => void
+  openModal: (modal: string, context?: Record<string, any>) => void
   selectPrompt: (prompt: Prompt) => void
 }) => {
   return (
@@ -59,6 +59,7 @@ const TrendingPromptsItem = ({
   prompt,
   tags,
   lastItem,
+  openModal,
 }: {
   name: string
   description?: string
@@ -68,6 +69,7 @@ const TrendingPromptsItem = ({
   prompt: Prompt
   tags?: string[]
   lastItem: boolean
+  openModal: (modal: string, context?: Record<string, any>) => void
 }) => {
   const [isCopied, setIsCopied] = useState(false)
   return (
