@@ -36,9 +36,9 @@ export const ShareUserMessage: React.FC<ShareUserMessageProps> = React.memo(({ m
   const hasAttachments = useMemo(() => hasAttachment(message), [message])
 
   return (
-    <div className="mx-auto my-4 w-full max-w-[712px] px-6 sm:px-4">
-      <div className="rounded-[16px] border border-border-tertiary bg-background-primary p-4">
-        <div className={`text-sm font-light leading-[1.6] text-text-primary/90 ${hasAttachments ? 'mb-4' : ''}`}>
+    <div className="mx-auto my-4 w-full max-w-[712px] px-6 md:px-4">
+      <div className="rounded-[16px] border border-tertiary bg-primary p-4">
+        <div className={`text-sm font-light leading-[1.6] text-primary/90 ${hasAttachments ? 'mb-4' : ''}`}>
           <Markdown
             remarkPlugins={[remarkGfm, remarkMath]}
             rehypePlugins={[rehypeKatex]}

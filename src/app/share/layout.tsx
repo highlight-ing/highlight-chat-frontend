@@ -12,7 +12,7 @@ export default function ShareLayout({ children }: { children: React.ReactNode })
   return (
     <html lang="en" className={`${inter.variable} dark`}>
       <body>
-        <div className={`${styles.page} bg-background flex min-h-screen flex-col`}>
+        <div className={`${styles.page} flex min-h-screen flex-col bg-primary`}>
           <main className="flex-grow">{children}</main>
         </div>
       </body>

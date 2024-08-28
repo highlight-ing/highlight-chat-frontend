@@ -41,11 +41,11 @@ const AssistantMessageButton: React.FC<AssistantMessageButtonProps> = ({ type, o
   const buttonClass = `group flex items-center transition-colors duration-300 
     ${status === 'success' ? 'animate-gentle-scale' : ''}`
 
-  const iconClass = `text-text-tertiary transition-colors group-hover:text-primary 
-    ${status === 'success' ? 'text-primary' : ''}`
+  const iconClass = `text-tertiary transition-colors group-hover:text-teal 
+    ${status === 'success' ? 'text-teal' : ''}`
 
-  const textClass = `ml-2 text-[13px] font-medium text-text-tertiary transition-colors group-hover:text-primary 
-    ${status === 'success' ? 'text-primary' : ''}`
+  const textClass = `ml-2 text-[13px] font-medium text-tertiary transition-colors group-hover:text-teal 
+    ${status === 'success' ? 'text-teal' : ''}`
 
   return (
     <button onClick={onClick} className={buttonClass}>

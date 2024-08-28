@@ -40,22 +40,22 @@ body {
 
   .custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: theme('colors.background-secondary') theme('colors.background-primary');
+    scrollbar-color: theme('backgroundColor.secondary') theme('backgroundColor.primary');
   }
 
   .custom-scrollbar::-webkit-scrollbar {
     width: 8px;
-    background: theme('colors.background-primary');
+    background: theme('backgroundColor.primary');
   }
 
   .custom-scrollbar::-webkit-scrollbar-track {
-    background-color: theme('colors.background-primary');
+    background-color: theme('backgroundColor.primary');
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: theme('colors.background-secondary');
+    background-color: theme('borderColor.secondary');
     border-radius: 20px;
-    border: 2px solid theme('colors.background-primary');
+    border: 2px solid theme('borderColor.primary');
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
