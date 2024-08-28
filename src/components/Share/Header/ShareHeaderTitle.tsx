@@ -7,7 +7,11 @@ interface ShareHeaderTitleProps {
 }
 
 const stripQuotes = (str: string): string => {
-  return str.replace(/^["'](.*)["']$/, '$1')
+  // Remove quotes from the beginning
+  str = str.replace(/^["']/, '')
+  // Remove quotes from the end
+  str = str.replace(/["']$/, '')
+  return str
 }
 
 const ShareHeaderTitle: React.FC<ShareHeaderTitleProps> = ({ title, sharedBy }) => {
@@ -18,7 +22,7 @@ const ShareHeaderTitle: React.FC<ShareHeaderTitleProps> = ({ title, sharedBy }) 
       <HighlightIcon size={24} color="white" />
       <div>
         <h1 className="font-base text-sm text-text-primary">{strippedTitle}</h1>
-        <p className="text-xs text-text-tertiary">Shared by {sharedBy || 'Anonymous'}</p>
+        <p className="text-xs text-text-tertiary">Shared by {sharedBy || 'Highlight User'}</p>
       </div>
     </div>
   )

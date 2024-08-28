@@ -33,6 +33,7 @@ const TrendingPrompts = ({
                 prompt={item}
                 tags={item.tags}
                 lastItem={index === prompts.length - 1}
+                openModal={openModal}
                 publicUseNumber={item.public_use_number}
               />
             ))}
