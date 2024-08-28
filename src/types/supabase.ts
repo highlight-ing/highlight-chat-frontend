@@ -147,16 +147,19 @@ export type Database = {
           created_at: string
           id: number
           prompt_id: number
+          was_processed: boolean
         }
         Insert: {
           created_at?: string
           id?: number
           prompt_id: number
+          was_processed?: boolean
         }
         Update: {
           created_at?: string
           id?: number
           prompt_id?: number
+          was_processed?: boolean
         }
         Relationships: [
           {
@@ -183,6 +186,7 @@ export type Database = {
           public_use_number: number
           slug: string
           suggestion_prompt_text: string | null
+          tags: string[] | null
           user_id: string
           video_url: string | null
         }
@@ -200,6 +204,7 @@ export type Database = {
           public_use_number?: number
           slug: string
           suggestion_prompt_text?: string | null
+          tags?: string[] | null
           user_id: string
           video_url?: string | null
         }
@@ -217,6 +222,7 @@ export type Database = {
           public_use_number?: number
           slug?: string
           suggestion_prompt_text?: string | null
+          tags?: string[] | null
           user_id?: string
           video_url?: string | null
         }

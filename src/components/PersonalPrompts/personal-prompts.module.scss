@@ -53,6 +53,14 @@
     }
 }
 
+.filledButton{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 77px;
+    padding: 2px 8px;
+}
+
 .personalPromptsItem {
     display: flex;
     padding: 20px;
@@ -64,16 +72,6 @@
     border-radius: 20px;
     background-color: var(--Background-Secondary, #191919);
     transition: background-color 0.3s ease;
-
-    &:hover {
-        background-color: $pink-20;
-
-        .button.primary {
-            --button-bg: #{$pink-40};
-            --button-hover-bg: #{$pink-60};
-            --button-active-bg: #{$pink-80};
-        }
-    }
 
     .personalPromptsItemHeader {
         display: flex;

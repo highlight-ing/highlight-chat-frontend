@@ -14,6 +14,11 @@
     display: none;
   }
 
+  &.disabled {
+    border: 1px solid $border-tertiary;
+    color: $text-tertiary;
+  }
+
   &:focus {
     outline: none;
     box-shadow: 0 0 0 2px rgba($primary-100, 0.5);

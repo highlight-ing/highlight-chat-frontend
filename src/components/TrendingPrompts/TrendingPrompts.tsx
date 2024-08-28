@@ -8,10 +8,12 @@ import Button from '@/components/Button/Button'
 import { Badge } from '@/components/Badge/Badge'
 
 const TrendingPrompts = ({
+  userId,
   prompts,
   openModal,
   selectPrompt,
 }: {
+  userId: string | undefined
   prompts: Prompt[]
   openModal: (modal: string, context?: Record<string, any>) => void
   selectPrompt: (prompt: Prompt) => void
@@ -70,7 +72,7 @@ const TrendingPromptsItem = ({
   color?: string
   selectPrompt: (prompt: Prompt) => void
   prompt: Prompt
-  tags?: string[]
+  tags?: string[] | null
   lastItem: boolean
   openModal: (modal: string, context?: Record<string, any>) => void
   publicUseNumber: number
@@ -87,6 +89,7 @@ const TrendingPromptsItem = ({
           <Button
             size="xsmall"
             variant="tertiary"
+            className={styles.filledButton}
             onClick={() => {
               const url = `https://chat.highlight.ing/prompts/${slug}`
               navigator.clipboard.writeText(url)
@@ -97,7 +100,7 @@ const TrendingPromptsItem = ({
           >
             {isCopied ? 'Copied' : 'Share'}
           </Button>
-          <Button size="xsmall" variant="primary" onClick={() => selectPrompt(prompt)}>
+          <Button className={styles.filledButton} size="xsmall" variant="primary" onClick={() => selectPrompt(prompt)}>
             Use
           </Button>
         </div>
@@ -110,11 +113,11 @@ const TrendingPromptsItem = ({
         )}
       </div>
       <div className={styles.trendingPromptsItemFooter}>
-        <Badge variant="outline">{publicUseNumber ? `${publicUseNumber} Uses` : 'No uses'}</Badge>
+        <Badge variant="disabled">{publicUseNumber ? `${publicUseNumber} Uses` : 'No uses'}</Badge>
         {tags && tags.length > 0 && (
           <div className={styles.trendingPromptsItemFooterTags}>
             {tags.map((tag) => (
-              <Badge variant="outline">{tag}</Badge>
+              <Badge variant="disabled">{tag}</Badge>
             ))}
           </div>
         )}

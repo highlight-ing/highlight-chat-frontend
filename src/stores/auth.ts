@@ -14,6 +14,7 @@ export interface AuthState {
 
 export type AuthSlice = AuthState & {
   setAuth: (auth: AuthState) => void
+  setUserId: (userId: string) => void
 }
 
 export const initialAuthState: AuthState = {
@@ -27,4 +28,5 @@ export const initialAuthState: AuthState = {
 export const createAuthSlice: StateCreator<AuthSlice> = (set) => ({
   ...initialAuthState,
   setAuth: (auth: AuthState) => set(auth),
+  setUserId: (userId: string) => set({ userId }),
 })

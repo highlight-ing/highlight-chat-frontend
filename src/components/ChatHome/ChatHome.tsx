@@ -26,6 +26,9 @@ const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
   )
   const [isVisible, setVisible] = useState(isShowing)
 
+  // Get the user ID from the store
+  const userId = useStore((state) => state.userId)
+
   useEffect(() => {
     if (isShowing) {
       setVisible(true)
@@ -44,7 +47,7 @@ const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
         <InputHeading />
         {isVisible && <Input isActiveChat={false} />}
       </div>
-      <Prompts openModal={openModal} />
+      <Prompts userId={userId} openModal={openModal} />
     </div>
   )
 }
@@ -78,13 +81,24 @@ function InputHeading() {
   )
 }
 
-const Prompts = ({ openModal }: { openModal: (modal: string, context?: Record<string, any>) => void }) => {
+const Prompts = ({
+  userId,
+  openModal,
+}: {
+  userId: string | undefined
+  openModal: (modal: string, context?: Record<string, any>) => void
+}) => {
   const { isLoadingPrompts, myPrompts, communityPrompts, selectPrompt } = usePromptApps()
 
-  if (isLoadingPrompts) {
+  if (isLoadingPrompts && !userId) {
     return (
-      <div className={`${styles.prompts} ${mainStyles.loadingGradient} w-full`}>
-        <div className={'h-20 w-full p-16'} />
+      <div className="flex flex-col gap-4">
+        <div className={`${styles.prompts} ${mainStyles.loadingGradient} w-full`}>
+          <div className={'h-24 w-full p-16'} />
+        </div>
+        <div className={`${styles.prompts} ${mainStyles.loadingGradient} w-full`}>
+          <div className={'h-96 w-full p-16'} />
+        </div>
       </div>
     )
   }
@@ -92,10 +106,10 @@ const Prompts = ({ openModal }: { openModal: (modal: string, context?: Record<st
   return (
     <>
       <div className={styles.callouts}>
-        <PersonalPrompts prompts={myPrompts} openModal={openModal} selectPrompt={selectPrompt} />
+        <PersonalPrompts userId={userId} prompts={myPrompts} openModal={openModal} selectPrompt={selectPrompt} />
       </div>
       <div className={styles.callouts}>
-        <TrendingPrompts prompts={communityPrompts} openModal={openModal} selectPrompt={selectPrompt} />
+        <TrendingPrompts userId={userId} prompts={communityPrompts} openModal={openModal} selectPrompt={selectPrompt} />
       </div>
     </>
   )

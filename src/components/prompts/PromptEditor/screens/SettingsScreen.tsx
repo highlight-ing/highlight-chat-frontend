@@ -171,6 +171,7 @@ const SettingsSchema = z.object({
   name: z.string().min(1, { message: 'Name is required' }).max(40, { message: 'Name must be less than 40 characters' }),
   videoUrl: videoUrlSchema,
   description: z.string().min(1, { message: 'Description is required' }),
+  tags: z.string().array().optional(),
 })
 
 export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
@@ -181,6 +182,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
       name: promptEditorData.name,
       videoUrl: promptEditorData.videoUrl ?? '',
       description: promptEditorData.description,
+      tags: promptEditorData.tags ?? '',
     },
     resolver: zodResolver(SettingsSchema),
     mode: 'all',
@@ -201,7 +203,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
 
   // Hook to update the prompt editor data when the form changes
   useEffect(() => {
-    const subscription = watch((value, { name, type }) => {
+    const subscription = watch((value: Record<string, any>, { name, type }) => {
       if (!name) {
         return
       }
@@ -233,6 +235,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
               {...register('videoUrl')}
               error={errors.videoUrl?.message}
             />
+
             <TextArea
               size={'xxlarge'}
               label={'Description'}
@@ -240,6 +243,14 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
               rows={3}
               {...register('description')}
               error={errors.description?.message}
+            />
+
+            <InputField
+              size={'xxlarge'}
+              label={'Tags'}
+              placeholder={'Add tags to your app (optional)'}
+              {...register('tags')}
+              error={errors.tags?.message}
             />
           </div>
         </div>

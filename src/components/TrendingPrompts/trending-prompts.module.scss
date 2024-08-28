@@ -52,6 +52,14 @@
     }
 }
 
+.filledButton{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 77px;
+    padding: 2px 8px;
+}
+
 .trendingPromptsItem {
     display: flex;
     padding: 20px;
@@ -86,14 +94,14 @@
         .trendingPromptsItemHeaderLeft {
             display: flex;
             flex-direction: row;
-            gap: 12px;
+            gap: 8px;
             justify-content: flex-start;
         }
 
         .trendingPromptsItemHeaderRight {
             display: flex;
             flex-direction: row;
-            gap: 12px;
+            gap: 8px;
             justify-content: flex-end;
         }
     }

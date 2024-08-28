@@ -14,6 +14,7 @@ export interface PromptEditorData {
   slug: string
   name: string
   description: string
+  tags?: string[]
   appPrompt: string
   suggestionsPrompt: string
   visibility: 'public' | 'private'
@@ -48,6 +49,7 @@ export const initialPromptEditorState: PromptEditorState = {
     name: '',
     description: '',
     visibility: 'private',
+    tags: [],
   },
   needSave: false,
   saving: false,

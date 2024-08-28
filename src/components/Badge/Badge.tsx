@@ -2,7 +2,7 @@ import * as React from 'react'
 import styles from './badge.module.scss'
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'secondary' | 'destructive' | 'outline'
+  variant?: 'default' | 'secondary' | 'destructive' | 'outline' | 'disabled'
 }
 
 function Badge({ className, variant = 'default', hidden = false, ...props }: BadgeProps) {
