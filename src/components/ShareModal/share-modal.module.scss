@@ -11,7 +11,6 @@
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
-
     &.visible {
         opacity: 1;
         visibility: visible;
@@ -57,14 +56,20 @@
 
 .previewBox {
     background-color: $background-tertiary;
-    border-radius: 8px;
-    padding: 16px;
+    border-radius: 16px;
+    padding: 13px 0;
+    position: relative;
 }
 
 .previewContent {
     display: flex;
     align-items: stretch;
     gap: 12px;
+    padding: 0 13px;
+}
+
+.previewFooter {
+    padding: 0 13px;
 }
 
 .iconWrapper {
@@ -81,15 +86,15 @@
 .separator {
     height: 1px;
     background-color: $light-5;
-    margin: 16px 0;
+    margin: 8px 0;
     width: 100%;
 }
 
 .footer {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 0 16px 16px 16px;
+  gap: 13px;
+  padding: 0 13px 13px 13px;
 }
 
 .disableButton, .copyButton {
@@ -100,12 +105,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 8px;
+  gap: 13px;
+  font-weight: 500;
 }
 
 .disableButton {
   background-color: $light-5;
   color: $light-80;
+  border-radius: 10px;
+  border: 1px solid var(--Border-Tertiary, #222);
 
   &:hover {
     background-color: $light-10;
@@ -120,6 +128,7 @@
 .copyButton {
   background-color: $primary-100;
   color: $dark-100;
+  font-weight: 600;
 
   &:hover {
     background-color: $primary-80;

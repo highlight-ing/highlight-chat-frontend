@@ -177,7 +177,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
           </DragDropContext>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           {conversationId && (
             <div className={styles.tabContainer}>
               <div className={`${styles.tab} cursor-pointer`} onClick={onToggleShareModal}>

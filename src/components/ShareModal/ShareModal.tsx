@@ -108,10 +108,14 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
                   </div>
                 </div>
                 <div className={styles.separator} />
-                <p className="text-sm font-light text-subtle">All contents currently inside the chat will be shared.</p>
+                <div className={styles.previewFooter}>
+                  <p className="text-[13px] font-semibold text-subtle">
+                    All contents currently inside the chat will be shared.
+                  </p>
+                </div>
               </div>
             ) : (
-              <p className="text-sm font-light text-light-60">
+              <p className="text-[13px] font-medium text-subtle">
                 You haven't selected a conversation yet. Please select one and try sharing again.
               </p>
             )}
