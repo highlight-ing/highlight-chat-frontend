@@ -55,7 +55,6 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
     })),
   )
 
-  const [selectedConversation, setSelectedConversation] = useState<ChatHistoryItem | null>(null)
   const promptAppName = useStore((state) => state.promptAppName)
   const [isShareModalVisible, setIsShareModalVisible] = useState(false)
 

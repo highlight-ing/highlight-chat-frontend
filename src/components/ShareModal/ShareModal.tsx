@@ -85,7 +85,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
   }
 
   const processedTitle = conversation?.title.replace(/^["']|["']$/g, '')
-  const fakeUrl = 'highlight.ing/life-coach'
+  const fakeUrl = 'Private Chat'
 
   return (
     <>

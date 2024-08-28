@@ -57,7 +57,7 @@
 .previewBox {
     background-color: $background-tertiary;
     border-radius: 16px;
-    padding: 13px 0;
+    padding: 13px 0 8px;
     position: relative;
 }
 
@@ -101,7 +101,7 @@
   width: 100%;
   padding: 8px 16px;
   border-radius: 8px;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -110,18 +110,21 @@
 }
 
 .disableButton {
-  background-color: $light-5;
-  color: $light-80;
-  border-radius: 10px;
+  color: $text-subtle;
+  font-weight: 700;
   border: 1px solid var(--Border-Tertiary, #222);
-
+  background-color: transparent;
+  
   &:hover {
-    background-color: $light-10;
+    background-color: $dark-80;
+    color: $text-tertiary;
+    transform: scale(1.01); // Subtle grow effect
   }
 
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    transform: none;
   }
 }
 
@@ -131,11 +134,13 @@
   font-weight: 600;
 
   &:hover {
-    background-color: $primary-80;
+    background-color: $primary-70;
+    transform: scale(1.01); // Subtle grow effect
   }
 
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    transform: none;
   }
 }
