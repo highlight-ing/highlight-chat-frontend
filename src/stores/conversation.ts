@@ -22,6 +22,7 @@ export type ConversationSlice = ConversationState & {
   addOrUpdateOpenConversation: (conversation: ChatHistoryItem) => void
   removeOpenConversation: (conversationId: string) => void
   setConversationLoading: (isLoading: boolean) => void
+  setShareId: (conversationId: string, shareId: string | null) => void
 }
 
 export const initialConversationState: ConversationState = {
@@ -74,5 +75,17 @@ export const createConversationSlice: StateCreator<Store, [], [], ConversationSl
   },
   setConversationLoading: (isLoading: boolean) => {
     set({ isConversationLoading: isLoading })
+  },
+  setShareId: (conversationId: string, shareId: string | null) => {
+    const conversations = get().openConversations
+    const updatedConversations = conversations.map((conv) =>
+      conv.id === conversationId ? { ...conv, shared_id: shareId } : conv,
+    )
+    set({ openConversations: updatedConversations })
+
+    // Also update the history if the conversation exists there
+    const history = get().history
+    const updatedHistory = history.map((conv) => (conv.id === conversationId ? { ...conv, shared_id: shareId } : conv))
+    set({ history: updatedHistory })
   },
 })

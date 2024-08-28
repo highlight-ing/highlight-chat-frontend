@@ -10,15 +10,21 @@ interface ShareModalProps {
   isVisible: boolean
   conversation: ChatHistoryItem | null
   onClose: () => void
+  setShareId: (conversationId: string, shareId: string | null) => void
 }
 
-const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClose }) => {
+const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClose, setShareId }) => {
   const modalRef = useRef<HTMLDivElement>(null)
   const [isGenerating, setIsGenerating] = useState(false)
   const [isDisabling, setIsDisabling] = useState(false)
   const { getShareLink } = useShareConversation()
   const { deleteSharedConversation } = useDeleteConversation()
   const addToast = useStore((state) => state.addToast)
+  const [chatVisibilityLabel, setChatVisibilityLabel] = useState<string>('Private Chat')
+
+  useEffect(() => {
+    setChatVisibilityLabel(conversation?.shared_id ? 'Public Chat' : 'Private Chat')
+  }, [conversation?.shared_id])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -39,6 +45,9 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
     try {
       const shareLink = await getShareLink(conversation.id)
       await navigator.clipboard.writeText(shareLink)
+
+      // Update the shared_id in the store
+      setShareId(conversation.id, shareLink)
 
       addToast({
         title: 'Snapshot shared and copied to your clipboard',
@@ -65,6 +74,10 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
     setIsDisabling(true)
     try {
       await deleteSharedConversation(conversation.id)
+
+      // Update the shared_id in the store
+      setShareId(conversation.id, null)
+
       addToast({
         title: 'Share Link Disabled',
         description: 'All share links for this conversation have been disabled.',
@@ -104,13 +117,15 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
                   </div>
                   <div className={styles.textContent}>
                     <p className="mb-1 text-[13px] font-medium leading-[16px] text-white">{processedTitle}</p>
-                    <p className="text-[13px] font-medium leading-[16px] text-light-40">{fakeUrl}</p>
+                    <p className="text-[13px] font-medium leading-[16px] text-light-40">{chatVisibilityLabel}</p>
                   </div>
                 </div>
                 <div className={styles.separator} />
                 <div className={styles.previewFooter}>
                   <p className="text-[13px] font-semibold text-subtle">
-                    All contents currently inside the chat will be shared.
+                    {conversation.shared_id
+                      ? `${conversation.shared_id}`
+                      : 'All contents currently inside the chat will be shared.'}
                   </p>
                 </div>
               </div>
@@ -121,7 +136,11 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
             )}
           </div>
           <div className={styles.footer}>
-            <button className={styles.disableButton} onClick={onDisableLink} disabled={!conversation || isDisabling}>
+            <button
+              className={styles.disableButton}
+              onClick={onDisableLink}
+              disabled={!conversation || isDisabling || !conversation.shared_id}
+            >
               {isDisabling ? (
                 <>
                   <span>Disabling...</span>

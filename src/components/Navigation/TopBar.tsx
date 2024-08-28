@@ -37,6 +37,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
     removeOpenConversation,
     clearConversationMessages,
     history,
+    setShareId,
   } = useStore(
     useShallow((state) => ({
       startNewConversation: state.startNewConversation,
@@ -52,6 +53,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
       removeOpenConversation: state.removeOpenConversation,
       clearConversationMessages: state.clearConversationMessages,
       history: state.history,
+      setShareId: state.setShareId,
     })),
   )
 
@@ -194,6 +196,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
         isVisible={isShareModalVisible}
         conversation={currentConversation || null}
         onClose={onCloseShareModal}
+        setShareId={setShareId}
       />
     </div>
   )
