@@ -37,6 +37,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
     removeOpenConversation,
     clearConversationMessages,
     history,
+    setShareId,
   } = useStore(
     useShallow((state) => ({
       startNewConversation: state.startNewConversation,
@@ -52,10 +53,10 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
       removeOpenConversation: state.removeOpenConversation,
       clearConversationMessages: state.clearConversationMessages,
       history: state.history,
+      setShareId: state.setShareId,
     })),
   )
 
-  const [selectedConversation, setSelectedConversation] = useState<ChatHistoryItem | null>(null)
   const promptAppName = useStore((state) => state.promptAppName)
   const [isShareModalVisible, setIsShareModalVisible] = useState(false)
 
@@ -177,7 +178,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
           </DragDropContext>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           {conversationId && (
             <div className={styles.tabContainer}>
               <div className={`${styles.tab} cursor-pointer`} onClick={onToggleShareModal}>
@@ -195,6 +196,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
         isVisible={isShareModalVisible}
         conversation={currentConversation || null}
         onClose={onCloseShareModal}
+        setShareId={setShareId}
       />
     </div>
   )

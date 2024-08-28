@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react'
-import { MessageText } from 'iconsax-react'
+import { EmojiHappy } from 'iconsax-react'
 import styles from './share-modal.module.scss'
 import variables from '@/variables.module.scss'
 import { ChatHistoryItem } from '@/types'
@@ -10,15 +10,21 @@ interface ShareModalProps {
   isVisible: boolean
   conversation: ChatHistoryItem | null
   onClose: () => void
+  setShareId: (conversationId: string, shareId: string | null) => void
 }
 
-const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClose }) => {
+const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClose, setShareId }) => {
   const modalRef = useRef<HTMLDivElement>(null)
   const [isGenerating, setIsGenerating] = useState(false)
   const [isDisabling, setIsDisabling] = useState(false)
   const { getShareLink } = useShareConversation()
   const { deleteSharedConversation } = useDeleteConversation()
   const addToast = useStore((state) => state.addToast)
+  const [chatVisibilityLabel, setChatVisibilityLabel] = useState<string>('Private Chat')
+
+  useEffect(() => {
+    setChatVisibilityLabel(conversation?.shared_id ? 'Public Chat' : 'Private Chat')
+  }, [conversation?.shared_id])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -39,6 +45,9 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
     try {
       const shareLink = await getShareLink(conversation.id)
       await navigator.clipboard.writeText(shareLink)
+
+      // Update the shared_id in the store
+      setShareId(conversation.id, shareLink)
 
       addToast({
         title: 'Snapshot shared and copied to your clipboard',
@@ -65,6 +74,10 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
     setIsDisabling(true)
     try {
       await deleteSharedConversation(conversation.id)
+
+      // Update the shared_id in the store
+      setShareId(conversation.id, null)
+
       addToast({
         title: 'Share Link Disabled',
         description: 'All share links for this conversation have been disabled.',
@@ -85,6 +98,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
   }
 
   const processedTitle = conversation?.title.replace(/^["']|["']$/g, '')
+  const fakeUrl = 'Private Chat'
 
   return (
     <>
@@ -93,28 +107,40 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
         <div className={styles.shareModal} ref={modalRef}>
           <div className={`${styles.header} flex flex-col justify-start`}>
             <h3 className="text-md font-regular text-left text-white">Share Chat</h3>
-            <p className="mt-2 text-sm font-light text-light-20">
-              All contents currently inside the chat will be shared.
-            </p>
           </div>
           <div className={styles.content}>
             {conversation ? (
               <div className={styles.previewBox}>
-                <div className="flex items-center gap-3">
-                  <MessageText size={20} color={variables.light60} />
-                  <div className="flex flex-col pb-2 pt-2">
-                    <p className="text-base text-white">{processedTitle}</p>
+                <div className={styles.previewContent}>
+                  <div className={styles.iconWrapper}>
+                    <EmojiHappy size={30} color={variables.purple100} variant="Bold" />
                   </div>
+                  <div className={styles.textContent}>
+                    <p className="mb-1 text-[13px] font-medium leading-[16px] text-white">{processedTitle}</p>
+                    <p className="text-[13px] font-medium leading-[16px] text-light-40">{chatVisibilityLabel}</p>
+                  </div>
+                </div>
+                <div className={styles.separator} />
+                <div className={styles.previewFooter}>
+                  <p className="text-[13px] font-semibold text-subtle">
+                    {conversation.shared_id
+                      ? `${conversation.shared_id}`
+                      : 'All contents currently inside the chat will be shared.'}
+                  </p>
                 </div>
               </div>
             ) : (
-              <p className="text-sm font-light text-light-60">
+              <p className="text-[13px] font-medium text-subtle">
                 You haven't selected a conversation yet. Please select one and try sharing again.
               </p>
             )}
           </div>
           <div className={styles.footer}>
-            <button className={styles.disableButton} onClick={onDisableLink} disabled={!conversation || isDisabling}>
+            <button
+              className={styles.disableButton}
+              onClick={onDisableLink}
+              disabled={!conversation || isDisabling || !conversation.shared_id}
+            >
               {isDisabling ? (
                 <>
                   <span>Disabling...</span>

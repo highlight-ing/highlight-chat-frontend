@@ -27,10 +27,10 @@ export const ShareAssistantMessage: React.FC<ShareAssistantMessageProps> = ({ me
 
   return (
     <div className="mx-auto w-full max-w-[712px] px-6 sm:px-4">
-      <div className="rounded-[24px] border border-border-tertiary bg-background-secondary p-4 pb-2">
+      <div className="rounded-[24px] bg-secondary p-4 pb-2">
         <div className="mb-4 flex items-center">
           <HighlightIcon size={16} color="gray" />
-          <span className="ml-2 text-xs font-medium text-text-secondary">Highlight</span>
+          <span className="ml-2 text-xs font-medium text-secondary">Highlight</span>
         </div>
         <div className={styles.messageBody}>
           <Markdown
