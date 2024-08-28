@@ -41,7 +41,7 @@ const PersonalPrompts = ({
       ) : (
         <div className={styles.emptyPersonalPrompts}>
           <Setting color={variables.light20} variant={'Bold'} />
-          <p>Prompts you create or fork will be added here.</p>
+          <p>Prompts you create and favorite will be added here.</p>
           <Button size="small" variant="tertiary" onClick={() => openModal('create-prompt')}>
             Create Prompt
           </Button>
