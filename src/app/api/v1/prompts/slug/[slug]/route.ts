@@ -5,6 +5,7 @@ import { PROMPTS_TABLE_SELECT_FIELDS, supabaseAdmin } from '@/lib/supabase'
  */
 export async function GET(request: Request, { params }: { params: { slug: string } }) {
   const supabase = supabaseAdmin()
+
   const { data: prompt, error } = await supabase
     .from('prompts')
     .select(PROMPTS_TABLE_SELECT_FIELDS)
