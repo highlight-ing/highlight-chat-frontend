@@ -60,11 +60,11 @@ export default function GetHighlightCTA() {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="duration-250 flex-shrink-0 whitespace-nowrap rounded-[8px] bg-primary px-3 py-1.5 text-xs font-bold text-text-black transition-all ease-in-out hover:bg-primary-60">
+            <button className="duration-250 flex-shrink-0 whitespace-nowrap rounded-[8px] bg-primary px-3 py-1.5 text-xs font-bold text-black transition-all ease-in-out hover:bg-primary-60">
               Get Highlight
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="border border-light-10 bg-background-secondary">
+          <DropdownMenuContent className="border border-light-10 bg-secondary">
             <DropdownMenuItem
               onClick={() => handleDownload('intel')}
               className="px-4 py-2 transition-colors duration-150 ease-in-out hover:bg-light-10"
@@ -86,7 +86,7 @@ export default function GetHighlightCTA() {
     return (
       <button
         onClick={() => handleDownload()}
-        className="duration-250 flex-shrink-0 whitespace-nowrap rounded-[8px] bg-primary px-3 py-1.5 text-xs font-bold text-text-black transition-all ease-in-out hover:bg-primary-60"
+        className="duration-250 flex-shrink-0 whitespace-nowrap rounded-[8px] bg-teal px-3 py-1.5 text-xs font-bold text-black transition-all ease-in-out hover:bg-primary-60"
       >
         Get Highlight
       </button>
@@ -95,11 +95,11 @@ export default function GetHighlightCTA() {
 
   return (
     <div className="fixed bottom-4 w-full max-w-[712px] px-8 sm:px-4">
-      <div className="flex items-center justify-between rounded-[20px] border border-light-10 bg-background-secondary p-3">
+      <div className="flex items-center justify-between rounded-[20px] border border-light-10 bg-secondary p-3">
         <div className="flex-shrink-0">
           <HighlightIcon size={24} color="white" />
         </div>
-        <p className="font-base mx-3 flex-grow truncate text-center text-[14px] text-text-tertiary sm:text-[16px]">
+        <p className="font-base mx-3 flex-grow truncate text-center text-[14px] text-tertiary sm:text-[16px]">
           {isMobile ? (
             <span>Learn more about Highlight</span>
           ) : (

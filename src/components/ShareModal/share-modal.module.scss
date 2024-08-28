@@ -39,11 +39,11 @@
 
 .shareModal {
   width: 400px;
-  background-color: $chat-share-modal-background;
+  background-color: $background-primary;
   border: 1px solid $light-5;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 0px 1px 0px rgba(0, 0, 0, 0.5), 0 2px 6px 0px rgba(0, 0, 0, 0.20);
 }
 
 .header {
@@ -56,31 +56,33 @@
 }
 
 .previewBox {
-    background-color: $dark-20;
+    background-color: $background-tertiary;
     border-radius: 8px;
-    padding: 12px;
-  
-    > div.separator {
-      height: 1px;
-      background-color: $light-5;
-      margin: 12px -12px;
-      width: calc(100% + 24px);
-    }
-  
-    > div:last-child {
-      display: flex;
-      align-items: center;
-  
-    > svg {
-      flex-shrink: 0;
-    }
-  
-    > div {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-  }
+    padding: 16px;
+}
+
+.previewContent {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+}
+
+.iconWrapper {
+    display: flex;
+    align-items: center;
+}
+
+.textContent {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.separator {
+    height: 1px;
+    background-color: $light-5;
+    margin: 16px 0;
+    width: 100%;
 }
 
 .footer {

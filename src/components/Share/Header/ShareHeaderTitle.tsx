@@ -21,8 +21,8 @@ const ShareHeaderTitle: React.FC<ShareHeaderTitleProps> = ({ title, sharedBy }) 
     <div className="flex items-center space-x-3">
       <HighlightIcon size={24} color="white" />
       <div>
-        <h1 className="font-base text-sm text-text-primary">{strippedTitle}</h1>
-        <p className="text-xs text-text-tertiary">Shared by {sharedBy || 'Highlight User'}</p>
+        <h1 className="font-base text-sm text-primary">{strippedTitle}</h1>
+        <p className="text-xs text-tertiary">Shared by {sharedBy || 'Highlight User'}</p>
       </div>
     </div>
   )

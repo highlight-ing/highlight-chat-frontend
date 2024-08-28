@@ -54,13 +54,13 @@ const SharePageComponent: React.FC<SharePageComponentProps> = ({ messages }) => 
   return (
     <div className="flex min-h-screen flex-col items-center">
       <div className="w-full max-w-[712px] flex-grow pb-24">
-        <p className="m-4 text-center text-xs text-text-tertiary">
+        <p className="m-4 text-center text-xs text-tertiary">
           Created with Highlight.{' '}
           <a
             href="https://highlight.ing/"
             target="_blank"
             rel="noopener noreferrer"
-            className="underline transition-colors duration-200 hover:text-text-secondary"
+            className="underline transition-colors duration-200 hover:text-secondary"
           >
             Download
           </a>{' '}

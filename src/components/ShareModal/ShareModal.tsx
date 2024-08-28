@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react'
-import { MessageText } from 'iconsax-react'
+import { EmojiHappy } from 'iconsax-react'
 import styles from './share-modal.module.scss'
 import variables from '@/variables.module.scss'
 import { ChatHistoryItem } from '@/types'
@@ -85,6 +85,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
   }
 
   const processedTitle = conversation?.title.replace(/^["']|["']$/g, '')
+  const fakeUrl = 'highlight.ing/life-coach'
 
   return (
     <>
@@ -93,19 +94,21 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
         <div className={styles.shareModal} ref={modalRef}>
           <div className={`${styles.header} flex flex-col justify-start`}>
             <h3 className="text-md font-regular text-left text-white">Share Chat</h3>
-            <p className="mt-2 text-sm font-light text-light-20">
-              All contents currently inside the chat will be shared.
-            </p>
           </div>
           <div className={styles.content}>
             {conversation ? (
               <div className={styles.previewBox}>
-                <div className="flex items-center gap-3">
-                  <MessageText size={20} color={variables.light60} />
-                  <div className="flex flex-col pb-2 pt-2">
-                    <p className="text-base text-white">{processedTitle}</p>
+                <div className={styles.previewContent}>
+                  <div className={styles.iconWrapper}>
+                    <EmojiHappy size={30} color={variables.purple100} variant="Bold" />
+                  </div>
+                  <div className={styles.textContent}>
+                    <p className="mb-1 text-[13px] font-medium leading-[16px] text-white">{processedTitle}</p>
+                    <p className="text-[13px] font-medium leading-[16px] text-light-40">{fakeUrl}</p>
                   </div>
                 </div>
+                <div className={styles.separator} />
+                <p className="text-sm font-light text-subtle">All contents currently inside the chat will be shared.</p>
               </div>
             ) : (
               <p className="text-sm font-light text-light-60">
