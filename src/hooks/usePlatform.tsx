@@ -1,19 +1,19 @@
 import { useState, useEffect } from 'react'
 import { PlatformType } from '@/types'
+import { isWindows, isMacOs, isIOS, isAndroid, isMobile, isDesktop } from 'react-device-detect'
 
 export function usePlatform() {
   const [platform, setPlatform] = useState<PlatformType>('unknown')
 
   useEffect(() => {
-    const userAgent = window.navigator.userAgent.toLowerCase()
-    if (/windows/.test(userAgent)) {
+    if (isWindows) {
       setPlatform('windows')
-    } else if (/macintosh|mac os x/.test(userAgent)) {
+    } else if (isMacOs) {
       setPlatform('mac')
-    } else if (/linux/.test(userAgent)) {
-      setPlatform('unsupported')
-    } else if (/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/.test(userAgent)) {
+    } else if (isIOS || isAndroid || isMobile) {
       setPlatform('mobile')
+    } else if (isDesktop) {
+      setPlatform('unsupported')
     } else {
       setPlatform('unknown')
     }
