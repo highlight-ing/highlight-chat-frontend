@@ -146,7 +146,7 @@ const PersonalPromptsItem = ({
         </div>
         <div className={styles.personalPromptsItemFooterRightButtons}>
           <Button
-            size="xsmall"
+            size="icon"
             variant="ghost-neutral"
             style={{
               border: `1px solid ${color}`,
@@ -154,10 +154,10 @@ const PersonalPromptsItem = ({
             onClick={() => openModal('confirm-delete-prompt', { externalId: externalId, name: name })}
             hidden={!isHovered}
           >
-            <Trash color={variables.tertiary} variant={'Bold'} size="16" />
+            <Trash color={variables.tertiary} variant={'Bold'} size="24" />
           </Button>
           <Button
-            size="xsmall"
+            size="icon"
             variant="ghost-neutral"
             style={{
               border: `1px solid ${color}`,
@@ -168,7 +168,7 @@ const PersonalPromptsItem = ({
             <Lock color={variables.tertiary} variant={'Bold'} size="16" />
           </Button>
           <Button
-            size="xsmall"
+            size="icon"
             variant="ghost-neutral"
             style={{
               border: `1px solid ${color}`,

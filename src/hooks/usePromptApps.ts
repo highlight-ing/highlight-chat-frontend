@@ -38,7 +38,10 @@ export default (loadPrompts?: boolean) => {
   const [isLoadingPrompts, setLoadingPrompts] = useState(loadPrompts || !isPromptsLoaded)
 
   const communityPrompts = useMemo(() => {
-    return prompts.filter((prompt) => prompt.user_id !== promptUserId).filter((prompt) => prompt.public)
+    return prompts
+      .filter((prompt) => prompt.user_id !== promptUserId && prompt.public)
+      .sort((a, b) => (b.public_use_number || 0) - (a.public_use_number || 0))
+      .slice(0, 10)
   }, [prompts, promptUserId])
 
   const myPrompts = useMemo(() => {

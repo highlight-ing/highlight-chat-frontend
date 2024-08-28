@@ -22,7 +22,7 @@ const TrendingPrompts = ({
     <div className={styles.trendingPromptsContainer}>
       {prompts.length > 0 ? (
         <div className={styles.trendingPromptsHeader}>
-          <h2>Trending Prompts</h2>
+          <h2>Top 10 Trending Prompts</h2>
           <div className={styles.trendingPrompts}>
             {prompts.map((item, index) => (
               <TrendingPromptsItem
