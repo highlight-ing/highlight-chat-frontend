@@ -78,6 +78,7 @@ const TrendingPromptsItem = ({
   publicUseNumber: number
 }) => {
   const [isCopied, setIsCopied] = useState(false)
+  console.log('tags', tags)
   return (
     <div className={`${styles.trendingPromptsItem} ${lastItem ? styles.lastItem : ''}`}>
       <div className={styles.trendingPromptsItemHeader}>
@@ -114,13 +115,13 @@ const TrendingPromptsItem = ({
       </div>
       <div className={styles.trendingPromptsItemFooter}>
         <Badge variant="disabled">{publicUseNumber ? `${publicUseNumber} Uses` : 'No uses'}</Badge>
-        {tags && tags.length > 0 && (
-          <div className={styles.trendingPromptsItemFooterTags}>
-            {tags.map((tag) => (
-              <Badge variant="disabled">{tag}</Badge>
-            ))}
-          </div>
-        )}
+        {tags &&
+          tags.length > 0 &&
+          tags.map((tag, index) => (
+            <Badge key={index} variant="disabled">
+              {tag}
+            </Badge>
+          ))}
       </div>
     </div>
   )
