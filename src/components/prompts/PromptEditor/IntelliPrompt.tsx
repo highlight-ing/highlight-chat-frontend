@@ -94,6 +94,20 @@ export default function IntelliPrompt({
       wordWrap: 'on',
       folding: false,
     })
+
+    editor.createDecorationsCollection([
+      {
+        range: {
+          startColumn: 1,
+          startLineNumber: 1,
+          endColumn: 10,
+          endLineNumber: 2,
+        },
+        options: {
+          className: styles.onboardingDecoration,
+        },
+      },
+    ])
   }
 
   function onVariableClick(variable: string) {
@@ -136,6 +150,7 @@ export default function IntelliPrompt({
           minimap: {
             enabled: false,
           },
+          automaticLayout: true,
         }}
         loading={<Loading />}
       />

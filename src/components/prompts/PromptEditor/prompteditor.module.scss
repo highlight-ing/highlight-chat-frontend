@@ -188,3 +188,34 @@
   font-size: 16px;
   color: $light-100;
 }
+
+.headingText {
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px; /* 120% */
+  letter-spacing: -0.3px;
+  color: #EEEEEE;
+}
+
+.explainerText {
+  padding-top: 16px;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 350;
+  line-height: 160%; /* 24px */
+  color: #B4B4B4;
+  width: 480px;
+}
+
+.buttonContainer {
+  padding-top: 71px;
+}
+
+.onboardingDecoration {
+  color: white !important;
+}
+
+.onboardingBlock {
+  opacity: 0.4;
+}

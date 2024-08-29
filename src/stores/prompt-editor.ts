@@ -9,6 +9,14 @@ import { useShallow } from 'zustand/react/shallow'
 
 export type PromptEditorScreen = 'startWithTemplate' | 'app' | 'suggestions' | 'settings'
 
+export interface PromptEditorOnboarding {
+  /**
+   * Where we currently are in the onboarding process.
+   */
+  index: number
+  isOnboarding: boolean
+}
+
 export interface PromptEditorData {
   externalId?: string
   slug: string
@@ -28,6 +36,7 @@ export interface PromptEditorState {
   needSave: boolean
   saving: boolean
   settingsHasNoErrors: boolean
+  onboarding: PromptEditorOnboarding
 }
 
 export type PromptEditorSlice = PromptEditorState & {
@@ -37,6 +46,7 @@ export type PromptEditorSlice = PromptEditorState & {
   setNeedSave: (needSave: boolean) => void
   setSaving: (saving: boolean) => void
   setSettingsHasNoErrors: (hasSettingsError: boolean) => void
+  setOnboarding: (onboarding: Partial<PromptEditorOnboarding>) => void
 }
 
 export const initialPromptEditorState: PromptEditorState = {
@@ -52,6 +62,10 @@ export const initialPromptEditorState: PromptEditorState = {
   needSave: false,
   saving: false,
   settingsHasNoErrors: false,
+  onboarding: {
+    index: 0,
+    isOnboarding: true,
+  },
 }
 
 export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, get) => ({
@@ -63,6 +77,13 @@ export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, ge
   setNeedSave: (needSave: boolean) => set({ needSave }),
   setSaving: (saving: boolean) => set({ saving }),
   setSettingsHasNoErrors: (settingsHasNoErrors: boolean) => set({ settingsHasNoErrors }),
+  setOnboarding: (onboarding: Partial<PromptEditorOnboarding>) =>
+    set({
+      onboarding: {
+        ...get().onboarding,
+        ...onboarding,
+      },
+    }),
 })
 
 export const usePromptEditorStore = () =>
@@ -79,5 +100,7 @@ export const usePromptEditorStore = () =>
       setSaving: state.setSaving,
       settingsHasNoErrors: state.settingsHasNoErrors,
       setSettingsHasNoErrors: state.setSettingsHasNoErrors,
+      onboarding: state.onboarding,
+      setOnboarding: state.setOnboarding,
     })),
   )
