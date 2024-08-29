@@ -263,6 +263,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
                 components={animatedComponents}
                 placeholder="Add #tags to make your prompt more easy to find..."
                 options={promptTags}
+                menuPlacement="top"
                 styles={{
                   control: (baseStyles, state) => ({
                     ...baseStyles,
