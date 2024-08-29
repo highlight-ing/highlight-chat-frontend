@@ -94,6 +94,7 @@ $background-primary: #0F0F0F;
 $background-secondary: #191919;
 $background-tertiary: #222222;
 
+$background-accent: #00F0FF;
 $background-accent-secondary: #004B52;
 
 $border-primary: #00FAFF;
@@ -162,4 +163,7 @@ $border-tertiary: #222222;
   purple60: $purple-60;
   purple80: $purple-80;
   purple100: $purple-100;
+
+  textSecondary: $text-secondary;
+  backgroundAccent: $background-accent;
 }

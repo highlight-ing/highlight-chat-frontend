@@ -4,6 +4,7 @@ import StartWithTemplateScreen from './screens/StartWithTemplateScreen'
 import { PromptEditorScreen, usePromptEditorStore } from '@/stores/prompt-editor'
 import SuggestionsScreen from './screens/SuggestionsScreen'
 import styles from './prompteditor.module.scss'
+import { trackEvent } from '@/utils/amplitude'
 
 function ScreenSelector({
   active,
@@ -29,11 +30,11 @@ function ScreenSelector({
 }
 
 function TutorialButton() {
-  const { setSelectedScreen, setOnboarding, onboarding } = usePromptEditorStore()
+  const { onboarding, startTutorial } = usePromptEditorStore()
 
   function handleClick() {
-    setOnboarding({ isOnboarding: true, index: 0 })
-    setSelectedScreen('app')
+    trackEvent('Trigger Prompt Editor Tutorial', {})
+    startTutorial()
   }
 
   return (

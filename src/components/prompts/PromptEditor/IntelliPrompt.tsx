@@ -20,15 +20,18 @@ interface PromptVariable {
 
 /**
  * The new, improved PromptInput component that uses Monaco Editor.
+ * @param otherButtons Additional buttons that will go in the "Context Bar" (the place where users can click to add variables)
  */
 export default function IntelliPrompt({
   value,
   onChange,
   variables,
+  otherButtons,
 }: {
   value?: string
   onChange?: (value: string) => void
   variables?: PromptVariable[]
+  otherButtons?: React.ReactNode[]
 }) {
   const monacoRef = useRef<Monaco | undefined>()
   const editorRef = useRef<editor.IStandaloneCodeEditor | undefined>()
@@ -44,6 +47,7 @@ export default function IntelliPrompt({
   }, [completionDisposable])
 
   useEffect(() => {
+    // Effect that makes the editor read only if the user is onboarding
     editorRef.current?.updateOptions({
       readOnly: onboarding.isOnboarding,
     })
@@ -133,6 +137,7 @@ export default function IntelliPrompt({
     <>
       <div className={styles.editorPage}>
         <div className={`${styles.editorActions} px-4`}>
+          {otherButtons?.map((button) => button)}
           {variables?.map((variable) => (
             <Tooltip
               key={variable.label}

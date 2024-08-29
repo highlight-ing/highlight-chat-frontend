@@ -15,6 +15,7 @@ export interface PromptEditorOnboarding {
    */
   index: number
   isOnboarding: boolean
+  hasOnboardedOnceBefore: boolean
 }
 
 export interface PromptEditorData {
@@ -47,6 +48,7 @@ export type PromptEditorSlice = PromptEditorState & {
   setSaving: (saving: boolean) => void
   setSettingsHasNoErrors: (hasSettingsError: boolean) => void
   setOnboarding: (onboarding: Partial<PromptEditorOnboarding>) => void
+  startTutorial: () => void
 }
 
 export const initialPromptEditorState: PromptEditorState = {
@@ -65,6 +67,7 @@ export const initialPromptEditorState: PromptEditorState = {
   onboarding: {
     index: 0,
     isOnboarding: true,
+    hasOnboardedOnceBefore: false,
   },
 }
 
@@ -84,6 +87,8 @@ export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, ge
         ...onboarding,
       },
     }),
+  startTutorial: () =>
+    set({ onboarding: { isOnboarding: true, index: 0, hasOnboardedOnceBefore: true }, selectedScreen: 'app' }),
 })
 
 export const usePromptEditorStore = () =>
@@ -102,5 +107,6 @@ export const usePromptEditorStore = () =>
       setSettingsHasNoErrors: state.setSettingsHasNoErrors,
       onboarding: state.onboarding,
       setOnboarding: state.setOnboarding,
+      startTutorial: state.startTutorial,
     })),
   )

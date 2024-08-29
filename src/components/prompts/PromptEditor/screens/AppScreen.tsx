@@ -1,10 +1,26 @@
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import IntelliPrompt from '../IntelliPrompt'
-import { ClipboardText, ExportSquare, Gallery, I3Square, MessageText1, Monitor, Sound } from 'iconsax-react'
+import {
+  ClipboardText,
+  ExportSquare,
+  Gallery,
+  I3Square,
+  MessageText1,
+  Monitor,
+  Sound,
+  Shapes,
+  Screenmirroring,
+  VoiceSquare,
+  Crown1,
+  Crown,
+  Note,
+} from 'iconsax-react'
 import sassVariables from '@/variables.module.scss'
 import styles from '../prompteditor.module.scss'
 import { useEffect } from 'react'
 import OnboardingBox from '../OnboardingBox'
+import Button from '@/components/Button/Button'
+import ContextMenu from '@/components/ContextMenu/ContextMenu'
 
 function OnboardingIndex0() {
   const { setOnboarding } = usePromptEditorStore()
@@ -100,6 +116,110 @@ function OnboardingIndex3() {
   )
 }
 
+function TemplateButton() {
+  const { setPromptEditorData } = usePromptEditorStore()
+
+  const APP_PROMPT_COMMENT =
+    "{{! These are comments, they won't effect the output of your app }}\n{{! The app prompt determines how your app will behave to the user. }}\n"
+
+  /**
+   * Comment that gets appended to all prompts
+   */
+  const SUGGESTIONS_PROMPT_COMMENT =
+    '{{! Write a prompt that explains how your app can help the user provided the context }}\n'
+
+  const contextMenuItems = [
+    {
+      label: (
+        <div className="flex items-center gap-2">
+          <Screenmirroring variant="Bold" size={16} color={sassVariables.textSecondary} />
+          Code Reviewer
+        </div>
+      ),
+      onClick: () => {
+        setPromptEditorData({
+          appPrompt:
+            APP_PROMPT_COMMENT +
+            'You are a code reviewer. You will review code and provide suggestions for improvements. Use the screen data {{screen}} to help the user with their code.',
+          suggestionsPrompt:
+            SUGGESTIONS_PROMPT_COMMENT +
+            'Using this screen data: {{screen}}, offer suggestions for ways to improve the code.',
+        })
+      },
+    },
+    {
+      label: (
+        <div className="flex items-center gap-2">
+          <Note variant="Bold" size={16} color={sassVariables.textSecondary} />
+          Meeting Summarizer
+        </div>
+      ),
+      onClick: () => {
+        setPromptEditorData({
+          appPrompt:
+            APP_PROMPT_COMMENT +
+            'You are a meeting summarizer. You will summarize the meeting notes from either the {{audio}} or {{clipboard_text}} that is provided. If both of these are missing, prompt the user to attach them.',
+          suggestionsPrompt: '',
+          name: 'Meeting Summarizer',
+          description: 'A meeting summarizer that will summarize meeting notes.',
+        })
+      },
+    },
+    {
+      label: (
+        <div className="flex items-center gap-2">
+          <VoiceSquare variant="Bold" size={16} color={sassVariables.textSecondary} />
+          Blog Post Generator
+        </div>
+      ),
+      onClick: () => {
+        setPromptEditorData({
+          appPrompt:
+            APP_PROMPT_COMMENT +
+            'You are a blog post generator. You will generate a blog post based on the screen data {{screen}} that is provided.',
+          suggestionsPrompt: '',
+          name: 'Blog Post Generator',
+          description:
+            'A blog post generator that will generate a blog post based on the screen data that is provided.',
+        })
+      },
+    },
+    {
+      label: (
+        <div className="flex items-center gap-2">
+          <Crown variant="Bold" size={16} color={sassVariables.textSecondary} />
+          Lizzard Person
+        </div>
+      ),
+      onClick: () => {
+        setPromptEditorData({
+          appPrompt:
+            APP_PROMPT_COMMENT +
+            'You are a lizzard person. Joke about how you will take over the world using the screen data {{screen}}, audio {{audio}}, and clipboard text {{clipboard_text}} that is provided.',
+          suggestionsPrompt: '',
+          name: 'Lizzard Person',
+          description: 'A lizzard person who will take over the world.',
+        })
+      },
+    },
+  ]
+
+  return (
+    <ContextMenu
+      key="templates-menu"
+      items={contextMenuItems}
+      position={'bottom'}
+      triggerId={`toggle-templates`}
+      leftClick={true}
+    >
+      <Button id="toggle-templates" size={'medium'} variant={'ghost-neutral'}>
+        <Shapes variant="Bold" size={16} color={sassVariables.backgroundAccent} />
+        Templates
+      </Button>
+    </ContextMenu>
+  )
+}
+
 export default function AppScreen() {
   const { promptEditorData, setPromptEditorData, onboarding } = usePromptEditorStore()
 
@@ -109,6 +229,7 @@ export default function AppScreen() {
         <IntelliPrompt
           value={promptEditorData.appPrompt}
           onChange={(e) => setPromptEditorData({ appPrompt: e })}
+          otherButtons={[<TemplateButton />]}
           variables={[
             {
               label: 'User Message',
