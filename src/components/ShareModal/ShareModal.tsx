@@ -5,6 +5,8 @@ import variables from '@/variables.module.scss'
 import { ChatHistoryItem } from '@/types'
 import { useShareConversation, useDeleteConversation } from '@/hooks/useShareConversation'
 import { useStore } from '@/providers/store-provider'
+import Button from '@/components/Button/Button'
+import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 
 interface ShareModalProps {
   isVisible: boolean
@@ -98,7 +100,6 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
   }
 
   const processedTitle = conversation?.title.replace(/^["']|["']$/g, '')
-  const fakeUrl = 'Private Chat'
 
   return (
     <>
@@ -112,21 +113,16 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
             {conversation ? (
               <div className={styles.previewBox}>
                 <div className={styles.previewContent}>
-                  <div className={styles.iconWrapper}>
-                    <EmojiHappy size={30} color={variables.purple100} variant="Bold" />
-                  </div>
+                  <EmojiHappy size={24} color={variables.purple100} variant="Bold" />
                   <div className={styles.textContent}>
-                    <p className="mb-1 text-[13px] font-medium leading-[16px] text-white">{processedTitle}</p>
+                    <p className={styles.title}>{processedTitle}</p>
                     <p className="text-[13px] font-medium leading-[16px] text-light-40">{chatVisibilityLabel}</p>
                   </div>
                 </div>
-                <div className={styles.separator} />
                 <div className={styles.previewFooter}>
-                  <p className="text-[13px] font-semibold text-subtle">
-                    {conversation.shared_id
-                      ? `${conversation.shared_id}`
-                      : 'All contents currently inside the chat will be shared.'}
-                  </p>
+                  {conversation.shared_id
+                    ? `${conversation.shared_id}`
+                    : 'All contents currently inside the chat will be shared.'}
                 </div>
               </div>
             ) : (
@@ -135,32 +131,39 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
               </p>
             )}
           </div>
-          <div className={styles.footer}>
-            <button
-              className={styles.disableButton}
-              onClick={onDisableLink}
-              disabled={!conversation || isDisabling || !conversation.shared_id}
-            >
-              {isDisabling ? (
-                <>
-                  <span>Disabling...</span>
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-dark border-t-transparent"></div>
-                </>
-              ) : (
-                <span>Disable all share links</span>
-              )}
-            </button>
-            <button className={styles.copyButton} onClick={onCopyLink} disabled={!conversation || isGenerating}>
-              {isGenerating ? (
-                <>
-                  <span>Generating...</span>
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-dark border-t-transparent"></div>
-                </>
-              ) : (
-                <span>Copy link to chat</span>
-              )}
-            </button>
-          </div>
+
+          <Button
+            size={'medium'}
+            variant={'primary'}
+            onClick={onCopyLink}
+            disabled={!conversation || isGenerating}
+            style={{
+              width: '100%',
+            }}
+          >
+            {isGenerating ? (
+              <>
+                <LoadingSpinner size={'20px'} /> Generating...
+              </>
+            ) : (
+              'Copy Share Link'
+            )}
+          </Button>
+          <Button
+            size={'medium'}
+            variant={'ghost-neutral'}
+            style={{ width: '100%' }}
+            disabled={!conversation || isDisabling || !conversation.shared_id}
+            onClick={onDisableLink}
+          >
+            {isDisabling ? (
+              <>
+                <LoadingSpinner size={'20px'} /> Disabling...
+              </>
+            ) : (
+              'Disable All Share Links'
+            )}
+          </Button>
         </div>
       </div>
     </>
