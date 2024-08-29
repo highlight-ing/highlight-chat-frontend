@@ -7,6 +7,57 @@ import Button from '@/components/Button/Button'
 import { Setting, Trash, Lock, Edit2 } from 'iconsax-react'
 import { Prompt } from '@/types/supabase-helpers'
 
+const CSS_VARIABLES = {
+  private: {
+    icon: {
+      color: variables.textPrimary,
+    },
+    background: {
+      color: variables.backgroundSecondary,
+      hoverColor: variables.backgroundTertiary,
+    },
+    button: {
+      textColor: variables.textSecondary,
+      backgroundColor: variables.backgroundTertiary,
+      hoverBackgroundColor: variables.backgroundTertiary,
+      borderColor: variables.backgroundTertiary,
+      hoverBorderColor: variables.backgroundTertiary,
+    },
+  },
+  public: {
+    icon: {
+      color: variables.pink100,
+    },
+    background: {
+      color: variables.backgroundSecondary,
+      hoverColor: variables.pink20,
+    },
+    button: {
+      textColor: variables.textSecondary,
+      backgroundColor: variables.backgroundTertiary,
+      hoverBackgroundColor: variables.pink20,
+      borderColor: variables.backgroundTertiary,
+      hoverBorderColor: variables.pink40,
+    },
+  },
+  forked: {
+    icon: {
+      color: variables.primary100,
+    },
+    background: {
+      color: variables.backgroundSecondary,
+      hoverColor: variables.primary20,
+    },
+    button: {
+      textColor: variables.textSecondary,
+      backgroundColor: variables.backgroundTertiary,
+      hoverBackgroundColor: variables.primary20,
+      borderColor: variables.backgroundTertiary,
+      hoverBorderColor: variables.primary20,
+    },
+  },
+}
+
 const PersonalPrompts = ({
   userId,
   prompts,
@@ -76,27 +127,28 @@ const PersonalPromptsItem = ({
 }) => {
   const [isCopied, setIsCopied] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
-  const color =
-    userId === prompt.user_id
-      ? prompt.public
-        ? variables.pink100
-        : variables.tertiary
-      : prompt.public
-        ? variables.primary100
-        : variables.tertiary50
+
+  const isOwner = userId === prompt.user_id
+  const isPublic = prompt.public
+  const colorScheme = isOwner
+    ? isPublic
+      ? CSS_VARIABLES.public
+      : CSS_VARIABLES.private
+    : isPublic
+      ? CSS_VARIABLES.forked
+      : CSS_VARIABLES.private
 
   return (
     <div
       className={styles.personalPromptsItem}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      // on hover change background color
       style={{
-        backgroundColor: isHovered ? `${color}40` : variables.backgroundSecondary,
+        backgroundColor: isHovered ? colorScheme.background.hoverColor : colorScheme.background.color,
       }}
     >
       <div className={styles.personalPromptsItemHeader}>
-        <Setting color={color} variant={'Bulk'} />
+        <Setting color={colorScheme.icon.color} variant={'Bulk'} />
         <h3>{name}</h3>
       </div>
       <div className={styles.personalPromptsItemContent}>
@@ -113,9 +165,9 @@ const PersonalPromptsItem = ({
             size="xsmall"
             variant="ghost-neutral"
             style={{
-              border: `1px solid ${color}`,
-              backgroundColor: color,
-              color: variables.light100,
+              border: `1px solid ${isHovered ? colorScheme.button.hoverBorderColor : colorScheme.button.borderColor}`,
+              backgroundColor: isHovered ? colorScheme.button.hoverBackgroundColor : colorScheme.button.backgroundColor,
+              color: colorScheme.button.textColor,
             }}
             onClick={() => {
               const url = `https://chat.highlight.ing/prompts/${slug}`
@@ -133,8 +185,8 @@ const PersonalPromptsItem = ({
           <Button
             className={styles.filledButton}
             style={{
-              border: `1px solid ${color}`,
-              color: color,
+              border: `1px solid ${isHovered ? colorScheme.button.hoverBorderColor : colorScheme.button.borderColor}`,
+              color: colorScheme.button.textColor,
             }}
             size="xsmall"
             variant="ghost-neutral"
@@ -149,7 +201,7 @@ const PersonalPromptsItem = ({
             size="icon"
             variant="ghost-neutral"
             style={{
-              border: `1px solid ${color}`,
+              border: `1px solid ${isHovered ? colorScheme.button.hoverBorderColor : colorScheme.button.borderColor}`,
             }}
             onClick={() => openModal('confirm-delete-prompt', { externalId: externalId, name: name })}
             hidden={!isHovered}
@@ -160,7 +212,7 @@ const PersonalPromptsItem = ({
             size="icon"
             variant="ghost-neutral"
             style={{
-              border: `1px solid ${color}`,
+              border: `1px solid ${isHovered ? colorScheme.button.hoverBorderColor : colorScheme.button.borderColor}`,
             }}
             onClick={() => openModal('change-prompt-visibility', { prompt })}
             hidden={!isHovered}
@@ -171,12 +223,12 @@ const PersonalPromptsItem = ({
             size="icon"
             variant="ghost-neutral"
             style={{
-              border: `1px solid ${color}`,
+              border: `1px solid ${isHovered ? colorScheme.button.hoverBorderColor : colorScheme.button.borderColor}`,
             }}
             onClick={() => openModal('edit-prompt', { prompt })}
             hidden={!isHovered}
           >
-            <Edit2 color={variables.tertiary} variant={'Bold'} size="16" />
+            <Edit2 color={colorScheme.button.textColor} variant={'Bold'} size="16" />
           </Button>
         </div>
       </div>
