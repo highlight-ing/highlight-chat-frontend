@@ -199,9 +199,9 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
                 ) : (
                   <div
                     className={`${globalStyles.promptIcon} ${globalStyles.self}`}
-                    style={{ '--size': '32px' } as React.CSSProperties}
+                    style={{ '--size': '36px' } as React.CSSProperties}
                   >
-                    <MessageText variant={'Bold'} size={16} />
+                    <MessageText variant={'Bold'} size={17} />
                   </div>
                 )}
               </>
