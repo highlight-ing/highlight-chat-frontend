@@ -224,14 +224,16 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
             <div className={styles.topHeaderLeft}>
               {promptApp ? promptApp.name : 'Highlight'}
               {!promptApp && currentConversation?.shared_id && (
-                <a href={`https://chat.hl.ing/share/${currentConversation?.shared_id}`}>
+                <a href={`https://chat.hl.ing/share/${currentConversation?.shared_id}`} target={'_blank'}>
                   {currentConversation.shared_id.split('://').pop()}
                 </a>
               )}
               {promptApp ? (
-                <a href={`https://chat.hl.ing/prompts/${promptApp.slug}`}>chat.hl.ing/prompts/{promptApp.slug}</a>
+                <a href={`https://chat.hl.ing/prompts/${promptApp.slug}`} target={'_blank'}>
+                  chat.hl.ing/prompts/{promptApp.slug}
+                </a>
               ) : currentConversation?.shared_id ? (
-                <a href={`https://chat.hl.ing/share/${currentConversation?.shared_id}`}>
+                <a href={`https://chat.hl.ing/share/${currentConversation?.shared_id}`} target={'_blank'}>
                   {currentConversation.shared_id.split('://').pop()}
                 </a>
               ) : (
