@@ -109,7 +109,7 @@ const Prompts = ({
         <PersonalPrompts userId={userId} prompts={myPrompts} openModal={openModal} selectPrompt={selectPrompt} />
       </div>
       <div className={styles.callouts}>
-        <TrendingPrompts userId={userId} prompts={communityPrompts} openModal={openModal} selectPrompt={selectPrompt} />
+        <TrendingPrompts prompts={communityPrompts} openModal={openModal} selectPrompt={selectPrompt} />
       </div>
     </>
   )

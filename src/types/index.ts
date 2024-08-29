@@ -152,3 +152,9 @@ export type AssistantMessageButtonConfig = {
 
 export type PlatformType = 'windows' | 'mac' | 'mobile' | 'unsupported' | 'unknown'
 export type DownloadPlatformType = 'windows' | 'mac-intel' | 'mac-silicon' | 'unsupported'
+
+// Prompt editor types
+export type PromptTag = {
+  value: string
+  label: string
+}

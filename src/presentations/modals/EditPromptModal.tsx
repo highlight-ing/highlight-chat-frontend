@@ -8,7 +8,7 @@ import { Prompt } from '@/types/supabase-helpers'
 import CloseButton from '@/components/CloseButton/CloseButton'
 import { useStore } from '@/providers/store-provider'
 import PromptSaveButton from '@/components/prompts/PromptEditor/PromptSaveButton'
-
+import { PromptTag } from '@/types'
 const EditPromptModal = ({ id, context }: ModalObjectProps) => {
   const prompt = context?.prompt as Prompt
 
@@ -28,6 +28,7 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
         visibility: prompt.public ? 'public' : 'private',
         videoUrl: prompt.video_url ?? undefined,
         image: prompt.image ? `${prompt.image}.${prompt.user_images?.file_extension}` : undefined,
+        tags: prompt.tags as PromptTag[],
       },
       true,
     )

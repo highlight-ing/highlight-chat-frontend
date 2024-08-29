@@ -3,17 +3,16 @@ import variables from '@/variables.module.scss'
 import { Prompt } from '@/types/supabase-helpers'
 import { Setting } from 'iconsax-react'
 import { useState } from 'react'
+import { PromptTag } from '@/types'
 // Components
 import Button from '@/components/Button/Button'
 import { Badge } from '@/components/Badge/Badge'
 
 const TrendingPrompts = ({
-  userId,
   prompts,
   openModal,
   selectPrompt,
 }: {
-  userId: string | undefined
   prompts: Prompt[]
   openModal: (modal: string, context?: Record<string, any>) => void
   selectPrompt: (prompt: Prompt) => void
@@ -33,7 +32,7 @@ const TrendingPrompts = ({
                 color={variables.primary100}
                 selectPrompt={selectPrompt}
                 prompt={item}
-                tags={item.tags}
+                tags={item.tags as PromptTag[] | null}
                 lastItem={index === prompts.length - 1}
                 openModal={openModal}
                 publicUseNumber={item.public_use_number}
@@ -72,13 +71,12 @@ const TrendingPromptsItem = ({
   color?: string
   selectPrompt: (prompt: Prompt) => void
   prompt: Prompt
-  tags?: string[] | null
+  tags?: PromptTag[] | null
   lastItem: boolean
   openModal: (modal: string, context?: Record<string, any>) => void
   publicUseNumber: number
 }) => {
   const [isCopied, setIsCopied] = useState(false)
-  console.log('tags', tags)
   return (
     <div className={`${styles.trendingPromptsItem} ${lastItem ? styles.lastItem : ''}`}>
       <div className={styles.trendingPromptsItemHeader}>
@@ -119,7 +117,7 @@ const TrendingPromptsItem = ({
           tags.length > 0 &&
           tags.map((tag, index) => (
             <Badge key={index} variant="disabled">
-              {tag}
+              {tag.label}
             </Badge>
           ))}
       </div>

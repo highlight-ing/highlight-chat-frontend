@@ -9,15 +9,17 @@ import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { Switch } from '@/components/catalyst/switch'
 import Image from 'next/image'
 import { supabaseLoader } from '@/lib/supabase'
-import { deletePrompt } from '@/utils/prompts'
-import useAuth from '@/hooks/useAuth'
-import { usePromptsStore } from '@/stores/prompts'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { videoUrlSchema } from '@/lib/zod'
-import variables from '@/variables.module.scss'
 import { useStore } from '@/providers/store-provider'
+import CreatableSelect from 'react-select/creatable'
+import { ActionMeta, OnChangeValue } from 'react-select'
+import { promptTags } from '@/lib/tags'
+import variables from '@/variables.module.scss'
+import makeAnimated from 'react-select/animated'
+import { PromptTag } from '@/types'
 
 function AppIcon() {
   return (
@@ -171,18 +173,20 @@ const SettingsSchema = z.object({
   name: z.string().min(1, { message: 'Name is required' }).max(40, { message: 'Name must be less than 40 characters' }),
   videoUrl: videoUrlSchema,
   description: z.string().min(1, { message: 'Description is required' }),
-  tags: z.string().array().optional(),
+  tags: z.array(z.object({ value: z.string(), label: z.string() })).optional(),
 })
 
 export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
   const { promptEditorData, setPromptEditorData, setSettingsHasNoErrors } = usePromptEditorStore()
+  const [selectedTags, setSelectedTags] = useState<PromptTag[]>(promptEditorData.tags || [])
+  console.log('promptEditorData.tags', promptEditorData)
+  const animatedComponents = makeAnimated()
 
   const { register, watch, formState, trigger } = useForm({
     defaultValues: {
       name: promptEditorData.name,
       videoUrl: promptEditorData.videoUrl ?? '',
       description: promptEditorData.description,
-      tags: promptEditorData.tags ?? '',
     },
     resolver: zodResolver(SettingsSchema),
     mode: 'all',
@@ -212,8 +216,14 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
     return () => subscription.unsubscribe()
   }, [watch])
 
+  const onChange = (newValue: OnChangeValue<PromptTag, true>) => {
+    const mutableTags = [...newValue]
+    setSelectedTags(mutableTags)
+    setPromptEditorData({ tags: mutableTags })
+  }
+
   return (
-    <div className="flex max-h-full min-h-0 flex-col items-center">
+    <div className="flex h-full flex-col items-center">
       <div className={`${styles.settingsPage} `}>
         <div className={'flex flex-1 flex-col gap-8'}>
           <div className="flex items-center space-x-6">
@@ -244,14 +254,66 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
               {...register('description')}
               error={errors.description?.message}
             />
-
-            <InputField
-              size={'xxlarge'}
-              label={'Tags'}
-              placeholder={'Add tags to your app (optional)'}
-              {...register('tags')}
-              error={errors.tags?.message}
-            />
+            <div className="flex flex-col gap-2">
+              <label className="text-light-100">Tags</label>
+              <CreatableSelect
+                value={selectedTags}
+                onChange={onChange}
+                isMulti
+                components={animatedComponents}
+                placeholder="Add #tags to make your prompt more easy to find..."
+                options={promptTags}
+                styles={{
+                  control: (baseStyles, state) => ({
+                    ...baseStyles,
+                    fontSize: '16px',
+                    border: `1px solid ${variables.light10}`,
+                    padding: '10px',
+                    borderRadius: '10px',
+                    borderColor: variables.light10,
+                    minHeight: '64px',
+                    color: variables.textPrimary,
+                    backgroundColor: variables.light5,
+                    marginLeft: '1px',
+                  }),
+                  menu: (baseStyles, state) => ({
+                    ...baseStyles,
+                    backgroundColor: variables.backgroundPrimary,
+                  }),
+                  menuList: (baseStyles, state) => ({
+                    ...baseStyles,
+                    backgroundColor: variables.backgroundPrimary,
+                  }),
+                  option: (baseStyles, state) => ({
+                    ...baseStyles,
+                    backgroundColor: state.isFocused ? variables.backgroundTertiary : variables.backgroundPrimary,
+                    color: variables.textPrimary,
+                  }),
+                  multiValue: (baseStyles, state) => ({
+                    ...baseStyles,
+                    backgroundColor: variables.backgroundPrimary,
+                    color: variables.textPrimary,
+                  }),
+                  multiValueLabel: (baseStyles, state) => ({
+                    ...baseStyles,
+                    backgroundColor: variables.backgroundPrimary,
+                    color: variables.textPrimary,
+                    borderRadius: '20px',
+                    padding: '2px 6px',
+                    fontSize: '14px',
+                  }),
+                  multiValueRemove: (baseStyles, state) => ({
+                    ...baseStyles,
+                    backgroundColor: variables.backgroundPrimary,
+                    color: variables.textPrimary,
+                    '&:hover': {
+                      backgroundColor: variables.backgroundTertiary,
+                      color: variables.red100,
+                    },
+                  }),
+                }}
+              />
+            </div>
           </div>
         </div>
         <div className={'flex flex-1 flex-col gap-4'}>

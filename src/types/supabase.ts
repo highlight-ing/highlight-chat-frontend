@@ -186,7 +186,7 @@ export type Database = {
           public_use_number: number
           slug: string
           suggestion_prompt_text: string | null
-          tags: string[] | null
+          tags: Json[] | null
           user_id: string
           video_url: string | null
         }
@@ -204,7 +204,7 @@ export type Database = {
           public_use_number?: number
           slug: string
           suggestion_prompt_text?: string | null
-          tags?: string[] | null
+          tags?: Json[] | null
           user_id: string
           video_url?: string | null
         }
@@ -222,7 +222,7 @@ export type Database = {
           public_use_number?: number
           slug?: string
           suggestion_prompt_text?: string | null
-          tags?: string[] | null
+          tags?: Json[] | null
           user_id?: string
           video_url?: string | null
         }
@@ -363,6 +363,7 @@ export type Database = {
     }
     Enums: {
       HLChatDBAttachment: 'screenshot' | 'voice' | 'clipboard' | 'ocr'
+      HLChatPromptTags: 'value' | 'label'
     }
     CompositeTypes: {
       [_ in never]: never

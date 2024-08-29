@@ -51,6 +51,7 @@ const SavePromptSchema = z.object({
   suggestionsPrompt: z.string(),
   visibility: z.enum(['public', 'private']),
   videoUrl: videoUrlSchema,
+  tags: z.array(z.object({ value: z.string(), label: z.string() })).optional(),
 })
 
 export type SavePromptData = z.infer<typeof SavePromptSchema>
@@ -134,6 +135,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
     suggestionsPrompt: formData.get('suggestionsPrompt'),
     visibility: formData.get('visibility'),
     videoUrl: formData.get('videoUrl'),
+    tags: JSON.parse(formData.get('tags') as string),
   })
 
   if (!validated.success) {
@@ -151,6 +153,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
     user_id: userId,
     image: newImageId ?? undefined,
     is_handlebar_prompt: true,
+    tags: validated.data.tags, // Store the full tag objects
   }
 
   const supabase = supabaseAdmin()
