@@ -10,11 +10,9 @@
   padding: 6px;
   background-color: $bg-layer-1;
   border-bottom: 1px solid $dark-40;
-  backdrop-filter: blur(16px);
   width: 100%;
   height: $topbar-height;
   font-size: 14px;
-  font-weight: 500;
   color: $light-80;
   z-index: 1;
 }
@@ -84,7 +82,8 @@
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: minmax(50px, 200px);
-  width: 100%; /* Ensures the grid takes up full width of its container */
+  max-width: 100%;
+  //width: 100%; /* Ensures the grid takes up full width of its container */
 }
 
 .tabContainer {
@@ -173,4 +172,45 @@
   opacity: 0;
   pointer-events: none;
   transform: scale(0.75);
+}
+
+.topHeader {
+  position: fixed;
+  top: $topbar-height;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  line-height: normal;
+  height: 56px;
+  padding: 0 12px;
+  background-color: rgba(15, 15, 15, 0.5);
+  backdrop-filter: blur(4px);
+  border-bottom: 1px solid $dark-20;
+  user-select: none;
+}
+
+.topHeaderLeft {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 13px;
+  font-weight: 500;
+  color: $light-100;
+
+  a {
+    color: $light-20;
+    font-size: 13px;
+    text-decoration: none;
+    max-width: 300px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }

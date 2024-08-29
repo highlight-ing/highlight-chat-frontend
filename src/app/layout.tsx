@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { DM_Mono, Public_Sans } from 'next/font/google'
+import { DM_Mono, Inter } from 'next/font/google'
 
 import './globals.css'
 
@@ -15,10 +15,8 @@ const dmMono = DM_Mono({
   variable: '--font-dm-mono',
 })
 
-const publicSans = Public_Sans({
+const inter = Inter({
   subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-public-sans',
 })
 
 export default function RootLayout({
@@ -27,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${dmMono.variable} ${publicSans.variable} dark`}>
+    <html lang="en" className={`${dmMono.variable} ${inter.className} dark`}>
       <body>{children}</body>
     </html>
   )
