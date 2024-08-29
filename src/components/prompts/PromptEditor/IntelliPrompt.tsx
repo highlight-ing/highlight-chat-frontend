@@ -145,6 +145,7 @@ export default function IntelliPrompt({
                 variant={'ghost-neutral'}
                 onClick={onboarding.isOnboarding ? undefined : () => onVariableClick(variable.insertText)}
                 key={variable.label}
+                disabled={onboarding.isOnboarding}
               >
                 {variable.icon}
                 {variable.label}

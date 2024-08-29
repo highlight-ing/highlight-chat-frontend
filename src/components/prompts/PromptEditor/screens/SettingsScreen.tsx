@@ -32,7 +32,7 @@ function AppIcon() {
 function ImageUpload() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [tempImageSrc, setTempImageSrc] = useState<string | undefined>()
-  const { promptEditorData, setPromptEditorData } = usePromptEditorStore()
+  const { promptEditorData, setPromptEditorData, onboarding } = usePromptEditorStore()
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -72,7 +72,12 @@ function ImageUpload() {
   return (
     <>
       {image}
-      <Button size="medium" variant="tertiary" onClick={() => fileInputRef.current?.click()}>
+      <Button
+        size="medium"
+        variant="tertiary"
+        onClick={() => fileInputRef.current?.click()}
+        disabled={onboarding.isOnboarding}
+      >
         Upload Image
       </Button>
       <input
@@ -174,6 +179,8 @@ const SettingsSchema = z.object({
 export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
   const { promptEditorData, setPromptEditorData, setSettingsHasNoErrors, onboarding } = usePromptEditorStore()
 
+  const disabled = onboarding.isOnboarding
+
   const { register, watch, formState, trigger } = useForm({
     defaultValues: {
       name: promptEditorData.name,
@@ -221,6 +228,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
                 size={'xxlarge'}
                 label={'Name'}
                 placeholder={'Name your app'}
+                disabled={disabled}
                 {...register('name')}
                 error={errors.name?.message}
               />
@@ -229,6 +237,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
                 size={'xxlarge'}
                 label={'Video Link'}
                 placeholder={'Provide a video demo for your app (optional)'}
+                disabled={disabled}
                 {...register('videoUrl')}
                 error={errors.videoUrl?.message}
               />
@@ -237,6 +246,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
                 label={'Description'}
                 placeholder={'Describe what your app does...'}
                 rows={3}
+                disabled={disabled}
                 {...register('description')}
                 error={errors.description?.message}
               />
@@ -246,6 +256,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
             <VisibilityToggle
               visibility={promptEditorData.visibility}
               onToggle={(visibility) => setPromptEditorData({ visibility })}
+              disabled={disabled}
             />
             <ShareLinkButton />
             <DeletePromptButton />
@@ -290,9 +301,11 @@ const SettingOption = ({
 const VisibilityToggle = ({
   visibility,
   onToggle,
+  disabled,
 }: {
   visibility: 'public' | 'private'
   onToggle: (visibility: 'public' | 'private') => void
+  disabled: boolean
 }) => {
   return (
     <SettingOption label={'Visibility'} description={'Share your app with the community'}>
@@ -302,6 +315,7 @@ const VisibilityToggle = ({
           color={'cyan'}
           checked={visibility === 'public'}
           onChange={(checked) => onToggle(checked ? 'public' : 'private')}
+          disabled={disabled}
         />
       </div>
     </SettingOption>

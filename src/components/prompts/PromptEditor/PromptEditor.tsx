@@ -29,7 +29,7 @@ function ScreenSelector({
 }
 
 function TutorialButton() {
-  const { setSelectedScreen, setOnboarding } = usePromptEditorStore()
+  const { setSelectedScreen, setOnboarding, onboarding } = usePromptEditorStore()
 
   function handleClick() {
     setOnboarding({ isOnboarding: true, index: 0 })
@@ -37,7 +37,10 @@ function TutorialButton() {
   }
 
   return (
-    <div onClick={handleClick} className={`${styles.tab} ${styles.right}`}>
+    <div
+      onClick={handleClick}
+      className={`${styles.tab} ${styles.right} ${onboarding.isOnboarding ? styles.disabled : ''}`}
+    >
       Tutorial
     </div>
   )

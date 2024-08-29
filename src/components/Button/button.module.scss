@@ -160,5 +160,9 @@
   &.accent {
     background-color: $background-accent-secondary;
     color: $text-accent;
+
+    &:hover {
+      background-color: rgba(0, 225, 252, 0.2);
+    }
   }
 }
