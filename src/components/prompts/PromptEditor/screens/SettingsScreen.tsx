@@ -179,7 +179,6 @@ const SettingsSchema = z.object({
 export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
   const { promptEditorData, setPromptEditorData, setSettingsHasNoErrors } = usePromptEditorStore()
   const [selectedTags, setSelectedTags] = useState<PromptTag[]>(promptEditorData.tags || [])
-  console.log('promptEditorData.tags', promptEditorData)
   const animatedComponents = makeAnimated()
 
   const { register, watch, formState, trigger } = useForm({
