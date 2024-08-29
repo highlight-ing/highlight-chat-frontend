@@ -17,6 +17,8 @@ export default function OnboardingBox({
   onClick?: () => void
   bottomComponent?: React.ReactNode
 }) {
+  const { onboarding } = usePromptEditorStore()
+
   return (
     <div className="absolute bottom-0 h-1/2 w-full border-t border-[#FFFFFF] border-opacity-10 bg-[#222222] px-[28px] py-[33px]">
       <h2 className={styles.headingText}>{title}</h2>
@@ -27,6 +29,16 @@ export default function OnboardingBox({
           <Button size="large" variant="accent" onClick={onClick}>
             {buttonText}
           </Button>
+        </div>
+      )}
+      {onboarding.index !== 4 && (
+        <div className="absolute bottom-[33px] flex gap-1">
+          {Array.from({ length: 5 }).map((_, index) => (
+            <span
+              key={index}
+              className={`h-[8px] w-[8px] rounded-full ${index === onboarding.index ? 'bg-[#EEEEEE]' : 'bg-[#3A3A3A]'}`}
+            />
+          ))}
         </div>
       )}
     </div>
