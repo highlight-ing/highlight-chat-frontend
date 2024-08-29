@@ -1,8 +1,16 @@
-import { forwardRef, PropsWithChildren } from 'react'
+import React, { forwardRef, PropsWithChildren } from 'react'
 import styles from './button.module.scss'
 
 type SizeType = 'xlarge' | 'large' | 'medium' | 'small' | 'xsmall'
-export type ButtonVariantType = 'primary' | 'secondary' | 'tertiary' | 'ghost' | 'ghost-neutral' | 'danger' | 'success'
+export type ButtonVariantType =
+  | 'primary'
+  | 'secondary'
+  | 'tertiary'
+  | 'ghost'
+  | 'ghost-neutral'
+  | 'danger'
+  | 'success'
+  | 'primary-outline'
 
 type ButtonProps = React.ComponentPropsWithoutRef<'button'> & {
   size: SizeType
@@ -19,7 +27,7 @@ const Button = forwardRef(
         ref={ref}
         className={`${styles.button} ${styles[size]} ${styles[variant]} ${
           disabled ? styles.disabled : ''
-        } ${className}`}
+        } ${className ?? ''}`}
         {...rest}
       >
         {children}

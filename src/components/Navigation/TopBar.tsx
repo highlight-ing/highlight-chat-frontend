@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { ChatHistoryItem, TopBarProps } from '@/types'
-import { Add, Clock, ExportCurve } from 'iconsax-react'
+import { Add, Clock, ExportCurve, MessageText, Send2 } from 'iconsax-react'
 import CircleButton from '@/components/CircleButton/CircleButton'
 import Tooltip from '@/components/Tooltip/Tooltip'
 import { useStore } from '@/providers/store-provider'
@@ -13,12 +13,15 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import styles from './top-bar.module.scss'
 import variables from '@/variables.module.scss'
 import { useOpenConverationsPersistence } from '@/hooks/useOpenConverationsPersistence'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import ShareModal from '@/components/ShareModal/ShareModal'
 import { useShareConversation, useDeleteConversation } from '@/hooks/useShareConversation'
 import { trackEvent } from '@/utils/amplitude'
 import { useTabHotkeys } from '@/hooks/useTabHotkeys'
 import Hotkey from '@/components/Hotkey/Hotkey'
+import Button from '@/components/Button/Button'
+import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
+import globalStyles from '@/global.module.scss'
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const router = useRouter()
@@ -27,7 +30,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
     startNewConversation,
     // promptName,
     // openModal,
-    // promptApp,
+    promptApp,
     // promptUserId,
     clearPrompt,
     conversationId,
@@ -107,7 +110,9 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   useTabHotkeys()
 
   // Find the current conversation in history
-  const currentConversation = history.find((chat) => chat.id === conversationId)
+  const currentConversation = useMemo(() => {
+    return history.find((chat) => chat.id === conversationId)
+  }, [conversationId, history])
 
   return (
     <div className={styles.topBar}>
@@ -132,7 +137,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
           </Tooltip>
         </div>
 
-        <div className="flex-grow overflow-hidden">
+        <div className="flex flex-grow items-center overflow-hidden">
           <DragDropContext onDragEnd={onDragTabEnd}>
             <Droppable droppableId="droppable" direction={'horizontal'}>
               {(provided) => (
@@ -167,30 +172,85 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
                     )
                   })}
                   {provided.placeholder}
-                  <Tooltip tooltip="Start new chat" position="bottom">
-                    <CircleButton onClick={onNewChatClick}>
-                      <Add variant={'Linear'} size={20} />
-                    </CircleButton>
-                  </Tooltip>
                 </div>
               )}
             </Droppable>
           </DragDropContext>
+          <Tooltip tooltip="Start new chat" position="bottom">
+            <CircleButton onClick={onNewChatClick}>
+              <Add variant={'Linear'} size={20} />
+            </CircleButton>
+          </Tooltip>
         </div>
+      </div>
 
-        <div className="flex items-center gap-2">
+      {conversationId && (
+        <div className={styles.topHeader}>
+          <div className={'flex gap-3'}>
+            {promptApp ? (
+              <>
+                {promptApp.image && promptApp.user_images?.file_extension ? (
+                  <PromptAppIcon
+                    width={36}
+                    height={36}
+                    imageId={promptApp.image}
+                    imageExtension={promptApp.user_images.file_extension}
+                  />
+                ) : (
+                  <div
+                    className={`${globalStyles.promptIcon} ${globalStyles.self}`}
+                    style={{ '--size': '36px' } as React.CSSProperties}
+                  >
+                    <MessageText variant={'Bold'} size={17} />
+                  </div>
+                )}
+              </>
+            ) : (
+              <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M6 10.4625C6 9.07484 7.11929 7.94995 8.5 7.94995C9.88071 7.94995 11 9.07484 11 10.4625V25.5374C11 26.9251 9.88071 28.0499 8.5 28.0499C7.11929 28.0499 6 26.9251 6 25.5374V10.4625Z"
+                  fill="white"
+                />
+                <path
+                  d="M25 10.4625C25 9.07484 26.1193 7.94995 27.5 7.94995C28.8807 7.94995 30 9.07484 30 10.4625V25.5374C30 26.9251 28.8807 28.0499 27.5 28.0499C26.1193 28.0499 25 26.9251 25 25.5374V10.4625Z"
+                  fill="white"
+                />
+                <path
+                  d="M24 17.9999C24 21.3302 21.3137 24.0299 18 24.0299C14.6863 24.0299 12 21.3302 12 17.9999C12 14.6697 14.6863 11.97 18 11.97C21.3137 11.97 24 14.6697 24 17.9999Z"
+                  fill="white"
+                />
+              </svg>
+            )}
+            <div className={styles.topHeaderLeft}>
+              {promptApp ? promptApp.name : 'Highlight'}
+              {!promptApp && currentConversation?.shared_id && (
+                <a href={`https://chat.hl.ing/share/${currentConversation?.shared_id}`} target={'_blank'}>
+                  {currentConversation.shared_id.split('://').pop()}
+                </a>
+              )}
+              {promptApp ? (
+                <a href={`https://chat.hl.ing/prompts/${promptApp.slug}`} target={'_blank'}>
+                  chat.hl.ing/prompts/{promptApp.slug}
+                </a>
+              ) : currentConversation?.shared_id ? (
+                <a href={`https://chat.hl.ing/share/${currentConversation?.shared_id}`} target={'_blank'}>
+                  {currentConversation.shared_id.split('://').pop()}
+                </a>
+              ) : (
+                <a href={`https://chat.hl.ing`}>chat.hl.ing</a>
+              )}
+            </div>
+          </div>
           {conversationId && (
-            <div className={styles.tabContainer}>
-              <div className={`${styles.tab} cursor-pointer`} onClick={onToggleShareModal}>
-                <span className="flex max-w-full items-center gap-2 overflow-hidden overflow-ellipsis whitespace-nowrap">
-                  <span>Share</span>
-                  <ExportCurve size={20} variant={'Linear'} />
-                </span>
-              </div>
+            <div>
+              <Button size={'small'} variant={'primary-outline'} onClick={onToggleShareModal}>
+                Share
+                <Send2 size={20} variant={'Bold'} />
+              </Button>
             </div>
           )}
         </div>
-      </div>
+      )}
 
       <ShareModal
         isVisible={isShareModalVisible}

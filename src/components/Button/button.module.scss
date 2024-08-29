@@ -15,6 +15,7 @@
   flex-shrink: 0;
   border-radius: 10px;
   user-select: none;
+  transition: background-color 100ms, border 100ms, color 100ms;
 
   &.disabled {
     opacity: 0.35;
@@ -28,8 +29,8 @@
     border-radius: 6px
   }
   &.small {
-    padding: 0 12px;
-    font-size: 12px;
+    padding: 0 16px;
+    font-size: 14px;
     height: 32px;
   }
   &.medium {
@@ -59,6 +60,22 @@
 
     &:active {
       background-color: $primary-80;
+    }
+  }
+
+  &.primary-outline {
+    background-color: transparent;
+    color: $primary-100;
+    border: 1px solid $primary-60;
+
+    &:hover {
+      border: 1px solid $primary-100;
+      background-color: $primary-5;
+    }
+
+    &:active {
+      color: $primary-80;
+      border: 1px solid $primary-80;
     }
   }
 
