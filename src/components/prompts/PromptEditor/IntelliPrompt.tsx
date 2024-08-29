@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { editor, IDisposable } from 'monaco-editor'
 import { buildSuggestions } from '@/lib/IntelliPrompt'
 import Tooltip from '@/components/Tooltip/Tooltip'
+import { usePromptEditorStore } from '@/stores/prompt-editor'
 
 function Loading() {
   return <span className="text-sm text-gray-500">Loading editor...</span>
@@ -34,11 +35,19 @@ export default function IntelliPrompt({
 
   const [completionDisposable, setCompletionDisposable] = useState<IDisposable>()
 
+  const { onboarding } = usePromptEditorStore()
+
   useEffect(() => {
     return () => {
       completionDisposable?.dispose()
     }
   }, [completionDisposable])
+
+  useEffect(() => {
+    editorRef.current?.updateOptions({
+      readOnly: onboarding.isOnboarding,
+    })
+  }, [onboarding.isOnboarding])
 
   function handleEditorWillMount(monaco: Monaco) {
     monacoRef.current = monaco
@@ -125,11 +134,16 @@ export default function IntelliPrompt({
       <div className={styles.editorPage}>
         <div className={`${styles.editorActions} px-4`}>
           {variables?.map((variable) => (
-            <Tooltip key={variable.label} position="top" tooltip={variable.description}>
+            <Tooltip
+              key={variable.label}
+              position="top"
+              tooltip={variable.description}
+              disabled={onboarding.isOnboarding}
+            >
               <Button
                 size={'medium'}
                 variant={'ghost-neutral'}
-                onClick={() => onVariableClick(variable.insertText)}
+                onClick={onboarding.isOnboarding ? undefined : () => onVariableClick(variable.insertText)}
                 key={variable.label}
               >
                 {variable.icon}
@@ -151,6 +165,9 @@ export default function IntelliPrompt({
             enabled: false,
           },
           automaticLayout: true,
+          readOnly: onboarding.isOnboarding,
+          fontFamily: 'Inter',
+          fontSize: 16,
         }}
         loading={<Loading />}
       />
