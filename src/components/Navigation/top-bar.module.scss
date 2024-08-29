@@ -189,6 +189,11 @@
   backdrop-filter: blur(4px);
   border-bottom: 1px solid $dark-20;
   user-select: none;
+  transition: left 250ms ease;
+
+  &.offset {
+    left: $chat-history-width;
+  }
 }
 
 .topHeaderLeft {
@@ -208,6 +213,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+    user-select: text;
 
     &:hover {
       text-decoration: underline;

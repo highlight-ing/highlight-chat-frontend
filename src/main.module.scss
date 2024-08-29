@@ -23,11 +23,11 @@
   }
 
   &.full {
-    animation: history-hide 250ms ease forwards;
+    animation: history-hide 250ms forwards;
   }
 
   &.partial {
-    animation: history-show 250ms ease forwards;
+    animation: history-show 250ms forwards;
   }
 }
 

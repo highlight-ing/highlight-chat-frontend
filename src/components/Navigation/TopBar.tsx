@@ -144,7 +144,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
                 <div
                   {...provided.droppableProps}
                   ref={provided.innerRef}
-                  className={`${styles.tabsContainer} ${showHistory ? styles.offset : ''} flex items-center`}
+                  className={`${styles.tabsContainer} flex items-center`}
                 >
                   {openConversations.map((conversation, index) => {
                     return (
@@ -185,7 +185,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
       </div>
 
       {conversationId && (
-        <div className={styles.topHeader}>
+        <div className={`${styles.topHeader} ${showHistory ? styles.offset : ''}`}>
           <div className={'flex gap-3'}>
             {promptApp ? (
               <>
