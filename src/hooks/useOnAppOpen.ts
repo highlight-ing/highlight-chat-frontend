@@ -30,7 +30,12 @@ export const useOnAppOpen = () => {
           return
         } else if (eventOpts?.action?.type === 'navigate') {
           const navigateOptions = eventOpts.action.options as NavigateOptions
-          router.push(navigateOptions.route)
+          if (navigateOptions.route !== '/new') {
+            router.push(navigateOptions.route)
+          } else {
+            startNewConversation()
+            clearPrompt()
+          }
           return
         }
       }
