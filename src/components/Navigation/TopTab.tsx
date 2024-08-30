@@ -13,6 +13,7 @@ import { trackEvent } from '@/utils/amplitude'
 import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
 import { useShallow } from 'zustand/react/shallow'
 import { usePromptApp } from '@/hooks/usePromptApp'
+import Tooltip from '@/components/Tooltip/Tooltip'
 
 interface TopTabProps {
   isActive?: boolean
@@ -145,54 +146,51 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
             width: '100%',
           }}
         >
-          <div
-            id={`tab-${conversation.id}`}
-            className={`${styles.tab} ${isActive ? styles.active : ''} ${isAnimating && !isDragging ? styles.isAnimating : ''}`}
-            onClick={() => onOpen(conversation)}
-            onMouseDown={handleMouseDown}
-            onAnimationEnd={() => setIsAnimating(false)}
-          >
-            {conversationPrompt && conversationPrompt.image && conversationPrompt.user_images?.file_extension ? (
-              <PromptAppIcon
-                width={17}
-                height={17}
-                imageId={conversationPrompt.image}
-                imageExtension={conversationPrompt.user_images.file_extension}
-              />
-            ) : (
-              <MessageText variant={'Bold'} size={17} />
-            )}
-            {initialTitleRef.current === title ? (
-              <span
-                className={'max-w-full overflow-hidden overflow-ellipsis whitespace-nowrap'}
-                style={{ lineHeight: 2 }}
+          {/* @ts-ignore */}
+          {({ isOpen }) => (
+            <Tooltip position={'bottom'} tooltip={isOpen ? undefined : title} offset={8}>
+              <div
+                id={`tab-${conversation.id}`}
+                className={`${styles.tab} ${isActive ? styles.active : ''} ${isAnimating && !isDragging ? styles.isAnimating : ''}`}
+                onClick={() => onOpen(conversation)}
+                onMouseDown={handleMouseDown}
+                onAnimationEnd={() => setIsAnimating(false)}
               >
-                {conversation.title.charAt(0) === '"' &&
-                conversation.title.charAt(conversation.title.length - 1) === '"'
-                  ? conversation.title.substring(1, conversation.title.length - 1)
-                  : conversation.title}
-              </span>
-            ) : (
-              <TypedText
-                text={
-                  conversation.title.charAt(0) === '"' &&
-                  conversation.title.charAt(conversation.title.length - 1) === '"'
-                    ? conversation.title.substring(1, conversation.title.length - 1)
-                    : conversation.title
-                }
-                className={'max-w-full overflow-hidden overflow-ellipsis whitespace-nowrap'}
-              />
-            )}
-          </div>
-          <div className={styles.tabActions}>
-            {isConversationLoading && isActive ? (
-              <LoadingSpinner color={variables.light60} size={'16px'} />
-            ) : (
-              <CircleButton onClick={() => onClose(conversation)} size={'20px'} className={styles.tabClose}>
-                <TabCloseIcon size={20.5} />
-              </CircleButton>
-            )}
-          </div>
+                {conversationPrompt && conversationPrompt.image && conversationPrompt.user_images?.file_extension ? (
+                  <PromptAppIcon
+                    width={17}
+                    height={17}
+                    imageId={conversationPrompt.image}
+                    imageExtension={conversationPrompt.user_images.file_extension}
+                  />
+                ) : (
+                  <MessageText variant={'Bold'} size={17} />
+                )}
+                {initialTitleRef.current === title ? (
+                  <span
+                    className={'max-w-full overflow-hidden overflow-ellipsis whitespace-nowrap'}
+                    style={{ lineHeight: 2 }}
+                  >
+                    {title}
+                  </span>
+                ) : (
+                  <TypedText
+                    text={title}
+                    className={'max-w-full overflow-hidden overflow-ellipsis whitespace-nowrap'}
+                  />
+                )}
+              </div>
+              <div className={styles.tabActions}>
+                {isConversationLoading && isActive ? (
+                  <LoadingSpinner color={variables.light60} size={'16px'} />
+                ) : (
+                  <CircleButton onClick={() => onClose(conversation)} size={'20px'} className={styles.tabClose}>
+                    <TabCloseIcon size={20.5} />
+                  </CircleButton>
+                )}
+              </div>
+            </Tooltip>
+          )}
         </ContextMenu>
       </div>
     )
