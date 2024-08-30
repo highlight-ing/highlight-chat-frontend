@@ -41,12 +41,15 @@
 // Templates styles
 
 .templateCardGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   gap: 12px;
   justify-content: center;
+  align-items: stretch;
 
   > .templateCard {
+    flex: 1 1 250px;
     @for $i from 1 through 10 {
       &:nth-child(#{$i}) {
         animation: fadeAndGrowIn forwards;
@@ -67,6 +70,10 @@
   text-align: center;
   transition: background-color 100ms ease;
   animation: growIn 100ms forwards;
+
+  @media (max-height: 800px) {
+    padding: 12px;
+  }
 
   &.default {
     background-color: $light-5;
@@ -99,11 +106,29 @@
     font-size: 16px;
     font-weight: 350;
     color: $light-100;
+
+    @media (max-width: 480px) {
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    @media (max-height: 600px) {
+      margin-top: 6px;
+      margin-bottom: 1px;
+    }
   }
   p {
     font-size: 13px;
     font-weight: 250;
     color: $light-80;
+
+    @media (max-width: 480px) {
+      font-size: 12px;
+    }
+
+    @media (max-height: 600px) {
+      font-size: 11px;
+    }
   }
 }
 
