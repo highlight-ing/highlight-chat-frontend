@@ -1,4 +1,5 @@
 import { createStore as create } from 'zustand/vanilla'
+import { persist } from 'zustand/middleware'
 
 import { MessagesSlice, MessagesState, createMessagesSlice, initialMessagesState } from './messages'
 import { AuthSlice, AuthState, createAuthSlice, initialAuthState } from './auth'
@@ -84,20 +85,32 @@ export const initStore: () => StoreState = () => {
 }
 
 export const createStore = (initState: StoreState = defaultState) => {
-  return create<Store>()((...a) => ({
-    ...initState,
-    ...createMessagesSlice(...a),
-    ...createHistorySlice(...a),
-    ...createAuthSlice(...a),
-    ...createChatInputSlice(...a),
-    ...createChatAttachmentsSlice(...a),
-    ...createConversationSlice(...a),
-    ...createPromptSlice(...a),
-    ...createPromptsSlice(...a),
-    ...createAboutMeSlice(...a),
-    ...createHighlightContextSlice(...a),
-    ...createModalsSlice(...a),
-    ...createPromptEditorSlice(...a),
-    ...createToastSlice(...a),
-  }))
+  return create<Store>()(
+    persist(
+      (...a) => ({
+        ...initState,
+        ...createMessagesSlice(...a),
+        ...createHistorySlice(...a),
+        ...createAuthSlice(...a),
+        ...createChatInputSlice(...a),
+        ...createChatAttachmentsSlice(...a),
+        ...createConversationSlice(...a),
+        ...createPromptSlice(...a),
+        ...createPromptsSlice(...a),
+        ...createAboutMeSlice(...a),
+        ...createHighlightContextSlice(...a),
+        ...createModalsSlice(...a),
+        ...createPromptEditorSlice(...a),
+        ...createToastSlice(...a),
+      }),
+      {
+        name: 'highlight-store',
+        partialize: (state) => ({
+          // This is the "Prompt Editor" onboarding, we persist this state because
+          // we want to only show the onboarding once automatically.
+          onboarding: state.onboarding,
+        }),
+      },
+    ),
+  )
 }

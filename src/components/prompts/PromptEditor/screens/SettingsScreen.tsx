@@ -9,15 +9,13 @@ import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { Switch } from '@/components/catalyst/switch'
 import Image from 'next/image'
 import { supabaseLoader } from '@/lib/supabase'
-import { deletePrompt } from '@/utils/prompts'
-import useAuth from '@/hooks/useAuth'
-import { usePromptsStore } from '@/stores/prompts'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { videoUrlSchema } from '@/lib/zod'
-import variables from '@/variables.module.scss'
 import { useStore } from '@/providers/store-provider'
+import OnboardingBox from '../OnboardingBox'
+import TemplateSelectorBox from '../TemplateSelectorBox'
 
 function AppIcon() {
   return (
@@ -34,7 +32,7 @@ function AppIcon() {
 function ImageUpload() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [tempImageSrc, setTempImageSrc] = useState<string | undefined>()
-  const { promptEditorData, setPromptEditorData } = usePromptEditorStore()
+  const { promptEditorData, setPromptEditorData, onboarding } = usePromptEditorStore()
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -74,7 +72,12 @@ function ImageUpload() {
   return (
     <>
       {image}
-      <Button size="medium" variant="tertiary" onClick={() => fileInputRef.current?.click()}>
+      <Button
+        size="medium"
+        variant="tertiary"
+        onClick={() => fileInputRef.current?.click()}
+        disabled={onboarding.isOnboarding}
+      >
         Upload Image
       </Button>
       <input
@@ -174,7 +177,9 @@ const SettingsSchema = z.object({
 })
 
 export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
-  const { promptEditorData, setPromptEditorData, setSettingsHasNoErrors } = usePromptEditorStore()
+  const { promptEditorData, setPromptEditorData, setSettingsHasNoErrors, onboarding } = usePromptEditorStore()
+
+  const disabled = onboarding.isOnboarding
 
   const { register, watch, formState, trigger } = useForm({
     defaultValues: {
@@ -211,48 +216,68 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
   }, [watch])
 
   return (
-    <div className="flex max-h-full min-h-0 flex-col items-center">
-      <div className={`${styles.settingsPage} `}>
-        <div className={'flex flex-1 flex-col gap-8'}>
-          <div className="flex items-center space-x-6">
-            <ImageUpload />
-          </div>
-          <div className="flex flex-col gap-6">
-            <InputField
-              size={'xxlarge'}
-              label={'Name'}
-              placeholder={'Name your app'}
-              {...register('name')}
-              error={errors.name?.message}
-            />
+    <>
+      <div className="flex max-h-full min-h-0 flex-col items-center">
+        <div className={`${styles.settingsPage} `}>
+          <div className={'flex flex-1 flex-col gap-8'}>
+            <div className="flex items-center space-x-6">
+              <ImageUpload />
+            </div>
+            <div className="flex flex-col gap-6">
+              <InputField
+                size={'xxlarge'}
+                label={'Name'}
+                placeholder={'Name your app'}
+                disabled={disabled}
+                {...register('name')}
+                error={errors.name?.message}
+              />
 
-            <InputField
-              size={'xxlarge'}
-              label={'Video Link'}
-              placeholder={'Provide a video demo for your app (optional)'}
-              {...register('videoUrl')}
-              error={errors.videoUrl?.message}
-            />
-            <TextArea
-              size={'xxlarge'}
-              label={'Description'}
-              placeholder={'Describe what your app does...'}
-              rows={3}
-              {...register('description')}
-              error={errors.description?.message}
-            />
+              <InputField
+                size={'xxlarge'}
+                label={'Video Link'}
+                placeholder={'Provide a video demo for your app (optional)'}
+                disabled={disabled}
+                {...register('videoUrl')}
+                error={errors.videoUrl?.message}
+              />
+              <TextArea
+                size={'xxlarge'}
+                label={'Description'}
+                placeholder={'Describe what your app does...'}
+                rows={3}
+                disabled={disabled}
+                {...register('description')}
+                error={errors.description?.message}
+              />
+            </div>
           </div>
-        </div>
-        <div className={'flex flex-1 flex-col gap-4'}>
-          <VisibilityToggle
-            visibility={promptEditorData.visibility}
-            onToggle={(visibility) => setPromptEditorData({ visibility })}
-          />
-          <ShareLinkButton />
-          <DeletePromptButton />
+          <div className={'flex flex-1 flex-col gap-4'}>
+            <VisibilityToggle
+              visibility={promptEditorData.visibility}
+              onToggle={(visibility) => setPromptEditorData({ visibility })}
+              disabled={disabled}
+            />
+            <ShareLinkButton />
+            <DeletePromptButton />
+          </div>
         </div>
       </div>
-    </div>
+      {onboarding.isOnboarding && onboarding.index === 4 && (
+        <OnboardingBox
+          title="Save, publish, and share"
+          line1="Once you’ve got your prompt ready, you can simply save and start using it or publish it for anyone to use."
+          line2="There’s no limit to the number of prompts you can create —so have fun! You can always reach us here if you need any help."
+          buttonText="Continue"
+          bottomComponent={
+            <div>
+              <p className={styles.pickText}>Pick a template to get started</p>
+              <TemplateSelectorBox />
+            </div>
+          }
+        />
+      )}
+    </>
   )
 }
 
@@ -276,9 +301,11 @@ const SettingOption = ({
 const VisibilityToggle = ({
   visibility,
   onToggle,
+  disabled,
 }: {
   visibility: 'public' | 'private'
   onToggle: (visibility: 'public' | 'private') => void
+  disabled: boolean
 }) => {
   return (
     <SettingOption label={'Visibility'} description={'Share your app with the community'}>
@@ -288,6 +315,7 @@ const VisibilityToggle = ({
           color={'cyan'}
           checked={visibility === 'public'}
           onChange={(checked) => onToggle(checked ? 'public' : 'private')}
+          disabled={disabled}
         />
       </div>
     </SettingOption>

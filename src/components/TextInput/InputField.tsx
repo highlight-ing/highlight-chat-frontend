@@ -6,6 +6,7 @@ interface InputFieldProps {
   placeholder?: string
   size: 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge'
   value?: string
+  disabled?: boolean
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void
   onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
@@ -14,7 +15,7 @@ interface InputFieldProps {
 }
 
 const InputField: React.FC<InputFieldProps> = forwardRef<HTMLInputElement, InputFieldProps>(
-  ({ label, placeholder, value, size, onBlur, onChange, onFocus, onKeyDown, error, ...props }, ref) => {
+  ({ label, placeholder, value, size, onBlur, onChange, onFocus, onKeyDown, error, disabled, ...props }, ref) => {
     const inputRef = useRef<HTMLInputElement>(null)
     const [showLabel, setShowLabel] = useState(!!value?.length)
 
@@ -46,6 +47,7 @@ const InputField: React.FC<InputFieldProps> = forwardRef<HTMLInputElement, Input
           onChange={onChange}
           onFocus={onFocusEvent}
           onKeyDown={onKeyDown}
+          disabled={disabled}
         />
       )
     }
@@ -67,7 +69,7 @@ const InputField: React.FC<InputFieldProps> = forwardRef<HTMLInputElement, Input
           {label}
         </span>
         {renderInput()}
-        {error && <span className={styles.inputError}>{error}</span>}
+        {error && !disabled && <span className={styles.inputError}>{error}</span>}
       </div>
     )
   },

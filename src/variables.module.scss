@@ -67,6 +67,7 @@ $tertiary-100: #161617;
 
 // Background colors
 $bg-layer-1: #0f0f0f;
+$bg-tertiary: #222222;
 $chat-share-modal-background: #202020;
 
 // Legacy bg colors
@@ -87,10 +88,14 @@ $text-secondary: #B4B4B4;
 $text-tertiary: #6E6E6E;
 $text-subtle: #484848;
 $text-black: #0F0F0F;
+$text-accent: #00E6F5;
 
 $background-primary: #0F0F0F;
 $background-secondary: #191919;
 $background-tertiary: #222222;
+
+$background-accent: #00F0FF;
+$background-accent-secondary: #004B52;
 
 $border-primary: #00FAFF;
 $border-secondary: #444444;
@@ -158,4 +163,7 @@ $border-tertiary: #222222;
   purple60: $purple-60;
   purple80: $purple-80;
   purple100: $purple-100;
+
+  textSecondary: $text-secondary;
+  backgroundAccent: $background-accent;
 }

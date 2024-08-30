@@ -43,7 +43,7 @@
 .templateCardGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 24px;
+  gap: 12px;
   justify-content: center;
 
   > .templateCard {
@@ -157,13 +157,18 @@
   color: $light-20;
   cursor: pointer;
   margin-bottom: -1px;
-  border-bottom: 1px solid transparent;
+
+  &.right {
+    margin-inline-start: auto;
+  }
+
 
   &:hover, &.active {
     color: $light-100;
   }
-  &.active {
-    border-bottom: 1px solid $light-100;
+
+  &.disabled {
+    pointer-events: none;
   }
 }
 
@@ -187,4 +192,47 @@
   background-color: inherit;
   font-size: 16px;
   color: $light-100;
+}
+
+.headingText {
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px; /* 120% */
+  letter-spacing: -0.3px;
+  color: #EEEEEE;
+}
+
+.explainerText {
+  padding-top: 16px;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 350;
+  line-height: 160%; /* 24px */
+  color: #B4B4B4;
+  width: 480px;
+}
+
+.buttonContainer {
+  padding-top: 32px;
+}
+
+.onboardingDecoration {
+  color: white !important;
+}
+
+.onboardingBlock {
+  opacity: 0.4;
+  // No cursor events
+  pointer-events: none; 
+}
+
+.pickText {
+  padding-top: 29px;
+  padding-bottom: 21px;
+  font-size: 17px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px; /* 117.647% */
+  letter-spacing: -0.34px;
 }
