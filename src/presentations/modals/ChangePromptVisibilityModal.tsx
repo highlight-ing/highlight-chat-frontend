@@ -43,18 +43,20 @@ export default function ChangePromptVisibilityModal({ id, context }: ModalObject
   return (
     <ConfirmationModal
       id={id}
+      header="Update prompt visibility"
       primaryAction={{
         label: 'Update visibility',
         onClick: onUpdate,
+        variant: 'success',
       }}
       secondaryAction={{
-        label: 'Nevermind',
+        label: 'Cancel',
         onClick: () => closeModal(id),
       }}
     >
       <div>
-        <span className="text-red-400 font-medium">Warning:</span> Updating the visibility of this prompt will affect
-        all users who have access to it.
+        <span className="font-medium">Note:</span> Changing the visibility of this prompt will update access for all
+        users who can currently see it.
       </div>
     </ConfirmationModal>
   )
