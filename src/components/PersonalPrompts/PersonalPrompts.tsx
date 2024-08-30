@@ -31,7 +31,7 @@ const CSS_VARIABLES = {
       hoverBorderColor: variables.tertiary50,
     },
     useButton: {
-      textColor: variables.primary60,
+      textColor: variables.primary100,
       backgroundColor: variables.backgroundTertiary,
       hoverBackgroundColor: variables.backgroundTertiary,
       borderColor: variables.backgroundTertiary,
