@@ -10,6 +10,7 @@ export type ButtonVariantType =
   | 'ghost-neutral'
   | 'danger'
   | 'success'
+  | 'accent'
   | 'primary-outline'
 
 type ButtonProps = React.ComponentPropsWithoutRef<'button'> & {

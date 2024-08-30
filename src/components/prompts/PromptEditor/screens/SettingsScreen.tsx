@@ -15,11 +15,13 @@ import { z } from 'zod'
 import { videoUrlSchema } from '@/lib/zod'
 import { useStore } from '@/providers/store-provider'
 import CreatableSelect from 'react-select/creatable'
-import { ActionMeta, OnChangeValue } from 'react-select'
+import { OnChangeValue } from 'react-select'
 import { promptTags } from '@/lib/tags'
 import variables from '@/variables.module.scss'
 import makeAnimated from 'react-select/animated'
 import { PromptTag } from '@/types'
+import OnboardingBox from '../OnboardingBox'
+import TemplateSelectorBox from '../TemplateSelectorBox'
 
 function AppIcon() {
   return (
@@ -36,7 +38,7 @@ function AppIcon() {
 function ImageUpload() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [tempImageSrc, setTempImageSrc] = useState<string | undefined>()
-  const { promptEditorData, setPromptEditorData } = usePromptEditorStore()
+  const { promptEditorData, setPromptEditorData, onboarding } = usePromptEditorStore()
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -76,7 +78,12 @@ function ImageUpload() {
   return (
     <>
       {image}
-      <Button size="medium" variant="tertiary" onClick={() => fileInputRef.current?.click()}>
+      <Button
+        size="medium"
+        variant="tertiary"
+        onClick={() => fileInputRef.current?.click()}
+        disabled={onboarding.isOnboarding}
+      >
         Upload Image
       </Button>
       <input
@@ -176,10 +183,52 @@ const SettingsSchema = z.object({
   tags: z.array(z.object({ value: z.string(), label: z.string() })).optional(),
 })
 
+// {visibility: 'public' | 'private', onToggle: (visibility: 'public' | 'private') => void}
+const SettingOption = ({
+  children,
+  label,
+  description,
+}: PropsWithChildren<{ label: string | ReactElement; description: string | ReactElement }>) => {
+  return (
+    <div className={styles.settingOption}>
+      <div className={'flex flex-col gap-1'}>
+        <h1 className={'text-light-100'}>{label}</h1>
+        <span className={'text-light-60'}>{description}</span>
+      </div>
+      {children}
+    </div>
+  )
+}
+
+const VisibilityToggle = ({
+  visibility,
+  onToggle,
+  disabled,
+}: {
+  visibility: 'public' | 'private'
+  onToggle: (visibility: 'public' | 'private') => void
+  disabled: boolean
+}) => {
+  return (
+    <SettingOption label={'Visibility'} description={'Share your app with the community'}>
+      <div className="flex items-center gap-2">
+        <p className="text-xs opacity-40">{visibility === 'public' ? 'Public' : 'Private'}</p>
+        <Switch
+          color={'cyan'}
+          checked={visibility === 'public'}
+          onChange={(checked) => onToggle(checked ? 'public' : 'private')}
+          disabled={disabled}
+        />
+      </div>
+    </SettingOption>
+  )
+}
+
 export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
-  const { promptEditorData, setPromptEditorData, setSettingsHasNoErrors } = usePromptEditorStore()
+  const { promptEditorData, setPromptEditorData, setSettingsHasNoErrors, onboarding } = usePromptEditorStore()
   const [selectedTags, setSelectedTags] = useState<PromptTag[]>(promptEditorData.tags || [])
   const animatedComponents = makeAnimated()
+  const disabled = onboarding.isOnboarding
 
   const { register, watch, formState, trigger } = useForm({
     defaultValues: {
@@ -222,147 +271,128 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
   }
 
   return (
-    <div className="flex h-full flex-col items-center">
-      <div className={`${styles.settingsPage} `}>
-        <div className={'flex flex-1 flex-col gap-8'}>
-          <div className="flex items-center space-x-6">
-            <ImageUpload />
-          </div>
-          <div className="flex flex-col gap-6">
-            <InputField
-              size={'xxlarge'}
-              label={'Name'}
-              placeholder={'Name your app'}
-              {...register('name')}
-              error={errors.name?.message}
-            />
-
-            <InputField
-              size={'xxlarge'}
-              label={'Video Link'}
-              placeholder={'Provide a video demo for your app (optional)'}
-              {...register('videoUrl')}
-              error={errors.videoUrl?.message}
-            />
-
-            <TextArea
-              size={'xxlarge'}
-              label={'Description'}
-              placeholder={'Describe what your app does...'}
-              rows={3}
-              {...register('description')}
-              error={errors.description?.message}
-            />
-            <div className="flex flex-col gap-2">
-              <label className="text-light-100">Tags</label>
-              <CreatableSelect
-                value={selectedTags}
-                onChange={onChange}
-                isMulti
-                components={animatedComponents}
-                placeholder="Add #tags to make your prompt more easy to find..."
-                options={promptTags}
-                menuPlacement="top"
-                styles={{
-                  control: (baseStyles, state) => ({
-                    ...baseStyles,
-                    fontSize: '16px',
-                    border: `1px solid ${variables.light10}`,
-                    padding: '10px',
-                    borderRadius: '10px',
-                    borderColor: variables.light10,
-                    minHeight: '64px',
-                    color: variables.textPrimary,
-                    backgroundColor: variables.light5,
-                    marginLeft: '1px',
-                  }),
-                  menu: (baseStyles, state) => ({
-                    ...baseStyles,
-                    backgroundColor: variables.backgroundPrimary,
-                  }),
-                  menuList: (baseStyles, state) => ({
-                    ...baseStyles,
-                    backgroundColor: variables.backgroundPrimary,
-                  }),
-                  option: (baseStyles, state) => ({
-                    ...baseStyles,
-                    backgroundColor: state.isFocused ? variables.backgroundTertiary : variables.backgroundPrimary,
-                    color: variables.textPrimary,
-                  }),
-                  multiValue: (baseStyles, state) => ({
-                    ...baseStyles,
-                    backgroundColor: variables.backgroundPrimary,
-                    color: variables.textPrimary,
-                  }),
-                  multiValueLabel: (baseStyles, state) => ({
-                    ...baseStyles,
-                    backgroundColor: variables.backgroundPrimary,
-                    color: variables.textPrimary,
-                    borderRadius: '20px',
-                    padding: '2px 6px',
-                    fontSize: '14px',
-                  }),
-                  multiValueRemove: (baseStyles, state) => ({
-                    ...baseStyles,
-                    backgroundColor: variables.backgroundPrimary,
-                    color: variables.textPrimary,
-                    '&:hover': {
-                      backgroundColor: variables.backgroundTertiary,
-                      color: variables.red100,
-                    },
-                  }),
-                }}
+    <>
+      <div className="flex h-full flex-col items-center">
+        <div className={`${styles.settingsPage}`}>
+          <div className={'flex flex-1 flex-col gap-8'}>
+            <div className="flex items-center space-x-6">
+              <ImageUpload />
+            </div>
+            <div className="flex flex-col gap-6">
+              <InputField
+                size={'xxlarge'}
+                label={'Name'}
+                placeholder={'Name your app'}
+                disabled={disabled}
+                {...register('name')}
+                error={errors.name?.message}
               />
+
+              <InputField
+                size={'xxlarge'}
+                label={'Video Link'}
+                placeholder={'Provide a video demo for your app (optional)'}
+                disabled={disabled}
+                {...register('videoUrl')}
+                error={errors.videoUrl?.message}
+              />
+              <TextArea
+                size={'xxlarge'}
+                label={'Description'}
+                placeholder={'Describe what your app does...'}
+                rows={3}
+                disabled={disabled}
+                {...register('description')}
+                error={errors.description?.message}
+              />
+              <div className="flex flex-col gap-2">
+                <label className="text-light-100">Tags</label>
+                <CreatableSelect
+                  value={selectedTags}
+                  onChange={onChange}
+                  isMulti
+                  components={animatedComponents}
+                  placeholder="Add #tags to make your prompt more easy to find..."
+                  options={promptTags}
+                  menuPlacement="top"
+                  styles={{
+                    control: (baseStyles, state) => ({
+                      ...baseStyles,
+                      fontSize: '16px',
+                      border: `1px solid ${variables.light10}`,
+                      padding: '10px',
+                      borderRadius: '10px',
+                      borderColor: variables.light10,
+                      minHeight: '64px',
+                      color: variables.textPrimary,
+                      backgroundColor: variables.light5,
+                      marginLeft: '1px',
+                    }),
+                    menu: (baseStyles, state) => ({
+                      ...baseStyles,
+                      backgroundColor: variables.backgroundPrimary,
+                    }),
+                    menuList: (baseStyles, state) => ({
+                      ...baseStyles,
+                      backgroundColor: variables.backgroundPrimary,
+                    }),
+                    option: (baseStyles, state) => ({
+                      ...baseStyles,
+                      backgroundColor: state.isFocused ? variables.backgroundTertiary : variables.backgroundPrimary,
+                      color: variables.textPrimary,
+                    }),
+                    multiValue: (baseStyles, state) => ({
+                      ...baseStyles,
+                      backgroundColor: variables.backgroundPrimary,
+                      color: variables.textPrimary,
+                    }),
+                    multiValueLabel: (baseStyles, state) => ({
+                      ...baseStyles,
+                      backgroundColor: variables.backgroundPrimary,
+                      color: variables.textPrimary,
+                      borderRadius: '20px',
+                      padding: '2px 6px',
+                      fontSize: '14px',
+                    }),
+                    multiValueRemove: (baseStyles, state) => ({
+                      ...baseStyles,
+                      backgroundColor: variables.backgroundPrimary,
+                      color: variables.textPrimary,
+                      '&:hover': {
+                        backgroundColor: variables.backgroundTertiary,
+                        color: variables.red100,
+                      },
+                    }),
+                  }}
+                />
+              </div>
             </div>
           </div>
-        </div>
-        <div className={'flex flex-1 flex-col gap-4'}>
-          <VisibilityToggle
-            visibility={promptEditorData.visibility}
-            onToggle={(visibility) => setPromptEditorData({ visibility })}
-          />
-          <ShareLinkButton />
-          <DeletePromptButton />
+          <div className={'flex flex-1 flex-col gap-4'}>
+            <VisibilityToggle
+              visibility={promptEditorData.visibility}
+              onToggle={(visibility) => setPromptEditorData({ visibility })}
+              disabled={disabled}
+            />
+            <ShareLinkButton />
+            <DeletePromptButton />
+          </div>
         </div>
       </div>
-    </div>
-  )
-}
-
-//{visibility: 'public' | 'private', onToggle: (visibility: 'public' | 'private') => void}
-const SettingOption = ({
-  children,
-  label,
-  description,
-}: PropsWithChildren<{ label: string | ReactElement; description: string | ReactElement }>) => {
-  return (
-    <div className={styles.settingOption}>
-      <div className={'flex flex-col gap-1'}>
-        <h1 className={'text-light-100'}>{label}</h1>
-        <span className={'text-light-60'}>{description}</span>
-      </div>
-      {children}
-    </div>
-  )
-}
-
-const VisibilityToggle = ({
-  visibility,
-  onToggle,
-}: {
-  visibility: 'public' | 'private'
-  onToggle: (visibility: 'public' | 'private') => void
-}) => {
-  return (
-    <SettingOption label={'Visibility'} description={'Share your app with the community'}>
-      <div className="flex items-center gap-2">
-        <p className="text-xs opacity-40">{visibility === 'public' ? 'Public' : 'Private'}</p>
-        <Switch
-          color={'cyan'}
-          checked={visibility === 'public'}
-          onChange={(checked) => onToggle(checked ? 'public' : 'private')}
+      {onboarding.isOnboarding && onboarding.index === 4 && (
+        <OnboardingBox
+          title="Save, publish, and share"
+          line1="Once you’ve got your prompt ready, you can simply save and start using it or publish it for anyone to use."
+          line2="There’s no limit to the number of prompts you can create —so have fun! You can always reach us here if you need any help."
+          buttonText="Continue"
+          bottomComponent={
+            <div>
+              <p className={styles.pickText}>Pick a template to get started</p>
+              <TemplateSelectorBox />
+            </div>
+          }
         />
-      </div>
-    </SettingOption>
+      )}
+    </>
   )
 }

@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { editor, IDisposable } from 'monaco-editor'
 import { buildSuggestions } from '@/lib/IntelliPrompt'
 import Tooltip from '@/components/Tooltip/Tooltip'
+import { usePromptEditorStore } from '@/stores/prompt-editor'
 
 function Loading() {
   return <span className="text-sm text-gray-500">Loading editor...</span>
@@ -19,26 +20,38 @@ interface PromptVariable {
 
 /**
  * The new, improved PromptInput component that uses Monaco Editor.
+ * @param otherButtons Additional buttons that will go in the "Context Bar" (the place where users can click to add variables)
  */
 export default function IntelliPrompt({
   value,
   onChange,
   variables,
+  otherButtons,
 }: {
   value?: string
   onChange?: (value: string) => void
   variables?: PromptVariable[]
+  otherButtons?: React.ReactNode[]
 }) {
   const monacoRef = useRef<Monaco | undefined>()
   const editorRef = useRef<editor.IStandaloneCodeEditor | undefined>()
 
   const [completionDisposable, setCompletionDisposable] = useState<IDisposable>()
 
+  const { onboarding } = usePromptEditorStore()
+
   useEffect(() => {
     return () => {
       completionDisposable?.dispose()
     }
   }, [completionDisposable])
+
+  useEffect(() => {
+    // Effect that makes the editor read only if the user is onboarding
+    editorRef.current?.updateOptions({
+      readOnly: onboarding.isOnboarding,
+    })
+  }, [onboarding.isOnboarding])
 
   function handleEditorWillMount(monaco: Monaco) {
     monacoRef.current = monaco
@@ -94,6 +107,20 @@ export default function IntelliPrompt({
       wordWrap: 'on',
       folding: false,
     })
+
+    editor.createDecorationsCollection([
+      {
+        range: {
+          startColumn: 1,
+          startLineNumber: 1,
+          endColumn: 10,
+          endLineNumber: 2,
+        },
+        options: {
+          className: styles.onboardingDecoration,
+        },
+      },
+    ])
   }
 
   function onVariableClick(variable: string) {
@@ -110,13 +137,20 @@ export default function IntelliPrompt({
     <>
       <div className={styles.editorPage}>
         <div className={`${styles.editorActions} px-4`}>
+          {otherButtons?.map((button) => button)}
           {variables?.map((variable) => (
-            <Tooltip key={variable.label} position="top" tooltip={variable.description}>
+            <Tooltip
+              key={variable.label}
+              position="top"
+              tooltip={variable.description}
+              disabled={onboarding.isOnboarding}
+            >
               <Button
                 size={'medium'}
                 variant={'ghost-neutral'}
-                onClick={() => onVariableClick(variable.insertText)}
+                onClick={onboarding.isOnboarding ? undefined : () => onVariableClick(variable.insertText)}
                 key={variable.label}
+                disabled={onboarding.isOnboarding}
               >
                 {variable.icon}
                 {variable.label}
@@ -136,6 +170,10 @@ export default function IntelliPrompt({
           minimap: {
             enabled: false,
           },
+          automaticLayout: true,
+          readOnly: onboarding.isOnboarding,
+          fontFamily: 'Inter',
+          fontSize: 16,
         }}
         loading={<Loading />}
       />
