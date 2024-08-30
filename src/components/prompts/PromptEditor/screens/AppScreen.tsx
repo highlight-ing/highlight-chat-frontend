@@ -229,7 +229,7 @@ export default function AppScreen() {
         <IntelliPrompt
           value={promptEditorData.appPrompt}
           onChange={(e) => setPromptEditorData({ appPrompt: e })}
-          otherButtons={[<TemplateButton />]}
+          otherButtons={[<TemplateButton key="templates-button" />]}
           variables={[
             {
               label: 'User Message',

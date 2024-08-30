@@ -66,7 +66,7 @@ export const initialPromptEditorState: PromptEditorState = {
   settingsHasNoErrors: false,
   onboarding: {
     index: 0,
-    isOnboarding: true,
+    isOnboarding: false,
     hasOnboardedOnceBefore: false,
   },
 }
