@@ -14,14 +14,28 @@ const CSS_VARIABLES = {
     },
     background: {
       color: variables.backgroundSecondary,
-      hoverColor: variables.backgroundTertiary,
+      hoverColor: '#292929',
     },
     button: {
       textColor: variables.textSecondary,
       backgroundColor: variables.backgroundTertiary,
       hoverBackgroundColor: variables.backgroundTertiary,
+      borderColor: variables.tertiary50,
+      hoverBorderColor: variables.tertiary50,
+    },
+    ctaButton: {
+      textColor: variables.textSecondary,
+      backgroundColor: variables.backgroundTertiary,
+      hoverBackgroundColor: variables.backgroundTertiary,
       borderColor: variables.backgroundTertiary,
-      hoverBorderColor: variables.backgroundTertiary,
+      hoverBorderColor: variables.tertiary50,
+    },
+    useButton: {
+      textColor: variables.primary60,
+      backgroundColor: variables.backgroundTertiary,
+      hoverBackgroundColor: variables.backgroundTertiary,
+      borderColor: variables.backgroundTertiary,
+      hoverBorderColor: '#00EAFF70',
     },
   },
   public: {
@@ -39,6 +53,20 @@ const CSS_VARIABLES = {
       borderColor: variables.backgroundTertiary,
       hoverBorderColor: variables.pink40,
     },
+    ctaButton: {
+      textColor: variables.textSecondary,
+      backgroundColor: variables.backgroundTertiary,
+      hoverBackgroundColor: variables.backgroundTertiary,
+      borderColor: variables.backgroundTertiary,
+      hoverBorderColor: variables.backgroundTertiary,
+    },
+    useButton: {
+      textColor: variables.textSecondary,
+      backgroundColor: variables.backgroundTertiary,
+      hoverBackgroundColor: variables.pink20,
+      borderColor: variables.backgroundTertiary,
+      hoverBorderColor: variables.pink40,
+    },
   },
   forked: {
     icon: {
@@ -49,6 +77,20 @@ const CSS_VARIABLES = {
       hoverColor: variables.primary20,
     },
     button: {
+      textColor: variables.textSecondary,
+      backgroundColor: variables.backgroundTertiary,
+      hoverBackgroundColor: variables.primary20,
+      borderColor: variables.backgroundTertiary,
+      hoverBorderColor: variables.primary20,
+    },
+    ctaButton: {
+      textColor: variables.textSecondary,
+      backgroundColor: variables.backgroundTertiary,
+      hoverBackgroundColor: variables.backgroundTertiary,
+      borderColor: variables.backgroundTertiary,
+      hoverBorderColor: variables.backgroundTertiary,
+    },
+    useButton: {
       textColor: variables.textSecondary,
       backgroundColor: variables.backgroundTertiary,
       hoverBackgroundColor: variables.primary20,
@@ -160,33 +202,53 @@ const PersonalPromptsItem = ({
       </div>
       <div className={styles.personalPromptsItemFooter}>
         <div className={styles.personalPromptsItemFooterLeftButtons}>
-          <Button
-            className={styles.filledButton}
-            size="xsmall"
-            variant="ghost-neutral"
-            style={{
-              border: `1px solid ${isHovered ? colorScheme.button.hoverBorderColor : colorScheme.button.borderColor}`,
-              backgroundColor: isHovered ? colorScheme.button.hoverBackgroundColor : colorScheme.button.backgroundColor,
-              color: colorScheme.button.textColor,
-            }}
-            onClick={() => {
-              const url = `https://chat.highlight.ing/prompts/${slug}`
-              navigator.clipboard.writeText(url)
-              setIsCopied(true)
-              setTimeout(() => setIsCopied(false), 2000)
-            }}
-            disabled={isCopied}
-          >
-            {isCopied ? 'Copied' : 'Share'}
-          </Button>
+          {isPublic ? (
+            <Button
+              className={styles.filledButton}
+              size="xsmall"
+              variant="ghost-neutral"
+              style={{
+                border: `1px solid ${isHovered ? colorScheme.ctaButton.hoverBorderColor : colorScheme.ctaButton.borderColor}`,
+                backgroundColor: isHovered
+                  ? colorScheme.ctaButton.hoverBackgroundColor
+                  : colorScheme.ctaButton.backgroundColor,
+                color: colorScheme.ctaButton.textColor,
+              }}
+              onClick={() => {
+                const url = `https://chat.highlight.ing/prompts/${slug}`
+                navigator.clipboard.writeText(url)
+                setIsCopied(true)
+                setTimeout(() => setIsCopied(false), 2000)
+              }}
+              disabled={isCopied}
+            >
+              {isCopied ? 'Copied' : 'Share'}
+            </Button>
+          ) : (
+            <Button
+              className={styles.filledButton}
+              size="xsmall"
+              variant="ghost-neutral"
+              style={{
+                border: `1px solid ${isHovered ? colorScheme.ctaButton.hoverBorderColor : colorScheme.ctaButton.borderColor}`,
+                backgroundColor: isHovered
+                  ? colorScheme.ctaButton.hoverBackgroundColor
+                  : colorScheme.ctaButton.backgroundColor,
+                color: colorScheme.ctaButton.textColor,
+              }}
+              onClick={() => openModal('change-prompt-visibility', { prompt })}
+            >
+              Publish
+            </Button>
+          )}
           <Badge variant="disabled" hidden={isHovered}>
             {publicUseNumber ? `${publicUseNumber} Uses` : 'No uses'}
           </Badge>
           <Button
             className={styles.filledButton}
             style={{
-              border: `1px solid ${isHovered ? colorScheme.button.hoverBorderColor : colorScheme.button.borderColor}`,
-              color: colorScheme.button.textColor,
+              border: `1px solid ${isHovered ? colorScheme.useButton.hoverBorderColor : colorScheme.useButton.borderColor}`,
+              color: colorScheme.useButton.textColor,
             }}
             size="xsmall"
             variant="ghost-neutral"
@@ -208,17 +270,19 @@ const PersonalPromptsItem = ({
           >
             <Trash color={variables.tertiary} variant={'Bold'} size="24" />
           </Button>
-          <Button
-            size="icon"
-            variant="ghost-neutral"
-            style={{
-              border: `1px solid ${isHovered ? colorScheme.button.hoverBorderColor : colorScheme.button.borderColor}`,
-            }}
-            onClick={() => openModal('change-prompt-visibility', { prompt })}
-            hidden={!isHovered}
-          >
-            <Lock color={variables.tertiary} variant={'Bold'} size="16" />
-          </Button>
+          {isPublic && (
+            <Button
+              size="icon"
+              variant="ghost-neutral"
+              style={{
+                border: `1px solid ${isHovered ? colorScheme.button.hoverBorderColor : colorScheme.button.borderColor}`,
+              }}
+              onClick={() => openModal('change-prompt-visibility', { prompt })}
+              hidden={!isHovered}
+            >
+              <Lock color={variables.tertiary} variant={'Bold'} size="16" />
+            </Button>
+          )}
           <Button
             size="icon"
             variant="ghost-neutral"
