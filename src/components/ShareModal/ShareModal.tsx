@@ -7,6 +7,7 @@ import { useShareConversation, useDeleteConversation } from '@/hooks/useShareCon
 import { useStore } from '@/providers/store-provider'
 import Button from '@/components/Button/Button'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
+import { trackEvent } from '@/utils/amplitude'
 
 interface ShareModalProps {
   isVisible: boolean
@@ -50,7 +51,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
 
       // Update the shared_id in the store
       setShareId(conversation.id, shareLink)
-
+      trackEvent('HL Chat Copy Link', { conversation_id: conversation.id, share_link: shareLink })
       addToast({
         title: 'Snapshot shared and copied to your clipboard',
         description: `${shareLink}`,
@@ -59,6 +60,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
       })
     } catch (error) {
       console.error('Failed to copy link:', error)
+      trackEvent('HL Chat Copy Link Error', { conversation_id: conversation.id, error: error })
 
       addToast({
         title: 'Failed to Copy Link',
@@ -79,7 +81,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
 
       // Update the shared_id in the store
       setShareId(conversation.id, null)
-
+      trackEvent('HL Chat Disable Link', { conversation_id: conversation.id })
       addToast({
         title: 'Share Link Disabled',
         description: 'All share links for this conversation have been disabled.',
@@ -88,6 +90,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
       })
     } catch (error) {
       console.error('Failed to disable link:', error)
+      trackEvent('HL Chat Disable Link Error', { conversation_id: conversation.id, error: error })
       addToast({
         title: 'Failed to Disable Link',
         description: 'An error occurred while disabling the share link.',
