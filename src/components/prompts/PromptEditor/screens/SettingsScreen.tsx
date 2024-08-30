@@ -14,6 +14,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { videoUrlSchema } from '@/lib/zod'
 import { useStore } from '@/providers/store-provider'
+import CreatableSelect from 'react-select/creatable'
+import { OnChangeValue } from 'react-select'
+import { promptTags } from '@/lib/tags'
+import variables from '@/variables.module.scss'
+import makeAnimated from 'react-select/animated'
+import { PromptTag } from '@/types'
 import OnboardingBox from '../OnboardingBox'
 import TemplateSelectorBox from '../TemplateSelectorBox'
 
@@ -174,114 +180,10 @@ const SettingsSchema = z.object({
   name: z.string().min(1, { message: 'Name is required' }).max(40, { message: 'Name must be less than 40 characters' }),
   videoUrl: videoUrlSchema,
   description: z.string().min(1, { message: 'Description is required' }),
+  tags: z.array(z.object({ value: z.string(), label: z.string() })).optional(),
 })
 
-export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
-  const { promptEditorData, setPromptEditorData, setSettingsHasNoErrors, onboarding } = usePromptEditorStore()
-
-  const disabled = onboarding.isOnboarding
-
-  const { register, watch, formState, trigger } = useForm({
-    defaultValues: {
-      name: promptEditorData.name,
-      videoUrl: promptEditorData.videoUrl ?? '',
-      description: promptEditorData.description,
-    },
-    resolver: zodResolver(SettingsSchema),
-    mode: 'all',
-  })
-
-  const errors = formState.errors
-
-  useEffect(() => {
-    // Trigger validation on initial mount
-    trigger()
-  }, [])
-
-  const errorCount = Object.keys(errors).length === 0
-
-  useEffect(() => {
-    setSettingsHasNoErrors(errorCount)
-  }, [errorCount])
-
-  // Hook to update the prompt editor data when the form changes
-  useEffect(() => {
-    const subscription = watch((value, { name, type }) => {
-      if (!name) {
-        return
-      }
-      setPromptEditorData({ [name]: value[name] })
-    })
-    return () => subscription.unsubscribe()
-  }, [watch])
-
-  return (
-    <>
-      <div className="flex max-h-full min-h-0 flex-col items-center">
-        <div className={`${styles.settingsPage} `}>
-          <div className={'flex flex-1 flex-col gap-8'}>
-            <div className="flex items-center space-x-6">
-              <ImageUpload />
-            </div>
-            <div className="flex flex-col gap-6">
-              <InputField
-                size={'xxlarge'}
-                label={'Name'}
-                placeholder={'Name your app'}
-                disabled={disabled}
-                {...register('name')}
-                error={errors.name?.message}
-              />
-
-              <InputField
-                size={'xxlarge'}
-                label={'Video Link'}
-                placeholder={'Provide a video demo for your app (optional)'}
-                disabled={disabled}
-                {...register('videoUrl')}
-                error={errors.videoUrl?.message}
-              />
-              <TextArea
-                size={'xxlarge'}
-                label={'Description'}
-                placeholder={'Describe what your app does...'}
-                rows={3}
-                disabled={disabled}
-                {...register('description')}
-                error={errors.description?.message}
-              />
-            </div>
-          </div>
-          <div className={'flex flex-1 flex-col gap-4'}>
-            <VisibilityToggle
-              visibility={promptEditorData.visibility}
-              onToggle={(visibility) => setPromptEditorData({ visibility })}
-              disabled={disabled}
-            />
-            <ShareLinkButton />
-            <DeletePromptButton />
-          </div>
-        </div>
-      </div>
-      {onboarding.isOnboarding && onboarding.index === 4 && (
-        <OnboardingBox
-          title="Save, publish, and share"
-          line1="Once you’ve got your prompt ready, you can simply save and start using it or publish it for anyone to use."
-          line2="There’s no limit to the number of prompts you can create —so have fun! You can always reach us here if you need any help."
-          buttonText="Continue"
-          bottomComponent={
-            <div>
-              <p className={styles.pickText}>Pick a template to get started</p>
-              <TemplateSelectorBox />
-            </div>
-          }
-        />
-      )}
-    </>
-  )
-}
-
-//{visibility: 'public' | 'private', onToggle: (visibility: 'public' | 'private') => void}
+// {visibility: 'public' | 'private', onToggle: (visibility: 'public' | 'private') => void}
 const SettingOption = ({
   children,
   label,
@@ -319,5 +221,178 @@ const VisibilityToggle = ({
         />
       </div>
     </SettingOption>
+  )
+}
+
+export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
+  const { promptEditorData, setPromptEditorData, setSettingsHasNoErrors, onboarding } = usePromptEditorStore()
+  const [selectedTags, setSelectedTags] = useState<PromptTag[]>(promptEditorData.tags || [])
+  const animatedComponents = makeAnimated()
+  const disabled = onboarding.isOnboarding
+
+  const { register, watch, formState, trigger } = useForm({
+    defaultValues: {
+      name: promptEditorData.name,
+      videoUrl: promptEditorData.videoUrl ?? '',
+      description: promptEditorData.description,
+    },
+    resolver: zodResolver(SettingsSchema),
+    mode: 'all',
+  })
+
+  const errors = formState.errors
+
+  useEffect(() => {
+    // Trigger validation on initial mount
+    trigger()
+  }, [])
+
+  const errorCount = Object.keys(errors).length === 0
+
+  useEffect(() => {
+    setSettingsHasNoErrors(errorCount)
+  }, [errorCount])
+
+  // Hook to update the prompt editor data when the form changes
+  useEffect(() => {
+    const subscription = watch((value: Record<string, any>, { name, type }) => {
+      if (!name) {
+        return
+      }
+      setPromptEditorData({ [name]: value[name] })
+    })
+    return () => subscription.unsubscribe()
+  }, [watch])
+
+  const onChange = (newValue: OnChangeValue<PromptTag, true>) => {
+    const mutableTags = [...newValue]
+    setSelectedTags(mutableTags)
+    setPromptEditorData({ tags: mutableTags })
+  }
+
+  return (
+    <>
+      <div className="flex h-full flex-col items-center">
+        <div className={`${styles.settingsPage}`}>
+          <div className={'flex flex-1 flex-col gap-8'}>
+            <div className="flex items-center space-x-6">
+              <ImageUpload />
+            </div>
+            <div className="flex flex-col gap-6">
+              <InputField
+                size={'xxlarge'}
+                label={'Name'}
+                placeholder={'Name your app'}
+                disabled={disabled}
+                {...register('name')}
+                error={errors.name?.message}
+              />
+
+              <InputField
+                size={'xxlarge'}
+                label={'Video Link'}
+                placeholder={'Provide a video demo for your app (optional)'}
+                disabled={disabled}
+                {...register('videoUrl')}
+                error={errors.videoUrl?.message}
+              />
+              <TextArea
+                size={'xxlarge'}
+                label={'Description'}
+                placeholder={'Describe what your app does...'}
+                rows={3}
+                disabled={disabled}
+                {...register('description')}
+                error={errors.description?.message}
+              />
+              <div className="flex flex-col gap-2">
+                <label className="text-light-100">Tags</label>
+                <CreatableSelect
+                  value={selectedTags}
+                  onChange={onChange}
+                  isMulti
+                  components={animatedComponents}
+                  placeholder="Add #tags to make your prompt more easy to find..."
+                  options={promptTags}
+                  menuPlacement="top"
+                  styles={{
+                    control: (baseStyles, state) => ({
+                      ...baseStyles,
+                      fontSize: '16px',
+                      border: `1px solid ${variables.light10}`,
+                      padding: '10px',
+                      borderRadius: '10px',
+                      borderColor: variables.light10,
+                      minHeight: '64px',
+                      color: variables.textPrimary,
+                      backgroundColor: variables.light5,
+                      marginLeft: '1px',
+                    }),
+                    menu: (baseStyles, state) => ({
+                      ...baseStyles,
+                      backgroundColor: variables.backgroundPrimary,
+                    }),
+                    menuList: (baseStyles, state) => ({
+                      ...baseStyles,
+                      backgroundColor: variables.backgroundPrimary,
+                    }),
+                    option: (baseStyles, state) => ({
+                      ...baseStyles,
+                      backgroundColor: state.isFocused ? variables.backgroundTertiary : variables.backgroundPrimary,
+                      color: variables.textPrimary,
+                    }),
+                    multiValue: (baseStyles, state) => ({
+                      ...baseStyles,
+                      backgroundColor: variables.backgroundPrimary,
+                      color: variables.textPrimary,
+                    }),
+                    multiValueLabel: (baseStyles, state) => ({
+                      ...baseStyles,
+                      backgroundColor: variables.backgroundPrimary,
+                      color: variables.textPrimary,
+                      borderRadius: '20px',
+                      padding: '2px 6px',
+                      fontSize: '14px',
+                    }),
+                    multiValueRemove: (baseStyles, state) => ({
+                      ...baseStyles,
+                      backgroundColor: variables.backgroundPrimary,
+                      color: variables.textPrimary,
+                      '&:hover': {
+                        backgroundColor: variables.backgroundTertiary,
+                        color: variables.red100,
+                      },
+                    }),
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+          <div className={'flex flex-1 flex-col gap-4'}>
+            <VisibilityToggle
+              visibility={promptEditorData.visibility}
+              onToggle={(visibility) => setPromptEditorData({ visibility })}
+              disabled={disabled}
+            />
+            <ShareLinkButton />
+            <DeletePromptButton />
+          </div>
+        </div>
+      </div>
+      {onboarding.isOnboarding && onboarding.index === 4 && (
+        <OnboardingBox
+          title="Save, publish, and share"
+          line1="Once you’ve got your prompt ready, you can simply save and start using it or publish it for anyone to use."
+          line2="There’s no limit to the number of prompts you can create —so have fun! You can always reach us here if you need any help."
+          buttonText="Continue"
+          bottomComponent={
+            <div>
+              <p className={styles.pickText}>Pick a template to get started</p>
+              <TemplateSelectorBox />
+            </div>
+          }
+        />
+      )}
+    </>
   )
 }

@@ -1,7 +1,7 @@
 import { StateCreator } from 'zustand'
 import { useStore } from '@/providers/store-provider'
 import { useShallow } from 'zustand/react/shallow'
-
+import { PromptTag } from '@/types'
 /**
  * Holds the state for the prompt editor,
  * when the user is creating or editing a prompt.
@@ -23,6 +23,7 @@ export interface PromptEditorData {
   slug: string
   name: string
   description: string
+  tags?: PromptTag[]
   appPrompt: string
   suggestionsPrompt: string
   visibility: 'public' | 'private'
@@ -60,6 +61,7 @@ export const initialPromptEditorState: PromptEditorState = {
     name: '',
     description: '',
     visibility: 'private',
+    tags: [],
   },
   needSave: false,
   saving: false,

@@ -14,10 +14,20 @@ import ExpandableVideo from '@/components/ExpandableVideo/ExpandableVideo'
 import { useShallow } from 'zustand/react/shallow'
 import { Prompt } from '@/types/supabase-helpers'
 import { trackEvent } from '@/utils/amplitude'
+import PersonalPrompts from '@/components/PersonalPrompts/PersonalPrompts'
+import TrendingPrompts from '@/components/TrendingPrompts/TrendingPrompts'
 
 const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
-  const openModal = useStore((state) => state.openModal)
+  const { openModal, closeModal } = useStore(
+    useShallow((state) => ({
+      openModal: state.openModal,
+      closeModal: state.closeModal,
+    })),
+  )
   const [isVisible, setVisible] = useState(isShowing)
+
+  // Get the user ID from the store
+  const userId = useStore((state) => state.userId)
 
   useEffect(() => {
     if (isShowing) {
@@ -37,36 +47,7 @@ const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
         <InputHeading />
         {isVisible && <Input isActiveChat={false} />}
       </div>
-      <div className={styles.callouts}>
-        <Callout
-          icon={<Setting color={variables.primary100} variant={'Bold'} />}
-          title={'Play with Highlight'}
-          description={'Check out what you can do with Highlight Chat.'}
-          onClick={() => {
-            openModal('prompts-modal')
-            trackEvent('HL Chat Prompts Modal Opened', {})
-          }}
-        />
-        <Callout
-          icon={<Setting color={variables.green100} variant={'Bold'} />}
-          title={'Explore Apps'}
-          description={'Try other Highlight apps created by the community.'}
-          onClick={() => {
-            window.open('highlight://appstore', '_blank')
-            trackEvent('HL Chat App Store Opened', {})
-          }}
-        />
-        <Callout
-          icon={<Setting color={variables.pink100} variant={'Bold'} />}
-          title={'Create Chat Apps'}
-          description={'Make your own Highlight Chat apps and publish them.'}
-          onClick={() => {
-            openModal('create-prompt')
-            trackEvent('HL Chat Create Prompt Modal Opened', {})
-          }}
-        />
-      </div>
-      <Prompts />
+      <Prompts userId={userId} openModal={openModal} />
     </div>
   )
 }
@@ -100,30 +81,41 @@ function InputHeading() {
   )
 }
 
-// Components
-const Callout = ({
-  icon,
-  title,
-  description,
-  onClick,
+const Prompts = ({
+  userId,
+  openModal,
 }: {
-  icon: React.ReactElement
-  title: string
-  description: string
-  onClick: (e: React.MouseEvent) => void
+  userId: string | undefined
+  openModal: (modal: string, context?: Record<string, any>) => void
 }) => {
-  return (
-    <div className={styles.homeCallout} onClick={onClick}>
-      <div className={styles.header}>
-        {icon}
-        {title}
+  const { isLoadingPrompts, myPrompts, communityPrompts, selectPrompt } = usePromptApps()
+
+  if (isLoadingPrompts && !userId) {
+    return (
+      <div className="flex flex-col gap-4">
+        <div className={`${styles.prompts} ${mainStyles.loadingGradient} w-full`}>
+          <div className={'h-24 w-full p-16'} />
+        </div>
+        <div className={`${styles.prompts} ${mainStyles.loadingGradient} w-full`}>
+          <div className={'h-96 w-full p-16'} />
+        </div>
       </div>
-      {description}
-    </div>
+    )
+  }
+
+  return (
+    <>
+      <div className={styles.callouts}>
+        <PersonalPrompts userId={userId} prompts={myPrompts} openModal={openModal} selectPrompt={selectPrompt} />
+      </div>
+      <div className={styles.callouts}>
+        <TrendingPrompts prompts={communityPrompts} openModal={openModal} selectPrompt={selectPrompt} />
+      </div>
+    </>
   )
 }
 
-const Prompts = () => {
+const oldPrompts = () => {
   const openModal = useStore((state) => state.openModal)
   const { isLoadingPrompts, myPrompts, selectPrompt } = usePromptApps()
   const [hotkey, setHotkey] = useState<string>('alt + .')
@@ -209,6 +201,29 @@ const HighlightTutorial = ({ hotkey }: { hotkey: string }) => {
         }}
         onPlay={() => trackEvent('HL Chat Tutorial Video Played', {})}
       />
+    </div>
+  )
+}
+
+// Components
+const Callout = ({
+  icon,
+  title,
+  description,
+  onClick,
+}: {
+  icon: React.ReactElement
+  title: string
+  description: string
+  onClick: (e: React.MouseEvent) => void
+}) => {
+  return (
+    <div className={styles.homeCallout} onClick={onClick}>
+      <div className={styles.header}>
+        {icon}
+        {title}
+      </div>
+      {description}
     </div>
   )
 }

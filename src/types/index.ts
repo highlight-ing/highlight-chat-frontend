@@ -1,3 +1,5 @@
+import { Prompt } from '@/types/supabase-helpers'
+
 type WindowAttachment = {
   type: 'window'
   title: string
@@ -152,3 +154,23 @@ export type AssistantMessageButtonConfig = {
 
 export type PlatformType = 'windows' | 'mac' | 'mobile' | 'unsupported' | 'unknown'
 export type DownloadPlatformType = 'windows' | 'mac-intel' | 'mac-silicon' | 'unsupported'
+
+// Prompt editor types
+export type PromptTag = {
+  value: string
+  label: string
+}
+
+export interface PersonalPromptsProps {
+  userId: string | undefined
+  prompts: Prompt[]
+  openModal: (modal: string, context?: Record<string, any>) => void
+  selectPrompt: (prompt: Prompt) => void
+}
+
+export interface PersonalPromptsItemProps {
+  userId: string | undefined
+  prompt: Prompt
+  selectPrompt: (prompt: Prompt) => void
+  openModal: (modal: string, context?: Record<string, any>) => void
+}

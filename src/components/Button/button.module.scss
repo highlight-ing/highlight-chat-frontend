@@ -17,9 +17,24 @@
   user-select: none;
   transition: background-color 100ms, border 100ms, color 100ms;
 
+  &.hidden {
+    display: none;
+  }
+
   &.disabled {
     opacity: 0.35;
     pointer-events: none;
+  }
+
+  &.icon {
+    display: flex;
+    width: 24px;
+    height: 24px;
+    padding: 2px 2px;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    border-radius: 6px !important;
   }
 
   &.xsmall {

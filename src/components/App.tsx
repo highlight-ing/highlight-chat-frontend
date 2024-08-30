@@ -195,6 +195,7 @@ export default function App({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const { getAccessToken } = useAuth()
+  const setUserId = useStore((state) => state.setUserId)
 
   const navigateToNewChat = useCallback(() => {
     if (pathname !== '/') {
@@ -223,6 +224,9 @@ export default function App({ children }: { children: React.ReactNode }) {
         if (!userId) {
           throw new Error('User ID not found in token')
         }
+
+        // Set the user ID in the store
+        setUserId(userId)
 
         // Initialize Amplitude with the user ID
         initAmplitude(userId)

@@ -41,6 +41,7 @@ export function usePromptEditor() {
     formData.append('appPrompt', promptEditorData.appPrompt)
     formData.append('suggestionsPrompt', promptEditorData.suggestionsPrompt)
     formData.append('visibility', promptEditorData.visibility)
+    formData.append('tags', JSON.stringify(promptEditorData.tags ?? []))
 
     if (promptEditorData.videoUrl) {
       console.log('appending the video url', promptEditorData.videoUrl)

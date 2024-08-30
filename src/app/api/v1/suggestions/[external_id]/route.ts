@@ -14,8 +14,6 @@ export async function GET(request: Request, { params }: { params: { external_id:
     .eq('external_id', params.external_id)
     .maybeSingle()
 
-  console.log('prompt', prompt)
-
   if (error) {
     return Response.json({ error: error.message }, { status: 500 })
   }
