@@ -241,7 +241,7 @@ export default function AppScreen() {
             {
               label: 'Image',
               insertText: 'image',
-              description: 'Adds an image variable, which will be replaced with the text extracted from the image.',
+              description: 'Adds a variable that uses the text contents from any image that you provide.',
               icon: <Gallery variant="Bold" size={16} color="#FF2099" />,
             },
             {

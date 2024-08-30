@@ -141,8 +141,16 @@ export default function IntelliPrompt({
           {variables?.map((variable) => (
             <Tooltip
               key={variable.label}
-              position="top"
-              tooltip={variable.description}
+              position="bottom"
+              tooltip={
+                <div className="flex w-56 flex-col gap-[8px] p-[4px] text-xs">
+                  <div className="font-normal text-[#EEEEEE]">{variable.description}</div>
+                  <div className="rounded-[10px] bg-[#222222] px-[8px] py-[4px]">
+                    <p className="text-[#484848]">Example</p>
+                    <p className="text-[10px]">Review the code in the image and give suggestions for improvements</p>
+                  </div>
+                </div>
+              }
               disabled={onboarding.isOnboarding}
             >
               <Button
