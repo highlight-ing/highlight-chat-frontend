@@ -56,9 +56,9 @@ const CSS_VARIABLES = {
     ctaButton: {
       textColor: variables.textSecondary,
       backgroundColor: variables.backgroundTertiary,
-      hoverBackgroundColor: variables.backgroundTertiary,
+      hoverBackgroundColor: variables.pink20,
       borderColor: variables.backgroundTertiary,
-      hoverBorderColor: variables.backgroundTertiary,
+      hoverBorderColor: variables.pink40,
     },
     useButton: {
       textColor: variables.textSecondary,
@@ -86,9 +86,9 @@ const CSS_VARIABLES = {
     ctaButton: {
       textColor: variables.textSecondary,
       backgroundColor: variables.backgroundTertiary,
-      hoverBackgroundColor: variables.backgroundTertiary,
+      hoverBackgroundColor: variables.primary20,
       borderColor: variables.backgroundTertiary,
-      hoverBorderColor: variables.backgroundTertiary,
+      hoverBorderColor: variables.primary20,
     },
     useButton: {
       textColor: variables.textSecondary,
