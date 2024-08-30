@@ -31,8 +31,6 @@ const ChatHeader = ({ isShowing }: { isShowing: boolean }) => {
   const slug = promptApp?.slug ?? ''
   const openModal = useStore((state) => state.openModal)
 
-  const closeAllModals = useStore((state) => state.closeAllModals)
-
   function onCopyClick() {
     navigator.clipboard.writeText(`https://chat.highlight.ing/prompts/${slug}`)
 
