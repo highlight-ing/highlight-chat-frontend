@@ -10,8 +10,19 @@
 
 .personalPromptsHeader {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  .personalPromptsHeaderRight {
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+
+  .personalPromptsHeaderLeft {
+    justify-content: flex-end;
+    align-items: flex-end;
+  }
 
   h2 {
     font-size: 16px;
@@ -37,7 +48,7 @@
   align-items: flex-start;
   gap: 12px;
   flex: 1 0 0;
-  width: calc(50% - 8px);
+  min-width: calc(50% - 8px);
   border-radius: 20px;
   background-color: var(--Background-Secondary, #191919);
   transition: background-color 0.3s ease;

@@ -6,7 +6,7 @@ import { PersonalPromptsProps, PersonalPromptsItemProps } from '@/types'
 // Components
 import { Badge } from '@/components/Badge/Badge'
 import Button from '@/components/Button/Button'
-import { Setting, Trash, Lock, Edit2 } from 'iconsax-react'
+import { Setting, Trash, Lock, Edit2, ElementPlus } from 'iconsax-react'
 import EmptyPrompts from '@/components/EmptyPrompts/EmptyPrompts'
 
 // Custom Variables for styling
@@ -20,18 +20,26 @@ const PersonalPrompts = ({ userId, prompts, openModal, selectPrompt }: PersonalP
   return (
     <div className={styles.personalPromptsContainer}>
       <div className={styles.personalPromptsHeader}>
-        <h2>My Prompts</h2>
-        <div className={styles.personalPrompts}>
-          {prompts.map((item) => (
-            <PersonalPromptsItem
-              key={item.name}
-              userId={userId}
-              prompt={item}
-              selectPrompt={selectPrompt}
-              openModal={openModal}
-            />
-          ))}
+        <div className={styles.personalPromptsHeaderLeft}>
+          <h2>My Prompts</h2>
         </div>
+        <div className={styles.personalPromptsHeaderRight}>
+          <Button size="xsmall" variant="ghost-neutral" onClick={() => openModal('create-prompt')}>
+            <ElementPlus color={variables.tertiary} variant={'Bold'} size="16" />
+            New Prompt
+          </Button>
+        </div>
+      </div>
+      <div className={styles.personalPrompts}>
+        {prompts.map((item) => (
+          <PersonalPromptsItem
+            key={item.external_id}
+            userId={userId}
+            prompt={item}
+            selectPrompt={selectPrompt}
+            openModal={openModal}
+          />
+        ))}
       </div>
     </div>
   )
