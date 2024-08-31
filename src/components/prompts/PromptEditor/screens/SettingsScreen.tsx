@@ -319,7 +319,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
                     control: (baseStyles, state) => ({
                       ...baseStyles,
                       fontSize: '16px',
-                      border: `1px solid ${variables.light10}`,
+                      border: state.isFocused ? `1px solid ${variables.light40}` : `1px solid ${variables.light10}`,
                       padding: '10px',
                       borderRadius: '10px',
                       borderColor: variables.light10,
@@ -327,6 +327,13 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
                       color: variables.textPrimary,
                       backgroundColor: variables.light5,
                       marginLeft: '1px',
+                      outline: 'none',
+                      boxShadow: 'none',
+                      '&:hover': {
+                        border: state.isFocused ? `1px solid ${variables.light40}` : `1px solid ${variables.light20}`,
+                        outline: 'none',
+                        boxShadow: 'none',
+                      },
                     }),
                     menu: (baseStyles, state) => ({
                       ...baseStyles,
