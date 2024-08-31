@@ -100,7 +100,7 @@ const TrendingPromptsItem = ({
             {isCopied ? 'Copied' : 'Share'}
           </Button>
           <Button className={styles.filledButton} size="xsmall" variant="primary" onClick={() => selectPrompt(prompt)}>
-            Use
+            Chat
           </Button>
         </div>
       </div>

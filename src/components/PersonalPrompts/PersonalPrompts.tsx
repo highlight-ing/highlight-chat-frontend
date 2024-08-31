@@ -21,7 +21,7 @@ const PersonalPrompts = ({ userId, prompts, openModal, selectPrompt }: PersonalP
     <div className={styles.personalPromptsContainer}>
       <div className={styles.personalPromptsHeader}>
         <div className={styles.personalPromptsHeaderLeft}>
-          <h2>My Prompts</h2>
+          <h2>Pinned Prompts</h2>
         </div>
         <div className={styles.personalPromptsHeaderRight}>
           <Button size="xsmall" variant="ghost-neutral" onClick={() => openModal('create-prompt')}>
@@ -134,7 +134,7 @@ const PersonalPromptsItem = ({ userId, prompt, selectPrompt, openModal }: Person
             onClick={() => selectPrompt(prompt)}
             hidden={!isHovered}
           >
-            Use
+            Chat
           </Button>
         </div>
         <div className={styles.personalPromptsItemFooterRightButtons}>
