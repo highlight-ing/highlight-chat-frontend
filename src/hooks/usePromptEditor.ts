@@ -39,7 +39,6 @@ export function usePromptEditor() {
     formData.append('name', promptEditorData.name)
     formData.append('description', promptEditorData.description)
     formData.append('appPrompt', promptEditorData.appPrompt)
-    formData.append('suggestionsPrompt', promptEditorData.suggestionsPrompt)
     formData.append('visibility', promptEditorData.visibility)
     formData.append('tags', JSON.stringify(promptEditorData.tags ?? []))
 

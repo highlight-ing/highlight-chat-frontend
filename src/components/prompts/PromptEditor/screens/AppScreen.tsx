@@ -122,12 +122,6 @@ function TemplateButton() {
   const APP_PROMPT_COMMENT =
     "{{! These are comments, they won't effect the output of your app }}\n{{! The app prompt determines how your app will behave to the user. }}\n"
 
-  /**
-   * Comment that gets appended to all prompts
-   */
-  const SUGGESTIONS_PROMPT_COMMENT =
-    '{{! Write a prompt that explains how your app can help the user provided the context }}\n'
-
   const contextMenuItems = [
     {
       label: (
@@ -141,9 +135,6 @@ function TemplateButton() {
           appPrompt:
             APP_PROMPT_COMMENT +
             'You are a code reviewer. You will review code and provide suggestions for improvements. Use the screen data {{screen}} to help the user with their code.',
-          suggestionsPrompt:
-            SUGGESTIONS_PROMPT_COMMENT +
-            'Using this screen data: {{screen}}, offer suggestions for ways to improve the code.',
         })
       },
     },
@@ -159,7 +150,6 @@ function TemplateButton() {
           appPrompt:
             APP_PROMPT_COMMENT +
             'You are a meeting summarizer. You will summarize the meeting notes from either the {{audio}} or {{clipboard_text}} that is provided. If both of these are missing, prompt the user to attach them.',
-          suggestionsPrompt: '',
           name: 'Meeting Summarizer',
           description: 'A meeting summarizer that will summarize meeting notes.',
         })
@@ -177,7 +167,6 @@ function TemplateButton() {
           appPrompt:
             APP_PROMPT_COMMENT +
             'You are a blog post generator. You will generate a blog post based on the screen data {{screen}} that is provided.',
-          suggestionsPrompt: '',
           name: 'Blog Post Generator',
           description:
             'A blog post generator that will generate a blog post based on the screen data that is provided.',
@@ -196,7 +185,6 @@ function TemplateButton() {
           appPrompt:
             APP_PROMPT_COMMENT +
             'You are a lizzard person. Joke about how you will take over the world using the screen data {{screen}}, audio {{audio}}, and clipboard text {{clipboard_text}} that is provided.',
-          suggestionsPrompt: '',
           name: 'Lizzard Person',
           description: 'A lizzard person who will take over the world.',
         })

@@ -7,7 +7,7 @@ import { PromptTag } from '@/types'
  * when the user is creating or editing a prompt.
  */
 
-export type PromptEditorScreen = 'startWithTemplate' | 'app' | 'suggestions' | 'settings'
+export type PromptEditorScreen = 'startWithTemplate' | 'app' | 'settings'
 
 export interface PromptEditorOnboarding {
   /**
@@ -25,7 +25,6 @@ export interface PromptEditorData {
   description: string
   tags?: PromptTag[]
   appPrompt: string
-  suggestionsPrompt: string
   visibility: 'public' | 'private'
   videoUrl?: string
   image?: string
@@ -57,7 +56,6 @@ export const initialPromptEditorState: PromptEditorState = {
   promptEditorData: {
     slug: '',
     appPrompt: '',
-    suggestionsPrompt: '',
     name: '',
     description: '',
     visibility: 'private',
