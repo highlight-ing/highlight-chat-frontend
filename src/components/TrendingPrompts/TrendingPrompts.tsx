@@ -6,6 +6,8 @@ import { useState, useEffect } from 'react'
 import { PromptTag } from '@/types'
 import { useMemo } from 'react'
 import { PinnedPrompt } from '@/types'
+import { supabaseLoader } from '@/lib/supabase'
+import Image from 'next/image'
 
 // Components
 import Button from '@/components/Button/Button'
@@ -107,7 +109,18 @@ const TrendingPromptsItem = ({
     <div className={`${styles.trendingPromptsItem} ${lastItem ? styles.lastItem : ''}`}>
       <div className={styles.trendingPromptsItemHeader}>
         <div className={styles.trendingPromptsItemHeaderLeft}>
-          <Setting color={color} variant={'Bulk'} />
+          {prompt.image ? (
+            <Image
+              src={`/user_content/${prompt.image}.${prompt.user_images?.file_extension}`}
+              alt="Prompt image"
+              className="h-6 w-6 rounded-full"
+              width={24}
+              height={24}
+              loader={supabaseLoader}
+            />
+          ) : (
+            <Setting color={color} variant={'Bulk'} />
+          )}
           <h3>{name}</h3>
         </div>
         <div className={styles.trendingPromptsItemHeaderRight}>

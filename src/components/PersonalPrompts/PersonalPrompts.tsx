@@ -9,7 +9,8 @@ import Button from '@/components/Button/Button'
 import { Setting, Trash, Lock, Edit2, ElementPlus } from 'iconsax-react'
 import EmptyPrompts from '@/components/EmptyPrompts/EmptyPrompts'
 import { Prompt } from '@/types/supabase-helpers'
-import { PinnedPrompt } from '@/types'
+import Image from 'next/image'
+import { supabaseLoader } from '@/lib/supabase'
 
 // Custom Variables for styling
 import CSS_VARIABLES from './customVariables'
@@ -35,6 +36,8 @@ const PersonalPrompts = ({ userId, prompts, pinnedPrompts, openModal, selectProm
       )
     }
   }, [])
+
+  console.log('mergedPrompts', mergedPrompts)
 
   return (
     <div className={styles.personalPromptsContainer}>
@@ -100,7 +103,18 @@ const PersonalPromptsItem = ({
       }}
     >
       <div className={styles.personalPromptsItemHeader}>
-        <Setting color={colorScheme.icon.color} variant={'Bulk'} />
+        {prompt.image ? (
+          <Image
+            src={`/user_content/${prompt.image}.${prompt.user_images?.file_extension}`}
+            alt="Prompt image"
+            className="h-6 w-6 rounded-full"
+            width={24}
+            height={24}
+            loader={supabaseLoader}
+          />
+        ) : (
+          <Setting color={colorScheme.icon.color} variant={'Bulk'} />
+        )}
         <h3>{prompt.name}</h3>
       </div>
       <div className={styles.personalPromptsItemContent}>
