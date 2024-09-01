@@ -88,8 +88,7 @@ const Prompts = ({
   userId: string | undefined
   openModal: (modal: string, context?: Record<string, any>) => void
 }) => {
-  const { isLoadingPrompts, myPrompts, communityPrompts, selectPrompt } = usePromptApps()
-
+  const { isLoadingPrompts, myPrompts, communityPrompts, pinnedPrompts, selectPrompt } = usePromptApps()
   if (isLoadingPrompts && !userId) {
     return (
       <div className="flex flex-col gap-4">
@@ -106,10 +105,22 @@ const Prompts = ({
   return (
     <>
       <div className={styles.callouts}>
-        <PersonalPrompts userId={userId} prompts={myPrompts} openModal={openModal} selectPrompt={selectPrompt} />
+        <PersonalPrompts
+          userId={userId}
+          prompts={myPrompts}
+          pinnedPrompts={pinnedPrompts}
+          openModal={openModal}
+          selectPrompt={selectPrompt}
+        />
       </div>
       <div className={styles.callouts}>
-        <TrendingPrompts prompts={communityPrompts} openModal={openModal} selectPrompt={selectPrompt} />
+        <TrendingPrompts
+          userId={userId}
+          prompts={communityPrompts}
+          pinnedPrompts={pinnedPrompts}
+          openModal={openModal}
+          selectPrompt={selectPrompt}
+        />
       </div>
     </>
   )

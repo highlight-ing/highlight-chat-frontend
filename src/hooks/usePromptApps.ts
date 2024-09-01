@@ -1,5 +1,12 @@
 import { useStore } from '@/providers/store-provider'
-import { addPromptToUser, countPromptView, fetchPrompts, fetchPromptText } from '@/utils/prompts'
+import {
+  addPromptToUser,
+  removePromptFromUser,
+  countPromptView,
+  fetchPrompts,
+  fetchPinnedPrompts,
+  fetchPromptText,
+} from '@/utils/prompts'
 import useAuth from '@/hooks/useAuth'
 import { Prompt } from '@/types/supabase-helpers'
 import { useShallow } from 'zustand/react/shallow'
@@ -17,6 +24,8 @@ export default (loadPrompts?: boolean) => {
     promptUserId,
     setPromptUserId,
     setPrompt,
+    pinnedPrompts,
+    setPinnedPrompts,
     clearPrompt,
     startNewConversation,
     isPromptsLoaded,
@@ -27,6 +36,8 @@ export default (loadPrompts?: boolean) => {
       setPrompts: state.setPrompts,
       promptUserId: state.promptUserId,
       setPromptUserId: state.setPromptUserId,
+      pinnedPrompts: state.pinnedPrompts,
+      setPinnedPrompts: state.setPinnedPrompts,
       setPrompt: state.setPrompt,
       clearPrompt: state.clearPrompt,
       startNewConversation: state.startNewConversation,
@@ -66,6 +77,10 @@ export default (loadPrompts?: boolean) => {
       }
       setPromptUserId(response.userId)
       setPrompts(response.prompts ?? [])
+      const pinnedPrompts = await fetchPinnedPrompts(accessToken)
+      // TODO(umut): dont forgor to fix this type shit
+      // @ts-expect-error
+      setPinnedPrompts(pinnedPrompts.prompts ?? [])
       setLoadingPrompts(false)
       setIsPromptsLoaded(true)
       resolve(response.prompts ?? [])
@@ -73,6 +88,40 @@ export default (loadPrompts?: boolean) => {
     })
 
     return loadPromptsPromise
+  }
+
+  const pinPrompt = async (prompt: Prompt) => {
+    if (!prompt.slug) {
+      return
+    }
+
+    const accessToken = await getAccessToken()
+
+    addPromptToUser(prompt.external_id, accessToken).catch((err) => {
+      addToast({
+        title: 'Error adding chat app',
+        description: err.message ?? err.toString(),
+        type: 'error',
+        timeout: 15000,
+      })
+    })
+  }
+
+  const unpinPrompt = async (prompt: Prompt) => {
+    if (!prompt.slug) {
+      return
+    }
+
+    const accessToken = await getAccessToken()
+
+    removePromptFromUser(prompt.external_id, accessToken).catch((err) => {
+      addToast({
+        title: 'Error removing chat app',
+        description: err.message ?? err.toString(),
+        type: 'error',
+        timeout: 15000,
+      })
+    })
   }
 
   const selectPrompt = async (prompt: Prompt, isNewConversation?: boolean) => {
@@ -161,8 +210,11 @@ export default (loadPrompts?: boolean) => {
     prompts,
     communityPrompts,
     myPrompts,
+    pinnedPrompts,
     getPrompt,
     refreshPrompts,
     selectPrompt,
+    pinPrompt,
+    unpinPrompt,
   }
 }

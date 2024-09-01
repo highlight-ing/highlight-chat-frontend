@@ -1,6 +1,42 @@
 import variables from '@/variables.module.scss'
+type ColorScheme = {
+  icon: {
+    color: string
+  }
+  background: {
+    color: string
+    hoverColor: string
+  }
+  button: {
+    textColor: string
+    backgroundColor: string
+    hoverBackgroundColor: string
+    borderColor: string
+    hoverBorderColor: string
+  }
+  ctaButton: {
+    textColor: string
+    backgroundColor: string
+    hoverBackgroundColor: string
+    borderColor: string
+    hoverBorderColor: string
+  }
+  useButton: {
+    textColor: string
+    backgroundColor: string
+    hoverBackgroundColor: string
+    borderColor: string
+    hoverBorderColor: string
+  }
+}
 
-const CSS_VARIABLES = {
+type CSSVariables = {
+  private: ColorScheme
+  public: ColorScheme
+  pinned: ColorScheme
+}
+
+const CSS_VARIABLES: CSSVariables = {
   private: {
     icon: {
       color: variables.textPrimary,
@@ -61,7 +97,7 @@ const CSS_VARIABLES = {
       hoverBorderColor: variables.pink40,
     },
   },
-  forked: {
+  pinned: {
     icon: {
       color: variables.primary100,
     },
@@ -94,3 +130,4 @@ const CSS_VARIABLES = {
 }
 
 export default CSS_VARIABLES
+export type { ColorScheme, CSSVariables }

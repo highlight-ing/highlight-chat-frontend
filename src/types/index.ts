@@ -1,4 +1,5 @@
 import { Prompt } from '@/types/supabase-helpers'
+import { ColorScheme, CSSVariables } from '@/components/PersonalPrompts/customVariables'
 
 type WindowAttachment = {
   type: 'window'
@@ -164,13 +165,17 @@ export type PromptTag = {
 export interface PersonalPromptsProps {
   userId: string | undefined
   prompts: Prompt[]
+  pinnedPrompts: Prompt[]
   openModal: (modal: string, context?: Record<string, any>) => void
   selectPrompt: (prompt: Prompt) => void
 }
 
 export interface PersonalPromptsItemProps {
-  userId: string | undefined
   prompt: Prompt
   selectPrompt: (prompt: Prompt) => void
   openModal: (modal: string, context?: Record<string, any>) => void
+  colorScheme: ColorScheme
+  isOwner: boolean
+  isPublic: boolean
+  isPinned: boolean
 }
