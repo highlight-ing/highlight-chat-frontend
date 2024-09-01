@@ -2,28 +2,45 @@ import styles from './trending-prompts.module.scss'
 import variables from '@/variables.module.scss'
 import { Prompt } from '@/types/supabase-helpers'
 import { Setting } from 'iconsax-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { PromptTag } from '@/types'
+import { useMemo } from 'react'
+import { PinnedPrompt } from '@/types'
+import { supabaseLoader } from '@/lib/supabase'
+import Image from 'next/image'
+
 // Components
 import Button from '@/components/Button/Button'
 import { Badge } from '@/components/Badge/Badge'
 
 const TrendingPrompts = ({
+  userId,
   prompts,
+  pinnedPrompts,
   openModal,
   selectPrompt,
 }: {
+  userId: string | undefined
   prompts: Prompt[]
+  pinnedPrompts: PinnedPrompt[]
   openModal: (modal: string, context?: Record<string, any>) => void
   selectPrompt: (prompt: Prompt) => void
 }) => {
+  const mergedPrompts = useMemo(() => {
+    const pinnedPromptIds = new Set(pinnedPrompts.map((p) => p.prompts?.external_id))
+    return prompts.map((prompt) => ({
+      ...prompt,
+      isPinned: pinnedPromptIds.has(prompt.external_id),
+    }))
+  }, [prompts, pinnedPrompts])
+
   return (
     <div className={styles.trendingPromptsContainer}>
       {prompts.length > 0 ? (
         <div className={styles.trendingPromptsHeader}>
           <h2>Top 10 Trending Prompts</h2>
           <div className={styles.trendingPrompts}>
-            {prompts.map((item, index) => (
+            {mergedPrompts.map((item, index) => (
               <TrendingPromptsItem
                 key={item.name}
                 name={item.name}
@@ -33,9 +50,11 @@ const TrendingPrompts = ({
                 selectPrompt={selectPrompt}
                 prompt={item}
                 tags={item.tags as PromptTag[] | null}
-                lastItem={index === prompts.length - 1}
+                lastItem={index === mergedPrompts.length - 1}
                 openModal={openModal}
                 publicUseNumber={item.public_use_number}
+                userId={userId}
+                pinState={item.isPinned}
               />
             ))}
           </div>
@@ -64,6 +83,8 @@ const TrendingPromptsItem = ({
   lastItem,
   openModal,
   publicUseNumber,
+  userId,
+  pinState,
 }: {
   name: string
   description?: string
@@ -75,13 +96,31 @@ const TrendingPromptsItem = ({
   lastItem: boolean
   openModal: (modal: string, context?: Record<string, any>) => void
   publicUseNumber: number
+  userId: string | undefined
+  pinState: boolean
 }) => {
-  const [isCopied, setIsCopied] = useState(false)
+  const [isPinned, setIsPinned] = useState(pinState)
+
+  useEffect(() => {
+    setIsPinned(pinState)
+  }, [pinState])
+
   return (
     <div className={`${styles.trendingPromptsItem} ${lastItem ? styles.lastItem : ''}`}>
       <div className={styles.trendingPromptsItemHeader}>
         <div className={styles.trendingPromptsItemHeaderLeft}>
-          <Setting color={color} variant={'Bulk'} />
+          {prompt.image ? (
+            <Image
+              src={`/user_content/${prompt.image}.${prompt.user_images?.file_extension}`}
+              alt="Prompt image"
+              className="h-6 w-6 rounded-full"
+              width={24}
+              height={24}
+              loader={supabaseLoader}
+            />
+          ) : (
+            <Setting color={color} variant={'Bulk'} />
+          )}
           <h3>{name}</h3>
         </div>
         <div className={styles.trendingPromptsItemHeaderRight}>
@@ -90,14 +129,11 @@ const TrendingPromptsItem = ({
             variant="tertiary"
             className={styles.filledButton}
             onClick={() => {
-              const url = `https://chat.highlight.ing/prompts/${slug}`
-              navigator.clipboard.writeText(url)
-              setIsCopied(true)
-              setTimeout(() => setIsCopied(false), 2000)
+              openModal('pin-prompt', { prompt })
             }}
-            disabled={isCopied}
+            disabled={isPinned}
           >
-            {isCopied ? 'Copied' : 'Share'}
+            {isPinned ? 'Pinned' : 'Pin'}
           </Button>
           <Button className={styles.filledButton} size="xsmall" variant="primary" onClick={() => selectPrompt(prompt)}>
             Chat

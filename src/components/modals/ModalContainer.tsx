@@ -11,6 +11,8 @@ import ConfirmationModal, { ConfirmationModalProps } from '@/components/modals/C
 import { useShallow } from 'zustand/react/shallow'
 import ConfirmDeletePromptModal from '@/presentations/modals/ConfirmDeletePromptModal'
 import ChangePromptVisibilityModal from '@/presentations/modals/ChangePromptVisibilityModal'
+import UnpinPromptModal from '@/presentations/modals/UnpinPromptModal'
+import PinPromptModal from '@/presentations/modals/PinPromptModal'
 
 type FunctionalComponent = (props: ModalObjectProps) => JSX.Element
 
@@ -25,6 +27,8 @@ const ModalMap: Record<string, FunctionalComponent> = {
   ),
   'confirm-delete-prompt': ConfirmDeletePromptModal,
   'change-prompt-visibility': ChangePromptVisibilityModal,
+  'unpin-prompt': UnpinPromptModal,
+  'pin-prompt': PinPromptModal,
 }
 
 export const ModalContainer = () => {

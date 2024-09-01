@@ -8,14 +8,41 @@ import { Badge } from '@/components/Badge/Badge'
 import Button from '@/components/Button/Button'
 import { Setting, Trash, Lock, Edit2, ElementPlus } from 'iconsax-react'
 import EmptyPrompts from '@/components/EmptyPrompts/EmptyPrompts'
+import { Prompt } from '@/types/supabase-helpers'
+import Image from 'next/image'
+import { supabaseLoader } from '@/lib/supabase'
 
 // Custom Variables for styling
 import CSS_VARIABLES from './customVariables'
 
-const PersonalPrompts = ({ userId, prompts, openModal, selectPrompt }: PersonalPromptsProps) => {
-  if (prompts.length === 0) {
+type PromptWithPin = Prompt & { isPinned?: boolean }
+
+const PersonalPrompts = ({ userId, prompts, pinnedPrompts, openModal, selectPrompt }: PersonalPromptsProps) => {
+  if (prompts.length === 0 && pinnedPrompts.length === 0) {
     return <EmptyPrompts openModal={openModal} />
   }
+
+  // Merge and deduplicate prompts and pinnedPrompts
+  const mergedPrompts = [
+    ...prompts,
+    // Add isPinned property to all pinned prompts
+    ...pinnedPrompts.map((pinnedPrompt) => ({ ...pinnedPrompt.prompts, isPinned: true }) as PromptWithPin),
+  ].reduce((acc: PromptWithPin[], current: PromptWithPin) => {
+    // Check if the current prompt already exists in the accumulator
+    const x = acc.find((item) => item.external_id === current.external_id)
+    if (!x) {
+      // If not found, add the current prompt to the accumulator
+      return acc.concat([current])
+    } else {
+      // If found, update the existing prompt
+      return acc.map((item) =>
+        item.external_id === current.external_id
+          ? // Merge isPinned status, keeping true if either is true
+            { ...item, isPinned: item.isPinned || current.isPinned }
+          : item,
+      )
+    }
+  }, [])
 
   return (
     <div className={styles.personalPromptsContainer}>
@@ -31,33 +58,45 @@ const PersonalPrompts = ({ userId, prompts, openModal, selectPrompt }: PersonalP
         </div>
       </div>
       <div className={styles.personalPrompts}>
-        {prompts.map((item) => (
-          <PersonalPromptsItem
-            key={item.external_id}
-            userId={userId}
-            prompt={item}
-            selectPrompt={selectPrompt}
-            openModal={openModal}
-          />
-        ))}
+        {mergedPrompts.map((item: Prompt) => {
+          const isOwner = userId === item.user_id
+          const isPublic = item.public
+          const isPinned = pinnedPrompts.some((pinnedPrompt) => pinnedPrompt.prompts?.external_id === item.external_id)
+          const colorScheme = isOwner
+            ? isPublic
+              ? CSS_VARIABLES.public
+              : CSS_VARIABLES.private
+            : isPublic && isPinned
+              ? CSS_VARIABLES.private
+              : CSS_VARIABLES.pinned
+
+          return (
+            <PersonalPromptsItem
+              prompt={item}
+              key={item.external_id}
+              selectPrompt={selectPrompt}
+              openModal={openModal}
+              isOwner={isOwner}
+              isPublic={isPublic}
+              colorScheme={colorScheme}
+            />
+          )
+        })}
       </div>
     </div>
   )
 }
 
-const PersonalPromptsItem = ({ userId, prompt, selectPrompt, openModal }: PersonalPromptsItemProps) => {
+const PersonalPromptsItem = ({
+  prompt,
+  selectPrompt,
+  openModal,
+  colorScheme,
+  isOwner,
+  isPublic,
+}: PersonalPromptsItemProps) => {
   const [isCopied, setIsCopied] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
-
-  const isOwner = userId === prompt.user_id
-  const isPublic = prompt.public
-  const colorScheme = isOwner
-    ? isPublic
-      ? CSS_VARIABLES.public
-      : CSS_VARIABLES.private
-    : isPublic
-      ? CSS_VARIABLES.forked
-      : CSS_VARIABLES.private
 
   return (
     <div
@@ -69,7 +108,18 @@ const PersonalPromptsItem = ({ userId, prompt, selectPrompt, openModal }: Person
       }}
     >
       <div className={styles.personalPromptsItemHeader}>
-        <Setting color={colorScheme.icon.color} variant={'Bulk'} />
+        {prompt.image ? (
+          <Image
+            src={`/user_content/${prompt.image}.${prompt.user_images?.file_extension}`}
+            alt="Prompt image"
+            className="h-6 w-6 rounded-full"
+            width={24}
+            height={24}
+            loader={supabaseLoader}
+          />
+        ) : (
+          <Setting color={colorScheme.icon.color} variant={'Bulk'} />
+        )}
         <h3>{prompt.name}</h3>
       </div>
       <div className={styles.personalPromptsItemContent}>
@@ -103,7 +153,7 @@ const PersonalPromptsItem = ({ userId, prompt, selectPrompt, openModal }: Person
             >
               {isCopied ? 'Copied' : 'Share'}
             </Button>
-          ) : (
+          ) : isOwner ? (
             <Button
               className={styles.filledButton}
               size="xsmall"
@@ -119,7 +169,7 @@ const PersonalPromptsItem = ({ userId, prompt, selectPrompt, openModal }: Person
             >
               Publish
             </Button>
-          )}
+          ) : null}
           <Badge variant="disabled" hidden={isHovered}>
             {prompt.public_use_number ? `${prompt.public_use_number} Uses` : 'No uses'}
           </Badge>
@@ -138,41 +188,59 @@ const PersonalPromptsItem = ({ userId, prompt, selectPrompt, openModal }: Person
           </Button>
         </div>
         <div className={styles.personalPromptsItemFooterRightButtons}>
-          <Button
-            size="icon"
-            variant="ghost-neutral"
-            style={{
-              border: `1px solid ${isHovered ? colorScheme.button.hoverBorderColor : colorScheme.button.borderColor}`,
-            }}
-            onClick={() => openModal('confirm-delete-prompt', { externalId: prompt.external_id, name: prompt.name })}
-            hidden={!isHovered}
-          >
-            <Trash color={variables.tertiary} variant={'Bold'} size="24" />
-          </Button>
-          {isPublic && (
+          {isOwner ? (
+            <>
+              <Button
+                size="icon"
+                variant="ghost-neutral"
+                style={{
+                  border: `1px solid ${isHovered ? colorScheme.button.hoverBorderColor : colorScheme.button.borderColor}`,
+                }}
+                onClick={() =>
+                  openModal('confirm-delete-prompt', { externalId: prompt.external_id, name: prompt.name })
+                }
+                hidden={!isHovered}
+              >
+                <Trash color={variables.tertiary} variant={'Bold'} size="24" />
+              </Button>
+              {isPublic && (
+                <Button
+                  size="icon"
+                  variant="ghost-neutral"
+                  style={{
+                    border: `1px solid ${isHovered ? colorScheme.button.hoverBorderColor : colorScheme.button.borderColor}`,
+                  }}
+                  onClick={() => openModal('change-prompt-visibility', { prompt })}
+                  hidden={!isHovered}
+                >
+                  <Lock color={variables.tertiary} variant={'Bold'} size="16" />
+                </Button>
+              )}
+              <Button
+                size="icon"
+                variant="ghost-neutral"
+                style={{
+                  border: `1px solid ${isHovered ? colorScheme.button.hoverBorderColor : colorScheme.button.borderColor}`,
+                }}
+                onClick={() => openModal('edit-prompt', { prompt })}
+                hidden={!isHovered}
+              >
+                <Edit2 color={colorScheme.button.textColor} variant={'Bold'} size="16" />
+              </Button>
+            </>
+          ) : (
             <Button
               size="icon"
               variant="ghost-neutral"
               style={{
                 border: `1px solid ${isHovered ? colorScheme.button.hoverBorderColor : colorScheme.button.borderColor}`,
               }}
-              onClick={() => openModal('change-prompt-visibility', { prompt })}
+              onClick={() => openModal('unpin-prompt', { prompt })}
               hidden={!isHovered}
             >
-              <Lock color={variables.tertiary} variant={'Bold'} size="16" />
+              <Trash color={colorScheme.button.textColor} variant={'Bold'} size="16" />
             </Button>
           )}
-          <Button
-            size="icon"
-            variant="ghost-neutral"
-            style={{
-              border: `1px solid ${isHovered ? colorScheme.button.hoverBorderColor : colorScheme.button.borderColor}`,
-            }}
-            onClick={() => openModal('edit-prompt', { prompt })}
-            hidden={!isHovered}
-          >
-            <Edit2 color={colorScheme.button.textColor} variant={'Bold'} size="16" />
-          </Button>
         </div>
       </div>
     </div>

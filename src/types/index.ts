@@ -1,4 +1,5 @@
 import { Prompt } from '@/types/supabase-helpers'
+import { ColorScheme, CSSVariables } from '@/components/PersonalPrompts/customVariables'
 
 type WindowAttachment = {
   type: 'window'
@@ -164,13 +165,36 @@ export type PromptTag = {
 export interface PersonalPromptsProps {
   userId: string | undefined
   prompts: Prompt[]
+  pinnedPrompts: PinnedPrompt[]
   openModal: (modal: string, context?: Record<string, any>) => void
   selectPrompt: (prompt: Prompt) => void
 }
 
 export interface PersonalPromptsItemProps {
-  userId: string | undefined
   prompt: Prompt
   selectPrompt: (prompt: Prompt) => void
   openModal: (modal: string, context?: Record<string, any>) => void
+  colorScheme: ColorScheme
+  isOwner: boolean
+  isPublic: boolean
+}
+
+// Type for the pinned prompt based on PROMPTS_TABLE_SELECT_FIELDS
+export type PinnedPrompt = {
+  prompts:
+    | ({
+        external_id: string
+        name: string
+        description: string | null
+        prompt_text: string | null
+        created_at: string
+        slug: string
+        user_id: string
+        image: string | null
+        user_images: {
+          file_extension: string
+        } | null
+        public_use_number: number
+      } & { isPinned?: boolean })
+    | null
 }

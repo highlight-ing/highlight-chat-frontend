@@ -1,5 +1,6 @@
 import { StateCreator } from 'zustand'
 import { Prompt } from '@/types/supabase-helpers'
+import { PinnedPrompt } from '@/types'
 import { useStore } from '@/providers/store-provider'
 import { useShallow } from 'zustand/react/shallow'
 import { Store } from '.'
@@ -8,11 +9,11 @@ import { Store } from '.'
  * Stores all the prompts available to the user,
  * including ones that they own.
  */
-
 export interface PromptsState {
   promptUserId?: string | undefined
   prompts: Prompt[]
   isPromptsLoaded: boolean
+  pinnedPrompts: PinnedPrompt[]
 }
 
 export type PromptsSlice = PromptsState & {
@@ -22,12 +23,14 @@ export type PromptsSlice = PromptsState & {
   removePrompt: (externalId: string) => void
   addPrompt: (prompt: Prompt) => void
   setIsPromptsLoaded: (isPromptsLoaded: boolean) => void
+  setPinnedPrompts: (pinnedPrompts: PinnedPrompt[]) => void
 }
 
 export const initialPromptsState: PromptsState = {
   promptUserId: undefined,
   prompts: [],
   isPromptsLoaded: false,
+  pinnedPrompts: [],
 }
 
 export const createPromptsSlice: StateCreator<Store, [], [], PromptsSlice> = (set, get) => ({
@@ -72,6 +75,11 @@ export const createPromptsSlice: StateCreator<Store, [], [], PromptsSlice> = (se
   setIsPromptsLoaded: (isPromptsLoaded) => {
     set({ isPromptsLoaded })
   },
+  setPinnedPrompts: (pinnedPrompts: PinnedPrompt[]) => {
+    set({
+      pinnedPrompts,
+    })
+  },
 })
 
 export const usePromptsStore = () =>
@@ -84,5 +92,7 @@ export const usePromptsStore = () =>
       updatePrompt: state.updatePrompt,
       removePrompt: state.removePrompt,
       addPrompt: state.addPrompt,
+      pinnedPrompts: state.pinnedPrompts,
+      setPinnedPrompts: state.setPinnedPrompts,
     })),
   )

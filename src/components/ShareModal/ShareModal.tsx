@@ -130,7 +130,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
               </div>
             ) : (
               <p className="text-[13px] font-medium text-subtle">
-                You haven't selected a conversation yet. Please select one and try sharing again.
+                You haven&apos;t selected a conversation yet. Please select one and try sharing again.
               </p>
             )}
           </div>

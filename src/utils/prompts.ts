@@ -1,7 +1,7 @@
 'use server'
 
 import { validateHighlightJWT } from '@/lib/auth'
-import { supabaseAdmin } from '@/lib/supabase'
+import { PROMPTS_TABLE_SELECT_FIELDS, supabaseAdmin } from '@/lib/supabase'
 import { videoUrlSchema } from '@/lib/zod'
 import { JWTPayload, JWTVerifyResult } from 'jose'
 import { z } from 'zod'
@@ -276,13 +276,40 @@ export async function fetchPrompts(authToken: string) {
 
   const supabase = supabaseAdmin()
 
-  const { data: prompts, error } = await supabase.from('prompts').select('*, user_images(file_extension)')
+  // Select all private or public prompts user has created
+  const { data: prompts, error: promptsError } = await supabase.from('prompts').select('*, user_images(file_extension)')
 
-  if (error) {
+  if (promptsError) {
     return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
   }
 
-  return { prompts, userId }
+  return { prompts: prompts, userId }
+}
+
+/**
+ * Fetches prompts from the database that the user has pinned.
+ */
+export async function fetchPinnedPrompts(authToken: string) {
+  let userId: string
+  try {
+    userId = await validateUserAuth(authToken)
+  } catch (error) {
+    return { error: ERROR_MESSAGES.INVALID_AUTH_TOKEN }
+  }
+
+  const supabase = supabaseAdmin()
+
+  // Select all prompts that the user has added
+  const { data: pinnedPrompts, error: pinnedPromptsError } = await supabase
+    .from('added_prompts')
+    .select(`prompts(${PROMPTS_TABLE_SELECT_FIELDS})`)
+    .eq('user_id', userId)
+
+  if (pinnedPromptsError) {
+    return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
+  }
+
+  return { prompts: pinnedPrompts }
 }
 
 /**
@@ -355,6 +382,37 @@ export async function addPromptToUser(externalId: string, authToken: string) {
 
   if (insertError) {
     console.error('Error adding prompt to user', insertError)
+    return { error: ERROR_MESSAGES.DATABASE_ERROR }
+  }
+}
+
+export async function removePromptFromUser(externalId: string, authToken: string) {
+  let userId: string
+  try {
+    userId = await validateUserAuth(authToken)
+  } catch (error) {
+    return { error: ERROR_MESSAGES.INVALID_AUTH_TOKEN }
+  }
+
+  const supabase = supabaseAdmin()
+
+  // Find the prompt ID
+  const { data: prompt } = await supabase.from('prompts').select('id').eq('external_id', externalId).maybeSingle()
+
+  if (!prompt) {
+    console.error('Prompt not found in Supabase')
+    return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
+  }
+
+  // Remove the prompt from the user's added_prompts
+  const { error: deleteError } = await supabase
+    .from('added_prompts')
+    .delete()
+    .eq('user_id', userId)
+    .eq('prompt_id', prompt.id)
+
+  if (deleteError) {
+    console.error('Error removing prompt from user', deleteError)
     return { error: ERROR_MESSAGES.DATABASE_ERROR }
   }
 }

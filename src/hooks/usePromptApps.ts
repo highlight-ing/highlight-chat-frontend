@@ -1,7 +1,8 @@
 import { useStore } from '@/providers/store-provider'
-import { addPromptToUser, countPromptView, fetchPrompts, fetchPromptText } from '@/utils/prompts'
+import { addPromptToUser, countPromptView, fetchPrompts, fetchPinnedPrompts, fetchPromptText } from '@/utils/prompts'
 import useAuth from '@/hooks/useAuth'
 import { Prompt } from '@/types/supabase-helpers'
+import { PinnedPrompt } from '@/types'
 import { useShallow } from 'zustand/react/shallow'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -17,6 +18,8 @@ export default (loadPrompts?: boolean) => {
     promptUserId,
     setPromptUserId,
     setPrompt,
+    pinnedPrompts,
+    setPinnedPrompts,
     clearPrompt,
     startNewConversation,
     isPromptsLoaded,
@@ -27,6 +30,8 @@ export default (loadPrompts?: boolean) => {
       setPrompts: state.setPrompts,
       promptUserId: state.promptUserId,
       setPromptUserId: state.setPromptUserId,
+      pinnedPrompts: state.pinnedPrompts,
+      setPinnedPrompts: state.setPinnedPrompts,
       setPrompt: state.setPrompt,
       clearPrompt: state.clearPrompt,
       startNewConversation: state.startNewConversation,
@@ -66,6 +71,8 @@ export default (loadPrompts?: boolean) => {
       }
       setPromptUserId(response.userId)
       setPrompts(response.prompts ?? [])
+      const pinnedPrompts = await fetchPinnedPrompts(accessToken)
+      setPinnedPrompts(pinnedPrompts.prompts ?? [])
       setLoadingPrompts(false)
       setIsPromptsLoaded(true)
       resolve(response.prompts ?? [])
@@ -161,6 +168,7 @@ export default (loadPrompts?: boolean) => {
     prompts,
     communityPrompts,
     myPrompts,
+    pinnedPrompts,
     getPrompt,
     refreshPrompts,
     selectPrompt,
