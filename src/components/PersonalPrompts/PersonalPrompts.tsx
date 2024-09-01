@@ -37,8 +37,6 @@ const PersonalPrompts = ({ userId, prompts, pinnedPrompts, openModal, selectProm
     }
   }, [])
 
-  console.log('mergedPrompts', mergedPrompts)
-
   return (
     <div className={styles.personalPromptsContainer}>
       <div className={styles.personalPromptsHeader}>
