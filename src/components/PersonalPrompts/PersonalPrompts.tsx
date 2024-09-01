@@ -9,29 +9,27 @@ import Button from '@/components/Button/Button'
 import { Setting, Trash, Lock, Edit2, ElementPlus } from 'iconsax-react'
 import EmptyPrompts from '@/components/EmptyPrompts/EmptyPrompts'
 import { Prompt } from '@/types/supabase-helpers'
+import { PinnedPrompt } from '@/types'
+
 // Custom Variables for styling
 import CSS_VARIABLES from './customVariables'
+
+type PromptWithPin = Prompt & { isPinned?: boolean }
 
 const PersonalPrompts = ({ userId, prompts, pinnedPrompts, openModal, selectPrompt }: PersonalPromptsProps) => {
   if (prompts.length === 0 && pinnedPrompts.length === 0) {
     return <EmptyPrompts openModal={openModal} />
   }
 
+  // Magic code here don't touch :)
   const mergedPrompts = [
     ...prompts,
-    ...pinnedPrompts.map((pinnedPrompt) => ({
-      // TODO(umut): fix this type shit
-      // @ts-expect-error
-      ...pinnedPrompt.prompts,
-      isPinned: true,
-    })),
-  ].reduce((acc, current) => {
-    // @ts-expect-error
+    ...pinnedPrompts.map((pinnedPrompt) => ({ ...pinnedPrompt.prompts, isPinned: true }) as PromptWithPin),
+  ].reduce((acc: PromptWithPin[], current: PromptWithPin) => {
     const x = acc.find((item) => item.external_id === current.external_id)
     if (!x) {
       return acc.concat([current])
     } else {
-      // @ts-expect-error
       return acc.map((item) =>
         item.external_id === current.external_id ? { ...item, isPinned: item.isPinned || current.isPinned } : item,
       )
@@ -55,7 +53,7 @@ const PersonalPrompts = ({ userId, prompts, pinnedPrompts, openModal, selectProm
         {mergedPrompts.map((item: Prompt) => {
           const isOwner = userId === item.user_id
           const isPublic = item.public
-          const isPinned = pinnedPrompts.some((pinnedPrompt) => pinnedPrompt.external_id === item.external_id)
+          const isPinned = pinnedPrompts.some((pinnedPrompt) => pinnedPrompt.prompts?.external_id === item.external_id)
           const colorScheme = isOwner
             ? isPublic
               ? CSS_VARIABLES.public
@@ -72,7 +70,6 @@ const PersonalPrompts = ({ userId, prompts, pinnedPrompts, openModal, selectProm
               openModal={openModal}
               isOwner={isOwner}
               isPublic={isPublic}
-              isPinned={isPinned}
               colorScheme={colorScheme}
             />
           )
@@ -89,7 +86,6 @@ const PersonalPromptsItem = ({
   colorScheme,
   isOwner,
   isPublic,
-  isPinned,
 }: PersonalPromptsItemProps) => {
   const [isCopied, setIsCopied] = useState(false)
   const [isHovered, setIsHovered] = useState(false)

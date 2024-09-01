@@ -5,7 +5,8 @@ import { Setting } from 'iconsax-react'
 import { useState, useEffect } from 'react'
 import { PromptTag } from '@/types'
 import { useMemo } from 'react'
-import { addPromptToUser } from '@/utils/prompts'
+import { PinnedPrompt } from '@/types'
+
 // Components
 import Button from '@/components/Button/Button'
 import { Badge } from '@/components/Badge/Badge'
@@ -19,20 +20,18 @@ const TrendingPrompts = ({
 }: {
   userId: string | undefined
   prompts: Prompt[]
-  pinnedPrompts: Prompt[]
+  pinnedPrompts: PinnedPrompt[]
   openModal: (modal: string, context?: Record<string, any>) => void
   selectPrompt: (prompt: Prompt) => void
 }) => {
   const mergedPrompts = useMemo(() => {
-    // @ts-expect-error
-    const pinnedPromptIds = new Set(pinnedPrompts.map((p) => p.prompts.external_id))
+    const pinnedPromptIds = new Set(pinnedPrompts.map((p) => p.prompts?.external_id))
     return prompts.map((prompt) => ({
       ...prompt,
       isPinned: pinnedPromptIds.has(prompt.external_id),
     }))
   }, [prompts, pinnedPrompts])
 
-  console.log(mergedPrompts)
   return (
     <div className={styles.trendingPromptsContainer}>
       {prompts.length > 0 ? (

@@ -2,6 +2,7 @@ import { useStore } from '@/providers/store-provider'
 import { addPromptToUser, countPromptView, fetchPrompts, fetchPinnedPrompts, fetchPromptText } from '@/utils/prompts'
 import useAuth from '@/hooks/useAuth'
 import { Prompt } from '@/types/supabase-helpers'
+import { PinnedPrompt } from '@/types'
 import { useShallow } from 'zustand/react/shallow'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -71,8 +72,6 @@ export default (loadPrompts?: boolean) => {
       setPromptUserId(response.userId)
       setPrompts(response.prompts ?? [])
       const pinnedPrompts = await fetchPinnedPrompts(accessToken)
-      // TODO(umut): dont forgor to fix this type shit
-      // @ts-expect-error
       setPinnedPrompts(pinnedPrompts.prompts ?? [])
       setLoadingPrompts(false)
       setIsPromptsLoaded(true)
