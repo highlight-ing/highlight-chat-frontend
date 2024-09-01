@@ -1,12 +1,5 @@
 import { useStore } from '@/providers/store-provider'
-import {
-  addPromptToUser,
-  removePromptFromUser,
-  countPromptView,
-  fetchPrompts,
-  fetchPinnedPrompts,
-  fetchPromptText,
-} from '@/utils/prompts'
+import { addPromptToUser, countPromptView, fetchPrompts, fetchPinnedPrompts, fetchPromptText } from '@/utils/prompts'
 import useAuth from '@/hooks/useAuth'
 import { Prompt } from '@/types/supabase-helpers'
 import { useShallow } from 'zustand/react/shallow'
@@ -88,40 +81,6 @@ export default (loadPrompts?: boolean) => {
     })
 
     return loadPromptsPromise
-  }
-
-  const pinPrompt = async (prompt: Prompt) => {
-    if (!prompt.slug) {
-      return
-    }
-
-    const accessToken = await getAccessToken()
-
-    addPromptToUser(prompt.external_id, accessToken).catch((err) => {
-      addToast({
-        title: 'Error adding chat app',
-        description: err.message ?? err.toString(),
-        type: 'error',
-        timeout: 15000,
-      })
-    })
-  }
-
-  const unpinPrompt = async (prompt: Prompt) => {
-    if (!prompt.slug) {
-      return
-    }
-
-    const accessToken = await getAccessToken()
-
-    removePromptFromUser(prompt.external_id, accessToken).catch((err) => {
-      addToast({
-        title: 'Error removing chat app',
-        description: err.message ?? err.toString(),
-        type: 'error',
-        timeout: 15000,
-      })
-    })
   }
 
   const selectPrompt = async (prompt: Prompt, isNewConversation?: boolean) => {
@@ -214,7 +173,5 @@ export default (loadPrompts?: boolean) => {
     getPrompt,
     refreshPrompts,
     selectPrompt,
-    pinPrompt,
-    unpinPrompt,
   }
 }
