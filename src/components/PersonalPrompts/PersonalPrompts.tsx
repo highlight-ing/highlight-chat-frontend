@@ -22,17 +22,24 @@ const PersonalPrompts = ({ userId, prompts, pinnedPrompts, openModal, selectProm
     return <EmptyPrompts openModal={openModal} />
   }
 
-  // Magic code here don't touch :)
+  // Merge and deduplicate prompts and pinnedPrompts
   const mergedPrompts = [
     ...prompts,
+    // Add isPinned property to all pinned prompts
     ...pinnedPrompts.map((pinnedPrompt) => ({ ...pinnedPrompt.prompts, isPinned: true }) as PromptWithPin),
   ].reduce((acc: PromptWithPin[], current: PromptWithPin) => {
+    // Check if the current prompt already exists in the accumulator
     const x = acc.find((item) => item.external_id === current.external_id)
     if (!x) {
+      // If not found, add the current prompt to the accumulator
       return acc.concat([current])
     } else {
+      // If found, update the existing prompt
       return acc.map((item) =>
-        item.external_id === current.external_id ? { ...item, isPinned: item.isPinned || current.isPinned } : item,
+        item.external_id === current.external_id
+          ? // Merge isPinned status, keeping true if either is true
+            { ...item, isPinned: item.isPinned || current.isPinned }
+          : item,
       )
     }
   }, [])
