@@ -7,11 +7,13 @@ import {
   MessageProgramming,
   MessageText1,
   Monitor,
+  Shapes,
   Sound,
 } from 'iconsax-react'
 import sassVariables from '@/variables.module.scss'
 import ContextMenu, { MenuItemType } from '@/components/ContextMenu/ContextMenu'
 import Button from '@/components/Button/Button'
+import Tooltip from '@/components/Tooltip/Tooltip'
 
 interface VariablesToolProps {
   disabled?: boolean
@@ -92,10 +94,29 @@ export const VariablesTool: React.FC<VariablesToolProps> = ({ disabled, onSelect
       leftClick={true}
       disabled={disabled}
     >
-      <Button id="toggle-variables" size={'medium'} variant={'ghost-neutral'} disabled={disabled}>
-        <MessageProgramming variant="Bold" size={20} color={sassVariables.green100} />
-        Variables
-      </Button>
+      {
+        // @ts-ignore
+        ({ isOpen }) => (
+          <Tooltip
+            position={'bottom'}
+            tooltip={
+              isOpen ? undefined : (
+                <div className={'flex flex-col gap-1'}>
+                  <span>Utilize Variables</span>
+                  <span className={'text-xs text-light-60'}>
+                    Refer to context variables from Highlight using simple phrases.
+                  </span>
+                </div>
+              )
+            }
+          >
+            <Button id="toggle-variables" size={'medium'} variant={'ghost-neutral'} disabled={disabled}>
+              <MessageProgramming variant="Bold" size={20} color={sassVariables.green100} />
+              Variables
+            </Button>
+          </Tooltip>
+        )
+      }
     </ContextMenu>
   )
 }

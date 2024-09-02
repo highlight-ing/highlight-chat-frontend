@@ -3,6 +3,7 @@ import { Crown, Note, Screenmirroring, Shapes, VoiceSquare } from 'iconsax-react
 import sassVariables from '@/variables.module.scss'
 import ContextMenu from '@/components/ContextMenu/ContextMenu'
 import Button from '@/components/Button/Button'
+import Tooltip from '@/components/Tooltip/Tooltip'
 
 export const TemplatesTool = () => {
   const { setPromptEditorData } = usePromptEditorStore()
@@ -88,10 +89,29 @@ export const TemplatesTool = () => {
       triggerId={`toggle-templates`}
       leftClick={true}
     >
-      <Button id="toggle-templates" size={'medium'} variant={'ghost-neutral'}>
-        <Shapes variant="Bold" size={16} color={sassVariables.backgroundAccent} />
-        Templates
-      </Button>
+      {
+        // @ts-ignore
+        ({ isOpen }) => (
+          <Tooltip
+            position={'bottom'}
+            tooltip={
+              isOpen ? undefined : (
+                <div className={'flex flex-col gap-1'}>
+                  <span>Explore template examples</span>
+                  <span className={'text-xs text-light-60'}>
+                    New to prompts? Check out some templates to get started.
+                  </span>
+                </div>
+              )
+            }
+          >
+            <Button id="toggle-templates" size={'medium'} variant={'ghost-neutral'}>
+              <Shapes variant="Bold" size={16} color={sassVariables.backgroundAccent} />
+              Templates
+            </Button>
+          </Tooltip>
+        )
+      }
     </ContextMenu>
   )
 }

@@ -165,11 +165,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 15px;
-  font-weight: 350;
+  font-size: 14px;
+  font-weight: 400;
+  gap: 8px;
 
   h1 {
-    font-weight: 450;
+    color: $light-100;
+    font-weight: 500;
   }
 }
 
@@ -188,6 +190,10 @@
   align-items: center;
   height: 100%;
   gap: 32px;
+
+  :last-child {
+    margin-inline-start: auto;
+  }
 }
 
 .tab {
@@ -199,11 +205,6 @@
   color: $light-20;
   cursor: pointer;
   margin-bottom: -1px;
-
-  &.right {
-    margin-inline-start: auto;
-  }
-
 
   &:hover, &.active {
     color: $light-100;

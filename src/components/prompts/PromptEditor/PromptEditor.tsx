@@ -4,6 +4,8 @@ import StartWithTemplateScreen from './screens/StartWithTemplateScreen'
 import { PromptEditorScreen, usePromptEditorStore } from '@/stores/prompt-editor'
 import styles from './prompteditor.module.scss'
 import VariablesScreen from './screens/VariablesScreen'
+import React from 'react'
+import Tooltip from '@/components/Tooltip/Tooltip'
 
 function ScreenSelector({
   active,
@@ -33,12 +35,26 @@ function VariablesEditorButton() {
   const { setSelectedScreen } = usePromptEditorStore()
 
   return (
-    <div
-      onClick={() => setSelectedScreen('variables')}
-      className={`${styles.tab} ${styles.right} ${onboarding.isOnboarding ? styles.disabled : ''}`}
+    <Tooltip
+      position={'bottom'}
+      tooltip={
+        onboarding.isOnboarding ? undefined : (
+          <div className={'flex flex-col gap-1'}>
+            <span>Advanced Variables Editor</span>
+            <span className={'text-xs text-light-60'}>
+              Edit the system prompt to control what context variables are included.
+            </span>
+          </div>
+        )
+      }
     >
-      Variables Editor
-    </div>
+      <div
+        onClick={() => setSelectedScreen('variables')}
+        className={`${styles.tab} ${onboarding.isOnboarding ? styles.disabled : ''}`}
+      >
+        Variables Editor
+      </div>
+    </Tooltip>
   )
 }
 
