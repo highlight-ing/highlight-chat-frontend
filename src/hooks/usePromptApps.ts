@@ -139,6 +139,8 @@ export default (loadPrompts?: boolean) => {
       })
     })
 
+    refreshPrompts()
+
     try {
       //@ts-expect-error
       globalThis.highlight.internal.installApp(prompt.slug)
