@@ -1,6 +1,7 @@
 import { useStore } from '@/providers/store-provider'
 import { useEffect } from 'react'
 import usePromptApps from '@/hooks/usePromptApps'
+import Highlight from '@highlight-ai/app-runtime'
 
 export const useOnPromptChange = () => {
   const { pinnedPrompts } = usePromptApps()
@@ -13,9 +14,12 @@ export const useOnPromptChange = () => {
       closeModal('prompt-added')
       return
     }
-    console.log(promptApp.slug, pinnedPrompts)
-    if (pinnedPrompts.some((p) => p.slug === promptApp.slug)) {
+    if (
+      pinnedPrompts.some((p) => p.external_id === promptApp.external_id) &&
+      !Highlight.appStorage.get(`ctas.promptAdded.${promptApp.external_id}`)
+    ) {
       openModal('prompt-added', { prompt: promptApp })
+      Highlight.appStorage.set(`ctas.promptAdded.${promptApp.external_id}`, true)
     }
   }, [promptApp, pinnedPrompts])
 }
