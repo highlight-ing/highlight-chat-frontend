@@ -274,7 +274,7 @@ export default function IntelliPrompt({ value, onChange }: { value?: string; onC
         <div className={`${styles.editorActions} px-4`}>
           <TemplatesTool />
           <VariablesTool onSelect={onVariableClick} disabled={onboarding.isOnboarding} />
-          <ConditionsTool disabled={onboarding.isOnboarding} />
+          {/*<ConditionsTool disabled={onboarding.isOnboarding} />*/}
         </div>
       </div>
       <Editor
