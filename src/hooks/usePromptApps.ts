@@ -157,6 +157,15 @@ export default (loadPrompts?: boolean) => {
     return apps.find((app) => app.id == promptId)
   }
 
+  const getPromptBySlug = async (slug: string) => {
+    let apps: Prompt[] = prompts
+    if (!isPromptsLoaded) {
+      apps = (await refreshPrompts()) ?? []
+    }
+    // @ts-ignore
+    return apps.find((app) => app.slug == slug)
+  }
+
   useEffect(() => {
     if (!loadPrompts && isPromptsLoaded) {
       return
@@ -171,6 +180,7 @@ export default (loadPrompts?: boolean) => {
     myPrompts,
     pinnedPrompts,
     getPrompt,
+    getPromptBySlug,
     refreshPrompts,
     selectPrompt,
   }

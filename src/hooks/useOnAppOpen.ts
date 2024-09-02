@@ -8,15 +8,17 @@ import Highlight, {
 import { useEffect } from 'react'
 import { useStore } from '@/providers/store-provider'
 import { useRouter } from 'next/navigation'
+import usePromptApps from '@/hooks/usePromptApps'
 
 export const useOnAppOpen = () => {
   const router = useRouter()
   const openModal = useStore((state) => state.openModal)
   const startNewConversation = useStore((state) => state.startNewConversation)
   const clearPrompt = useStore((state) => state.clearPrompt)
+  const { selectPrompt, getPromptBySlug } = usePromptApps()
 
   useEffect(() => {
-    const onOpen = (eventOpts: boolean | AppOpenEventOptions) => {
+    const onOpen = async (eventOpts: boolean | AppOpenEventOptions) => {
       let isActiveApp
       if (typeof eventOpts === 'boolean') {
         isActiveApp = eventOpts
@@ -30,11 +32,19 @@ export const useOnAppOpen = () => {
           return
         } else if (eventOpts?.action?.type === 'navigate') {
           const navigateOptions = eventOpts.action.options as NavigateOptions
-          if (navigateOptions.route !== '/new') {
-            router.push(navigateOptions.route)
-          } else {
+          if (navigateOptions.route.startsWith('/new')) {
+            const param = navigateOptions.route.split('/').pop()
+            if (param && param !== 'new') {
+              const prompt = await getPromptBySlug(param)
+              if (prompt) {
+                await selectPrompt(prompt, true)
+                return
+              }
+            }
             startNewConversation()
             clearPrompt()
+          } else {
+            router.push(navigateOptions.route)
           }
           return
         }
