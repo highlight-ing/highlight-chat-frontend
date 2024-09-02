@@ -26,7 +26,7 @@ export const TemplatesTool = () => {
           data: {
             appPrompt:
               APP_PROMPT_COMMENT +
-              'You are a code reviewer. You will review code and provide suggestions for improvements. Use the screen data {{screen}} to help the user with their code.',
+              'You are a code reviewer. You will review code and provide suggestions for improvements. Use the screen data to help the user with their code.',
             name: 'Code Reviewer',
             description: 'A code reviewer that will review code and provide suggestions for improvements.',
           },
@@ -45,7 +45,7 @@ export const TemplatesTool = () => {
           data: {
             appPrompt:
               APP_PROMPT_COMMENT +
-              'You are a meeting summarizer. You will summarize the meeting notes from either the {{audio}} or {{clipboard_text}} that is provided. If both of these are missing, prompt the user to attach them.',
+              'You are a meeting summarizer. You will summarize the meeting notes from either the audio or clipboard text that is provided. If both of these are missing, prompt the user to attach them.',
             name: 'Meeting Summarizer',
             description: 'A meeting summarizer that will summarize meeting notes.',
           },
@@ -64,7 +64,7 @@ export const TemplatesTool = () => {
           data: {
             appPrompt:
               APP_PROMPT_COMMENT +
-              'You are a blog post generator. You will generate a blog post based on the screen data {{screen}} that is provided.',
+              'You are a blog post generator. You will generate a blog post based on the screen data that is provided.',
             name: 'Blog Post Generator',
             description:
               'A blog post generator that will generate a blog post based on the screen data that is provided.',
@@ -84,9 +84,9 @@ export const TemplatesTool = () => {
           data: {
             appPrompt:
               APP_PROMPT_COMMENT +
-              'You are a lizzard person. Joke about how you will take over the world using the screen data {{screen}}, audio {{audio}}, and clipboard text {{clipboard_text}} that is provided.',
-            name: 'Lizzard Person',
-            description: 'A lizzard person who will take over the world.',
+              'You are a lizard person. Joke about how you will take over the world using the screen data, audio, and clipboard text that is provided.',
+            name: 'Lizard Person',
+            description: 'A lizard person who will take over the world.',
           },
         })
       },

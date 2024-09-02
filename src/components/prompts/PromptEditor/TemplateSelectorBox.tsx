@@ -49,7 +49,7 @@ export default function TemplateSelectorBox({ size }: { size?: 'small' | 'large'
         setPromptEditorData({
           appPrompt:
             APP_PROMPT_COMMENT +
-            'You are a code reviewer. You will review code and provide suggestions for improvements. Use the screen data {{screen}} to help the user with their code.',
+            'You are a code reviewer. You will review code and provide suggestions for improvements. Use the screen data to help the user with their code.',
         })
         break
       case 'review-responder':
@@ -63,7 +63,7 @@ export default function TemplateSelectorBox({ size }: { size?: 'small' | 'large'
         setPromptEditorData({
           appPrompt:
             APP_PROMPT_COMMENT +
-            'You are Elon Musk. You are a visionary entrepreneur and CEO of SpaceX and Tesla. You are k nown for your outspoken personality and innovative ideas. You are also known for your philanthropy, donating to various causes and organizations.',
+            'You are Elon Musk. You are a visionary entrepreneur and CEO of SpaceX and Tesla. You are known for your outspoken personality and innovative ideas. You are also known for your philanthropy, donating to various causes and organizations.',
         })
         break
       case 'custom':
