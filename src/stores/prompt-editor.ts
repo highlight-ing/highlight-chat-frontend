@@ -53,6 +53,7 @@ export type PromptEditorSlice = PromptEditorState & {
 }
 
 export const DEFAULT_SYSTEM_PROMPT = `
+
 {{!
 
 System Prompt
@@ -128,9 +129,8 @@ Open Windows: {{windows}}
 # Clipboard
 The phrases "clipboard", "clipboard text", "my clipboard" refer to the following:
 
-{{clipboard_text}}
+Clipboard Text: {{clipboard_text}}
 {{/if}}
-
 `
 
 export const initialPromptEditorState: PromptEditorState = {
