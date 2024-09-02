@@ -434,7 +434,14 @@ export async function getPromptAppBySlug(slug: string) {
   return { promptApp }
 }
 
-export async function countPromptView(externalId: string) {
+export async function countPromptView(externalId: string, authToken: string) {
+  let userId: string
+  try {
+    userId = await validateUserAuth(authToken)
+  } catch (error) {
+    return { error: ERROR_MESSAGES.INVALID_AUTH_TOKEN }
+  }
+
   const supabase = supabaseAdmin()
 
   const { data: promptApp, error } = await supabase
@@ -455,6 +462,7 @@ export async function countPromptView(externalId: string) {
 
   const { error: promptUsageError } = await supabase.from('prompt_usages').insert({
     prompt_id: promptApp.id,
+    user_id: userId,
   })
 
   if (promptUsageError) {
