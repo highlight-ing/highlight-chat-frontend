@@ -41,12 +41,16 @@
 // Templates styles
 
 .templateCardGrid {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 12px;
-  justify-content: center;
-  align-items: stretch;
+  //display: flex;
+  //flex-direction: row;
+  //flex-wrap: wrap;
+  //gap: 12px;
+  //justify-content: center;
+  //align-items: stretch;
+
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
 
   > .templateCard {
     flex: 1 1 250px;
