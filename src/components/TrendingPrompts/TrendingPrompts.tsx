@@ -146,9 +146,16 @@ const TrendingPromptsItem = ({
               {isPinned ? 'Pinned' : 'Pin'}
             </Button>
           </Tooltip>
-          <Button className={styles.filledButton} size="xsmall" variant="primary" onClick={() => selectPrompt(prompt)}>
-            Chat
-          </Button>
+          <Tooltip position={'bottom'} tooltip={`Start a chat with ${prompt.name}`}>
+            <Button
+              className={styles.filledButton}
+              size="xsmall"
+              variant="primary"
+              onClick={() => selectPrompt(prompt)}
+            >
+              Chat
+            </Button>
+          </Tooltip>
         </div>
       </div>
       <div className={styles.trendingPromptsItemContent}>
