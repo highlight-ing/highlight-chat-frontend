@@ -6,6 +6,7 @@ import { buildSuggestions } from '@/lib/IntelliPrompt'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { TemplatesTool } from '@/components/prompts/PromptEditor/Toolbar/TemplatesTool'
 import { VariablesTool } from '@/components/prompts/PromptEditor/Toolbar/VariablesTool'
+import { ConditionsTool } from '@/components/prompts/PromptEditor/Toolbar/ConditionsTool'
 
 function Loading() {
   return <span className="text-sm text-gray-500">Loading editor...</span>
@@ -270,6 +271,7 @@ export default function IntelliPrompt({ value, onChange }: { value?: string; onC
         <div className={`${styles.editorActions} px-4`}>
           <TemplatesTool />
           <VariablesTool onSelect={onVariableClick} disabled={onboarding.isOnboarding} />
+          <ConditionsTool disabled={onboarding.isOnboarding} />
         </div>
       </div>
       <Editor
