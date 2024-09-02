@@ -243,13 +243,13 @@
 }
 
 .onboardingDecoration {
-  color: white !important;
+  color: white;
 }
 
 .onboardingBlock {
   opacity: 0.4;
   // No cursor events
-  pointer-events: none; 
+  pointer-events: none;
 }
 
 .pickText {
@@ -260,4 +260,40 @@
   font-weight: 400;
   line-height: 20px; /* 117.647% */
   letter-spacing: -0.34px;
+}
+
+.contextHighlight {
+  color: $pink-100 !important;
+  background-color: $pink-10;
+  border-radius: 4px;
+}
+.image {
+  color: $pink-100 !important;
+  background-color: $pink-10;
+  border-radius: 4px;
+}
+.screen {
+  color: $pink-100 !important;
+  background-color: $pink-10;
+  border-radius: 4px;
+}
+.userMessage {
+  color: $green-80 !important;
+  background-color: $green-10;
+  border-radius: 4px;
+}
+.audio {
+  color: $green-80 !important;
+  background-color: $green-10;
+  border-radius: 4px;
+}
+.openWindows {
+  color: $green-80 !important;
+  background-color: $green-10;
+  border-radius: 4px;
+}
+.clipboardText {
+  color: rgb(255, 245, 0) !important;
+  background-color: rgba(255, 245, 0, 0.1);
+  border-radius: 4px;
 }
