@@ -34,6 +34,7 @@ export default function useHandleConversationLoad() {
         setConversationLoading(true)
         const response = await get(`history/${conversationId}/messages`, {
           signal: abortController.signal,
+          version: 'v3',
         })
         if (!response.ok) {
           // @TODO Error handling

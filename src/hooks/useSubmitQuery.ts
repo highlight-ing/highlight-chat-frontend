@@ -191,7 +191,7 @@ export const useSubmitQuery = () => {
         }
       }
 
-      const response = await post(endpoint, formData)
+      const response = await post(endpoint, formData, { version: 'v3' })
       if (!response.ok) {
         throw new Error('Network response was not ok')
       }

@@ -22,7 +22,7 @@ export const useImageDownload = (imageId: string | null) => {
       setError(null)
 
       try {
-        const url = await getImage(imageId)
+        const url = await getImage(imageId, { version: 'v3' })
         if (isMounted) {
           setImageUrl(url)
         }
