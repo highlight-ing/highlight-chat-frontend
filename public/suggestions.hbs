@@ -1,17 +1,17 @@
 {{! suggestions.hbs }}
 {{#system}}
  \{{#if userIntent}}
-    Print 4 suggestions that autocomplete from the words: "\{{userIntent}}".
-    Each suggestions should include the words: "\{{userIntent}}". 
-    The 4 suggestions should be maximally useful for someone with the below screen activity.
-    suggestions should be completely achievable within a LLM without function calling (only text generation), if given the information provided.
-    Write each suggestion as a concise sentence, maximum 10 words long, without periods at the end.
-    Format the JSON array exactly like this, only replacing the suggestions: ["suggestion1","suggestion2","suggestion3","suggestion4"].
+    Print 4 tasks that autocomplete from the words: "\{{userIntent}}".
+    Each task should include the words: "\{{userIntent}}". 
+    The 4 tasks should be maximally useful for someone with the below screen activity.
+    Tasks should be completely achievable with an LLM-provided text response, given the information provided; tasks should not require further actions beyond reading the response.
+    Write each task as a concise sentence, maximum 10 words long, without periods at the end.
+    Format the JSON array exactly like this, only replacing the tasks: ["Task1","Task2","Task3","Task4"].
   \{{else}}
-    List the 5 most insightful and impressive suggestions that an LLM without function calling (only text generation) could complete for someone with the below screen activity.
-    suggestions should be completely achievable within a LLM, if given the information provided.
-    Write each suggestion as a concise sentence, maximum 10 words long, without periods at the end.
-    Format the JSON array exactly like this, only replacing the suggestions: ["suggestion1","suggestion2","suggestion3","suggestion4"].
+    List the 4 most insightful and impressive tasks that an LLM could complete for someone with the below screen activity.
+    Tasks should be completely achievable with an LLM-provided text response, given the information provided; tasks should not require further actions beyond reading the response.
+    Write each task as a concise sentence, maximum 10 words long, without periods at the end.
+    Format the JSON array exactly like this, only replacing the tasks: ["Task1","Task2","Task3","Task4"].
   \{{/if}}
   Print the JSON array - and no other text - now.
 {{/system}}
