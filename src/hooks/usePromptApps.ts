@@ -123,7 +123,7 @@ export default (loadPrompts?: boolean) => {
 
     // Add the app to the user's list of "added" apps
     // if it's not already there
-    addPromptToUser(prompt.external_id, accessToken).catch((err) => {
+    await addPromptToUser(prompt.external_id, accessToken).catch((err) => {
       addToast({
         title: 'Error adding chat app',
         description: err.message ?? err.toString(),
@@ -132,11 +132,12 @@ export default (loadPrompts?: boolean) => {
       })
     })
 
+    // Reload Electron's prompt apps
     try {
       //@ts-expect-error
-      globalThis.highlight.internal.installApp(prompt.slug)
+      globalThis.highlight.internal.reloadPrompts()
     } catch (err) {
-      console.error('Error installing app', err)
+      console.error('Error reloading prompts', err)
     }
   }
 

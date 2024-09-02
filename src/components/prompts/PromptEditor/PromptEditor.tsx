@@ -3,7 +3,7 @@ import SettingsScreen from './screens/SettingsScreen'
 import StartWithTemplateScreen from './screens/StartWithTemplateScreen'
 import { PromptEditorScreen, usePromptEditorStore } from '@/stores/prompt-editor'
 import styles from './prompteditor.module.scss'
-import { trackEvent } from '@/utils/amplitude'
+import VariablesScreen from './screens/VariablesScreen'
 
 function ScreenSelector({
   active,
@@ -28,20 +28,16 @@ function ScreenSelector({
   )
 }
 
-function TutorialButton() {
-  const { onboarding, startTutorial } = usePromptEditorStore()
-
-  function handleClick() {
-    trackEvent('Trigger Prompt Editor Tutorial', {})
-    startTutorial()
-  }
+function VariablesEditorButton() {
+  const { onboarding } = usePromptEditorStore()
+  const { setSelectedScreen } = usePromptEditorStore()
 
   return (
     <div
-      onClick={handleClick}
+      onClick={() => setSelectedScreen('variables')}
       className={`${styles.tab} ${styles.right} ${onboarding.isOnboarding ? styles.disabled : ''}`}
     >
-      Tutorial
+      Variables Editor
     </div>
   )
 }
@@ -66,13 +62,14 @@ export default function PromptEditor({ onClose }: { onClose?: () => void }) {
               title="Settings"
               disabled={onboarding.isOnboarding}
             />
-            <TutorialButton />
+            <VariablesEditorButton />
           </div>
         </div>
       )}
       <div className={'h-full'}>
         {selectedScreen === 'startWithTemplate' && <StartWithTemplateScreen />}
         {selectedScreen === 'app' && <AppScreen />}
+        {selectedScreen === 'variables' && <VariablesScreen />}
         {selectedScreen === 'settings' && <SettingsScreen onClose={onClose} />}
       </div>
     </>

@@ -1,7 +1,7 @@
 import { ModalObjectProps } from '@/types'
 import Modal from '@/components/modals/Modal'
 import PromptEditor from '@/components/prompts/PromptEditor/PromptEditor'
-import { usePromptEditorStore } from '@/stores/prompt-editor'
+import { DEFAULT_SYSTEM_PROMPT, usePromptEditorStore } from '@/stores/prompt-editor'
 import { useEffect } from 'react'
 import styles from './modals.module.scss'
 import { Prompt } from '@/types/supabase-helpers'
@@ -9,6 +9,7 @@ import CloseButton from '@/components/CloseButton/CloseButton'
 import { useStore } from '@/providers/store-provider'
 import PromptSaveButton from '@/components/prompts/PromptEditor/PromptSaveButton'
 import { PromptTag } from '@/types'
+
 const EditPromptModal = ({ id, context }: ModalObjectProps) => {
   const prompt = context?.prompt as Prompt
 
@@ -28,6 +29,7 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
         videoUrl: prompt.video_url ?? undefined,
         image: prompt.image ? `${prompt.image}.${prompt.user_images?.file_extension}` : undefined,
         tags: prompt.tags as PromptTag[],
+        systemPrompt: prompt.system_prompt ?? DEFAULT_SYSTEM_PROMPT,
       },
       true,
     )
