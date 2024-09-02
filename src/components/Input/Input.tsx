@@ -56,9 +56,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   }, [inputRef, input])
 
   useEffect(() => {
-    if (storeInput) {
-      setInput(storeInput)
-    }
+    setInput(storeInput)
   }, [storeInput])
 
   useEffect(() => {
