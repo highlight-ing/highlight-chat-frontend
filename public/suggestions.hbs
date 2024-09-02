@@ -1,7 +1,6 @@
 {{! suggestions.hbs }}
 {{#system}}
-You are a screen assistant that provides suggestions about what a user can achieve with a text-only LLM based (no function calling or image generation) on what's on their screen, in order to encourage them to use an LLM. 
-  \{{#if userIntent}}
+ \{{#if userIntent}}
     Print 4 suggestions that autocomplete from the words: "\{{userIntent}}".
     Each suggestions should include the words: "\{{userIntent}}". 
     The 4 suggestions should be maximally useful for someone with the below screen activity.
