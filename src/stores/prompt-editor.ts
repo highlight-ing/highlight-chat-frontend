@@ -64,53 +64,72 @@ This lets you write prompts in plain english without thinking about the handleba
 
 
 {{! Handle references to the user message }}
+{{#if user_message}}
 # User Message
 The phrases "user message", "user input", "typed message", "question" refer to the following:
 
 User Message: {{user_message}}
+{{/if}}
 
 
 {{! Handle references to the text retrieved for the focused app }}
+{{#if window_context}}
 # App Text
 The phrases "app text", "window context", "window text", "app context", "focused app" refer to the following:
 
 App text: {{window_context}}
+{{/if}}
 
 
 {{! Handle references to the entire screen text }}
+{{#if (or screen image)}}
 # Screen
 The phrases "screen contents", "screen data", "screen text", "on my screen" refer to the following:
 
+{{#if screen}}
 Screen text: {{screen}}
+{{/if}}
+
+{{#if image}}
 Image for additional context: {{image}}
+{{/if}}
+{{/if}}
 
 
 {{! Handle references to the attached screenshot }}
+{{#if image}}
 # Screenshot
 The phrases "screenshot", "screen shot", "screenshots" refer to the following:
 
 Screenshot: {{image}}
+{{/if}}
 
 
 {{! Handle references to transcribed audio }}
+{{#if audio}}
 # Audio
 The phrases "audio", "conversation", "call", "meeting", "transcript" refer to the following:
 
 Audio: {{audio}}
+{{/if}}
 
 
 {{! Handle references to what apps the user has open on their PC }}
+{{#if windows}}
 # Open Windows
 The phrases "open windows", "open apps", "active programs", "running programs", "active apps", "running apps" refer to the following:
 
 Open Windows: {{windows}}
+{{/if}}
 
 
 {{! Handle references to what data is in the user's clipboard }}
+{{#if clipboard_text}}
 # Clipboard
 The phrases "clipboard", "clipboard text", "my clipboard" refer to the following:
 
 {{clipboard_text}}
+{{/if}}
 
 `
 
