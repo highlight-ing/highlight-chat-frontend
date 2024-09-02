@@ -1,30 +1,8 @@
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import IntelliPrompt from '../IntelliPrompt'
-import {
-  ClipboardText,
-  ExportSquare,
-  Gallery,
-  I3Square,
-  MessageText1,
-  Monitor,
-  Sound,
-  Shapes,
-  Screenmirroring,
-  VoiceSquare,
-  Crown,
-  Note,
-  Hierarchy,
-  MessageProgramming,
-  DocumentText,
-  Category2,
-  MessageSearch,
-} from 'iconsax-react'
-import sassVariables from '@/variables.module.scss'
 import styles from '../prompteditor.module.scss'
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 import OnboardingBox from '../OnboardingBox'
-import Button from '@/components/Button/Button'
-import ContextMenu, { MenuItemType } from '@/components/ContextMenu/ContextMenu'
 
 function OnboardingIndex0() {
   const { setOnboarding } = usePromptEditorStore()

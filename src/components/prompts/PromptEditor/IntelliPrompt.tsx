@@ -7,6 +7,7 @@ import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { TemplatesTool } from '@/components/prompts/PromptEditor/Toolbar/TemplatesTool'
 import { VariablesTool } from '@/components/prompts/PromptEditor/Toolbar/VariablesTool'
 import { ConditionsTool } from '@/components/prompts/PromptEditor/Toolbar/ConditionsTool'
+import { useStore } from '@/providers/store-provider'
 
 function Loading() {
   return <span className="text-sm text-gray-500">Loading editor...</span>
@@ -101,6 +102,7 @@ export default function IntelliPrompt({ value, onChange }: { value?: string; onC
   const [completionDisposable, setCompletionDisposable] = useState<IDisposable>()
 
   const { onboarding } = usePromptEditorStore()
+  const openModal = useStore((state) => state.openModal)
 
   useEffect(() => {
     return () => {
@@ -235,6 +237,12 @@ export default function IntelliPrompt({ value, onChange }: { value?: string; onC
 
   const onVariableClick = useCallback((variable: string, phrase: string) => {
     const editor = monacoRef.current?.editor?.getEditors?.()?.[0]
+
+    openModal('confirm-override-prompt', {
+      callback: () => {
+        console.log('called back')
+      },
+    })
 
     const isCaretOnNewLine = (): boolean => {
       if (editor) {
