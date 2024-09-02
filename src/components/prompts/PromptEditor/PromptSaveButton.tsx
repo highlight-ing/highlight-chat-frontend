@@ -4,9 +4,10 @@ import { usePromptEditorStore } from '@/stores/prompt-editor'
 
 export default function PromptSaveButton() {
   const { save, saveDisabled } = usePromptEditor()
-  const { selectedScreen, setSelectedScreen, onboarding } = usePromptEditorStore()
+  const { selectedScreen, setSelectedScreen, onboarding, promptEditorData } = usePromptEditorStore()
 
-  const saveMode = selectedScreen === 'settings'
+  const isNewPrompt = promptEditorData.externalId === undefined
+  const saveMode = selectedScreen === 'settings' || !isNewPrompt
 
   function onButtonClick() {
     if (saveMode) {
