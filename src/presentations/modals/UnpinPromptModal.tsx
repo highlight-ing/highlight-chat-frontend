@@ -31,7 +31,7 @@ export default function UnpinPromptModal({ id, context }: ModalObjectProps) {
     }
 
     Highlight.appStorage.delete(`ctas.promptAdded.${prompt.external_id}`)
-    refreshPinnedPrompts()
+    refreshPinnedPrompts(authToken)
 
     closeModal(id)
 
