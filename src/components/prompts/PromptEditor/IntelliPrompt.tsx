@@ -1,11 +1,11 @@
 import Editor, { Monaco } from '@monaco-editor/react'
 import styles from './prompteditor.module.scss'
-import Button from '@/components/Button/Button'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { editor, IDisposable } from 'monaco-editor'
 import { buildSuggestions } from '@/lib/IntelliPrompt'
-import Tooltip from '@/components/Tooltip/Tooltip'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
+import { TemplatesTool } from '@/components/prompts/PromptEditor/Toolbar/TemplatesTool'
+import { VariablesTool } from '@/components/prompts/PromptEditor/Toolbar/VariablesTool'
 
 function Loading() {
   return <span className="text-sm text-gray-500">Loading editor...</span>
@@ -22,6 +22,8 @@ const VariablePhrases = [
   {
     variable: 'clipboard_text',
     phrases: ['clipboard text', 'my clipboard', 'clipboard'],
+    label: 'Clipboard Text',
+    description: "Reference text from the user's clipboard.",
   },
   {
     variable: 'windows',
@@ -34,18 +36,26 @@ const VariablePhrases = [
       'running programs',
       'active apps',
     ],
+    label: 'Open Windows',
+    description: 'Reference a comma-separated list of open window titles.',
   },
   {
     variable: 'audio',
     phrases: ['audio', 'conversation', 'call', 'meeting', 'transcript'],
+    label: 'Audio',
+    description: 'Reference the audio transcript.',
   },
   {
     variable: 'image',
     phrases: ['screenshot', 'screen shot', 'screenshots', 'print screen'],
+    label: 'Image / Screenshot',
+    description: 'Reference the text extracted from the image.',
   },
   {
     variable: 'screen',
     phrases: ['screen contents', 'screen data', 'screen text', 'on my screen'],
+    label: 'Screen Text',
+    description: 'Reference the text extracted from the screen using OCR.',
   },
   {
     variable: 'window_context',
@@ -59,10 +69,14 @@ const VariablePhrases = [
       'app contents',
       'window contents',
     ],
+    label: 'App Text',
+    description: "Reference the active app's contents as text.",
   },
   {
     variable: 'user_message',
     phrases: ['user message', 'user input', 'user text', 'typed message', 'typed input', 'question'],
+    label: 'User Message',
+    description: "Reference the user's typed message, or the suggestion they clicked from the assistant.",
   },
 ]
 
@@ -79,19 +93,8 @@ const matchPhrase = (text: string, variable: string, phrase: string | null) => {
  * The new, improved PromptInput component that uses Monaco Editor.
  * @param otherButtons Additional buttons that will go in the "Context Bar" (the place where users can click to add variables)
  */
-export default function IntelliPrompt({
-  value,
-  onChange,
-  variables,
-  otherButtons,
-}: {
-  value?: string
-  onChange?: (value: string) => void
-  variables?: PromptVariable[]
-  otherButtons?: React.ReactNode[]
-}) {
+export default function IntelliPrompt({ value, onChange }: { value?: string; onChange?: (value: string) => void }) {
   const monacoRef = useRef<Monaco | undefined>()
-  const editorRef = useRef<editor.IStandaloneCodeEditor | undefined>()
   const decorationsRef = useRef<editor.IEditorDecorationsCollection | null>(null)
 
   const [completionDisposable, setCompletionDisposable] = useState<IDisposable>()
@@ -106,7 +109,8 @@ export default function IntelliPrompt({
 
   useEffect(() => {
     // Effect that makes the editor read only if the user is onboarding
-    editorRef.current?.updateOptions({
+    const editor = monacoRef.current?.editor?.getEditors?.()?.[0]
+    editor?.updateOptions({
       readOnly: onboarding.isOnboarding,
     })
   }, [onboarding.isOnboarding])
@@ -139,9 +143,9 @@ export default function IntelliPrompt({
       provideCompletionItems: (model, position) => {
         const suggestions = buildSuggestions(
           monaco,
-          variables?.map((v) => ({
+          VariablePhrases?.map((v) => ({
             label: v.label,
-            insertText: v.insertText,
+            insertText: v.variable,
             description: v.description,
           })) ?? [],
           model,
@@ -158,8 +162,6 @@ export default function IntelliPrompt({
   }
 
   function handleEditorDidMount(editor: editor.IStandaloneCodeEditor, monaco: Monaco) {
-    editorRef.current = editor
-
     editor.updateOptions({
       autoClosingBrackets: 'never',
       wordWrap: 'on',
@@ -173,9 +175,12 @@ export default function IntelliPrompt({
   }
 
   const highlightWords = () => {
-    if (!editorRef.current || !decorationsRef.current) return
+    const editor = monacoRef.current?.editor?.getEditors?.()?.[0]
+    if (!monacoRef.current || !editor || !decorationsRef.current) {
+      return
+    }
 
-    const model = editorRef.current.getModel()
+    const model = editor.getModel()
     if (!model) return
 
     const text = model.getValue()
@@ -227,13 +232,32 @@ export default function IntelliPrompt({
     decorationsRef.current.set(decorationsArray)
   }
 
-  function onVariableClick(variable: string) {
-    editorRef.current?.trigger('keyboard', 'type', { text: `{{${variable}}}` })
-  }
+  const onVariableClick = useCallback((variable: string, phrase: string) => {
+    const editor = monacoRef.current?.editor?.getEditors?.()?.[0]
+
+    const isCaretOnNewLine = (): boolean => {
+      if (editor) {
+        const model = editor.getModel()
+        if (model) {
+          const position = editor.getPosition()
+          if (position) {
+            // Check if the cursor is at the first column (start) of a line
+            return position.column === 1
+          }
+        }
+      }
+      return false
+    }
+
+    if (editor?.getValue()?.length === 0 || isCaretOnNewLine()) {
+      editor?.trigger('keyboard', 'type', { text: phrase })
+    } else {
+      editor?.trigger('keyboard', 'type', { text: variable })
+    }
+  }, [])
 
   function handleEditorChange(value: string | undefined, ev: editor.IModelContentChangedEvent) {
-    if (!value) return
-    onChange?.(value)
+    onChange?.(value ?? '')
   }
 
   useEffect(() => {
@@ -244,34 +268,17 @@ export default function IntelliPrompt({
     <>
       <div className={styles.editorPage}>
         <div className={`${styles.editorActions} px-4`}>
-          {otherButtons?.map((button) => button)}
-          {variables?.map((variable) => (
-            <Tooltip
-              key={variable.label}
-              position="top"
-              tooltip={variable.description}
-              disabled={onboarding.isOnboarding}
-            >
-              <Button
-                size={'medium'}
-                variant={'ghost-neutral'}
-                onClick={onboarding.isOnboarding ? undefined : () => onVariableClick(variable.insertText)}
-                key={variable.label}
-                disabled={onboarding.isOnboarding}
-              >
-                {variable.icon}
-                {variable.label}
-              </Button>
-            </Tooltip>
-          ))}
+          <TemplatesTool />
+          <VariablesTool onSelect={onVariableClick} disabled={onboarding.isOnboarding} />
         </div>
       </div>
       <Editor
         theme="highlight"
-        beforeMount={handleEditorWillMount}
-        onMount={handleEditorDidMount}
         language="handlebars"
         value={value}
+        beforeMount={handleEditorWillMount}
+        loading={<Loading />}
+        onMount={handleEditorDidMount}
         onChange={handleEditorChange}
         options={{
           minimap: {
@@ -279,10 +286,8 @@ export default function IntelliPrompt({
           },
           automaticLayout: true,
           readOnly: onboarding.isOnboarding,
-          fontFamily: 'Inter',
           fontSize: 14,
         }}
-        loading={<Loading />}
       />
     </>
   )
