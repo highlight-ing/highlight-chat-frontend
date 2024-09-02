@@ -262,24 +262,14 @@
   letter-spacing: -0.34px;
 }
 
-.contextHighlight {
+.screen, .image, .window_context {
   color: $pink-100 !important;
   background-color: $pink-10;
   border-radius: 4px;
 }
-.image {
-  color: $pink-100 !important;
-  background-color: $pink-10;
-  border-radius: 4px;
-}
-.screen {
-  color: $pink-100 !important;
-  background-color: $pink-10;
-  border-radius: 4px;
-}
-.userMessage {
-  color: $green-80 !important;
-  background-color: $green-10;
+.user_message {
+  color: $primary-100 !important;
+  background-color: $primary-5;
   border-radius: 4px;
 }
 .audio {
@@ -287,13 +277,13 @@
   background-color: $green-10;
   border-radius: 4px;
 }
-.openWindows {
-  color: $green-80 !important;
-  background-color: $green-10;
+.windows {
+  color: $purple-100 !important;
+  background-color: $purple-10;
   border-radius: 4px;
 }
-.clipboardText {
-  color: rgb(255, 245, 0) !important;
-  background-color: rgba(255, 245, 0, 0.1);
+.clipboard_text {
+  color: #ECFF0C !important;
+  background-color: rgba(236, 255, 12, 0.1);
   border-radius: 4px;
 }

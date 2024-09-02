@@ -18,22 +18,62 @@ interface PromptVariable {
   description: string
 }
 
-const highlightedWords = [
-  'clipboard text',
-  'clipboard_text',
-  'audio',
-  'conversation',
-  'app text',
-  'screenshot',
-  'screenshots',
-  'screen',
-  'image',
-  'images',
-  'window context',
-  'focused window',
-  'user_message',
-  'user message',
+const VariablePhrases = [
+  {
+    variable: 'clipboard_text',
+    phrases: ['clipboard text', 'my clipboard', 'clipboard'],
+  },
+  {
+    variable: 'windows',
+    phrases: [
+      'open windows',
+      'open apps',
+      'active programs',
+      'open programs',
+      'running apps',
+      'running programs',
+      'active apps',
+    ],
+  },
+  {
+    variable: 'audio',
+    phrases: ['audio', 'conversation', 'call', 'meeting', 'transcript'],
+  },
+  {
+    variable: 'image',
+    phrases: ['screenshot', 'screen shot', 'screenshots', 'print screen'],
+  },
+  {
+    variable: 'screen',
+    phrases: ['screen contents', 'screen data', 'screen text', 'on my screen'],
+  },
+  {
+    variable: 'window_context',
+    phrases: [
+      'app text',
+      'window text',
+      'app context',
+      'window context',
+      'active app',
+      'focused app',
+      'app contents',
+      'window contents',
+    ],
+  },
+  {
+    variable: 'user_message',
+    phrases: ['user message', 'user input', 'user text', 'typed message', 'typed input', 'question'],
+  },
 ]
+
+const matchPhrase = (text: string, variable: string, phrase: string | null) => {
+  const regex = new RegExp(phrase ?? variable, 'gi')
+  const matches = regex.exec(text)
+  if (!matches?.length) {
+    return matchPhrase(text, variable, null)
+  }
+  return matches
+}
 
 /**
  * The new, improved PromptInput component that uses Monaco Editor.
@@ -129,10 +169,10 @@ export default function IntelliPrompt({
     decorationsRef.current = editor.createDecorationsCollection()
 
     // Initial highlight
-    highlightWords(highlightedWords)
+    highlightWords()
   }
 
-  const highlightWords = (words: string[]) => {
+  const highlightWords = () => {
     if (!editorRef.current || !decorationsRef.current) return
 
     const model = editorRef.current.getModel()
@@ -141,27 +181,15 @@ export default function IntelliPrompt({
     const text = model.getValue()
     const decorationsArray: editor.IModelDeltaDecoration[] = []
 
-    words.forEach((word) => {
-      const regex = new RegExp(word, 'gi')
+    for (const v of VariablePhrases) {
+      const variable = v.variable
+      const phrases = v.phrases
+      const regex = new RegExp(variable, 'gi')
       let match
       while ((match = regex.exec(text)) !== null) {
         const startPosition = model.getPositionAt(match.index)
-        const endPosition = model.getPositionAt(match.index + word.length)
-        let className = styles.contextHighlight
-        const matchedString = match[0]
-        if (matchedString.includes('audio') || matchedString.includes('conversation')) {
-          className = styles.audio
-        } else if (matchedString.includes('image')) {
-          className = styles.image
-        } else if (matchedString.includes('screen')) {
-          className = styles.screen
-        } else if (matchedString.includes('clipboard')) {
-          className = styles.clipboardText
-        } else if (matchedString.includes('window')) {
-          className = styles.openWindows
-        } else if (matchedString.includes('message')) {
-          className = styles.userMessage
-        }
+        const endPosition = model.getPositionAt(match.index + variable.length)
+        const className = styles[variable]
         decorationsArray.push({
           range: {
             startColumn: startPosition.column,
@@ -174,7 +202,27 @@ export default function IntelliPrompt({
           },
         })
       }
-    })
+      for (const phrase of phrases) {
+        const regex = new RegExp(phrase, 'gi')
+        let match
+        while ((match = regex.exec(text)) !== null) {
+          const startPosition = model.getPositionAt(match.index)
+          const endPosition = model.getPositionAt(match.index + phrase.length)
+          const className = styles[variable]
+          decorationsArray.push({
+            range: {
+              startColumn: startPosition.column,
+              startLineNumber: startPosition.lineNumber,
+              endColumn: endPosition.column,
+              endLineNumber: endPosition.lineNumber,
+            },
+            options: {
+              inlineClassName: className,
+            },
+          })
+        }
+      }
+    }
 
     decorationsRef.current.set(decorationsArray)
   }
@@ -189,7 +237,7 @@ export default function IntelliPrompt({
   }
 
   useEffect(() => {
-    highlightWords(highlightedWords)
+    highlightWords()
   }, [value])
 
   return (
@@ -232,7 +280,7 @@ export default function IntelliPrompt({
           automaticLayout: true,
           readOnly: onboarding.isOnboarding,
           fontFamily: 'Inter',
-          fontSize: 16,
+          fontSize: 14,
         }}
         loading={<Loading />}
       />

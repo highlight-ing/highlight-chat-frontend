@@ -11,16 +11,20 @@ import {
   Shapes,
   Screenmirroring,
   VoiceSquare,
-  Crown1,
   Crown,
   Note,
+  Hierarchy,
+  MessageProgramming,
+  DocumentText,
+  Category2,
+  MessageSearch,
 } from 'iconsax-react'
 import sassVariables from '@/variables.module.scss'
 import styles from '../prompteditor.module.scss'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import OnboardingBox from '../OnboardingBox'
 import Button from '@/components/Button/Button'
-import ContextMenu from '@/components/ContextMenu/ContextMenu'
+import ContextMenu, { MenuItemType } from '@/components/ContextMenu/ContextMenu'
 
 function OnboardingIndex0() {
   const { setOnboarding } = usePromptEditorStore()
@@ -132,7 +136,7 @@ function TemplateButton() {
     {
       label: (
         <div className="flex items-center gap-2">
-          <Screenmirroring variant="Bold" size={16} color={sassVariables.textSecondary} />
+          <Screenmirroring variant="Bold" size={20} color={sassVariables.textSecondary} />
           Code Reviewer
         </div>
       ),
@@ -150,7 +154,7 @@ function TemplateButton() {
     {
       label: (
         <div className="flex items-center gap-2">
-          <Note variant="Bold" size={16} color={sassVariables.textSecondary} />
+          <Note variant="Bold" size={20} color={sassVariables.textSecondary} />
           Meeting Summarizer
         </div>
       ),
@@ -168,7 +172,7 @@ function TemplateButton() {
     {
       label: (
         <div className="flex items-center gap-2">
-          <VoiceSquare variant="Bold" size={16} color={sassVariables.textSecondary} />
+          <VoiceSquare variant="Bold" size={20} color={sassVariables.textSecondary} />
           Blog Post Generator
         </div>
       ),
@@ -187,18 +191,18 @@ function TemplateButton() {
     {
       label: (
         <div className="flex items-center gap-2">
-          <Crown variant="Bold" size={16} color={sassVariables.textSecondary} />
-          Lizzard Person
+          <Crown variant="Bold" size={20} color={sassVariables.textSecondary} />
+          Lizard Person
         </div>
       ),
       onClick: () => {
         setPromptEditorData({
           appPrompt:
             APP_PROMPT_COMMENT +
-            'You are a lizzard person. Joke about how you will take over the world using the screen data {{screen}}, audio {{audio}}, and clipboard text {{clipboard_text}} that is provided.',
+            'You are a lizard person. Joke about how you will take over the world using the screen data {{screen}}, audio {{audio}}, and clipboard text {{clipboard_text}} that is provided.',
           suggestionsPrompt: '',
-          name: 'Lizzard Person',
-          description: 'A lizzard person who will take over the world.',
+          name: 'Lizard Person',
+          description: 'A lizard person who will take over the world.',
         })
       },
     },
@@ -229,55 +233,59 @@ export default function AppScreen() {
         <IntelliPrompt
           value={promptEditorData.appPrompt}
           onChange={(e) => setPromptEditorData({ appPrompt: e })}
-          otherButtons={[<TemplateButton key="templates-button" />]}
-          variables={[
-            {
-              label: 'User Message',
-              insertText: 'user_message',
-              description:
-                'Adds a user message variable. The action the user is performing, what they clicked or typed in the floating action menu.',
-              icon: <MessageText1 variant="Bold" size={16} color={sassVariables.green60} />,
-            },
-            {
-              label: 'Image',
-              insertText: 'image',
-              description: 'Adds an image variable, which will be replaced with the text extracted from the image.',
-              icon: <Gallery variant="Bold" size={16} color="#FF2099" />,
-            },
-            {
-              label: 'Screen',
-              insertText: 'screen',
-              description:
-                'Adds a screen variable, which will be replaced with the OCR screen text extracted from the screen.',
-              icon: <Monitor variant="Bold" size={16} color="#FF2099" />,
-            },
-            {
-              label: 'Audio',
-              insertText: 'audio',
-              description: 'Adds an audio variable, which will be replaced with the text extracted from the audio.',
-              icon: <Sound variant="Bold" size={16} color={sassVariables.green60} />,
-            },
-            {
-              label: 'Open Windows',
-              insertText: 'windows',
-              description: "A list of all the windows open on the user's machine.",
-              icon: <I3Square variant="Bold" size={16} color={sassVariables.green60} />,
-            },
-            {
-              label: 'Window Context',
-              insertText: 'window_context',
-              description:
-                'Adds a window_context variable, the raw context of the window the user is currently interacting with.',
-              icon: <ExportSquare variant="Bold" size={16} color={sassVariables.green60} />,
-            },
-            {
-              label: 'Clipboard Text',
-              insertText: 'clipboard_text',
-              description:
-                'Adds a clipboard_text variable, which will be replaced with the text currently in the user’s clipboard.',
-              icon: <ClipboardText variant="Bold" size={16} color={'#ECFF0C'} />,
-            },
+          otherButtons={[
+            <TemplateButton key="templates-button" />,
+            <VariablesButton key="variables-button" />,
+            <ConditionsButton key="conditions-button" />,
           ]}
+          // variables={[
+          //   {
+          //     label: 'User Message',
+          //     insertText: 'user_message',
+          //     description:
+          //       'Adds a user message variable. The action the user is performing, what they clicked or typed in the floating action menu.',
+          //     icon: <MessageText1 variant="Bold" size={16} color={sassVariables.green60} />,
+          //   },
+          //   {
+          //     label: 'Image',
+          //     insertText: 'image',
+          //     description: 'Adds an image variable, which will be replaced with the text extracted from the image.',
+          //     icon: <Gallery variant="Bold" size={16} color="#FF2099" />,
+          //   },
+          //   {
+          //     label: 'Screen',
+          //     insertText: 'screen',
+          //     description:
+          //       'Adds a screen variable, which will be replaced with the OCR screen text extracted from the screen.',
+          //     icon: <Monitor variant="Bold" size={16} color="#FF2099" />,
+          //   },
+          //   {
+          //     label: 'Audio',
+          //     insertText: 'audio',
+          //     description: 'Adds an audio variable, which will be replaced with the text extracted from the audio.',
+          //     icon: <Sound variant="Bold" size={16} color={sassVariables.green60} />,
+          //   },
+          //   {
+          //     label: 'Open Windows',
+          //     insertText: 'windows',
+          //     description: "A list of all the windows open on the user's machine.",
+          //     icon: <I3Square variant="Bold" size={16} color={sassVariables.green60} />,
+          //   },
+          //   {
+          //     label: 'Window Context',
+          //     insertText: 'window_context',
+          //     description:
+          //       'Adds a window_context variable, the raw context of the window the user is currently interacting with.',
+          //     icon: <ExportSquare variant="Bold" size={16} color={sassVariables.green60} />,
+          //   },
+          //   {
+          //     label: 'Clipboard Text',
+          //     insertText: 'clipboard_text',
+          //     description:
+          //       'Adds a clipboard_text variable, which will be replaced with the text currently in the user’s clipboard.',
+          //     icon: <ClipboardText variant="Bold" size={16} color={'#ECFF0C'} />,
+          //   },
+          // ]}
         />
       </span>
       {onboarding.isOnboarding && onboarding.index === 0 && <OnboardingIndex0 />}
@@ -285,5 +293,124 @@ export default function AppScreen() {
       {onboarding.isOnboarding && onboarding.index === 2 && <OnboardingIndex2 />}
       {onboarding.isOnboarding && onboarding.index === 3 && <OnboardingIndex3 />}
     </>
+  )
+}
+
+const VariablesButton = () => {
+  const contextMenuItems = useMemo(() => {
+    return [
+      {
+        label: (
+          <>
+            <Sound variant="Bold" size={20} color={sassVariables.green100} /> Audio
+          </>
+        ),
+        onClick: () => {},
+      },
+      {
+        label: (
+          <>
+            <ClipboardText variant="Bold" size={20} color={sassVariables.yellow80} /> Clipboard Text
+          </>
+        ),
+        onClick: () => {},
+      },
+      {
+        label: (
+          <>
+            <MessageText1 variant="Bold" size={20} color={sassVariables.primary80} /> User Message
+          </>
+        ),
+        onClick: () => {},
+      },
+      {
+        label: (
+          <>
+            <Category2 variant="Bold" size={20} color={sassVariables.purple100} /> Open Windows
+          </>
+        ),
+        onClick: () => {},
+      },
+      {
+        divider: true,
+      },
+      {
+        label: (
+          <>
+            <DocumentText variant="Bold" size={20} color={sassVariables.pink80} /> App Text
+          </>
+        ),
+        onClick: () => {},
+      },
+      {
+        label: (
+          <>
+            <Monitor variant="Bold" size={20} color={sassVariables.pink80} /> Screen Text
+          </>
+        ),
+        onClick: () => {},
+      },
+      {
+        label: (
+          <>
+            <Gallery variant="Bold" size={20} color={sassVariables.pink80} /> Image / Screenshot
+          </>
+        ),
+        onClick: () => {},
+      },
+    ] as MenuItemType[]
+  }, [])
+
+  return (
+    <ContextMenu
+      key="variables-menu"
+      items={contextMenuItems}
+      position={'bottom'}
+      triggerId={`toggle-variables`}
+      leftClick={true}
+    >
+      <Button id="toggle-variables" size={'medium'} variant={'ghost-neutral'}>
+        <MessageProgramming variant="Bold" size={20} color={sassVariables.green100} />
+        Variables
+      </Button>
+    </ContextMenu>
+  )
+}
+
+const ConditionsButton = () => {
+  const contextMenuItems = useMemo(() => {
+    return [
+      {
+        label: (
+          <>
+            <Category2 variant="Bold" size={20} color={sassVariables.purple100} /> If window is open
+          </>
+        ),
+        onClick: () => {},
+      },
+      {
+        label: (
+          <>
+            <MessageSearch variant="Bold" size={20} color={sassVariables.primary100} /> If user message includes text
+          </>
+        ),
+        onClick: () => {},
+      },
+    ]
+  }, [])
+
+  return (
+    <ContextMenu
+      key="conditions-menu"
+      items={contextMenuItems}
+      position={'bottom'}
+      triggerId={`toggle-conditions`}
+      leftClick={true}
+    >
+      <Button id="toggle-conditions" size={'medium'} variant={'ghost-neutral'}>
+        <Hierarchy variant="Bold" size={16} color={sassVariables.pink100} />
+        Conditions
+      </Button>
+    </ContextMenu>
   )
 }
