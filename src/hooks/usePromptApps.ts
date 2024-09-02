@@ -87,6 +87,13 @@ export default (loadPrompts?: boolean) => {
     if (Array.isArray(pinned)) {
       setPinnedPrompts(pinned ?? [])
     }
+
+    try {
+      //@ts-expect-error
+      globalThis.highlight.internal.reloadPrompts()
+    } catch (err) {
+      console.error('Error installing app', err)
+    }
   }
 
   const selectPrompt = async (prompt: Prompt, isNewConversation?: boolean, pinPrompt?: boolean) => {
