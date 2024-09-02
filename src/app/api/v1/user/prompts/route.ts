@@ -60,6 +60,11 @@ export async function GET(request: Request) {
     return index === self.findIndex((t) => t.external_id === prompt.external_id)
   })
 
+  // Sort by date created
+  addedPrompts.sort((a, b) => {
+    return b.created_at.localeCompare(a.created_at)
+  })
+
   if (!selectResult) {
     // Return an empty array since no prompts were found
     return Response.json([], { status: 200 })
