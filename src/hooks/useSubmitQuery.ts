@@ -263,10 +263,10 @@ export const useSubmitQuery = () => {
       console.log('Attachment: ', JSON.stringify(attachment))
     })
 
-    if (!context.suggestion || context.suggestion.trim() === '') {
-      console.log('No context received, ignoring.')
-      return
-    }
+    // if (!context.suggestion || context.suggestion.trim() === '') {
+    //   console.log('No context received, ignoring.')
+    //   return
+    // }
 
     if (!context.application) {
       console.log('No application data in context, ignoring.')
