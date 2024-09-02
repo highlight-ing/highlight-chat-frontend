@@ -81,13 +81,15 @@ export const ShareUserMessage: React.FC<ShareUserMessageProps> = React.memo(({ m
             {message.window && message.window?.title && (
               <Attachment type="window" value={message.window.title} appIcon={message.window.appIcon} />
             )}
-            {message.clipboard_text && <Attachment type="clipboard" value={message.clipboard_text} />}
-            {message.file_title && <Attachment type="pdf" value={message.file_title} />}
+            {message.clipboard_text && <Attachment type="clipboard" value={message.clipboard_text.substring(0, 100)} />}
+            {message.file_title && <Attachment type="pdf" value={message.file_title.substring(0, 100)} />}
             {message.file_attachments &&
               message.file_attachments.map((a, index) => (
-                <Attachment key={index} type={a.type} value={getDisplayValue(a)} />
+                <Attachment key={index} type={a.type} value={getDisplayValue(a).substring(0, 100)} />
               ))}
-            {message.window_context && <Attachment type="window_context" value={message.window_context} />}
+            {message.window_context && (
+              <Attachment type="window_context" value={message.window_context.substring(0, 100)} />
+            )}
             {message.fetchedImage && <Attachment type="image" value={message.fetchedImage} isSharedImage={true} />}
           </div>
         )}
