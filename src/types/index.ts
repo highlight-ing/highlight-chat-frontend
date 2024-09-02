@@ -167,20 +167,35 @@ export interface PersonalPromptsProps {
   prompts: Prompt[]
   pinnedPrompts: PinnedPrompt[]
   openModal: (modal: string, context?: Record<string, any>) => void
-  selectPrompt: (prompt: Prompt) => void
+  selectPrompt: (prompt: Prompt, startNewConversation?: boolean, pinPrompt?: boolean) => void
 }
 
 export interface PersonalPromptsItemProps {
   prompt: Prompt
-  selectPrompt: (prompt: Prompt) => void
+  selectPrompt: (prompt: Prompt, startNewConversation?: boolean, pinPrompt?: boolean) => void
   openModal: (modal: string, context?: Record<string, any>) => void
   colorScheme: ColorScheme
   isOwner: boolean
   isPublic: boolean
 }
 
-// Type for the pinned prompt based on PROMPTS_TABLE_SELECT_FIELDS
 export type PinnedPrompt = {
+  external_id: string
+  name: string
+  description: string | null
+  prompt_text: string | null
+  created_at: string
+  slug: string
+  user_id: string
+  image: string | null
+  user_images: {
+    file_extension: string
+  } | null
+  public_use_number: number
+} & { isPinned?: boolean }
+
+// Type for the pinned prompt based on PROMPTS_TABLE_SELECT_FIELDS
+export type PinnedPrompts = {
   prompts:
     | ({
         external_id: string

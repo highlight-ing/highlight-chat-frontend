@@ -101,7 +101,7 @@ export type Database = {
         Row: {
           audio: string | null
           clipboard_text: string | null
-          content: string
+          content: string | null
           context: string | null
           conversation_id: string
           created_at: string
@@ -118,7 +118,7 @@ export type Database = {
         Insert: {
           audio?: string | null
           clipboard_text?: string | null
-          content: string
+          content?: string | null
           context?: string | null
           conversation_id?: string
           created_at?: string
@@ -135,7 +135,7 @@ export type Database = {
         Update: {
           audio?: string | null
           clipboard_text?: string | null
-          content?: string
+          content?: string | null
           context?: string | null
           conversation_id?: string
           created_at?: string
@@ -164,18 +164,21 @@ export type Database = {
           created_at: string
           id: number
           prompt_id: number
+          user_id: string | null
           was_processed: boolean
         }
         Insert: {
           created_at?: string
           id?: number
           prompt_id: number
+          user_id?: string | null
           was_processed?: boolean
         }
         Update: {
           created_at?: string
           id?: number
           prompt_id?: number
+          user_id?: string | null
           was_processed?: boolean
         }
         Relationships: [

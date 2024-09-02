@@ -27,7 +27,7 @@ const PersonalPrompts = ({ userId, prompts, pinnedPrompts, openModal, selectProm
   const mergedPrompts = [
     ...prompts,
     // Add isPinned property to all pinned prompts
-    ...pinnedPrompts.map((pinnedPrompt) => ({ ...pinnedPrompt.prompts, isPinned: true }) as PromptWithPin),
+    ...pinnedPrompts.map((pinnedPrompt) => ({ ...pinnedPrompt, isPinned: true }) as PromptWithPin),
   ].reduce((acc: PromptWithPin[], current: PromptWithPin) => {
     // Check if the current prompt already exists in the accumulator
     const x = acc.find((item) => item.external_id === current.external_id)
@@ -62,7 +62,7 @@ const PersonalPrompts = ({ userId, prompts, pinnedPrompts, openModal, selectProm
         {mergedPrompts.map((item: Prompt) => {
           const isOwner = userId === item.user_id
           const isPublic = item.public
-          const isPinned = pinnedPrompts.some((pinnedPrompt) => pinnedPrompt.prompts?.external_id === item.external_id)
+          const isPinned = pinnedPrompts.some((pinnedPrompt) => pinnedPrompt?.external_id === item.external_id)
           const colorScheme = isOwner
             ? isPublic
               ? CSS_VARIABLES.public
@@ -102,7 +102,7 @@ const PersonalPromptsItem = ({
   return (
     <div
       className={styles.personalPromptsItem}
-      onClick={() => selectPrompt(prompt)}
+      onClick={() => selectPrompt(prompt, true, false)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{
@@ -202,7 +202,7 @@ const PersonalPromptsItem = ({
               variant="ghost-neutral"
               onClick={(e) => {
                 e.stopPropagation()
-                selectPrompt(prompt)
+                selectPrompt(prompt, true, false)
               }}
               hidden={!isHovered}
             >
