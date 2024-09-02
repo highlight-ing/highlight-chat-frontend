@@ -179,6 +179,7 @@ export interface PersonalPromptsItemProps {
   isPublic: boolean
 }
 
+// Type for the pinned prompt based on PROMPTS_TABLE_SELECT_FIELDS
 export type PinnedPrompt = {
   external_id: string
   name: string
@@ -193,23 +194,3 @@ export type PinnedPrompt = {
   } | null
   public_use_number: number
 } & { isPinned?: boolean }
-
-// Type for the pinned prompt based on PROMPTS_TABLE_SELECT_FIELDS
-export type PinnedPrompts = {
-  prompts:
-    | ({
-        external_id: string
-        name: string
-        description: string | null
-        prompt_text: string | null
-        created_at: string
-        slug: string
-        user_id: string
-        image: string | null
-        user_images: {
-          file_extension: string
-        } | null
-        public_use_number: number
-      } & { isPinned?: boolean })
-    | null
-}
