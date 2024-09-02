@@ -22,9 +22,13 @@ export const TemplatesTool = () => {
       ),
       onClick: () => {
         openModal('confirm-override-prompt', {
-          text:
-            APP_PROMPT_COMMENT +
-            'You are a code reviewer. You will review code and provide suggestions for improvements. Use the screen data {{screen}} to help the user with their code.',
+          data: {
+            appPrompt:
+              APP_PROMPT_COMMENT +
+              'You are a code reviewer. You will review code and provide suggestions for improvements. Use the screen data {{screen}} to help the user with their code.',
+            name: 'Code Reviewer',
+            description: 'A code reviewer that will review code and provide suggestions for improvements.',
+          },
         })
       },
     },
