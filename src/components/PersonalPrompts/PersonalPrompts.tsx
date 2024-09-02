@@ -159,24 +159,34 @@ const PersonalPromptsItem = ({
               </Button>
             </Tooltip>
           ) : isOwner ? (
-            <Button
-              className={styles.filledButton}
-              size="xsmall"
-              variant="ghost-neutral"
-              style={{
-                border: `1px solid ${isHovered ? colorScheme.ctaButton.hoverBorderColor : colorScheme.ctaButton.borderColor}`,
-                backgroundColor: isHovered
-                  ? colorScheme.ctaButton.hoverBackgroundColor
-                  : colorScheme.ctaButton.backgroundColor,
-                color: colorScheme.ctaButton.textColor,
-              }}
-              onClick={(e) => {
-                e.stopPropagation()
-                openModal('change-prompt-visibility', { prompt })
-              }}
+            <Tooltip
+              position={'bottom'}
+              tooltip={
+                <div className={'flex flex-col gap-1'}>
+                  Publish your prompt
+                  <span className={'text-xs text-light-60'}>Make your prompt public for it to trend</span>
+                </div>
+              }
             >
-              Publish
-            </Button>
+              <Button
+                className={styles.filledButton}
+                size="xsmall"
+                variant="ghost-neutral"
+                style={{
+                  border: `1px solid ${isHovered ? colorScheme.ctaButton.hoverBorderColor : colorScheme.ctaButton.borderColor}`,
+                  backgroundColor: isHovered
+                    ? colorScheme.ctaButton.hoverBackgroundColor
+                    : colorScheme.ctaButton.backgroundColor,
+                  color: colorScheme.ctaButton.textColor,
+                }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  openModal('change-prompt-visibility', { prompt })
+                }}
+              >
+                Publish
+              </Button>
+            </Tooltip>
           ) : null}
           <Badge variant="disabled" hidden={isHovered}>
             {prompt.public_use_number ? `${prompt.public_use_number} Uses` : 'No uses'}
