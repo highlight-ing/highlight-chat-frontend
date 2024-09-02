@@ -65,8 +65,7 @@
 
   .footer {
     display: flex;
-    //align-items: center;
-    //justify-content: center;
+    align-items: center;
     border-bottom-left-radius: 16px;
     border-bottom-right-radius: 16px;
     gap: 12px;
@@ -75,7 +74,6 @@
     color: $primary-80;
     font-size: 12px;
     font-weight: 500;
-    line-height: normal;
     outline: 1px solid $primary-10;
     line-height: 1.8;
 
