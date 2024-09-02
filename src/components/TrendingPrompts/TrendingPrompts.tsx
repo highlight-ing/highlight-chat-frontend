@@ -12,6 +12,7 @@ import Image from 'next/image'
 // Components
 import Button from '@/components/Button/Button'
 import { Badge } from '@/components/Badge/Badge'
+import Tooltip from '@/components/Tooltip/Tooltip'
 
 const TrendingPrompts = ({
   userId,
@@ -124,17 +125,27 @@ const TrendingPromptsItem = ({
           <h3>{name}</h3>
         </div>
         <div className={styles.trendingPromptsItemHeaderRight}>
-          <Button
-            size="xsmall"
-            variant="tertiary"
-            className={styles.filledButton}
-            onClick={() => {
-              openModal('pin-prompt', { prompt })
-            }}
-            disabled={isPinned}
+          <Tooltip
+            position={'bottom'}
+            tooltip={
+              <div className={'flex flex-col gap-1'}>
+                Pin to Assistant
+                <span className={'text-xs text-light-60'}>Show this prompt when you summon Highlight</span>
+              </div>
+            }
           >
-            {isPinned ? 'Pinned' : 'Pin'}
-          </Button>
+            <Button
+              size="xsmall"
+              variant="tertiary"
+              className={styles.filledButton}
+              onClick={() => {
+                openModal('pin-prompt', { prompt })
+              }}
+              disabled={isPinned}
+            >
+              {isPinned ? 'Pinned' : 'Pin'}
+            </Button>
+          </Tooltip>
           <Button className={styles.filledButton} size="xsmall" variant="primary" onClick={() => selectPrompt(prompt)}>
             Chat
           </Button>

@@ -3,131 +3,133 @@
 
 
 .emptyTrendingPrompts {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    width: 100%;
-    height: 164px;
-    padding: 30px;
-    justify-content: center;
-    align-items: center;
-    flex-shrink: 0;
-    border-radius: 20px;
-    border: 1px solid var(--Border-Tertiary, #222);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  height: 164px;
+  padding: 30px;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  border-radius: 20px;
+  border: 1px solid var(--Border-Tertiary, #222);
 
-    p {
-        color: $light-40;
-        font-size: 13px;
-        font-style: normal;
-        font-weight: 500;
-        line-height: 16px;
-    }
+  p {
+    color: $light-40;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 16px;
+  }
 }
 
 .trendingPromptsContainer {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  user-select: none;
 }
 
 .trendingPrompts {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    background-color: var(--Background-Secondary, #191919);
-    border-radius: 20px;
-    overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: var(--Background-Secondary, #191919);
+  border-radius: 20px;
+  overflow: hidden;
 }
 
 .trendingPromptsHeader {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    h2 {
-        font-size: 16px;
-        font-style: normal;
-        font-weight: 500;
-        line-height: 24px;
-        color: $primary-100;
-    }
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  h2 {
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+    color: $primary-100;
+  }
 }
 
-.filledButton{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 77px;
-    padding: 2px 8px;
+.filledButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 77px;
+  padding: 2px 8px;
 }
 
 .trendingPromptsItem {
+  display: flex;
+  padding: 20px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  background-color: var(--Background-Secondary, #191919);
+  transition: background-color 0.3s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  &:hover {
+    background-color: $tertiary-100;
+
+    .button.primary {
+      --button-bg: #{$pink-40};
+      --button-hover-bg: #{$pink-60};
+      --button-active-bg: #{$pink-80};
+    }
+  }
+
+  &.lastItem {
+    border-bottom: none;
+  }
+
+  .trendingPromptsItemHeader {
     display: flex;
-    padding: 20px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+
+    .trendingPromptsItemHeaderLeft {
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+      justify-content: flex-start;
+    }
+
+    .trendingPromptsItemHeaderRight {
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+  }
+
+  .trendingPromptsItemContent {
+    display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
+    flex: 1 0 0;
+
+    p {
+      color: $light-40;
+      font-size: 15px;
+      font-weight: 300;
+      line-height: 160%;
+      align-self: stretch;
+    }
+  }
+
+  .trendingPromptsItemFooter {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
     width: 100%;
-    background-color: var(--Background-Secondary, #191919);
-    transition: background-color 0.3s ease;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-
-    &:hover {
-        background-color: $tertiary-100;
-
-        .button.primary {
-            --button-bg: #{$pink-40};
-            --button-hover-bg: #{$pink-60};
-            --button-active-bg: #{$pink-80};
-        }
-    }
-
-    &.lastItem {
-        border-bottom: none;
-    }
-
-    .trendingPromptsItemHeader {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        .trendingPromptsItemHeaderLeft {
-            display: flex;
-            flex-direction: row;
-            gap: 8px;
-            justify-content: flex-start;
-        }
-
-        .trendingPromptsItemHeaderRight {
-            display: flex;
-            flex-direction: row;
-            gap: 8px;
-            justify-content: flex-end;
-        }
-    }
-
-    .trendingPromptsItemContent {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-        flex: 1 0 0;
-
-        p {
-            color: $light-40;
-            font-size: 15px;
-            font-style: normal;
-            font-weight: 150;
-            line-height: 160%;
-            align-self: stretch;
-        }
-    }
-
-    .trendingPromptsItemFooter {
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-start;
-        width: 100%;
-        gap: 8px;
-    }
+    gap: 8px;
+  }
 }
