@@ -326,7 +326,6 @@ export const useSubmitQuery = () => {
       formData.append('windows', JSON.stringify(windows))
 
       if (promptApp) {
-        console.log('this is prompt app', promptApp.id)
         formData.append('app_id', promptApp.id.toString())
       }
 
