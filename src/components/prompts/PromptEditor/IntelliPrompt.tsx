@@ -238,11 +238,11 @@ export default function IntelliPrompt({ value, onChange }: { value?: string; onC
   const onVariableClick = useCallback((variable: string, phrase: string) => {
     const editor = monacoRef.current?.editor?.getEditors?.()?.[0]
 
-    openModal('confirm-override-prompt', {
-      callback: () => {
-        console.log('called back')
-      },
-    })
+    // openModal('confirm-override-prompt', {
+    //   callback: () => {
+    //     console.log('called back')
+    //   },
+    // })
 
     const isCaretOnNewLine = (): boolean => {
       if (editor) {
