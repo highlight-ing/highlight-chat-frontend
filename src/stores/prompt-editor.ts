@@ -7,7 +7,7 @@ import { PromptTag } from '@/types'
  * when the user is creating or editing a prompt.
  */
 
-export type PromptEditorScreen = 'startWithTemplate' | 'app' | 'suggestions' | 'settings'
+export type PromptEditorScreen = 'startWithTemplate' | 'app' | 'settings' | 'variables'
 
 export interface PromptEditorOnboarding {
   /**
@@ -25,7 +25,7 @@ export interface PromptEditorData {
   description: string
   tags?: PromptTag[]
   appPrompt: string
-  suggestionsPrompt: string
+  systemPrompt: string
   visibility: 'public' | 'private'
   videoUrl?: string
   image?: string
@@ -52,12 +52,74 @@ export type PromptEditorSlice = PromptEditorState & {
   startTutorial: () => void
 }
 
+export const DEFAULT_SYSTEM_PROMPT = `
+{{!
+
+System Prompt
+
+The system prompt defines language to resolve variables against.
+This lets you write prompts in plain english without thinking about the handlebars syntax.
+
+}}
+
+
+{{! Handle references to the user message }}
+# User Message
+The phrases "user message", "user input", "typed message", "question" refer to the following:
+
+User Message: {{user_message}}
+
+
+{{! Handle references to the text retrieved for the focused app }}
+# App Text
+The phrases "app text", "window context", "window text", "app context", "focused app" refer to the following:
+
+App text: {{window_context}}
+
+
+{{! Handle references to the entire screen text }}
+# Screen
+The phrases "screen contents", "screen data", "screen text", "on my screen" refer to the following:
+
+Screen text: {{screen}}
+Image for additional context: {{image}}
+
+
+{{! Handle references to the attached screenshot }}
+# Screenshot
+The phrases "screenshot", "screen shot", "screenshots" refer to the following:
+
+Screenshot: {{image}}
+
+
+{{! Handle references to transcribed audio }}
+# Audio
+The phrases "audio", "conversation", "call", "meeting", "transcript" refer to the following:
+
+Audio: {{audio}}
+
+
+{{! Handle references to what apps the user has open on their PC }}
+# Open Windows
+The phrases "open windows", "open apps", "active programs", "running programs", "active apps", "running apps" refer to the following:
+
+Open Windows: {{windows}}
+
+
+{{! Handle references to what data is in the user's clipboard }}
+# Clipboard
+The phrases "clipboard", "clipboard text", "my clipboard" refer to the following:
+
+{{clipboard_text}}
+
+`
+
 export const initialPromptEditorState: PromptEditorState = {
   selectedScreen: 'startWithTemplate',
   promptEditorData: {
     slug: '',
     appPrompt: '',
-    suggestionsPrompt: '',
+    systemPrompt: DEFAULT_SYSTEM_PROMPT,
     name: '',
     description: '',
     visibility: 'private',

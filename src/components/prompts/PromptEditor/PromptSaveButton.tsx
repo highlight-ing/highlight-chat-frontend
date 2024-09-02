@@ -11,9 +11,6 @@ export default function PromptSaveButton() {
   function onButtonClick() {
     if (saveMode) {
       save()
-    } else if (selectedScreen === 'app') {
-      // Temporary until we remove suggestions prompt entirely
-      setSelectedScreen('suggestions')
     } else {
       setSelectedScreen('settings')
     }

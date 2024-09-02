@@ -59,26 +59,43 @@ export type Database = {
         }
         Relationships: []
       }
-      image_data: {
+      encrypted_messages: {
         Row: {
-          base64_image: string
+          conversation_id: string
           created_at: string
+          encrypted_content: string
           id: string
+          image_url: string | null
+          role: string
           user_id: string
         }
         Insert: {
-          base64_image: string
+          conversation_id?: string
           created_at?: string
+          encrypted_content: string
           id?: string
-          user_id: string
-        }
-        Update: {
-          base64_image?: string
-          created_at?: string
-          id?: string
+          image_url?: string | null
+          role: string
           user_id?: string
         }
-        Relationships: []
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          encrypted_content?: string
+          id?: string
+          image_url?: string | null
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'encrypted_messages_conversation_id_fkey'
+            columns: ['conversation_id']
+            isOneToOne: false
+            referencedRelation: 'conversation'
+            referencedColumns: ['id']
+          },
+        ]
       }
       message: {
         Row: {
@@ -186,6 +203,7 @@ export type Database = {
           public_use_number: number
           slug: string
           suggestion_prompt_text: string | null
+          system_prompt: string | null
           tags: Json[] | null
           user_id: string
           video_url: string | null
@@ -204,6 +222,7 @@ export type Database = {
           public_use_number?: number
           slug: string
           suggestion_prompt_text?: string | null
+          system_prompt?: string | null
           tags?: Json[] | null
           user_id: string
           video_url?: string | null
@@ -222,6 +241,7 @@ export type Database = {
           public_use_number?: number
           slug?: string
           suggestion_prompt_text?: string | null
+          system_prompt?: string | null
           tags?: Json[] | null
           user_id?: string
           video_url?: string | null

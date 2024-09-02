@@ -2,9 +2,8 @@ import AppScreen from './screens/AppScreen'
 import SettingsScreen from './screens/SettingsScreen'
 import StartWithTemplateScreen from './screens/StartWithTemplateScreen'
 import { PromptEditorScreen, usePromptEditorStore } from '@/stores/prompt-editor'
-import SuggestionsScreen from './screens/SuggestionsScreen'
 import styles from './prompteditor.module.scss'
-import { trackEvent } from '@/utils/amplitude'
+import VariablesScreen from './screens/VariablesScreen'
 
 function ScreenSelector({
   active,
@@ -29,20 +28,16 @@ function ScreenSelector({
   )
 }
 
-function TutorialButton() {
-  const { onboarding, startTutorial } = usePromptEditorStore()
-
-  function handleClick() {
-    trackEvent('Trigger Prompt Editor Tutorial', {})
-    startTutorial()
-  }
+function VariablesEditorButton() {
+  const { onboarding } = usePromptEditorStore()
+  const { setSelectedScreen } = usePromptEditorStore()
 
   return (
     <div
-      onClick={handleClick}
+      onClick={() => setSelectedScreen('variables')}
       className={`${styles.tab} ${styles.right} ${onboarding.isOnboarding ? styles.disabled : ''}`}
     >
-      Tutorial
+      Variables Editor
     </div>
   )
 }
@@ -62,25 +57,19 @@ export default function PromptEditor({ onClose }: { onClose?: () => void }) {
               disabled={onboarding.isOnboarding}
             />
             <ScreenSelector
-              active={selectedScreen === 'suggestions'}
-              name="suggestions"
-              title="Suggestions"
-              disabled={onboarding.isOnboarding}
-            />
-            <ScreenSelector
               active={selectedScreen === 'settings'}
               name="settings"
               title="Settings"
               disabled={onboarding.isOnboarding}
             />
-            <TutorialButton />
+            <VariablesEditorButton />
           </div>
         </div>
       )}
       <div className={'h-full'}>
         {selectedScreen === 'startWithTemplate' && <StartWithTemplateScreen />}
         {selectedScreen === 'app' && <AppScreen />}
-        {selectedScreen === 'suggestions' && <SuggestionsScreen />}
+        {selectedScreen === 'variables' && <VariablesScreen />}
         {selectedScreen === 'settings' && <SettingsScreen onClose={onClose} />}
       </div>
     </>

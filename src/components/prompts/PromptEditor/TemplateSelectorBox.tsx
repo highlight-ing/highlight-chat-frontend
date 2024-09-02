@@ -33,12 +33,6 @@ function TemplateCard({
 const APP_PROMPT_COMMENT =
   "{{! These are comments, they won't effect the output of your app }}\n{{! The app prompt determines how your app will behave to the user. }}\n"
 
-/**
- * Comment that gets appended to all prompts
- */
-const SUGGESTIONS_PROMPT_COMMENT =
-  '{{! Write a prompt that explains how your app can help the user provided the context }}\n'
-
 export default function TemplateSelectorBox() {
   const { setSelectedScreen, setPromptEditorData, setOnboarding } = usePromptEditorStore()
 
@@ -52,9 +46,6 @@ export default function TemplateSelectorBox() {
           appPrompt:
             APP_PROMPT_COMMENT +
             'You are a code reviewer. You will review code and provide suggestions for improvements. Use the screen data {{screen}} to help the user with their code.',
-          suggestionsPrompt:
-            SUGGESTIONS_PROMPT_COMMENT +
-            'Using this screen data: {{screen}}, offer suggestions for ways to improve the code.',
         })
         break
       case 'review-responder':
@@ -62,9 +53,6 @@ export default function TemplateSelectorBox() {
           appPrompt:
             APP_PROMPT_COMMENT +
             'You are a review responder. You will respond to reviews and comments on your app. You will also provide suggestions for improvements.',
-          suggestionsPrompt:
-            SUGGESTIONS_PROMPT_COMMENT +
-            'Using this screen data: {{screen}}, attempt to find reviews and generate the list of suggestions using them.',
         })
         break
       case 'elon-musk':
@@ -72,15 +60,11 @@ export default function TemplateSelectorBox() {
           appPrompt:
             APP_PROMPT_COMMENT +
             'You are Elon Musk. You are a visionary entrepreneur and CEO of SpaceX and Tesla. You are k nown for your outspoken personality and innovative ideas. You are also known for your philanthropy, donating to various causes and organizations.',
-          suggestionsPrompt:
-            SUGGESTIONS_PROMPT_COMMENT +
-            'Using the data provided, write suggestions that Elon Musk might make: {{screen}}\n{{audio}} ',
         })
         break
       case 'custom':
         setPromptEditorData({
           appPrompt: APP_PROMPT_COMMENT,
-          suggestionsPrompt: SUGGESTIONS_PROMPT_COMMENT,
         })
         break
     }
