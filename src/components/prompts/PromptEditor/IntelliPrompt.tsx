@@ -1,5 +1,6 @@
 import Editor, { Monaco } from '@monaco-editor/react'
 import styles from './prompteditor.module.scss'
+import variables from '@/variables.module.scss'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { editor, IDisposable } from 'monaco-editor'
 import { buildSuggestions } from '@/lib/IntelliPrompt'
@@ -132,7 +133,7 @@ export default function IntelliPrompt({ value, onChange }: { value?: string; onC
       ],
       colors: {
         // 'editor.foreground': '#000000',
-        // 'editor.background': '#000000',
+        'editor.background': variables.backgroundSecondary,
         // 'editorCursor.foreground': '#8B0000',
         // 'editor.lineHighlightBackground': '#0000FF20',
         // 'editorLineNumber.foreground': '#008800',

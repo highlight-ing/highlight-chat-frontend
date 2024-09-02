@@ -28,7 +28,7 @@ const TrendingPrompts = ({
   selectPrompt: (prompt: Prompt) => void
 }) => {
   const mergedPrompts = useMemo(() => {
-    const pinnedPromptIds = new Set(pinnedPrompts.map((p) => p.prompts?.external_id))
+    const pinnedPromptIds = new Set(pinnedPrompts.map((p) => p?.external_id))
     return prompts.map((prompt) => ({
       ...prompt,
       isPinned: pinnedPromptIds.has(prompt.external_id),
@@ -91,7 +91,7 @@ const TrendingPromptsItem = ({
   description?: string
   slug: string
   color?: string
-  selectPrompt: (prompt: Prompt) => void
+  selectPrompt: (prompt: Prompt, startNewConversation?: boolean, pinPrompt?: boolean) => void
   prompt: Prompt
   tags?: PromptTag[] | null
   lastItem: boolean
@@ -151,7 +151,7 @@ const TrendingPromptsItem = ({
               className={styles.filledButton}
               size="xsmall"
               variant="primary"
-              onClick={() => selectPrompt(prompt)}
+              onClick={() => selectPrompt(prompt, true, false)}
             >
               Chat
             </Button>

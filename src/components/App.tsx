@@ -102,7 +102,6 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
   useEffect(() => {
     const debouncedHandleSubmit = debounce(300, async (context: HighlightContext, promptApp?: Prompt) => {
       setInput(context.suggestion || '')
-      console.log('this is prompt app 2', promptApp)
       await handleIncomingContext(context, navigateToNewChat, promptApp)
     })
 

@@ -25,8 +25,8 @@
 }
 
 .modalContainer {
-  background-color: rgba(36, 36, 36, 0.8);
-  border: 1px solid $light-10;
+  background-color: $background-secondary;
+  border: 1px solid $light-5;
   border-radius: 16px;
   box-sizing: border-box;
   box-shadow: 0 3px 36px rgba(0, 0, 0, 0.75);
