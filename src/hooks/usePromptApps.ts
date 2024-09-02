@@ -161,14 +161,6 @@ export default (loadPrompts?: boolean) => {
       }
       refreshPinnedPrompts(accessToken)
     }
-
-    // Reload Electron's prompt apps
-    try {
-      //@ts-expect-error
-      globalThis.highlight.internal.reloadPrompts()
-    } catch (err) {
-      console.error('Error reloading prompts', err)
-    }
   }
 
   const getPrompt = async (promptId: string | number) => {
@@ -205,6 +197,7 @@ export default (loadPrompts?: boolean) => {
     getPrompt,
     getPromptBySlug,
     refreshPrompts,
+    refreshPinnedPrompts,
     selectPrompt,
   }
 }

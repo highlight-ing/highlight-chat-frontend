@@ -15,7 +15,7 @@ export interface UnpinPromptModalContext {
 export default function UnpinPromptModal({ id, context }: ModalObjectProps) {
   const { prompt } = context as UnpinPromptModalContext
   const { getAccessToken } = useAuth()
-  const { refreshPrompts } = usePromptApps()
+  const { refreshPinnedPrompts } = usePromptApps()
 
   const addToast = useStore((state) => state.addToast)
 
@@ -31,7 +31,7 @@ export default function UnpinPromptModal({ id, context }: ModalObjectProps) {
     }
 
     Highlight.appStorage.delete(`ctas.promptAdded.${prompt.external_id}`)
-    refreshPrompts()
+    refreshPinnedPrompts()
 
     closeModal(id)
 
