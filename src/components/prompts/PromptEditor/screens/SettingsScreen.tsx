@@ -290,8 +290,8 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
 
               <InputField
                 size={'xxlarge'}
-                label={'Video Link'}
-                placeholder={'Provide a video demo for your app (optional)'}
+                label={'YouTube or Vimeo Link'}
+                placeholder={'Provide a YouTube or Vimeo link (optional)'}
                 disabled={disabled}
                 {...register('videoUrl')}
                 error={errors.videoUrl?.message}

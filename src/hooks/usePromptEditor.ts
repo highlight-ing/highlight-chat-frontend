@@ -88,8 +88,10 @@ export function usePromptEditor() {
     }
 
     addToast({
-      title: 'Saved changes',
+      title: 'Prompt Updated',
+      description: 'Your latest prompt is active everywhere.',
       type: 'success',
+      timeout: 7500,
     })
 
     setNeedSave(false)
