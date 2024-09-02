@@ -18,6 +18,23 @@ interface PromptVariable {
   description: string
 }
 
+const highlightedWords = [
+  'clipboard text',
+  'clipboard_text',
+  'audio',
+  'conversation',
+  'app text',
+  'screenshot',
+  'screenshots',
+  'screen',
+  'image',
+  'images',
+  'window context',
+  'focused window',
+  'user_message',
+  'user message',
+]
+
 /**
  * The new, improved PromptInput component that uses Monaco Editor.
  * @param otherButtons Additional buttons that will go in the "Context Bar" (the place where users can click to add variables)
@@ -35,6 +52,7 @@ export default function IntelliPrompt({
 }) {
   const monacoRef = useRef<Monaco | undefined>()
   const editorRef = useRef<editor.IStandaloneCodeEditor | undefined>()
+  const decorationsRef = useRef<editor.IEditorDecorationsCollection | null>(null)
 
   const [completionDisposable, setCompletionDisposable] = useState<IDisposable>()
 
@@ -108,19 +126,57 @@ export default function IntelliPrompt({
       folding: false,
     })
 
-    editor.createDecorationsCollection([
-      {
-        range: {
-          startColumn: 1,
-          startLineNumber: 1,
-          endColumn: 10,
-          endLineNumber: 2,
-        },
-        options: {
-          className: styles.onboardingDecoration,
-        },
-      },
-    ])
+    decorationsRef.current = editor.createDecorationsCollection()
+
+    // Initial highlight
+    highlightWords(highlightedWords)
+  }
+
+  const highlightWords = (words: string[]) => {
+    if (!editorRef.current || !decorationsRef.current) return
+
+    const model = editorRef.current.getModel()
+    if (!model) return
+
+    const text = model.getValue()
+    const decorationsArray: editor.IModelDeltaDecoration[] = []
+
+    words.forEach((word) => {
+      const regex = new RegExp(word, 'gi')
+      let match
+      while ((match = regex.exec(text)) !== null) {
+        const startPosition = model.getPositionAt(match.index)
+        const endPosition = model.getPositionAt(match.index + word.length)
+        let className = styles.contextHighlight
+        const matchedString = match[0]
+        if (matchedString.includes('audio') || matchedString.includes('conversation')) {
+          className = styles.audio
+        } else if (matchedString.includes('image')) {
+          className = styles.image
+        } else if (matchedString.includes('screen')) {
+          className = styles.screen
+        } else if (matchedString.includes('clipboard')) {
+          className = styles.clipboardText
+        } else if (matchedString.includes('window')) {
+          className = styles.openWindows
+        } else if (matchedString.includes('message')) {
+          className = styles.userMessage
+        }
+        decorationsArray.push({
+          range: {
+            startColumn: startPosition.column,
+            startLineNumber: startPosition.lineNumber,
+            endColumn: endPosition.column,
+            endLineNumber: endPosition.lineNumber,
+          },
+          options: {
+            inlineClassName: className,
+          },
+        })
+      }
+    })
+
+    decorationsRef.current.set(decorationsArray)
   }
 
   function onVariableClick(variable: string) {
@@ -129,9 +185,12 @@ export default function IntelliPrompt({
 
   function handleEditorChange(value: string | undefined, ev: editor.IModelContentChangedEvent) {
     if (!value) return
-
     onChange?.(value)
   }
+
+  useEffect(() => {
+    highlightWords(highlightedWords)
+  }, [value])
 
   return (
     <>
