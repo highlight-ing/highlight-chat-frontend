@@ -205,6 +205,7 @@
   color: $light-20;
   cursor: pointer;
   margin-bottom: -1px;
+  user-select: none;
 
   &:hover, &.active {
     color: $light-100;
