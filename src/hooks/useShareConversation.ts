@@ -23,6 +23,7 @@ export const useShareConversation = () => {
       formData.append('conversation_id', conversationId)
       const response = await post('share-link/create', formData, {
         signal: abortController.signal,
+        version: 'v3',
       })
 
       if (!response.ok) {
