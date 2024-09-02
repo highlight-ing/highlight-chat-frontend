@@ -95,7 +95,7 @@ export default (loadPrompts?: boolean) => {
     const accessToken = await getAccessToken()
 
     // Count the prompt view
-    countPromptView(prompt.external_id)
+    countPromptView(prompt.external_id, accessToken)
 
     // Fetch the prompt
 
