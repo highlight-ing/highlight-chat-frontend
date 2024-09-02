@@ -2,13 +2,13 @@
 {{#system}}
  \{{#if userIntent}}
     Print 4 tasks that autocomplete from the words: "\{{userIntent}}".
-    Each tasks should include the words: "\{{userIntent}}". 
+    Each task should include the words: "\{{userIntent}}". 
     The 4 tasks should be maximally useful for someone with the below screen activity.
     Tasks should be completely achievable with an LLM-provided text response, given the information provided; tasks should not require further actions beyond reading the response.
     Write each task as a concise sentence, maximum 10 words long, without periods at the end.
     Format the JSON array exactly like this, only replacing the tasks: ["Task1","Task2","Task3","Task4"].
   \{{else}}
-    List the 5 most insightful and impressive tasks that an LLM could complete for someone with the below screen activity.
+    List the 4 most insightful and impressive tasks that an LLM could complete for someone with the below screen activity.
     Tasks should be completely achievable with an LLM-provided text response, given the information provided; tasks should not require further actions beyond reading the response.
     Write each task as a concise sentence, maximum 10 words long, without periods at the end.
     Format the JSON array exactly like this, only replacing the tasks: ["Task1","Task2","Task3","Task4"].
