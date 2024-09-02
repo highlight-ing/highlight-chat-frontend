@@ -74,18 +74,27 @@ function processAttachments(attachments: any[]): Attachment[] {
 }
 
 function useContextReceivedHandler(navigateToNewChat: () => void) {
-  const { addAttachment, setHighlightContext, setInput, promptApp, startNewConversation, setPrompt, closeAllModals } =
-    useStore(
-      useShallow((state) => ({
-        addAttachment: state.addAttachment,
-        setHighlightContext: state.setHighlightContext,
-        setInput: state.setInput,
-        promptApp: state.promptApp,
-        startNewConversation: state.startNewConversation,
-        setPrompt: state.setPrompt,
-        closeAllModals: state.closeAllModals,
-      })),
-    )
+  const {
+    addAttachment,
+    setHighlightContext,
+    setInput,
+    promptApp,
+    startNewConversation,
+    setPrompt,
+    closeAllModals,
+    clearPrompt,
+  } = useStore(
+    useShallow((state) => ({
+      addAttachment: state.addAttachment,
+      setHighlightContext: state.setHighlightContext,
+      setInput: state.setInput,
+      promptApp: state.promptApp,
+      startNewConversation: state.startNewConversation,
+      setPrompt: state.setPrompt,
+      closeAllModals: state.closeAllModals,
+      clearPrompt: state.clearPrompt,
+    })),
+  )
 
   const { handleIncomingContext } = useSubmitQuery()
 
@@ -112,6 +121,8 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
             prompt: res.promptApp.prompt_text ?? '',
           })
         }
+      } else {
+        clearPrompt()
       }
 
       // Close all modals

@@ -52,14 +52,13 @@ export async function GET(request: Request) {
     return Response.json({ error: ownedPromptsError.message }, { status: 500 })
   }
 
-  // Create a Set of external_ids from addedPrompts for efficient lookup
-  const addedPromptIds = new Set(addedPrompts.map((prompt) => prompt.external_id))
-
-  // Filter ownedPrompts to only include those not already in addedPrompts
-  const uniqueOwnedPrompts = ownedPrompts.filter((prompt) => !addedPromptIds.has(prompt.external_id))
-
   // Append the unique owned prompts to addedPrompts
-  addedPrompts = [...addedPrompts, ...uniqueOwnedPrompts]
+  addedPrompts = [...addedPrompts, ...ownedPrompts]
+
+  // Sort out any duplicates
+  addedPrompts = addedPrompts.filter((prompt, index, self) => {
+    return index === self.findIndex((t) => t.external_id === prompt.external_id)
+  })
 
   if (!selectResult) {
     // Return an empty array since no prompts were found
