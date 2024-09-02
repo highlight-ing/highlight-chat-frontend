@@ -389,13 +389,12 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
       {onboarding.isOnboarding && onboarding.index === 4 && (
         <OnboardingBox
           title="Save, publish, and share"
-          line1="Once you’ve got your prompt ready, you can simply save and start using it or publish it for anyone to use."
-          line2="There’s no limit to the number of prompts you can create —so have fun! You can always reach us here if you need any help."
+          line2="There’s no limit to the number of prompts you can create and share, so have fun!"
           buttonText="Continue"
           bottomComponent={
             <div>
               <p className={styles.pickText}>Pick a template to get started</p>
-              <TemplateSelectorBox />
+              <TemplateSelectorBox size={'small'} />
             </div>
           }
         />

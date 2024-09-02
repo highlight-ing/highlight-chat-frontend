@@ -9,23 +9,27 @@ function TemplateCard({
   icon,
   color,
   onClick,
+  size,
 }: {
   title: string
   description: string
   icon: React.ReactNode
   color: 'purple' | 'blue' | 'pink' | 'default'
   onClick?: () => void
+  size?: 'small' | 'large'
 }) {
   return (
     <Squircle
-      cornerRadius={32}
+      cornerRadius={size === 'small' ? 16 : 32}
       cornerSmoothing={1}
-      className={`${styles.templateCard} ${styles[color]}`}
+      className={`${styles.templateCard} ${styles[color]} ${size ? styles[size] : ''}`}
       onClick={onClick}
     >
-      {icon}
-      <h6>{title}</h6>
-      <p>{description}</p>
+      <div className={'flex-shrink-0'}>{icon}</div>
+      <div className={size === 'small' ? 'flex h-fit flex-col text-left' : ''}>
+        <h6>{title}</h6>
+        <p>{description}</p>
+      </div>
     </Squircle>
   )
 }
@@ -33,7 +37,7 @@ function TemplateCard({
 const APP_PROMPT_COMMENT =
   "{{! These are comments, they won't effect the output of your app }}\n{{! The app prompt determines how your app will behave to the user. }}\n"
 
-export default function TemplateSelectorBox() {
+export default function TemplateSelectorBox({ size }: { size?: 'small' | 'large' }) {
   const { setSelectedScreen, setPromptEditorData, setOnboarding } = usePromptEditorStore()
 
   function onSelectTemplate(template: string) {
@@ -78,6 +82,7 @@ export default function TemplateSelectorBox() {
         icon={<User variant="Bold" color="#712FFF" />}
         color="purple"
         onClick={() => onSelectTemplate('code-reviewer')}
+        size={size}
       />
       <TemplateCard
         title="Review Responder"
@@ -85,6 +90,7 @@ export default function TemplateSelectorBox() {
         icon={<Personalcard variant="Bold" color="#00F0FF" />}
         color="blue"
         onClick={() => onSelectTemplate('review-responder')}
+        size={size}
       />
       <TemplateCard
         title="Elon Musk"
@@ -92,6 +98,7 @@ export default function TemplateSelectorBox() {
         icon={<EmojiHappy variant="Bold" color="#FF2099" />}
         color="pink"
         onClick={() => onSelectTemplate('elon-musk')}
+        size={size}
       />
       <TemplateCard
         title="Custom"
@@ -99,6 +106,7 @@ export default function TemplateSelectorBox() {
         icon={<Setting variant="Bold" />}
         color="default"
         onClick={() => onSelectTemplate('custom')}
+        size={size}
       />
     </div>
   )

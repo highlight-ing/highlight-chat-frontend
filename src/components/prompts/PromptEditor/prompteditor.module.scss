@@ -75,6 +75,19 @@
     padding: 12px;
   }
 
+  &.small {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+
+    h6 {
+      margin: 0 0 4px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+  }
+
   &.default {
     background-color: $light-5;
     &:hover {
@@ -104,7 +117,7 @@
     margin-top: 12px;
     margin-bottom: 2px;
     font-size: 16px;
-    font-weight: 350;
+    font-weight: 500;
     color: $light-100;
 
     @media (max-width: 480px) {
@@ -119,7 +132,7 @@
   }
   p {
     font-size: 13px;
-    font-weight: 250;
+    font-weight: 350;
     color: $light-80;
 
     @media (max-width: 480px) {
@@ -235,7 +248,7 @@
   font-weight: 350;
   line-height: 160%; /* 24px */
   color: #B4B4B4;
-  width: 480px;
+  //width: 480px;
 }
 
 .buttonContainer {

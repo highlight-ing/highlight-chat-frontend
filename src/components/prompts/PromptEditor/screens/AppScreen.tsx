@@ -97,7 +97,7 @@ function OnboardingIndex3() {
 
   useEffect(() => {
     setPromptEditorData({
-      appPrompt: `{{! These are comments, they won't effect the output of your app }}\n{{! Some tips for writing prompts. }}\nSummarize my meeting notes using the {{audio}} and/or {{clipboard_text}} that is provided.\nList out all decisions and action items as a bullet list.`,
+      appPrompt: `{{! These are comments, they won't effect the output of your app }}\n{{! Some tips for writing prompts. }}\nSummarize my meeting notes using the audio and/or clipboard text that is provided.\nList out all decisions and action items as a bullet list.`,
     })
   }, [])
 
