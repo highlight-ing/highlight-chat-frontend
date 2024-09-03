@@ -16,6 +16,7 @@ import { trackEvent } from '@/utils/amplitude'
 import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
 import useHandleConversationLoad from '@/hooks/useHandleConversationLoad'
 import { useOnAppOpen } from '@/hooks/useOnAppOpen'
+import { useOnPromptChange } from '@/hooks/useOnPromptChange'
 
 /**
  * Hook that handles pasting from the clipboard.
@@ -72,10 +73,10 @@ function useHandleClipboardPaste() {
 
 const HighlightChat = () => {
   // STATE
-  const { inputIsDisabled, promptName, isConversationLoading } = useStore(
+  const { inputIsDisabled, promptApp, isConversationLoading } = useStore(
     useShallow((state) => ({
       inputIsDisabled: state.inputIsDisabled,
-      promptName: state.promptName,
+      promptApp: state.promptApp,
       isConversationLoading: state.isConversationLoading,
     })),
   )
@@ -91,19 +92,20 @@ const HighlightChat = () => {
   useHandleClipboardPaste()
   useHandleConversationLoad()
   useOnAppOpen()
+  useOnPromptChange()
 
   return (
     <div className={styles.page}>
       <History showHistory={showHistory} setShowHistory={setShowHistory} />
       <TopBar showHistory={showHistory} setShowHistory={setShowHistory} />
       <div
-        className={`${styles.contents} ${showHistory ? styles.partial : styles.full} ${messages.length > 0 || inputIsDisabled || !!promptName ? styles.justifyEnd : ''}`}
+        className={`${styles.contents} ${showHistory ? styles.partial : styles.full} ${messages.length > 0 || inputIsDisabled || !!promptApp ? styles.justifyEnd : ''}`}
       >
-        <ChatHeader isShowing={!isConversationLoading && !!promptName && messages.length === 0} />
+        <ChatHeader isShowing={!isConversationLoading && !!promptApp && messages.length === 0} />
         {(isChatting || (isConversationLoading && messages.length > 0)) && <Messages />}
         {isConversationLoading && messages.length === 0 && !inputIsDisabled && <MessagesPlaceholder />}
-        <ChatHome isShowing={!isChatting && !promptName && !isConversationLoading} />
-        {(isChatting || promptName) && <Input isActiveChat={true} />}
+        <ChatHome isShowing={!isChatting && !promptApp && !isConversationLoading} />
+        {(isChatting || promptApp) && <Input isActiveChat={true} />}
       </div>
     </div>
   )

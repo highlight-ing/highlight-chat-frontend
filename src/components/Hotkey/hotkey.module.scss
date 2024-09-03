@@ -1,27 +1,33 @@
 @import '@/variables.module';
 
 .hotkeyContainer {
-  display: flex;
+  margin: 0 2px;
+  display: inline-flex;
   gap: 5px;
 }
 
 .hotkey {
   display: flex;
   align-items: center;
-  color: $light-60;
-  border-bottom: 2px solid $dark-40;
-  background-color: $light-20;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.32);
-  border-radius: 5px;
-  padding: 4px 6px;
+  color: $light-40;
+  text-shadow: 0 -1px 1px $dark-40;
+  background-color: $light-10;
+  border: 1px solid $light-5;
+  outline: 1px solid $dark-80;
+  //box-shadow: 0 2px 0px $light-5;
+  border-radius: 6px;
+  padding: 3px 6px;
   font-size: 12px;
   font-weight: bold;
+  flex-shrink: 0;
+  line-height: normal;
 
   &.small {
-    padding: 0px 6px;
+    border-radius: 4px;
+    padding: 2px 6px;
     font-size: 11px;
-    font-weight: normal;
+    font-weight: 500;
     box-shadow: none;
-    border: none;
+    //border: none;
   }
 }

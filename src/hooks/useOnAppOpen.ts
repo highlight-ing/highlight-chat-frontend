@@ -35,9 +35,10 @@ export const useOnAppOpen = () => {
           if (navigateOptions.route.startsWith('/new')) {
             const param = navigateOptions.route.split('/').pop()
             if (param && param !== 'new') {
-              const prompt = await getPromptBySlug(param)
+              const shouldPin = param.includes('pin=true')
+              const prompt = await getPromptBySlug(param.split('?')[0])
               if (prompt) {
-                await selectPrompt(prompt, true)
+                await selectPrompt(prompt, true, shouldPin)
                 return
               }
             }

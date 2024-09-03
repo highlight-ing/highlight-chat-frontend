@@ -41,12 +41,16 @@
 // Templates styles
 
 .templateCardGrid {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 12px;
-  justify-content: center;
-  align-items: stretch;
+  //display: flex;
+  //flex-direction: row;
+  //flex-wrap: wrap;
+  //gap: 12px;
+  //justify-content: center;
+  //align-items: stretch;
+
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
 
   > .templateCard {
     flex: 1 1 250px;
@@ -73,6 +77,19 @@
 
   @media (max-height: 800px) {
     padding: 12px;
+  }
+
+  &.small {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+
+    h6 {
+      margin: 0 0 4px;
+      font-size: 14px;
+      font-weight: 500;
+    }
   }
 
   &.default {
@@ -104,7 +121,7 @@
     margin-top: 12px;
     margin-bottom: 2px;
     font-size: 16px;
-    font-weight: 350;
+    font-weight: 500;
     color: $light-100;
 
     @media (max-width: 480px) {
@@ -119,7 +136,7 @@
   }
   p {
     font-size: 13px;
-    font-weight: 250;
+    font-weight: 350;
     color: $light-80;
 
     @media (max-width: 480px) {
@@ -148,11 +165,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 15px;
-  font-weight: 350;
+  font-size: 14px;
+  font-weight: 400;
+  gap: 8px;
 
   h1 {
-    font-weight: 450;
+    color: $light-100;
+    font-weight: 500;
   }
 }
 
@@ -171,6 +190,10 @@
   align-items: center;
   height: 100%;
   gap: 32px;
+
+  :last-child {
+    margin-inline-start: auto;
+  }
 }
 
 .tab {
@@ -178,15 +201,11 @@
   align-items: center;
   height: 100%;
   font-size: 15px;
-  font-weight: 350;
+  font-weight: 500;
   color: $light-20;
   cursor: pointer;
   margin-bottom: -1px;
-
-  &.right {
-    margin-inline-start: auto;
-  }
-
+  user-select: none;
 
   &:hover, &.active {
     color: $light-100;
@@ -235,7 +254,7 @@
   font-weight: 350;
   line-height: 160%; /* 24px */
   color: #B4B4B4;
-  width: 480px;
+  //width: 480px;
 }
 
 .buttonContainer {
@@ -243,13 +262,13 @@
 }
 
 .onboardingDecoration {
-  color: white !important;
+  color: white;
 }
 
 .onboardingBlock {
   opacity: 0.4;
   // No cursor events
-  pointer-events: none; 
+  pointer-events: none;
 }
 
 .pickText {
@@ -260,4 +279,30 @@
   font-weight: 400;
   line-height: 20px; /* 117.647% */
   letter-spacing: -0.34px;
+}
+
+.screen, .image, .window_context {
+  color: $pink-100 !important;
+  background-color: $pink-10;
+  border-radius: 4px;
+}
+.user_message {
+  color: $primary-100 !important;
+  background-color: $primary-5;
+  border-radius: 4px;
+}
+.audio {
+  color: $green-80 !important;
+  background-color: $green-10;
+  border-radius: 4px;
+}
+.windows {
+  color: $purple-100 !important;
+  background-color: $purple-10;
+  border-radius: 4px;
+}
+.clipboard_text {
+  color: #ECFF0C !important;
+  background-color: rgba(236, 255, 12, 0.1);
+  border-radius: 4px;
 }

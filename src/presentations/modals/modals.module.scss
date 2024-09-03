@@ -35,3 +35,51 @@
   padding: 0 !important;
   gap: 0 !important;
 }
+
+.promptIntroModal {
+  padding: 0 !important;
+  gap: 0 !important;
+
+  .chattingWith {
+    font-size: 12px;
+    font-weight: 450;
+    color: $light-40;
+  }
+
+  h1 {
+    font-size: 16px;
+    font-weight: 500;
+    color: $light-100;
+    margin: 0;
+    padding: 0;
+  }
+
+  p {
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    color: $light-40;
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
+  .footer {
+    display: flex;
+    align-items: center;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    gap: 12px;
+    padding: 16px;
+    background-color: $primary-5;
+    color: $primary-80;
+    font-size: 12px;
+    font-weight: 500;
+    outline: 1px solid $primary-10;
+    line-height: 1.8;
+
+    .hotkey {
+      background-color: $primary-20;
+      color: $primary-100;
+    }
+  }
+}

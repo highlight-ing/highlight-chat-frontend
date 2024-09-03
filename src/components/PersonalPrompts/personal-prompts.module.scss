@@ -4,8 +4,9 @@
 .personalPromptsContainer {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 8px;
   width: 100%;
+  user-select: none;
 }
 
 .personalPromptsHeader {
@@ -33,12 +34,9 @@
 }
 
 .personalPrompts {
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
-  justify-content: flex-start;
-  align-items: flex-start;
   gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
 }
 
 .personalPromptsItem {
@@ -52,6 +50,7 @@
   border-radius: 20px;
   background-color: var(--Background-Secondary, #191919);
   transition: background-color 0.3s ease;
+  cursor: pointer;
 
   .personalPromptsItemHeader {
     display: flex;
@@ -69,9 +68,8 @@
     p {
       color: $light-40;
       font-size: 15px;
-      font-weight: 150;
-      line-height: 160%;
-      align-self: stretch;
+      font-weight: 300;
+      line-height: 1.6;
     }
   }
 

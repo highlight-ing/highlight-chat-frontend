@@ -6,7 +6,7 @@ import { PersonalPromptsProps, PersonalPromptsItemProps } from '@/types'
 // Components
 import { Badge } from '@/components/Badge/Badge'
 import Button from '@/components/Button/Button'
-import { Setting, Trash, Lock, Edit2, ElementPlus } from 'iconsax-react'
+import { Setting, Trash, Lock, Edit2, ElementPlus, ArchiveMinus } from 'iconsax-react'
 import EmptyPrompts from '@/components/EmptyPrompts/EmptyPrompts'
 import { Prompt } from '@/types/supabase-helpers'
 import Image from 'next/image'
@@ -14,6 +14,7 @@ import { supabaseLoader } from '@/lib/supabase'
 
 // Custom Variables for styling
 import CSS_VARIABLES from './customVariables'
+import Tooltip from '@/components/Tooltip/Tooltip'
 
 type PromptWithPin = Prompt & { isPinned?: boolean }
 
@@ -26,7 +27,7 @@ const PersonalPrompts = ({ userId, prompts, pinnedPrompts, openModal, selectProm
   const mergedPrompts = [
     ...prompts,
     // Add isPinned property to all pinned prompts
-    ...pinnedPrompts.map((pinnedPrompt) => ({ ...pinnedPrompt.prompts, isPinned: true }) as PromptWithPin),
+    ...pinnedPrompts.map((pinnedPrompt) => ({ ...pinnedPrompt, isPinned: true }) as PromptWithPin),
   ].reduce((acc: PromptWithPin[], current: PromptWithPin) => {
     // Check if the current prompt already exists in the accumulator
     const x = acc.find((item) => item.external_id === current.external_id)
@@ -51,7 +52,7 @@ const PersonalPrompts = ({ userId, prompts, pinnedPrompts, openModal, selectProm
           <h2>Pinned Prompts</h2>
         </div>
         <div className={styles.personalPromptsHeaderRight}>
-          <Button size="xsmall" variant="ghost-neutral" onClick={() => openModal('create-prompt')}>
+          <Button size="medium" variant="ghost-neutral" onClick={() => openModal('create-prompt')}>
             <ElementPlus color={variables.tertiary} variant={'Bold'} size="16" />
             New Prompt
           </Button>
@@ -61,7 +62,7 @@ const PersonalPrompts = ({ userId, prompts, pinnedPrompts, openModal, selectProm
         {mergedPrompts.map((item: Prompt) => {
           const isOwner = userId === item.user_id
           const isPublic = item.public
-          const isPinned = pinnedPrompts.some((pinnedPrompt) => pinnedPrompt.prompts?.external_id === item.external_id)
+          const isPinned = pinnedPrompts.some((pinnedPrompt) => pinnedPrompt?.external_id === item.external_id)
           const colorScheme = isOwner
             ? isPublic
               ? CSS_VARIABLES.public
@@ -101,6 +102,7 @@ const PersonalPromptsItem = ({
   return (
     <div
       className={styles.personalPromptsItem}
+      onClick={() => selectPrompt(prompt, true, false)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{
@@ -132,114 +134,153 @@ const PersonalPromptsItem = ({
       <div className={styles.personalPromptsItemFooter}>
         <div className={styles.personalPromptsItemFooterLeftButtons}>
           {isPublic ? (
-            <Button
-              className={styles.filledButton}
-              size="xsmall"
-              variant="ghost-neutral"
-              style={{
-                border: `1px solid ${isHovered ? colorScheme.ctaButton.hoverBorderColor : colorScheme.ctaButton.borderColor}`,
-                backgroundColor: isHovered
-                  ? colorScheme.ctaButton.hoverBackgroundColor
-                  : colorScheme.ctaButton.backgroundColor,
-                color: colorScheme.ctaButton.textColor,
-              }}
-              onClick={() => {
-                const url = `https://chat.highlight.ing/prompts/${prompt.slug}`
-                navigator.clipboard.writeText(url)
-                setIsCopied(true)
-                setTimeout(() => setIsCopied(false), 2000)
-              }}
-              disabled={isCopied}
-            >
-              {isCopied ? 'Copied' : 'Share'}
-            </Button>
+            <Tooltip position={'bottom'} tooltip={isCopied ? undefined : 'Copy share link'}>
+              <Button
+                className={styles.filledButton}
+                size="xsmall"
+                variant="ghost-neutral"
+                style={{
+                  border: `1px solid ${isHovered ? colorScheme.ctaButton.hoverBorderColor : colorScheme.ctaButton.borderColor}`,
+                  backgroundColor: isHovered
+                    ? colorScheme.ctaButton.hoverBackgroundColor
+                    : colorScheme.ctaButton.backgroundColor,
+                  color: colorScheme.ctaButton.textColor,
+                }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  const url = `https://chat.highlight.ing/prompts/${prompt.slug}`
+                  navigator.clipboard.writeText(url)
+                  setIsCopied(true)
+                  setTimeout(() => setIsCopied(false), 2000)
+                }}
+                disabled={isCopied}
+              >
+                {isCopied ? 'Copied' : 'Share'}
+              </Button>
+            </Tooltip>
           ) : isOwner ? (
-            <Button
-              className={styles.filledButton}
-              size="xsmall"
-              variant="ghost-neutral"
-              style={{
-                border: `1px solid ${isHovered ? colorScheme.ctaButton.hoverBorderColor : colorScheme.ctaButton.borderColor}`,
-                backgroundColor: isHovered
-                  ? colorScheme.ctaButton.hoverBackgroundColor
-                  : colorScheme.ctaButton.backgroundColor,
-                color: colorScheme.ctaButton.textColor,
-              }}
-              onClick={() => openModal('change-prompt-visibility', { prompt })}
+            <Tooltip
+              position={'bottom'}
+              tooltip={
+                <div className={'flex flex-col gap-1'}>
+                  Publish your prompt
+                  <span className={'text-xs text-light-60'}>Make your prompt public for it to trend</span>
+                </div>
+              }
             >
-              Publish
-            </Button>
+              <Button
+                className={styles.filledButton}
+                size="xsmall"
+                variant="ghost-neutral"
+                style={{
+                  border: `1px solid ${isHovered ? colorScheme.ctaButton.hoverBorderColor : colorScheme.ctaButton.borderColor}`,
+                  backgroundColor: isHovered
+                    ? colorScheme.ctaButton.hoverBackgroundColor
+                    : colorScheme.ctaButton.backgroundColor,
+                  color: colorScheme.ctaButton.textColor,
+                }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  openModal('change-prompt-visibility', { prompt })
+                }}
+              >
+                Publish
+              </Button>
+            </Tooltip>
           ) : null}
           <Badge variant="disabled" hidden={isHovered}>
             {prompt.public_use_number ? `${prompt.public_use_number} Uses` : 'No uses'}
           </Badge>
-          <Button
-            className={styles.filledButton}
-            style={{
-              border: `1px solid ${isHovered ? colorScheme.useButton.hoverBorderColor : colorScheme.useButton.borderColor}`,
-              color: colorScheme.useButton.textColor,
-            }}
-            size="xsmall"
-            variant="ghost-neutral"
-            onClick={() => selectPrompt(prompt)}
-            hidden={!isHovered}
-          >
-            Chat
-          </Button>
+          <Tooltip position={'bottom'} tooltip={`Start a chat with ${prompt.name}`}>
+            <Button
+              className={styles.filledButton}
+              style={{
+                border: `1px solid ${isHovered ? colorScheme.useButton.hoverBorderColor : colorScheme.useButton.borderColor}`,
+                color: colorScheme.useButton.textColor,
+              }}
+              size="xsmall"
+              variant="ghost-neutral"
+              onClick={(e) => {
+                e.stopPropagation()
+                selectPrompt(prompt, true, false)
+              }}
+              hidden={!isHovered}
+            >
+              Chat
+            </Button>
+          </Tooltip>
         </div>
         <div className={styles.personalPromptsItemFooterRightButtons}>
           {isOwner ? (
             <>
-              <Button
-                size="icon"
-                variant="ghost-neutral"
-                style={{
-                  border: `1px solid ${isHovered ? colorScheme.button.hoverBorderColor : colorScheme.button.borderColor}`,
-                }}
-                onClick={() =>
-                  openModal('confirm-delete-prompt', { externalId: prompt.external_id, name: prompt.name })
-                }
-                hidden={!isHovered}
-              >
-                <Trash color={variables.tertiary} variant={'Bold'} size="24" />
-              </Button>
-              {isPublic && (
+              <Tooltip position={'bottom'} tooltip={<span className={'text-rose-400'}>Delete prompt</span>}>
                 <Button
                   size="icon"
                   variant="ghost-neutral"
                   style={{
                     border: `1px solid ${isHovered ? colorScheme.button.hoverBorderColor : colorScheme.button.borderColor}`,
                   }}
-                  onClick={() => openModal('change-prompt-visibility', { prompt })}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    openModal('confirm-delete-prompt', { externalId: prompt.external_id, name: prompt.name })
+                  }}
                   hidden={!isHovered}
                 >
-                  <Lock color={variables.tertiary} variant={'Bold'} size="16" />
+                  <Trash color={variables.tertiary} variant={'Bold'} size="24" />
                 </Button>
+              </Tooltip>
+              {isPublic && (
+                <Tooltip position={'bottom'} tooltip={'Change prompt visibility'}>
+                  <Button
+                    size="icon"
+                    variant="ghost-neutral"
+                    style={{
+                      border: `1px solid ${isHovered ? colorScheme.button.hoverBorderColor : colorScheme.button.borderColor}`,
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      openModal('change-prompt-visibility', { prompt })
+                    }}
+                    hidden={!isHovered}
+                  >
+                    <Lock color={variables.tertiary} variant={'Bold'} size="16" />
+                  </Button>
+                </Tooltip>
               )}
+              <Tooltip position={'bottom'} tooltip={'Edit prompt'}>
+                <Button
+                  size="icon"
+                  variant="ghost-neutral"
+                  style={{
+                    border: `1px solid ${isHovered ? colorScheme.button.hoverBorderColor : colorScheme.button.borderColor}`,
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    openModal('edit-prompt', { prompt })
+                  }}
+                  hidden={!isHovered}
+                >
+                  <Edit2 color={colorScheme.button.textColor} variant={'Bold'} size="16" />
+                </Button>
+              </Tooltip>
+            </>
+          ) : (
+            <Tooltip position={'bottom'} tooltip={'Unpin prompt'}>
               <Button
                 size="icon"
                 variant="ghost-neutral"
                 style={{
                   border: `1px solid ${isHovered ? colorScheme.button.hoverBorderColor : colorScheme.button.borderColor}`,
                 }}
-                onClick={() => openModal('edit-prompt', { prompt })}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  openModal('unpin-prompt', { prompt })
+                }}
                 hidden={!isHovered}
               >
-                <Edit2 color={colorScheme.button.textColor} variant={'Bold'} size="16" />
+                <ArchiveMinus color={colorScheme.button.textColor} variant={'Bold'} size="16" />
               </Button>
-            </>
-          ) : (
-            <Button
-              size="icon"
-              variant="ghost-neutral"
-              style={{
-                border: `1px solid ${isHovered ? colorScheme.button.hoverBorderColor : colorScheme.button.borderColor}`,
-              }}
-              onClick={() => openModal('unpin-prompt', { prompt })}
-              hidden={!isHovered}
-            >
-              <Trash color={colorScheme.button.textColor} variant={'Bold'} size="16" />
-            </Button>
+            </Tooltip>
           )}
         </div>
       </div>

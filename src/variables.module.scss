@@ -58,6 +58,14 @@ $purple-60: rgba(113, 47, 255, 0.6);
 $purple-80: rgba(113, 47, 255, 0.8);
 $purple-100: #712FFF;
 
+$yellow-5: rgba(236, 255, 12, 0.05);
+$yellow-10: rgba(236, 255, 12, 0.1);
+$yellow-20: rgba(236, 255, 12, 0.2);
+$yellow-40: rgba(236, 255, 12, 0.4);
+$yellow-60: rgba(236, 255, 12, 0.6);
+$yellow-80: rgba(236, 255, 12, 0.8);
+$yellow-100: #ECFF0C;
+
 // These are not in the same order as the others, copied from Medal theme format
 $tertiary-0: #B3B1B6;
 $tertiary-30: #83817c;
@@ -163,6 +171,14 @@ $border-tertiary: #222222;
   purple60: $purple-60;
   purple80: $purple-80;
   purple100: $purple-100;
+
+  yellow5: $yellow-5;
+  yellow10: $yellow-10;
+  yellow20: $yellow-20;
+  yellow40: $yellow-40;
+  yellow60: $yellow-60;
+  yellow80: $yellow-80;
+  yellow100: $yellow-100;
 
   tertiary0: $tertiary-0;
   tertiary30: $tertiary-30;

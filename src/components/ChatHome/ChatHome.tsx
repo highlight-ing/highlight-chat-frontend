@@ -135,7 +135,6 @@ const oldPrompts = () => {
     const fetchHotkey = async () => {
       const hotkey = await Highlight.app.getHotkey()
       setHotkey(hotkey)
-      trackEvent('HL Chat Hotkey Fetched', { hotkey })
     }
     fetchHotkey()
   }, [])

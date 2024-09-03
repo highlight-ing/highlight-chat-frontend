@@ -263,20 +263,21 @@ export const useSubmitQuery = () => {
       console.log('Attachment: ', JSON.stringify(attachment))
     })
 
-    if (!context.suggestion || context.suggestion.trim() === '') {
-      console.log('No context received, ignoring.')
-      return
-    }
+    // if (!context.suggestion || context.suggestion.trim() === '') {
+    //   console.log('No context received, ignoring.')
+    //   return
+    // }
 
     if (!context.application) {
       console.log('No application data in context, ignoring.')
       return
     }
-    // Check if the context is empty, only contains empty suggestion and attachments, or has no application data
-    if (!context.suggestion && (!context.attachments || context.attachments.length === 0)) {
-      console.log('Empty or invalid context received, ignoring.')
-      return
-    }
+    // // Check if the context is empty, only contains empty suggestion and attachments, or has no application data
+    // if (!context.attachments || context.attachments.length === 0) {
+    //   console.log(context.attachments)
+    //   console.log('Empty or invalid context received, ignoring.')
+    //   return
+    // }
 
     let query = context.suggestion || ''
     let screenshotUrl = context.attachments?.find((a) => a.type === 'screenshot')?.value

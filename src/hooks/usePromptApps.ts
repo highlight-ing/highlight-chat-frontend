@@ -71,8 +71,7 @@ export default (loadPrompts?: boolean) => {
       }
       setPromptUserId(response.userId)
       setPrompts(response.prompts ?? [])
-      const pinnedPrompts = await fetchPinnedPrompts(accessToken)
-      setPinnedPrompts(pinnedPrompts.prompts ?? [])
+      await refreshPinnedPrompts(accessToken)
       setLoadingPrompts(false)
       setIsPromptsLoaded(true)
       resolve(response.prompts ?? [])
@@ -82,7 +81,22 @@ export default (loadPrompts?: boolean) => {
     return loadPromptsPromise
   }
 
-  const selectPrompt = async (prompt: Prompt, isNewConversation?: boolean) => {
+  const refreshPinnedPrompts = async (accessToken: string) => {
+    const pinned = await fetchPinnedPrompts(accessToken ?? (await getAccessToken()))
+    // @ts-ignore
+    if (Array.isArray(pinned)) {
+      setPinnedPrompts(pinned ?? [])
+    }
+
+    try {
+      //@ts-expect-error
+      globalThis.highlight.internal.reloadPrompts()
+    } catch (err) {
+      console.error('Error installing app', err)
+    }
+  }
+
+  const selectPrompt = async (prompt: Prompt, isNewConversation?: boolean, pinPrompt?: boolean) => {
     if (!prompt.slug) {
       return
     }
@@ -128,22 +142,24 @@ export default (loadPrompts?: boolean) => {
       startNewConversation()
     }
 
-    // Add the app to the user's list of "added" apps
-    // if it's not already there
-    addPromptToUser(prompt.external_id, accessToken).catch((err) => {
-      addToast({
-        title: 'Error adding chat app',
-        description: err.message ?? err.toString(),
-        type: 'error',
-        timeout: 15000,
+    if (pinPrompt !== false) {
+      // Add the app to the user's list of "added" apps
+      // if it's not already there
+      await addPromptToUser(prompt.external_id, accessToken).catch((err) => {
+        addToast({
+          title: 'Error adding chat app',
+          description: err.message ?? err.toString(),
+          type: 'error',
+          timeout: 15000,
+        })
       })
-    })
-
-    try {
-      //@ts-expect-error
-      globalThis.highlight.internal.installApp(prompt.slug)
-    } catch (err) {
-      console.error('Error installing app', err)
+      try {
+        //@ts-expect-error
+        globalThis.highlight.internal.installApp(prompt.slug)
+      } catch (err) {
+        console.error('Error installing app', err)
+      }
+      refreshPinnedPrompts(accessToken)
     }
   }
 
@@ -181,6 +197,7 @@ export default (loadPrompts?: boolean) => {
     getPrompt,
     getPromptBySlug,
     refreshPrompts,
+    refreshPinnedPrompts,
     selectPrompt,
   }
 }
