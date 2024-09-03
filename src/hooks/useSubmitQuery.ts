@@ -331,7 +331,7 @@ export const useSubmitQuery = () => {
       formData.append('windows', JSON.stringify(windows))
 
       if (promptApp) {
-        formData.append('app_id', promptApp.id.toString())
+        formData.append('app_id', promptApp.external_id.toString())
       }
 
       if (aboutMe) {
