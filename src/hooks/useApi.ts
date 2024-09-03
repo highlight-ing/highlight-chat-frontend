@@ -1,6 +1,6 @@
 import useAuth from '@/hooks/useAuth'
 
-const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080/'
+const backendUrl = 'http://localhost:8080/' //process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080/'
 
 type ApiVersion = 'v1' | 'v3'
 

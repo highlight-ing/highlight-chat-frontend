@@ -101,6 +101,7 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
 
   useEffect(() => {
     const debouncedHandleSubmit = debounce(300, async (context: HighlightContext, promptApp?: Prompt) => {
+      console.log('debouncedHandleSubmit: ', context)
       setInput(context.suggestion || '')
       await handleIncomingContext(context, navigateToNewChat, promptApp)
     })
@@ -110,6 +111,9 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
       // so that the newest conversation is set to use the prompt app
 
       let res
+
+      //@ts-expect-error
+      console.log('context.promptSlug: ', context.promptSlug)
 
       //@ts-expect-error
       if (context.promptSlug) {
@@ -129,10 +133,13 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
         clearPrompt()
       }
 
+      console.log('promptApp: ', promptApp)
+
       // Close all modals
       closeAllModals()
 
       startNewConversation()
+      console.log('context.attachments: ', context.attachments)
       const attachments = processAttachments(context.attachments || []) as RuntimeAttachmentType[]
       const newContext = { ...context, attachments }
       setHighlightContext(newContext)

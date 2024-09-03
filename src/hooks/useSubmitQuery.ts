@@ -175,12 +175,14 @@ export const useSubmitQuery = () => {
   }
 
   const fetchResponse = async (conversationId: string, formData: FormData, token: string, isPromptApp: boolean) => {
+    console.log('fetchResponse: ', conversationId, formData, token, isPromptApp)
     setInputIsDisabled(true)
 
     try {
       formData.append('conversation_id', conversationId)
 
       const endpoint = isPromptApp ? 'chat/prompt-as-app' : 'chat/'
+      console.log('endpoint: ', endpoint)
 
       const abortController = new AbortController()
       abortControllerRef.current = abortController
@@ -257,8 +259,10 @@ export const useSubmitQuery = () => {
     navigateToNewChat: () => void,
     promptApp?: Prompt,
   ) => {
+    console.log('promptApp inside handleIncomingContext: ', promptApp)
     console.log('Received context inside handleIncomingContext: ', context)
     console.log('Got attachment count: ', context.attachments?.length)
+
     context.attachments?.map((attachment) => {
       console.log('Attachment: ', JSON.stringify(attachment))
     })

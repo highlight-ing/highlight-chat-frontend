@@ -431,6 +431,8 @@ export async function getPromptAppBySlug(slug: string) {
     .eq('slug', slug)
     .maybeSingle()
 
+  console.log('promptApp in sql: ', promptApp)
+
   if (error) {
     console.error('Error fetching prompt app from Supabase', error)
     return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
