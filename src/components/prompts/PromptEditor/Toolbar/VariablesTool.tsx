@@ -9,6 +9,7 @@ import {
   Monitor,
   Shapes,
   Sound,
+  TextalignLeft,
 } from 'iconsax-react'
 import sassVariables from '@/variables.module.scss'
 import ContextMenu, { MenuItemType } from '@/components/ContextMenu/ContextMenu'
@@ -42,6 +43,15 @@ export const VariablesTool: React.FC<VariablesToolProps> = ({ disabled, onSelect
       {
         label: (
           <>
+            <Category2 variant="Bold" size={20} color={sassVariables.purple100} /> Open Windows
+          </>
+        ),
+        onClick: () => onSelect('open windows', "Using the user's open windows, ..."),
+      },
+      { divider: true },
+      {
+        label: (
+          <>
             <MessageText1 variant="Bold" size={20} color={sassVariables.primary80} /> User Message
           </>
         ),
@@ -50,10 +60,10 @@ export const VariablesTool: React.FC<VariablesToolProps> = ({ disabled, onSelect
       {
         label: (
           <>
-            <Category2 variant="Bold" size={20} color={sassVariables.purple100} /> Open Windows
+            <TextalignLeft variant="Bold" size={20} color={sassVariables.primary100} /> User "About Me"
           </>
         ),
-        onClick: () => onSelect('open windows', "Using the user's open windows, ..."),
+        onClick: () => onSelect('about me', 'Using the user\'s "about me", ...'),
       },
       {
         divider: true,
