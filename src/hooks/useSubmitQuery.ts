@@ -304,7 +304,7 @@ export const useSubmitQuery = () => {
       setInputIsDisabled(true)
 
       const att = context.attachments || ([] as unknown)
-      const fileAttachments = att.filter((a) => a.type && fileAttachmentTypes.includes(a.type))
+      const fileAttachments = (att as FileAttachment[]).filter((a) => a.type && fileAttachmentTypes.includes(a.type))
 
       const conversationId = getOrCreateConversationId()
       addConversationMessage(conversationId!, {
