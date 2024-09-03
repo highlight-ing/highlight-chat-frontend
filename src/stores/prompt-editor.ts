@@ -53,7 +53,6 @@ export type PromptEditorSlice = PromptEditorState & {
 }
 
 export const DEFAULT_SYSTEM_PROMPT = `
-
 {{!
 
 System Prompt
@@ -72,6 +71,14 @@ The phrases "user message", "user input", "typed message", "question" refer to t
 User Message: {{user_message}}
 {{/if}}
 
+
+{{! Handle references to what data is in the user's "about me" }}
+{{#if about_me}}
+# About Me
+The phrases "about me", "about the user", "user personalization" refer to the following:
+
+About Me: {{about_me}}
+{{/if}}
 
 {{! Handle references to the text retrieved for the focused app }}
 {{#if window_context}}

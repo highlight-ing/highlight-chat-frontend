@@ -8,7 +8,6 @@ import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { TemplatesTool } from '@/components/prompts/PromptEditor/Toolbar/TemplatesTool'
 import { VariablesTool } from '@/components/prompts/PromptEditor/Toolbar/VariablesTool'
 import { ConditionsTool } from '@/components/prompts/PromptEditor/Toolbar/ConditionsTool'
-import { useStore } from '@/providers/store-provider'
 
 function Loading() {
   return <span className="text-sm text-gray-500">Loading editor...</span>
@@ -81,6 +80,12 @@ const VariablePhrases = [
     label: 'User Message',
     description: "Reference the user's typed message, or the suggestion they clicked from the assistant.",
   },
+  {
+    variable: 'about_me',
+    phrases: ['about me', 'about the user', 'user personalization', "user's personalization"],
+    label: 'User Personalization',
+    description: 'Reference the user\'s "about me", which contains personalization about the user.',
+  },
 ]
 
 const matchPhrase = (text: string, variable: string, phrase: string | null) => {
@@ -103,7 +108,6 @@ export default function IntelliPrompt({ value, onChange }: { value?: string; onC
   const [completionDisposable, setCompletionDisposable] = useState<IDisposable>()
 
   const { onboarding } = usePromptEditorStore()
-  const openModal = useStore((state) => state.openModal)
 
   useEffect(() => {
     return () => {
