@@ -7,18 +7,10 @@ import { buildSuggestions } from '@/lib/IntelliPrompt'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { TemplatesTool } from '@/components/prompts/PromptEditor/Toolbar/TemplatesTool'
 import { VariablesTool } from '@/components/prompts/PromptEditor/Toolbar/VariablesTool'
-import { ConditionsTool } from '@/components/prompts/PromptEditor/Toolbar/ConditionsTool'
 import { useStore } from '@/providers/store-provider'
 
 function Loading() {
   return <span className="text-sm text-gray-500">Loading editor...</span>
-}
-
-interface PromptVariable {
-  icon: React.ReactNode
-  label: string
-  insertText: string
-  description: string
 }
 
 const VariablePhrases = [

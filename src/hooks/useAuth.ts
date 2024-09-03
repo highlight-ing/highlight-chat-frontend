@@ -2,7 +2,6 @@ import { refreshTokens } from '@/app/(app)/actions'
 import { useStore } from '@/providers/store-provider'
 import Highlight from '@highlight-ai/app-runtime'
 import { decodeJwt } from 'jose'
-import { useEffect } from 'react'
 
 async function getNewTokens(): Promise<{ accessToken: string; refreshToken: string; authExpiration: number }> {
   const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await Highlight.auth.signIn()
@@ -43,6 +42,7 @@ async function attemptToRefreshTokens(oldRefreshToken: string): Promise<{
   }
 }
 
+// Keeps track of the promise to fetch/refresh tokens
 let requestPromise: Promise<string> | null = null
 
 /**
@@ -56,12 +56,6 @@ export default function useAuth() {
     setAuth: state.setAuth,
     authExpiration: state.authExpiration,
   }))
-
-  // Keeps track of the promise to fetch/refresh tokens
-
-  // Hook that checks if the auth state in Highlight has changed, if so,
-  // we need to update the auth state in the store
-  useEffect(() => {}, [])
 
   /**
    * Fetches tokens from the auth store or fetches new ones if they don't exist.
