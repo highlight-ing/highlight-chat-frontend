@@ -180,9 +180,7 @@ export const useSubmitQuery = () => {
     try {
       formData.append('conversation_id', conversationId)
 
-      console.log('isPromptApp: ', isPromptApp)
       const endpoint = isPromptApp ? 'chat/prompt-as-app' : 'chat/'
-      console.log('endpoint: ', endpoint)
 
       const abortController = new AbortController()
       abortControllerRef.current = abortController
@@ -365,8 +363,6 @@ export const useSubmitQuery = () => {
       formData.append('prompt', query)
 
       const isPromptApp = promptApp ? true : false
-      console.log('isPromptApp: ', isPromptApp)
-      console.log('promptApp: ', promptApp)
 
       if (isPromptApp && promptApp!.external_id !== undefined) {
         formData.append('app_id', promptApp!.external_id)
