@@ -49,7 +49,7 @@ export default function PinPromptModal({ id, context }: ModalObjectProps) {
   return (
     <ConfirmationModal
       id={id}
-      header="Unpin prompt"
+      header="Pin prompt"
       primaryAction={{
         label: 'Pin',
         onClick: onUpdate,

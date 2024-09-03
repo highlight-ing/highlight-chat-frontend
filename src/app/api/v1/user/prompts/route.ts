@@ -3,6 +3,8 @@ import { PROMPTS_TABLE_SELECT_FIELDS, supabaseAdmin } from '@/lib/supabase'
 
 /**
  * API route that returns all prompts for the calling user (based on the authorization token)
+ *
+ * This route is called by Highlight's Electron client.
  */
 export async function GET(request: Request) {
   const supabase = supabaseAdmin()
@@ -31,17 +33,13 @@ export async function GET(request: Request) {
   // Select all prompts that the user has added
   const { data: selectResult, error } = await supabase
     .from('added_prompts')
-    .select(`prompts(${PROMPTS_TABLE_SELECT_FIELDS})`)
+    .select(`prompts(${PROMPTS_TABLE_SELECT_FIELDS}), created_at`)
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
 
   if (error) {
     return Response.json({ error: error.message }, { status: 500 })
   }
-
-  let addedPrompts = selectResult
-    .filter((prompt): prompt is { prompts: NonNullable<typeof prompt.prompts> } => prompt.prompts !== null)
-    .map((prompt) => prompt.prompts)
 
   // Select all prompts that the user owns
   const { data: ownedPrompts, error: ownedPromptsError } = await supabase
@@ -54,23 +52,34 @@ export async function GET(request: Request) {
     return Response.json({ error: ownedPromptsError.message }, { status: 500 })
   }
 
-  // Append the unique owned prompts to addedPrompts
-  addedPrompts = [...addedPrompts, ...ownedPrompts]
-
-  // Sort out any duplicates
-  addedPrompts = addedPrompts.filter((prompt, index, self) => {
-    return index === self.findIndex((t) => t.external_id === prompt.external_id)
-  })
+  // Join the two arrays
+  const sortingArray = [...selectResult, ...ownedPrompts]
 
   // Sort by date created
-  addedPrompts.sort((a, b) => {
+  sortingArray.sort((a, b) => {
     return b.created_at.localeCompare(a.created_at)
   })
 
-  if (!selectResult) {
-    // Return an empty array since no prompts were found
-    return Response.json([], { status: 200 })
-  }
+  // Ensure that the outputted array is only prompts, no extra fields
+  const addedPrompts = sortingArray.map((prompt) => {
+    // Check if the prompt has the correct shape
+    if ('prompts' in prompt && prompt.prompts) {
+      return prompt.prompts
+    } else if ('external_id' in prompt) {
+      return prompt
+    } else {
+      console.error('Unexpected prompt structure:', prompt)
+      return null
+    }
+  })
 
-  return Response.json(addedPrompts, { status: 200 })
+  // Remove any nulls from the array
+  let filteredPrompts = addedPrompts.filter((prompt) => prompt !== null)
+
+  // Sort out any duplicates
+  filteredPrompts = filteredPrompts.filter((prompt, index, self) => {
+    return index === self.findIndex((t) => t.external_id === prompt.external_id)
+  })
+
+  return Response.json(filteredPrompts, { status: 200 })
 }
