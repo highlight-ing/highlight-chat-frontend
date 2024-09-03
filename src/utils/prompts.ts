@@ -346,6 +346,9 @@ export async function deletePrompt(externalId: string, authToken: string) {
   }
 }
 
+/**
+ * "Pins" a prompt to the user; adds the prompt to the user's added_prompts table.
+ */
 export async function addPromptToUser(externalId: string, authToken: string) {
   let userId: string
   try {
@@ -436,6 +439,9 @@ export async function getPromptAppBySlug(slug: string) {
   return { promptApp }
 }
 
+/**
+ * Records that a prompt was viewed by a user.
+ */
 export async function countPromptView(externalId: string, authToken: string) {
   let userId: string
   try {
