@@ -180,7 +180,9 @@ export const useSubmitQuery = () => {
     try {
       formData.append('conversation_id', conversationId)
 
+      console.log('isPromptApp: ', isPromptApp)
       const endpoint = isPromptApp ? 'chat/prompt-as-app' : 'chat/'
+      console.log('endpoint: ', endpoint)
 
       const abortController = new AbortController()
       abortControllerRef.current = abortController
@@ -343,7 +345,7 @@ export const useSubmitQuery = () => {
       }
 
       const accessToken = await getAccessToken()
-      await fetchResponse(conversationId, formData, accessToken, !!promptApp)
+      await fetchResponse(conversationId, formData, accessToken, promptApp ? true : false)
     }
   }
 
@@ -362,10 +364,12 @@ export const useSubmitQuery = () => {
       const formData = new FormData()
       formData.append('prompt', query)
 
-      const isPromptApp = promptApp?.is_handlebar_prompt ?? false
+      const isPromptApp = promptApp ? true : false
+      console.log('isPromptApp: ', isPromptApp)
+      console.log('promptApp: ', promptApp)
 
-      if (isPromptApp) {
-        formData.append('app_id', promptApp!.id.toString())
+      if (isPromptApp && promptApp!.external_id !== undefined) {
+        formData.append('app_id', promptApp!.external_id)
       }
 
       // Fetch windows information
