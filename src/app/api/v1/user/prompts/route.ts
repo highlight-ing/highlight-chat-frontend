@@ -33,6 +33,7 @@ export async function GET(request: Request) {
     .from('added_prompts')
     .select(`prompts(${PROMPTS_TABLE_SELECT_FIELDS})`)
     .eq('user_id', userId)
+    .order('created_at', { ascending: false })
 
   if (error) {
     return Response.json({ error: error.message }, { status: 500 })
@@ -47,6 +48,7 @@ export async function GET(request: Request) {
     .from('prompts')
     .select(`${PROMPTS_TABLE_SELECT_FIELDS}`)
     .eq('user_id', userId)
+    .order('created_at', { ascending: false })
 
   if (ownedPromptsError) {
     return Response.json({ error: ownedPromptsError.message }, { status: 500 })

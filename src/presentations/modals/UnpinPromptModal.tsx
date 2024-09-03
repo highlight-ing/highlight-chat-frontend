@@ -6,6 +6,7 @@ import { Prompt } from '@/types/supabase-helpers'
 import useAuth from '@/hooks/useAuth'
 import { removePromptFromUser } from '@/utils/prompts'
 import usePromptApps from '@/hooks/usePromptApps'
+import { trackEvent } from '@/utils/amplitude'
 import Highlight from '@highlight-ai/app-runtime'
 
 export interface UnpinPromptModalContext {
@@ -32,6 +33,10 @@ export default function UnpinPromptModal({ id, context }: ModalObjectProps) {
 
     Highlight.appStorage.delete(`ctas.promptAdded.${prompt.external_id}`)
     refreshPinnedPrompts(authToken)
+
+    trackEvent('HL Prompt Unpinned', {
+      prompt_id: prompt.external_id,
+    })
 
     closeModal(id)
 

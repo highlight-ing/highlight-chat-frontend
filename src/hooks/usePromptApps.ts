@@ -153,6 +153,7 @@ export default (loadPrompts?: boolean) => {
           timeout: 15000,
         })
       })
+
       try {
         //@ts-expect-error
         globalThis.highlight.internal.installApp(prompt.slug)

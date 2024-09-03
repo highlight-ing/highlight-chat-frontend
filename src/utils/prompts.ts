@@ -305,6 +305,7 @@ export async function fetchPinnedPrompts(authToken: string): Promise<{ error: st
     .from('added_prompts')
     .select(`prompts(${PROMPTS_TABLE_SELECT_FIELDS})`)
     .eq('user_id', userId)
+    .order('created_at', { ascending: false })
 
   if (pinnedPromptsError) {
     return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
