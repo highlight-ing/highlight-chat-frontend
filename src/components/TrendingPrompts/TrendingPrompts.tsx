@@ -2,10 +2,8 @@ import styles from './trending-prompts.module.scss'
 import variables from '@/variables.module.scss'
 import { Prompt } from '@/types/supabase-helpers'
 import { Setting } from 'iconsax-react'
-import { useState, useEffect } from 'react'
-import { PromptTag } from '@/types'
-import { useMemo } from 'react'
-import { PinnedPrompt } from '@/types'
+import { useState, useEffect, useMemo } from 'react'
+import { PromptTag, PinnedPrompt } from '@/types'
 import { supabaseLoader } from '@/lib/supabase'
 import Image from 'next/image'
 
@@ -121,7 +119,7 @@ const TrendingPromptsItem = ({
             position={'bottom'}
             tooltip={
               <div className={'flex flex-col gap-1'}>
-                Pin to Assistant
+                Pin to Assistant{'\n'}
                 <span className={'text-xs text-light-60'}>Show this prompt when you summon Highlight</span>
               </div>
             }
@@ -158,14 +156,16 @@ const TrendingPromptsItem = ({
         )}
       </div>
       <div className={styles.trendingPromptsItemFooter}>
-        <Badge variant="disabled">{publicUseNumber ? `${publicUseNumber} Uses` : 'No uses'}</Badge>
-        {tags &&
-          tags.length > 0 &&
-          tags.map((tag, index) => (
-            <Badge key={index} variant="disabled">
-              {tag.label}
-            </Badge>
-          ))}
+        <div className={styles.tagsContainer}>
+          <Badge variant="disabled">{publicUseNumber ? `${publicUseNumber} Uses` : 'No uses'}</Badge>
+          {tags &&
+            tags.length > 0 &&
+            tags.map((tag, index) => (
+              <Badge key={index - 1} variant="disabled">
+                {tag.label}
+              </Badge>
+            ))}
+        </div>
       </div>
     </div>
   )
