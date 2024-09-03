@@ -273,6 +273,7 @@ export const useSubmitQuery = () => {
       return
     }
     // // Check if the context is empty, only contains empty suggestion and attachments, or has no application data
+    //
     // if (!context.attachments || context.attachments.length === 0) {
     //   console.log(context.attachments)
     //   console.log('Empty or invalid context received, ignoring.')
@@ -304,7 +305,7 @@ export const useSubmitQuery = () => {
       setInputIsDisabled(true)
 
       const att = context.attachments || ([] as unknown)
-      const fileAttachments = att.filter((a) => a.type && fileAttachmentTypes.includes(a.type))
+      const fileAttachments = (att as FileAttachment[]).filter((a) => a.type && fileAttachmentTypes.includes(a.type))
 
       const conversationId = getOrCreateConversationId()
       addConversationMessage(conversationId!, {
