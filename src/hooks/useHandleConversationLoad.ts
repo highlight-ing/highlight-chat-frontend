@@ -13,6 +13,7 @@ export default function useHandleConversationLoad() {
   const conversationMessages = useStore((state) => state.conversationMessages)
   const updateConversationMessages = useStore((state) => state.updateConversationMessages)
   const setConversationLoading = useStore((state) => state.setConversationLoading)
+  const startNewConversation = useStore((state) => state.startNewConversation)
   const conversationLoadsRef = useRef<Record<string, number>>({})
   const { getPrompt, selectPrompt } = usePromptApps(false)
 
@@ -32,8 +33,9 @@ export default function useHandleConversationLoad() {
 
     const loadConversationMessages = async () => {
       try {
-        if (conversationLoadsRef.current[conversationId] > 30) {
-          console.error('Failed to load messages 30 times, skipping:', conversationId)
+        if (conversationLoadsRef.current[conversationId] >= 15) {
+          console.error('Failed to load messages 15 times, skipping:', conversationId)
+          startNewConversation()
           return
         }
         setConversationLoading(true)
