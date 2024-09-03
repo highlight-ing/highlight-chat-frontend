@@ -34,6 +34,7 @@ export default function useHandleConversationLoad() {
         setConversationLoading(true)
         const response = await get(`history/${conversationId}/messages`, {
           signal: abortController.signal,
+          version: 'v3',
         })
         if (!response.ok) {
           // @TODO Error handling
@@ -111,7 +112,7 @@ export default function useHandleConversationLoad() {
         const prompt = await getPrompt(chat.app_id)
         if (prompt) {
           console.log('Setting prompt app for conversation')
-          await selectPrompt(prompt, false)
+          await selectPrompt(prompt, false, false)
         }
       } else if (!chat.app_id && promptApp?.id) {
         console.log('Clearing prompt app for conversation')

@@ -18,6 +18,7 @@ import { getPromptAppBySlug } from '@/utils/prompts'
 import ToastContainer from '@/components/Toast/ToastContainer'
 import usePromptApps from '@/hooks/usePromptApps'
 import { useChatHistory } from '@/hooks/useChatHistory'
+import { Prompt } from '@/types/supabase-helpers'
 
 function processAttachments(attachments: any[]): Attachment[] {
   return attachments.map((attachment) => {
@@ -74,23 +75,32 @@ function processAttachments(attachments: any[]): Attachment[] {
 }
 
 function useContextReceivedHandler(navigateToNewChat: () => void) {
-  const { addAttachment, setHighlightContext, setInput, promptApp, startNewConversation, setPrompt, closeAllModals } =
-    useStore(
-      useShallow((state) => ({
-        addAttachment: state.addAttachment,
-        setHighlightContext: state.setHighlightContext,
-        setInput: state.setInput,
-        promptApp: state.promptApp,
-        startNewConversation: state.startNewConversation,
-        setPrompt: state.setPrompt,
-        closeAllModals: state.closeAllModals,
-      })),
-    )
+  const {
+    addAttachment,
+    setHighlightContext,
+    setInput,
+    promptApp,
+    startNewConversation,
+    setPrompt,
+    closeAllModals,
+    clearPrompt,
+  } = useStore(
+    useShallow((state) => ({
+      addAttachment: state.addAttachment,
+      setHighlightContext: state.setHighlightContext,
+      setInput: state.setInput,
+      promptApp: state.promptApp,
+      startNewConversation: state.startNewConversation,
+      setPrompt: state.setPrompt,
+      closeAllModals: state.closeAllModals,
+      clearPrompt: state.clearPrompt,
+    })),
+  )
 
   const { handleIncomingContext } = useSubmitQuery()
 
   useEffect(() => {
-    const debouncedHandleSubmit = debounce(300, async (context: HighlightContext) => {
+    const debouncedHandleSubmit = debounce(300, async (context: HighlightContext, promptApp?: Prompt) => {
       setInput(context.suggestion || '')
       await handleIncomingContext(context, navigateToNewChat, promptApp)
     })
@@ -98,10 +108,13 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
     const contextDestroyer = Highlight.app.addListener('onContext', async (context: HighlightContext) => {
       // Check if it's a prompt app, if so, we should set the prompt store
       // so that the newest conversation is set to use the prompt app
+
+      let res
+
       //@ts-expect-error
       if (context.promptSlug) {
         // @ts-expect-error
-        const res = await getPromptAppBySlug(context.promptSlug)
+        res = await getPromptAppBySlug(context.promptSlug)
 
         if (res && res.promptApp) {
           setPrompt({
@@ -112,6 +125,8 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
             prompt: res.promptApp.prompt_text ?? '',
           })
         }
+      } else {
+        clearPrompt()
       }
 
       // Close all modals
@@ -121,7 +136,7 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
       const attachments = processAttachments(context.attachments || []) as RuntimeAttachmentType[]
       const newContext = { ...context, attachments }
       setHighlightContext(newContext)
-      debouncedHandleSubmit(newContext)
+      debouncedHandleSubmit(newContext, res?.promptApp ?? undefined)
     })
 
     const attachmentDestroyer = Highlight.app.addListener('onConversationAttachment', (attachment: string) => {

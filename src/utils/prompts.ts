@@ -8,6 +8,7 @@ import { z } from 'zod'
 import mime from 'mime-types'
 import slugify from 'slugify'
 import { nanoid } from 'nanoid'
+import { PinnedPrompt } from '@/types'
 
 /**
  * This file contains all the server actions for interacting with prompts.
@@ -48,7 +49,7 @@ const SavePromptSchema = z.object({
   name: z.string().max(40, { message: 'Name must be less than 40 characters' }),
   description: z.string(),
   appPrompt: z.string(),
-  suggestionsPrompt: z.string(),
+  systemPrompt: z.string(),
   visibility: z.enum(['public', 'private']),
   videoUrl: videoUrlSchema,
   tags: z.array(z.object({ value: z.string(), label: z.string() })).optional(),
@@ -132,7 +133,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
     name: formData.get('name'),
     description: formData.get('description'),
     appPrompt: formData.get('appPrompt'),
-    suggestionsPrompt: formData.get('suggestionsPrompt'),
+    systemPrompt: formData.get('systemPrompt'),
     visibility: formData.get('visibility'),
     videoUrl: formData.get('videoUrl'),
     tags: JSON.parse(formData.get('tags') as string),
@@ -147,7 +148,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
     name: validated.data.name,
     description: validated.data.description,
     prompt_text: validated.data.appPrompt,
-    suggestion_prompt_text: validated.data.suggestionsPrompt,
+    system_prompt: validated.data.systemPrompt,
     public: validated.data.visibility === 'public',
     video_url: validated.data.videoUrl,
     user_id: userId,
@@ -289,7 +290,7 @@ export async function fetchPrompts(authToken: string) {
 /**
  * Fetches prompts from the database that the user has pinned.
  */
-export async function fetchPinnedPrompts(authToken: string) {
+export async function fetchPinnedPrompts(authToken: string): Promise<{ error: string } | PinnedPrompt[]> {
   let userId: string
   try {
     userId = await validateUserAuth(authToken)
@@ -310,7 +311,7 @@ export async function fetchPinnedPrompts(authToken: string) {
     return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
   }
 
-  return { prompts: pinnedPrompts }
+  return pinnedPrompts.map((p) => p.prompts) as PinnedPrompt[]
 }
 
 /**

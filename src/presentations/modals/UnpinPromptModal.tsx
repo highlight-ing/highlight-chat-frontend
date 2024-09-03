@@ -7,6 +7,7 @@ import useAuth from '@/hooks/useAuth'
 import { removePromptFromUser } from '@/utils/prompts'
 import usePromptApps from '@/hooks/usePromptApps'
 import { trackEvent } from '@/utils/amplitude'
+import Highlight from '@highlight-ai/app-runtime'
 
 export interface UnpinPromptModalContext {
   prompt: Prompt
@@ -15,7 +16,7 @@ export interface UnpinPromptModalContext {
 export default function UnpinPromptModal({ id, context }: ModalObjectProps) {
   const { prompt } = context as UnpinPromptModalContext
   const { getAccessToken } = useAuth()
-  const { refreshPrompts } = usePromptApps()
+  const { refreshPinnedPrompts } = usePromptApps()
 
   const addToast = useStore((state) => state.addToast)
 
@@ -30,7 +31,8 @@ export default function UnpinPromptModal({ id, context }: ModalObjectProps) {
       return
     }
 
-    refreshPrompts()
+    Highlight.appStorage.delete(`ctas.promptAdded.${prompt.external_id}`)
+    refreshPinnedPrompts(authToken)
 
     trackEvent('HL Prompt Unpinned', {
       prompt_id: prompt.external_id,

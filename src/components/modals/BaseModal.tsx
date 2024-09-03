@@ -97,7 +97,7 @@ const BaseModal = ({
   return (
     <div
       id={id}
-      className={`${styles.modalOverlay} ${position ?? ''}`}
+      className={`${styles.modalOverlay} ${position ? styles[position] : ''}`}
       onClick={(e) => {
         if (exitOnClick !== false) {
           close(e)

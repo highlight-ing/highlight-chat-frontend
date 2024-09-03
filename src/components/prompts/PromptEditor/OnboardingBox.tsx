@@ -11,8 +11,8 @@ export default function OnboardingBox({
   bottomComponent,
 }: {
   title: string
-  line1: string
-  line2: string
+  line1?: string
+  line2?: string
   buttonText: string
   onClick?: () => void
   bottomComponent?: React.ReactNode
@@ -22,8 +22,8 @@ export default function OnboardingBox({
   return (
     <div className="absolute bottom-0 h-1/2 w-full overflow-y-auto border-t border-[#FFFFFF] border-opacity-10 bg-[#222222] px-[28px] py-[33px]">
       <h2 className={styles.headingText}>{title}</h2>
-      <p className={styles.explainerText}>{line1}</p>
-      <p className={styles.explainerText}>{line2}</p>
+      {line1 && <p className={styles.explainerText}>{line1}</p>}
+      {line2 && <p className={styles.explainerText}>{line2}</p>}
       {bottomComponent ?? (
         <div className={styles.buttonContainer}>
           <Button size="large" variant="accent" onClick={onClick}>

@@ -12,6 +12,7 @@ import Image from 'next/image'
 // Components
 import Button from '@/components/Button/Button'
 import { Badge } from '@/components/Badge/Badge'
+import Tooltip from '@/components/Tooltip/Tooltip'
 
 const TrendingPrompts = ({
   userId,
@@ -27,7 +28,7 @@ const TrendingPrompts = ({
   selectPrompt: (prompt: Prompt) => void
 }) => {
   const mergedPrompts = useMemo(() => {
-    const pinnedPromptIds = new Set(pinnedPrompts.map((p) => p.prompts?.external_id))
+    const pinnedPromptIds = new Set(pinnedPrompts.map((p) => p?.external_id))
     return prompts.map((prompt) => ({
       ...prompt,
       isPinned: pinnedPromptIds.has(prompt.external_id),
@@ -90,7 +91,7 @@ const TrendingPromptsItem = ({
   description?: string
   slug: string
   color?: string
-  selectPrompt: (prompt: Prompt) => void
+  selectPrompt: (prompt: Prompt, startNewConversation?: boolean, pinPrompt?: boolean) => void
   prompt: Prompt
   tags?: PromptTag[] | null
   lastItem: boolean
@@ -124,20 +125,37 @@ const TrendingPromptsItem = ({
           <h3>{name}</h3>
         </div>
         <div className={styles.trendingPromptsItemHeaderRight}>
-          <Button
-            size="xsmall"
-            variant="tertiary"
-            className={styles.filledButton}
-            onClick={() => {
-              openModal('pin-prompt', { prompt })
-            }}
-            disabled={isPinned}
+          <Tooltip
+            position={'bottom'}
+            tooltip={
+              <div className={'flex flex-col gap-1'}>
+                Pin to Assistant
+                <span className={'text-xs text-light-60'}>Show this prompt when you summon Highlight</span>
+              </div>
+            }
           >
-            {isPinned ? 'Pinned' : 'Pin'}
-          </Button>
-          <Button className={styles.filledButton} size="xsmall" variant="primary" onClick={() => selectPrompt(prompt)}>
-            Chat
-          </Button>
+            <Button
+              size="xsmall"
+              variant="tertiary"
+              className={styles.filledButton}
+              onClick={() => {
+                openModal('pin-prompt', { prompt })
+              }}
+              disabled={isPinned}
+            >
+              {isPinned ? 'Pinned' : 'Pin'}
+            </Button>
+          </Tooltip>
+          <Tooltip position={'bottom'} tooltip={`Start a chat with ${prompt.name}`}>
+            <Button
+              className={styles.filledButton}
+              size="xsmall"
+              variant="primary"
+              onClick={() => selectPrompt(prompt, true, false)}
+            >
+              Chat
+            </Button>
+          </Tooltip>
         </div>
       </div>
       <div className={styles.trendingPromptsItemContent}>

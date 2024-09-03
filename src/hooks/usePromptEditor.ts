@@ -39,7 +39,7 @@ export function usePromptEditor() {
     formData.append('name', promptEditorData.name)
     formData.append('description', promptEditorData.description)
     formData.append('appPrompt', promptEditorData.appPrompt)
-    formData.append('suggestionsPrompt', promptEditorData.suggestionsPrompt)
+    formData.append('systemPrompt', promptEditorData.systemPrompt)
     formData.append('visibility', promptEditorData.visibility)
     formData.append('tags', JSON.stringify(promptEditorData.tags ?? []))
 
@@ -67,12 +67,12 @@ export function usePromptEditor() {
     }
 
     if (res?.new) {
-      // Since this is a new prompt, we need to "install" the prompt.
+      // Reload Electron's prompt apps
       try {
         //@ts-expect-error
-        globalThis.highlight.internal.installApp(res.prompt.slug)
+        globalThis.highlight.internal.reloadPrompts()
       } catch (err) {
-        console.error('Error installing app', err)
+        console.error('Error reloading prompts', err)
       }
 
       setPromptEditorData({
@@ -88,8 +88,10 @@ export function usePromptEditor() {
     }
 
     addToast({
-      title: 'Saved changes',
+      title: 'Prompt Updated',
+      description: 'Your latest prompt is active everywhere.',
       type: 'success',
+      timeout: 7500,
     })
 
     setNeedSave(false)
