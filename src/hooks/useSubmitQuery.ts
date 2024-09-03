@@ -305,7 +305,7 @@ export const useSubmitQuery = () => {
       setInputIsDisabled(true)
 
       const att = context.attachments || ([] as unknown)
-      const fileAttachments = (att as FileAttachment[]).filter((a) => a.type && fileAttachmentTypes.includes(a.type))
+      const fileAttachments = att.filter((a) => a.type && fileAttachmentTypes.includes(a.type))
 
       const conversationId = getOrCreateConversationId()
       addConversationMessage(conversationId!, {
@@ -316,7 +316,7 @@ export const useSubmitQuery = () => {
         audio,
         window: windowTitle ? { title: windowTitle, appIcon: appIcon, type: 'window' } : undefined,
         windows: windows,
-        file_attachments: fileAttachments,
+        file_attachments: fileAttachments as unknown as FileAttachment[],
       })
 
       setInput('')
