@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { AssistantMessage, BaseMessage, UserMessage } from '@/types'
 import { useStore } from '@/providers/store-provider'
 import { useApi } from '@/hooks/useApi'
@@ -13,6 +13,7 @@ export default function useHandleConversationLoad() {
   const conversationMessages = useStore((state) => state.conversationMessages)
   const updateConversationMessages = useStore((state) => state.updateConversationMessages)
   const setConversationLoading = useStore((state) => state.setConversationLoading)
+  const conversationLoadsRef = useRef<Record<string, number>>({})
   const { getPrompt, selectPrompt } = usePromptApps(false)
 
   useEffect(() => {
@@ -31,7 +32,12 @@ export default function useHandleConversationLoad() {
 
     const loadConversationMessages = async () => {
       try {
+        if (conversationLoadsRef.current[conversationId] > 30) {
+          console.error('Failed to load messages 30 times, skipping:', conversationId)
+          return
+        }
         setConversationLoading(true)
+        conversationLoadsRef.current[conversationId] = (conversationLoadsRef.current[conversationId] ?? 0) + 1
         const response = await get(`history/${conversationId}/messages`, {
           signal: abortController.signal,
           version: 'v3',
@@ -78,6 +84,7 @@ export default function useHandleConversationLoad() {
         } else {
           updateConversationMessages(conversationId, mappedMessages)
         }
+        delete conversationLoadsRef.current[conversationId]
       } catch (err) {
         console.error(err)
       } finally {
