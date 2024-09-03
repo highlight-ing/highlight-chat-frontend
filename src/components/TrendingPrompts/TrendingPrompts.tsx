@@ -37,7 +37,7 @@ const TrendingPrompts = ({
 
   return (
     <div className={styles.trendingPromptsContainer}>
-      {prompts.length > 0 ? (
+      {prompts.length > 0 && (
         <div className={styles.trendingPromptsHeader}>
           <h2>Top 10 Trending Prompts</h2>
           <div className={styles.trendingPrompts}>
@@ -59,14 +59,6 @@ const TrendingPrompts = ({
               />
             ))}
           </div>
-        </div>
-      ) : (
-        <div className={styles.emptyTrendingPrompts}>
-          <Setting color={variables.light20} variant={'Bold'} />
-          <p>Prompts you create or fork will be added here.</p>
-          <Button size="small" variant="tertiary" onClick={() => openModal('create-prompt')}>
-            Create Prompt
-          </Button>
         </div>
       )}
     </div>
