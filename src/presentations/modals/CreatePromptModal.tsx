@@ -9,12 +9,14 @@ import { useStore } from '@/providers/store-provider'
 import PromptSaveButton from '@/components/prompts/PromptEditor/PromptSaveButton'
 
 const CreatePromptModal = ({ id, context }: ModalObjectProps) => {
-  const { onboarding, promptEditorData, clearPromptEditorData, startTutorial } = usePromptEditorStore()
+  const { onboarding, promptEditorData, clearPromptEditorData, startTutorial, setSelectedScreen } =
+    usePromptEditorStore()
   const closeModal = useStore((state) => state.closeModal)
 
   const shouldShowTutorial = !onboarding.hasOnboardedOnceBefore && promptEditorData.externalId === undefined
 
   useEffect(() => {
+    setSelectedScreen('app')
     clearPromptEditorData()
 
     if (shouldShowTutorial) {
