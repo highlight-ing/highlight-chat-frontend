@@ -16,7 +16,9 @@ const CreatePromptModal = ({ id, context }: ModalObjectProps) => {
 
   useEffect(() => {
     clearPromptEditorData()
+  }, [])
 
+  useEffect(() => {
     if (shouldShowTutorial) {
       // If the user has not onboarded once before & is making a new prompt, we should show the tutorial
       startTutorial()

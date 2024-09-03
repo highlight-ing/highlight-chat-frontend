@@ -134,7 +134,7 @@ Clipboard Text: {{clipboard_text}}
 `
 
 export const initialPromptEditorState: PromptEditorState = {
-  selectedScreen: 'startWithTemplate',
+  selectedScreen: 'app',
   promptEditorData: {
     slug: '',
     appPrompt: '',
