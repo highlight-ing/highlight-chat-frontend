@@ -1,8 +1,8 @@
 import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import React, { Fragment } from 'react'
-
-import { AssistantIcon } from '@/icons/icons'
+import variables from '@/variables.module.scss'
+import { AssistantIcon, PersonalizeIcon } from '@/icons/icons'
 import { Message as MessageType, UserMessage } from '../../types'
 import { Attachment } from '../Attachment'
 
@@ -13,6 +13,7 @@ import CodeBlock from '@/components/Messages/CodeBlock'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import 'katex/dist/katex.min.css'
+import Button from '@/components/Button/Button'
 
 // @ts-ignore
 import { BlockMath, InlineMath } from 'react-katex'
@@ -164,6 +165,18 @@ export const Message = ({ message, isThinking }: MessageProps) => {
               {typeof message.content === 'string' ? preprocessLaTeX(message.content) : ''}
             </Markdown>
           </div>
+          {message.personalize && (
+            <Button
+              size="large"
+              variant="ghost"
+              onClick={() => {
+                window.open('highlight://settings/about-me', '_blank')
+              }}
+            >
+              <PersonalizeIcon size={24} color={variables.light80} />
+              <span className={styles.personalizeText}>Personalize your About Me</span>
+            </Button>
+          )}
         </div>
       ) : (
         <span className={styles.thinking}>

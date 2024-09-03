@@ -214,7 +214,7 @@ export const useSubmitQuery = () => {
 
         checkAbortSignal()
 
-        const newContent = await parseAndHandleStreamChunk(chunk, {
+        const { content: accumulatedContent, personalize } = await parseAndHandleStreamChunk(chunk, {
           formData,
           addAttachment,
           showConfirmationModal,
@@ -222,11 +222,20 @@ export const useSubmitQuery = () => {
           handleSubmit,
         })
 
-        if (newContent) {
-          accumulatedMessage += newContent
+        if (personalize) {
           updateLastConversationMessage(conversationId, {
             role: 'assistant',
             content: accumulatedMessage,
+            personalize: personalize,
+          })
+        }
+
+        if (accumulatedContent) {
+          accumulatedMessage += accumulatedContent
+          updateLastConversationMessage(conversationId, {
+            role: 'assistant',
+            content: accumulatedMessage,
+            personalize: personalize,
           })
         }
       }

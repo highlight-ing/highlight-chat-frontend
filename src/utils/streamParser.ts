@@ -15,7 +15,7 @@ export async function parseAndHandleStreamChunk(
 ) {
   let contextConfirmed: boolean | null = null
   let accumulatedContent = ''
-
+  let personalize = false
   // Split the chunk into individual data objects
   const dataObjects = chunk.split(/\n(?=data: )/)
 
@@ -49,11 +49,17 @@ export async function parseAndHandleStreamChunk(
               }
             }
           }
+          if (jsonChunk.name === 'ask_user_to_personalize') {
+            if (jsonChunk.input.personalize === true) {
+              console.log('personalize', jsonChunk.input.personalize)
+              personalize = true
+            }
+          }
           break
 
         case 'done':
-          // Message is complete, return the accumulated content
-          return accumulatedContent
+          // Return both accumulated content and personalize flag
+          return { content: accumulatedContent, personalize }
 
         case 'message_delta':
           // Handle message delta if needed
@@ -84,8 +90,8 @@ export async function parseAndHandleStreamChunk(
     }
   }
 
-  // If we haven't returned yet, return the accumulated content
-  return accumulatedContent
+  // If we haven't returned yet, return the accumulated content and personalize flag
+  return { content: accumulatedContent, personalize }
 }
 
 async function handleWindowContext(
