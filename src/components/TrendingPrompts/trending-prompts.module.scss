@@ -131,5 +131,15 @@
     justify-content: flex-start;
     width: 100%;
     gap: 8px;
+    overflow: hidden; // Hide overflow
+
+    .tagsContainer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      overflow-x: auto;
+      max-width: calc(100% - 80px); // Adjust based on the width of the "Uses" badge
+      padding-bottom: 8px; // Space for scrollbar
+    }
   }
 }
