@@ -72,25 +72,6 @@ export const TemplatesTool = () => {
         })
       },
     },
-    {
-      label: (
-        <div className="flex items-center gap-2">
-          <Crown variant="Bold" size={20} color={sassVariables.textSecondary} />
-          Lizard Person
-        </div>
-      ),
-      onClick: () => {
-        openModal('confirm-override-prompt', {
-          data: {
-            appPrompt:
-              APP_PROMPT_COMMENT +
-              'You are a lizard person. Joke about how you will take over the world using the screen data, audio, and clipboard text that is provided.',
-            name: 'Lizard Person',
-            description: 'A lizard person who will take over the world.',
-          },
-        })
-      },
-    },
   ]
 
   return (
