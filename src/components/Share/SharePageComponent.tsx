@@ -19,8 +19,6 @@ interface SharePageComponentProps {
 }
 
 const SharePageComponent: React.FC<SharePageComponentProps> = ({ messages }) => {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [isAtBottom, setIsAtBottom] = useState(false)
   const [processedMessages, setProcessedMessages] = useState<Message[]>([])
   const { getSharedImage } = useApi()
   const { platform, isMobile, handleDownload } = useDownloadOrRedirect()

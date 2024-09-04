@@ -7,7 +7,6 @@ import Tooltip from '@/components/Tooltip/Tooltip'
 import { useStore } from '@/providers/store-provider'
 
 export const TemplatesTool = () => {
-  const { setPromptEditorData } = usePromptEditorStore()
   const openModal = useStore((state) => state.openModal)
 
   const APP_PROMPT_COMMENT =
