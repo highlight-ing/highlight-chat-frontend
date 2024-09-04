@@ -265,13 +265,30 @@ export const AttachmentsButton = () => {
   const acceptTypes =
     'text/*,image/*,application/pdf,application/json,application/xml,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.presentationml.presentation,.md'
 
+  const openMenu = () => {
+    const element = document.getElementById('attachments-button')
+    if (element) {
+      setTimeout(() => {
+        element.click()
+      }, 50)
+    }
+  }
+
   return (
     <>
       <ContextMenu position="top" triggerId="attachments-button" leftClick={true} items={menuItems}>
         {
           // @ts-ignore
           ({ isOpen }) => (
-            <Tooltip tooltip={isOpen ? '' : 'Attach files & context'} position={'top'}>
+            <Tooltip tooltip={isOpen || screenshotPickerVisible ? '' : 'Attach files & context'} position={'top'}>
+              <ScreenshotAttachmentPicker
+                isVisible={screenshotPickerVisible}
+                onClose={() => {
+                  setScreenshotPickerVisible(false)
+                  trackEvent('HL Chat Screenshot Picker Closed', {})
+                }}
+                onBack={openMenu}
+              />
               <button type="button" className={styles.button} id="attachments-button">
                 <PaperclipIcon />
                 <input
@@ -286,13 +303,6 @@ export const AttachmentsButton = () => {
           )
         }
       </ContextMenu>
-      <ScreenshotAttachmentPicker
-        isVisible={screenshotPickerVisible}
-        onClose={() => {
-          setScreenshotPickerVisible(false)
-          trackEvent('HL Chat Screenshot Picker Closed', {})
-        }}
-      />
     </>
   )
 }
