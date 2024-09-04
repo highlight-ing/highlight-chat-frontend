@@ -12,7 +12,7 @@ import {
 } from './chat-attachments'
 import { ConversationSlice, ConversationState, createConversationSlice, initialConversationState } from './conversation'
 import { PromptSlice, PromptState, createPromptSlice, initialPromptState } from './prompt'
-import { PromptsSlice, PromptsState, createPromptsSlice, initialPromptsState } from './prompts'
+import { PromptsSlice, createPromptsSlice, initialPromptsState } from './prompts'
 import { AboutMeSlice, AboutMeState, createAboutMeSlice, initialAboutMeState } from './about-me'
 import {
   HighlightContextSlice,
@@ -109,6 +109,14 @@ export const createStore = (initState: StoreState = defaultState) => {
           // This is the "Prompt Editor" onboarding, we persist this state because
           // we want to only show the onboarding once automatically.
           onboarding: state.onboarding,
+          /**
+           * Store the auth state in persistent storage.
+           */
+          accessToken: state.accessToken,
+          refreshToken: state.refreshToken,
+          userId: state.userId,
+          userIsAnonymous: state.userIsAnonymous,
+          authExpiration: state.authExpiration,
         }),
       },
     ),

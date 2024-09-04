@@ -1,4 +1,4 @@
-import { jwtVerify } from 'jose'
+import { jwtVerify, JWTPayload, JWTVerifyResult } from 'jose'
 
 /**
  * Validates a JWT from the Highlight auth service.
@@ -28,4 +28,22 @@ export function extractBearerToken(headers: Headers): string | null {
 
   // Return null if the Bearer token is not found
   return null
+}
+
+export async function validateUserAuth(authToken: string) {
+  let jwt: JWTVerifyResult<JWTPayload>
+
+  try {
+    jwt = await validateHighlightJWT(authToken)
+  } catch (error) {
+    throw new Error('Invalid auth token')
+  }
+
+  const userId = jwt.payload.sub
+
+  if (!userId) {
+    throw new Error('User ID not found in auth token')
+  }
+
+  return userId
 }

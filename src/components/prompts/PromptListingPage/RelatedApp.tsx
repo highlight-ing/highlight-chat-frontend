@@ -2,7 +2,6 @@
 
 import Button from '@/components/Button/Button'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
 
 function AppIcon() {

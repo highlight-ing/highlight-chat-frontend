@@ -21,6 +21,9 @@ export function usePromptEditor() {
     setSaveDisabled(!(settingsHasNoErrors && needSave && !saving))
   }, [settingsHasNoErrors, needSave, saving])
 
+  /**
+   * Saves the prompt data from the prompt-editor store to the database.
+   */
   async function save() {
     setSaving(true)
 
@@ -44,7 +47,6 @@ export function usePromptEditor() {
     formData.append('tags', JSON.stringify(promptEditorData.tags ?? []))
 
     if (promptEditorData.videoUrl) {
-      console.log('appending the video url', promptEditorData.videoUrl)
       formData.append('videoUrl', promptEditorData.videoUrl)
     }
 

@@ -77,6 +77,11 @@ export default async function PromptPage({ params }: PromptPageProps) {
     })
   }
 
+  // Attempt to select the user's username
+  const { data: user } = await supabase.from('profiles').select('username').eq('user_id', prompt.user_id).maybeSingle()
+
+  const author = user?.username ?? 'Highlight User'
+
   return (
     <div className="min-h-screen bg-bg-layer-1">
       <div className="flex flex-row items-center border-b border-b-light-5 p-2">
@@ -92,7 +97,7 @@ export default async function PromptPage({ params }: PromptPageProps) {
           imageExtension={prompt.user_images?.file_extension ?? undefined}
           slug={prompt.slug ?? ''}
           name={prompt.name}
-          author={'Unknown'}
+          author={author}
           description={prompt.description ?? ''}
           relatedApps={relatedApps}
           videoUrl={prompt.video_url ?? undefined}

@@ -8,7 +8,7 @@ export default function TryButton({ slug }: { slug: string }) {
   }
 
   return (
-    <Button size="xlarge" variant="primary" onClick={handleClick}>
+    <Button className="w-full" size="xlarge" variant="primary" onClick={handleClick}>
       Try for free
     </Button>
   )
