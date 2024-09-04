@@ -170,11 +170,17 @@ export const Message = ({ message, isThinking }: MessageProps) => {
               size="large"
               variant="ghost"
               onClick={() => {
-                window.open('highlight://settings/about-me', '_blank')
+                if (message.info !== '') {
+                  window.open(`highlight://settings/about-me?info=${message.info}`, '_blank')
+                } else {
+                  window.open(`highlight://settings/about-me`, '_blank')
+                }
               }}
             >
               <PersonalizeIcon size={24} color={variables.light80} />
-              <span className={styles.personalizeText}>Personalize your About Me</span>
+              <span className={styles.personalizeText}>
+                {message.info !== '' ? 'Add info to your About Me' : 'Personalize your About Me'}
+              </span>
             </Button>
           )}
         </div>

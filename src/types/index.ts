@@ -26,11 +26,13 @@ export type UserMessage = BaseMessage & {
   file_attachments?: Attachment[]
   window_context?: string
   personalize?: boolean
+  info?: string
 }
 
 export type AssistantMessage = BaseMessage & {
   role: 'assistant'
   personalize?: boolean
+  info?: string
 }
 
 export type Message = UserMessage | AssistantMessage
