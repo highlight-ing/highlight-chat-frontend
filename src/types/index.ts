@@ -104,7 +104,11 @@ export interface ChatHistoryItem {
   title: string
   updated_at: string
   user_id: string
-  shared_conversations?: string[]
+  shared_conversations?: {
+    created_at: string
+    id: string
+    title: string
+  }[]
 }
 
 export interface ModalObjectProps {
