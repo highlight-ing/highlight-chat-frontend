@@ -79,13 +79,29 @@ export const createConversationSlice: StateCreator<Store, [], [], ConversationSl
   setShareId: (conversationId: string, shareId: string | null) => {
     const conversations = get().openConversations
     const updatedConversations = conversations.map((conv) =>
-      conv.id === conversationId ? { ...conv, shared_id: shareId } : conv,
+      conv.id === conversationId
+        ? {
+            ...conv,
+            shared_conversations: shareId
+              ? [{ created_at: new Date().toISOString(), id: shareId, title: conv.title }]
+              : [],
+          }
+        : conv,
     )
     set({ openConversations: updatedConversations })
 
     // Also update the history if the conversation exists there
     const history = get().history
-    const updatedHistory = history.map((conv) => (conv.id === conversationId ? { ...conv, shared_id: shareId } : conv))
+    const updatedHistory = history.map((conv) =>
+      conv.id === conversationId
+        ? {
+            ...conv,
+            shared_conversations: shareId
+              ? [{ created_at: new Date().toISOString(), id: shareId, title: conv.title }]
+              : [],
+          }
+        : conv,
+    )
     set({ history: updatedHistory })
   },
 })
