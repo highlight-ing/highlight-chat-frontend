@@ -22,6 +22,7 @@ import makeAnimated from 'react-select/animated'
 import { PromptTag } from '@/types'
 import OnboardingBox from '../OnboardingBox'
 import TemplateSelectorBox from '../TemplateSelectorBox'
+import { trackEvent } from '@/utils/amplitude'
 
 function AppIcon() {
   return (
@@ -110,6 +111,13 @@ function ShareLinkButton() {
   const [copied, setCopied] = useState(false)
 
   function onCopyLinkClick() {
+    trackEvent('Prompt Editor', {
+      action: 'Share Link Copied',
+      promptId: promptEditorData.externalId,
+      promptSlug: promptEditorData.slug,
+      promptName: promptEditorData.name,
+    })
+
     if (timeout.current) {
       clearTimeout(timeout.current)
     }
@@ -147,6 +155,13 @@ function DeletePromptButton() {
   const isNewPrompt = !promptEditorData.externalId
 
   async function _onDelete() {
+    trackEvent('Prompt Editor', {
+      action: 'Delete Prompt',
+      promptId: promptEditorData.externalId,
+      promptSlug: promptEditorData.slug,
+      promptName: promptEditorData.name,
+    })
+
     if (!promptEditorData.externalId) {
       return
     }
