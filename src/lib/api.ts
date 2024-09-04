@@ -3,7 +3,7 @@ import { SharedChat } from '@/types'
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080/'
 
 interface RequestOptions {
-  version?: 'v1'
+  version?: 'v1' | 'v3'
   signal?: AbortSignal
 }
 

@@ -12,7 +12,7 @@ interface SharePageProps {
 }
 
 export async function generateMetadata({ params }: SharePageProps): Promise<Metadata> {
-  const sharedData = await getSharedConversation(params.id)
+  const sharedData = await getSharedConversation(params.id, { version: 'v3' })
   if (!sharedData) {
     return {
       title: 'Shared Conversation | Your App Name',
