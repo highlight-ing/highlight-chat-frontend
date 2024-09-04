@@ -15,7 +15,7 @@ const useOnExternalMessage = () => {
     setConversationId: state.setConversationId,
     addConversationMessage: state.addConversationMessage,
   }))
-  const { clearPrompt } = usePromptApps()
+  //   const { clearPrompt } = usePromptApps()
 
   useEffect(() => {
     const removeListener = Highlight.app.addListener('onExternalMessage', async (caller: string, message: any) => {
@@ -60,7 +60,7 @@ const useOnExternalMessage = () => {
     return () => {
       removeListener()
     }
-  }, [router, get, startNewConversation, setConversationId, addConversationMessage, clearPrompt])
+  }, [router, get, startNewConversation, setConversationId, addConversationMessage])
 }
 
 export default useOnExternalMessage
