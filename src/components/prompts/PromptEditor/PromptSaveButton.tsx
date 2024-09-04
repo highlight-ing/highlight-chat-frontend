@@ -14,12 +14,20 @@ export default function PromptSaveButton() {
     if (saveMode) {
       trackEvent('Prompt Editor', {
         action: 'Save clicked',
+        isNewPrompt: isNewPrompt,
+        promptName: promptEditorData.name,
+        promptSlug: promptEditorData.slug,
+        promptId: promptEditorData.externalId,
       })
 
       save()
     } else {
       trackEvent('Prompt Editor', {
         action: 'Next clicked',
+        isNewPrompt: isNewPrompt,
+        promptName: promptEditorData.name,
+        promptSlug: promptEditorData.slug,
+        promptId: promptEditorData.externalId,
       })
 
       setSelectedScreen('settings')

@@ -159,6 +159,27 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          created_at: string
+          id: number
+          user_id: string
+          username: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          user_id: string
+          username?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          user_id?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
       prompt_usages: {
         Row: {
           created_at: string
@@ -193,6 +214,7 @@ export type Database = {
       }
       prompts: {
         Row: {
+          can_trend: boolean | null
           created_at: string
           description: string | null
           external_id: string
@@ -212,6 +234,7 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          can_trend?: boolean | null
           created_at?: string
           description?: string | null
           external_id?: string
@@ -231,6 +254,7 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          can_trend?: boolean | null
           created_at?: string
           description?: string | null
           external_id?: string
@@ -263,7 +287,7 @@ export type Database = {
         Row: {
           audio: string | null
           clipboard_text: string | null
-          content: string
+          content: string | null
           context: string | null
           conversation_id: string
           created_at: string
@@ -278,7 +302,7 @@ export type Database = {
         Insert: {
           audio?: string | null
           clipboard_text?: string | null
-          content: string
+          content?: string | null
           context?: string | null
           conversation_id?: string
           created_at?: string
@@ -293,7 +317,7 @@ export type Database = {
         Update: {
           audio?: string | null
           clipboard_text?: string | null
-          content?: string
+          content?: string | null
           context?: string | null
           conversation_id?: string
           created_at?: string

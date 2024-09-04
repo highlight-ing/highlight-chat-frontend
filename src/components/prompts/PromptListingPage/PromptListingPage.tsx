@@ -39,6 +39,8 @@ export default function PromptListingPage({
   image,
   imageExtension,
 }: PromptListingPageProps) {
+  const newVideoUrl = videoUrl ?? 'https://vimeo.com/1001298855'
+
   return (
     <div>
       <div className="grid grid-flow-col gap-4">
@@ -59,9 +61,9 @@ export default function PromptListingPage({
             <TryButton slug={slug} />
           </div>
         </div>
-        {videoUrl && (
+        {newVideoUrl && (
           <div className="aspect-w-16 aspect-h-9 flex items-center justify-center">
-            <Video url={videoUrl} />
+            <Video url={newVideoUrl} />
           </div>
         )}
       </div>

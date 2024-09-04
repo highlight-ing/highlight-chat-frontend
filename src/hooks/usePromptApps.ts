@@ -2,7 +2,6 @@ import { useStore } from '@/providers/store-provider'
 import { addPromptToUser, countPromptView, fetchPrompts, fetchPinnedPrompts, fetchPromptText } from '@/utils/prompts'
 import useAuth from '@/hooks/useAuth'
 import { Prompt } from '@/types/supabase-helpers'
-import { PinnedPrompt } from '@/types'
 import { useShallow } from 'zustand/react/shallow'
 import { useEffect, useMemo, useState } from 'react'
 import { trackEvent } from '@/utils/amplitude'
@@ -93,7 +92,7 @@ export default (loadPrompts?: boolean) => {
       //@ts-expect-error
       globalThis.highlight.internal.reloadPrompts()
     } catch (err) {
-      console.error('Error installing app', err)
+      console.error('Error reloading prompts', err)
     }
   }
 

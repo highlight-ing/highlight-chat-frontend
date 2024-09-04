@@ -7,7 +7,6 @@ import {
   MessageProgramming,
   MessageText1,
   Monitor,
-  Shapes,
   Sound,
   TextalignLeft,
 } from 'iconsax-react'

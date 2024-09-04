@@ -1,11 +1,18 @@
-import { refreshTokens } from '@/app/(app)/actions'
+import { refreshTokens, updateUserInfo } from '@/app/(app)/actions'
 import { useStore } from '@/providers/store-provider'
 import Highlight from '@highlight-ai/app-runtime'
 import { decodeJwt } from 'jose'
-import { useEffect } from 'react'
 
-async function getNewTokens(): Promise<{ accessToken: string; refreshToken: string; authExpiration: number }> {
+interface TokensResponse {
+  accessToken: string
+  refreshToken: string
+  authExpiration: number
+  userId?: string
+}
+async function getNewTokens(): Promise<TokensResponse> {
   const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await Highlight.auth.signIn()
+
+  updateUserInfo(newAccessToken)
 
   const payload = decodeJwt(newAccessToken)
 
@@ -15,19 +22,17 @@ async function getNewTokens(): Promise<{ accessToken: string; refreshToken: stri
     throw new Error('Invalid access token, missing subscriber id (user ID) in the payload.')
   }
 
-  return { accessToken: newAccessToken, refreshToken: newRefreshToken, authExpiration: exp }
+  return { accessToken: newAccessToken, refreshToken: newRefreshToken, authExpiration: exp, userId: payload.sub }
 }
 
-async function attemptToRefreshTokens(oldRefreshToken: string): Promise<{
-  accessToken: string
-  refreshToken: string
-  authExpiration: number
-}> {
+async function attemptToRefreshTokens(oldRefreshToken: string): Promise<TokensResponse> {
   // Attempt to refresh the tokens
   try {
     const refreshTokensResponse = await refreshTokens(oldRefreshToken)
 
     console.log('[useAuth] Refreshed tokens from backend.')
+
+    updateUserInfo(refreshTokensResponse.access_token)
 
     const payload = decodeJwt(refreshTokensResponse.access_token)
 
@@ -35,6 +40,7 @@ async function attemptToRefreshTokens(oldRefreshToken: string): Promise<{
       accessToken: refreshTokensResponse.access_token,
       refreshToken: refreshTokensResponse.refresh_token,
       authExpiration: payload.exp ?? 0,
+      userId: payload.sub,
     }
   } catch (error) {
     // If the refresh fails, get new tokens
@@ -50,18 +56,13 @@ let requestPromise: Promise<string> | null = null
  * @todo Add persistant store to Zustand, this hook matter that much without persistant storage.
  */
 export default function useAuth() {
-  let { accessToken, refreshToken, authExpiration, setAuth } = useStore((state) => ({
+  let { accessToken, refreshToken, authExpiration, setAuth, userId } = useStore((state) => ({
     accessToken: state.accessToken,
     refreshToken: state.refreshToken,
     setAuth: state.setAuth,
     authExpiration: state.authExpiration,
+    userId: state.userId,
   }))
-
-  // Keeps track of the promise to fetch/refresh tokens
-
-  // Hook that checks if the auth state in Highlight has changed, if so,
-  // we need to update the auth state in the store
-  useEffect(() => {}, [])
 
   /**
    * Fetches tokens from the auth store or fetches new ones if they don't exist.
@@ -74,6 +75,7 @@ export default function useAuth() {
 
     // Check if the store already has tokens
     if (!accessToken || !refreshToken || !authExpiration || forceNewTokens) {
+      console.log(accessToken, refreshToken, authExpiration, forceNewTokens)
       console.log('[useAuth] No existing auth tokens found, getting new tokens.')
       requestPromise = getNewTokens()
         .then((tokens) => {
@@ -109,5 +111,5 @@ export default function useAuth() {
     return accessToken
   }
 
-  return { getAccessToken }
+  return { getAccessToken, userId }
 }
