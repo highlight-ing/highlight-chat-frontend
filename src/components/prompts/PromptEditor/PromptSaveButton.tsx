@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button'
 import { usePromptEditor } from '@/hooks/usePromptEditor'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
+import { trackEvent } from '@/utils/amplitude'
 
 export default function PromptSaveButton() {
   const { save, saveDisabled } = usePromptEditor()
@@ -11,8 +12,16 @@ export default function PromptSaveButton() {
 
   function onButtonClick() {
     if (saveMode) {
+      trackEvent('Prompt Editor', {
+        action: 'Save clicked',
+      })
+
       save()
     } else {
+      trackEvent('Prompt Editor', {
+        action: 'Next clicked',
+      })
+
       setSelectedScreen('settings')
     }
   }

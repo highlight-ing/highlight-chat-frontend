@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react'
 import { useApi } from '@/hooks/useApi'
 import { useStore } from '@/providers/store-provider'
 import { ChatHistoryItem } from '@/types'

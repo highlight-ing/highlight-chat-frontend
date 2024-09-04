@@ -7,17 +7,10 @@ import { buildSuggestions } from '@/lib/IntelliPrompt'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { TemplatesTool } from '@/components/prompts/PromptEditor/Toolbar/TemplatesTool'
 import { VariablesTool } from '@/components/prompts/PromptEditor/Toolbar/VariablesTool'
-import { ConditionsTool } from '@/components/prompts/PromptEditor/Toolbar/ConditionsTool'
+import { trackEvent } from '@/utils/amplitude'
 
 function Loading() {
   return <span className="text-sm text-gray-500">Loading editor...</span>
-}
-
-interface PromptVariable {
-  icon: React.ReactNode
-  label: string
-  insertText: string
-  description: string
 }
 
 const VariablePhrases = [
@@ -241,6 +234,11 @@ export default function IntelliPrompt({ value, onChange }: { value?: string; onC
   }
 
   const onVariableClick = useCallback((variable: string, phrase: string) => {
+    trackEvent('Prompt Editor', {
+      action: 'Variable clicked',
+      variable: variable,
+    })
+
     const editor = monacoRef.current?.editor?.getEditors?.()?.[0]
 
     const isCaretOnNewLine = (): boolean => {

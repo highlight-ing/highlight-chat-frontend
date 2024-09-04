@@ -5,6 +5,7 @@ import { Prompt } from '@/types/supabase-helpers'
 import { PinnedPrompt } from '@/types'
 import { useShallow } from 'zustand/react/shallow'
 import { useEffect, useMemo, useState } from 'react'
+import { trackEvent } from '@/utils/amplitude'
 
 let loadPromptsPromise: Promise<Prompt[]> | null = null
 
@@ -97,6 +98,13 @@ export default (loadPrompts?: boolean) => {
   }
 
   const selectPrompt = async (prompt: Prompt, isNewConversation?: boolean, pinPrompt?: boolean) => {
+    trackEvent('Prompt Apps', {
+      action: 'Prompt selected',
+      promptName: prompt.name,
+      promptSlug: prompt.slug,
+      promptId: prompt.external_id,
+    })
+
     if (!prompt.slug) {
       return
     }
