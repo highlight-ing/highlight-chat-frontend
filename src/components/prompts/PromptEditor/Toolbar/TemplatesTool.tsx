@@ -7,7 +7,6 @@ import Tooltip from '@/components/Tooltip/Tooltip'
 import { useStore } from '@/providers/store-provider'
 
 export const TemplatesTool = () => {
-  const { setPromptEditorData } = usePromptEditorStore()
   const openModal = useStore((state) => state.openModal)
 
   const APP_PROMPT_COMMENT =
@@ -68,25 +67,6 @@ export const TemplatesTool = () => {
             name: 'Blog Post Generator',
             description:
               'A blog post generator that will generate a blog post based on the screen data that is provided.',
-          },
-        })
-      },
-    },
-    {
-      label: (
-        <div className="flex items-center gap-2">
-          <Crown variant="Bold" size={20} color={sassVariables.textSecondary} />
-          Lizard Person
-        </div>
-      ),
-      onClick: () => {
-        openModal('confirm-override-prompt', {
-          data: {
-            appPrompt:
-              APP_PROMPT_COMMENT +
-              'You are a lizard person. Joke about how you will take over the world using the screen data, audio, and clipboard text that is provided.',
-            name: 'Lizard Person',
-            description: 'A lizard person who will take over the world.',
           },
         })
       },

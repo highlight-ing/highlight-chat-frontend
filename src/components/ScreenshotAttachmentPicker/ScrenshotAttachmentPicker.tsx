@@ -6,20 +6,43 @@ import styles from './screenshot-attachment-picker.module.scss'
 import { useEffect, useRef, useState } from 'react'
 import { CloseIcon } from '@/icons/icons'
 import { trackEvent } from '@/utils/amplitude'
+import { ArrowCircleLeft, CloseCircle } from 'iconsax-react'
+import { Portal } from 'react-portal'
 
 interface ScreenshotAttachmentPickerProps {
   isVisible: boolean
   onClose: () => void
+  onBack: () => void
 }
 
-export const ScreenshotAttachmentPicker = ({ isVisible, onClose }: ScreenshotAttachmentPickerProps) => {
+export const ScreenshotAttachmentPicker = ({ isVisible, onClose, onBack }: ScreenshotAttachmentPickerProps) => {
   const [windows, setWindows] = useState<{ windowTitle: string; appIcon?: string }[]>([])
   const [displays, setDisplays] = useState<{ thumbnail: string }[]>([])
+  const [portalStyles, setPortalStyles] = useState<React.CSSProperties>({})
 
   const addAttachment = useStore((state) => state.addAttachment)
 
-  const outerContainerRef = useRef<HTMLDivElement>(null)
-  const innerContainerRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const portalRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!containerRef.current) return
+
+    const newStyles: React.CSSProperties = {
+      position: 'fixed',
+    }
+
+    const targetRect = containerRef.current.getBoundingClientRect()
+    newStyles.top = targetRect.top - 500
+    newStyles.left = targetRect.left
+
+    if (targetRect.top - 500 < 0) {
+      newStyles.top = 50
+      newStyles.maxHeight = targetRect.top
+    }
+
+    setPortalStyles(newStyles)
+  }, [isVisible])
 
   useEffect(() => {
     if (isVisible) {
@@ -29,13 +52,8 @@ export const ScreenshotAttachmentPicker = ({ isVisible, onClose }: ScreenshotAtt
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        outerContainerRef.current &&
-        innerContainerRef.current &&
-        !innerContainerRef.current.contains(event.target as Node) &&
-        outerContainerRef.current.contains(event.target as Node)
-      ) {
-        handleClose()
+      if (portalRef.current && !portalRef.current.contains(event.target as Node)) {
+        onClose()
       }
     }
 
@@ -48,6 +66,11 @@ export const ScreenshotAttachmentPicker = ({ isVisible, onClose }: ScreenshotAtt
   const handleClose = () => {
     trackEvent('HL Chat Screenshot Picker Closed', {})
     onClose()
+  }
+
+  const handleBack = () => {
+    onClose()
+    onBack()
   }
 
   const onAddScreenshot = async (screenshot: string, source: 'display' | 'window') => {
@@ -92,41 +115,40 @@ export const ScreenshotAttachmentPicker = ({ isVisible, onClose }: ScreenshotAtt
   }, [isVisible])
 
   return (
-    <>
-      {isVisible &&
-        createPortal(
-          <div ref={outerContainerRef} className={styles.outerContainer}>
-            <div ref={innerContainerRef} className={styles.innerContainer}>
-              <div className={styles.closeButton} onClick={handleClose}>
-                <CloseIcon size={16} />
-              </div>
-              <div className={styles.displays}>
-                <span className={styles.columnHeader}>Displays</span>
-                <div className={styles.displayImages}>
-                  {displays.map((display) => (
-                    <img
-                      src={display.thumbnail}
-                      className={styles.display}
-                      onClick={() => onClickDisplay(display.thumbnail)}
-                    />
-                  ))}
-                </div>
-              </div>
-              <div className={styles.windows}>
-                <span className={styles.columnHeader}>Windows</span>
-                <div className={styles.windowRows}>
-                  {windows.map((window) => (
-                    <div className={styles.window} onClick={() => onClickWindow(window.windowTitle)}>
-                      <img src={window.appIcon} className={styles.windowIcon} />
-                      <div className={styles.windowTitle}>{window.windowTitle}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+    <div ref={containerRef}>
+      <Portal>
+        {isVisible && (
+          <div ref={portalRef} className={styles.innerContainer} style={{ ...portalStyles }}>
+            <div className={styles.header}>
+              <ArrowCircleLeft variant="Bold" size={24} onClick={handleBack} style={{ cursor: 'pointer' }} />
+              <span>Attach Screenshot</span>
+              <CloseCircle variant="Bold" size={24} onClick={handleClose} style={{ cursor: 'pointer' }} />
             </div>
-          </div>,
-          document.body,
+            <div className={styles.rows}>
+              {displays.map((display, index) => (
+                <div
+                  className={styles.screenshotContainer}
+                  onClick={() => onClickDisplay(display.thumbnail)}
+                  key={index}
+                >
+                  <img src={display.thumbnail} className={`${styles.image} ${styles.displayImage}`} />
+                  <div className={styles.title}>Display {index + 1}</div>
+                </div>
+              ))}
+              {windows.map((window, index) => (
+                <div
+                  className={styles.screenshotContainer}
+                  onClick={() => onClickWindow(window.windowTitle)}
+                  key={index}
+                >
+                  <img src={window.appIcon} className={`${styles.image} ${styles.appIcon}`} />
+                  <div className={styles.title}>{window.windowTitle}</div>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
-    </>
+      </Portal>
+    </div>
   )
 }

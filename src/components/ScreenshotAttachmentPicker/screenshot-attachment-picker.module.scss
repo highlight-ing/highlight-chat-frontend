@@ -1,112 +1,82 @@
 @import '@/variables.module';
 
-.outerContainer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: transparent;
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  backdrop-filter: blur(5px);
-}
-
 .innerContainer {
   display: flex;
-  justify-content: space-evenly;
-  background-color: $bg-first-layer;
-  border: 1px solid $light-20;
-  border-radius: 8px;
-  padding: 16px 16px;
-  position: relative;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.closeButton {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  cursor: pointer;
-  color: $light-80;
-}
-
-.columnHeader {
-  font-size: 16px;
-  font-weight: normal;
-  color: $light-100;
-}
-
-.displays {
-  display: flex;
   flex-direction: column;
-  gap: 12px;
+  background-color: $background-secondary;
+  border: 1px solid $border-tertiary;
+  border-radius: 15px;
+  padding: 8px;
+  max-height: 500px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  border-right: 1px solid $light-20;
-  padding-right: 16px;
+  flex: 1;
+  color: $text-subtle;
+  margin-bottom: 12px;
+  font-size: 13px;
 }
 
-.displayImages {
-  display: flex;
-  flex-direction: column;
-  gap: 8px
+.image {
+  transition:
+  opacity 150ms ease,
+  padding 150ms ease;
+    object-fit: cover;
+    border-radius: 8px;
+  opacity: 0.8;
 }
 
-.display {
+.appIcon {
+  width: 47px;
+  height: 47px;
+  border: none;
+}
+
+.displayImage {
+  width: 72px;
+  height: 47px;
+  border: 1px solid $light-10;
+}
+
+.rows {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  border-radius: 4px;
-  height: 100px;
-  width: 'auto';
+  overflow-y: auto;
+}
+
+.screenshotContainer {
+  display: flex;
+  align-items: center;
+  padding: 7px 16px 7px 5px;
   cursor: pointer;
-  opacity: 0.8;
+  gap: 10px;
+  font-size: 16px;
+  text-wrap: nowrap;
+  cursor: pointer;
+  border-radius: 14px;
+  border: 1px solid $border-tertiary;
+  width: 100%;
+  max-width: 250px;
+
+  &:hover {
+    background-color: $background-hover;
+  }
 
   &:hover {
     opacity: 1;
   }
 }
 
-.windows {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-items: center;
-  padding-left: 16px;
-}
-
-.windowRows {
-  display: flex;
-  flex-direction: column;
-  max-width: 300px;
-}
-
-.window {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-  padding: 4px 8px;
-  color: $light-60;
-
-  &:hover {
-    background-color: $light-10;
-    border-radius: 4px;
-    color: $light-100;
-  }
-}
-
-.windowIcon {
-  width: 20px;
-  height: 20px;
-}
-
-.windowTitle {
-  font-size: 16px;
+.title {
+  font-size: 12px;
+  line-height: 20px;
   font-weight: 500;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  flex-wrap: nowrap;
+  color: $text-secondary;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
