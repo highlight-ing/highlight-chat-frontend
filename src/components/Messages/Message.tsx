@@ -167,7 +167,7 @@ export const Message = ({ message, isThinking }: MessageProps) => {
         </div>
       ) : (
         <span className={styles.thinking}>
-          <TypedText text={message.content} cursor={false} speed={1.5} />
+          <TypedText text={message.content ?? ''} cursor={false} speed={1.5} />
         </span>
       )}
     </div>
