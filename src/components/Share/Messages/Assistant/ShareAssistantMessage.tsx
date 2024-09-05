@@ -23,7 +23,7 @@ const preprocessLaTeX = (content: string) => {
 }
 
 export const ShareAssistantMessage: React.FC<ShareAssistantMessageProps> = ({ message, buttonTypes }) => {
-  const buttons = useAssistantMessageButtons({ message: message.content, buttonTypes })
+  const buttons = useAssistantMessageButtons({ message: message.content ?? '', buttonTypes })
 
   return (
     <div className="mx-auto w-full max-w-[712px] px-6 md:px-4">
