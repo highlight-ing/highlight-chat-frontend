@@ -9,7 +9,7 @@ type WindowAttachment = {
 
 export type BaseMessage = {
   role: 'user' | 'assistant'
-  content: string
+  content?: string
 }
 
 export type UserMessage = BaseMessage & {
