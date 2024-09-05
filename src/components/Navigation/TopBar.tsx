@@ -222,18 +222,26 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
             )}
             <div className={styles.topHeaderLeft}>
               {promptApp ? promptApp.name : 'Highlight'}
-              {!promptApp && currentConversation?.shared_id && (
-                <a href={`https://chat.hl.ing/share/${currentConversation?.shared_id}`} target={'_blank'}>
-                  {currentConversation.shared_id.split('://').pop()}
-                </a>
-              )}
+              {!promptApp &&
+                currentConversation?.shared_conversations &&
+                currentConversation.shared_conversations.length > 0 && (
+                  <a
+                    href={`https://chat.hl.ing/share/${currentConversation.shared_conversations[0].id}`}
+                    target={'_blank'}
+                  >
+                    {currentConversation.shared_conversations[0].title}
+                  </a>
+                )}
               {promptApp ? (
                 <a href={`https://chat.hl.ing/prompts/${promptApp.slug}`} target={'_blank'}>
                   chat.hl.ing/prompts/{promptApp.slug}
                 </a>
-              ) : currentConversation?.shared_id ? (
-                <a href={`https://chat.hl.ing/share/${currentConversation?.shared_id}`} target={'_blank'}>
-                  {currentConversation.shared_id.split('://').pop()}
+              ) : currentConversation?.shared_conversations && currentConversation.shared_conversations.length > 0 ? (
+                <a
+                  href={`https://chat.hl.ing/share/${currentConversation.shared_conversations[0].id}`}
+                  target={'_blank'}
+                >
+                  chat.hl.ing/share/{currentConversation.shared_conversations[0].id}
                 </a>
               ) : (
                 <a href={`https://chat.hl.ing`}>chat.hl.ing</a>

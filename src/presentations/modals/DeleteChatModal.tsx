@@ -25,7 +25,7 @@ const DeleteChatModal = ({ id, context }: ModalObjectProps) => {
     )
 
   const onDelete = async () => {
-    const response = await deleteRequest(`history/${chat.id}`)
+    const response = await deleteRequest(`history/${chat.id}`, { version: 'v3' })
     if (!response.ok) {
       // @TODO Error handling
       console.error('Failed to delete')
