@@ -9,9 +9,10 @@ import { Attachment } from '@/components/Attachment'
 import CodeBlock from '@/components/Messages/CodeBlock'
 import { getDisplayValue } from '@/utils/attachments'
 import { ProfileCircle } from 'iconsax-react'
+import Spinner from '@/components/Spinner'
 
 interface ShareUserMessageProps {
-  message: UserMessage & { fetchedImage?: string }
+  message: UserMessage & { fetchedImage?: string; isImageLoading?: boolean }
 }
 
 const hasAttachment = (message: UserMessage) => {
@@ -92,6 +93,14 @@ export const ShareUserMessage: React.FC<ShareUserMessageProps> = React.memo(({ m
               ))}
             {message.window_context && <Attachment type="window_context" value={message.window_context} />}
             {message.fetchedImage && <Attachment type="image" value={message.fetchedImage} isSharedImage={true} />}
+            {message.image_url &&
+              (message.isImageLoading ? (
+                <div className="flex h-24 w-24 items-center justify-center rounded bg-light-10">
+                  <Spinner size="medium" />
+                </div>
+              ) : message.fetchedImage ? (
+                <Attachment type="image" value={message.fetchedImage} isSharedImage={true} />
+              ) : null)}
           </div>
         )}
       </div>
