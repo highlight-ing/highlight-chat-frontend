@@ -279,7 +279,7 @@ export const AttachmentsButton = () => {
   ].filter(Boolean) as MenuItemType[]
 
   const acceptTypes =
-    'text/*,image/*,application/*,application/pdf,application/json,application/xml,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.presentationml.presentation,.tsx,.jsx,.md,.yaml,.yml,.toml,.ts,.js,.py,.rs,.swift,.java'
+    'text/*,image/*,application/*,application/pdf,application/json,application/xml,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.presentationml.presentation,.txt,.rtf,.md,.markdown,.mdown,.mkdn,.mdwn,.mkd,.org,.rst,.tex,.log,.ini,.cfg,.conf,.yml,.yaml,.toml,.json,.xml,.csv,.tsv,.js,.jsx,.ts,.tsx,.py,.rb,.rs,.swift,.java,.kt,.go,.php,.pl,.sh,.bash,.zsh,.fish,.sql,.html,.htm,.xhtml,.css,.scss,.sass,.less,.svg,.cjs,.mjs,.cts,.mts,.vue,.svelte,.astro,.c,.cpp,.h,.hpp,.cs,.fs,.vb,.r,.jl,.lua,.m,.mm,.scala,.groovy,.dart,.asm,.s,.elm,.erl,.ex,.exs,.hs,.lhs,.lisp,.clj,.cljs,.cljc,.edn,.ml,.mli,.ps1,.psm1,.psd1,.proto,.graphql,.gql,.bat,.cmd,.awk,.sed,.vim,.emacs,.el,.dockerfile,.dockerignore,.gitignore,.gitattributes,.env,.env.local,.env.development,.env.test,.env.production,.babelrc,.eslintrc,.prettierrc,.stylelintrc,.htaccess,.nginx,.apache2'
 
   const openMenu = () => {
     const element = document.getElementById('attachments-button')
