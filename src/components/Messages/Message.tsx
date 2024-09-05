@@ -170,11 +170,7 @@ export const Message = ({ message, isThinking }: MessageProps) => {
               size="large"
               variant="ghost"
               onClick={() => {
-                if (message.info !== '') {
-                  window.open(`highlight://settings/about-me?info=${message.info}`, '_blank')
-                } else {
-                  window.open(`highlight://settings/about-me`, '_blank')
-                }
+                window.open('highlight://settings/about-me', '_blank')
               }}
             >
               <PersonalizeIcon size={24} color={variables.light80} />
