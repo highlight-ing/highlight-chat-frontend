@@ -43,8 +43,8 @@ export default function PromptListingPage({
 
   return (
     <div>
-      <div className="grid grid-flow-col gap-4">
-        <div className="flex flex-col justify-center gap-3">
+      <div className="flex flex-col gap-4 md:flex-row">
+        <div className="flex basis-1/2 flex-col justify-center gap-3">
           <div className="flex gap-3">
             {image && imageExtension ? (
               <PromptAppIcon className="h-16 w-16 rounded-full" imageId={image} imageExtension={imageExtension} />
@@ -56,8 +56,7 @@ export default function PromptListingPage({
               <h6 className="text-light-60">Created by {author}</h6>
             </div>
           </div>
-          <p>{description}</p>
-          <div className="mt-2">
+          <div className="mt-16">
             <TryButton slug={slug} />
           </div>
         </div>
