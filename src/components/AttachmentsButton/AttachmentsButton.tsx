@@ -56,6 +56,44 @@ export const AttachmentsButton = () => {
     trackEvent('HL Chat Attachment Added', { type: 'audio', durationInMinutes })
   }
 
+  const readTextFile = async (file: File): Promise<string> => {
+    return await new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = (e) => resolve(e.target?.result as string)
+      reader.onerror = (e) => reject(e)
+      reader.readAsText(file)
+    })
+  }
+
+  const extractTextFromPowerPoint = async (file: File): Promise<string> => {
+    const arrayBuffer = await file.arrayBuffer()
+    const json = await pptxtojson.parse(arrayBuffer)
+
+    const cleanText = (text: string): string => {
+      return text
+        .replace(/&nbsp;/g, ' ')
+        .replace(/<\/?[^>]+(>|$)/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+    }
+
+    const slideText = json.slides
+      .map((slide, index) => {
+        const slideNumber = index + 1
+        const slideContent = slide.elements
+          .filter((e) => e.type === 'text')
+          .map((e) => cleanText(e.content))
+          .filter((text) => text.length > 0)
+          .join('\n')
+
+        return slideContent.length > 0 ? `[Slide ${slideNumber}]\n${slideContent}` : ''
+      })
+      .filter((text) => text.length > 0)
+      .join('\n\n')
+
+    return slideText
+  }
+
   const textBasedTypes = [
     'application/json',
     'application/xml',
@@ -102,14 +140,6 @@ export const AttachmentsButton = () => {
           fileName: file.name,
         })
         trackEvent('HL Chat Attachment Added', { type: 'text_file', fileType: file.type })
-      } else if (textBasedTypes.includes(file.type) || file.type.includes('text/')) {
-        const value = await readTextFile(file)
-        addAttachment({
-          type: 'text_file',
-          value,
-          fileName: file.name,
-        })
-        trackEvent('HL Chat Attachment Added', { type: 'text_file', fileType: file.type })
       } else if (file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
         const value = await extractTextFromPowerPoint(file)
         addAttachment({
@@ -118,46 +148,32 @@ export const AttachmentsButton = () => {
           fileName: file.name,
         })
         trackEvent('HL Chat Attachment Added', { type: 'power_point', fileType: file.type })
+      } else if (
+        textBasedTypes.includes(file.type) ||
+        file.type.includes('application/') ||
+        file.type.includes('text/')
+      ) {
+        const value = await readTextFile(file)
+        addAttachment({
+          type: 'text_file',
+          value,
+          fileName: file.name,
+        })
+        trackEvent('HL Chat Attachment Added', { type: 'text_file', fileType: file.type })
+      } else {
+        try {
+          const value = await readTextFile(file)
+          addAttachment({
+            type: 'text_file',
+            value,
+            fileName: file.name,
+          })
+          trackEvent('HL Chat Attachment Added', { type: 'file', fileType: file.type })
+        } catch (e) {
+          console.log('Error reading file', file.name, e)
+        }
       }
     }
-  }
-
-  const readTextFile = async (file: File): Promise<string> => {
-    return await new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = (e) => resolve(e.target?.result as string)
-      reader.onerror = (e) => reject(e)
-      reader.readAsText(file)
-    })
-  }
-
-  const extractTextFromPowerPoint = async (file: File): Promise<string> => {
-    const arrayBuffer = await file.arrayBuffer()
-    const json = await pptxtojson.parse(arrayBuffer)
-
-    const cleanText = (text: string): string => {
-      return text
-        .replace(/&nbsp;/g, ' ')
-        .replace(/<\/?[^>]+(>|$)/g, '')
-        .replace(/\s+/g, ' ')
-        .trim()
-    }
-
-    const slideText = json.slides
-      .map((slide, index) => {
-        const slideNumber = index + 1
-        const slideContent = slide.elements
-          .filter((e) => e.type === 'text')
-          .map((e) => cleanText(e.content))
-          .filter((text) => text.length > 0)
-          .join('\n')
-
-        return slideContent.length > 0 ? `[Slide ${slideNumber}]\n${slideContent}` : ''
-      })
-      .filter((text) => text.length > 0)
-      .join('\n\n')
-
-    return slideText
   }
 
   const onClickScreenshot = async () => {
@@ -263,7 +279,7 @@ export const AttachmentsButton = () => {
   ].filter(Boolean) as MenuItemType[]
 
   const acceptTypes =
-    'text/*,image/*,application/pdf,application/json,application/xml,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.presentationml.presentation,.md'
+    'text/*,image/*,application/*,application/pdf,application/json,application/xml,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.presentationml.presentation,.tsx,.jsx,.md,.yaml,.yml,.toml,.ts,.js,.py,.rs,.swift,.java'
 
   const openMenu = () => {
     const element = document.getElementById('attachments-button')
