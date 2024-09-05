@@ -41,7 +41,7 @@ const SharePageComponent: React.FC<SharePageComponentProps> = ({ messages }) => 
         memoizedMessages.map(async (message) => {
           if (message.role === 'user' && 'image_url' in message && message.image_url) {
             try {
-              const imageUrl = await memoizedGetSharedImage(message.image_url)
+              const imageUrl = await memoizedGetSharedImage(message.image_url, { version: 'v3' })
               return { ...message, fetchedImage: imageUrl }
             } catch (error) {
               console.error('Error fetching image:', error)
