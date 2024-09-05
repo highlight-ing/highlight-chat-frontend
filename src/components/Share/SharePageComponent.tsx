@@ -19,7 +19,7 @@ interface SharePageComponentProps {
 }
 
 const SharePageComponent: React.FC<SharePageComponentProps> = ({ messages }) => {
-  const [processedMessages, setProcessedMessages] = useState<Message[]>([])
+  const [processedMessages, setProcessedMessages] = useState<(Message & { isImageLoading?: boolean })[]>([])
   const { getSharedImage } = useApi()
   const { platform, isMobile, handleDownload } = useDownloadOrRedirect()
 
@@ -37,21 +37,27 @@ const SharePageComponent: React.FC<SharePageComponentProps> = ({ messages }) => 
 
   useEffect(() => {
     const processMessages = async () => {
-      const processed = await Promise.all(
-        memoizedMessages.map(async (message) => {
+      const processed = memoizedMessages.map((message) => ({
+        ...message,
+        isImageLoading: message.role === 'user' && 'image_url' in message && message.image_url ? true : false,
+      }))
+      setProcessedMessages(processed)
+
+      const updatedProcessed = await Promise.all(
+        processed.map(async (message) => {
           if (message.role === 'user' && 'image_url' in message && message.image_url) {
             try {
-              const imageUrl = await memoizedGetSharedImage(message.image_url, { version: 'v3' })
-              return { ...message, fetchedImage: imageUrl }
+              const image = await memoizedGetSharedImage(message.image_url, { version: 'v3' })
+              return { ...message, fetchedImage: image, isImageLoading: false }
             } catch (error) {
               console.error('Error fetching image:', error)
-              return message
+              return { ...message, isImageLoading: false }
             }
           }
           return message
         }),
       )
-      setProcessedMessages(processed)
+      setProcessedMessages(updatedProcessed)
     }
 
     processMessages()
