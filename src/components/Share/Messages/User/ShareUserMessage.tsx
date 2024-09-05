@@ -92,11 +92,10 @@ export const ShareUserMessage: React.FC<ShareUserMessageProps> = React.memo(({ m
                 <Attachment key={index} type={a.type} value={getDisplayValue(a)} />
               ))}
             {message.window_context && <Attachment type="window_context" value={message.window_context} />}
-            {message.fetchedImage && <Attachment type="image" value={message.fetchedImage} isSharedImage={true} />}
             {message.image_url &&
               (message.isImageLoading ? (
                 <div className="flex h-24 w-24 items-center justify-center rounded bg-light-10">
-                  <Spinner size="medium" />
+                  <Spinner size="small" />
                 </div>
               ) : message.fetchedImage ? (
                 <Attachment type="image" value={message.fetchedImage} isSharedImage={true} />
