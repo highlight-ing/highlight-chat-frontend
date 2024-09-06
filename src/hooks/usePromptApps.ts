@@ -46,6 +46,7 @@ export default (loadPrompts?: boolean) => {
     return prompts
       .filter((prompt) => prompt.user_id !== promptUserId && prompt.public)
       .sort((a, b) => (b.public_use_number || 0) - (a.public_use_number || 0))
+      .filter((prompt) => prompt.can_trend)
       .slice(0, 10)
   }, [prompts, promptUserId])
 
