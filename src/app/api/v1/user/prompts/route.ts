@@ -1,4 +1,4 @@
-import { extractBearerToken, validateHighlightJWT } from '@/lib/auth'
+import { authenticateApiUser } from '@/lib/api'
 import { PROMPTS_TABLE_SELECT_FIELDS, supabaseAdmin } from '@/lib/supabase'
 
 /**
@@ -9,22 +9,13 @@ import { PROMPTS_TABLE_SELECT_FIELDS, supabaseAdmin } from '@/lib/supabase'
 export async function GET(request: Request) {
   const supabase = supabaseAdmin()
 
-  const token = extractBearerToken(request.headers)
+  const authUser = await authenticateApiUser(request)
 
-  if (!token) {
-    // User didn't provide a token
-    return Response.json({ error: 'Unauthorized, bearer token is required' }, { status: 401 })
+  if (authUser instanceof Response) {
+    return authUser
   }
 
-  let jwtResponse
-  // Validate the JWT
-  try {
-    jwtResponse = await validateHighlightJWT(token)
-  } catch (error) {
-    return Response.json({ error: 'Unauthorized, invalid bearer token' }, { status: 401 })
-  }
-
-  const userId = jwtResponse.payload.sub
+  const userId = authUser.sub
 
   if (!userId) {
     return Response.json({ error: 'Unauthorized, no subject in token' }, { status: 401 })
@@ -33,7 +24,7 @@ export async function GET(request: Request) {
   // Select all prompts that the user has added
   const { data: selectResult, error } = await supabase
     .from('added_prompts')
-    .select(`prompts(id, ${PROMPTS_TABLE_SELECT_FIELDS}, prompt_usages(created_at)), created_at`)
+    .select(`prompts(${PROMPTS_TABLE_SELECT_FIELDS}, prompt_usages(created_at)), created_at`)
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
 
@@ -44,7 +35,7 @@ export async function GET(request: Request) {
   // Select all prompts that the user owns
   const { data: ownedPrompts, error: ownedPromptsError } = await supabase
     .from('prompts')
-    .select(`id, ${PROMPTS_TABLE_SELECT_FIELDS}, prompt_usages(created_at)`)
+    .select(`${PROMPTS_TABLE_SELECT_FIELDS}, prompt_usages(created_at)`)
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
 
