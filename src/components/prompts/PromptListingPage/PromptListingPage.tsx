@@ -1,7 +1,7 @@
 import RelatedApp, { RelatedAppProps } from './RelatedApp'
-import Video from './Video'
-import TryButton from './TryButton'
 import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
+import Buttons from './Buttons'
+import Video from './Video'
 
 function IconPlaceholder() {
   return (
@@ -16,6 +16,7 @@ function IconPlaceholder() {
 }
 
 export interface PromptListingPageProps {
+  externalId: string
   name: string
   slug: string
   author: string
@@ -30,6 +31,7 @@ export interface PromptListingPageProps {
  * A prompt store page, this is the page that shows an individual prompt.
  */
 export default function PromptListingPage({
+  externalId,
   name,
   slug,
   author,
@@ -57,7 +59,7 @@ export default function PromptListingPage({
             </div>
           </div>
           <div className="mt-16">
-            <TryButton slug={slug} />
+            <Buttons externalId={externalId} slug={slug} />
           </div>
         </div>
         {newVideoUrl && (

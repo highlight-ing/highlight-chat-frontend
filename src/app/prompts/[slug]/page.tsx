@@ -93,6 +93,7 @@ export default async function PromptPage({ params }: PromptPageProps) {
       </div>
       <div className="p-20">
         <PromptListingPage
+          externalId={prompt.external_id}
           image={prompt.image ?? undefined}
           imageExtension={prompt.user_images?.file_extension ?? undefined}
           slug={prompt.slug ?? ''}
