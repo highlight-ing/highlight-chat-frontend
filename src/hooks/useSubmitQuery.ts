@@ -216,8 +216,8 @@ export const useSubmitQuery = () => {
 
         const {
           content: accumulatedContent,
-          personalize,
-          info,
+          factIndex,
+          fact,
         } = await parseAndHandleStreamChunk(chunk, {
           formData,
           addAttachment,
@@ -226,14 +226,14 @@ export const useSubmitQuery = () => {
           handleSubmit,
         })
 
-        console.log('personalize: ', personalize)
-        console.log('info: ', info)
-        if (personalize) {
+        console.log('factIndex: ', factIndex)
+        console.log('fact: ', fact)
+        if (factIndex && fact) {
           updateLastConversationMessage(conversationId, {
             role: 'assistant',
             content: accumulatedMessage,
-            personalize: personalize,
-            info: info,
+            factIndex: factIndex,
+            fact: fact,
           })
         }
 
@@ -242,7 +242,6 @@ export const useSubmitQuery = () => {
           updateLastConversationMessage(conversationId, {
             role: 'assistant',
             content: accumulatedMessage,
-            personalize: personalize,
           })
         }
       }

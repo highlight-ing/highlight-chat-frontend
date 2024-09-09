@@ -15,8 +15,8 @@ export async function parseAndHandleStreamChunk(
 ) {
   let contextConfirmed: boolean | null = null
   let accumulatedContent = ''
-  let personalize = false
-  let info = ''
+  let factIndex = null
+  let fact = null
   // Split the chunk into individual data objects
   const dataObjects = chunk.split(/\n(?=data: )/)
 
@@ -50,18 +50,25 @@ export async function parseAndHandleStreamChunk(
               }
             }
           }
-          if (jsonChunk.name === 'add_info_to_about_me') {
-            if (jsonChunk.input.personalize === true) {
-              console.log('personalize', jsonChunk.input.personalize)
-              personalize = true
-              info = jsonChunk.input.info
+          if (jsonChunk.name === 'add_or_update_about_me_facts') {
+            // This will update the fact at the specified index
+            if (jsonChunk.input.fact_index && jsonChunk.input.fact) {
+              console.log('incoming fact', jsonChunk.input.fact)
+              console.log('incoming fact index', jsonChunk.input.fact_index)
+              factIndex = jsonChunk.input.fact_index
+              fact = jsonChunk.input.fact
+            }
+            // This will add the fact to the end of the array
+            else if (jsonChunk.input.fact) {
+              console.log('incoming fact', jsonChunk.input.fact)
+              fact = jsonChunk.input.fact
             }
           }
           break
 
         case 'done':
           // Return both accumulated content and personalize flag
-          return { content: accumulatedContent, personalize, info }
+          return { content: accumulatedContent, factIndex, fact }
 
         case 'message_delta':
           // Handle message delta if needed
@@ -93,7 +100,7 @@ export async function parseAndHandleStreamChunk(
   }
 
   // If we haven't returned yet, return the accumulated content and personalize flag
-  return { content: accumulatedContent, personalize, info }
+  return { content: accumulatedContent, factIndex, fact }
 }
 
 async function handleWindowContext(

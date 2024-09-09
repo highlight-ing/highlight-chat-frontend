@@ -1,6 +1,6 @@
 import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import React, { Fragment } from 'react'
+import React, { Fragment, useState } from 'react'
 import variables from '@/variables.module.scss'
 import { AssistantIcon, PersonalizeIcon } from '@/icons/icons'
 import { Message as MessageType, UserMessage } from '../../types'
@@ -40,6 +40,33 @@ interface MessageProps {
   message: MessageType
 }
 
+const FactButton = ({ factIndex, fact }: { factIndex?: number; fact?: string }) => {
+  const [clicked, setClicked] = useState(false)
+
+  const handleClick = () => {
+    setClicked(true)
+    window.open('highlight://settings/about-me', '_blank')
+  }
+
+  if (clicked || (!factIndex && !fact)) {
+    return null
+  }
+
+  let buttonText = 'Personalize your About Me'
+  if (factIndex !== undefined && fact) {
+    buttonText = 'Update About Me'
+  } else if (fact) {
+    buttonText = 'Add info to your About Me'
+  }
+
+  return (
+    <Button size="large" variant="ghost" onClick={handleClick}>
+      <PersonalizeIcon size={24} color={variables.light80} />
+      <span className={styles.personalizeText}>{buttonText}</span>
+    </Button>
+  )
+}
+
 /**
  * LLMs spit out formulas with delimiters that katex doesn't recognize.
  * In this case, we try to replace it with `$$` delimiters.
@@ -59,6 +86,8 @@ const preprocessLaTeX = (content: string) => {
 
 export const Message = ({ message, isThinking }: MessageProps) => {
   const promptApp = useStore((state) => state.promptApp)
+  const { factIndex, fact } = message
+
   return (
     <div className={`${styles.messageContainer} ${message.role === 'user' ? styles.self : ''}`}>
       {message.role === 'assistant' && (
@@ -165,20 +194,7 @@ export const Message = ({ message, isThinking }: MessageProps) => {
               {typeof message.content === 'string' ? preprocessLaTeX(message.content) : ''}
             </Markdown>
           </div>
-          {message.personalize && (
-            <Button
-              size="large"
-              variant="ghost"
-              onClick={() => {
-                window.open('highlight://settings/about-me', '_blank')
-              }}
-            >
-              <PersonalizeIcon size={24} color={variables.light80} />
-              <span className={styles.personalizeText}>
-                {message.info !== '' ? 'Add info to your About Me' : 'Personalize your About Me'}
-              </span>
-            </Button>
-          )}
+          {factIndex || fact ? <FactButton factIndex={factIndex} fact={fact} /> : null}
         </div>
       ) : (
         <span className={styles.thinking}>
