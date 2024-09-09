@@ -175,7 +175,13 @@ export const useSubmitQuery = () => {
     })
   }
 
-  const fetchResponse = async (conversationId: string, formData: FormData, token: string, isPromptApp: boolean) => {
+  const fetchResponse = async (
+    conversationId: string,
+    formData: FormData,
+    token: string,
+    isPromptApp: boolean,
+    promptApp?: Prompt,
+  ) => {
     setInputIsDisabled(true)
 
     try {
@@ -251,7 +257,7 @@ export const useSubmitQuery = () => {
               value: ocrScreenContents,
             })
 
-            handleSubmit("Here's the context you requested.", {
+            handleSubmit("Here's the context you requested.", promptApp, {
               image: screenshot,
               window_context: ocrScreenContents,
             })
@@ -373,14 +379,14 @@ export const useSubmitQuery = () => {
       }
 
       const accessToken = await getAccessToken()
-      await fetchResponse(conversationId, formData, accessToken, promptApp ? true : false)
+      await fetchResponse(conversationId, formData, accessToken, promptApp ? true : false, promptApp)
     }
   }
 
   const handleSubmit = async (
     input: string,
-    context?: { image?: string; window_context?: string },
     promptApp?: Prompt,
+    context?: { image?: string; window_context?: string },
   ) => {
     console.log('handleSubmit triggered')
     const query = input.trim()
@@ -447,7 +453,7 @@ export const useSubmitQuery = () => {
       clearAttachments() // Clear the attachment immediately
 
       const accessToken = await getAccessToken()
-      await fetchResponse(conversationId, formData, accessToken, isPromptApp)
+      await fetchResponse(conversationId, formData, accessToken, isPromptApp, promptApp)
     }
   }
 
