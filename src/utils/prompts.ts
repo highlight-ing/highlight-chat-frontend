@@ -82,11 +82,11 @@ async function uploadImage(file: File, userId: string) {
 }
 
 /**
- * Adds tags to a prompt in the database.
+ * Updates the tags set on a prompt.
  * @param promptId The ID of the prompt to add the tags to.
  * @param tags The numerical, internal IDs of the tags to add to the prompt.
  */
-async function addTagsToPrompt(promptId: number, tags: number[]) {
+async function updatePromptTags(promptId: number, tags: number[]) {
   const supabase = supabaseAdmin()
 
   // Select all the tags that have been added to the prompt
@@ -103,7 +103,7 @@ async function addTagsToPrompt(promptId: number, tags: number[]) {
     .filter((x) => !tags.includes(x))
 
   if (tagsToDelete) {
-    await supabase.from('added_prompt_tags').delete().in('tag_id', tagsToDelete)
+    await supabase.from('added_prompt_tags').delete().in('tag_id', tagsToDelete).throwOnError()
   }
 
   // Create an array of tags to add
@@ -166,7 +166,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
 
   const supabase = supabaseAdmin()
 
-  // Handle the tags
+  // Handle the tags by looping through them and slugifying them
   const tags =
     validated.data.tags?.map((tag) => {
       return {
@@ -178,7 +178,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
       }
     }) ?? []
 
-  // Check if the tags already exist
+  // Check if the tags have already been created, if so, we don't need to create new entries.
   const { data: existingTags, error: existingTagsError } = await supabase
     .from('tags')
     .select('id, slug')
@@ -210,7 +210,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
     return { error: ERROR_MESSAGES.DATABASE_ERROR }
   }
 
-  // Use this array to later call addTagsToPrompt
+  // Combine both the existing and created tags, so that we know which tag IDs need to be added to the prompt
   const tagsToAdd = [...existingTags, ...createdTags].map((x) => x.id)
 
   const promptData = {
@@ -241,10 +241,12 @@ export async function savePrompt(formData: FormData, authToken: string) {
     }
 
     // Add the tags to the prompt
-    await addTagsToPrompt(prompt.id, tagsToAdd)
+    await updatePromptTags(prompt.id, tagsToAdd)
 
     return { prompt }
   } else {
+    // Create a new prompt
+
     // Generate the slug from the name
     let slug = slugify(validated.data.name, { lower: true })
 
@@ -264,7 +266,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
     }
 
     // Add the tags to the prompt
-    await addTagsToPrompt(prompt.id, tagsToAdd)
+    await updatePromptTags(prompt.id, tagsToAdd)
 
     return { prompt, new: true }
   }
@@ -353,13 +355,30 @@ export async function fetchPrompts(authToken: string) {
   // Select all private or public prompts user has created
   const { data: prompts, error: promptsError } = await supabase
     .from('prompts')
-    .select('*, user_images(file_extension), tags()')
+    .select(
+      'id, external_id, name, description, prompt_text, prompt_url, created_at, slug, user_id, public, suggestion_prompt_text, video_url, image, is_handlebar_prompt, public_use_number, system_prompt, can_trend, user_images(file_extension), added_prompt_tags(tags(external_id, tag, slug))',
+    )
+
+  // Map the prompts to follow the original structure with tags.
+  const mappedPrompts =
+    prompts?.map((x) => ({
+      ...x,
+      tags:
+        x.added_prompt_tags?.map((y) => {
+          return {
+            label: y.tags?.tag,
+            value: y.tags?.tag,
+          }
+        }) ?? [],
+    })) ?? []
 
   if (promptsError) {
     return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
   }
 
-  return { prompts: prompts, userId }
+  return {
+    prompts: mappedPrompts,
+  }
 }
 
 /**
@@ -387,21 +406,6 @@ export async function fetchPinnedPrompts(authToken: string): Promise<{ error: st
   }
 
   return pinnedPrompts.map((p) => p.prompts) as PinnedPrompt[]
-}
-
-/**
- * Fetches a prompt from the database by slug.
- */
-export async function fetchPrompt(slug: string) {
-  const supabase = supabaseAdmin()
-
-  const { data: prompt, error } = await supabase.from('prompts').select('*').eq('slug', slug).maybeSingle()
-
-  if (error) {
-    return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
-  }
-
-  return { prompt }
 }
 
 export async function deletePrompt(externalId: string, authToken: string) {

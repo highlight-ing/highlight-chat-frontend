@@ -39,23 +39,26 @@ const TrendingPrompts = ({
         <div className={styles.trendingPromptsHeader}>
           <h2>Top 10 Trending Prompts</h2>
           <div className={styles.trendingPrompts}>
-            {mergedPrompts.map((item, index) => (
-              <TrendingPromptsItem
-                key={item.name}
-                name={item.name}
-                description={item.description ?? ''}
-                slug={item.slug}
-                color={variables.primary100}
-                selectPrompt={selectPrompt}
-                prompt={item}
-                tags={item.tags as PromptTag[] | null}
-                lastItem={index === mergedPrompts.length - 1}
-                openModal={openModal}
-                publicUseNumber={item.public_use_number}
-                userId={userId}
-                pinState={item.isPinned}
-              />
-            ))}
+            {mergedPrompts.map((item, index) => {
+              console.log(item)
+              return (
+                <TrendingPromptsItem
+                  key={item.name}
+                  name={item.name}
+                  description={item.description ?? ''}
+                  slug={item.slug}
+                  color={variables.primary100}
+                  selectPrompt={selectPrompt}
+                  prompt={item}
+                  tags={item.tags as PromptTag[] | null}
+                  lastItem={index === mergedPrompts.length - 1}
+                  openModal={openModal}
+                  publicUseNumber={item.public_use_number}
+                  userId={userId}
+                  pinState={item.isPinned}
+                />
+              )
+            })}
           </div>
         </div>
       )}
