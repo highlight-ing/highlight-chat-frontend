@@ -30,6 +30,7 @@ export interface PromptEditorData {
   videoUrl?: string
   image?: string
   uploadingImage?: File
+  remotePromptUrl?: string
 }
 
 export interface PromptEditorState {

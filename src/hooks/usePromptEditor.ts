@@ -45,6 +45,7 @@ export function usePromptEditor() {
     formData.append('systemPrompt', promptEditorData.systemPrompt)
     formData.append('visibility', promptEditorData.visibility)
     formData.append('tags', JSON.stringify(promptEditorData.tags ?? []))
+    formData.append('remotePromptUrl', promptEditorData.remotePromptUrl ?? '')
 
     if (promptEditorData.videoUrl) {
       formData.append('videoUrl', promptEditorData.videoUrl)

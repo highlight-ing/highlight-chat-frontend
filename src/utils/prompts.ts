@@ -34,6 +34,9 @@ const SavePromptSchema = z.object({
   visibility: z.enum(['public', 'private']),
   videoUrl: videoUrlSchema,
   tags: z.array(z.object({ value: z.string(), label: z.string() })).optional(),
+  remotePromptUrl: z
+    .union([z.string().url({ message: 'Remote prompt URL must be a valid URL' }), z.literal('')])
+    .optional(),
 })
 
 export type SavePromptData = z.infer<typeof SavePromptSchema>
@@ -118,6 +121,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
     visibility: formData.get('visibility'),
     videoUrl: formData.get('videoUrl'),
     tags: JSON.parse(formData.get('tags') as string),
+    remotePromptUrl: formData.get('remotePromptUrl'),
   })
 
   if (!validated.success) {
@@ -136,6 +140,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
     image: newImageId ?? undefined,
     is_handlebar_prompt: true,
     tags: validated.data.tags, // Store the full tag objects
+    prompt_url: validated.data.remotePromptUrl,
   }
 
   const supabase = supabaseAdmin()

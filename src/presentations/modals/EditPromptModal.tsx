@@ -31,6 +31,7 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
         image: prompt.image ? `${prompt.image}.${prompt.user_images?.file_extension}` : undefined,
         tags: prompt.tags as PromptTag[],
         systemPrompt: prompt.system_prompt ?? DEFAULT_SYSTEM_PROMPT,
+        remotePromptUrl: prompt.prompt_url ?? undefined,
       },
       true,
     )

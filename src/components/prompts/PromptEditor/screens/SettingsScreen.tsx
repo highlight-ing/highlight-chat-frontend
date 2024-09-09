@@ -196,6 +196,9 @@ const SettingsSchema = z.object({
   videoUrl: videoUrlSchema,
   description: z.string().min(1, { message: 'Description is required' }),
   tags: z.array(z.object({ value: z.string(), label: z.string() })).optional(),
+  remotePromptUrl: z
+    .union([z.string().url({ message: 'Remote prompt URL must be a valid URL' }), z.literal('')])
+    .optional(),
 })
 
 // {visibility: 'public' | 'private', onToggle: (visibility: 'public' | 'private') => void}
@@ -250,6 +253,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
       name: promptEditorData.name,
       videoUrl: promptEditorData.videoUrl ?? '',
       description: promptEditorData.description,
+      remotePromptUrl: promptEditorData.remotePromptUrl ?? '',
     },
     resolver: zodResolver(SettingsSchema),
     mode: 'all',
@@ -293,7 +297,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
             <div className="flex items-center space-x-6">
               <ImageUpload />
             </div>
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-6 pb-10">
               <InputField
                 size={'xxlarge'}
                 label={'Name'}
@@ -320,74 +324,80 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
                 {...register('description')}
                 error={errors.description?.message}
               />
-              <div className="flex flex-col gap-2">
-                <label className="text-light-100">Tags</label>
-                <CreatableSelect
-                  value={selectedTags}
-                  onChange={onChange}
-                  isMulti
-                  components={animatedComponents}
-                  placeholder="Add #tags to make your prompt more easy to find..."
-                  options={promptTags}
-                  menuPlacement="top"
-                  styles={{
-                    control: (baseStyles, state) => ({
-                      ...baseStyles,
-                      fontSize: '16px',
-                      border: state.isFocused ? `1px solid ${variables.light40}` : `1px solid ${variables.light10}`,
-                      padding: '10px',
-                      borderRadius: '10px',
-                      borderColor: variables.light10,
-                      minHeight: '64px',
-                      color: variables.textPrimary,
-                      backgroundColor: variables.light5,
-                      marginLeft: '1px',
+              <label className="text-light-100">Tags</label>
+              <CreatableSelect
+                value={selectedTags}
+                onChange={onChange}
+                isMulti
+                components={animatedComponents}
+                placeholder="Add #tags to make your prompt more easy to find..."
+                options={promptTags}
+                menuPlacement="top"
+                styles={{
+                  control: (baseStyles, state) => ({
+                    ...baseStyles,
+                    fontSize: '16px',
+                    border: state.isFocused ? `1px solid ${variables.light40}` : `1px solid ${variables.light10}`,
+                    padding: '10px',
+                    borderRadius: '10px',
+                    borderColor: variables.light10,
+                    minHeight: '64px',
+                    color: variables.textPrimary,
+                    backgroundColor: variables.light5,
+                    marginLeft: '1px',
+                    outline: 'none',
+                    boxShadow: 'none',
+                    '&:hover': {
+                      border: state.isFocused ? `1px solid ${variables.light40}` : `1px solid ${variables.light20}`,
                       outline: 'none',
                       boxShadow: 'none',
-                      '&:hover': {
-                        border: state.isFocused ? `1px solid ${variables.light40}` : `1px solid ${variables.light20}`,
-                        outline: 'none',
-                        boxShadow: 'none',
-                      },
-                    }),
-                    menu: (baseStyles, state) => ({
-                      ...baseStyles,
-                      backgroundColor: variables.backgroundPrimary,
-                    }),
-                    menuList: (baseStyles, state) => ({
-                      ...baseStyles,
-                      backgroundColor: variables.backgroundPrimary,
-                    }),
-                    option: (baseStyles, state) => ({
-                      ...baseStyles,
-                      backgroundColor: state.isFocused ? variables.backgroundTertiary : variables.backgroundPrimary,
-                      color: variables.textPrimary,
-                    }),
-                    multiValue: (baseStyles, state) => ({
-                      ...baseStyles,
-                      backgroundColor: variables.backgroundPrimary,
-                      color: variables.textPrimary,
-                    }),
-                    multiValueLabel: (baseStyles, state) => ({
-                      ...baseStyles,
-                      backgroundColor: variables.backgroundPrimary,
-                      color: variables.textPrimary,
-                      borderRadius: '20px',
-                      padding: '2px 6px',
-                      fontSize: '14px',
-                    }),
-                    multiValueRemove: (baseStyles, state) => ({
-                      ...baseStyles,
-                      backgroundColor: variables.backgroundPrimary,
-                      color: variables.textPrimary,
-                      '&:hover': {
-                        backgroundColor: variables.backgroundTertiary,
-                        color: variables.red100,
-                      },
-                    }),
-                  }}
-                />
-              </div>
+                    },
+                  }),
+                  menu: (baseStyles, state) => ({
+                    ...baseStyles,
+                    backgroundColor: variables.backgroundPrimary,
+                  }),
+                  menuList: (baseStyles, state) => ({
+                    ...baseStyles,
+                    backgroundColor: variables.backgroundPrimary,
+                  }),
+                  option: (baseStyles, state) => ({
+                    ...baseStyles,
+                    backgroundColor: state.isFocused ? variables.backgroundTertiary : variables.backgroundPrimary,
+                    color: variables.textPrimary,
+                  }),
+                  multiValue: (baseStyles, state) => ({
+                    ...baseStyles,
+                    backgroundColor: variables.backgroundPrimary,
+                    color: variables.textPrimary,
+                  }),
+                  multiValueLabel: (baseStyles, state) => ({
+                    ...baseStyles,
+                    backgroundColor: variables.backgroundPrimary,
+                    color: variables.textPrimary,
+                    borderRadius: '20px',
+                    padding: '2px 6px',
+                    fontSize: '14px',
+                  }),
+                  multiValueRemove: (baseStyles, state) => ({
+                    ...baseStyles,
+                    backgroundColor: variables.backgroundPrimary,
+                    color: variables.textPrimary,
+                    '&:hover': {
+                      backgroundColor: variables.backgroundTertiary,
+                      color: variables.red100,
+                    },
+                  }),
+                }}
+              />
+              <InputField
+                size={'xxlarge'}
+                label={'Remote Prompt URL'}
+                placeholder={'Provide a remote prompt URL (optional)'}
+                disabled={disabled}
+                {...register('remotePromptUrl')}
+                error={errors.remotePromptUrl?.message}
+              />
             </div>
           </div>
           <div className={'flex flex-1 flex-col gap-4'}>
