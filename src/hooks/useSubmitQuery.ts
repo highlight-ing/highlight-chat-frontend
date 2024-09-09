@@ -175,7 +175,13 @@ export const useSubmitQuery = () => {
     })
   }
 
-  const fetchResponse = async (conversationId: string, formData: FormData, token: string, isPromptApp: boolean) => {
+  const fetchResponse = async (
+    conversationId: string,
+    formData: FormData,
+    token: string,
+    isPromptApp: boolean,
+    promptApp?: Prompt,
+  ) => {
     setInputIsDisabled(true)
 
     try {
@@ -215,20 +221,47 @@ export const useSubmitQuery = () => {
 
         checkAbortSignal()
 
-        const newContent = await parseAndHandleStreamChunk(chunk, {
-          formData,
-          addAttachment,
+        const { content, windowName } = await parseAndHandleStreamChunk(chunk, {
           showConfirmationModal,
           addToast,
-          handleSubmit,
         })
 
-        if (newContent) {
-          accumulatedMessage += newContent
+        if (content) {
+          accumulatedMessage += content
           updateLastConversationMessage(conversationId, {
             role: 'assistant',
             content: accumulatedMessage,
           })
+        }
+
+        if (windowName) {
+          const contextGranted = await Highlight.permissions.requestWindowContextPermission()
+          const screenshotGranted = await Highlight.permissions.requestScreenshotPermission()
+          if (contextGranted && screenshotGranted) {
+            addToast({
+              title: 'Context Granted',
+              description: 'Context granted for ' + windowName,
+              type: 'success',
+              timeout: 5000,
+            })
+            const screenshot = await Highlight.user.getWindowScreenshot(windowName)
+            addAttachment({
+              type: 'image',
+              value: screenshot,
+            })
+
+            const windowContext = await Highlight.user.getWindowContext(windowName)
+            const ocrScreenContents = windowContext.environment.ocrScreenContents || ''
+            addAttachment({
+              type: 'window_context',
+              value: ocrScreenContents,
+            })
+
+            handleSubmit("Here's the context you requested.", promptApp, {
+              image: screenshot,
+              window_context: ocrScreenContents,
+            })
+          }
         }
       }
     } catch (error) {
@@ -346,11 +379,15 @@ export const useSubmitQuery = () => {
       }
 
       const accessToken = await getAccessToken()
-      await fetchResponse(conversationId, formData, accessToken, promptApp ? true : false)
+      await fetchResponse(conversationId, formData, accessToken, promptApp ? true : false, promptApp)
     }
   }
 
-  const handleSubmit = async (input: string, promptApp?: Prompt) => {
+  const handleSubmit = async (
+    input: string,
+    promptApp?: Prompt,
+    context?: { image?: string; window_context?: string },
+  ) => {
     console.log('handleSubmit triggered')
     const query = input.trim()
 
@@ -386,6 +423,16 @@ export const useSubmitQuery = () => {
         attachments,
       )
 
+      // TODO(umut): This is a hack to add the context to the form data.
+      if (context) {
+        if (context.image) {
+          formData.append('screenshot', context.image)
+        }
+        if (context.window_context) {
+          formData.append('window_context', context.window_context)
+        }
+      }
+
       console.log('windowContext: ', windowContext)
 
       const conversationId = getOrCreateConversationId()
@@ -406,7 +453,7 @@ export const useSubmitQuery = () => {
       clearAttachments() // Clear the attachment immediately
 
       const accessToken = await getAccessToken()
-      await fetchResponse(conversationId, formData, accessToken, isPromptApp)
+      await fetchResponse(conversationId, formData, accessToken, isPromptApp, promptApp)
     }
   }
 
