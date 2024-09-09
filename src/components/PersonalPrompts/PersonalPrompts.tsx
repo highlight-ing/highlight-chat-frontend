@@ -24,7 +24,7 @@ const PersonalPrompts = ({ userId, prompts, pinnedPrompts }: PersonalPromptsProp
   const openModal = useStore((state) => state.openModal)
 
   if (prompts.length === 0 && pinnedPrompts.length === 0) {
-    return <EmptyPrompts openModal={openModal} />
+    return <EmptyPrompts />
   }
 
   // Merge and deduplicate prompts and pinnedPrompts
