@@ -1,18 +1,11 @@
-import Highlight from '@highlight-ai/app-runtime'
-import { FileAttachment, Toast } from '@/types'
+import { Toast } from '@/types'
 
 type StreamParserProps = {
-  formData: FormData
-  addAttachment: (attachment: FileAttachment) => void
   showConfirmationModal: (message: string) => Promise<boolean>
   addToast: (toast: Partial<Toast>) => void
-  handleSubmit: (input: string) => Promise<void>
 }
 
-export async function parseAndHandleStreamChunk(
-  chunk: string,
-  { formData, addAttachment, showConfirmationModal, addToast, handleSubmit }: StreamParserProps,
-) {
+export async function parseAndHandleStreamChunk(chunk: string, { showConfirmationModal, addToast }: StreamParserProps) {
   let contextConfirmed: boolean | null = null
   let accumulatedContent = ''
 
@@ -45,15 +38,15 @@ export async function parseAndHandleStreamChunk(
             if (contextConfirmed) {
               const window = jsonChunk.input.window
               if (window) {
-                await handleWindowContext(window, formData, addAttachment, handleSubmit)
+                return { content: accumulatedContent, windowName: window }
               }
             }
           }
           break
 
         case 'done':
-          // Message is complete, return the accumulated content
-          return accumulatedContent
+          // Message is complete, return the accumulated content and attachments added
+          return { content: accumulatedContent, windowName: null }
 
         case 'message_delta':
           // Handle message delta if needed
@@ -84,33 +77,6 @@ export async function parseAndHandleStreamChunk(
     }
   }
 
-  // If we haven't returned yet, return the accumulated content
-  return accumulatedContent
-}
-
-async function handleWindowContext(
-  window: string,
-  formData: FormData,
-  addAttachment: (attachment: FileAttachment) => void,
-  handleSubmit: (input: string) => Promise<void>,
-) {
-  const contextGranted = await Highlight.permissions.requestWindowContextPermission()
-  const screenshotGranted = await Highlight.permissions.requestScreenshotPermission()
-  if (contextGranted && screenshotGranted) {
-    const screenshot = await Highlight.user.getWindowScreenshot(window)
-    addAttachment({
-      type: 'image',
-      value: screenshot,
-    })
-
-    const windowContext = await Highlight.user.getWindowContext(window)
-    const ocrScreenContents = windowContext.environment.ocrScreenContents || ''
-    addAttachment({
-      type: 'window_context',
-      value: ocrScreenContents,
-    })
-    // await new Promise((resolve) => setTimeout(resolve, 500))
-
-    // await handleSubmit("Here's the context you requested.") // When called it ignores the window context and image wtf?
-  }
+  // If we haven't returned yet, return the accumulated content and attachments added
+  return { content: accumulatedContent, windowName: null }
 }
