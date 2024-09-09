@@ -3,6 +3,42 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      added_prompt_tags: {
+        Row: {
+          created_at: string
+          id: number
+          prompt_id: number | null
+          tag_id: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          prompt_id?: number | null
+          tag_id?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          prompt_id?: number | null
+          tag_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'added_tags_prompt_id_fkey'
+            columns: ['prompt_id']
+            isOneToOne: false
+            referencedRelation: 'prompts'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'added_tags_tag_id_fkey'
+            columns: ['tag_id']
+            isOneToOne: false
+            referencedRelation: 'tags'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       added_prompts: {
         Row: {
           created_at: string
@@ -373,6 +409,30 @@ export type Database = {
             referencedColumns: ['id']
           },
         ]
+      }
+      tags: {
+        Row: {
+          created_at: string
+          external_id: string
+          id: number
+          slug: string
+          tag: string
+        }
+        Insert: {
+          created_at?: string
+          external_id?: string
+          id?: number
+          slug: string
+          tag: string
+        }
+        Update: {
+          created_at?: string
+          external_id?: string
+          id?: number
+          slug?: string
+          tag?: string
+        }
+        Relationships: []
       }
       user_images: {
         Row: {
