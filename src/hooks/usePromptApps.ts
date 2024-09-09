@@ -97,7 +97,32 @@ export default (loadPrompts?: boolean) => {
     }
   }
 
-  const selectPrompt = async (prompt: Prompt, isNewConversation?: boolean, pinPrompt?: boolean) => {
+  const getPrompt = async (promptId: string | number) => {
+    let apps: Prompt[] = prompts
+    if (!isPromptsLoaded) {
+      apps = (await refreshPrompts()) ?? []
+    }
+    // @ts-ignore
+    return apps.find((app) => app.id == promptId)
+  }
+
+  const getPromptByExternalId = async (externalId: string) => {
+    let apps: Prompt[] = prompts
+    if (!isPromptsLoaded) {
+      apps = (await refreshPrompts()) ?? []
+    }
+    // @ts-ignore
+    return apps.find((app) => app.external_id == externalId)
+  }
+
+  const selectPrompt = async (promptExternalId: string, isNewConversation?: boolean, pinPrompt?: boolean) => {
+    const prompt = await getPromptByExternalId(promptExternalId)
+
+    if (!prompt) {
+      // TODO: Add some error handling logic here (like a toast)
+      return
+    }
+
     trackEvent('Prompt Apps', {
       action: 'Prompt selected',
       promptName: prompt.name,
@@ -145,15 +170,6 @@ export default (loadPrompts?: boolean) => {
       }
       refreshPinnedPrompts()
     }
-  }
-
-  const getPrompt = async (promptId: string | number) => {
-    let apps: Prompt[] = prompts
-    if (!isPromptsLoaded) {
-      apps = (await refreshPrompts()) ?? []
-    }
-    // @ts-ignore
-    return apps.find((app) => app.id == promptId)
   }
 
   const getPromptBySlug = async (slug: string) => {

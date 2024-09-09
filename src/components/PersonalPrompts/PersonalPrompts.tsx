@@ -15,10 +15,14 @@ import { supabaseLoader } from '@/lib/supabase'
 // Custom Variables for styling
 import CSS_VARIABLES from './customVariables'
 import Tooltip from '@/components/Tooltip/Tooltip'
+import usePromptApps from '@/hooks/usePromptApps'
+import { useStore } from '@/providers/store-provider'
 
 type PromptWithPin = Prompt & { isPinned?: boolean }
 
-const PersonalPrompts = ({ userId, prompts, pinnedPrompts, openModal, selectPrompt }: PersonalPromptsProps) => {
+const PersonalPrompts = ({ userId, prompts, pinnedPrompts }: PersonalPromptsProps) => {
+  const openModal = useStore((state) => state.openModal)
+
   if (prompts.length === 0 && pinnedPrompts.length === 0) {
     return <EmptyPrompts openModal={openModal} />
   }
@@ -75,8 +79,6 @@ const PersonalPrompts = ({ userId, prompts, pinnedPrompts, openModal, selectProm
             <PersonalPromptsItem
               prompt={item}
               key={item.external_id}
-              selectPrompt={selectPrompt}
-              openModal={openModal}
               isOwner={isOwner}
               isPublic={isPublic}
               colorScheme={colorScheme}
@@ -88,21 +90,16 @@ const PersonalPrompts = ({ userId, prompts, pinnedPrompts, openModal, selectProm
   )
 }
 
-const PersonalPromptsItem = ({
-  prompt,
-  selectPrompt,
-  openModal,
-  colorScheme,
-  isOwner,
-  isPublic,
-}: PersonalPromptsItemProps) => {
+const PersonalPromptsItem = ({ prompt, colorScheme, isOwner, isPublic }: PersonalPromptsItemProps) => {
   const [isCopied, setIsCopied] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
+  const { selectPrompt } = usePromptApps()
+  const openModal = useStore((state) => state.openModal)
 
   return (
     <div
       className={styles.personalPromptsItem}
-      onClick={() => selectPrompt(prompt, true, false)}
+      onClick={() => selectPrompt(prompt.external_id, true, false)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{
@@ -202,7 +199,7 @@ const PersonalPromptsItem = ({
               variant="ghost-neutral"
               onClick={(e) => {
                 e.stopPropagation()
-                selectPrompt(prompt, true, false)
+                selectPrompt(prompt.external_id, true, false)
               }}
               hidden={!isHovered}
             >
