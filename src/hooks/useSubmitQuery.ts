@@ -417,6 +417,7 @@ export const useSubmitQuery = () => {
         attachments,
       )
 
+      // TODO(umut): This is a hack to add the context to the form data.
       if (context) {
         if (context.image) {
           formData.append('screenshot', context.image)
