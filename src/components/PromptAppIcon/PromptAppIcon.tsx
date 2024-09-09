@@ -4,6 +4,9 @@ import Image from 'next/image'
 import { supabaseLoader } from '@/lib/supabase'
 import globalStyles from '@/global.module.scss'
 
+/**
+ * Loads an image from Supabase.
+ */
 export default function PromptAppIcon({
   height = 64,
   width = 64,

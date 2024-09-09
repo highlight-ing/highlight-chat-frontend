@@ -9,6 +9,7 @@ import { FileAttachment, FileAttachmentType, TextFileAttachment } from '@/types'
 import { useShallow } from 'zustand/react/shallow'
 import { useEffect, useRef } from 'react'
 import { parseAndHandleStreamChunk } from '@/utils/streamParser'
+import { processAttachments } from '@/utils/contextprocessor'
 
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024 // 1MB in bytes
@@ -311,7 +312,9 @@ export const useSubmitQuery = () => {
     let contentToUse = rawContents || ocrText
 
     const fileAttachmentTypes = ['pdf', 'spreadsheet', 'text_file', 'image']
-    const hasFileAttachment = context.attachments?.some((a: { type: string }) => fileAttachmentTypes.includes(a.type))
+
+    const processedAttachments = processAttachments(context.attachments || [])
+    const hasFileAttachment = processedAttachments.some((a: { type: string }) => fileAttachmentTypes.includes(a.type))
 
     // Fetch windows information
     const windows = await fetchWindows()
@@ -319,7 +322,7 @@ export const useSubmitQuery = () => {
     if (query || clipboardText || contentToUse || screenshotUrl || audio || hasFileAttachment) {
       setInputIsDisabled(true)
 
-      const att = context.attachments || ([] as unknown)
+      const att = processedAttachments
       const fileAttachments = (att as FileAttachment[]).filter((a) => a.type && fileAttachmentTypes.includes(a.type))
 
       const conversationId = getOrCreateConversationId()
@@ -349,8 +352,8 @@ export const useSubmitQuery = () => {
         formData.append('about_me', JSON.stringify(aboutMe))
       }
 
-      const contextAttachments = context.attachments || []
-      await addAttachmentsToFormData(formData, contextAttachments)
+      // const contextAttachments = context.attachments || []
+      await addAttachmentsToFormData(formData, processedAttachments)
 
       // Add OCR text or raw contents to form data
       if (contentToUse) {

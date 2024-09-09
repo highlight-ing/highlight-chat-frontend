@@ -1,10 +1,8 @@
 import { useStore } from '@/providers/store-provider'
-import { createPortal } from 'react-dom'
 import Highlight from '@highlight-ai/app-runtime'
 
 import styles from './screenshot-attachment-picker.module.scss'
 import { useEffect, useRef, useState } from 'react'
-import { CloseIcon } from '@/icons/icons'
 import { trackEvent } from '@/utils/amplitude'
 import { ArrowCircleLeft, CloseCircle } from 'iconsax-react'
 import { Portal } from 'react-portal'

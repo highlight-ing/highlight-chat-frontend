@@ -9,7 +9,7 @@ type WindowAttachment = {
 
 export type BaseMessage = {
   role: 'user' | 'assistant'
-  content: string
+  content?: string
 }
 
 export type UserMessage = BaseMessage & {
@@ -108,7 +108,11 @@ export interface ChatHistoryItem {
   title: string
   updated_at: string
   user_id: string
-  shared_id?: string | null
+  shared_conversations?: {
+    created_at: string
+    id: string
+    title: string
+  }[]
 }
 
 export interface ModalObjectProps {

@@ -1,14 +1,13 @@
 'use server'
 
-import { validateHighlightJWT } from '@/lib/auth'
 import { PROMPTS_TABLE_SELECT_FIELDS, supabaseAdmin } from '@/lib/supabase'
 import { videoUrlSchema } from '@/lib/zod'
-import { JWTPayload, JWTVerifyResult } from 'jose'
 import { z } from 'zod'
 import mime from 'mime-types'
 import slugify from 'slugify'
 import { nanoid } from 'nanoid'
 import { PinnedPrompt } from '@/types'
+import { validateUserAuth } from '@/lib/auth'
 
 /**
  * This file contains all the server actions for interacting with prompts.
@@ -24,24 +23,6 @@ const ERROR_MESSAGES = {
   DATABASE_ERROR: 'Error occurred while making a write to database.',
   DATABASE_READ_ERROR: 'Error occurred while reading from database.',
   PROMPT_NOT_FOUND: 'Prompt not found in database.',
-}
-
-async function validateUserAuth(authToken: string) {
-  let jwt: JWTVerifyResult<JWTPayload>
-
-  try {
-    jwt = await validateHighlightJWT(authToken)
-  } catch (error) {
-    throw new Error('Invalid auth token')
-  }
-
-  const userId = jwt.payload.sub
-
-  if (!userId) {
-    throw new Error('User ID not found in auth token')
-  }
-
-  return userId
 }
 
 const SavePromptSchema = z.object({

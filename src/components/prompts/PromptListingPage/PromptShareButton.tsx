@@ -1,6 +1,7 @@
 'use client'
 
 import Button from '@/components/Button/Button'
+import { trackEvent } from '@/utils/amplitude'
 import { useRef, useState } from 'react'
 
 export default function PromptShareButton() {
@@ -8,6 +9,10 @@ export default function PromptShareButton() {
   const [copied, setCopied] = useState(false)
 
   function onShareClick() {
+    trackEvent('Prompt Store Listing', {
+      action: 'Share clicked',
+    })
+
     if (timeout.current) {
       clearTimeout(timeout.current)
     }

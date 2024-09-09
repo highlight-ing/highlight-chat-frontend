@@ -1,7 +1,7 @@
 import RelatedApp, { RelatedAppProps } from './RelatedApp'
-import Video from './Video'
-import TryButton from './TryButton'
 import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
+import Buttons from './Buttons'
+import Video from './Video'
 
 function IconPlaceholder() {
   return (
@@ -16,6 +16,7 @@ function IconPlaceholder() {
 }
 
 export interface PromptListingPageProps {
+  externalId: string
   name: string
   slug: string
   author: string
@@ -30,6 +31,7 @@ export interface PromptListingPageProps {
  * A prompt store page, this is the page that shows an individual prompt.
  */
 export default function PromptListingPage({
+  externalId,
   name,
   slug,
   author,
@@ -39,10 +41,12 @@ export default function PromptListingPage({
   image,
   imageExtension,
 }: PromptListingPageProps) {
+  const newVideoUrl = videoUrl ?? 'https://vimeo.com/1001298855'
+
   return (
     <div>
-      <div className="grid grid-flow-col gap-4">
-        <div className="flex flex-col justify-center gap-3">
+      <div className="flex flex-col gap-4 md:flex-row">
+        <div className="flex basis-1/2 flex-col justify-center gap-3">
           <div className="flex gap-3">
             {image && imageExtension ? (
               <PromptAppIcon className="h-16 w-16 rounded-full" imageId={image} imageExtension={imageExtension} />
@@ -54,14 +58,13 @@ export default function PromptListingPage({
               <h6 className="text-light-60">Created by {author}</h6>
             </div>
           </div>
-          <p>{description}</p>
-          <div className="mt-2">
-            <TryButton slug={slug} />
+          <div className="mt-16">
+            <Buttons externalId={externalId} slug={slug} />
           </div>
         </div>
-        {videoUrl && (
+        {newVideoUrl && (
           <div className="aspect-w-16 aspect-h-9 flex items-center justify-center">
-            <Video url={videoUrl} />
+            <Video url={newVideoUrl} />
           </div>
         )}
       </div>

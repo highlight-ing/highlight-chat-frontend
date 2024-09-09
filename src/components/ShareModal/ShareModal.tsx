@@ -26,8 +26,12 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
   const [chatVisibilityLabel, setChatVisibilityLabel] = useState<string>('Private Chat')
 
   useEffect(() => {
-    setChatVisibilityLabel(conversation?.shared_id ? 'Public Chat' : 'Private Chat')
-  }, [conversation?.shared_id])
+    setChatVisibilityLabel(
+      conversation?.shared_conversations && conversation.shared_conversations.length > 0
+        ? 'Public Chat'
+        : 'Private Chat',
+    )
+  }, [conversation?.shared_conversations])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -49,7 +53,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
       const shareLink = await getShareLink(conversation.id)
       await navigator.clipboard.writeText(shareLink)
 
-      // Update the shared_id in the store
+      // Update the shared_conversations in the store
       setShareId(conversation.id, shareLink)
       trackEvent('HL Chat Copy Link', { conversation_id: conversation.id, share_link: shareLink })
       addToast({
@@ -79,7 +83,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
     try {
       await deleteSharedConversation(conversation.id)
 
-      // Update the shared_id in the store
+      // Update the shared_conversations in the store
       setShareId(conversation.id, null)
       trackEvent('HL Chat Disable Link', { conversation_id: conversation.id })
       addToast({
@@ -123,8 +127,8 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
                   </div>
                 </div>
                 <div className={styles.previewFooter}>
-                  {conversation.shared_id
-                    ? `${conversation.shared_id}`
+                  {conversation.shared_conversations && conversation.shared_conversations.length > 0
+                    ? `${conversation.shared_conversations[0].id}`
                     : 'All contents currently inside the chat will be shared.'}
                 </div>
               </div>
@@ -156,7 +160,11 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
             size={'medium'}
             variant={'ghost-neutral'}
             style={{ width: '100%' }}
-            disabled={!conversation || isDisabling || !conversation.shared_id}
+            disabled={
+              !conversation ||
+              isDisabling ||
+              !(conversation.shared_conversations && conversation.shared_conversations.length > 0)
+            }
             onClick={onDisableLink}
           >
             {isDisabling ? (

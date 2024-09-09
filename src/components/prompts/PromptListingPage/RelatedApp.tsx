@@ -2,7 +2,6 @@
 
 import Button from '@/components/Button/Button'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
 
 function AppIcon() {
@@ -39,8 +38,8 @@ export default function RelatedApp({ name, description, slug, imageId, imageExte
           )}
         </div>
         <div className="flex flex-col gap-0.5">
-          <p className="text-light-100">{name}</p>
-          <p className="line-clamp-2 text-light-60">{description}</p>
+          <p className="text-light-100 text-sm">{name}</p>
+          <p className="line-clamp-2 text-sm text-light-60">{description}</p>
         </div>
       </div>
       <div className="ml-auto">

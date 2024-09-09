@@ -1,5 +1,8 @@
 'use server'
 
+import { validateUserAuth } from '@/lib/auth'
+import { supabaseAdmin } from '@/lib/supabase'
+
 // Hard code this, probably move to an env variable later on
 const HIGHLIGHT_CLIENT_ID = 'e64e0f07dd078e9750a2d8cca0b8e90849b9689aa601247aa4fafee8089cd3d4'
 const HIGHLIGHT_CLIENT_SECRET = process.env.HIGHLIGHT_AUTH_CLIENT_SECRET
@@ -40,5 +43,55 @@ export async function refreshTokens(refreshToken: string) {
     access_token: string
     refresh_token: string
     expires_in: number
+  }
+}
+
+/**
+ * Use's Highlight's userinfo endpoint to update the user's information in the HL Chat database
+ */
+export async function updateUserInfo(accessToken: string) {
+  let userId: string
+  try {
+    userId = await validateUserAuth(accessToken)
+  } catch (error) {
+    console.warn('Error validating user auth', error)
+    return
+  }
+
+  const response = await fetch('https://backend.workers.highlight.ing/v1/auth/userinfo', {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  })
+
+  if (!response.ok) {
+    console.warn('Non-OK status code returned from Highlight userinfo endpoint')
+
+    return
+  }
+
+  const userInfo = await response.json()
+
+  if (!userInfo.username) {
+    console.info('No username found in Highlight userinfo response, skipping update.')
+
+    return
+  }
+
+  const supabase = supabaseAdmin()
+
+  const { error } = await supabase.from('profiles').upsert(
+    {
+      user_id: userId,
+      username: userInfo.username,
+    },
+    {
+      onConflict: 'user_id',
+    },
+  )
+
+  if (error) {
+    console.warn('Error updating user info', error)
   }
 }

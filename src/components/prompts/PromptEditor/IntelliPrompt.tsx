@@ -94,7 +94,15 @@ const matchPhrase = (text: string, variable: string, phrase: string | null) => {
  * The new, improved PromptInput component that uses Monaco Editor.
  * @param otherButtons Additional buttons that will go in the "Context Bar" (the place where users can click to add variables)
  */
-export default function IntelliPrompt({ value, onChange }: { value?: string; onChange?: (value: string) => void }) {
+export default function IntelliPrompt({
+  value,
+  onChange,
+  hideTemplates,
+}: {
+  value?: string
+  onChange?: (value: string) => void
+  hideTemplates?: boolean
+}) {
   const monacoRef = useRef<Monaco | undefined>()
   const decorationsRef = useRef<editor.IEditorDecorationsCollection | null>(null)
 
@@ -274,7 +282,7 @@ export default function IntelliPrompt({ value, onChange }: { value?: string; onC
     <>
       <div className={styles.editorPage}>
         <div className={`${styles.editorActions} px-4`}>
-          <TemplatesTool />
+          {!hideTemplates && <TemplatesTool />}
           <VariablesTool onSelect={onVariableClick} disabled={onboarding.isOnboarding} />
           {/*<ConditionsTool disabled={onboarding.isOnboarding} />*/}
         </div>

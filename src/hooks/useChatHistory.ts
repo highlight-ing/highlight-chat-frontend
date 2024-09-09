@@ -30,6 +30,7 @@ export const useChatHistory = (): {
         throw new Error('Network response was not ok')
       }
       const data: ChatHistoryResponse = await response.json()
+
       setHistory(data.conversations)
       for (const chat of data.conversations) {
         if (openConversations.find((conv) => conv.id === chat.id)) {
@@ -57,6 +58,7 @@ export const useChatHistory = (): {
         throw new Error('Network response was not ok')
       }
       const data = await response.json()
+
       if (
         equal(
           history.find((item) => item.id === conversationId),

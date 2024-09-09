@@ -5,6 +5,10 @@ export default function VariablesScreen() {
   const { promptEditorData, setPromptEditorData } = usePromptEditorStore()
 
   return (
-    <IntelliPrompt value={promptEditorData.systemPrompt} onChange={(e) => setPromptEditorData({ systemPrompt: e })} />
+    <IntelliPrompt
+      value={promptEditorData.systemPrompt}
+      onChange={(e) => setPromptEditorData({ systemPrompt: e })}
+      hideTemplates
+    />
   )
 }

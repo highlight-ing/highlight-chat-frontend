@@ -9,9 +9,10 @@ import { Attachment } from '@/components/Attachment'
 import CodeBlock from '@/components/Messages/CodeBlock'
 import { getDisplayValue } from '@/utils/attachments'
 import { ProfileCircle } from 'iconsax-react'
+import Spinner from '@/components/Spinner'
 
 interface ShareUserMessageProps {
-  message: UserMessage & { fetchedImage?: string }
+  message: UserMessage & { fetchedImage?: string; isImageLoading?: boolean }
 }
 
 const hasAttachment = (message: UserMessage) => {
@@ -34,46 +35,49 @@ const preprocessLaTeX = (content: string) => {
 
 export const ShareUserMessage: React.FC<ShareUserMessageProps> = React.memo(({ message }) => {
   const hasAttachments = useMemo(() => hasAttachment(message), [message])
+  const hasContent = typeof message.content === 'string' && message.content.trim() !== ''
 
   return (
     <div className="mx-auto my-4 w-full max-w-[712px] px-6 md:px-4">
       <div className="rounded-[16px] border border-tertiary bg-primary p-4">
-        <div className={`text-sm font-light leading-[1.6] text-primary/90 ${hasAttachments ? 'mb-4' : ''}`}>
-          <Markdown
-            remarkPlugins={[remarkGfm, remarkMath]}
-            rehypePlugins={[rehypeKatex]}
-            components={{
-              //@ts-ignore
-              code({ node, inline, className, children, ...props }) {
-                const match = /language-(\w+)/.exec(className || '')
-                return !inline && match ? (
-                  <CodeBlock language={match[1]}>{children}</CodeBlock>
-                ) : (
-                  <code className={className} {...props}>
-                    {children}
-                  </code>
-                )
-              },
-              td({ children }) {
-                if (typeof children === 'string') {
-                  return <td>{children}</td>
-                }
-                if (Array.isArray(children)) {
-                  return (
-                    <td>
-                      {children.map((child, index) => (
-                        <React.Fragment key={index}>{child === '<br>' ? <br /> : child}</React.Fragment>
-                      ))}
-                    </td>
+        {hasContent && (
+          <div className={`text-sm font-light leading-[1.6] text-primary/90 ${hasAttachments ? 'mb-4' : ''}`}>
+            <Markdown
+              remarkPlugins={[remarkGfm, remarkMath]}
+              rehypePlugins={[rehypeKatex]}
+              components={{
+                //@ts-ignore
+                code({ node, inline, className, children, ...props }) {
+                  const match = /language-(\w+)/.exec(className || '')
+                  return !inline && match ? (
+                    <CodeBlock language={match[1]}>{children}</CodeBlock>
+                  ) : (
+                    <code className={className} {...props}>
+                      {children}
+                    </code>
                   )
-                }
-                return <td>{children}</td>
-              },
-            }}
-          >
-            {typeof message.content === 'string' ? preprocessLaTeX(message.content) : ''}
-          </Markdown>
-        </div>
+                },
+                td({ children }) {
+                  if (typeof children === 'string') {
+                    return <td>{children}</td>
+                  }
+                  if (Array.isArray(children)) {
+                    return (
+                      <td>
+                        {children.map((child, index) => (
+                          <React.Fragment key={index}>{child === '<br>' ? <br /> : child}</React.Fragment>
+                        ))}
+                      </td>
+                    )
+                  }
+                  return <td>{children}</td>
+                },
+              }}
+            >
+              {typeof message.content === 'string' ? preprocessLaTeX(message.content) : ''}
+            </Markdown>
+          </div>
+        )}
         {hasAttachments && (
           <div className="flex flex-wrap gap-2">
             {/* {message.screenshot && <Attachment type="image" value={message.screenshot} />} */}
@@ -88,7 +92,14 @@ export const ShareUserMessage: React.FC<ShareUserMessageProps> = React.memo(({ m
                 <Attachment key={index} type={a.type} value={getDisplayValue(a)} />
               ))}
             {message.window_context && <Attachment type="window_context" value={message.window_context} />}
-            {message.fetchedImage && <Attachment type="image" value={message.fetchedImage} isSharedImage={true} />}
+            {message.image_url &&
+              (message.isImageLoading ? (
+                <div className="flex h-24 w-24 items-center justify-center rounded bg-light-10">
+                  <Spinner size="small" />
+                </div>
+              ) : message.fetchedImage ? (
+                <Attachment type="image" value={message.fetchedImage} isSharedImage={true} />
+              ) : null)}
           </div>
         )}
       </div>

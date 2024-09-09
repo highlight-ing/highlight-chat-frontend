@@ -9,6 +9,9 @@ export interface AuthState {
    * behavior, like preventing them from creating prompts until they sign in fully.
    */
   userIsAnonymous?: boolean
+  /**
+   * Stores when the access token expires.
+   */
   authExpiration?: number
 }
 

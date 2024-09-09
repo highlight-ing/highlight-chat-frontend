@@ -10,7 +10,6 @@ import { useStore } from '@/providers/store-provider'
 import PromptSaveButton from '@/components/prompts/PromptEditor/PromptSaveButton'
 import { PromptTag } from '@/types'
 import Button from '@/components/Button/Button'
-import AnimatedLabel from '@/components/AnimatedLabel/AnimatedLabel'
 
 const EditPromptModal = ({ id, context }: ModalObjectProps) => {
   const prompt = context?.prompt as Prompt
