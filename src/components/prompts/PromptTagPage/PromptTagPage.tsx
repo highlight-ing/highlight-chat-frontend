@@ -10,7 +10,7 @@ export interface PromptTagPageProps {
 export default function PromptTagPage({ prompts }: PromptTagPageProps) {
   return (
     <div>
-      <div className="flex flex-row items-center">
+      <div className="flex flex-row items-center border-b border-[#222222] bg-[#191919]/[5%]">
         <div>
           <span>Highlight</span>
         </div>
