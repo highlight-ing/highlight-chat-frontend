@@ -56,16 +56,19 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
     setLoadingState(true)
     try {
       const shareLink = await getShareLink(conversation.id)
-      await navigator.clipboard.writeText(shareLink)
+      await navigator.clipboard.writeText(`https://chat.hl.ing/share/${shareLink}`)
 
       if (!isExistingShare) {
         setShareId(conversation.id, shareLink)
-        trackEvent('HL Chat Copy Link', { conversation_id: conversation.id, share_link: shareLink })
+        trackEvent('HL Chat Copy Link', {
+          conversation_id: conversation.id,
+          share_link: `https://chat.hl.ing/share/${shareLink}`,
+        })
       }
 
       addToast({
         title: 'Snapshot shared and copied to your clipboard',
-        description: shareLink,
+        description: `https://chat.hl.ing/share/${shareLink}`,
         type: 'success',
         timeout: 4000,
       })
@@ -135,7 +138,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
                 </div>
                 <div className={styles.previewFooter}>
                   {conversation.shared_conversations && conversation.shared_conversations.length > 0
-                    ? `${conversation.shared_conversations[0].id}`
+                    ? `https://chat.hl.ing/share/${conversation.shared_conversations[0].id}`
                     : 'All contents currently inside the chat will be shared.'}
                 </div>
               </div>
