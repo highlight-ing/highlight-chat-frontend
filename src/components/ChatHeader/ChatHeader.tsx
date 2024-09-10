@@ -64,8 +64,8 @@ const ChatHeader = ({ isShowing }: { isShowing: boolean }) => {
       <div className={`${styles.promptIcon} ${styles[promptType]}`}>
         {promptApp && promptApp.image && promptApp.user_images?.file_extension ? (
           <PromptAppIcon
-            width={64}
-            height={64}
+            width={90}
+            height={90}
             className={styles.promptIcon}
             imageId={promptApp!.image!}
             imageExtension={promptApp!.user_images?.file_extension ?? ''}

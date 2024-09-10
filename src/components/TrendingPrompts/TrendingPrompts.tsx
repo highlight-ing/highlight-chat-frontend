@@ -154,7 +154,7 @@ const TrendingPromptsItem = ({
               variant="tertiary"
               className={styles.filledButton}
               onClick={() => {
-                openModal('preview-prompt', { prompt })
+                openModal('customize-prompt', { prompt })
               }}
             >
               Preview

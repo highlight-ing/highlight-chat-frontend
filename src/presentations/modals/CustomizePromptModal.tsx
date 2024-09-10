@@ -4,11 +4,10 @@ import styles from './modals.module.scss'
 import { Prompt } from '@/types/supabase-helpers'
 import CloseButton from '@/components/CloseButton/CloseButton'
 import { useStore } from '@/providers/store-provider'
-import { PromptShareLinkButton } from '@/components/prompts/PromptCopyPage/PromptShareLinkButton'
-import { PromptCopyButton } from '@/components/prompts/PromptCopyPage/PromptCopyButton'
-import { PromptCopyDetails } from '@/components/prompts/PromptCopyPage/PromptCopyDetails'
+import { CustomizePromptButton } from '@/components/prompts/CustomizePromptPage/CustomizePromptButton'
+import { CustomizePromptDetails } from '@/components/prompts/CustomizePromptPage/CustomizePromptDetails'
 
-const PreviewPromptModal = ({ id, context }: ModalObjectProps) => {
+const CustomizePromptModal = ({ id, context }: ModalObjectProps) => {
   const prompt = context?.prompt as Prompt
 
   const closeModal = useStore((state) => state.closeModal)
@@ -23,16 +22,15 @@ const PreviewPromptModal = ({ id, context }: ModalObjectProps) => {
           <CloseButton alignment="left" onClick={() => closeModal(id)} />
           <div className="flex grow justify-center">{prompt.name}</div>
           <div className="absolute right-0 flex gap-1 p-2">
-            <PromptShareLinkButton promptSlug={prompt.slug} />
-            <PromptCopyButton prompt={prompt} />
+            <CustomizePromptButton prompt={prompt} />
           </div>
         </div>
       }
       showClose={false}
     >
-      <PromptCopyDetails prompt={prompt} />
+      <CustomizePromptDetails prompt={prompt} />
     </Modal>
   )
 }
 
-export default PreviewPromptModal
+export default CustomizePromptModal
