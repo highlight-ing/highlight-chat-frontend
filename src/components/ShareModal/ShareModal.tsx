@@ -17,9 +17,11 @@ interface ShareModalProps {
 }
 
 const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClose, setShareId }) => {
+  console.log('conversation', conversation)
   const modalRef = useRef<HTMLDivElement>(null)
   const [isGenerating, setIsGenerating] = useState(false)
   const [isDisabling, setIsDisabling] = useState(false)
+  const [isCopying, setIsCopying] = useState(false)
   const { getShareLink } = useShareConversation()
   const { deleteSharedConversation } = useDeleteConversation()
   const addToast = useStore((state) => state.addToast)
@@ -48,32 +50,58 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
 
   const onCopyLink = async () => {
     if (!conversation) return
-    setIsGenerating(true)
-    try {
-      const shareLink = await getShareLink(conversation.id)
-      await navigator.clipboard.writeText(shareLink)
+    if (conversation.shared_conversations && conversation.shared_conversations.length > 0) {
+      setIsCopying(true)
+      try {
+        const shareLink = await getShareLink(conversation.id)
+        await navigator.clipboard.writeText(shareLink)
+        addToast({
+          title: 'Snapshot shared and copied to your clipboard',
+          description: `${shareLink}`,
+          type: 'success',
+          timeout: 4000,
+        })
+      } catch (error) {
+        console.error('Failed to copy link:', error)
+        trackEvent('HL Chat Copy Link Error', { conversation_id: conversation.id, error: error })
 
-      // Update the shared_conversations in the store
-      setShareId(conversation.id, shareLink)
-      trackEvent('HL Chat Copy Link', { conversation_id: conversation.id, share_link: shareLink })
-      addToast({
-        title: 'Snapshot shared and copied to your clipboard',
-        description: `${shareLink}`,
-        type: 'success',
-        timeout: 4000,
-      })
-    } catch (error) {
-      console.error('Failed to copy link:', error)
-      trackEvent('HL Chat Copy Link Error', { conversation_id: conversation.id, error: error })
+        addToast({
+          title: 'Failed to Copy Link',
+          description: 'An error occurred while generating the share link.',
+          type: 'error',
+        })
+      } finally {
+        setIsCopying(false)
+        onClose()
+      }
+    } else {
+      setIsGenerating(true)
+      try {
+        const shareLink = await getShareLink(conversation.id)
+        await navigator.clipboard.writeText(shareLink)
 
-      addToast({
-        title: 'Failed to Copy Link',
-        description: 'An error occurred while generating the share link.',
-        type: 'error',
-      })
-    } finally {
-      setIsGenerating(false)
-      onClose()
+        // Update the shared_conversations in the store
+        setShareId(conversation.id, shareLink)
+        trackEvent('HL Chat Copy Link', { conversation_id: conversation.id, share_link: shareLink })
+        addToast({
+          title: 'Snapshot shared and copied to your clipboard',
+          description: `${shareLink}`,
+          type: 'success',
+          timeout: 4000,
+        })
+      } catch (error) {
+        console.error('Failed to copy link:', error)
+        trackEvent('HL Chat Copy Link Error', { conversation_id: conversation.id, error: error })
+
+        addToast({
+          title: 'Failed to Copy Link',
+          description: 'An error occurred while generating the share link.',
+          type: 'error',
+        })
+      } finally {
+        setIsGenerating(false)
+        onClose()
+      }
     }
   }
 
@@ -143,7 +171,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
             size={'medium'}
             variant={'primary'}
             onClick={onCopyLink}
-            disabled={!conversation || isGenerating}
+            disabled={!conversation || isGenerating || isCopying}
             style={{
               width: '100%',
             }}
@@ -151,6 +179,10 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
             {isGenerating ? (
               <>
                 <LoadingSpinner size={'20px'} /> Generating...
+              </>
+            ) : isCopying ? (
+              <>
+                <LoadingSpinner size={'20px'} /> Copying...
               </>
             ) : (
               'Copy Share Link'
