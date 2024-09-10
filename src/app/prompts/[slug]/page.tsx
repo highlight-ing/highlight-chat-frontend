@@ -91,7 +91,7 @@ export default async function PromptPage({ params }: PromptPageProps) {
           <PromptShareButton />
         </div>
       </div>
-      <div className="p-20">
+      <div className="p-5 md:p-20">
         <PromptListingPage
           externalId={prompt.external_id}
           image={prompt.image ?? undefined}

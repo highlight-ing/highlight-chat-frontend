@@ -1,4 +1,4 @@
-import { PROMPTS_TABLE_SELECT_FIELDS, supabaseAdmin } from '@/lib/supabase'
+import { PROMPTS_TABLE_SELECT_FIELDS, promptSelectMapper, supabaseAdmin } from '@/lib/supabase'
 
 /**
  * API route that returns a single prompt by its slug
@@ -21,5 +21,5 @@ export async function GET(request: Request, { params }: { params: { slug: string
     return Response.json({ error: 'Prompt not found' }, { status: 404 })
   }
 
-  return Response.json(prompt)
+  return Response.json(promptSelectMapper(prompt))
 }

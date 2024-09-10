@@ -1,6 +1,6 @@
 'use server'
 
-import { PROMPTS_TABLE_SELECT_FIELDS, supabaseAdmin } from '@/lib/supabase'
+import { PROMPTS_TABLE_SELECT_FIELDS, promptSelectMapper, supabaseAdmin } from '@/lib/supabase'
 import { videoUrlSchema } from '@/lib/zod'
 import { z } from 'zod'
 import mime from 'mime-types'
@@ -223,7 +223,6 @@ export async function savePrompt(formData: FormData, authToken: string) {
     user_id: userId,
     image: newImageId ?? undefined,
     is_handlebar_prompt: true,
-    tags: validated.data.tags, // Store the full tag objects
   }
 
   if (validated.data.externalId) {
@@ -360,17 +359,7 @@ export async function fetchPrompts(authToken: string) {
     )
 
   // Map the prompts to follow the original structure with tags.
-  const mappedPrompts =
-    prompts?.map((x) => ({
-      ...x,
-      tags:
-        x.added_prompt_tags?.map((y) => {
-          return {
-            label: y.tags?.tag,
-            value: y.tags?.tag,
-          }
-        }) ?? [],
-    })) ?? []
+  const mappedPrompts = prompts?.map(promptSelectMapper) ?? []
 
   if (promptsError) {
     return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
@@ -405,7 +394,7 @@ export async function fetchPinnedPrompts(authToken: string): Promise<{ error: st
     return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
   }
 
-  return pinnedPrompts.map((p) => p.prompts) as PinnedPrompt[]
+  return pinnedPrompts.map((p) => promptSelectMapper(p.prompts)) as PinnedPrompt[]
 }
 
 export async function deletePrompt(externalId: string, authToken: string) {
