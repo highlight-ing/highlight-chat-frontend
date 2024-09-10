@@ -1,5 +1,5 @@
 import { useStore } from '@/providers/store-provider'
-import { addPromptToUser, countPromptView, fetchPrompts, fetchPinnedPrompts, fetchPromptText } from '@/utils/prompts'
+import { addPromptToUser, countPromptView, fetchPrompts, fetchPinnedPrompts } from '@/utils/prompts'
 import useAuth from '@/hooks/useAuth'
 import { Prompt } from '@/types/supabase-helpers'
 import { useShallow } from 'zustand/react/shallow'

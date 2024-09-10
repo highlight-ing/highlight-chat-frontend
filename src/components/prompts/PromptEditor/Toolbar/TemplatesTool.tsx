@@ -1,5 +1,4 @@
-import { usePromptEditorStore } from '@/stores/prompt-editor'
-import { Crown, Note, Screenmirroring, Shapes, VoiceSquare } from 'iconsax-react'
+import { Note, Screenmirroring, Shapes, VoiceSquare } from 'iconsax-react'
 import sassVariables from '@/variables.module.scss'
 import ContextMenu from '@/components/ContextMenu/ContextMenu'
 import Button from '@/components/Button/Button'

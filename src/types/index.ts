@@ -1,5 +1,5 @@
 import { Prompt } from '@/types/supabase-helpers'
-import { ColorScheme, CSSVariables } from '@/components/PersonalPrompts/customVariables'
+import { ColorScheme } from '@/components/PersonalPrompts/customVariables'
 
 type WindowAttachment = {
   type: 'window'

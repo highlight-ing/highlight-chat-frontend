@@ -4,7 +4,7 @@ import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { APP_PROMPT_COMMENT } from '@/types'
 import { useStore } from '@/providers/store-provider'
 
-export function CustomizePromptButton({ prompt }: { prompt: Prompt }) {
+export function CustomizePromptButton({ prompt }: Readonly<{ prompt: Prompt }>) {
   const { setSelectedScreen, setPromptEditorData, setOnboarding } = usePromptEditorStore()
 
   const closeModal = useStore((state) => state.closeModal)
