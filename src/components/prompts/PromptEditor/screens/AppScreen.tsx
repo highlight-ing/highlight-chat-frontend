@@ -107,7 +107,9 @@ export default function AppScreen() {
         <IntelliPrompt
           value={promptEditorData.appPrompt}
           onChange={(e) => setPromptEditorData({ appPrompt: e })}
-          hideControls={false}
+          hideVariables={true}
+          hideTemplates={true}
+          readOnly={true}
         />
       </span>
       {onboarding.isOnboarding && onboarding.index === 0 && <OnboardingIndex0 />}

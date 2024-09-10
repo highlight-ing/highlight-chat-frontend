@@ -97,12 +97,16 @@ const matchPhrase = (text: string, variable: string, phrase: string | null) => {
 export default function IntelliPrompt({
   value,
   onChange,
-  hideControls,
-}: {
+  hideVariables = false,
+  hideTemplates = false,
+  readOnly = false,
+}: Readonly<{
   value?: string
   onChange?: (value: string) => void
-  hideControls?: boolean
-}) {
+  hideVariables?: boolean
+  hideTemplates?: boolean
+  readOnly?: boolean
+}>) {
   const monacoRef = useRef<Monaco | undefined>()
   const decorationsRef = useRef<editor.IEditorDecorationsCollection | null>(null)
 
@@ -282,8 +286,8 @@ export default function IntelliPrompt({
     <>
       <div className={styles.editorPage}>
         <div className={`${styles.editorActions} px-4`}>
-          {!hideControls && <TemplatesTool />}
-          {!hideControls && <VariablesTool onSelect={onVariableClick} disabled={onboarding.isOnboarding} />}
+          {hideTemplates && <TemplatesTool />}
+          {hideVariables && <VariablesTool onSelect={onVariableClick} disabled={onboarding.isOnboarding} />}
           {/*<ConditionsTool disabled={onboarding.isOnboarding} />*/}
         </div>
       </div>
@@ -300,7 +304,7 @@ export default function IntelliPrompt({
             enabled: false,
           },
           automaticLayout: true,
-          readOnly: onboarding.isOnboarding || hideControls,
+          readOnly: onboarding.isOnboarding || readOnly,
           fontSize: 14,
         }}
       />
