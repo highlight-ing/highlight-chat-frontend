@@ -20,6 +20,7 @@ interface ContextMenuProps {
   position: Position
   triggerId: string
   wrapperStyle?: React.CSSProperties
+  hidden?: boolean
 }
 
 const ContextMenu = ({
@@ -30,6 +31,7 @@ const ContextMenu = ({
   items,
   offset = 0,
   wrapperStyle,
+  hidden,
 }: PropsWithChildren<ContextMenuProps>) => {
   const [isOpen, setOpen] = useState(false)
   const [appliedStyle, setAppliedStyle] = useState<React.CSSProperties>({})
@@ -87,7 +89,7 @@ const ContextMenu = ({
   }, [isOpen])
 
   return (
-    <div className="relative h-fit w-fit" ref={containerRef} style={wrapperStyle}>
+    <div className={`relative h-fit w-fit ${hidden ? 'hidden' : ''}`} ref={containerRef} style={wrapperStyle}>
       {typeof children === 'function'
         ? // @ts-ignore
           children({ isOpen })

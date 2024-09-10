@@ -265,7 +265,6 @@ export type Database = {
           slug: string
           suggestion_prompt_text: string | null
           system_prompt: string | null
-          tags: Json[] | null
           user_id: string
           video_url: string | null
         }
@@ -285,7 +284,6 @@ export type Database = {
           slug: string
           suggestion_prompt_text?: string | null
           system_prompt?: string | null
-          tags?: Json[] | null
           user_id: string
           video_url?: string | null
         }
@@ -305,7 +303,6 @@ export type Database = {
           slug?: string
           suggestion_prompt_text?: string | null
           system_prompt?: string | null
-          tags?: Json[] | null
           user_id?: string
           video_url?: string | null
         }
