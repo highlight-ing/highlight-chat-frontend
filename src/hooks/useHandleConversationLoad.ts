@@ -121,7 +121,7 @@ export default function useHandleConversationLoad() {
         const prompt = await getPrompt(chat.app_id)
         if (prompt) {
           console.log('Setting prompt app for conversation')
-          await selectPrompt(prompt, false, false)
+          await selectPrompt(prompt.external_id, false, false)
         }
       } else if (!chat.app_id && promptApp?.id) {
         console.log('Clearing prompt app for conversation')

@@ -11,19 +11,17 @@ import Image from 'next/image'
 import Button from '@/components/Button/Button'
 import { Badge } from '@/components/Badge/Badge'
 import Tooltip from '@/components/Tooltip/Tooltip'
+import usePromptApps from '@/hooks/usePromptApps'
+import { useStore } from '@/providers/store-provider'
 
 const TrendingPrompts = ({
   userId,
   prompts,
   pinnedPrompts,
-  openModal,
-  selectPrompt,
 }: {
   userId: string | undefined
   prompts: Prompt[]
   pinnedPrompts: PinnedPrompt[]
-  openModal: (modal: string, context?: Record<string, any>) => void
-  selectPrompt: (prompt: Prompt) => void
 }) => {
   const mergedPrompts = useMemo(() => {
     const pinnedPromptIds = new Set(pinnedPrompts.map((p) => p?.external_id))
@@ -39,23 +37,23 @@ const TrendingPrompts = ({
         <div className={styles.trendingPromptsHeader}>
           <h2>Top 10 Trending Prompts</h2>
           <div className={styles.trendingPrompts}>
-            {mergedPrompts.map((item, index) => (
-              <TrendingPromptsItem
-                key={item.name}
-                name={item.name}
-                description={item.description ?? ''}
-                slug={item.slug}
-                color={variables.primary100}
-                selectPrompt={selectPrompt}
-                prompt={item}
-                tags={item.tags as PromptTag[] | null}
-                lastItem={index === mergedPrompts.length - 1}
-                openModal={openModal}
-                publicUseNumber={item.public_use_number}
-                userId={userId}
-                pinState={item.isPinned}
-              />
-            ))}
+            {mergedPrompts.map((item, index) => {
+              return (
+                <TrendingPromptsItem
+                  key={item.name}
+                  name={item.name}
+                  description={item.description ?? ''}
+                  slug={item.slug}
+                  color={variables.primary100}
+                  prompt={item}
+                  tags={item.tags as PromptTag[] | null}
+                  lastItem={index === mergedPrompts.length - 1}
+                  publicUseNumber={item.public_use_number}
+                  userId={userId}
+                  pinState={item.isPinned}
+                />
+              )
+            })}
           </div>
         </div>
       )}
@@ -66,30 +64,26 @@ const TrendingPrompts = ({
 const TrendingPromptsItem = ({
   name,
   description,
-  slug,
   color,
-  selectPrompt,
   prompt,
   tags,
   lastItem,
-  openModal,
   publicUseNumber,
-  userId,
   pinState,
 }: {
   name: string
   description?: string
   slug: string
   color?: string
-  selectPrompt: (prompt: Prompt, startNewConversation?: boolean, pinPrompt?: boolean) => void
   prompt: Prompt
   tags?: PromptTag[] | null
   lastItem: boolean
-  openModal: (modal: string, context?: Record<string, any>) => void
   publicUseNumber: number
   userId: string | undefined
   pinState: boolean
 }) => {
+  const openModal = useStore((state) => state.openModal)
+  const { selectPrompt } = usePromptApps()
   const [isPinned, setIsPinned] = useState(pinState)
 
   useEffect(() => {
@@ -165,7 +159,7 @@ const TrendingPromptsItem = ({
               className={styles.filledButton}
               size="xsmall"
               variant="primary"
-              onClick={() => selectPrompt(prompt, true, false)}
+              onClick={() => selectPrompt(prompt.external_id, true, false)}
             >
               Chat
             </Button>

@@ -13,13 +13,13 @@ const ChatHeader = ({ isShowing }: { isShowing: boolean }) => {
   // const { myPrompts } = usePromptApps()
   const router = useRouter()
 
-  const { startNewConversation, promptApp, promptName, promptDescription, promptUserId, clearPrompt } = useStore(
+  const { startNewConversation, promptApp, promptName, promptDescription, userId, clearPrompt } = useStore(
     useShallow((state) => ({
       startNewConversation: state.startNewConversation,
       promptApp: state.promptApp,
       promptName: state.promptName,
       promptDescription: state.promptDescription,
-      promptUserId: state.promptUserId,
+      userId: state.userId,
       clearPrompt: state.clearPrompt,
     })),
   )
@@ -51,7 +51,7 @@ const ChatHeader = ({ isShowing }: { isShowing: boolean }) => {
     router.push('/')
   }
 
-  const promptType = getPromptAppType(promptUserId, promptApp)
+  const promptType = getPromptAppType(userId, promptApp)
 
   return (
     <div className={`${styles.chatHeader} ${isShowing ? styles.show : ''}`}>

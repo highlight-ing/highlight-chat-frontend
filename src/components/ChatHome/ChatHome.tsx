@@ -18,12 +18,6 @@ import PersonalPrompts from '@/components/PersonalPrompts/PersonalPrompts'
 import TrendingPrompts from '@/components/TrendingPrompts/TrendingPrompts'
 
 const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
-  const { openModal, closeModal } = useStore(
-    useShallow((state) => ({
-      openModal: state.openModal,
-      closeModal: state.closeModal,
-    })),
-  )
   const [isVisible, setVisible] = useState(isShowing)
 
   // Get the user ID from the store
@@ -47,7 +41,7 @@ const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
         <InputHeading />
         {isVisible && <Input isActiveChat={false} />}
       </div>
-      <Prompts userId={userId} openModal={openModal} />
+      <Prompts userId={userId} />
     </div>
   )
 }
@@ -81,14 +75,8 @@ function InputHeading() {
   )
 }
 
-const Prompts = ({
-  userId,
-  openModal,
-}: {
-  userId: string | undefined
-  openModal: (modal: string, context?: Record<string, any>) => void
-}) => {
-  const { isLoadingPrompts, myPrompts, communityPrompts, pinnedPrompts, selectPrompt } = usePromptApps()
+const Prompts = ({ userId }: { userId: string | undefined }) => {
+  const { isLoadingPrompts, myPrompts, communityPrompts, pinnedPrompts } = usePromptApps()
   if (isLoadingPrompts && !userId) {
     return (
       <div className="flex flex-col gap-4">
@@ -105,82 +93,12 @@ const Prompts = ({
   return (
     <>
       <div className={styles.callouts}>
-        <PersonalPrompts
-          userId={userId}
-          prompts={myPrompts}
-          pinnedPrompts={pinnedPrompts}
-          openModal={openModal}
-          selectPrompt={selectPrompt}
-        />
+        <PersonalPrompts userId={userId} prompts={myPrompts} pinnedPrompts={pinnedPrompts} />
       </div>
       <div className={styles.callouts}>
-        <TrendingPrompts
-          userId={userId}
-          prompts={communityPrompts}
-          pinnedPrompts={pinnedPrompts}
-          openModal={openModal}
-          selectPrompt={selectPrompt}
-        />
+        <TrendingPrompts userId={userId} prompts={communityPrompts} pinnedPrompts={pinnedPrompts} />
       </div>
     </>
-  )
-}
-
-const oldPrompts = () => {
-  const openModal = useStore((state) => state.openModal)
-  const { isLoadingPrompts, myPrompts, selectPrompt } = usePromptApps()
-  const [hotkey, setHotkey] = useState<string>('alt + .')
-
-  useEffect(() => {
-    const fetchHotkey = async () => {
-      const hotkey = await Highlight.app.getHotkey()
-      setHotkey(hotkey)
-    }
-    fetchHotkey()
-  }, [])
-
-  if (isLoadingPrompts) {
-    return (
-      <div className={`${styles.prompts} ${mainStyles.loadingGradient}`}>
-        <div className={'h-20 w-full p-16'} />
-      </div>
-    )
-  }
-
-  if (!myPrompts.length) {
-    return <HighlightTutorial hotkey={hotkey} />
-  }
-
-  return (
-    <div className={styles.prompts}>
-      {myPrompts.map((prompt: Prompt) => {
-        return (
-          <PromptListRow
-            key={prompt.external_id}
-            prompt={prompt}
-            type={'self'}
-            onClick={() => {
-              selectPrompt(prompt)
-              trackEvent('HL Chat Prompt Selected', { promptSlug: prompt.slug })
-            }}
-            onClickEdit={() => {
-              openModal('edit-prompt', { prompt: prompt })
-            }}
-          />
-        )
-      })}
-
-      <PromptListRow
-        // @ts-ignore
-        prompt={{ slug: 'create', description: 'Create your own chat app' }}
-        icon={<AddCircle variant={'Bold'} color={variables.light60} />}
-        type={'default'}
-        onClick={() => {
-          openModal('create-prompt')
-          trackEvent('HL Chat Start Create Chat App', { context: 'Chat Home List' })
-        }}
-      />
-    </div>
   )
 }
 
