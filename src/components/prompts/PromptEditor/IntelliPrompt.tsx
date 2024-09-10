@@ -281,9 +281,6 @@ export default function IntelliPrompt({
   useEffect(() => {
     highlightWords()
   }, [value])
-  console.log('hideTemplates', hideTemplates)
-  console.log('hideVariables', hideVariables)
-  console.log('readOnly', readOnly)
   return (
     <>
       <div className={styles.editorPage}>

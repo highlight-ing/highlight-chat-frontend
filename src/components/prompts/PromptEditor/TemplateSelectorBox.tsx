@@ -2,6 +2,7 @@ import { Squircle } from '@squircle-js/react'
 import styles from './prompteditor.module.scss'
 import { EmojiHappy, Personalcard, Setting, User } from 'iconsax-react'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
+import { APP_PROMPT_COMMENT } from '@/types'
 
 function TemplateCard({
   title,
@@ -33,9 +34,6 @@ function TemplateCard({
     </Squircle>
   )
 }
-
-const APP_PROMPT_COMMENT =
-  "{{! These are comments, they won't effect the output of your app }}\n{{! The app prompt determines how your app will behave to the user. }}\n"
 
 export default function TemplateSelectorBox({ size }: { size?: 'small' | 'large' }) {
   const { setSelectedScreen, setPromptEditorData, setOnboarding } = usePromptEditorStore()

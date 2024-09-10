@@ -29,6 +29,7 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
         visibility: prompt.public ? 'public' : 'private',
         videoUrl: prompt.video_url ?? undefined,
         image: prompt.image ? `${prompt.image}.${prompt.user_images?.file_extension}` : undefined,
+        // @ts-ignore
         tags: prompt.tags as PromptTag[],
         systemPrompt: prompt.system_prompt ?? DEFAULT_SYSTEM_PROMPT,
       },

@@ -3,7 +3,7 @@ import styles from './customize-prompt.module.scss'
 import IntelliPrompt from '@/components/prompts/PromptEditor/IntelliPrompt'
 import { CustomizePromptPreview } from '@/components/prompts/CustomizePromptPage/CustomizePromptPreview'
 
-export function CustomizePromptDetails({ prompt }: { prompt: Prompt }) {
+export function CustomizePromptDetails({ prompt }: { readonly prompt: Prompt }) {
   return (
     <>
       <CustomizePromptPreview prompt={prompt} />
