@@ -20,6 +20,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
   const modalRef = useRef<HTMLDivElement>(null)
   const [isGenerating, setIsGenerating] = useState(false)
   const [isDisabling, setIsDisabling] = useState(false)
+  const [isCopying, setIsCopying] = useState(false)
   const { getShareLink } = useShareConversation()
   const { deleteSharedConversation } = useDeleteConversation()
   const addToast = useStore((state) => state.addToast)
@@ -48,17 +49,23 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
 
   const onCopyLink = async () => {
     if (!conversation) return
-    setIsGenerating(true)
+
+    const isExistingShare = conversation.shared_conversations?.length ?? 0 > 0
+    const setLoadingState = isExistingShare ? setIsCopying : setIsGenerating
+
+    setLoadingState(true)
     try {
       const shareLink = await getShareLink(conversation.id)
       await navigator.clipboard.writeText(`https://chat.hl.ing/share/${shareLink}`)
 
-      // Update the shared_conversations in the store
-      setShareId(conversation.id, shareLink)
-      trackEvent('HL Chat Copy Link', {
-        conversation_id: conversation.id,
-        share_link: `https://chat.hl.ing/share/${shareLink}`,
-      })
+      if (!isExistingShare) {
+        setShareId(conversation.id, shareLink)
+        trackEvent('HL Chat Copy Link', {
+          conversation_id: conversation.id,
+          share_link: `https://chat.hl.ing/share/${shareLink}`,
+        })
+      }
+
       addToast({
         title: 'Snapshot shared and copied to your clipboard',
         description: `https://chat.hl.ing/share/${shareLink}`,
@@ -67,7 +74,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
       })
     } catch (error) {
       console.error('Failed to copy link:', error)
-      trackEvent('HL Chat Copy Link Error', { conversation_id: conversation.id, error: error })
+      trackEvent('HL Chat Copy Link Error', { conversation_id: conversation.id, error })
 
       addToast({
         title: 'Failed to Copy Link',
@@ -75,7 +82,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
         type: 'error',
       })
     } finally {
-      setIsGenerating(false)
+      setLoadingState(false)
       onClose()
     }
   }
@@ -146,7 +153,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
             size={'medium'}
             variant={'primary'}
             onClick={onCopyLink}
-            disabled={!conversation || isGenerating}
+            disabled={!conversation || isGenerating || isCopying}
             style={{
               width: '100%',
             }}
@@ -154,6 +161,10 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
             {isGenerating ? (
               <>
                 <LoadingSpinner size={'20px'} /> Generating...
+              </>
+            ) : isCopying ? (
+              <>
+                <LoadingSpinner size={'20px'} /> Copying...
               </>
             ) : (
               'Copy Share Link'
