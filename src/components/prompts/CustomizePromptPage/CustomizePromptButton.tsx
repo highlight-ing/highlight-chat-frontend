@@ -5,12 +5,13 @@ import { APP_PROMPT_COMMENT } from '@/types'
 import { useStore } from '@/providers/store-provider'
 
 export function CustomizePromptButton({ prompt }: Readonly<{ prompt: Prompt }>) {
-  const { setSelectedScreen, setPromptEditorData, setOnboarding } = usePromptEditorStore()
+  const { setSelectedScreen, setPromptEditorData, clearPromptEditorData, setOnboarding } = usePromptEditorStore()
 
   const closeModal = useStore((state) => state.closeModal)
   const openModal = useStore((state) => state.openModal)
 
   function onCopyPromptClick() {
+    clearPromptEditorData()
     setOnboarding({ isOnboarding: false, index: 0 })
     setSelectedScreen('startWithTemplate')
     setPromptEditorData({
