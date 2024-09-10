@@ -9,17 +9,12 @@ import { supabaseLoader } from '@/lib/supabase'
 import Image from 'next/image'
 import usePromptApps from '@/hooks/usePromptApps'
 import { useStore } from '@/providers/store-provider'
-import { useShallow } from 'zustand/react/shallow'
 import { PromptTag } from '@/types'
 
 export const CustomizePromptPreview = ({ prompt }: { prompt: Prompt }) => {
   const { selectPrompt } = usePromptApps()
-  const { closeModal } = useStore(
-    useShallow((state) => ({
-      openModal: state.openModal,
-      closeModal: state.closeModal,
-    })),
-  )
+  const closeModal = useStore((state) => state.closeModal)
+
   return (
     <div className={styles.customizePromptsItem}>
       <div className={styles.customizePromptsItemHeader}>
@@ -77,8 +72,8 @@ function PromptTags({ tags }: { tags: PromptTag[] }) {
   return (
     tags.length > 0 && (
       <div className={styles.promptTags}>
-        {tags.map((tag, index) => (
-          <Badge key={index - 1} variant="disabled">
+        {tags.map((tag) => (
+          <Badge key={tag.value} variant="disabled">
             {tag.label}
           </Badge>
         ))}
