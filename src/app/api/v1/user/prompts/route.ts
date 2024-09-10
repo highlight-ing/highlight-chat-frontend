@@ -1,5 +1,5 @@
 import { authenticateApiUser } from '@/lib/api'
-import { PROMPTS_TABLE_SELECT_FIELDS, supabaseAdmin } from '@/lib/supabase'
+import { PROMPTS_TABLE_SELECT_FIELDS, promptSelectMapper, supabaseAdmin } from '@/lib/supabase'
 
 /**
  * API route that returns all prompts for the calling user (based on the authorization token)
@@ -55,9 +55,9 @@ export async function GET(request: Request) {
   const addedPrompts = sortingArray.map((prompt) => {
     // Check if the prompt has the correct shape
     if ('prompts' in prompt && prompt.prompts) {
-      return prompt.prompts
+      return promptSelectMapper(prompt.prompts)
     } else if ('external_id' in prompt) {
-      return prompt
+      return promptSelectMapper(prompt)
     } else {
       console.error('Unexpected prompt structure:', prompt)
       return null
