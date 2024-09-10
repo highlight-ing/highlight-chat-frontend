@@ -1,4 +1,4 @@
-import { PROMPTS_TABLE_SELECT_FIELDS, supabaseAdmin } from '@/lib/supabase'
+import { PROMPTS_TABLE_SELECT_FIELDS, promptSelectMapper, supabaseAdmin } from '@/lib/supabase'
 
 /**
  * API route that returns all public prompts
@@ -12,5 +12,5 @@ export async function GET(request: Request) {
     return Response.json({ error: error.message }, { status: 500 })
   }
 
-  return Response.json(prompts)
+  return Response.json(prompts.map(promptSelectMapper))
 }
