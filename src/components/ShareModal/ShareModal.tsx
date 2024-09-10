@@ -50,58 +50,38 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
 
   const onCopyLink = async () => {
     if (!conversation) return
-    if (conversation.shared_conversations && conversation.shared_conversations.length > 0) {
-      setIsCopying(true)
-      try {
-        const shareLink = await getShareLink(conversation.id)
-        await navigator.clipboard.writeText(shareLink)
-        addToast({
-          title: 'Snapshot shared and copied to your clipboard',
-          description: `${shareLink}`,
-          type: 'success',
-          timeout: 4000,
-        })
-      } catch (error) {
-        console.error('Failed to copy link:', error)
-        trackEvent('HL Chat Copy Link Error', { conversation_id: conversation.id, error: error })
 
-        addToast({
-          title: 'Failed to Copy Link',
-          description: 'An error occurred while generating the share link.',
-          type: 'error',
-        })
-      } finally {
-        setIsCopying(false)
-        onClose()
-      }
-    } else {
-      setIsGenerating(true)
-      try {
-        const shareLink = await getShareLink(conversation.id)
-        await navigator.clipboard.writeText(shareLink)
+    const isExistingShare = conversation.shared_conversations?.length ?? 0 > 0
+    const setLoadingState = isExistingShare ? setIsCopying : setIsGenerating
 
-        // Update the shared_conversations in the store
+    setLoadingState(true)
+    try {
+      const shareLink = await getShareLink(conversation.id)
+      await navigator.clipboard.writeText(shareLink)
+
+      if (!isExistingShare) {
         setShareId(conversation.id, shareLink)
         trackEvent('HL Chat Copy Link', { conversation_id: conversation.id, share_link: shareLink })
-        addToast({
-          title: 'Snapshot shared and copied to your clipboard',
-          description: `${shareLink}`,
-          type: 'success',
-          timeout: 4000,
-        })
-      } catch (error) {
-        console.error('Failed to copy link:', error)
-        trackEvent('HL Chat Copy Link Error', { conversation_id: conversation.id, error: error })
-
-        addToast({
-          title: 'Failed to Copy Link',
-          description: 'An error occurred while generating the share link.',
-          type: 'error',
-        })
-      } finally {
-        setIsGenerating(false)
-        onClose()
       }
+
+      addToast({
+        title: 'Snapshot shared and copied to your clipboard',
+        description: shareLink,
+        type: 'success',
+        timeout: 4000,
+      })
+    } catch (error) {
+      console.error('Failed to copy link:', error)
+      trackEvent('HL Chat Copy Link Error', { conversation_id: conversation.id, error })
+
+      addToast({
+        title: 'Failed to Copy Link',
+        description: 'An error occurred while generating the share link.',
+        type: 'error',
+      })
+    } finally {
+      setLoadingState(false)
+      onClose()
     }
   }
 
