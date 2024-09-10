@@ -104,7 +104,11 @@ export default function AppScreen() {
   return (
     <>
       <span className={onboarding.isOnboarding && onboarding.index === 0 ? styles.onboardingBlock : ''}>
-        <IntelliPrompt value={promptEditorData.appPrompt} onChange={(e) => setPromptEditorData({ appPrompt: e })} />
+        <IntelliPrompt
+          value={promptEditorData.appPrompt}
+          onChange={(e) => setPromptEditorData({ appPrompt: e })}
+          hideControls={false}
+        />
       </span>
       {onboarding.isOnboarding && onboarding.index === 0 && <OnboardingIndex0 />}
       {onboarding.isOnboarding && onboarding.index === 1 && <OnboardingIndex1 />}

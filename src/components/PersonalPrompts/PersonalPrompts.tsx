@@ -6,7 +6,7 @@ import { PersonalPromptsProps, PersonalPromptsItemProps } from '@/types'
 // Components
 import { Badge } from '@/components/Badge/Badge'
 import Button from '@/components/Button/Button'
-import { Setting, Trash, Lock, Edit2, ElementPlus, ArchiveMinus } from 'iconsax-react'
+import { Setting, Trash, Lock, Edit2, ElementPlus, ArchiveSlash } from 'iconsax-react'
 import EmptyPrompts from '@/components/EmptyPrompts/EmptyPrompts'
 import { Prompt } from '@/types/supabase-helpers'
 import Image from 'next/image'
@@ -278,7 +278,7 @@ const PersonalPromptsItem = ({
                 }}
                 hidden={!isHovered}
               >
-                <ArchiveMinus color={colorScheme.button.textColor} variant={'Bold'} size="16" />
+                <ArchiveSlash color={colorScheme.button.textColor} variant={'Bold'} size="16" />
               </Button>
             </Tooltip>
           )}

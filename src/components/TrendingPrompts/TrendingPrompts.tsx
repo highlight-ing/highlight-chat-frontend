@@ -1,7 +1,7 @@
 import styles from './trending-prompts.module.scss'
 import variables from '@/variables.module.scss'
 import { Prompt } from '@/types/supabase-helpers'
-import { Setting } from 'iconsax-react'
+import { Setting, ArchiveSlash, ArchiveAdd } from 'iconsax-react'
 import { useState, useEffect, useMemo } from 'react'
 import { PromptTag, PinnedPrompt } from '@/types'
 import { supabaseLoader } from '@/lib/supabase'
@@ -125,7 +125,7 @@ const TrendingPromptsItem = ({
             }
           >
             <Button
-              size="xsmall"
+              size="icon"
               variant="tertiary"
               className={styles.filledButton}
               onClick={() => {
@@ -133,7 +133,31 @@ const TrendingPromptsItem = ({
               }}
               disabled={isPinned}
             >
-              {isPinned ? 'Pinned' : 'Pin'}
+              {isPinned ? (
+                <ArchiveSlash color={variables.textPrimary} variant={'Bold'} size="16" />
+              ) : (
+                <ArchiveAdd color={variables.textPrimary} variant={'Bold'} size="16" />
+              )}
+            </Button>
+          </Tooltip>
+          <Tooltip
+            position={'bottom'}
+            tooltip={
+              <div className={'flex flex-col gap-1'}>
+                Preview Prompt {'\n'}
+                <span className={'text-xs text-light-60'}>Preview this prompt to find out how it works</span>
+              </div>
+            }
+          >
+            <Button
+              size="xsmall"
+              variant="tertiary"
+              className={styles.filledButton}
+              onClick={() => {
+                openModal('preview-prompt', { prompt })
+              }}
+            >
+              Preview
             </Button>
           </Tooltip>
           <Tooltip position={'bottom'} tooltip={`Start a chat with ${prompt.name}`}>
