@@ -281,13 +281,15 @@ export default function IntelliPrompt({
   useEffect(() => {
     highlightWords()
   }, [value])
-
+  console.log('hideTemplates', hideTemplates)
+  console.log('hideVariables', hideVariables)
+  console.log('readOnly', readOnly)
   return (
     <>
       <div className={styles.editorPage}>
         <div className={`${styles.editorActions} px-4`}>
-          {hideTemplates && <TemplatesTool />}
-          {hideVariables && <VariablesTool onSelect={onVariableClick} disabled={onboarding.isOnboarding} />}
+          <TemplatesTool hidden={hideTemplates} />
+          <VariablesTool onSelect={onVariableClick} disabled={onboarding.isOnboarding} hidden={hideVariables} />
           {/*<ConditionsTool disabled={onboarding.isOnboarding} />*/}
         </div>
       </div>

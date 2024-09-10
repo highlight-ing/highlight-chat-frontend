@@ -8,7 +8,7 @@ export function CustomizePromptDetails({ prompt }: { prompt: Prompt }) {
     <>
       <CustomizePromptPreview prompt={prompt} />
       <div className={styles.appPromptAccordion}>
-        <IntelliPrompt value={prompt.prompt_text ?? ''} hideControls={true} />
+        <IntelliPrompt value={prompt.prompt_text ?? ''} hideVariables hideTemplates readOnly />
       </div>
     </>
   )

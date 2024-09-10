@@ -6,7 +6,7 @@ import Button from '@/components/Button/Button'
 import Tooltip from '@/components/Tooltip/Tooltip'
 import { useStore } from '@/providers/store-provider'
 
-export const TemplatesTool = () => {
+export const TemplatesTool = ({ hidden }: { hidden: boolean }) => {
   const openModal = useStore((state) => state.openModal)
 
   const APP_PROMPT_COMMENT =
@@ -80,6 +80,7 @@ export const TemplatesTool = () => {
       position={'bottom'}
       triggerId={`toggle-templates`}
       leftClick={true}
+      hidden={hidden}
     >
       {
         // @ts-ignore
