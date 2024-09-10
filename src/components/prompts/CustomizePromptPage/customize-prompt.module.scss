@@ -51,7 +51,6 @@
   gap: 8px;
   overflow-x: auto;
   max-width: 100%; // Adjust based on the width of the "Uses" badge
-  padding-bottom: 8px; // Space for scrollbar
 }
 
 .appPromptAccordion {
@@ -81,6 +80,7 @@
     display: flex;
     flex-direction: row;
     gap: 12px;
+    color: $text-primary;
   }
 
   .customizePromptsItemContent {
@@ -124,14 +124,19 @@
 
     .customizePromptsItemFooterRightButtons {
       justify-content: flex-end;
+      .customizePromptButton {
+        font-size: 14px;
+        width: 77px;
+        padding: 2px 8px;
+        border: 1px solid $primary-100;
+        transition: all 0.2s ease-in-out;
+        color: $primary-100;
+        &:hover {
+          background-color: $primary-100;
+          border-color: $primary-100;
+          color: #191919;
+        }
+      }
     }
   }
-}
-
-.filledButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 77px;
-  padding: 2px 8px;
 }

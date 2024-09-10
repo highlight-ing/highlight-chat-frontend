@@ -10,6 +10,7 @@ import Image from 'next/image'
 import usePromptApps from '@/hooks/usePromptApps'
 import { useStore } from '@/providers/store-provider'
 import { useShallow } from 'zustand/react/shallow'
+import { PromptTag } from '@/types'
 
 export const CustomizePromptPreview = ({ prompt }: { prompt: Prompt }) => {
   const { selectPrompt } = usePromptApps()
@@ -48,27 +49,18 @@ export const CustomizePromptPreview = ({ prompt }: { prompt: Prompt }) => {
           <Badge variant="disabled">
             {prompt.public_use_number ? `${prompt.public_use_number} Users` : 'No users'}
           </Badge>
-          {prompt.tags &&
-            prompt.tags.length > 0 &&
-            prompt.tags.map((tag, index) => (
-              <Badge key={index - 1} variant="disabled">
-                {tag.label}
-              </Badge>
-            ))}
+          {/* @ts-ignore */}
+          <PromptTags tags={prompt.tags as PromptTag[]} />
         </div>
         <div className={styles.customizePromptsItemFooterRightButtons}>
           <Tooltip position={'bottom'} tooltip={`Start a chat with ${prompt.name}`}>
             <Button
-              className={styles.filledButton}
-              style={{
-                border: `1px solid ${variables.primary100}`,
-                color: variables.primary100,
-              }}
+              className={styles.customizePromptButton}
               size="xsmall"
               variant="ghost-neutral"
               onClick={(e) => {
                 e.stopPropagation()
-                selectPrompt(prompt, true, false)
+                selectPrompt(prompt.external_id, true, false)
                 closeModal('customize-prompt')
               }}
             >
@@ -78,5 +70,19 @@ export const CustomizePromptPreview = ({ prompt }: { prompt: Prompt }) => {
         </div>
       </div>
     </div>
+  )
+}
+
+function PromptTags({ tags }: { tags: PromptTag[] }) {
+  return (
+    tags.length > 0 && (
+      <div className={styles.promptTags}>
+        {tags.map((tag, index) => (
+          <Badge key={index - 1} variant="disabled">
+            {tag.label}
+          </Badge>
+        ))}
+      </div>
+    )
   )
 }

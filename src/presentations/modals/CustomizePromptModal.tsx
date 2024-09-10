@@ -1,4 +1,5 @@
 import { ModalObjectProps } from '@/types'
+import { useEffect } from 'react'
 import Modal from '@/components/modals/Modal'
 import styles from './modals.module.scss'
 import { Prompt } from '@/types/supabase-helpers'

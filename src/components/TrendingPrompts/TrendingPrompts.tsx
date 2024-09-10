@@ -46,6 +46,7 @@ const TrendingPrompts = ({
                   slug={item.slug}
                   color={variables.primary100}
                   prompt={item}
+                  // @ts-ignore
                   tags={item.tags as PromptTag[] | null}
                   lastItem={index === mergedPrompts.length - 1}
                   publicUseNumber={item.public_use_number}
