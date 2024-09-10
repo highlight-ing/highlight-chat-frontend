@@ -38,7 +38,7 @@ export const useOnAppOpen = () => {
               const shouldPin = param.includes('pin=true')
               const prompt = await getPromptBySlug(param.split('?')[0])
               if (prompt) {
-                await selectPrompt(prompt, true, shouldPin)
+                await selectPrompt(prompt.external_id, true, shouldPin)
                 return
               }
             }

@@ -30,8 +30,8 @@ const PromptsModal = ({ id, context }: ModalObjectProps) => {
     return prompts.find((prompt) => prompt.id === context?.prompt?.id) ?? context?.prompt
   }, [context, prompts])
 
-  const onSelectPrompt = async (prompt: Prompt) => {
-    await selectPrompt(prompt)
+  const onSelectPrompt = async (externalId: string) => {
+    await selectPrompt(externalId)
     closeModal(id)
   }
 
@@ -47,7 +47,7 @@ const PromptsModal = ({ id, context }: ModalObjectProps) => {
           <PromptListRow
             type={myPrompts.some((prompt) => prompt.id === selectedPrompt.id) ? 'self' : 'community'}
             prompt={selectedPrompt}
-            onClick={() => onSelectPrompt(selectedPrompt)}
+            onClick={() => onSelectPrompt(selectedPrompt.external_id)}
             isCta={true}
           />
         </>
@@ -70,7 +70,7 @@ const PromptsModal = ({ id, context }: ModalObjectProps) => {
                 key={prompt.external_id}
                 prompt={prompt}
                 type={'self'}
-                onClick={() => onSelectPrompt(prompt)}
+                onClick={() => onSelectPrompt(prompt.external_id)}
                 onClickEdit={(e) => openModal('edit-prompt', { prompt })}
               />
             )
@@ -90,7 +90,7 @@ const PromptsModal = ({ id, context }: ModalObjectProps) => {
                 key={prompt.external_id}
                 type={'community'}
                 prompt={prompt}
-                onClick={() => onSelectPrompt(prompt)}
+                onClick={() => onSelectPrompt(prompt.external_id)}
               />
             )
           })}
