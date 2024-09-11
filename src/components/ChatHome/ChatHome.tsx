@@ -2,13 +2,11 @@ import variables from '@/variables.module.scss'
 import styles from './chathome.module.scss'
 import mainStyles from '@/main.module.scss'
 import { AddCircle, MouseCircle, SearchStatus, Setting } from 'iconsax-react'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useStore } from '@/providers/store-provider'
-import PromptListRow from '@/components/prompts/PromptListRow'
 import { Input } from '@/components/Input/Input'
 import { HighlightIcon } from '@/icons/icons'
 import usePromptApps from '@/hooks/usePromptApps'
-import Highlight from '@highlight-ai/app-runtime'
 import Hotkey from '@/components/Hotkey/Hotkey'
 import ExpandableVideo from '@/components/ExpandableVideo/ExpandableVideo'
 import { useShallow } from 'zustand/react/shallow'
@@ -16,6 +14,7 @@ import { Prompt } from '@/types/supabase-helpers'
 import { trackEvent } from '@/utils/amplitude'
 import PersonalPrompts from '@/components/PersonalPrompts/PersonalPrompts'
 import TrendingPrompts from '@/components/TrendingPrompts/TrendingPrompts'
+import Button from '../Button/Button'
 
 const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
   const [isVisible, setVisible] = useState(isShowing)
@@ -75,6 +74,39 @@ function InputHeading() {
   )
 }
 
+/**
+ * A default prompt like Summarize, Explain, Write, or Analyze
+ */
+function DefaultPrompt({ externalId }: { externalId: string }) {
+  const prompts = useStore((state) => state.prompts)
+  const [prompt, setPrompt] = useState<Prompt | undefined>(undefined)
+
+  useEffect(() => {
+    const prompt = prompts.find((p) => p.external_id === externalId)
+    setPrompt(prompt)
+  }, [externalId, prompts])
+
+  if (!prompt) {
+    return <></>
+  }
+
+  return (
+    <div className="inline-flex flex-col items-start justify-start gap-3 rounded-[20px] bg-[#191919] p-5 transition-colors duration-200 ease-in-out hover:cursor-pointer hover:bg-[#292929]">
+      <div className="inline-flex gap-2 text-base font-medium leading-normal text-[#eeeeee]">
+        <Setting variant="Bulk" /> {prompt.name}
+      </div>
+      <div className="inline-flex items-start justify-start gap-2 self-stretch">
+        <Button size="xsmall" variant="tertiary" className={styles.filledButton} onClick={() => {}}>
+          Preview
+        </Button>
+        <div className="flex items-center justify-center gap-1 rounded-md border border-[#222222] px-2 py-0.5">
+          <div className="text-[13px] font-medium leading-tight text-[#3a3a3a]">42,069 Uses</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const Prompts = ({ userId }: { userId: string | undefined }) => {
   const { isLoadingPrompts, myPrompts, communityPrompts, pinnedPrompts } = usePromptApps()
   if (isLoadingPrompts && !userId) {
@@ -92,6 +124,12 @@ const Prompts = ({ userId }: { userId: string | undefined }) => {
 
   return (
     <>
+      <div className="grid grid-cols-2 gap-4">
+        <DefaultPrompt externalId="2d2d0033-edc7-4f43-bad9-3c0baaaee2ee" />
+        <DefaultPrompt externalId="f9da16e0-ae49-43bb-95d3-5e89d3e3fc9b" />
+        <DefaultPrompt externalId="957af06a-2f69-4854-a4d7-189bf3758a73" />
+        <DefaultPrompt externalId="e9306eac-3dc2-4380-bb67-37f5ab3a1eaf" />
+      </div>
       <div className={styles.callouts}>
         <PersonalPrompts userId={userId} prompts={myPrompts} pinnedPrompts={pinnedPrompts} />
       </div>
