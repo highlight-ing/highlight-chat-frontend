@@ -114,25 +114,6 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
       console.log('Fetching chat history')
       refreshChatHistory()
       initialFetchDone.current = true
-    } else if (conversationId && !history.some((chat) => chat.id === conversationId)) {
-      const fetchAndSafeRetry = async (retries: number) => {
-        // New conversation found after initial fetch
-        console.log('Fetching new conversation and adding it to history')
-        const newConversation = await refreshChatItem(conversationId, true)
-        if (newConversation) {
-          console.log('Added conversation to history')
-          return
-        }
-        if (retries > 0) {
-          console.log('Failed to fetch new conversation, retrying in 1s')
-          setTimeout(() => {
-            fetchAndSafeRetry(--retries)
-          }, 1000)
-        } else {
-          console.error('Repeatedly failed to fetch new conversation, giving up')
-        }
-      }
-      fetchAndSafeRetry(5)
     }
   }, [history, conversationId])
 

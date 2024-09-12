@@ -18,62 +18,7 @@ import usePromptApps from '@/hooks/usePromptApps'
 import { useChatHistory } from '@/hooks/useChatHistory'
 import { Prompt } from '@/types/supabase-helpers'
 import { processAttachments } from '@/utils/contextprocessor'
-
 import * as Sentry from '@sentry/react'
-
-function processAttachments(attachments: any[]): Attachment[] {
-  return attachments.map((attachment) => {
-    if (attachment.type !== 'file') {
-      return attachment as Attachment
-    }
-    const { fileName, mimeType, value } = attachment
-
-    if (mimeType.startsWith('image/')) {
-      return {
-        type: 'image',
-        value,
-      } as ImageAttachment
-    } else if (mimeType === 'application/pdf') {
-      console.log('Processing PDF:', fileName, mimeType, value)
-      const file = dataURItoFile(attachment.value, fileName, mimeType)
-      if (!file) {
-        console.error('Could not convert data URI to file for PDF:', fileName, value)
-        return attachment
-      }
-      console.log('Converted PDF to file:', file, file.size, file.type, file.name)
-      return {
-        type: 'pdf',
-        value: file,
-      } as PdfAttachment
-    } else if (
-      mimeType.includes('spreadsheetml') ||
-      mimeType.includes('excel') ||
-      attachment.fileName.endsWith('.xlsx')
-    ) {
-      return {
-        type: 'spreadsheet',
-        value,
-      } as SpreadsheetAttachment
-    } else if (
-      mimeType.startsWith('text/') ||
-      mimeType === 'application/json' ||
-      mimeType === 'application/xml' ||
-      mimeType === 'application/javascript' ||
-      mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
-      mimeType === 'application/msword' ||
-      mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
-    ) {
-      return {
-        type: 'text_file',
-        value,
-        fileName,
-      } as TextFileAttachment
-    } else {
-      console.error('Unprocessable attachment:', mimeType, fileName, value)
-      return attachment
-    }
-  })
-}
 
 function useContextReceivedHandler(navigateToNewChat: () => void) {
   const {
@@ -105,7 +50,7 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
   useEffect(() => {
     const debouncedHandleSubmit = debounce(300, async (context: HighlightContext, promptApp?: Prompt) => {
       setInput(context.suggestion || '')
-      await handleIncomingContext(context, navigateToNewChat, promptApp)
+      await handleIncomingContext(context, promptApp)
     })
 
     const contextDestroyer = Highlight.app.addListener('onContext', async (context: HighlightContext) => {
@@ -267,10 +212,10 @@ export default function App({ children }: { children: React.ReactNode }) {
 
     const initializeSentry = () => {
       Sentry.init({
-        dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
-        integrations: [Sentry.browserTracingIntegration(), Sentry.replayIntegration()],
-        // Performance Monitoring
-        tracesSampleRate: 1.0, // Capture 100% of the transactions, reduce in production!
+        dsn: 'https://c37160a2ddfdb8148ee3da04c5fb007e@o150878.ingest.us.sentry.io/4507940451516416',
+        integrations: [Sentry.browserTracingIntegration()],
+        // Tracing
+        tracesSampleRate: 1.0, //  Capture 100% of the transactions
         // Session Replay
         replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
         replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.

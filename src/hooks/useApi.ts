@@ -25,7 +25,7 @@ interface RequestOptions {
 }
 
 const fetchRequest = async (route: string, { bearerToken, body, version, method, signal }: FetchOptions) => {
-  return fetch(`${backendUrl}api/${version ?? 'v1'}/${route}`, {
+  return fetch(`${backendUrl}api/${version ?? 'v3'}/${route}`, {
     method: method,
     body: body,
     headers: {
@@ -36,7 +36,7 @@ const fetchRequest = async (route: string, { bearerToken, body, version, method,
 }
 
 const fetchPublicRequest = async (route: string, { body, version, method, signal }: PublicFetchOptions) => {
-  return fetch(`${backendUrl}api/${version ?? 'v1'}/${route}`, {
+  return fetch(`${backendUrl}api/${version ?? 'v3'}/${route}`, {
     method: method,
     body: body,
     signal: signal,
