@@ -46,6 +46,10 @@ export function usePromptEditor() {
     formData.append('visibility', promptEditorData.visibility)
     formData.append('tags', JSON.stringify(promptEditorData.tags ?? []))
 
+    if (promptEditorData.preferredAttachment) {
+      formData.append('preferredAttachment', promptEditorData.preferredAttachment)
+    }
+
     if (promptEditorData.videoUrl) {
       formData.append('videoUrl', promptEditorData.videoUrl)
     }
