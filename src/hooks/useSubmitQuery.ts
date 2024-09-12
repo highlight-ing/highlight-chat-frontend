@@ -465,7 +465,7 @@ export const useSubmitQuery = () => {
         audio,
         file_title: fileTitle,
         clipboard_text: clipboardText,
-        windows: await fetchWindows(), // Add windows information to the message
+        windows: await fetchWindows(),
         window_context: windowContext,
         file_attachments: attachments.filter((attachment) => attachment.type === 'text_file'),
       })
