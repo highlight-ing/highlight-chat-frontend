@@ -19,6 +19,7 @@ import ToastContainer from '@/components/Toast/ToastContainer'
 import usePromptApps from '@/hooks/usePromptApps'
 import { useChatHistory } from '@/hooks/useChatHistory'
 import { Prompt } from '@/types/supabase-helpers'
+import * as Sentry from '@sentry/react'
 
 function processAttachments(attachments: any[]): Attachment[] {
   return attachments.map((attachment) => {
@@ -111,9 +112,7 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
 
       let res
 
-      //@ts-expect-error
       if (context.promptSlug) {
-        // @ts-expect-error
         res = await getPromptAppBySlug(context.promptSlug)
 
         if (res && res.promptApp) {
@@ -258,7 +257,20 @@ export default function App({ children }: { children: React.ReactNode }) {
       }
     }
 
+    const initializeSentry = () => {
+      Sentry.init({
+        dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+        integrations: [Sentry.browserTracingIntegration(), Sentry.replayIntegration()],
+        // Performance Monitoring
+        tracesSampleRate: 1.0, // Capture 100% of the transactions, reduce in production!
+        // Session Replay
+        replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
+        replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
+      })
+    }
+
     initializeAmplitude()
+    initializeSentry()
   }, [])
 
   useContextReceivedHandler(navigateToNewChat)

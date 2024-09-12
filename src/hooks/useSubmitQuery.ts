@@ -9,6 +9,8 @@ import { FileAttachment, FileAttachmentType, TextFileAttachment } from '@/types'
 import { useShallow } from 'zustand/react/shallow'
 import { useEffect, useRef } from 'react'
 import { parseAndHandleStreamChunk } from '@/utils/streamParser'
+import { trackEvent } from '@/utils/amplitude'
+import * as Sentry from '@sentry/react'
 
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024 // 1MB in bytes
@@ -175,7 +177,13 @@ export const useSubmitQuery = () => {
   }
 
   const fetchResponse = async (conversationId: string, formData: FormData, token: string, isPromptApp: boolean) => {
+    const transaction = Sentry.startTransaction({
+      name: 'fetchResponse',
+      op: 'function',
+    })
+
     setInputIsDisabled(true)
+    const startTime = Date.now()
 
     try {
       formData.append('conversation_id', conversationId)
@@ -191,9 +199,14 @@ export const useSubmitQuery = () => {
         }
       }
 
-      const response = await post(endpoint, formData, { version: 'v3' })
+      const response = await Sentry.startSpan({ name: 'API Request', op: 'http' }, async (span) => {
+        const res = await post(endpoint, formData, { version: 'v3' })
+        span.setData('endpoint', endpoint)
+        span.setData('status', res.status)
+        return res
+      })
       if (!response.ok) {
-        throw new Error('Network response was not ok')
+        throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`)
       }
 
       const reader = response.body?.getReader()
@@ -231,6 +244,9 @@ export const useSubmitQuery = () => {
         }
       }
     } catch (error) {
+      const endTime = Date.now()
+      const duration = endTime - startTime
+
       // @ts-ignore
       console.error('Error fetching response:', error.stack ?? error.message)
 
@@ -238,6 +254,24 @@ export const useSubmitQuery = () => {
       if (error.message.includes('aborted')) {
         console.log('Skipping message request, aborted')
       } else {
+        // Log to Sentry
+        Sentry.captureException(error, {
+          extra: {
+            conversationId,
+            isPromptApp,
+            duration,
+            endpoint: isPromptApp ? 'chat/prompt-as-app' : 'chat/',
+          },
+        })
+
+        // Log to Amplitude
+        trackEvent('HL_CHAT_BACKEND_API_ERROR', {
+          endpoint: isPromptApp ? 'chat/prompt-as-app' : 'chat/',
+          duration,
+          // @ts-ignore
+          errorMessage: error.message,
+        })
+
         addToast({
           title: 'Unexpected Error',
           // @ts-ignore
@@ -247,6 +281,23 @@ export const useSubmitQuery = () => {
         })
       }
     } finally {
+      const endTime = Date.now()
+      const duration = endTime - startTime
+
+      transaction.setData('duration', duration)
+      transaction.setData('isPromptApp', isPromptApp)
+      transaction.setData('endpoint', isPromptApp ? 'chat/prompt-as-app' : 'chat/')
+      transaction.setData('success', !abortControllerRef.current?.signal.aborted)
+
+      transaction.finish()
+
+      // Log request to Amplitude
+      trackEvent('HL_CHAT_BACKEND_API_REQUEST', {
+        endpoint: isPromptApp ? 'chat/prompt-as-app' : 'chat/',
+        duration,
+        success: !abortControllerRef.current?.signal.aborted,
+      })
+
       setInputIsDisabled(false)
       abortControllerRef.current = undefined
     }
@@ -263,22 +314,10 @@ export const useSubmitQuery = () => {
       console.log('Attachment: ', JSON.stringify(attachment))
     })
 
-    // if (!context.suggestion || context.suggestion.trim() === '') {
-    //   console.log('No context received, ignoring.')
-    //   return
-    // }
-
     if (!context.application) {
       console.log('No application data in context, ignoring.')
       return
     }
-    // // Check if the context is empty, only contains empty suggestion and attachments, or has no application data
-    //
-    // if (!context.attachments || context.attachments.length === 0) {
-    //   console.log(context.attachments)
-    //   console.log('Empty or invalid context received, ignoring.')
-    //   return
-    // }
 
     let query = context.suggestion || ''
     let screenshotUrl = context.attachments?.find((a) => a.type === 'screenshot')?.value
@@ -348,73 +387,79 @@ export const useSubmitQuery = () => {
   }
 
   const handleSubmit = async (input: string, promptApp?: Prompt) => {
-    console.log('handleSubmit triggered')
-    const query = input.trim()
+    const transaction = Sentry.startTransaction({
+      name: 'handleSubmit',
+      op: 'function',
+    })
 
-    if (!query) {
-      console.log('No query provided, ignoring.')
-      return
-    }
+    try {
+      console.log('handleSubmit triggered')
+      const query = input.trim()
 
-    if (query) {
-      setInputIsDisabled(true)
-
-      const formData = new FormData()
-      formData.append('prompt', query)
-
-      const isPromptApp = promptApp ? true : false
-
-      if (isPromptApp && promptApp!.external_id !== undefined) {
-        formData.append('app_id', promptApp!.external_id)
+      if (!query) {
+        console.log('No query provided, ignoring.')
+        return
       }
 
-      // Fetch windows information
-      const windows = await fetchWindows()
-      formData.append('windows', JSON.stringify(windows))
-      // formData.append("llm_provider", "openai")
+      if (query) {
+        setInputIsDisabled(true)
 
-      // Add about_me to form data
-      if (aboutMe) {
-        formData.append('about_me', JSON.stringify(aboutMe))
+        const formData = new FormData()
+        formData.append('prompt', query)
+
+        const isPromptApp = promptApp ? true : false
+
+        if (isPromptApp && promptApp!.external_id !== undefined) {
+          formData.append('app_id', promptApp!.external_id)
+        }
+
+        // Fetch windows information
+        await Sentry.startSpan({ name: 'fetchWindows', op: 'function' }, async () => {
+          const windows = await fetchWindows()
+          formData.append('windows', JSON.stringify(windows))
+        })
+
+        if (aboutMe) {
+          formData.append('about_me', JSON.stringify(aboutMe))
+        }
+
+        const { screenshot, audio, fileTitle, clipboardText, ocrText, windowContext } = await Sentry.startSpan(
+          { name: 'addAttachmentsToFormData', op: 'function' },
+          async () => {
+            return await addAttachmentsToFormData(formData, attachments)
+          },
+        )
+
+        console.log('windowContext: ', windowContext)
+
+        const conversationId = getOrCreateConversationId()
+        addConversationMessage(conversationId!, {
+          role: 'user',
+          content: query,
+          screenshot,
+          ocr_text: ocrText,
+          audio,
+          file_title: fileTitle,
+          clipboard_text: clipboardText,
+          windows: await fetchWindows(), // Add windows information to the message
+          window_context: windowContext,
+          file_attachments: attachments.filter((attachment) => attachment.type === 'text_file'),
+        })
+
+        setInput('')
+        clearAttachments()
+
+        const accessToken = await getAccessToken()
+        await fetchResponse(conversationId, formData, accessToken, isPromptApp)
       }
-
-      const { screenshot, audio, fileTitle, clipboardText, ocrText, windowContext } = await addAttachmentsToFormData(
-        formData,
-        attachments,
-      )
-
-      console.log('windowContext: ', windowContext)
-
-      const conversationId = getOrCreateConversationId()
-      addConversationMessage(conversationId!, {
-        role: 'user',
-        content: query,
-        screenshot,
-        ocr_text: ocrText,
-        audio,
-        file_title: fileTitle,
-        clipboard_text: clipboardText,
-        windows: windows, // Add windows information to the message
-        window_context: windowContext,
-        file_attachments: attachments.filter((attachment) => attachment.type === 'text_file'),
-      })
-
-      setInput('')
-      clearAttachments() // Clear the attachment immediately
-
-      const accessToken = await getAccessToken()
-      await fetchResponse(conversationId, formData, accessToken, isPromptApp)
+    } catch (error) {
+      Sentry.captureException(error)
+    } finally {
+      transaction.finish()
     }
   }
 
   useEffect(() => {
-    // console.log('conversationIdRef:', conversationIdRef.current)
-    // console.log('conversationId', conversationId)
-    // console.log('abortControllerRef', typeof abortControllerRef.current)
-    // if (conversationIdRef.current && conversationIdRef.current !== conversationId && abortControllerRef.current) {
-    //   console.log("Aborting previous chat's message stream")
-    //   abortControllerRef.current.abort('Aborted, conversation ID changed, stop streaming messages')
-    // }
     conversationIdRef.current = conversationId
   }, [conversationId])
 
