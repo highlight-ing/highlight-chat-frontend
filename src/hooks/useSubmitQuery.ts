@@ -13,16 +13,6 @@ import { trackEvent } from '@/utils/amplitude'
 import * as Sentry from '@sentry/react'
 import { processAttachments } from '@/utils/contextprocessor'
 
-Sentry.init({
-  dsn: 'https://c37160a2ddfdb8148ee3da04c5fb007e@o150878.ingest.us.sentry.io/4507940451516416',
-  integrations: [Sentry.browserTracingIntegration()],
-  // Tracing
-  tracesSampleRate: 1.0, //  Capture 100% of the transactions
-  // Session Replay
-  replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
-  replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
-})
-
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024 // 1MB in bytes
   if (file.size <= ONE_MB) {
@@ -281,7 +271,7 @@ export const useSubmitQuery = () => {
       }
     } catch (error) {
       const endTime = Date.now()
-      const duration = endTime - startTime
+      const duration = (endTime - startTime) / 1000
 
       // @ts-ignore
       console.error('Error fetching response:', error.stack ?? error.message)
