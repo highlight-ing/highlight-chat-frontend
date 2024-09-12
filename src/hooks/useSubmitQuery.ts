@@ -209,75 +209,76 @@ export const useSubmitQuery = () => {
         }
       }
 
-      const span = Sentry.startSpan({ name: 'fetchResponse' }, async () => {
-        const response = await post(endpoint, formData, { version: 'v3' })
+      const response = await Sentry.startSpan({ name: 'fetchResponse' }, async () => {
+        const res = await post(endpoint, formData, { version: 'v3' })
+        return res
+      })
 
-        if (!response.ok) {
-          throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`)
-        }
+      if (!response.ok) {
+        throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`)
+      }
 
-        const reader = response.body?.getReader()
-        if (!reader) {
-          throw new Error('No reader available')
-        }
+      const reader = response.body?.getReader()
+      if (!reader) {
+        throw new Error('No reader available')
+      }
+
+      checkAbortSignal()
+
+      addConversationMessage(conversationId!, { role: 'assistant', content: '' })
+
+      let accumulatedMessage = ''
+
+      while (!abortController.signal.aborted) {
+        const { done, value } = await reader.read()
+        if (done) break
+        const chunk = new TextDecoder().decode(value)
 
         checkAbortSignal()
 
-        addConversationMessage(conversationId!, { role: 'assistant', content: '' })
+        const { content, windowName } = await parseAndHandleStreamChunk(chunk, {
+          showConfirmationModal,
+          addToast,
+        })
 
-        let accumulatedMessage = ''
-
-        while (!abortController.signal.aborted) {
-          const { done, value } = await reader.read()
-          if (done) break
-          const chunk = new TextDecoder().decode(value)
-
-          checkAbortSignal()
-
-          const { content, windowName } = await parseAndHandleStreamChunk(chunk, {
-            showConfirmationModal,
-            addToast,
+        if (content) {
+          accumulatedMessage += content
+          updateLastConversationMessage(conversationId, {
+            role: 'assistant',
+            content: accumulatedMessage,
           })
+        }
 
-          if (content) {
-            accumulatedMessage += content
-            updateLastConversationMessage(conversationId, {
-              role: 'assistant',
-              content: accumulatedMessage,
+        if (windowName) {
+          const contextGranted = await Highlight.permissions.requestWindowContextPermission()
+          const screenshotGranted = await Highlight.permissions.requestScreenshotPermission()
+          if (contextGranted && screenshotGranted) {
+            addToast({
+              title: 'Context Granted',
+              description: 'Context granted for ' + windowName,
+              type: 'success',
+              timeout: 5000,
+            })
+            const screenshot = await Highlight.user.getWindowScreenshot(windowName)
+            addAttachment({
+              type: 'image',
+              value: screenshot,
+            })
+
+            const windowContext = await Highlight.user.getWindowContext(windowName)
+            const ocrScreenContents = windowContext.environment.ocrScreenContents || ''
+            addAttachment({
+              type: 'window_context',
+              value: ocrScreenContents,
+            })
+
+            handleSubmit("Here's the context you requested.", promptApp, {
+              image: screenshot,
+              window_context: ocrScreenContents,
             })
           }
-
-          if (windowName) {
-            const contextGranted = await Highlight.permissions.requestWindowContextPermission()
-            const screenshotGranted = await Highlight.permissions.requestScreenshotPermission()
-            if (contextGranted && screenshotGranted) {
-              addToast({
-                title: 'Context Granted',
-                description: 'Context granted for ' + windowName,
-                type: 'success',
-                timeout: 5000,
-              })
-              const screenshot = await Highlight.user.getWindowScreenshot(windowName)
-              addAttachment({
-                type: 'image',
-                value: screenshot,
-              })
-
-              const windowContext = await Highlight.user.getWindowContext(windowName)
-              const ocrScreenContents = windowContext.environment.ocrScreenContents || ''
-              addAttachment({
-                type: 'window_context',
-                value: ocrScreenContents,
-              })
-
-              handleSubmit("Here's the context you requested.", promptApp, {
-                image: screenshot,
-                window_context: ocrScreenContents,
-              })
-            }
-          }
         }
-      })
+      }
     } catch (error) {
       const endTime = Date.now()
       const duration = endTime - startTime
