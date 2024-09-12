@@ -9,16 +9,16 @@ import { useStore } from '@/providers/store-provider'
 import Modals from './modals/Modals'
 import { ModalContainer } from '@/components/modals/ModalContainer'
 import { useShallow } from 'zustand/react/shallow'
-import { dataURItoFile } from '@/utils/attachments'
-import { Attachment, ImageAttachment, PdfAttachment, SpreadsheetAttachment, TextFileAttachment } from '@/types'
 import { initAmplitude, trackEvent } from '@/utils/amplitude'
 import useAuth from '@/hooks/useAuth'
 import { decodeJwt } from 'jose'
-import { getPromptAppBySlug } from '@/utils/prompts'
+import { countPromptView, getPromptAppBySlug } from '@/utils/prompts'
 import ToastContainer from '@/components/Toast/ToastContainer'
 import usePromptApps from '@/hooks/usePromptApps'
 import { useChatHistory } from '@/hooks/useChatHistory'
 import { Prompt } from '@/types/supabase-helpers'
+import { processAttachments } from '@/utils/contextprocessor'
+
 import * as Sentry from '@sentry/react'
 
 function processAttachments(attachments: any[]): Attachment[] {
@@ -98,6 +98,8 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
     })),
   )
 
+  const { getAccessToken } = useAuth()
+
   const { handleIncomingContext } = useSubmitQuery()
 
   useEffect(() => {
@@ -115,7 +117,11 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
       if (context.promptSlug) {
         res = await getPromptAppBySlug(context.promptSlug)
 
+        const accessToken = await getAccessToken()
+
         if (res && res.promptApp) {
+          countPromptView(res.promptApp.external_id, accessToken)
+
           setPrompt({
             promptApp: res.promptApp,
             promptName: res.promptApp.name,

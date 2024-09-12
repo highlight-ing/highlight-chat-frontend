@@ -12,7 +12,7 @@ export function useDownloadOrRedirect() {
     setIsMobile(platform === 'mobile')
   }, [platform])
 
-  const handleDownload = (macType?: 'intel' | 'silicon') => {
+  const handleDownload = (macType?: 'intel' | 'silicon', externalId?: string) => {
     let downloadType: DownloadPlatformType
     let downloadUrl: string
 
@@ -21,10 +21,10 @@ export function useDownloadOrRedirect() {
       downloadUrl = 'https://highlight.ing/discord'
     } else if (platform === 'mac') {
       downloadType = macType === 'silicon' ? 'mac-silicon' : 'mac-intel'
-      downloadUrl = buildDownloadURL(downloadType)
+      downloadUrl = buildDownloadURL(downloadType, externalId)
     } else {
       downloadType = 'windows'
-      downloadUrl = buildDownloadURL(downloadType)
+      downloadUrl = buildDownloadURL(downloadType, externalId)
     }
 
     // Track the download event

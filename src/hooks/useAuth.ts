@@ -9,6 +9,7 @@ interface TokensResponse {
   authExpiration: number
   userId?: string
 }
+
 async function getNewTokens(): Promise<TokensResponse> {
   const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await Highlight.auth.signIn()
 

@@ -94,7 +94,19 @@ const matchPhrase = (text: string, variable: string, phrase: string | null) => {
  * The new, improved PromptInput component that uses Monaco Editor.
  * @param otherButtons Additional buttons that will go in the "Context Bar" (the place where users can click to add variables)
  */
-export default function IntelliPrompt({ value, onChange }: { value?: string; onChange?: (value: string) => void }) {
+export default function IntelliPrompt({
+  value,
+  onChange,
+  hideVariables = false,
+  hideTemplates = false,
+  readOnly = false,
+}: Readonly<{
+  value?: string
+  onChange?: (value: string) => void
+  hideVariables?: boolean
+  hideTemplates?: boolean
+  readOnly?: boolean
+}>) {
   const monacoRef = useRef<Monaco | undefined>()
   const decorationsRef = useRef<editor.IEditorDecorationsCollection | null>(null)
 
@@ -269,13 +281,12 @@ export default function IntelliPrompt({ value, onChange }: { value?: string; onC
   useEffect(() => {
     highlightWords()
   }, [value])
-
   return (
     <>
       <div className={styles.editorPage}>
         <div className={`${styles.editorActions} px-4`}>
-          <TemplatesTool />
-          <VariablesTool onSelect={onVariableClick} disabled={onboarding.isOnboarding} />
+          <TemplatesTool hidden={hideTemplates} />
+          <VariablesTool onSelect={onVariableClick} disabled={onboarding.isOnboarding} hidden={hideVariables} />
           {/*<ConditionsTool disabled={onboarding.isOnboarding} />*/}
         </div>
       </div>
@@ -292,7 +303,7 @@ export default function IntelliPrompt({ value, onChange }: { value?: string; onC
             enabled: false,
           },
           automaticLayout: true,
-          readOnly: onboarding.isOnboarding,
+          readOnly: onboarding.isOnboarding || readOnly,
           fontSize: 14,
         }}
       />

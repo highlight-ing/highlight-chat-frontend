@@ -41,6 +41,13 @@ export default function ConfirmDeletePromptModal({ id, context }: ModalObjectPro
       type: 'success',
       timeout: 1500,
     })
+
+    try {
+      //@ts-expect-error
+      globalThis.highlight.internal.reloadPrompts()
+    } catch (err) {
+      console.error('Error reloading prompts', err)
+    }
   }
 
   return (
@@ -56,7 +63,7 @@ export default function ConfirmDeletePromptModal({ id, context }: ModalObjectPro
       }}
     >
       <div>
-        <span className="font-medium text-red-400">Warning:</span> Deleting this prompt cannot be undone.
+        <span className="text-red-400 font-medium">Warning:</span> Deleting this prompt cannot be undone.
       </div>
     </ConfirmationModal>
   )

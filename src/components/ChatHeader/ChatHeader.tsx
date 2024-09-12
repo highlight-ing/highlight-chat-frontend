@@ -13,13 +13,13 @@ const ChatHeader = ({ isShowing }: { isShowing: boolean }) => {
   // const { myPrompts } = usePromptApps()
   const router = useRouter()
 
-  const { startNewConversation, promptApp, promptName, promptDescription, promptUserId, clearPrompt } = useStore(
+  const { startNewConversation, promptApp, promptName, promptDescription, userId, clearPrompt } = useStore(
     useShallow((state) => ({
       startNewConversation: state.startNewConversation,
       promptApp: state.promptApp,
       promptName: state.promptName,
       promptDescription: state.promptDescription,
-      promptUserId: state.promptUserId,
+      userId: state.userId,
       clearPrompt: state.clearPrompt,
     })),
   )
@@ -51,7 +51,7 @@ const ChatHeader = ({ isShowing }: { isShowing: boolean }) => {
     router.push('/')
   }
 
-  const promptType = getPromptAppType(promptUserId, promptApp)
+  const promptType = getPromptAppType(userId, promptApp)
 
   return (
     <div className={`${styles.chatHeader} ${isShowing ? styles.show : ''}`}>
@@ -64,8 +64,8 @@ const ChatHeader = ({ isShowing }: { isShowing: boolean }) => {
       <div className={`${styles.promptIcon} ${styles[promptType]}`}>
         {promptApp && promptApp.image && promptApp.user_images?.file_extension ? (
           <PromptAppIcon
-            width={64}
-            height={64}
+            width={90}
+            height={90}
             className={styles.promptIcon}
             imageId={promptApp!.image!}
             imageExtension={promptApp!.user_images?.file_extension ?? ''}

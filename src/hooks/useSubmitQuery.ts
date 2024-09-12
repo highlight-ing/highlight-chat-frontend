@@ -11,6 +11,7 @@ import { useEffect, useRef } from 'react'
 import { parseAndHandleStreamChunk } from '@/utils/streamParser'
 import { trackEvent } from '@/utils/amplitude'
 import * as Sentry from '@sentry/react'
+import { processAttachments } from '@/utils/contextprocessor'
 
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024 // 1MB in bytes
@@ -176,12 +177,18 @@ export const useSubmitQuery = () => {
     })
   }
 
-  const fetchResponse = async (conversationId: string, formData: FormData, token: string, isPromptApp: boolean) => {
+  const fetchResponse = async (
+    conversationId: string,
+    formData: FormData,
+    token: string,
+    isPromptApp: boolean,
+    promptApp?: Prompt,
+  ) => {
     const transaction = Sentry.startTransaction({
       name: 'fetchResponse',
       op: 'function',
     })
-
+    
     setInputIsDisabled(true)
     const startTime = Date.now()
 
@@ -227,20 +234,47 @@ export const useSubmitQuery = () => {
 
         checkAbortSignal()
 
-        const newContent = await parseAndHandleStreamChunk(chunk, {
-          formData,
-          addAttachment,
+        const { content, windowName } = await parseAndHandleStreamChunk(chunk, {
           showConfirmationModal,
           addToast,
-          handleSubmit,
         })
 
-        if (newContent) {
-          accumulatedMessage += newContent
+        if (content) {
+          accumulatedMessage += content
           updateLastConversationMessage(conversationId, {
             role: 'assistant',
             content: accumulatedMessage,
           })
+        }
+
+        if (windowName) {
+          const contextGranted = await Highlight.permissions.requestWindowContextPermission()
+          const screenshotGranted = await Highlight.permissions.requestScreenshotPermission()
+          if (contextGranted && screenshotGranted) {
+            addToast({
+              title: 'Context Granted',
+              description: 'Context granted for ' + windowName,
+              type: 'success',
+              timeout: 5000,
+            })
+            const screenshot = await Highlight.user.getWindowScreenshot(windowName)
+            addAttachment({
+              type: 'image',
+              value: screenshot,
+            })
+
+            const windowContext = await Highlight.user.getWindowContext(windowName)
+            const ocrScreenContents = windowContext.environment.ocrScreenContents || ''
+            addAttachment({
+              type: 'window_context',
+              value: ocrScreenContents,
+            })
+
+            handleSubmit("Here's the context you requested.", promptApp, {
+              image: screenshot,
+              window_context: ocrScreenContents,
+            })
+          }
         }
       }
     } catch (error) {
@@ -335,7 +369,9 @@ export const useSubmitQuery = () => {
     let contentToUse = rawContents || ocrText
 
     const fileAttachmentTypes = ['pdf', 'spreadsheet', 'text_file', 'image']
-    const hasFileAttachment = context.attachments?.some((a: { type: string }) => fileAttachmentTypes.includes(a.type))
+
+    const processedAttachments = processAttachments(context.attachments || [])
+    const hasFileAttachment = processedAttachments.some((a: { type: string }) => fileAttachmentTypes.includes(a.type))
 
     // Fetch windows information
     const windows = await fetchWindows()
@@ -343,7 +379,7 @@ export const useSubmitQuery = () => {
     if (query || clipboardText || contentToUse || screenshotUrl || audio || hasFileAttachment) {
       setInputIsDisabled(true)
 
-      const att = context.attachments || ([] as unknown)
+      const att = processedAttachments
       const fileAttachments = (att as FileAttachment[]).filter((a) => a.type && fileAttachmentTypes.includes(a.type))
 
       const conversationId = getOrCreateConversationId()
@@ -373,8 +409,8 @@ export const useSubmitQuery = () => {
         formData.append('about_me', JSON.stringify(aboutMe))
       }
 
-      const contextAttachments = context.attachments || []
-      await addAttachmentsToFormData(formData, contextAttachments)
+      // const contextAttachments = context.attachments || []
+      await addAttachmentsToFormData(formData, processedAttachments)
 
       // Add OCR text or raw contents to form data
       if (contentToUse) {
@@ -382,15 +418,27 @@ export const useSubmitQuery = () => {
       }
 
       const accessToken = await getAccessToken()
-      await fetchResponse(conversationId, formData, accessToken, promptApp ? true : false)
+      await fetchResponse(conversationId, formData, accessToken, promptApp ? true : false, promptApp)
     }
   }
 
-  const handleSubmit = async (input: string, promptApp?: Prompt) => {
+  const handleSubmit = async (
+    input: string,
+    promptApp?: Prompt,
+    context?: { image?: string; window_context?: string },
+  ) => {
+    console.log('handleSubmit triggered')
     const transaction = Sentry.startTransaction({
       name: 'handleSubmit',
       op: 'function',
     })
+    
+    const query = input.trim()
+
+    if (!query) {
+      console.log('No query provided, ignoring.')
+      return
+    }
 
     try {
       console.log('handleSubmit triggered')
@@ -422,6 +470,18 @@ export const useSubmitQuery = () => {
         if (aboutMe) {
           formData.append('about_me', JSON.stringify(aboutMe))
         }
+        
+      // TODO(umut): This is a hack to add the context to the form data.
+      if (context) {
+        if (context.image) {
+          formData.append('screenshot', context.image)
+        }
+        if (context.window_context) {
+          formData.append('window_context', context.window_context)
+        }
+      }
+
+      console.log('windowContext: ', windowContext)
 
         const { screenshot, audio, fileTitle, clipboardText, ocrText, windowContext } = await Sentry.startSpan(
           { name: 'addAttachmentsToFormData', op: 'function' },
@@ -448,14 +508,12 @@ export const useSubmitQuery = () => {
 
         setInput('')
         clearAttachments()
-
-        const accessToken = await getAccessToken()
-        await fetchResponse(conversationId, formData, accessToken, isPromptApp)
-      }
     } catch (error) {
       Sentry.captureException(error)
     } finally {
       transaction.finish()
+      const accessToken = await getAccessToken()
+      await fetchResponse(conversationId, formData, accessToken, isPromptApp, promptApp)
     }
   }
 

@@ -39,18 +39,27 @@ export function cn(...inputs: ClassValue[]) {
 //   return `/api/download?${queryParams.toString()}`
 // }
 
-export function buildDownloadURL(platform: 'windows' | 'mac-intel' | 'mac-silicon'): string {
-  const baseUrl = 'https://download.highlight.ing'
+export function buildDownloadURL(platform: 'windows' | 'mac-intel' | 'mac-silicon', promptExternalId?: string): string {
+  const baseUrl = new URL('https://highlight.ing/api/download')
+
+  if (promptExternalId) {
+    baseUrl.searchParams.set('prompt_external_id', promptExternalId)
+  }
+
   switch (platform) {
     case 'windows':
-      return `${baseUrl}/windows`
+      break
     case 'mac-intel':
-      return `${baseUrl}/mac`
+      baseUrl.searchParams.set('architecture', 'x64')
+      break
     case 'mac-silicon':
-      return `${baseUrl}/arm64`
+      baseUrl.searchParams.set('architecture', 'arm64')
+      break
     default:
-      return baseUrl
+      throw new Error('Invalid platform')
   }
+
+  return baseUrl.toString()
 }
 
 export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))

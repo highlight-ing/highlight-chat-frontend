@@ -1,5 +1,5 @@
 import { Prompt } from '@/types/supabase-helpers'
-import { ColorScheme, CSSVariables } from '@/components/PersonalPrompts/customVariables'
+import { ColorScheme } from '@/components/PersonalPrompts/customVariables'
 
 type WindowAttachment = {
   type: 'window'
@@ -170,14 +170,10 @@ export interface PersonalPromptsProps {
   userId: string | undefined
   prompts: Prompt[]
   pinnedPrompts: PinnedPrompt[]
-  openModal: (modal: string, context?: Record<string, any>) => void
-  selectPrompt: (prompt: Prompt, startNewConversation?: boolean, pinPrompt?: boolean) => void
 }
 
 export interface PersonalPromptsItemProps {
   prompt: Prompt
-  selectPrompt: (prompt: Prompt, startNewConversation?: boolean, pinPrompt?: boolean) => void
-  openModal: (modal: string, context?: Record<string, any>) => void
   colorScheme: ColorScheme
   isOwner: boolean
   isPublic: boolean
@@ -198,3 +194,6 @@ export type PinnedPrompt = {
   } | null
   public_use_number: number
 } & { isPinned?: boolean }
+
+export const APP_PROMPT_COMMENT =
+  "{{! These are comments, they won't effect the output of your app }}\n{{! The app prompt determines how your app will behave to the user. }}\n"

@@ -15,6 +15,8 @@ import UnpinPromptModal from '@/presentations/modals/UnpinPromptModal'
 import PinPromptModal from '@/presentations/modals/PinPromptModal'
 import ConfirmOverridePrompt from '@/presentations/modals/ConfirmOverridePrompt'
 import PromptAddedModal from '@/presentations/modals/PromptAddedModal'
+import CustomizePromptModal from '@/presentations/modals/CustomizePromptModal'
+import CreatePromptFromTemplateModal from '@/presentations/modals/CreatePromptFromTemplate'
 
 type FunctionalComponent = (props: ModalObjectProps) => JSX.Element
 
@@ -33,6 +35,8 @@ const ModalMap: Record<string, FunctionalComponent> = {
   'pin-prompt': PinPromptModal,
   'confirm-override-prompt': ConfirmOverridePrompt,
   'prompt-added': PromptAddedModal,
+  'customize-prompt': CustomizePromptModal,
+  'create-prompt-from-template': CreatePromptFromTemplateModal,
 }
 
 export const ModalContainer = () => {
