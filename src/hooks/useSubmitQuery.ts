@@ -108,12 +108,6 @@ async function addAttachmentsToFormData(formData: FormData, attachments: any[]) 
 export const useSubmitQuery = () => {
   const { post } = useApi()
 
-  const { addAttachment } = useStore(
-    useShallow((state) => ({
-      addAttachment: state.addAttachment,
-    })),
-  )
-
   const {
     getOrCreateConversationId,
     attachments,
@@ -123,6 +117,7 @@ export const useSubmitQuery = () => {
     addConversationMessage,
     updateLastConversationMessage,
     addToast,
+    addAttachment,
   } = useStore(
     useShallow((state) => ({
       getOrCreateConversationId: state.getOrCreateConversationId,
@@ -133,6 +128,7 @@ export const useSubmitQuery = () => {
       addConversationMessage: state.addConversationMessage,
       updateLastConversationMessage: state.updateLastConversationMessage,
       addToast: state.addToast,
+      addAttachment: state.addAttachment,
     })),
   )
 
@@ -193,16 +189,10 @@ export const useSubmitQuery = () => {
       const abortController = new AbortController()
       abortControllerRef.current = abortController
 
-      const checkAbortSignal = () => {
-        if (abortController.signal.aborted) {
-          throw new Error('Chat message request aborted')
-        }
-      }
+      // Move the addConversationMessage call before the network request
+      addConversationMessage(conversationId!, { role: 'assistant', content: '' })
 
-      const response = await Sentry.startSpan({ name: 'fetchResponse' }, async () => {
-        const res = await post(endpoint, formData, { version: 'v3' })
-        return res
-      })
+      const response = await post(endpoint, formData, { version: 'v3' })
 
       if (!response.ok) {
         throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`)
@@ -213,18 +203,12 @@ export const useSubmitQuery = () => {
         throw new Error('No reader available')
       }
 
-      checkAbortSignal()
-
-      addConversationMessage(conversationId!, { role: 'assistant', content: '' })
-
       let accumulatedMessage = ''
 
       while (!abortController.signal.aborted) {
         const { done, value } = await reader.read()
         if (done) break
         const chunk = new TextDecoder().decode(value)
-
-        checkAbortSignal()
 
         const { content, windowName } = await parseAndHandleStreamChunk(chunk, {
           showConfirmationModal,
@@ -233,89 +217,28 @@ export const useSubmitQuery = () => {
 
         if (content) {
           accumulatedMessage += content
-          updateLastConversationMessage(conversationId, {
-            role: 'assistant',
-            content: accumulatedMessage,
+          // Use requestAnimationFrame to update UI on next frame
+          requestAnimationFrame(() => {
+            updateLastConversationMessage(conversationId, {
+              role: 'assistant',
+              content: accumulatedMessage,
+            })
           })
         }
 
         if (windowName) {
-          const contextGranted = await Highlight.permissions.requestWindowContextPermission()
-          const screenshotGranted = await Highlight.permissions.requestScreenshotPermission()
-          if (contextGranted && screenshotGranted) {
-            addToast({
-              title: 'Context Granted',
-              description: 'Context granted for ' + windowName,
-              type: 'success',
-              timeout: 5000,
-            })
-            const screenshot = await Highlight.user.getWindowScreenshot(windowName)
-            addAttachment({
-              type: 'image',
-              value: screenshot,
-            })
-
-            const windowContext = await Highlight.user.getWindowContext(windowName)
-            const ocrScreenContents = windowContext.environment.ocrScreenContents || ''
-            addAttachment({
-              type: 'window_context',
-              value: ocrScreenContents,
-            })
-
-            handleSubmit("Here's the context you requested.", promptApp, {
-              image: screenshot,
-              window_context: ocrScreenContents,
-            })
-          }
+          // Handle window context request (moved to a separate function)
+          await handleWindowContextRequest(windowName, promptApp)
         }
       }
     } catch (error) {
-      const endTime = Date.now()
-      const duration = (endTime - startTime) / 1000
-
-      // @ts-ignore
-      console.error('Error fetching response:', error.stack ?? error.message)
-
-      // @ts-ignore
-      if (error.message.includes('aborted')) {
-        console.log('Skipping message request, aborted')
-      } else {
-        // Log to Sentry
-        Sentry.captureException(error, {
-          extra: {
-            conversationId,
-            isPromptApp,
-            duration,
-            endpoint: isPromptApp ? 'chat/prompt-as-app' : 'chat/',
-          },
-        })
-
-        // Log to Amplitude
-        trackEvent('HL_CHAT_BACKEND_API_ERROR', {
-          endpoint: isPromptApp ? 'chat/prompt-as-app' : 'chat/',
-          duration,
-          // @ts-ignore
-          errorMessage: error.message,
-        })
-
-        addToast({
-          title: 'Unexpected Error',
-          // @ts-ignore
-          description: `${error?.message}`,
-          type: 'error',
-          timeout: 15000,
-        })
-      }
+      handleFetchError(error, isPromptApp, startTime, conversationId)
     } finally {
       const endTime = Date.now()
       const duration = endTime - startTime
 
-      // Log request to Amplitude
-      trackEvent('HL_CHAT_BACKEND_API_REQUEST', {
-        endpoint: isPromptApp ? 'chat/prompt-as-app' : 'chat/',
-        duration,
-        success: !abortControllerRef.current?.signal.aborted,
-      })
+      // Log request to Amplitude (moved to a separate function to avoid blocking)
+      setTimeout(() => logAmplitudeEvent(isPromptApp, duration), 0)
 
       setInputIsDisabled(false)
       abortControllerRef.current = undefined
@@ -429,17 +352,13 @@ export const useSubmitQuery = () => {
         formData.append('app_id', promptApp!.external_id)
       }
 
-      // Fetch windows information
-      await Sentry.startSpan({ name: 'fetchWindows', op: 'function' }, async () => {
-        const windows = await fetchWindows()
-        formData.append('windows', JSON.stringify(windows))
-      })
+      // Fetch windows information asynchronously
+      const windowsPromise = fetchWindows()
 
       if (aboutMe) {
         formData.append('about_me', JSON.stringify(aboutMe))
       }
 
-      // TODO(umut): This is a hack to add the context to the form data.
       if (context) {
         if (context.image) {
           formData.append('screenshot', context.image)
@@ -449,12 +368,16 @@ export const useSubmitQuery = () => {
         }
       }
 
-      const { screenshot, audio, fileTitle, clipboardText, ocrText, windowContext } = await Sentry.startSpan(
-        { name: 'addAttachmentsToFormData', op: 'function' },
-        async () => {
-          return await addAttachmentsToFormData(formData, attachments)
-        },
-      )
+      // Process attachments asynchronously
+      const attachmentPromise = addAttachmentsToFormData(formData, attachments)
+
+      // Wait for both promises to resolve
+      const [windows, { screenshot, audio, fileTitle, clipboardText, ocrText, windowContext }] = await Promise.all([
+        windowsPromise,
+        attachmentPromise,
+      ])
+
+      formData.append('windows', JSON.stringify(windows))
 
       const conversationId = getOrCreateConversationId()
       addConversationMessage(conversationId!, {
@@ -465,7 +388,7 @@ export const useSubmitQuery = () => {
         audio,
         file_title: fileTitle,
         clipboard_text: clipboardText,
-        windows: await fetchWindows(),
+        windows,
         window_context: windowContext,
         file_attachments: attachments.filter((attachment) => attachment.type === 'text_file'),
       })
@@ -486,6 +409,83 @@ export const useSubmitQuery = () => {
   useEffect(() => {
     conversationIdRef.current = conversationId
   }, [conversationId])
+
+  async function handleWindowContextRequest(windowName: string, promptApp?: Prompt) {
+    const contextGranted = await Highlight.permissions.requestWindowContextPermission()
+    const screenshotGranted = await Highlight.permissions.requestScreenshotPermission()
+    if (contextGranted && screenshotGranted) {
+      addToast({
+        title: 'Context Granted',
+        description: 'Context granted for ' + windowName,
+        type: 'success',
+        timeout: 5000,
+      })
+      const screenshot = await Highlight.user.getWindowScreenshot(windowName)
+      addAttachment({
+        type: 'image',
+        value: screenshot,
+      })
+
+      const windowContext = await Highlight.user.getWindowContext(windowName)
+      const ocrScreenContents = windowContext.environment.ocrScreenContents || ''
+      addAttachment({
+        type: 'window_context',
+        value: ocrScreenContents,
+      })
+
+      handleSubmit("Here's the context you requested.", promptApp, {
+        image: screenshot,
+        window_context: ocrScreenContents,
+      })
+    }
+  }
+
+  function handleFetchError(error: any, isPromptApp: boolean, startTime: number, conversationId: string) {
+    const endTime = Date.now()
+    const duration = (endTime - startTime) / 1000
+
+    console.error('Error fetching response:', error.stack ?? error.message)
+
+    if (error.message.includes('aborted')) {
+      console.log('Skipping message request, aborted')
+    } else {
+      // Log to Sentry (non-blocking)
+      setTimeout(() => {
+        Sentry.captureException(error, {
+          extra: {
+            conversationId,
+            isPromptApp,
+            duration,
+            endpoint: isPromptApp ? 'chat/prompt-as-app' : 'chat/',
+          },
+        })
+      }, 0)
+
+      // Log to Amplitude (non-blocking)
+      setTimeout(() => {
+        trackEvent('HL_CHAT_BACKEND_API_ERROR', {
+          endpoint: isPromptApp ? 'chat/prompt-as-app' : 'chat/',
+          duration,
+          errorMessage: error.message,
+        })
+      }, 0)
+
+      addToast({
+        title: 'Unexpected Error',
+        description: `${error?.message}`,
+        type: 'error',
+        timeout: 15000,
+      })
+    }
+  }
+
+  function logAmplitudeEvent(isPromptApp: boolean, duration: number) {
+    trackEvent('HL_CHAT_BACKEND_API_REQUEST', {
+      endpoint: isPromptApp ? 'chat/prompt-as-app' : 'chat/',
+      duration,
+      success: true,
+    })
+  }
 
   return { handleSubmit, handleIncomingContext }
 }
