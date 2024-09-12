@@ -100,3 +100,43 @@ body {
 .animate-gentle-scale {
   animation: gentleScale 0.3s ease-in-out;
 }
+
+@keyframes voiceWave {
+  0%, 100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(1.5);
+  }
+}
+
+.animated-voice-square .voice-line {
+  transform-origin: center;
+  animation: voiceWave 1s infinite;
+}
+
+.animated-voice-square .voice-line-1 {
+  animation-delay: 0s;
+}
+
+.animated-voice-square .voice-line-2 {
+  animation-delay: 0.15s;
+}
+
+.animated-voice-square .voice-line-3 {
+  animation-delay: 0.3s;
+}
+
+.animated-voice-square .voice-line-4 {
+  animation-delay: 0.45s;
+}
+
+.animated-voice-square .voice-line-5 {
+  animation-delay: 0.6s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated-voice-square .voice-line {
+    animation: none;
+  }
+}
