@@ -16,6 +16,7 @@ import { Prompt } from '@/types/supabase-helpers'
 import { trackEvent } from '@/utils/amplitude'
 import PersonalPrompts from '@/components/PersonalPrompts/PersonalPrompts'
 import TrendingPrompts from '@/components/TrendingPrompts/TrendingPrompts'
+import ConversationsHome from '@/components/Conversations/ConversationsHome'
 
 const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
   const [isVisible, setVisible] = useState(isShowing)
@@ -41,6 +42,7 @@ const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
         <InputHeading />
         {isVisible && <Input isActiveChat={false} />}
       </div>
+      <ConversationsHome />
       <Prompts userId={userId} />
     </div>
   )

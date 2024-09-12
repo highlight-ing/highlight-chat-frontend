@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-interface ConversationData {
+export interface ConversationData {
   id: string // UUID
   title: string
   summary: string
@@ -23,7 +23,7 @@ declare global {
   }
 }
 
-export const useGetConversationTest = () => {
+export const useConversations = () => {
   const [conversations, setConversations] = useState<ConversationData[]>([])
 
   useEffect(() => {
