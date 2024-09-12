@@ -17,6 +17,7 @@ import { trackEvent } from '@/utils/amplitude'
 import PersonalPrompts from '@/components/PersonalPrompts/PersonalPrompts'
 import TrendingPrompts from '@/components/TrendingPrompts/TrendingPrompts'
 import ConversationsHome from '@/components/Conversations/ConversationsHome'
+import ConversationsActive from '@/components/Conversations/ConversationsActive'
 
 const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
   const [isVisible, setVisible] = useState(isShowing)
@@ -43,6 +44,7 @@ const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
         {isVisible && <Input isActiveChat={false} />}
       </div>
       <ConversationsHome />
+      <ConversationsActive />
       <Prompts userId={userId} />
     </div>
   )

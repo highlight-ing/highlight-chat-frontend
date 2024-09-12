@@ -23,7 +23,8 @@ const AnimatedVoiceSquare: React.FC<AnimatedVoiceSquareProps> = ({
   const getLineHeight = (index: number) => {
     const maxHeight = height * 0.4
     if (index === 2) return maxHeight
-    if (index === 1 || index === 3) return maxHeight * 0.8
+    if (index === 1 || index === 3) return maxHeight * 0.7
+    if (index === 0 || index === 4) return maxHeight * 0.25
     return maxHeight * 0.5
   }
 
