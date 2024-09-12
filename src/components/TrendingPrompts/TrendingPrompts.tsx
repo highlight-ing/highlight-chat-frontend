@@ -94,7 +94,9 @@ const TrendingPromptsItem = ({
   return (
     <div
       className={`${styles.trendingPromptsItem} ${lastItem ? styles.lastItem : ''}`}
-      onClick={() => openModal('customize-prompt', { prompt })}
+      onClick={() => {
+        openModal('customize-prompt', { prompt })
+      }}
     >
       <div className={styles.trendingPromptsItemHeader}>
         <div className={styles.trendingPromptsItemHeaderLeft}>
@@ -126,7 +128,8 @@ const TrendingPromptsItem = ({
               size="icon"
               variant="tertiary"
               className={styles.filledButton}
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation()
                 openModal('pin-prompt', { prompt })
               }}
               disabled={isPinned}
@@ -151,7 +154,8 @@ const TrendingPromptsItem = ({
               size="xsmall"
               variant="tertiary"
               className={styles.filledButton}
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation()
                 openModal('customize-prompt', { prompt })
               }}
             >
@@ -163,7 +167,10 @@ const TrendingPromptsItem = ({
               className={styles.filledButton}
               size="xsmall"
               variant="primary"
-              onClick={() => selectPrompt(prompt.external_id, true, false)}
+              onClick={(e) => {
+                e.stopPropagation()
+                selectPrompt(prompt.external_id, true, false)
+              }}
             >
               Chat
             </Button>
