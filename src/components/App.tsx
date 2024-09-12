@@ -114,7 +114,9 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
 
       let res
 
+      //@ts-expect-error
       if (context.promptSlug) {
+        //@ts-expect-error
         res = await getPromptAppBySlug(context.promptSlug)
 
         const accessToken = await getAccessToken()
