@@ -211,21 +211,7 @@ function PreferredAttachment() {
         // value={promptEditorData.preferredAttachment}
         defaultValue="default"
       >
-        <ListboxOption value="default">
-          <ListboxLabel>Default</ListboxLabel>
-        </ListboxOption>
-        <ListboxOption value="screen">
-          <ListboxLabel>Screen</ListboxLabel>
-        </ListboxOption>
-        <ListboxOption value="page-text">
-          <ListboxLabel>Page Text</ListboxLabel>
-        </ListboxOption>
-        <ListboxOption value="clipboard">
-          <ListboxLabel>Clipboard</ListboxLabel>
-        </ListboxOption>
-        <ListboxOption value="audio">
-          <ListboxLabel>Audio</ListboxLabel>
-        </ListboxOption>
+        <ListboxOption value="default">Default</ListboxOption>
       </Listbox>
     </SettingOption>
   )
