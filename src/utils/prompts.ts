@@ -355,7 +355,7 @@ export async function fetchPrompts(authToken: string) {
   const { data: prompts, error: promptsError } = await supabase
     .from('prompts')
     .select(
-      'id, external_id, name, description, prompt_text, prompt_url, created_at, slug, user_id, public, suggestion_prompt_text, video_url, image, is_handlebar_prompt, public_use_number, system_prompt, can_trend, user_images(file_extension), added_prompt_tags(tags(external_id, tag, slug))',
+      'id, external_id, name, description, prompt_text, prompt_url, created_at, slug, user_id, public, suggestion_prompt_text, video_url, image, is_handlebar_prompt, public_use_number, system_prompt, can_trend, user_images(file_extension), preferred_attachment, added_prompt_tags(tags(external_id, tag, slug))',
     )
 
   // Map the prompts to follow the original structure with tags.
