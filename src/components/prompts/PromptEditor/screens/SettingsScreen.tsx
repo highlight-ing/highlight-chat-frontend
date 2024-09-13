@@ -12,7 +12,7 @@ import { supabaseLoader } from '@/lib/supabase'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { PreferredAttachmentSchema, videoUrlSchema } from '@/lib/zod'
+import { videoUrlSchema } from '@/lib/zod'
 import { useStore } from '@/providers/store-provider'
 import CreatableSelect from 'react-select/creatable'
 import { OnChangeValue } from 'react-select'
@@ -23,7 +23,6 @@ import { PromptTag } from '@/types'
 import OnboardingBox from '../OnboardingBox'
 import TemplateSelectorBox from '../TemplateSelectorBox'
 import { trackEvent } from '@/utils/amplitude'
-import { Listbox, ListboxLabel, ListboxOption } from '@/components/catalyst/listbox'
 
 function AppIcon() {
   return (
@@ -188,44 +187,6 @@ function DeletePromptButton() {
       >
         Delete Prompt
       </Button>
-    </SettingOption>
-  )
-}
-
-function PreferredAttachment() {
-  const promptEditorData = useStore((state) => state.promptEditorData)
-  const setPromptEditorData = useStore((state) => state.setPromptEditorData)
-
-  function onPreferredAttachmentChange(value: string) {
-    const parsedValue = PreferredAttachmentSchema.parse(value)
-
-    setPromptEditorData({ preferredAttachment: parsedValue })
-  }
-
-  return (
-    <SettingOption label={'Preferred Attachment'} description={'The attachment type that your prompt relies on'}>
-      <Listbox
-        name="status"
-        onChange={onPreferredAttachmentChange}
-        value={promptEditorData.preferredAttachment}
-        defaultValue="default"
-      >
-        <ListboxOption value="default">
-          <ListboxLabel>Default</ListboxLabel>
-        </ListboxOption>
-        <ListboxOption value="screen">
-          <ListboxLabel>Screen</ListboxLabel>
-        </ListboxOption>
-        <ListboxOption value="page-text">
-          <ListboxLabel>Page Text</ListboxLabel>
-        </ListboxOption>
-        <ListboxOption value="clipboard">
-          <ListboxLabel>Clipboard</ListboxLabel>
-        </ListboxOption>
-        <ListboxOption value="audio">
-          <ListboxLabel>Audio</ListboxLabel>
-        </ListboxOption>
-      </Listbox>
     </SettingOption>
   )
 }
@@ -437,7 +398,6 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
             />
             <ShareLinkButton />
             <DeletePromptButton />
-            <PreferredAttachment />
           </div>
         </div>
       </div>

@@ -17,7 +17,7 @@ export function Listbox<T>({
   autoFocus?: boolean
   'aria-label'?: string
   children?: React.ReactNode
-} & Omit<Headless.ListboxProps<typeof Fragment, T>, 'as' | 'multiple'>) {
+} & Omit<Headless.ListboxProps<typeof Fragment, T>, 'multiple'>) {
   return (
     <Headless.Listbox {...props} multiple={false}>
       <Headless.ListboxButton
@@ -93,7 +93,6 @@ export function Listbox<T>({
           'shadow-lg ring-1 ring-zinc-950/10 dark:ring-inset dark:ring-white/10',
           // Transitions
           'transition-opacity duration-100 ease-in data-[transition]:pointer-events-none data-[closed]:data-[leave]:opacity-0',
-          'z-10',
         )}
       >
         {options}
@@ -106,10 +105,7 @@ export function ListboxOption<T>({
   children,
   className,
   ...props
-}: { className?: string; children?: React.ReactNode } & Omit<
-  Headless.ListboxOptionProps<'div', T>,
-  'as' | 'className'
->) {
+}: { className?: string; children?: React.ReactNode } & Omit<Headless.ListboxOptionProps<'div', T>, 'className'>) {
   let sharedClasses = clsx(
     // Base
     'flex min-w-0 items-center',
