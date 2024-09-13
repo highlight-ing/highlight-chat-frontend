@@ -1,8 +1,4 @@
-import Modal from '@/components/modals/Modal'
 import { ChatHistoryItem, ModalObjectProps } from '@/types'
-
-import styles from './modals.module.scss'
-import Button from '@/components/Button/Button'
 import { useApi } from '@/hooks/useApi'
 import { useChatHistory } from '@/hooks/useChatHistory'
 import { useStore } from '@/providers/store-provider'

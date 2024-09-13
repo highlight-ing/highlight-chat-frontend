@@ -1,0 +1,142 @@
+@import '@/variables.module';
+
+.chatHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  //justify-content: center;
+  transition: opacity 100ms ease, transform 100ms ease;
+  transform: scale(0.75);
+  height: 100%;
+  gap: 8px;
+}
+
+.promptName {
+  font-size: 24px;
+  color: $light-80;
+}
+
+.promptDescription {
+  font-size: 14px;
+  color: $light-40;
+}
+
+.promptIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background-color: $light-20;
+  color: $light-100;
+
+  &.self {
+    background-color: $purple-20;
+    color: $purple-100;
+  }
+  &.community {
+    background-color: $primary-20;
+    color: $primary-100;
+  }
+  &.official {
+    background-color: $pink-20;
+    color: $pink-100;
+  }
+}
+
+.promptTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  overflow-x: auto;
+  max-width: 100%; // Adjust based on the width of the "Uses" badge
+}
+
+.appPromptAccordion {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border-radius: 8px;
+  max-height: 300px;
+
+}
+
+
+.customizePromptsItem {
+  display: flex;
+  padding: 20px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1 0 0;
+  min-width: calc(50% - 8px);
+  border-radius: 20px;
+  background-color: var(--Background-Secondary, #191919);
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+
+  .customizePromptsItemHeader {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    color: $text-primary;
+  }
+
+  .customizePromptsItemContent {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    flex: 1 0 0;
+
+    p {
+      color: $light-40;
+      font-size: 15px;
+      font-weight: 300;
+      line-height: 1.6;
+    }
+  }
+
+  .customizePromptsItemFooter {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+
+    .customizePromptsItemFooterButton {
+      color: $light-40;
+      transition: color 0.3s ease, background-color 0.3s ease;
+
+      &:hover {
+        color: $red-100;
+      }
+    }
+
+    .customizePromptsItemFooterLeftButtons,
+    .customizePromptsItemFooterRightButtons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .customizePromptsItemFooterLeftButtons {
+      justify-content: flex-start;
+    }
+
+    .customizePromptsItemFooterRightButtons {
+      justify-content: flex-end;
+      .customizePromptButton {
+        font-size: 14px;
+        width: 77px;
+        padding: 2px 8px;
+        border: 1px solid $primary-100;
+        transition: all 0.2s ease-in-out;
+        color: $primary-100;
+        &:hover {
+          background-color: $primary-100;
+          border-color: $primary-100;
+          color: #191919;
+        }
+      }
+    }
+  }
+}

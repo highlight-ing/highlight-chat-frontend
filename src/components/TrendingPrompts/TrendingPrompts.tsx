@@ -1,7 +1,7 @@
 import styles from './trending-prompts.module.scss'
 import variables from '@/variables.module.scss'
 import { Prompt } from '@/types/supabase-helpers'
-import { Setting } from 'iconsax-react'
+import { Setting, ArchiveSlash, ArchiveAdd } from 'iconsax-react'
 import { useState, useEffect, useMemo } from 'react'
 import { PromptTag, PinnedPrompt } from '@/types'
 import { supabaseLoader } from '@/lib/supabase'
@@ -46,6 +46,7 @@ const TrendingPrompts = ({
                   slug={item.slug}
                   color={variables.primary100}
                   prompt={item}
+                  // @ts-ignore
                   tags={item.tags as PromptTag[] | null}
                   lastItem={index === mergedPrompts.length - 1}
                   publicUseNumber={item.public_use_number}
@@ -91,7 +92,12 @@ const TrendingPromptsItem = ({
   }, [pinState])
 
   return (
-    <div className={`${styles.trendingPromptsItem} ${lastItem ? styles.lastItem : ''}`}>
+    <div
+      className={`${styles.trendingPromptsItem} ${lastItem ? styles.lastItem : ''}`}
+      onClick={() => {
+        openModal('customize-prompt', { prompt })
+      }}
+    >
       <div className={styles.trendingPromptsItemHeader}>
         <div className={styles.trendingPromptsItemHeaderLeft}>
           {prompt.image ? (
@@ -119,15 +125,41 @@ const TrendingPromptsItem = ({
             }
           >
             <Button
-              size="xsmall"
+              size="icon"
               variant="tertiary"
               className={styles.filledButton}
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation()
                 openModal('pin-prompt', { prompt })
               }}
               disabled={isPinned}
             >
-              {isPinned ? 'Pinned' : 'Pin'}
+              {isPinned ? (
+                <ArchiveSlash color={variables.textPrimary} variant={'Bold'} size="16" />
+              ) : (
+                <ArchiveAdd color={variables.textPrimary} variant={'Bold'} size="16" />
+              )}
+            </Button>
+          </Tooltip>
+          <Tooltip
+            position={'bottom'}
+            tooltip={
+              <div className={'flex flex-col gap-1'}>
+                Preview Prompt {'\n'}
+                <span className={'text-xs text-light-60'}>Preview this prompt to find out how it works</span>
+              </div>
+            }
+          >
+            <Button
+              size="xsmall"
+              variant="tertiary"
+              className={styles.filledButton}
+              onClick={(e) => {
+                e.stopPropagation()
+                openModal('customize-prompt', { prompt })
+              }}
+            >
+              Preview
             </Button>
           </Tooltip>
           <Tooltip position={'bottom'} tooltip={`Start a chat with ${prompt.name}`}>
@@ -135,7 +167,10 @@ const TrendingPromptsItem = ({
               className={styles.filledButton}
               size="xsmall"
               variant="primary"
-              onClick={() => selectPrompt(prompt.external_id, true, false)}
+              onClick={(e) => {
+                e.stopPropagation()
+                selectPrompt(prompt.external_id, true, false)
+              }}
             >
               Chat
             </Button>

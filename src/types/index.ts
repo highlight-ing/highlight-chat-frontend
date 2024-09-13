@@ -1,5 +1,5 @@
 import { Prompt } from '@/types/supabase-helpers'
-import { ColorScheme, CSSVariables } from '@/components/PersonalPrompts/customVariables'
+import { ColorScheme } from '@/components/PersonalPrompts/customVariables'
 
 type WindowAttachment = {
   type: 'window'
@@ -194,3 +194,6 @@ export type PinnedPrompt = {
   } | null
   public_use_number: number
 } & { isPinned?: boolean }
+
+export const APP_PROMPT_COMMENT =
+  "{{! These are comments, they won't effect the output of your app }}\n{{! The app prompt determines how your app will behave to the user. }}\n"
