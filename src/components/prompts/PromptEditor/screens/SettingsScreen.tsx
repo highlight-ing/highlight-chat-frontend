@@ -23,8 +23,8 @@ import { PromptTag } from '@/types'
 import OnboardingBox from '../OnboardingBox'
 import TemplateSelectorBox from '../TemplateSelectorBox'
 import { trackEvent } from '@/utils/amplitude'
-// import { Listbox, ListboxLabel, ListboxOption } from '@/components/catalyst/listbox'
-import { Listbox, ListboxButton, ListboxLabel, ListboxOption, ListboxOptions } from '@headlessui/react'
+import { Listbox, ListboxLabel, ListboxOption } from '@/components/catalyst/listbox'
+// import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
 
 function AppIcon() {
   return (
@@ -212,6 +212,10 @@ function PreferredAttachment() {
         defaultValue="default"
       >
         <ListboxOption value="default">Default</ListboxOption>
+        <ListboxOption value="screen">Screen</ListboxOption>
+        <ListboxOption value="page-text">Page Text</ListboxOption>
+        <ListboxOption value="clipboard">Clipboard</ListboxOption>
+        <ListboxOption value="audio">Audio</ListboxOption>
       </Listbox>
     </SettingOption>
   )
