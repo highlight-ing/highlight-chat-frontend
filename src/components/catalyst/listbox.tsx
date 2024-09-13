@@ -122,7 +122,7 @@ export function ListboxOption<T>({
   )
 
   return (
-    <Headless.ListboxOption as={Fragment} {...props}>
+    <Headless.ListboxOption as={'div'} {...props}>
       {({ selectedOption }) => {
         if (selectedOption) {
           return <div className={clsx(className, sharedClasses)}>{children}</div>
