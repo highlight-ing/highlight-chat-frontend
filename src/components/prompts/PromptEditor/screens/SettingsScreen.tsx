@@ -23,7 +23,8 @@ import { PromptTag } from '@/types'
 import OnboardingBox from '../OnboardingBox'
 import TemplateSelectorBox from '../TemplateSelectorBox'
 import { trackEvent } from '@/utils/amplitude'
-import { Listbox, ListboxLabel, ListboxOption } from '@/components/catalyst/listbox'
+// import { Listbox, ListboxLabel, ListboxOption } from '@/components/catalyst/listbox'
+import { Listbox, ListboxButton, ListboxLabel, ListboxOption, ListboxOptions } from '@headlessui/react'
 
 function AppIcon() {
   return (
