@@ -1,7 +1,7 @@
 'use server'
 
 import { PROMPTS_TABLE_SELECT_FIELDS, promptSelectMapper, supabaseAdmin } from '@/lib/supabase'
-import { videoUrlSchema } from '@/lib/zod'
+import { PreferredAttachmentSchema, videoUrlSchema } from '@/lib/zod'
 import { z } from 'zod'
 import mime from 'mime-types'
 import slugify from 'slugify'
@@ -26,7 +26,7 @@ const ERROR_MESSAGES = {
 }
 
 const SavePromptSchema = z.object({
-  externalId: z.string().optional().nullable(),
+  externalId: z.string().nullish(),
   name: z.string().max(40, { message: 'Name must be less than 40 characters' }),
   description: z.string(),
   appPrompt: z.string(),
@@ -34,6 +34,7 @@ const SavePromptSchema = z.object({
   visibility: z.enum(['public', 'private']),
   videoUrl: videoUrlSchema,
   tags: z.array(z.object({ value: z.string(), label: z.string() })).optional(),
+  preferredAttachment: PreferredAttachmentSchema.nullish(),
 })
 
 export type SavePromptData = z.infer<typeof SavePromptSchema>
@@ -157,6 +158,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
     visibility: formData.get('visibility'),
     videoUrl: formData.get('videoUrl'),
     tags: JSON.parse(formData.get('tags') as string),
+    preferredAttachment: formData.get('preferredAttachment'),
   })
 
   if (!validated.success) {
@@ -223,6 +225,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
     user_id: userId,
     image: newImageId ?? undefined,
     is_handlebar_prompt: true,
+    preferred_attachment: validated.data.preferredAttachment,
   }
 
   if (validated.data.externalId) {

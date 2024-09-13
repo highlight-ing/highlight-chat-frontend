@@ -9,6 +9,7 @@ import CloseButton from '@/components/CloseButton/CloseButton'
 import { useStore } from '@/providers/store-provider'
 import PromptSaveButton from '@/components/prompts/PromptEditor/PromptSaveButton'
 import Button from '@/components/Button/Button'
+import { PreferredAttachmentSchema } from '@/lib/zod'
 
 const EditPromptModal = ({ id, context }: ModalObjectProps) => {
   const prompt = context?.prompt as Prompt
@@ -31,6 +32,7 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
         // @ts-ignore
         tags: prompt.tags as PromptTag[],
         systemPrompt: prompt.system_prompt ?? DEFAULT_SYSTEM_PROMPT,
+        preferredAttachment: PreferredAttachmentSchema.nullish().parse(prompt.preferred_attachment) ?? 'default',
       },
       true,
     )
