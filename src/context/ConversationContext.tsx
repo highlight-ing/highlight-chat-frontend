@@ -9,7 +9,7 @@ import { useConversationsSettings } from './ConversationSettingsContext'
 import { useAudioPermission } from '@/hooks/useAudioPermission'
 import Highlight from '@highlight-ai/app-runtime'
 
-const POLL_MIC_INTERVAL = 100
+const POLL_MIC_ACITIVTY = 300
 
 interface ConversationContextType {
   conversations: ConversationData[]
@@ -116,12 +116,12 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       setMicActivity(0)
       return
     }
-    const activity = await fetchMicActivity(300)
+    const activity = await fetchMicActivity(POLL_MIC_ACITIVTY)
     setMicActivity(activity)
   }, [isAudioOn, isAudioPermissionEnabled])
 
   useEffect(() => {
-    const intervalId = setInterval(pollMicActivity, POLL_MIC_INTERVAL)
+    const intervalId = setInterval(pollMicActivity, POLL_MIC_ACITIVTY)
     return () => clearInterval(intervalId)
   }, [pollMicActivity])
 
@@ -228,3 +228,48 @@ export const useConversations = () => {
   }
   return context
 }
+
+// TODO: - probably not going to do this in HL Chat, hook for new highlight api get/listen for conversations
+/*
+import React, { useEffect, useState } from 'react'
+import { ConversationData } from '@/types/conversations'
+export const useConversations = () => {
+  const [conversations, setConversations] = useState<ConversationData[]>([])
+
+  useEffect(() => {
+    const fetchConversations = async () => {
+      if (typeof window !== 'undefined' && window.highlight?.internal?.getConversations) {
+        try {
+          const fetchedConversations = await window.highlight.internal.getConversations()
+          setConversations(fetchedConversations)
+          console.log(fetchedConversations)
+        } catch (error) {
+          console.error('Error fetching conversations:', error)
+        }
+      }
+    }
+
+    fetchConversations()
+
+    // Set up the listener
+    let removeListener: (() => void) | undefined
+
+    if (window.highlight?.internal?.createConversationsStorageListener) {
+      removeListener = window.highlight.internal.createConversationsStorageListener(() => {
+        console.log('Conversations updated')
+        fetchConversations() // Fetch updated conversations when the event is triggered
+      })
+    }
+
+    // Clean up the listener when the component unmounts
+    return () => {
+      if (removeListener) {
+        removeListener()
+      }
+    }
+  }, [])
+
+  return conversations
+}
+
+*/
