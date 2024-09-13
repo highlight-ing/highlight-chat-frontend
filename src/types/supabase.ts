@@ -258,6 +258,7 @@ export type Database = {
           image: string | null
           is_handlebar_prompt: boolean
           name: string
+          preferred_attachment: string | null
           prompt_text: string | null
           prompt_url: string | null
           public: boolean
@@ -265,7 +266,6 @@ export type Database = {
           slug: string
           suggestion_prompt_text: string | null
           system_prompt: string | null
-          tags: Json[] | null
           user_id: string
           video_url: string | null
         }
@@ -278,6 +278,7 @@ export type Database = {
           image?: string | null
           is_handlebar_prompt?: boolean
           name: string
+          preferred_attachment?: string | null
           prompt_text?: string | null
           prompt_url?: string | null
           public?: boolean
@@ -285,7 +286,6 @@ export type Database = {
           slug: string
           suggestion_prompt_text?: string | null
           system_prompt?: string | null
-          tags?: Json[] | null
           user_id: string
           video_url?: string | null
         }
@@ -298,6 +298,7 @@ export type Database = {
           image?: string | null
           is_handlebar_prompt?: boolean
           name?: string
+          preferred_attachment?: string | null
           prompt_text?: string | null
           prompt_url?: string | null
           public?: boolean
@@ -305,7 +306,6 @@ export type Database = {
           slug?: string
           suggestion_prompt_text?: string | null
           system_prompt?: string | null
-          tags?: Json[] | null
           user_id?: string
           video_url?: string | null
         }
