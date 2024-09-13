@@ -206,8 +206,8 @@ function PreferredAttachment() {
     <SettingOption label={'Preferred Attachment'} description={'The attachment type that your prompt relies on'}>
       <Listbox
         name="status"
-        onChange={onPreferredAttachmentChange}
-        value={promptEditorData.preferredAttachment}
+        // onChange={onPreferredAttachmentChange}
+        // value={promptEditorData.preferredAttachment}
         defaultValue="default"
       >
         <ListboxOption value="default">
