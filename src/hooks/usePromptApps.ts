@@ -56,7 +56,7 @@ export default (loadPrompts?: boolean) => {
     }
 
     loadPromptsPromise = new Promise<Prompt[]>(async (resolve) => {
-      console.log('Refreshing prompts')
+      console.log('Refreshing prompts...')
       setLoadingPrompts(true)
 
       const accessToken = await getAccessToken()
