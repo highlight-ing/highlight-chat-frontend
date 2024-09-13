@@ -20,7 +20,3 @@ export const videoUrlSchema = z
       message: 'Invalid video URL, must be a YouTube or Vimeo URL.',
     },
   )
-
-export const PreferredAttachmentSchema = z.enum(['default', 'screen', 'page-text', 'clipboard', 'audio'])
-
-export type PreferredAttachment = z.infer<typeof PreferredAttachmentSchema>

@@ -1,7 +1,7 @@
 'use server'
 
 import { PROMPTS_TABLE_SELECT_FIELDS, promptSelectMapper, supabaseAdmin } from '@/lib/supabase'
-import { PreferredAttachmentSchema, videoUrlSchema } from '@/lib/zod'
+import { videoUrlSchema } from '@/lib/zod'
 import { z } from 'zod'
 import mime from 'mime-types'
 import slugify from 'slugify'
@@ -26,7 +26,7 @@ const ERROR_MESSAGES = {
 }
 
 const SavePromptSchema = z.object({
-  externalId: z.string().nullish(),
+  externalId: z.string().optional().nullable(),
   name: z.string().max(40, { message: 'Name must be less than 40 characters' }),
   description: z.string(),
   appPrompt: z.string(),
@@ -34,7 +34,6 @@ const SavePromptSchema = z.object({
   visibility: z.enum(['public', 'private']),
   videoUrl: videoUrlSchema,
   tags: z.array(z.object({ value: z.string(), label: z.string() })).optional(),
-  preferredAttachment: PreferredAttachmentSchema.nullish(),
 })
 
 export type SavePromptData = z.infer<typeof SavePromptSchema>
@@ -158,7 +157,6 @@ export async function savePrompt(formData: FormData, authToken: string) {
     visibility: formData.get('visibility'),
     videoUrl: formData.get('videoUrl'),
     tags: JSON.parse(formData.get('tags') as string),
-    preferredAttachment: formData.get('preferredAttachment'),
   })
 
   if (!validated.success) {
@@ -225,7 +223,6 @@ export async function savePrompt(formData: FormData, authToken: string) {
     user_id: userId,
     image: newImageId ?? undefined,
     is_handlebar_prompt: true,
-    preferred_attachment: validated.data.preferredAttachment,
   }
 
   if (validated.data.externalId) {
@@ -358,7 +355,7 @@ export async function fetchPrompts(authToken: string) {
   const { data: prompts, error: promptsError } = await supabase
     .from('prompts')
     .select(
-      'id, external_id, name, description, prompt_text, prompt_url, created_at, slug, user_id, public, suggestion_prompt_text, video_url, image, is_handlebar_prompt, public_use_number, system_prompt, can_trend, user_images(file_extension), preferred_attachment, added_prompt_tags(tags(external_id, tag, slug))',
+      'id, external_id, name, description, prompt_text, prompt_url, created_at, slug, user_id, public, suggestion_prompt_text, video_url, image, is_handlebar_prompt, public_use_number, system_prompt, can_trend, user_images(file_extension), added_prompt_tags(tags(external_id, tag, slug))',
     )
 
   // Map the prompts to follow the original structure with tags.
