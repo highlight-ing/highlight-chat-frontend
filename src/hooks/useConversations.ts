@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-
+import { ConversationData } from '@/types/conversations'
 export const useConversations = () => {
   const [conversations, setConversations] = useState<ConversationData[]>([])
 

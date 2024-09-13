@@ -1,5 +1,6 @@
 import Highlight from '@highlight-ai/app-runtime'
 import { LLMMessage } from '@/types'
+import { ConversationData } from '@/types/conversations'
 
 export const CONVERSATIONS_STORAGE_KEY = 'conversations'
 export const AUTO_CLEAR_VALUE_KEY = 'autoClearValue'
@@ -8,18 +9,6 @@ export const AUDIO_ENABLED_KEY = 'audioEnabled'
 
 const isBrowser = typeof window !== 'undefined'
 const getAppStorage = () => (isBrowser ? window.highlight.appStorage : null)
-
-export interface ConversationData {
-  id: string // UUID
-  title: string
-  summary: string
-  timestamp: Date
-  topic: string
-  transcript: string
-  summarized: boolean
-  shareLink: string
-  userId: string
-}
 
 declare global {
   interface Window {
