@@ -258,6 +258,7 @@ export type Database = {
           image: string | null
           is_handlebar_prompt: boolean
           name: string
+          preferred_attachment: string | null
           prompt_text: string | null
           prompt_url: string | null
           public: boolean
@@ -277,6 +278,7 @@ export type Database = {
           image?: string | null
           is_handlebar_prompt?: boolean
           name: string
+          preferred_attachment?: string | null
           prompt_text?: string | null
           prompt_url?: string | null
           public?: boolean
@@ -296,6 +298,7 @@ export type Database = {
           image?: string | null
           is_handlebar_prompt?: boolean
           name?: string
+          preferred_attachment?: string | null
           prompt_text?: string | null
           prompt_url?: string | null
           public?: boolean
