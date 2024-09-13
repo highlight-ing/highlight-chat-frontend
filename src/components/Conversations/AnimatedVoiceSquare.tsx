@@ -5,6 +5,7 @@ interface AnimatedVoiceSquareProps {
   height?: number
   backgroundColor?: string
   lineColor?: string
+  shouldAnimate?: boolean // Add this line
 }
 
 const AnimatedVoiceSquare: React.FC<AnimatedVoiceSquareProps> = ({
@@ -12,6 +13,7 @@ const AnimatedVoiceSquare: React.FC<AnimatedVoiceSquareProps> = ({
   height = 24,
   backgroundColor = '#4CED9F',
   lineColor,
+  shouldAnimate = true, // Add this line with a default value
 }) => {
   const viewBox = `0 0 ${width} ${height}`
   const strokeColor = lineColor || 'currentColor'
@@ -21,11 +23,21 @@ const AnimatedVoiceSquare: React.FC<AnimatedVoiceSquareProps> = ({
   const centerY = height / 2
 
   const getLineHeight = (index: number) => {
-    const maxHeight = height * 0.4
-    if (index === 2) return maxHeight
-    if (index === 1 || index === 3) return maxHeight * 0.7
-    if (index === 0 || index === 4) return maxHeight * 0.25
-    return maxHeight * 0.5
+    let maxHeight = 0
+    switch (shouldAnimate) {
+      case true:
+        maxHeight = height * 0.4
+        if (index === 2) return maxHeight
+        if (index === 1 || index === 3) return maxHeight * 0.7
+        if (index === 0 || index === 4) return maxHeight * 0.25
+        return maxHeight * 0.5
+      case false:
+        maxHeight = height * 0.6
+        if (index === 2) return maxHeight
+        if (index === 1 || index === 3) return maxHeight * 0.7
+        if (index === 0 || index === 4) return maxHeight * 0.25
+        return maxHeight * 0.5
+    }
   }
 
   return (
@@ -35,7 +47,7 @@ const AnimatedVoiceSquare: React.FC<AnimatedVoiceSquareProps> = ({
       viewBox={viewBox}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className="animated-voice-square"
+      className={`animated-voice-square ${shouldAnimate ? 'animate' : ''}`} // Modify this line
     >
       <rect width={width} height={height} rx={width / 4.8} fill={backgroundColor} />
       {[0, 1, 2, 3, 4].map((index) => {

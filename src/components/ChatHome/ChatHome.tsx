@@ -18,6 +18,7 @@ import PersonalPrompts from '@/components/PersonalPrompts/PersonalPrompts'
 import TrendingPrompts from '@/components/TrendingPrompts/TrendingPrompts'
 import ConversationsHome from '@/components/Conversations/ConversationsHome'
 import ConversationsActive from '@/components/Conversations/ConversationsActive'
+import AudioTranscriptionComponent from '@/components/Conversations/AudioTranscriptionComponent'
 
 const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
   const [isVisible, setVisible] = useState(isShowing)
@@ -43,8 +44,7 @@ const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
         <InputHeading />
         {isVisible && <Input isActiveChat={false} />}
       </div>
-      <ConversationsHome />
-      <ConversationsActive />
+      <AudioTranscriptionComponent />
       <Prompts userId={userId} />
     </div>
   )
