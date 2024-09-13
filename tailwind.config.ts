@@ -91,6 +91,7 @@ const config: Config = {
         'conv-green-30': 'rgba(76, 237, 160, 0.3)',
         'conv-green-20': 'rgba(76, 237, 160, 0.2)',
         'conv-green-10': 'rgba(76, 237, 160, 0.1)',
+        'conv-white': 'rgba(255, 255, 255, 1.0)',
       },
       textColor: {
         primary: '#EEEEEE',
@@ -106,12 +107,19 @@ const config: Config = {
         teal: '#00FAFF',
         'conv-primary': 'rgba(15, 15, 15, 1.0)',
         'conv-secondary': 'rgba(34, 34, 34, 1.0)',
+        'conv-tertiary': 'rgba(25, 25, 25, 1.0)',
+        'conv-text-primary': '#EEEEEE',
+        'conv-text-secondary': '#B4B4B4',
+        'conv-text-tertiary': '#6E6E6E',
+        'conv-text-subtle': '#484848',
+        'conv-text-black': '#0F0F0F',
       },
       borderColor: {
         primary: '#00FAFF',
         secondary: '#444444',
         tertiary: '#222222',
         'conv-primary': 'rgba(34, 34, 34, 1)',
+        'conv-light': 'rgba(255, 255, 255, 1.0)',
       },
       animation: {
         gentleScale: 'gentleScale 0.3s ease-in-out',

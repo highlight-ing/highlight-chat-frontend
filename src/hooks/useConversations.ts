@@ -1,27 +1,4 @@
-import { useEffect, useState } from 'react'
-
-export interface ConversationData {
-  id: string // UUID
-  title: string
-  summary: string
-  timestamp: Date
-  topic: string
-  transcript: string
-  summarized: boolean
-  shareLink: string
-  userId: string
-}
-
-declare global {
-  interface Window {
-    highlight: {
-      internal: {
-        getConversations: () => Promise<ConversationData[]>
-        createConversationsStorageListener: (callback: () => void) => () => void
-      }
-    }
-  }
-}
+import React, { useEffect, useState } from 'react'
 
 export const useConversations = () => {
   const [conversations, setConversations] = useState<ConversationData[]>([])

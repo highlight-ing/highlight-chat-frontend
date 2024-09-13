@@ -197,3 +197,15 @@ export type PinnedPrompt = {
 
 export const APP_PROMPT_COMMENT =
   "{{! These are comments, they won't effect the output of your app }}\n{{! The app prompt determines how your app will behave to the user. }}\n"
+
+export interface GeneratedPrompt {
+  text: string
+  index: number
+}
+
+export interface LLMMessage {
+  content: string
+  role: 'system' | 'user'
+}
+
+export type CopyState = 'idle' | 'copying' | 'copied' | 'hiding'

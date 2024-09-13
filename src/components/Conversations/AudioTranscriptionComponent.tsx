@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Switch } from '@/components/ui/switch'
 import EnableConversationsButton from './EnableConversationsButton'
-import { VoiceSquare } from 'iconsax-react'
 import AnimatedVoiceSquare from './AnimatedVoiceSquare'
 
 type AudioState = 'active' | 'inactive' | 'off' | 'noPermissions'
@@ -92,18 +91,10 @@ export default function AudioTranscriptionComponent() {
     <div className={containerClasses}>
       <div className="flex items-center gap-3">{getContent()}</div>
       {audioState !== 'noPermissions' ? (
-        <Switch checked={isOn} onCheckedChange={handleToggle} className="data-[state=checked]:bg-[#2D4A3C]" />
+        <Switch checked={isOn} onCheckedChange={handleToggle} className="data-[state=checked]:bg-conv-green" />
       ) : (
         <EnableConversationsButton onClick={() => setAudioState('inactive')} />
       )}
-
-      {/* Add this button for testing */}
-      <button
-        onClick={cycleState}
-        className="ml-4 h-[24px] w-[77px] rounded-[6px] bg-[#2D4A3C] text-[13px] font-medium text-secondary"
-      >
-        Cycle State
-      </button>
     </div>
   )
 }
