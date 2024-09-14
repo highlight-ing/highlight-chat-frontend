@@ -2,11 +2,12 @@ import { StateCreator } from 'zustand'
 import { useStore } from '@/providers/store-provider'
 import { useShallow } from 'zustand/react/shallow'
 import { PromptTag } from '@/types'
+import { PreferredAttachment } from '@/lib/zod'
+
 /**
  * Holds the state for the prompt editor,
  * when the user is creating or editing a prompt.
  */
-
 export type PromptEditorScreen = 'startWithTemplate' | 'app' | 'settings' | 'variables'
 
 export interface PromptEditorOnboarding {
@@ -30,6 +31,7 @@ export interface PromptEditorData {
   videoUrl?: string
   image?: string
   uploadingImage?: File
+  preferredAttachment?: PreferredAttachment
 }
 
 export interface PromptEditorState {
@@ -150,6 +152,7 @@ export const initialPromptEditorState: PromptEditorState = {
     description: '',
     visibility: 'private',
     tags: [],
+    preferredAttachment: 'default',
   },
   needSave: false,
   saving: false,

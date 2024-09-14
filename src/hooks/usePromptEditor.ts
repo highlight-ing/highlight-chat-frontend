@@ -46,6 +46,10 @@ export function usePromptEditor() {
     formData.append('visibility', promptEditorData.visibility)
     formData.append('tags', JSON.stringify(promptEditorData.tags ?? []))
 
+    if (promptEditorData.preferredAttachment) {
+      formData.append('preferredAttachment', promptEditorData.preferredAttachment)
+    }
+
     if (promptEditorData.videoUrl) {
       formData.append('videoUrl', promptEditorData.videoUrl)
     }
@@ -68,15 +72,15 @@ export function usePromptEditor() {
       return
     }
 
+    try {
+      //@ts-expect-error
+      globalThis.highlight.internal.reloadPrompts()
+    } catch (err) {
+      console.error('Error reloading prompts', err)
+    }
+
     if (res?.new) {
       // Reload Electron's prompt apps
-      try {
-        //@ts-expect-error
-        globalThis.highlight.internal.reloadPrompts()
-      } catch (err) {
-        console.error('Error reloading prompts', err)
-      }
-
       setPromptEditorData({
         externalId: res.prompt.external_id,
         slug: res.prompt.slug ?? '',
