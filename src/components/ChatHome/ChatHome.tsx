@@ -15,6 +15,8 @@ import { trackEvent } from '@/utils/amplitude'
 import PersonalPrompts from '@/components/PersonalPrompts/PersonalPrompts'
 import TrendingPrompts from '@/components/TrendingPrompts/TrendingPrompts'
 import Button from '../Button/Button'
+import { supabaseLoader } from '@/lib/supabase'
+import Image from 'next/image'
 
 const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
   const [isVisible, setVisible] = useState(isShowing)
@@ -79,6 +81,7 @@ function InputHeading() {
  */
 function DefaultPrompt({ externalId }: { externalId: string }) {
   const prompts = useStore((state) => state.prompts)
+  const openModal = useStore((state) => state.openModal)
   const [prompt, setPrompt] = useState<Prompt | undefined>(undefined)
 
   useEffect(() => {
@@ -90,17 +93,32 @@ function DefaultPrompt({ externalId }: { externalId: string }) {
     return <></>
   }
 
+  function onClick() {
+    openModal('customize-prompt', { prompt })
+  }
+
   return (
-    <div className="inline-flex flex-col items-start justify-start gap-3 rounded-[20px] bg-[#191919] p-5 transition-colors duration-200 ease-in-out hover:cursor-pointer hover:bg-[#292929]">
+    <div
+      onClick={onClick}
+      className="inline-flex flex-col items-start justify-start gap-3 rounded-[20px] bg-[#191919] p-5 transition-colors duration-200 ease-in-out hover:cursor-pointer hover:bg-[#292929]"
+    >
       <div className="inline-flex gap-2 text-base font-medium leading-normal text-[#eeeeee]">
-        <Setting variant="Bulk" /> {prompt.name}
+        <Image
+          src={`/user_content/${prompt.image}.${prompt.user_images?.file_extension}`}
+          alt="Prompt image"
+          className="h-6 w-6 rounded-full"
+          width={24}
+          height={24}
+          loader={supabaseLoader}
+        />
+        {prompt.name}
       </div>
       <div className="inline-flex items-start justify-start gap-2 self-stretch">
-        <Button size="xsmall" variant="tertiary" className={styles.filledButton} onClick={() => {}}>
+        <Button size="xsmall" variant="tertiary" className={styles.filledButton} onClick={onClick}>
           Preview
         </Button>
         <div className="flex items-center justify-center gap-1 rounded-md border border-[#222222] px-2 py-0.5">
-          <div className="text-[13px] font-medium leading-tight text-[#3a3a3a]">42,069 Uses</div>
+          <div className="text-[13px] font-medium leading-tight text-[#3a3a3a]">{prompt.public_use_number} Uses</div>
         </div>
       </div>
     </div>

@@ -92,10 +92,7 @@ const TrendingPromptsItem = ({
   }, [pinState])
 
   return (
-    <div
-      className={`${styles.trendingPromptsItem} ${lastItem ? styles.lastItem : ''}`}
-      onClick={() => openModal('customize-prompt', { prompt })}
-    >
+    <div className={`${styles.trendingPromptsItem} ${lastItem ? styles.lastItem : ''}`}>
       <div className={styles.trendingPromptsItemHeader}>
         <div className={styles.trendingPromptsItemHeaderLeft}>
           {prompt.image ? (
