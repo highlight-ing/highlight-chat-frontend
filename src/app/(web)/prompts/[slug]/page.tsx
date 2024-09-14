@@ -1,9 +1,9 @@
-import NotFoundPage from '@/components/NotFoundPage/NotFoundPage'
 import PromptListingPage from '@/components/prompts/PromptListingPage/PromptListingPage'
 import PromptShareButton from '@/components/prompts/PromptListingPage/PromptShareButton'
 import { RelatedAppProps } from '@/components/prompts/PromptListingPage/RelatedApp'
 import { supabaseAdmin } from '@/lib/supabase'
 import { Metadata, ResolvingMetadata } from 'next'
+import { notFound } from 'next/navigation'
 
 interface PromptPageProps {
   params: { slug: string }
@@ -22,14 +22,11 @@ export async function generateMetadata({ params }: PromptPageProps, parent: Reso
   }
 
   if (!prompt) {
-    return {
-      title: 'Page Not Found',
-      description: 'The page you are looking for does not exist.',
-    }
+    notFound()
   }
 
   return {
-    title: `${prompt.name} | Highlight Prompts`,
+    title: `${prompt.name} | Highlight Chat`,
     description: prompt.description ?? '',
   }
 }
@@ -44,7 +41,7 @@ export default async function PromptPage({ params }: PromptPageProps) {
   }
 
   if (!prompt) {
-    return <NotFoundPage />
+    notFound()
   }
 
   const supabase = supabaseAdmin()
