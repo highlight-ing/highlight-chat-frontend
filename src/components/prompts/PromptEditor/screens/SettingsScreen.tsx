@@ -12,7 +12,7 @@ import { supabaseLoader } from '@/lib/supabase'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { PreferredAttachmentSchema, videoUrlSchema } from '@/lib/zod'
+import { PreferredAttachmentSchema, PreferredAttachment, videoUrlSchema } from '@/lib/zod'
 import { useStore } from '@/providers/store-provider'
 import CreatableSelect from 'react-select/creatable'
 import { OnChangeValue } from 'react-select'
@@ -23,8 +23,9 @@ import { PromptTag } from '@/types'
 import OnboardingBox from '../OnboardingBox'
 import TemplateSelectorBox from '../TemplateSelectorBox'
 import { trackEvent } from '@/utils/amplitude'
-import { Listbox, ListboxLabel, ListboxOption } from '@/components/catalyst/listbox'
-// import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
+import ContextMenu from '@/components/ContextMenu/ContextMenu'
+import Tooltip from '@/components/Tooltip/Tooltip'
+import { ArrowDown2, ArrowUp2 } from 'iconsax-react'
 
 function AppIcon() {
   return (
@@ -193,7 +194,22 @@ function DeletePromptButton() {
   )
 }
 
-function PreferredAttachment() {
+function preferredAttachmentToLabel(preferredAttachment: PreferredAttachment) {
+  switch (preferredAttachment) {
+    case 'default':
+      return 'Default'
+    case 'screen':
+      return 'Screen'
+    case 'page-text':
+      return 'Page Text'
+    case 'clipboard':
+      return 'Clipboard'
+    case 'audio':
+      return 'Audio'
+  }
+}
+
+function PreferredAttachmentSetting() {
   const promptEditorData = useStore((state) => state.promptEditorData)
   const setPromptEditorData = useStore((state) => state.setPromptEditorData)
 
@@ -205,18 +221,44 @@ function PreferredAttachment() {
 
   return (
     <SettingOption label={'Preferred Attachment'} description={'The attachment type that your prompt relies on'}>
-      <Listbox
-        name="status"
-        // onChange={onPreferredAttachmentChange}
-        // value={promptEditorData.preferredAttachment}
-        defaultValue="default"
+      <ContextMenu
+        key="templates-menu"
+        items={[
+          {
+            label: 'Default',
+            onClick: () => onPreferredAttachmentChange('default'),
+          },
+          {
+            label: 'Screen',
+            onClick: () => onPreferredAttachmentChange('screen'),
+          },
+          {
+            label: 'Page Text',
+            onClick: () => onPreferredAttachmentChange('page-text'),
+          },
+          {
+            label: 'Clipboard',
+            onClick: () => onPreferredAttachmentChange('clipboard'),
+          },
+          {
+            label: 'Audio',
+            onClick: () => onPreferredAttachmentChange('audio'),
+          },
+        ]}
+        position={'bottom'}
+        triggerId={`set-preferred-attachment`}
+        leftClick={true}
       >
-        <ListboxOption value="default">Default</ListboxOption>
-        <ListboxOption value="screen">Screen</ListboxOption>
-        <ListboxOption value="page-text">Page Text</ListboxOption>
-        <ListboxOption value="clipboard">Clipboard</ListboxOption>
-        <ListboxOption value="audio">Audio</ListboxOption>
-      </Listbox>
+        {
+          // @ts-ignore
+          ({ isOpen }) => (
+            <Button id="set-preferred-attachment" size={'medium'} variant={'tertiary'}>
+              <ArrowDown2 size={16} />
+              {preferredAttachmentToLabel(promptEditorData.preferredAttachment ?? 'default')}
+            </Button>
+          )
+        }
+      </ContextMenu>
     </SettingOption>
   )
 }
@@ -421,6 +463,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
             </div>
           </div>
           <div className={'flex flex-1 flex-col gap-4'}>
+            <PreferredAttachmentSetting />
             <VisibilityToggle
               visibility={promptEditorData.visibility}
               onToggle={(visibility) => setPromptEditorData({ visibility })}
@@ -428,7 +471,6 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
             />
             <ShareLinkButton />
             <DeletePromptButton />
-            <PreferredAttachment />
           </div>
         </div>
       </div>
