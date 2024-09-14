@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: PromptPageProps, parent: Reso
   }
 
   return {
-    title: `${prompt.name} | Highlight Prompts`,
+    title: `${prompt.name} | Highlight Chat`,
     description: prompt.description ?? '',
   }
 }

@@ -166,7 +166,7 @@ function PromptListItem({ prompt }: { prompt: PromptWithTags }) {
   }
 
   return (
-    <div className="flex flex-col gap-3 bg-[#191919] p-5">
+    <a href={`/prompts/${prompt.slug}`} className="flex flex-col gap-3 bg-[#191919] p-5 hover:bg-[#191919]/[80%]">
       <div className="flex justify-between">
         <div className="text-base font-medium leading-normal text-[#eeeeee]">{prompt.name ?? ''}</div>
 
@@ -194,7 +194,7 @@ function PromptListItem({ prompt }: { prompt: PromptWithTags }) {
           </div>
         ))}
       </div>
-    </div>
+    </a>
   )
 }
 

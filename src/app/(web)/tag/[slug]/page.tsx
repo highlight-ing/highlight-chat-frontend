@@ -1,6 +1,7 @@
 import PromptTagPage from '@/components/prompts/PromptTagPage/PromptTagPage'
 import { supabaseAdmin } from '@/lib/supabase'
 import { Prompt } from '@/types/supabase-helpers'
+import { Metadata, ResolvingMetadata } from 'next'
 import { notFound } from 'next/navigation'
 
 interface TagPageProps {
@@ -14,6 +15,20 @@ export interface PromptWithTags extends Prompt {
       slug: string
     } | null
   }[]
+}
+
+export async function generateMetadata({ params }: TagPageProps, parent: ResolvingMetadata): Promise<Metadata> {
+  const supabase = supabaseAdmin()
+  const { data: tag } = await supabase.from('tags').select('*').eq('slug', params.slug).maybeSingle().throwOnError()
+
+  if (!tag) {
+    notFound()
+  }
+
+  return {
+    title: `${tag.tag} Prompts | Highlight Chat`,
+    description: `Explore ${tag.tag} prompts designed for Highlight Chat.`,
+  }
 }
 
 export default async function Page({ params }: TagPageProps) {
@@ -31,6 +46,7 @@ export default async function Page({ params }: TagPageProps) {
     .from('added_prompt_tags')
     .select('prompts(*, user_images(file_extension), added_prompt_tags(tags(tag, slug)))')
     .eq('tag_id', data.id)
+    .eq('prompts.public', true)
     .throwOnError()
 
   if (!promptSelect) {
@@ -38,8 +54,6 @@ export default async function Page({ params }: TagPageProps) {
   }
 
   const prompts = promptSelect.map((prompt) => prompt.prompts).filter((prompt) => prompt !== null)
-
-  prompts[0].added_prompt_tags
 
   return <PromptTagPage tag={data.tag} prompts={prompts} />
 }
