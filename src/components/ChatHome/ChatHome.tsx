@@ -142,12 +142,12 @@ const Prompts = ({ userId }: { userId: string | undefined }) => {
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-4">
+      {/* <div className="grid grid-cols-2 gap-4">
         <DefaultPrompt externalId="2d2d0033-edc7-4f43-bad9-3c0baaaee2ee" />
         <DefaultPrompt externalId="f9da16e0-ae49-43bb-95d3-5e89d3e3fc9b" />
         <DefaultPrompt externalId="957af06a-2f69-4854-a4d7-189bf3758a73" />
         <DefaultPrompt externalId="e9306eac-3dc2-4380-bb67-37f5ab3a1eaf" />
-      </div>
+      </div> */}
       <div className={styles.callouts}>
         <PersonalPrompts userId={userId} prompts={myPrompts} pinnedPrompts={pinnedPrompts} />
       </div>
