@@ -1,6 +1,69 @@
 import { authenticateApiUser } from '@/lib/api'
 import { PROMPTS_TABLE_SELECT_FIELDS, promptSelectMapper, supabaseAdmin } from '@/lib/supabase'
 
+async function checkIfDefaultPromptsAdded(userId: string) {
+  const supabase = supabaseAdmin()
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('user_id', userId)
+    .throwOnError()
+    .maybeSingle()
+
+  let hasAddedDefaultPrompts = profile?.added_default_prompts ?? false
+
+  if (hasAddedDefaultPrompts) {
+    return
+  }
+
+  // Update the user's profile
+
+  const { error: updateError } = await supabase.from('profiles').upsert(
+    {
+      user_id: userId,
+      added_default_prompts: true,
+    },
+    {
+      onConflict: 'user_id',
+    },
+  )
+
+  if (updateError) {
+    console.error('Error updating user profile:', updateError)
+  }
+
+  // Pin the 4 default prompts to the user
+  const { error: insertError } = await supabase.from('added_prompts').insert([
+    {
+      // Summarize
+      prompt_id: 452,
+      user_id: userId,
+    },
+    {
+      // Explain
+      prompt_id: 453,
+      user_id: userId,
+    },
+    {
+      // Rewrite
+      prompt_id: 455,
+      user_id: userId,
+    },
+    {
+      // Analyze
+      prompt_id: 454,
+      user_id: userId,
+    },
+  ])
+
+  if (insertError) {
+    console.error('Error pinning default prompts:', insertError)
+  }
+
+  return
+}
+
 /**
  * API route that returns all prompts for the calling user (based on the authorization token)
  *
@@ -20,6 +83,9 @@ export async function GET(request: Request) {
   if (!userId) {
     return Response.json({ error: 'Unauthorized, no subject in token' }, { status: 401 })
   }
+
+  // Check if the user has added the default prompts
+  await checkIfDefaultPromptsAdded(userId)
 
   // Select all prompts that the user has added
   const { data: selectResult, error } = await supabase

@@ -196,6 +196,7 @@ export default (loadPrompts?: boolean) => {
     pinnedPrompts,
     getPrompt,
     getPromptBySlug,
+    getPromptByExternalId,
     refreshPrompts,
     refreshPinnedPrompts,
     selectPrompt,
