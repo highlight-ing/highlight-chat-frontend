@@ -136,7 +136,7 @@ function ShareLinkButton() {
   return (
     <SettingOption
       label={'Share Link'}
-      description={<span className={'text-md'}>{slug ? url : 'Save your prompt to generate a share link'}</span>}
+      description={<span className={'text-md'}>{slug ? url : 'Save your action to generate a share link'}</span>}
     >
       <Button
         onClick={onCopyLinkClick}
@@ -297,7 +297,7 @@ const VisibilityToggle = ({
   disabled: boolean
 }) => {
   return (
-    <SettingOption label={'Visibility'} description={'Share your app with the community'}>
+    <SettingOption label={'Visibility'} description={'Share your action with the community'}>
       <div className="flex items-center gap-2">
         <p className="text-xs opacity-40">{visibility === 'public' ? 'Public' : 'Private'}</p>
         <Switch
@@ -369,7 +369,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
               <InputField
                 size={'xxlarge'}
                 label={'Name'}
-                placeholder={'Name your app'}
+                placeholder={'Name your action'}
                 disabled={disabled}
                 {...register('name')}
                 error={errors.name?.message}
@@ -386,7 +386,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
               <TextArea
                 size={'xxlarge'}
                 label={'Description'}
-                placeholder={'Describe what your app does...'}
+                placeholder={'Describe what your action does...'}
                 rows={3}
                 disabled={disabled}
                 {...register('description')}
@@ -399,7 +399,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
                   onChange={onChange}
                   isMulti
                   components={animatedComponents}
-                  placeholder="Add #tags to make your prompt more easy to find..."
+                  placeholder="Add #tags to make your action more easy to find..."
                   options={promptTags}
                   menuPlacement="top"
                   styles={{
