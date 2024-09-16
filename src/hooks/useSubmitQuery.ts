@@ -256,7 +256,9 @@ export const useSubmitQuery = () => {
             })
 
             const windowContext = await Highlight.user.getWindowContext(windowName)
-            const ocrScreenContents = windowContext.environment.ocrScreenContents || ''
+            const ocrScreenContents = windowContext.application.focusedWindow.rawContents
+              ? windowContext.application.focusedWindow.rawContents
+              : windowContext.environment.ocrScreenContents || ''
             addAttachment({
               type: 'window_context',
               value: ocrScreenContents,
