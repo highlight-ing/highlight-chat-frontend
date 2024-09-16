@@ -285,3 +285,11 @@
   transition: opacity 200ms ease, transform 200ms ease;
   transform: translateY(100px);
 }
+
+.filledButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 77px;
+  padding: 2px 8px;
+}

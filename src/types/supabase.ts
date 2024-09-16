@@ -197,18 +197,21 @@ export type Database = {
       }
       profiles: {
         Row: {
+          added_default_prompts: boolean | null
           created_at: string
           id: number
           user_id: string
           username: string | null
         }
         Insert: {
+          added_default_prompts?: boolean | null
           created_at?: string
           id?: number
           user_id: string
           username?: string | null
         }
         Update: {
+          added_default_prompts?: boolean | null
           created_at?: string
           id?: number
           user_id?: string
