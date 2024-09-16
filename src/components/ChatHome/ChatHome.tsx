@@ -15,6 +15,7 @@ import TrendingPrompts from '@/components/TrendingPrompts/TrendingPrompts'
 import Button from '../Button/Button'
 import { supabaseLoader } from '@/lib/supabase'
 import Image from 'next/image'
+import { Prompt } from '@/types/supabase-helpers'
 
 const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
   const [isVisible, setVisible] = useState(isShowing)
