@@ -1,4 +1,3 @@
-import variables from '@/variables.module.scss'
 import styles from './chathome.module.scss'
 import mainStyles from '@/main.module.scss'
 import { AddCircle, MouseCircle, SearchStatus, Setting } from 'iconsax-react'
@@ -10,13 +9,13 @@ import usePromptApps from '@/hooks/usePromptApps'
 import Hotkey from '@/components/Hotkey/Hotkey'
 import ExpandableVideo from '@/components/ExpandableVideo/ExpandableVideo'
 import { useShallow } from 'zustand/react/shallow'
-import { Prompt } from '@/types/supabase-helpers'
 import { trackEvent } from '@/utils/amplitude'
 import PersonalPrompts from '@/components/PersonalPrompts/PersonalPrompts'
 import TrendingPrompts from '@/components/TrendingPrompts/TrendingPrompts'
 import Button from '../Button/Button'
 import { supabaseLoader } from '@/lib/supabase'
 import Image from 'next/image'
+import { Prompt } from '@/types/supabase-helpers'
 
 const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
   const [isVisible, setVisible] = useState(isShowing)

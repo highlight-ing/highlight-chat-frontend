@@ -6,7 +6,18 @@ import { PersonalPromptsProps, PersonalPromptsItemProps } from '@/types'
 // Components
 import { Badge } from '@/components/Badge/Badge'
 import Button from '@/components/Button/Button'
-import { Setting, Trash, Lock, Edit2, ElementPlus, ArchiveMinus } from 'iconsax-react'
+import {
+  Setting,
+  Trash,
+  Lock,
+  Edit2,
+  ElementPlus,
+  ArchiveMinus,
+  ClipboardText,
+  Monitor,
+  DocumentText,
+  Microphone,
+} from 'iconsax-react'
 import EmptyPrompts from '@/components/EmptyPrompts/EmptyPrompts'
 import { Prompt } from '@/types/supabase-helpers'
 import Image from 'next/image'
@@ -53,12 +64,12 @@ const PersonalPrompts = ({ userId, prompts, pinnedPrompts }: PersonalPromptsProp
     <div className={styles.personalPromptsContainer}>
       <div className={styles.personalPromptsHeader}>
         <div className={styles.personalPromptsHeaderLeft}>
-          <h2>Pinned Prompts</h2>
+          <h2>Pinned Actions</h2>
         </div>
         <div className={styles.personalPromptsHeaderRight}>
           <Button size="medium" variant="ghost-neutral" onClick={() => openModal('create-prompt')}>
             <ElementPlus color={variables.tertiary} variant={'Bold'} size="16" />
-            New Prompt
+            New Action
           </Button>
         </div>
       </div>
@@ -85,6 +96,53 @@ const PersonalPrompts = ({ userId, prompts, pinnedPrompts }: PersonalPromptsProp
             />
           )
         })}
+      </div>
+    </div>
+  )
+}
+
+function PreferredAttachment({ type }: { type: string }) {
+  let title = ''
+  let description = ''
+  let icon = <></>
+
+  switch (type) {
+    case 'screen':
+      title = 'Responds to Screen'
+      description = 'Action is aware of your screen contents'
+      icon = <Monitor variant={'Bold'} size="1.25rem" />
+      break
+    case 'page-text':
+      title = 'Responds to Page Text'
+      description = 'Action is aware of the text on the page'
+      icon = <DocumentText variant={'Bold'} size="1.25rem" />
+      break
+    case 'clipboard':
+      title = 'Responds to Clipboard'
+      description = 'Action is aware of the text in your clipboard'
+      icon = <ClipboardText variant={'Bold'} size="1.25rem" />
+      break
+    case 'audio':
+      title = 'Responds to Audio'
+      description = 'Action is aware of the audio in your microphone'
+      icon = <Microphone variant={'Bold'} size="1.25rem" />
+      break
+    default:
+      return <></>
+  }
+
+  return (
+    <div className="inline-flex h-[52px] w-full items-center justify-start gap-[51px] rounded-[14px] border border-[#222222] bg-[#191919] py-[7px] pl-[5px] pr-3">
+      <div className="flex h-[42px] items-center justify-start gap-2">
+        <div className="flex h-[42px] w-[42px] items-center justify-center rounded-[10px] border border-white/0 p-[11px]">
+          {icon}
+        </div>
+        <div className="flex items-center justify-start gap-6">
+          <div className="inline-flex flex-col items-start justify-center">
+            <div className="text-[13px] font-medium leading-none text-[#b4b4b4]">{title}</div>
+            <div className="mt-0.5 text-[10px] leading-none text-[#6e6e6e]">{description}</div>
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -128,6 +186,7 @@ const PersonalPromptsItem = ({ prompt, colorScheme, isOwner, isPublic }: Persona
           <p>No description</p>
         )}
       </div>
+      {prompt.preferred_attachment && <PreferredAttachment type={prompt.preferred_attachment} />}
       <div className={styles.personalPromptsItemFooter}>
         <div className={styles.personalPromptsItemFooterLeftButtons}>
           {isPublic ? (
