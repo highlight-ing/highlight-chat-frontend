@@ -210,7 +210,7 @@ export default function App({ children }: { children: React.ReactNode }) {
       }
     }
 
-    const initializeSentry = () => {
+    const initializeSentry = async () => {
       Sentry.init({
         dsn: 'https://c37160a2ddfdb8148ee3da04c5fb007e@o150878.ingest.us.sentry.io/4507940451516416',
         integrations: [Sentry.browserTracingIntegration()],
@@ -220,6 +220,20 @@ export default function App({ children }: { children: React.ReactNode }) {
         replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
         replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
       })
+      // Get the access token using the useAuth hook
+      const accessToken = await getAccessToken()
+
+      // Decode the token to get the payload
+      const payload = decodeJwt(accessToken)
+
+      // Extract the user ID from the 'sub' field
+      const userId = payload.sub as string
+
+      if (!userId) {
+        throw new Error('User ID not found in token')
+      }
+
+      Sentry.setUser({ id: userId })
     }
 
     initializeAmplitude()
