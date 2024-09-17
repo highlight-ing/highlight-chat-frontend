@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Switch } from '@/components/ui/switch'
 import EnableConversationsButton from './EnableConversationsButton'
 import AnimatedVoiceSquare from './AnimatedVoiceSquare'
 import { useConversations } from '@/context/ConversationContext'
+import { useDebouncedCallback } from 'use-debounce'
 
 type AudioState = 'active' | 'inactive' | 'off' | 'noPermissions'
 
@@ -14,15 +15,43 @@ export default function AudioTranscriptionComponent() {
   const [isOn, setIsOn] = useState(true)
   const { micActivity, elapsedTime } = useConversations()
 
+  const slowDebounce = useDebouncedCallback(
+    (newState: AudioState) => {
+      setAudioState(newState)
+    },
+    2500, // 2.5 seconds debounce for going to inactive
+  )
+
+  const fastDebounce = useDebouncedCallback(
+    (newState: AudioState) => {
+      setAudioState(newState)
+    },
+    100, // 100ms debounce for going to active
+  )
+
+  const updateAudioState = useCallback(() => {
+    if (!isOn) {
+      setAudioState('off')
+      return
+    }
+
+    if (micActivity > 0) {
+      fastDebounce('active')
+      slowDebounce.cancel() // Cancel any pending slow debounce
+    } else {
+      slowDebounce('inactive')
+    }
+  }, [isOn, micActivity, fastDebounce, slowDebounce])
+
+  useEffect(() => {
+    updateAudioState()
+  }, [updateAudioState])
+
   const handleToggle = () => {
     const newIsOn = !isOn
     setIsOn(newIsOn)
     setAudioState(newIsOn ? (micActivity > 0 ? 'active' : 'inactive') : 'off')
   }
-
-  useEffect(() => {
-    setAudioState(isOn ? (micActivity > 0 ? 'active' : 'inactive') : 'off')
-  }, [micActivity, isOn])
 
   const formatElapsedTime = (seconds: number): string => {
     if (seconds < 60) {
@@ -80,6 +109,7 @@ export default function AudioTranscriptionComponent() {
           backgroundColor="transparent"
           lineColor={audioState === 'active' ? ACTIVE_LINE_COLOR : INACTIVE_LINE_COLOR}
           shouldAnimate={audioState === 'active'}
+          transitionDuration={2500} // Add this prop to AnimatedVoiceSquare
         />
         {getContent()}
       </div>

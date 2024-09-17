@@ -6,6 +6,8 @@ interface AnimatedVoiceSquareProps {
   backgroundColor?: string
   lineColor?: string
   shouldAnimate?: boolean // Add this line
+  transitionDuration?: number
+  activationDuration?: number
 }
 
 const AnimatedVoiceSquare: React.FC<AnimatedVoiceSquareProps> = ({
@@ -14,6 +16,8 @@ const AnimatedVoiceSquare: React.FC<AnimatedVoiceSquareProps> = ({
   backgroundColor = '#4CED9F',
   lineColor,
   shouldAnimate = true, // Add this line with a default value
+  transitionDuration = 2500,
+  activationDuration = 100,
 }) => {
   const viewBox = `0 0 ${width} ${height}`
   const strokeColor = lineColor || 'currentColor'
