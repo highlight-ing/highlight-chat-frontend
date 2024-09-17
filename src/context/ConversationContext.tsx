@@ -1,224 +1,174 @@
-import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react'
-import { ConversationData, createConversation } from '@/types/conversations'
-import {
-  saveConversationsInAppStorage,
-  deleteAllConversationsInAppStorage,
-  fetchMicActivity,
-} from '@/utils/highlightService'
-import { useConversationsSettings } from './ConversationSettingsContext'
-import { useAudioPermission } from '@/hooks/useAudioPermission'
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { ConversationData } from '@/types/conversations'
 import Highlight from '@highlight-ai/app-runtime'
+import { useAudioPermission } from '@/hooks/useAudioPermission'
 
-const POLL_MIC_ACITIVTY = 300
+const POLL_MIC_ACTIVITY = 300
+const AUDIO_ENABLED_KEY = 'audioEnabled'
 
 interface ConversationContextType {
   conversations: ConversationData[]
   currentConversation: string
+  elapsedTime: number
+  autoSaveTime: number
+  autoClearDays: number
   micActivity: number
-  addConversation: (conversation: ConversationData) => void
-  updateConversation: (updatedConversation: ConversationData) => void
-  deleteConversation: (id: string) => void
+  isAudioOn: boolean
+  saveCurrentConversation: () => Promise<void>
+  addConversation: (conversation: ConversationData) => Promise<void>
+  updateConversation: (conversation: ConversationData) => Promise<void>
+  deleteConversation: (id: string) => Promise<void>
   deleteAllConversations: () => Promise<void>
-  handleSave: (didTapSaveButton?: boolean) => void
-  filteredConversations: ConversationData[]
-  searchQuery: string
-  setSearchQuery: (query: string) => void
+  setAutoSaveTime: (time: number) => Promise<void>
+  setAutoClearDays: (days: number) => Promise<void>
+  setIsAudioOn: (isOn: boolean) => Promise<void>
 }
 
 const ConversationContext = createContext<ConversationContextType | undefined>(undefined)
 
 export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [conversations, setConversations] = useState<ConversationData[]>([])
-  const [currentConversationParts, setCurrentConversationParts] = useState<string[]>([])
+  const [currentConversation, setCurrentConversation] = useState<string>('')
+  const [elapsedTime, setElapsedTime] = useState<number>(0)
+  const [autoSaveTime, setAutoSaveTime] = useState<number>(0)
+  const [autoClearDays, setAutoClearDays] = useState<number>(0)
   const [micActivity, setMicActivity] = useState(0)
-  const [searchQuery, setSearchQuery] = useState('')
+  const [isAudioOn, setIsAudioOn] = useState(true)
 
-  const { autoSaveValue, isAudioOn } = useConversationsSettings()
-
-  const autoSaveValueRef = useRef(autoSaveValue)
-  const lastTranscriptTimeRef = useRef<number>(Date.now())
   const isAudioPermissionEnabled = useAudioPermission()
 
-  useEffect(() => {
-    autoSaveValueRef.current = autoSaveValue
-    console.log(`Auto-save value updated to: ${autoSaveValue} seconds`)
-  }, [autoSaveValue])
+  const setupListeners = useCallback(() => {
+    const removeCurrentConversationListener = Highlight.app.addListener(
+      'onCurrentConversationUpdate',
+      (conversation: string) => {
+        if (isAudioOn) {
+          console.log('New current conversation:', conversation)
+          setCurrentConversation(conversation)
+        }
+      },
+    )
 
-  const getCurrentConversationString = useCallback(
-    (reversed: boolean = true) => {
-      return reversed ? currentConversationParts.join(' ') : [...currentConversationParts].reverse().join(' ')
-    },
-    [currentConversationParts],
-  )
+    const removeConversationsUpdatedListener = Highlight.app.addListener(
+      'onConversationsUpdated',
+      (updatedConversations: ConversationData[]) => {
+        if (isAudioOn) {
+          console.log('Updated conversations:', updatedConversations)
+          setConversations(updatedConversations)
+        }
+      },
+    )
 
-  const addConversation = useCallback((newConversation: ConversationData) => {
-    setConversations((prev) => {
-      const updated = [newConversation, ...prev]
-      saveConversationsInAppStorage(updated)
-      return updated
-    })
-  }, [])
+    const removeElapsedTimeUpdatedListener = Highlight.app.addListener(
+      'onConversationsElapsedTimeUpdated',
+      (time: number) => {
+        if (isAudioOn) {
+          setElapsedTime(time)
+        }
+      },
+    )
 
-  const updateConversation = useCallback((updatedConversation: ConversationData) => {
-    setConversations((prev) => {
-      const updated = prev.map((conv) => (conv.id === updatedConversation.id ? updatedConversation : conv))
-      saveConversationsInAppStorage(updated)
-      return updated
-    })
-  }, [])
+    const removeAutoSaveUpdatedListener = Highlight.app.addListener(
+      'onConversationsAutoSaveUpdated',
+      (time: number) => {
+        console.log('Updated auto-save time:', time)
+        setAutoSaveTime(time)
+      },
+    )
 
-  const deleteConversation = useCallback((id: string) => {
-    setConversations((prev) => {
-      const updated = prev.filter((conv) => conv.id !== id)
-      saveConversationsInAppStorage(updated)
-      return updated
-    })
-  }, [])
+    const removeAutoClearUpdatedListener = Highlight.app.addListener(
+      'onConversationsAutoClearUpdated',
+      (days: number) => {
+        console.log('Updated auto-clear days:', days)
+        setAutoClearDays(days)
+      },
+    )
 
-  const deleteAllConversations = useCallback(async () => {
-    await deleteAllConversationsInAppStorage()
-    setConversations([])
-  }, [])
-
-  const saveCurrentConversation = useCallback(
-    (forceSave: boolean = false) => {
-      const conversationString = getCurrentConversationString(false)
-      console.log('Current conversation string:', conversationString)
-      if (forceSave || conversationString.trim().length >= 1) {
-        const newConversation = createConversation(conversationString)
-        addConversation(newConversation)
-        console.log('Saving conversation:', newConversation)
-        setCurrentConversationParts([])
-        console.log('Cleared currentConversationParts')
-      } else {
-        console.log('No conversation to save')
-      }
-    },
-    [getCurrentConversationString, addConversation],
-  )
-
-  const saveCurrentConversationRef = useRef(saveCurrentConversation)
+    return () => {
+      removeCurrentConversationListener()
+      removeConversationsUpdatedListener()
+      removeElapsedTimeUpdatedListener()
+      removeAutoSaveUpdatedListener()
+      removeAutoClearUpdatedListener()
+    }
+  }, [isAudioOn])
 
   useEffect(() => {
-    saveCurrentConversationRef.current = saveCurrentConversation
-  }, [saveCurrentConversation])
+    const removeListeners = setupListeners()
+    return () => removeListeners()
+  }, [setupListeners])
 
-  const handleSave = useCallback(
-    (didTapSaveButton: boolean = false) => {
-      setCurrentConversationParts(currentConversationParts)
-      saveCurrentConversation(didTapSaveButton)
-    },
-    [saveCurrentConversation, currentConversationParts],
-  )
+  const fetchLatestData = useCallback(async () => {
+    let goose = await Highlight.app
+    const allConversations = await Highlight.conversations.getAllConversations()
+    setConversations(allConversations)
+    const currentConv = await Highlight.conversations.getCurrentConversation()
+    setCurrentConversation(currentConv.transcript)
+    const elapsedTime = await Highlight.conversations.getElapsedTime()
+    setElapsedTime(elapsedTime)
+  }, [])
+
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      await fetchLatestData()
+      const autoSaveTime = await Highlight.conversations.getAutoSaveTime()
+      setAutoSaveTime(autoSaveTime)
+      const autoClearDays = await Highlight.conversations.getAutoClearDays()
+      setAutoClearDays(autoClearDays)
+
+      // Load isAudioOn from appStorage
+      const storedIsAudioOn = await Highlight.appStorage.get(AUDIO_ENABLED_KEY)
+      setIsAudioOn(storedIsAudioOn !== null ? storedIsAudioOn : true)
+    }
+    fetchInitialData()
+  }, [fetchLatestData])
 
   const pollMicActivity = useCallback(async () => {
-    if (!isAudioOn || !isAudioPermissionEnabled) {
+    if (!isAudioPermissionEnabled || !isAudioOn) {
       setMicActivity(0)
       return
     }
-    const activity = await fetchMicActivity(POLL_MIC_ACITIVTY)
+    const activity = await Highlight.user.getMicActivity(POLL_MIC_ACTIVITY)
     setMicActivity(activity)
-  }, [isAudioOn, isAudioPermissionEnabled])
+  }, [isAudioPermissionEnabled, isAudioOn])
 
   useEffect(() => {
-    const intervalId = setInterval(pollMicActivity, POLL_MIC_ACITIVTY)
+    const intervalId = setInterval(pollMicActivity, POLL_MIC_ACTIVITY)
     return () => clearInterval(intervalId)
   }, [pollMicActivity])
 
-  useEffect(() => {
-    const handleTranscript = (text: string) => {
-      const currentTime = Date.now()
-      const timeSinceLastTranscript = currentTime - lastTranscriptTimeRef.current
-
-      console.log(`Time since last transcript: ${timeSinceLastTranscript / 1000} seconds`)
-      console.log(`Auto-save threshold: ${autoSaveValueRef.current} seconds`)
-
-      if (timeSinceLastTranscript >= autoSaveValueRef.current * 1000) {
-        console.log('Auto-save triggered')
-        saveCurrentConversationRef.current()
+  const setIsAudioOnAndSave = useCallback(
+    async (isOn: boolean) => {
+      setIsAudioOn(isOn)
+      await Highlight.appStorage.set(AUDIO_ENABLED_KEY, isOn)
+      if (isOn) {
+        await fetchLatestData()
       } else {
-        console.log('Auto-save not triggered')
+        setCurrentConversation('')
+        setElapsedTime(0)
       }
-
-      const [timestampStr, ...contentParts] = text.split(' - ')
-      const content = contentParts.join(' - ').trim()
-
-      const transcriptTime = new Date(`${new Date().toDateString()} ${timestampStr}`)
-      console.log(`Transcript timestamp: ${transcriptTime.toISOString()}`)
-
-      setCurrentConversationParts((prevParts) => {
-        if (content && (prevParts.length === 0 || content !== prevParts[0])) {
-          console.log(`New content added: "${content.substring(0, 50)}..."`)
-          console.log('Previous parts:', prevParts)
-          const newParts = [content, ...prevParts.filter((part) => part !== content)]
-          console.log('New parts:', newParts)
-          return newParts
-        }
-        return prevParts
-      })
-
-      lastTranscriptTimeRef.current = transcriptTime.getTime()
-      console.log(`Updated lastTranscriptTimeRef: ${new Date(lastTranscriptTimeRef.current).toISOString()}`)
-    }
-
-    // @ts-ignore
-    const destroy = Highlight.app.addListener('onAsrTranscriptEvent', handleTranscript)
-
-    return () => {
-      destroy()
-    }
-  }, [])
-  // TODO: - probably not going to do this in HL Chat
-  //   useEffect(() => {
-  //     const fetchInitialTranscript = async () => {
-  //       try {
-  //         const longTranscript = await fetchLongTranscript()
-  //         if (longTranscript) {
-  //           setCurrentConversationParts(prevParts => {
-  //             const trimmedTranscript = longTranscript.trim()
-  //             if (prevParts.length === 0 || trimmedTranscript !== prevParts[0]) {
-  //               return [trimmedTranscript, ...prevParts.filter(part => part !== trimmedTranscript)]
-  //             }
-  //             return prevParts
-  //           })
-  //         }
-  //       } catch (error) {
-  //         console.error('Error fetching initial long transcript:', error)
-  //       }
-  //     }
-
-  //     fetchInitialTranscript()
-  //   }, [])
-
-  const filteredConversations = conversations.filter((conversation) => {
-    const matchTranscript = conversation.transcript.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchSummary = conversation.summary.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchTranscript || matchSummary
-  })
-
-  useEffect(() => {
-    console.log('currentConversationParts updated:', currentConversationParts)
-  }, [currentConversationParts])
-
-  return (
-    <ConversationContext.Provider
-      value={{
-        conversations,
-        currentConversation: getCurrentConversationString(),
-        micActivity,
-        addConversation,
-        updateConversation,
-        deleteConversation,
-        deleteAllConversations,
-        handleSave,
-        filteredConversations,
-        searchQuery,
-        setSearchQuery,
-      }}
-    >
-      {children}
-    </ConversationContext.Provider>
+    },
+    [fetchLatestData],
   )
+
+  const contextValue: ConversationContextType = {
+    conversations,
+    currentConversation,
+    elapsedTime,
+    autoSaveTime,
+    autoClearDays,
+    micActivity,
+    isAudioOn,
+    saveCurrentConversation: Highlight.conversations.saveCurrentConversation,
+    addConversation: Highlight.conversations.addConversation,
+    updateConversation: Highlight.conversations.updateConversation,
+    deleteConversation: Highlight.conversations.deleteConversation,
+    deleteAllConversations: Highlight.conversations.deleteAllConversations,
+    setAutoSaveTime: Highlight.conversations.setAutoSaveTime,
+    setAutoClearDays: Highlight.conversations.setAutoClearDays,
+    setIsAudioOn: setIsAudioOnAndSave,
+  }
+
+  return <ConversationContext.Provider value={contextValue}>{children}</ConversationContext.Provider>
 }
 
 export const useConversations = () => {
@@ -228,48 +178,3 @@ export const useConversations = () => {
   }
   return context
 }
-
-// TODO: - probably not going to do this in HL Chat, hook for new highlight api get/listen for conversations
-/*
-import React, { useEffect, useState } from 'react'
-import { ConversationData } from '@/types/conversations'
-export const useConversations = () => {
-  const [conversations, setConversations] = useState<ConversationData[]>([])
-
-  useEffect(() => {
-    const fetchConversations = async () => {
-      if (typeof window !== 'undefined' && window.highlight?.internal?.getConversations) {
-        try {
-          const fetchedConversations = await window.highlight.internal.getConversations()
-          setConversations(fetchedConversations)
-          console.log(fetchedConversations)
-        } catch (error) {
-          console.error('Error fetching conversations:', error)
-        }
-      }
-    }
-
-    fetchConversations()
-
-    // Set up the listener
-    let removeListener: (() => void) | undefined
-
-    if (window.highlight?.internal?.createConversationsStorageListener) {
-      removeListener = window.highlight.internal.createConversationsStorageListener(() => {
-        console.log('Conversations updated')
-        fetchConversations() // Fetch updated conversations when the event is triggered
-      })
-    }
-
-    // Clean up the listener when the component unmounts
-    return () => {
-      if (removeListener) {
-        removeListener()
-      }
-    }
-  }, [])
-
-  return conversations
-}
-
-*/

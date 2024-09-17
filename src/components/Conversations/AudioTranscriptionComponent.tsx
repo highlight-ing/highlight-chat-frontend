@@ -11,9 +11,8 @@ const INACTIVE_LINE_COLOR = 'rgba(72, 72, 72, 1)'
 
 export default function AudioTranscriptionComponent() {
   const [audioState, setAudioState] = useState<AudioState>('active')
-  const [duration, setDuration] = useState('4min 30s')
   const [isOn, setIsOn] = useState(true)
-  const { micActivity } = useConversations()
+  const { micActivity, elapsedTime } = useConversations()
 
   const handleToggle = () => {
     const newIsOn = !isOn
@@ -25,13 +24,23 @@ export default function AudioTranscriptionComponent() {
     setAudioState(isOn ? (micActivity > 0 ? 'active' : 'inactive') : 'off')
   }, [micActivity, isOn])
 
+  const formatElapsedTime = (seconds: number): string => {
+    if (seconds < 60) {
+      return `${seconds}s`
+    }
+    const minutes = Math.floor(seconds / 60)
+    const remainingSeconds = seconds % 60
+    return `${minutes}min ${remainingSeconds}s`
+  }
+
   const getContent = () => {
+    const formattedTime = formatElapsedTime(elapsedTime)
     return (
       <>
         <p
           className={`absolute left-[44px] text-[16px] font-medium transition-opacity duration-300 ease-in-out ${audioState === 'active' ? 'opacity-100' : 'opacity-0'}`}
         >
-          Transcribing | {duration}
+          Transcribing | {formattedTime}
         </p>
         <p
           className={`absolute left-[44px] text-[16px] font-medium text-subtle transition-opacity duration-300 ease-in-out ${audioState === 'inactive' ? 'opacity-100' : 'opacity-0'}`}

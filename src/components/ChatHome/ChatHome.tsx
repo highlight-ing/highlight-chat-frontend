@@ -46,11 +46,9 @@ const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
         <InputHeading />
         {isVisible && <Input isActiveChat={false} />}
       </div>
-      <ConversationsSettingsProvider>
-        <ConversationProvider>
-          <AudioTranscriptionComponent />
-        </ConversationProvider>
-      </ConversationsSettingsProvider>
+      <ConversationProvider>
+        <AudioTranscriptionComponent />
+      </ConversationProvider>
       <Prompts userId={userId} />
     </div>
   )
