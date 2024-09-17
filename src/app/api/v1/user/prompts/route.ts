@@ -63,7 +63,7 @@ async function checkIfDefaultPromptsAdded(userId: string) {
   }
 
   // Pin the 4 default prompts to the user
-  const { data, error: insertError } = await supabase.from('prompts').insert(newPrompts).select('*')
+  const { error: insertError } = await supabase.from('prompts').insert(newPrompts)
 
   if (insertError) {
     console.error('Error inserting new default prompts:', insertError)
