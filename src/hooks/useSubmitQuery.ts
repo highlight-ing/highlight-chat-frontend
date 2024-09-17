@@ -1,3 +1,4 @@
+// src/hooks/useSubmitQuery.ts
 import { useEffect, useRef } from 'react'
 import { useStore } from '@/providers/store-provider'
 import useAuth from './useAuth'
@@ -7,12 +8,13 @@ import { useShallow } from 'zustand/react/shallow'
 import { HighlightContext } from '@highlight-ai/app-runtime'
 import Highlight from '@highlight-ai/app-runtime'
 import * as Sentry from '@sentry/react'
-import { FileAttachment } from '@/types'
 
 import { addAttachmentsToFormData, fetchWindows } from '@/utils/attachmentUtils'
 import { parseAndHandleStreamChunk } from '@/utils/streamParser'
+import { buildFormData, FormDataInputs, AttachedContexts, AvailableContexts } from '@/utils/formDataUtils'
 import { trackEvent } from '@/utils/amplitude'
 import { processAttachments } from '@/utils/contextprocessor'
+import { FileAttachment } from '@/types'
 
 export const useSubmitQuery = () => {
   const { post } = useApi()
@@ -103,13 +105,12 @@ export const useSubmitQuery = () => {
     const startTime = Date.now()
 
     try {
-      formData.append('conversation_id', conversationId)
-      const endpoint = isPromptApp ? 'chat/prompt-as-app' : 'chat/'
-
       const abortController = new AbortController()
       abortControllerRef.current = abortController
 
-      const response = await post(endpoint, formData, { version: 'v3', signal: abortController.signal })
+      const endpoint = isPromptApp ? 'chat/prompt-as-app' : 'chat/'
+
+      const response = await post(endpoint, formData, { version: 'v4', signal: abortController.signal })
       if (!response.ok) {
         throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`)
       }
@@ -209,6 +210,7 @@ export const useSubmitQuery = () => {
     }
 
     const { suggestion: query = '', attachments: rawAttachments = [], application, environment } = context
+
     const screenshotUrl = rawAttachments.find((a) => a.type === 'screenshot')?.value
     const clipboardText = rawAttachments.find((a) => a.type === 'clipboard')?.value
     const audio = rawAttachments.find((a) => a.type === 'audio')?.value
@@ -247,23 +249,19 @@ export const useSubmitQuery = () => {
       setInput('')
       clearAttachments()
 
-      const formData = new FormData()
-      formData.append('prompt', query)
-      formData.append('windows', JSON.stringify(windows))
+      // Extract and format attached_context_metadata
+      const attachedContext: AttachedContexts = {}
 
-      if (promptApp) {
-        formData.append('app_id', promptApp.external_id)
-      }
+      const availableContexts: AvailableContexts = {}
 
-      if (aboutMe) {
-        formData.append('about_me', JSON.stringify(aboutMe))
-      }
-
-      await addAttachmentsToFormData(formData, processedAttachments)
-
-      if (contentToUse) {
-        formData.append('ocr_text', contentToUse)
-      }
+      // Build FormData using the updated builder
+      const formData = await buildFormData({
+        prompt: query,
+        conversationId,
+        llmProvider: 'anthropic',
+        attachedContext,
+        availableContexts,
+      })
 
       const accessToken = await getAccessToken()
       await fetchResponse(conversationId, formData, accessToken, !!promptApp, promptApp)
@@ -287,47 +285,27 @@ export const useSubmitQuery = () => {
     try {
       setInputIsDisabled(true)
 
-      const formData = new FormData()
-      formData.append('prompt', query)
+      const conversationId = getOrCreateConversationId()
 
-      const isPromptApp = !!promptApp
+      // Extract and format attached_context_metadata
+      const attachedContext: AttachedContexts = {}
 
-      if (isPromptApp && promptApp.external_id !== undefined) {
-        formData.append('app_id', promptApp.external_id)
-      }
+      const availableContexts: AvailableContexts = {}
 
-      await Sentry.startSpan({ name: 'fetchWindows', op: 'function' }, async () => {
-        const windows = await fetchWindows()
-        formData.append('windows', JSON.stringify(windows))
+      // Build FormData using the updated builder
+      const formData = await buildFormData({
+        prompt: query,
+        conversationId,
+        llmProvider: 'anthropic',
+        attachedContext,
+        availableContexts,
       })
 
-      if (aboutMe) {
-        formData.append('about_me', JSON.stringify(aboutMe))
-      }
-
-      if (context) {
-        if (context.image) {
-          formData.append('screenshot', context.image)
-        }
-        if (context.window_context) {
-          formData.append('window_context', context.window_context)
-        }
-      }
-
-      const processedAttachments = await addAttachmentsToFormData(formData, attachments)
-      const { screenshot, audio, fileTitle, clipboardText, ocrText, windowContext } = processedAttachments
-
-      const conversationId = getOrCreateConversationId()
       addConversationMessage(conversationId, {
         role: 'user',
         content: query,
-        screenshot,
-        ocr_text: ocrText,
-        audio,
-        file_title: fileTitle,
-        clipboard_text: clipboardText,
-        windows: await fetchWindows(),
-        window_context: windowContext,
+        screenshot: context?.image,
+        window_context: context?.window_context,
         file_attachments: attachments.filter((a) => a.type === 'text_file'),
       })
 
@@ -335,7 +313,7 @@ export const useSubmitQuery = () => {
       clearAttachments()
 
       const accessToken = await getAccessToken()
-      await fetchResponse(conversationId, formData, accessToken, isPromptApp, promptApp)
+      await fetchResponse(conversationId, formData, accessToken, !!promptApp, promptApp)
     } catch (error: any) {
       handleError(error, { method: 'handleSubmit' })
     } finally {
