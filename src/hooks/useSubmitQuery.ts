@@ -199,11 +199,7 @@ export const useSubmitQuery = () => {
         }
       }
 
-      const response = await Sentry.startSpan({ name: 'fetchResponse' }, async () => {
-        const res = await post(endpoint, formData, { version: 'v3' })
-        return res
-      })
-
+      const response = await post(endpoint, formData, { version: 'v3' })
       if (!response.ok) {
         throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`)
       }
