@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { Switch } from '@/components/ui/switch'
 import EnableConversationsButton from './EnableConversationsButton'
 import AnimatedVoiceSquare from './AnimatedVoiceSquare'
 import { useConversations } from '@/context/ConversationContext'
 import { useDebouncedCallback } from 'use-debounce'
 
-type AudioState = 'active' | 'inactive' | 'off' | 'noPermissions'
+type AudioState = 'active' | 'inactive' | 'off' | 'noPermissions' | 'saving'
 
 const ACTIVE_LINE_COLOR = 'rgba(76, 237, 160, 1.0)'
 const INACTIVE_LINE_COLOR = 'rgba(72, 72, 72, 1)'
@@ -13,7 +13,9 @@ const INACTIVE_LINE_COLOR = 'rgba(72, 72, 72, 1)'
 export default function AudioTranscriptionComponent() {
   const [audioState, setAudioState] = useState<AudioState>('active')
   const [isOn, setIsOn] = useState(true)
-  const { micActivity, elapsedTime } = useConversations()
+  const { micActivity, elapsedTime, currentConversation, isSaving } = useConversations()
+
+  const [isActive, setIsActive] = useState(false)
 
   const slowDebounce = useDebouncedCallback(
     (newState: AudioState) => {
@@ -32,16 +34,24 @@ export default function AudioTranscriptionComponent() {
   const updateAudioState = useCallback(() => {
     if (!isOn) {
       setAudioState('off')
+      setIsActive(false)
+      return
+    }
+
+    if (isSaving) {
+      setAudioState('saving')
       return
     }
 
     if (micActivity > 0) {
       fastDebounce('active')
+      setIsActive(true)
       slowDebounce.cancel() // Cancel any pending slow debounce
     } else {
       slowDebounce('inactive')
+      setIsActive(false)
     }
-  }, [isOn, micActivity, fastDebounce, slowDebounce])
+  }, [isOn, micActivity, isSaving, fastDebounce, slowDebounce])
 
   useEffect(() => {
     updateAudioState()
@@ -62,15 +72,55 @@ export default function AudioTranscriptionComponent() {
     return `${minutes}min ${remainingSeconds}s`
   }
 
+  const currentConversationPreview = useMemo(() => {
+    if (!currentConversation) return 'Waiting for transcript...'
+
+    // Remove timestamp and diarization
+    const parts = currentConversation.split(':')
+    const content = parts.slice(3).join(':').trim()
+
+    // Take first 100 characters
+    const preview = content.length > 100 ? content.slice(0, 100) + '...' : content
+
+    return preview
+  }, [currentConversation])
+
   const getContent = () => {
     const formattedTime = formatElapsedTime(elapsedTime)
+
     return (
       <>
-        <p
-          className={`absolute left-[44px] text-[16px] font-medium transition-opacity duration-300 ease-in-out ${audioState === 'active' ? 'opacity-100' : 'opacity-0'}`}
+        <div
+          className={`absolute left-[44px] transition-opacity duration-300 ease-in-out ${audioState === 'active' || audioState === 'saving' ? 'opacity-100' : 'opacity-0'}`}
         >
-          Transcribing | {formattedTime}
-        </p>
+          <div className="flex items-center">
+            <p className="w-[190px] overflow-hidden text-[16px] font-medium">
+              <span
+                className="inline-block transition-all duration-300 ease-in-out"
+                style={{
+                  transform: audioState === 'saving' ? 'translateY(-100%)' : 'translateY(0)',
+                  opacity: audioState === 'saving' ? 0 : 1,
+                }}
+              >
+                Transcribing | {formattedTime}
+              </span>
+              <span
+                className="absolute left-0 top-0 inline-block transition-all duration-300 ease-in-out"
+                style={{
+                  transform: audioState === 'saving' ? 'translateY(0)' : 'translateY(100%)',
+                  opacity: audioState === 'saving' ? 1 : 0,
+                }}
+              >
+                Saving Transcript
+              </span>
+            </p>
+            {audioState !== 'saving' && (
+              <p className="w-[400px] truncate text-[14px] text-conv-current-preview transition-opacity duration-300 ease-in-out">
+                {currentConversationPreview}
+              </p>
+            )}
+          </div>
+        </div>
         <p
           className={`absolute left-[44px] text-[16px] font-medium text-subtle transition-opacity duration-300 ease-in-out ${audioState === 'inactive' ? 'opacity-100' : 'opacity-0'}`}
         >
@@ -94,7 +144,7 @@ export default function AudioTranscriptionComponent() {
     mx-auto flex w-full items-center justify-between rounded-[20px] p-6
     transition-all duration-300 ease-in-out
     ${
-      audioState === 'active'
+      isActive || (audioState === 'saving' && isActive)
         ? 'border border-conv-green bg-conv-green-20'
         : 'border border-conv-primary bg-conv-primary'
     }
@@ -107,9 +157,9 @@ export default function AudioTranscriptionComponent() {
           width={32}
           height={32}
           backgroundColor="transparent"
-          lineColor={audioState === 'active' ? ACTIVE_LINE_COLOR : INACTIVE_LINE_COLOR}
-          shouldAnimate={audioState === 'active'}
-          transitionDuration={2500} // Add this prop to AnimatedVoiceSquare
+          lineColor={isActive || (audioState === 'saving' && isActive) ? ACTIVE_LINE_COLOR : INACTIVE_LINE_COLOR}
+          shouldAnimate={isActive || (audioState === 'saving' && isActive)}
+          transitionDuration={2500}
         />
         {getContent()}
       </div>

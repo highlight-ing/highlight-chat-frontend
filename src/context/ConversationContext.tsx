@@ -22,6 +22,7 @@ interface ConversationContextType {
   setAutoSaveTime: (time: number) => Promise<void>
   setAutoClearDays: (days: number) => Promise<void>
   setIsAudioOn: (isOn: boolean) => Promise<void>
+  isSaving: boolean
 }
 
 const ConversationContext = createContext<ConversationContextType | undefined>(undefined)
@@ -34,6 +35,7 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [autoClearDays, setAutoClearDays] = useState<number>(0)
   const [micActivity, setMicActivity] = useState(0)
   const [isAudioOn, setIsAudioOn] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
 
   const isAudioPermissionEnabled = useAudioPermission()
 
@@ -83,12 +85,31 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       },
     )
 
+    const removeSaveConversationListener = Highlight.app.addListener(
+      // @ts-ignore
+      'onConversationSaved',
+      () => {
+        console.log('Saving current conversation')
+      },
+    )
+
+    const removeConversationSavedListener = Highlight.app.addListener('onConversationSaved', () => {
+      setIsSaving(true)
+      setTimeout(() => {
+        setIsSaving(false)
+        setCurrentConversation('')
+        setElapsedTime(0)
+      }, 1000)
+    })
+
     return () => {
       removeCurrentConversationListener()
       removeConversationsUpdatedListener()
       removeElapsedTimeUpdatedListener()
       removeAutoSaveUpdatedListener()
       removeAutoClearUpdatedListener()
+      removeSaveConversationListener()
+      removeConversationSavedListener()
     }
   }, [isAudioOn])
 
@@ -98,11 +119,10 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, [setupListeners])
 
   const fetchLatestData = useCallback(async () => {
-    let goose = await Highlight.app
     const allConversations = await Highlight.conversations.getAllConversations()
     setConversations(allConversations)
     const currentConv = await Highlight.conversations.getCurrentConversation()
-    setCurrentConversation(currentConv.transcript)
+    setCurrentConversation(currentConv)
     const elapsedTime = await Highlight.conversations.getElapsedTime()
     setElapsedTime(elapsedTime)
   }, [])
@@ -166,6 +186,7 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setAutoSaveTime: Highlight.conversations.setAutoSaveTime,
     setAutoClearDays: Highlight.conversations.setAutoClearDays,
     setIsAudioOn: setIsAudioOnAndSave,
+    isSaving,
   }
 
   return <ConversationContext.Provider value={contextValue}>{children}</ConversationContext.Provider>

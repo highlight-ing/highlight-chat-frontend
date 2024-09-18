@@ -92,6 +92,7 @@ const config: Config = {
         'conv-green-20': 'rgba(76, 237, 160, 0.2)',
         'conv-green-10': 'rgba(76, 237, 160, 0.1)',
         'conv-white': 'rgba(255, 255, 255, 1.0)',
+        'conv-current-preview': 'rgba(102, 141, 122, 1.0)',
       },
       textColor: {
         primary: '#EEEEEE',
