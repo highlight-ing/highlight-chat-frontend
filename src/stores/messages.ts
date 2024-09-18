@@ -38,7 +38,7 @@ export const createMessagesSlice: StateCreator<MessagesSlice> = (set, get) => ({
     if (lastMessageIndex === -1) {
       get().addConversationMessage(conversationId, message)
     } else {
-      openConversationMessages[conversationId][lastMessageIndex].personalize = personalization
+      openConversationMessages
     }
     openConversationMessages[conversationId] = [...openConversationMessages[conversationId].slice(0, -1), message]
     set({ conversationMessages: openConversationMessages })
