@@ -222,7 +222,7 @@ export const useSubmitQuery = () => {
 
         checkAbortSignal()
 
-        const { content, windowName } = await parseAndHandleStreamChunk(chunk, {
+        const { content, windowName, conversation, factIndex, fact } = await parseAndHandleStreamChunk(chunk, {
           showConfirmationModal,
           addToast,
         })
@@ -232,6 +232,34 @@ export const useSubmitQuery = () => {
           updateLastConversationMessage(conversationId, {
             role: 'assistant',
             content: accumulatedMessage,
+          })
+        }
+
+        if (conversation) {
+          const conversation_data = await Highlight.conversations.getConversationById(conversation)
+          if (conversation_data) {
+            addAttachment({
+              type: 'audio',
+              value: conversation_data.transcript,
+              duration: Math.floor(
+                (new Date(conversation_data.endedAt).getTime() - new Date(conversation_data.startedAt).getTime()) /
+                  60000,
+              ),
+            })
+          } else {
+            addToast({
+              title: 'Failed to request Conversation',
+              description: 'We were unable to request conversation with this ID',
+            })
+          }
+        }
+
+        if (fact || (fact && factIndex)) {
+          updateLastConversationMessage(conversationId, {
+            role: 'assistant',
+            content: accumulatedMessage,
+            factIndex: factIndex,
+            fact: fact,
           })
         }
 

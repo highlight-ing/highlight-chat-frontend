@@ -1,10 +1,11 @@
 import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import React, { Fragment } from 'react'
-
-import { AssistantIcon } from '@/icons/icons'
+import React, { Fragment, useState } from 'react'
+import variables from '@/variables.module.scss'
+import { AssistantIcon, PersonalizeIcon } from '@/icons/icons'
 import { Message as MessageType, UserMessage } from '../../types'
 import { Attachment } from '../Attachment'
+import Highlight from '@highlight-ai/app-runtime'
 
 import globalStyles from '@/global.module.scss'
 import styles from './message.module.scss'
@@ -13,6 +14,7 @@ import CodeBlock from '@/components/Messages/CodeBlock'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import 'katex/dist/katex.min.css'
+import Button from '@/components/Button/Button'
 
 // @ts-ignore
 import { BlockMath, InlineMath } from 'react-katex'
@@ -39,6 +41,40 @@ interface MessageProps {
   message: MessageType
 }
 
+const FactButton = ({ factIndex, fact }: { factIndex?: number; fact?: string }) => {
+  const [clicked, setClicked] = useState(false)
+
+  const handleClick = () => {
+    setClicked(true)
+    if (factIndex && fact) {
+      // If update
+      Highlight.user.updateFact(factIndex, fact)
+    }
+    if (fact) {
+      Highlight.user.addFact(fact)
+    }
+    window.open('highlight://settings/about-me', '_blank')
+  }
+
+  if (clicked || (!factIndex && !fact)) {
+    return null
+  }
+
+  let buttonText = 'Personalize your About Me'
+  if (factIndex && fact) {
+    buttonText = 'Update About Me'
+  } else if (fact) {
+    buttonText = 'Add info to your About Me'
+  }
+
+  return (
+    <Button size="large" variant="ghost" onClick={handleClick}>
+      <PersonalizeIcon size={24} color={variables.light80} />
+      <span className={styles.personalizeText}>{buttonText}</span>
+    </Button>
+  )
+}
+
 /**
  * LLMs spit out formulas with delimiters that katex doesn't recognize.
  * In this case, we try to replace it with `$$` delimiters.
@@ -58,6 +94,8 @@ const preprocessLaTeX = (content: string) => {
 
 export const Message = ({ message, isThinking }: MessageProps) => {
   const promptApp = useStore((state) => state.promptApp)
+  const { factIndex, fact } = message
+
   return (
     <div className={`${styles.messageContainer} ${message.role === 'user' ? styles.self : ''}`}>
       {message.role === 'assistant' && (
@@ -164,6 +202,7 @@ export const Message = ({ message, isThinking }: MessageProps) => {
               {typeof message.content === 'string' ? preprocessLaTeX(message.content) : ''}
             </Markdown>
           </div>
+          {factIndex || fact ? <FactButton factIndex={factIndex} fact={fact} /> : null}
         </div>
       ) : (
         <span className={styles.thinking}>

@@ -8,7 +8,8 @@ type StreamParserProps = {
 export async function parseAndHandleStreamChunk(chunk: string, { showConfirmationModal, addToast }: StreamParserProps) {
   let contextConfirmed: boolean | null = null
   let accumulatedContent = ''
-
+  let factIndex = null
+  let fact = null
   // Split the chunk into individual data objects
   const dataObjects = chunk.split(/\n(?=data: )/)
 
@@ -29,7 +30,7 @@ export async function parseAndHandleStreamChunk(chunk: string, { showConfirmatio
 
         // We can define each tool use with different names
         case 'tool_use':
-          if (jsonChunk.name === 'get_more_context') {
+          if (jsonChunk.name === 'get_more_context_from_window' || jsonChunk.name === 'get_more_context') {
             if (contextConfirmed === null) {
               contextConfirmed = await showConfirmationModal(
                 'The assistant is requesting additional context. Do you want to allow this?',
@@ -38,7 +39,57 @@ export async function parseAndHandleStreamChunk(chunk: string, { showConfirmatio
             if (contextConfirmed) {
               const window = jsonChunk.input.window
               if (window) {
-                return { content: accumulatedContent, windowName: window }
+                return {
+                  content: accumulatedContent,
+                  windowName: window,
+                  conversation: null,
+                  factIndex: null,
+                  fact: null,
+                }
+              }
+            }
+          }
+          if (jsonChunk.name === 'get_more_context_from_conversations') {
+            if (contextConfirmed === null) {
+              contextConfirmed = await showConfirmationModal(
+                'The assistant is requesting additional context. Do you want to allow this?',
+              )
+            }
+            if (contextConfirmed) {
+              const conversation = jsonChunk.input.conversation
+              if (conversation) {
+                return {
+                  content: accumulatedContent,
+                  windowName: null,
+                  conversation: conversation,
+                  factIndex: null,
+                  fact: null,
+                }
+              }
+            }
+          }
+          if (jsonChunk.name === 'add_or_update_about_me_facts') {
+            // This will update the fact at the specified index
+            if (jsonChunk.input.fact_index && jsonChunk.input.fact) {
+              factIndex = jsonChunk.input.fact_index
+              fact = jsonChunk.input.fact
+              return {
+                content: accumulatedContent,
+                windowName: null,
+                conversation: null,
+                factIndex: factIndex,
+                fact: fact,
+              }
+            }
+            // This will add the fact to the end of the array
+            else if (jsonChunk.input.fact) {
+              fact = jsonChunk.input.fact
+              return {
+                content: accumulatedContent,
+                windowName: null,
+                conversation: null,
+                factIndex: null,
+                fact: fact,
               }
             }
           }
@@ -46,7 +97,7 @@ export async function parseAndHandleStreamChunk(chunk: string, { showConfirmatio
 
         case 'done':
           // Message is complete, return the accumulated content and attachments added
-          return { content: accumulatedContent, windowName: null }
+          return { content: accumulatedContent, windowName: null, conversation: null, factIndex: null, fact: null }
 
         case 'message_delta':
           // Handle message delta if needed
@@ -78,5 +129,5 @@ export async function parseAndHandleStreamChunk(chunk: string, { showConfirmatio
   }
 
   // If we haven't returned yet, return the accumulated content and attachments added
-  return { content: accumulatedContent, windowName: null }
+  return { content: accumulatedContent, windowName: null, conversation: null, factIndex: null, fact: null }
 }

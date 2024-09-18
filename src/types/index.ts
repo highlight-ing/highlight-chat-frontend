@@ -25,10 +25,14 @@ export type UserMessage = BaseMessage & {
   windows?: string[]
   file_attachments?: Attachment[]
   window_context?: string
+  factIndex?: number
+  fact?: string
 }
 
 export type AssistantMessage = BaseMessage & {
   role: 'assistant'
+  factIndex?: number
+  fact?: string
 }
 
 export type Message = UserMessage | AssistantMessage
