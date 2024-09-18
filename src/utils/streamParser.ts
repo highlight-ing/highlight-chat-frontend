@@ -70,7 +70,7 @@ export async function parseAndHandleStreamChunk(chunk: string, { showConfirmatio
           }
           if (jsonChunk.name === 'add_or_update_about_me_facts') {
             // This will update the fact at the specified index
-            if (jsonChunk.input.fact_index && jsonChunk.input.fact) {
+            if (typeof jsonChunk.input.fact_index === 'number' && jsonChunk.input.fact) {
               factIndex = jsonChunk.input.fact_index
               fact = jsonChunk.input.fact
               return {

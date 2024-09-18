@@ -46,11 +46,11 @@ const FactButton = ({ factIndex, fact }: { factIndex?: number; fact?: string }) 
 
   const handleClick = () => {
     setClicked(true)
-    if (factIndex && fact) {
+    console.log('handleClick func fact: ', fact, 'factIndex: ', factIndex)
+    if (typeof factIndex === 'number' && fact) {
       // If update
       Highlight.user.updateFact(factIndex, fact)
-    }
-    if (fact) {
+    } else if (fact) {
       Highlight.user.addFact(fact)
     }
     window.open('highlight://settings/about-me', '_blank')
@@ -61,7 +61,7 @@ const FactButton = ({ factIndex, fact }: { factIndex?: number; fact?: string }) 
   }
 
   let buttonText = 'Personalize your About Me'
-  if (factIndex && fact) {
+  if (typeof factIndex === 'number' && fact) {
     buttonText = 'Update About Me'
   } else if (fact) {
     buttonText = 'Add info to your About Me'

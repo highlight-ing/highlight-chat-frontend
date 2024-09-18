@@ -111,22 +111,22 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
 }
 
 /**
- * Hook that automatically registers the about me data when the app mounts.
+ * Hook that automatically registers the about me data when the app mounts or when a new message is sent.
  */
 function useAboutMeRegister() {
   const setAboutMe = useStore((state) => state.setAboutMe)
+  const lastMessageSentTimestamp = useStore((state) => state.lastMessageSentTimestamp)
 
   useEffect(() => {
     const getAboutMe = async () => {
       const aboutMe = await Highlight.user.getFacts()
+      console.log('About Me:', aboutMe)
       if (aboutMe?.length > 0) {
-        const aboutMeString = aboutMe.join('\n')
-        console.log('About Me:', aboutMeString)
-        setAboutMe(aboutMeString)
+        setAboutMe(aboutMe)
       }
     }
     getAboutMe()
-  }, [])
+  }, [lastMessageSentTimestamp])
 }
 
 /**
