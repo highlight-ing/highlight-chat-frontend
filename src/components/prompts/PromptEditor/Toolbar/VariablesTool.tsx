@@ -18,9 +18,10 @@ import Tooltip from '@/components/Tooltip/Tooltip'
 interface VariablesToolProps {
   disabled?: boolean
   onSelect: (keyword: string, phrase: string) => void
+  hidden?: boolean
 }
 
-export const VariablesTool: React.FC<VariablesToolProps> = ({ disabled, onSelect }) => {
+export const VariablesTool: React.FC<VariablesToolProps> = ({ disabled, onSelect, hidden }) => {
   const contextMenuItems = useMemo(() => {
     return [
       {
@@ -102,6 +103,7 @@ export const VariablesTool: React.FC<VariablesToolProps> = ({ disabled, onSelect
       triggerId={`toggle-variables`}
       leftClick={true}
       disabled={disabled}
+      hidden={hidden}
     >
       {
         // @ts-ignore

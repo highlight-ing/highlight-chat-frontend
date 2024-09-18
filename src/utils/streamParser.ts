@@ -1,18 +1,11 @@
-import Highlight from '@highlight-ai/app-runtime'
-import { FileAttachment, Toast } from '@/types'
+import { Toast } from '@/types'
 
 type StreamParserProps = {
-  formData: FormData
-  addAttachment: (attachment: FileAttachment) => void
   showConfirmationModal: (message: string) => Promise<boolean>
   addToast: (toast: Partial<Toast>) => void
-  handleSubmit: (input: string) => Promise<void>
 }
 
-export async function parseAndHandleStreamChunk(
-  chunk: string,
-  { formData, addAttachment, showConfirmationModal, addToast, handleSubmit }: StreamParserProps,
-) {
+export async function parseAndHandleStreamChunk(chunk: string, { showConfirmationModal, addToast }: StreamParserProps) {
   let contextConfirmed: boolean | null = null
   let accumulatedContent = ''
   let factIndex = null
@@ -37,7 +30,7 @@ export async function parseAndHandleStreamChunk(
 
         // We can define each tool use with different names
         case 'tool_use':
-          if (jsonChunk.name === 'get_more_context') {
+          if (jsonChunk.name === 'get_more_context_from_window' || jsonChunk.name === 'get_more_context') {
             if (contextConfirmed === null) {
               contextConfirmed = await showConfirmationModal(
                 'The assistant is requesting additional context. Do you want to allow this?',
@@ -46,29 +39,65 @@ export async function parseAndHandleStreamChunk(
             if (contextConfirmed) {
               const window = jsonChunk.input.window
               if (window) {
-                await handleWindowContext(window, formData, addAttachment, handleSubmit)
+                return {
+                  content: accumulatedContent,
+                  windowName: window,
+                  conversation: null,
+                  factIndex: null,
+                  fact: null,
+                }
+              }
+            }
+          }
+          if (jsonChunk.name === 'get_more_context_from_conversations') {
+            if (contextConfirmed === null) {
+              contextConfirmed = await showConfirmationModal(
+                'The assistant is requesting additional context. Do you want to allow this?',
+              )
+            }
+            if (contextConfirmed) {
+              const conversation = jsonChunk.input.conversation
+              if (conversation) {
+                return {
+                  content: accumulatedContent,
+                  windowName: null,
+                  conversation: conversation,
+                  factIndex: null,
+                  fact: null,
+                }
               }
             }
           }
           if (jsonChunk.name === 'add_or_update_about_me_facts') {
             // This will update the fact at the specified index
             if (jsonChunk.input.fact_index && jsonChunk.input.fact) {
-              console.log('incoming fact', jsonChunk.input.fact)
-              console.log('incoming fact index', jsonChunk.input.fact_index)
               factIndex = jsonChunk.input.fact_index
               fact = jsonChunk.input.fact
+              return {
+                content: accumulatedContent,
+                windowName: null,
+                conversation: null,
+                factIndex: factIndex,
+                fact: fact,
+              }
             }
             // This will add the fact to the end of the array
             else if (jsonChunk.input.fact) {
-              console.log('incoming fact', jsonChunk.input.fact)
               fact = jsonChunk.input.fact
+              return {
+                content: accumulatedContent,
+                windowName: null,
+                conversation: null,
+                factIndex: null,
+                fact: fact,
+              }
             }
           }
           break
 
         case 'done':
-          // Return both accumulated content and personalize flag
-          return { content: accumulatedContent, factIndex, fact }
+          // Message is complete, return the accumulated content and attachments added
+          return { content: accumulatedContent, windowName: null, conversation: null, factIndex: null, fact: null }
 
         case 'message_delta':
           // Handle message delta if needed
@@ -99,33 +128,6 @@ export async function parseAndHandleStreamChunk(
     }
   }
 
-  // If we haven't returned yet, return the accumulated content and personalize flag
-  return { content: accumulatedContent, factIndex, fact }
-}
-
-async function handleWindowContext(
-  window: string,
-  formData: FormData,
-  addAttachment: (attachment: FileAttachment) => void,
-  handleSubmit: (input: string) => Promise<void>,
-) {
-  const contextGranted = await Highlight.permissions.requestWindowContextPermission()
-  const screenshotGranted = await Highlight.permissions.requestScreenshotPermission()
-  if (contextGranted && screenshotGranted) {
-    const screenshot = await Highlight.user.getWindowScreenshot(window)
-    addAttachment({
-      type: 'image',
-      value: screenshot,
-    })
-
-    const windowContext = await Highlight.user.getWindowContext(window)
-    const ocrScreenContents = windowContext.environment.ocrScreenContents || ''
-    addAttachment({
-      type: 'window_context',
-      value: ocrScreenContents,
-    })
-    // await new Promise((resolve) => setTimeout(resolve, 500))
-
-    // await handleSubmit("Here's the context you requested.") // When called it ignores the window context and image wtf?
-  }
+  // If we haven't returned yet, return the accumulated content and attachments added
+  return { content: accumulatedContent, windowName: null, conversation: null, factIndex: null, fact: null }
 }

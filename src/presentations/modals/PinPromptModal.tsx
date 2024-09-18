@@ -39,8 +39,8 @@ export default function PinPromptModal({ id, context }: ModalObjectProps) {
     closeModal(id)
 
     addToast({
-      title: 'Prompt pinned',
-      description: 'Your prompt has been pinned.',
+      title: 'Action pinned',
+      description: 'Your action has been pinned.',
       type: 'success',
       timeout: 1500,
     })
@@ -49,7 +49,7 @@ export default function PinPromptModal({ id, context }: ModalObjectProps) {
   return (
     <ConfirmationModal
       id={id}
-      header="Pin prompt"
+      header="Pin action"
       primaryAction={{
         label: 'Pin',
         onClick: onUpdate,
@@ -60,7 +60,7 @@ export default function PinPromptModal({ id, context }: ModalObjectProps) {
         onClick: () => closeModal(id),
       }}
     >
-      <div>Pinning this prompt will add it to your pinned prompts.</div>
+      <div>Pinning this action will add it to your pinned actions.</div>
     </ConfirmationModal>
   )
 }

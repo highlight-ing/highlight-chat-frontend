@@ -33,7 +33,7 @@ const CreatePromptModal = ({ id, context }: ModalObjectProps) => {
       header={
         <div className={'flex w-full items-center justify-between'}>
           <CloseButton alignment="left" onClick={() => closeModal(id)} />
-          <div className="flex grow justify-center">Create New Highlight App</div>
+          <div className="flex grow justify-center">Create New Action</div>
           <div className="absolute right-0 p-2">
             <PromptSaveButton />
           </div>

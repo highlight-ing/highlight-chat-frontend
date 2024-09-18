@@ -1,29 +1,23 @@
-import variables from '@/variables.module.scss'
 import styles from './chathome.module.scss'
 import mainStyles from '@/main.module.scss'
 import { AddCircle, MouseCircle, SearchStatus, Setting } from 'iconsax-react'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useStore } from '@/providers/store-provider'
-import PromptListRow from '@/components/prompts/PromptListRow'
 import { Input } from '@/components/Input/Input'
 import { HighlightIcon } from '@/icons/icons'
 import usePromptApps from '@/hooks/usePromptApps'
-import Highlight from '@highlight-ai/app-runtime'
 import Hotkey from '@/components/Hotkey/Hotkey'
 import ExpandableVideo from '@/components/ExpandableVideo/ExpandableVideo'
 import { useShallow } from 'zustand/react/shallow'
-import { Prompt } from '@/types/supabase-helpers'
 import { trackEvent } from '@/utils/amplitude'
 import PersonalPrompts from '@/components/PersonalPrompts/PersonalPrompts'
 import TrendingPrompts from '@/components/TrendingPrompts/TrendingPrompts'
+import Button from '../Button/Button'
+import { supabaseLoader } from '@/lib/supabase'
+import Image from 'next/image'
+import { Prompt } from '@/types/supabase-helpers'
 
 const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
-  const { openModal, closeModal } = useStore(
-    useShallow((state) => ({
-      openModal: state.openModal,
-      closeModal: state.closeModal,
-    })),
-  )
   const [isVisible, setVisible] = useState(isShowing)
 
   // Get the user ID from the store
@@ -47,7 +41,7 @@ const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
         <InputHeading />
         {isVisible && <Input isActiveChat={false} />}
       </div>
-      <Prompts userId={userId} openModal={openModal} />
+      <Prompts userId={userId} />
     </div>
   )
 }
@@ -81,14 +75,57 @@ function InputHeading() {
   )
 }
 
-const Prompts = ({
-  userId,
-  openModal,
-}: {
-  userId: string | undefined
-  openModal: (modal: string, context?: Record<string, any>) => void
-}) => {
-  const { isLoadingPrompts, myPrompts, communityPrompts, pinnedPrompts, selectPrompt } = usePromptApps()
+/**
+ * A default prompt like Summarize, Explain, Write, or Analyze
+ */
+function DefaultPrompt({ externalId }: { externalId: string }) {
+  const prompts = useStore((state) => state.prompts)
+  const openModal = useStore((state) => state.openModal)
+  const [prompt, setPrompt] = useState<Prompt | undefined>(undefined)
+
+  useEffect(() => {
+    const prompt = prompts.find((p) => p.external_id === externalId)
+    setPrompt(prompt)
+  }, [externalId, prompts])
+
+  if (!prompt) {
+    return <></>
+  }
+
+  function onClick() {
+    openModal('customize-prompt', { prompt })
+  }
+
+  return (
+    <div
+      onClick={onClick}
+      className="inline-flex flex-col items-start justify-start gap-3 rounded-[20px] bg-[#191919] p-5 transition-colors duration-200 ease-in-out hover:cursor-pointer hover:bg-[#292929]"
+    >
+      <div className="inline-flex gap-2 text-base font-medium leading-normal text-[#eeeeee]">
+        <Image
+          src={`/user_content/${prompt.image}.${prompt.user_images?.file_extension}`}
+          alt="Prompt image"
+          className="h-6 w-6 rounded-full"
+          width={24}
+          height={24}
+          loader={supabaseLoader}
+        />
+        {prompt.name}
+      </div>
+      <div className="inline-flex items-start justify-start gap-2 self-stretch">
+        <Button size="xsmall" variant="tertiary" className={styles.filledButton} onClick={onClick}>
+          Preview
+        </Button>
+        <div className="flex items-center justify-center gap-1 rounded-md border border-[#222222] px-2 py-0.5">
+          <div className="text-[13px] font-medium leading-tight text-[#3a3a3a]">{prompt.public_use_number} Uses</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const Prompts = ({ userId }: { userId: string | undefined }) => {
+  const { isLoadingPrompts, myPrompts, communityPrompts, pinnedPrompts } = usePromptApps()
   if (isLoadingPrompts && !userId) {
     return (
       <div className="flex flex-col gap-4">
@@ -104,83 +141,19 @@ const Prompts = ({
 
   return (
     <>
+      {/* <div className="grid grid-cols-2 gap-4">
+        <DefaultPrompt externalId="2d2d0033-edc7-4f43-bad9-3c0baaaee2ee" />
+        <DefaultPrompt externalId="f9da16e0-ae49-43bb-95d3-5e89d3e3fc9b" />
+        <DefaultPrompt externalId="957af06a-2f69-4854-a4d7-189bf3758a73" />
+        <DefaultPrompt externalId="e9306eac-3dc2-4380-bb67-37f5ab3a1eaf" />
+      </div> */}
       <div className={styles.callouts}>
-        <PersonalPrompts
-          userId={userId}
-          prompts={myPrompts}
-          pinnedPrompts={pinnedPrompts}
-          openModal={openModal}
-          selectPrompt={selectPrompt}
-        />
+        <PersonalPrompts userId={userId} prompts={myPrompts} pinnedPrompts={pinnedPrompts} />
       </div>
       <div className={styles.callouts}>
-        <TrendingPrompts
-          userId={userId}
-          prompts={communityPrompts}
-          pinnedPrompts={pinnedPrompts}
-          openModal={openModal}
-          selectPrompt={selectPrompt}
-        />
+        <TrendingPrompts userId={userId} prompts={communityPrompts} pinnedPrompts={pinnedPrompts} />
       </div>
     </>
-  )
-}
-
-const oldPrompts = () => {
-  const openModal = useStore((state) => state.openModal)
-  const { isLoadingPrompts, myPrompts, selectPrompt } = usePromptApps()
-  const [hotkey, setHotkey] = useState<string>('alt + .')
-
-  useEffect(() => {
-    const fetchHotkey = async () => {
-      const hotkey = await Highlight.app.getHotkey()
-      setHotkey(hotkey)
-    }
-    fetchHotkey()
-  }, [])
-
-  if (isLoadingPrompts) {
-    return (
-      <div className={`${styles.prompts} ${mainStyles.loadingGradient}`}>
-        <div className={'h-20 w-full p-16'} />
-      </div>
-    )
-  }
-
-  if (!myPrompts.length) {
-    return <HighlightTutorial hotkey={hotkey} />
-  }
-
-  return (
-    <div className={styles.prompts}>
-      {myPrompts.map((prompt: Prompt) => {
-        return (
-          <PromptListRow
-            key={prompt.external_id}
-            prompt={prompt}
-            type={'self'}
-            onClick={() => {
-              selectPrompt(prompt)
-              trackEvent('HL Chat Prompt Selected', { promptSlug: prompt.slug })
-            }}
-            onClickEdit={() => {
-              openModal('edit-prompt', { prompt: prompt })
-            }}
-          />
-        )
-      })}
-
-      <PromptListRow
-        // @ts-ignore
-        prompt={{ slug: 'create', description: 'Create your own chat app' }}
-        icon={<AddCircle variant={'Bold'} color={variables.light60} />}
-        type={'default'}
-        onClick={() => {
-          openModal('create-prompt')
-          trackEvent('HL Chat Start Create Chat App', { context: 'Chat Home List' })
-        }}
-      />
-    </div>
   )
 }
 

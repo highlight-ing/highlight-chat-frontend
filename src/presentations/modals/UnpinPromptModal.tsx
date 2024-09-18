@@ -32,7 +32,7 @@ export default function UnpinPromptModal({ id, context }: ModalObjectProps) {
     }
 
     Highlight.appStorage.delete(`ctas.promptAdded.${prompt.external_id}`)
-    refreshPinnedPrompts(authToken)
+    refreshPinnedPrompts()
 
     trackEvent('HL Prompt Unpinned', {
       prompt_id: prompt.external_id,
@@ -41,8 +41,8 @@ export default function UnpinPromptModal({ id, context }: ModalObjectProps) {
     closeModal(id)
 
     addToast({
-      title: 'Prompt unpinned',
-      description: 'Your prompt has been unpinned.',
+      title: 'Action unpinned',
+      description: 'Your action has been unpinned.',
       type: 'success',
       timeout: 1500,
     })
@@ -51,7 +51,7 @@ export default function UnpinPromptModal({ id, context }: ModalObjectProps) {
   return (
     <ConfirmationModal
       id={id}
-      header="Unpin prompt"
+      header="Unpin action"
       primaryAction={{
         label: 'Unpin',
         onClick: onUpdate,
@@ -62,7 +62,7 @@ export default function UnpinPromptModal({ id, context }: ModalObjectProps) {
         onClick: () => closeModal(id),
       }}
     >
-      <div>Unpinning this prompt will remove it from your pinned prompts.</div>
+      <div>Unpinning this action will remove it from your pinned actions.</div>
     </ConfirmationModal>
   )
 }

@@ -3,6 +3,42 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      added_prompt_tags: {
+        Row: {
+          created_at: string
+          id: number
+          prompt_id: number | null
+          tag_id: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          prompt_id?: number | null
+          tag_id?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          prompt_id?: number | null
+          tag_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'added_tags_prompt_id_fkey'
+            columns: ['prompt_id']
+            isOneToOne: false
+            referencedRelation: 'prompts'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'added_tags_tag_id_fkey'
+            columns: ['tag_id']
+            isOneToOne: false
+            referencedRelation: 'tags'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       added_prompts: {
         Row: {
           created_at: string
@@ -161,18 +197,21 @@ export type Database = {
       }
       profiles: {
         Row: {
+          added_default_prompts: boolean | null
           created_at: string
           id: number
           user_id: string
           username: string | null
         }
         Insert: {
+          added_default_prompts?: boolean | null
           created_at?: string
           id?: number
           user_id: string
           username?: string | null
         }
         Update: {
+          added_default_prompts?: boolean | null
           created_at?: string
           id?: number
           user_id?: string
@@ -222,6 +261,7 @@ export type Database = {
           image: string | null
           is_handlebar_prompt: boolean
           name: string
+          preferred_attachment: string | null
           prompt_text: string | null
           prompt_url: string | null
           public: boolean
@@ -229,7 +269,6 @@ export type Database = {
           slug: string
           suggestion_prompt_text: string | null
           system_prompt: string | null
-          tags: Json[] | null
           user_id: string
           video_url: string | null
         }
@@ -242,6 +281,7 @@ export type Database = {
           image?: string | null
           is_handlebar_prompt?: boolean
           name: string
+          preferred_attachment?: string | null
           prompt_text?: string | null
           prompt_url?: string | null
           public?: boolean
@@ -249,7 +289,6 @@ export type Database = {
           slug: string
           suggestion_prompt_text?: string | null
           system_prompt?: string | null
-          tags?: Json[] | null
           user_id: string
           video_url?: string | null
         }
@@ -262,6 +301,7 @@ export type Database = {
           image?: string | null
           is_handlebar_prompt?: boolean
           name?: string
+          preferred_attachment?: string | null
           prompt_text?: string | null
           prompt_url?: string | null
           public?: boolean
@@ -269,7 +309,6 @@ export type Database = {
           slug?: string
           suggestion_prompt_text?: string | null
           system_prompt?: string | null
-          tags?: Json[] | null
           user_id?: string
           video_url?: string | null
         }
@@ -373,6 +412,30 @@ export type Database = {
             referencedColumns: ['id']
           },
         ]
+      }
+      tags: {
+        Row: {
+          created_at: string
+          external_id: string
+          id: number
+          slug: string
+          tag: string
+        }
+        Insert: {
+          created_at?: string
+          external_id?: string
+          id?: number
+          slug: string
+          tag: string
+        }
+        Update: {
+          created_at?: string
+          external_id?: string
+          id?: number
+          slug?: string
+          tag?: string
+        }
+        Relationships: []
       }
       user_images: {
         Row: {

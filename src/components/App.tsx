@@ -12,12 +12,13 @@ import { useShallow } from 'zustand/react/shallow'
 import { initAmplitude, trackEvent } from '@/utils/amplitude'
 import useAuth from '@/hooks/useAuth'
 import { decodeJwt } from 'jose'
-import { getPromptAppBySlug } from '@/utils/prompts'
+import { countPromptView, getPromptAppBySlug } from '@/utils/prompts'
 import ToastContainer from '@/components/Toast/ToastContainer'
 import usePromptApps from '@/hooks/usePromptApps'
 import { useChatHistory } from '@/hooks/useChatHistory'
 import { Prompt } from '@/types/supabase-helpers'
 import { processAttachments } from '@/utils/contextprocessor'
+import * as Sentry from '@sentry/react'
 
 function useContextReceivedHandler(navigateToNewChat: () => void) {
   const {
@@ -42,12 +43,14 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
     })),
   )
 
+  const { getAccessToken } = useAuth()
+
   const { handleIncomingContext } = useSubmitQuery()
 
   useEffect(() => {
     const debouncedHandleSubmit = debounce(300, async (context: HighlightContext, promptApp?: Prompt) => {
       setInput(context.suggestion || '')
-      await handleIncomingContext(context, navigateToNewChat, promptApp)
+      await handleIncomingContext(context, promptApp)
     })
 
     const contextDestroyer = Highlight.app.addListener('onContext', async (context: HighlightContext) => {
@@ -58,10 +61,14 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
 
       //@ts-expect-error
       if (context.promptSlug) {
-        // @ts-expect-error
+        //@ts-expect-error
         res = await getPromptAppBySlug(context.promptSlug)
 
+        const accessToken = await getAccessToken()
+
         if (res && res.promptApp) {
+          countPromptView(res.promptApp.external_id, accessToken)
+
           setPrompt({
             promptApp: res.promptApp,
             promptName: res.promptApp.name,
@@ -203,7 +210,34 @@ export default function App({ children }: { children: React.ReactNode }) {
       }
     }
 
+    const initializeSentry = async () => {
+      Sentry.init({
+        dsn: 'https://c37160a2ddfdb8148ee3da04c5fb007e@o150878.ingest.us.sentry.io/4507940451516416',
+        integrations: [Sentry.browserTracingIntegration()],
+        // Tracing
+        tracesSampleRate: 1.0, //  Capture 100% of the transactions
+        // Session Replay
+        replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
+        replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
+      })
+      // Get the access token using the useAuth hook
+      const accessToken = await getAccessToken()
+
+      // Decode the token to get the payload
+      const payload = decodeJwt(accessToken)
+
+      // Extract the user ID from the 'sub' field
+      const userId = payload.sub as string
+
+      if (!userId) {
+        throw new Error('User ID not found in token')
+      }
+
+      Sentry.setUser({ id: userId })
+    }
+
     initializeAmplitude()
+    initializeSentry()
   }, [])
 
   useContextReceivedHandler(navigateToNewChat)

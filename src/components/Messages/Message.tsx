@@ -5,6 +5,7 @@ import variables from '@/variables.module.scss'
 import { AssistantIcon, PersonalizeIcon } from '@/icons/icons'
 import { Message as MessageType, UserMessage } from '../../types'
 import { Attachment } from '../Attachment'
+import Highlight from '@highlight-ai/app-runtime'
 
 import globalStyles from '@/global.module.scss'
 import styles from './message.module.scss'
@@ -45,6 +46,13 @@ const FactButton = ({ factIndex, fact }: { factIndex?: number; fact?: string }) 
 
   const handleClick = () => {
     setClicked(true)
+    if (factIndex && fact) {
+      // If update
+      Highlight.user.updateFact(factIndex, fact)
+    }
+    if (fact) {
+      Highlight.user.addFact(fact)
+    }
     window.open('highlight://settings/about-me', '_blank')
   }
 
@@ -53,7 +61,7 @@ const FactButton = ({ factIndex, fact }: { factIndex?: number; fact?: string }) 
   }
 
   let buttonText = 'Personalize your About Me'
-  if (factIndex !== undefined && fact) {
+  if (factIndex && fact) {
     buttonText = 'Update About Me'
   } else if (fact) {
     buttonText = 'Add info to your About Me'

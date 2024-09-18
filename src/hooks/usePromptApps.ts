@@ -1,5 +1,5 @@
 import { useStore } from '@/providers/store-provider'
-import { addPromptToUser, countPromptView, fetchPrompts, fetchPinnedPrompts, fetchPromptText } from '@/utils/prompts'
+import { addPromptToUser, countPromptView, fetchPrompts, fetchPinnedPrompts } from '@/utils/prompts'
 import useAuth from '@/hooks/useAuth'
 import { Prompt } from '@/types/supabase-helpers'
 import { useShallow } from 'zustand/react/shallow'
@@ -13,27 +13,23 @@ export default (loadPrompts?: boolean) => {
   const addToast = useStore((state) => state.addToast)
 
   const {
+    userId,
     prompts,
     setPrompts,
-    promptUserId,
-    setPromptUserId,
     setPrompt,
     pinnedPrompts,
     setPinnedPrompts,
-    clearPrompt,
     startNewConversation,
     isPromptsLoaded,
     setIsPromptsLoaded,
   } = useStore(
     useShallow((state) => ({
+      userId: state.userId,
       prompts: state.prompts,
       setPrompts: state.setPrompts,
-      promptUserId: state.promptUserId,
-      setPromptUserId: state.setPromptUserId,
       pinnedPrompts: state.pinnedPrompts,
       setPinnedPrompts: state.setPinnedPrompts,
       setPrompt: state.setPrompt,
-      clearPrompt: state.clearPrompt,
       startNewConversation: state.startNewConversation,
       isPromptsLoaded: state.isPromptsLoaded,
       setIsPromptsLoaded: state.setIsPromptsLoaded,
@@ -44,15 +40,15 @@ export default (loadPrompts?: boolean) => {
 
   const communityPrompts = useMemo(() => {
     return prompts
-      .filter((prompt) => prompt.user_id !== promptUserId && prompt.public)
+      .filter((prompt) => prompt.user_id !== userId && prompt.public)
       .sort((a, b) => (b.public_use_number || 0) - (a.public_use_number || 0))
       .filter((prompt) => prompt.can_trend)
       .slice(0, 10)
-  }, [prompts, promptUserId])
+  }, [prompts, userId])
 
   const myPrompts = useMemo(() => {
-    return prompts.filter((prompt) => prompt.user_id === promptUserId)
-  }, [prompts, promptUserId])
+    return prompts.filter((prompt) => prompt.user_id === userId)
+  }, [prompts, userId])
 
   const refreshPrompts = async () => {
     if (loadPromptsPromise && !loadPrompts) {
@@ -62,17 +58,21 @@ export default (loadPrompts?: boolean) => {
     loadPromptsPromise = new Promise<Prompt[]>(async (resolve) => {
       console.log('Refreshing prompts')
       setLoadingPrompts(true)
+
       const accessToken = await getAccessToken()
       const response = await fetchPrompts(accessToken)
+
       if (response.error) {
         setLoadingPrompts(false)
         resolve([])
         loadPromptsPromise = null
         return
       }
-      setPromptUserId(response.userId)
+
       setPrompts(response.prompts ?? [])
-      await refreshPinnedPrompts(accessToken)
+
+      await refreshPinnedPrompts()
+
       setLoadingPrompts(false)
       setIsPromptsLoaded(true)
       resolve(response.prompts ?? [])
@@ -82,8 +82,8 @@ export default (loadPrompts?: boolean) => {
     return loadPromptsPromise
   }
 
-  const refreshPinnedPrompts = async (accessToken: string) => {
-    const pinned = await fetchPinnedPrompts(accessToken ?? (await getAccessToken()))
+  const refreshPinnedPrompts = async () => {
+    const pinned = await fetchPinnedPrompts(await getAccessToken())
     // @ts-ignore
     if (Array.isArray(pinned)) {
       setPinnedPrompts(pinned ?? [])
@@ -97,7 +97,32 @@ export default (loadPrompts?: boolean) => {
     }
   }
 
-  const selectPrompt = async (prompt: Prompt, isNewConversation?: boolean, pinPrompt?: boolean) => {
+  const getPrompt = async (promptId: string | number) => {
+    let apps: Prompt[] = prompts
+    if (!isPromptsLoaded) {
+      apps = (await refreshPrompts()) ?? []
+    }
+    // @ts-ignore
+    return apps.find((app) => app.id == promptId)
+  }
+
+  const getPromptByExternalId = async (externalId: string) => {
+    let apps: Prompt[] = prompts
+    if (!isPromptsLoaded) {
+      apps = (await refreshPrompts()) ?? []
+    }
+    // @ts-ignore
+    return apps.find((app) => app.external_id == externalId)
+  }
+
+  const selectPrompt = async (promptExternalId: string, isNewConversation?: boolean, pinPrompt?: boolean) => {
+    const prompt = await getPromptByExternalId(promptExternalId)
+
+    if (!prompt) {
+      // TODO: Add some error handling logic here (like a toast)
+      return
+    }
+
     trackEvent('Prompt Apps', {
       action: 'Prompt selected',
       promptName: prompt.name,
@@ -109,41 +134,16 @@ export default (loadPrompts?: boolean) => {
       return
     }
 
-    if (prompt.slug === 'hlchat') {
-      clearPrompt()
-      return
-    }
-
     const accessToken = await getAccessToken()
 
     // Count the prompt view
     countPromptView(prompt.external_id, accessToken)
-
-    // Fetch the prompt
-
-    let text
-
-    if (!prompt.is_handlebar_prompt) {
-      text = await fetchPromptText(prompt.external_id)
-    }
-
-    if (typeof text === 'object' && 'error' in text) {
-      addToast({
-        title: 'Error fetching prompt',
-        description: text.error,
-        type: 'error',
-        timeout: 15000,
-      })
-
-      return
-    }
 
     setPrompt({
       promptApp: prompt,
       promptName: prompt.name,
       promptDescription: prompt.description!,
       promptAppName: prompt.slug!,
-      prompt: text,
     })
 
     if (isNewConversation !== false) {
@@ -164,21 +164,12 @@ export default (loadPrompts?: boolean) => {
 
       try {
         //@ts-expect-error
-        globalThis.highlight.internal.installApp(prompt.slug)
+        globalThis.highlight.internal.reloadPrompts()
       } catch (err) {
         console.error('Error installing app', err)
       }
-      refreshPinnedPrompts(accessToken)
+      refreshPinnedPrompts()
     }
-  }
-
-  const getPrompt = async (promptId: string | number) => {
-    let apps: Prompt[] = prompts
-    if (!isPromptsLoaded) {
-      apps = (await refreshPrompts()) ?? []
-    }
-    // @ts-ignore
-    return apps.find((app) => app.id == promptId)
   }
 
   const getPromptBySlug = async (slug: string) => {
@@ -205,6 +196,7 @@ export default (loadPrompts?: boolean) => {
     pinnedPrompts,
     getPrompt,
     getPromptBySlug,
+    getPromptByExternalId,
     refreshPrompts,
     refreshPinnedPrompts,
     selectPrompt,

@@ -31,7 +31,7 @@ export const useShareConversation = () => {
       }
 
       const data = await response.json()
-      return `https://chat.hl.ing/share/${data.shared_conversation_id}`
+      return `${data.shared_conversation_id}`
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
         console.log('Share conversation request was aborted')

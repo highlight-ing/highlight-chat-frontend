@@ -36,10 +36,11 @@
 .personalPrompts {
   gap: 16px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
 .personalPromptsItem {
+  height: fit-content;
   display: flex;
   padding: 20px;
   flex-direction: column;

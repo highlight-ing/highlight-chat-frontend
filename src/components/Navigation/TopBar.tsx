@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { ChatHistoryItem, TopBarProps } from '@/types'
-import { Add, Clock, ExportCurve, MessageText, Send2 } from 'iconsax-react'
+import { Add, Clock, MessageText, Send2 } from 'iconsax-react'
 import CircleButton from '@/components/CircleButton/CircleButton'
 import Tooltip from '@/components/Tooltip/Tooltip'
 import { useStore } from '@/providers/store-provider'
@@ -15,10 +15,8 @@ import variables from '@/variables.module.scss'
 import { useOpenConverationsPersistence } from '@/hooks/useOpenConverationsPersistence'
 import { useMemo, useState } from 'react'
 import ShareModal from '@/components/ShareModal/ShareModal'
-import { useShareConversation, useDeleteConversation } from '@/hooks/useShareConversation'
 import { trackEvent } from '@/utils/amplitude'
 import { useTabHotkeys } from '@/hooks/useTabHotkeys'
-import Hotkey from '@/components/Hotkey/Hotkey'
 import Button from '@/components/Button/Button'
 import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
 import globalStyles from '@/global.module.scss'
@@ -28,33 +26,25 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
 
   const {
     startNewConversation,
-    // promptName,
-    // openModal,
     promptApp,
-    // promptUserId,
     clearPrompt,
     conversationId,
     openConversations,
     setConversationId,
     setOpenConversations,
     removeOpenConversation,
-    clearConversationMessages,
     history,
     setShareId,
   } = useStore(
     useShallow((state) => ({
       startNewConversation: state.startNewConversation,
-      promptName: state.promptName,
-      openModal: state.openModal,
       promptApp: state.promptApp,
-      promptUserId: state.promptUserId,
       clearPrompt: state.clearPrompt,
       conversationId: state.conversationId,
       openConversations: state.openConversations,
       setConversationId: state.setConversationId,
       setOpenConversations: state.setOpenConversations,
       removeOpenConversation: state.removeOpenConversation,
-      clearConversationMessages: state.clearConversationMessages,
       history: state.history,
       setShareId: state.setShareId,
     })),
@@ -225,12 +215,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
               {!promptApp &&
                 currentConversation?.shared_conversations &&
                 currentConversation.shared_conversations.length > 0 && (
-                  <a
-                    href={`https://chat.hl.ing/share/${currentConversation.shared_conversations[0].id}`}
-                    target={'_blank'}
-                  >
-                    {currentConversation.shared_conversations[0].title}
-                  </a>
+                  <span>{currentConversation.shared_conversations[0].title}</span>
                 )}
               {promptApp ? (
                 <a href={`https://chat.hl.ing/prompts/${promptApp.slug}`} target={'_blank'}>
