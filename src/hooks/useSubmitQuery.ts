@@ -123,6 +123,7 @@ export const useSubmitQuery = () => {
     addConversationMessage,
     updateLastConversationMessage,
     addToast,
+    updateLastMessageSentTimestamp,
   } = useStore(
     useShallow((state) => ({
       getOrCreateConversationId: state.getOrCreateConversationId,
@@ -133,6 +134,7 @@ export const useSubmitQuery = () => {
       addConversationMessage: state.addConversationMessage,
       updateLastConversationMessage: state.updateLastConversationMessage,
       addToast: state.addToast,
+      updateLastMessageSentTimestamp: state.updateLastMessageSentTimestamp,
     })),
   )
 
@@ -253,12 +255,18 @@ export const useSubmitQuery = () => {
             })
           }
         }
-
-        if (fact || (fact && factIndex)) {
+        console.log('incoming from parser factIndex: ', factIndex, 'fact: ', fact)
+        if (typeof factIndex === 'number' && fact) {
           updateLastConversationMessage(conversationId, {
             role: 'assistant',
             content: accumulatedMessage,
             factIndex: factIndex,
+            fact: fact,
+          })
+        } else if (fact) {
+          updateLastConversationMessage(conversationId, {
+            role: 'assistant',
+            content: accumulatedMessage,
             fact: fact,
           })
         }
@@ -403,6 +411,8 @@ export const useSubmitQuery = () => {
       })
 
       setInput('')
+      // This will refresh the 'about me'
+      updateLastMessageSentTimestamp()
       clearAttachments()
 
       const formData = new FormData()
@@ -497,6 +507,7 @@ export const useSubmitQuery = () => {
       })
 
       setInput('')
+      updateLastMessageSentTimestamp()
       clearAttachments()
 
       const accessToken = await getAccessToken()
