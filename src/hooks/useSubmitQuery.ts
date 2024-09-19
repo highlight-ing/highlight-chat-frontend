@@ -250,9 +250,13 @@ export const useSubmitQuery = () => {
       clearAttachments()
 
       // Extract and format attached_context_metadata
-      const attachedContext: AttachedContexts = {}
+      const attachedContext: AttachedContexts = {
+        context: [],
+      }
 
-      const availableContexts: AvailableContexts = {}
+      const availableContexts: AvailableContexts = {
+        context: [],
+      }
 
       // Build FormData using the updated builder
       const formData = await buildFormData({
@@ -288,9 +292,13 @@ export const useSubmitQuery = () => {
       const conversationId = getOrCreateConversationId()
 
       // Extract and format attached_context_metadata
-      const attachedContext: AttachedContexts = {}
+      const attachedContext: AttachedContexts = {
+        context: [],
+      }
 
-      const availableContexts: AvailableContexts = {}
+      const availableContexts: AvailableContexts = {
+        context: [],
+      }
 
       // Build FormData using the updated builder
       const formData = await buildFormData({

@@ -28,13 +28,35 @@ export interface FileAttachmentMetadata {
   type: 'file_attachment'
   words: number
   created_at: Date
-  fileType: string
+  file_type: string
+}
+
+export interface ImageAttachmentMetadata {
+  type: 'image'
+  name: string
+  file_id: string
+}
+
+export interface PDFAttachment {
+  type: 'pdf'
+  name: string
+  file_id: string
 }
 
 // Visible text that has been OCR'ed
 export interface OCRTextAttachment {
   type: 'ocr_text'
   text: string
+}
+
+export interface WindowContentsAttachment {
+  type: 'window_contents'
+  text: string
+}
+
+export interface WindowListAttachment {
+  type: 'window_list'
+  titles: Array<string>
 }
 
 export interface ClipboardTextAttachment {
@@ -47,29 +69,45 @@ export interface AboutMeAttachment {
   text: string
 }
 
+export interface ConversationAttachment {
+  type: 'conversation'
+  title: string
+  text: string
+  started_at: string
+  ended_at: string
+}
+
+export interface ConversationAttachmentMetadata {
+  type: 'conversation'
+  title: string
+  words: number
+  started_at: string
+  ended_at: string
+}
+
 export interface AttachedContexts {
-  context: Array<{
-    id: string
-    type: string
-    title?: string
-    words?: number
-    started_at?: string
-    ended_at?: string
-    name?: string
-    text?: string
-  }>
+  context: Array<
+    | TextFileAttachmentMetadata
+    | FileAttachmentMetadata
+    | ImageAttachmentMetadata
+    | PDFAttachment
+    | OCRTextAttachment
+    | WindowContentsAttachment
+    | WindowListAttachment
+    | ClipboardTextAttachment
+    | AboutMeAttachment
+    | ConversationAttachment
+  >
 }
 
 export interface AvailableContexts {
-  context: Array<{
-    id: string
-    type: string
-    name?: string
-    title?: string
-    words?: number
-    started_at?: string
-    ended_at?: string
-  }>
+  context: Array<
+    | TextFileAttachmentMetadata
+    | FileAttachmentMetadata
+    | ImageAttachmentMetadata
+    | PDFAttachment
+    | ConversationAttachmentMetadata
+  >
 }
 
 export const buildFormData = async ({
