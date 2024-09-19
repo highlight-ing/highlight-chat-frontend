@@ -4,9 +4,10 @@ import { ConversationData } from '@/types/conversations'
 import { useConversations } from '@/context/ConversationContext'
 
 interface ConversationEntryProps {
-  conversation: ConversationData
+  conversation?: ConversationData
   isFirst: boolean
   isLast: boolean
+  isShowMore?: boolean
 }
 
 function getRelativeTimeString(date: Date): string {
@@ -27,13 +28,27 @@ function getRelativeTimeString(date: Date): string {
   }
 }
 
-export function ConversationEntry({ conversation, isFirst, isLast }: ConversationEntryProps) {
+export function ConversationEntry({ conversation, isFirst, isLast, isShowMore = false }: ConversationEntryProps) {
   const { getWordCount } = useConversations()
+  const roundedClasses = isFirst ? 'rounded-t-[20px]' : isLast ? 'rounded-b-[20px]' : ''
+
+  if (isShowMore) {
+    return (
+      <div
+        className={`w-full border-t border-[#0F0F0F] bg-secondary p-6 transition-all duration-300 ease-in-out ${roundedClasses}`}
+      >
+        <div className="flex justify-center">
+          <button className="rounded-[6px] bg-tertiary px-5 py-2 font-medium text-secondary transition-colors duration-200 hover:bg-white/20">
+            Show More
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   const isDefaultTitle = conversation.title.startsWith('Conversation ended at')
   const displayTitle =
     isDefaultTitle || conversation.title === '' ? getRelativeTimeString(conversation.timestamp) : conversation.title
-
-  const roundedClasses = isFirst ? 'rounded-t-[20px]' : isLast ? 'rounded-b-[20px]' : ''
 
   return (
     <div

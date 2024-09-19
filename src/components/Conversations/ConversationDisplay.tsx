@@ -32,13 +32,9 @@ export default function ConversationDisplay({ timeFrame = 'week' }: Conversation
     <div className="mx-auto mt-6 w-full max-w-[800px]">
       <SectionHeader title="Last 6 Hours" />
       {recentConversations.map((conv, index) => (
-        <ConversationEntry
-          key={conv.id}
-          conversation={conv}
-          isFirst={index === 0}
-          isLast={index === recentConversations.length - 1}
-        />
+        <ConversationEntry key={conv.id} conversation={conv} isFirst={index === 0} isLast={false} />
       ))}
+      <ConversationEntry isShowMore={true} isFirst={false} isLast={true} />
     </div>
   )
 }
