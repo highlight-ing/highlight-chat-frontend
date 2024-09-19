@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { ConversationEntry } from './ConversationEntry'
 import { SectionHeader } from './SectionHeader'
 import { useConversations } from '@/context/ConversationContext'
@@ -10,51 +10,33 @@ interface ConversationDisplayProps {
 }
 
 export default function ConversationDisplay({ timeFrame = 'week' }: ConversationDisplayProps) {
-  const { conversations } = useConversations()
+  const { conversations, getWordCount } = useConversations()
+  const [timeThreshold, setTimeThreshold] = useState(new Date())
 
-  const now = new Date()
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-  const timeFrameStart = new Date(todayStart)
+  const updateTimeThreshold = useCallback(() => {
+    const now = new Date()
+    setTimeThreshold(new Date(now.getTime() - 6 * 60 * 60 * 1000))
+  }, [])
 
-  switch (timeFrame) {
-    case 'today':
-      break
-    case 'week':
-      timeFrameStart.setDate(timeFrameStart.getDate() - 7)
-      break
-    case 'two-weeks':
-      timeFrameStart.setDate(timeFrameStart.getDate() - 14)
-      break
-    case 'month':
-      timeFrameStart.setMonth(timeFrameStart.getMonth() - 1)
-      break
-  }
+  useEffect(() => {
+    updateTimeThreshold()
+    const intervalId = setInterval(updateTimeThreshold, 5 * 60 * 1000) // Every 5 minutes
+    return () => clearInterval(intervalId)
+  }, [updateTimeThreshold])
 
-  const todayConversations = conversations.filter((conv) => conv.timestamp >= todayStart)
-
-  const pastConversations = conversations.filter(
-    (conv) => conv.timestamp < todayStart && conv.timestamp >= timeFrameStart,
+  const recentConversations = conversations.filter(
+    (conv) => conv.timestamp >= timeThreshold && getWordCount(conv.transcript) >= 50,
   )
 
   return (
     <div className="mx-auto mt-6 w-full max-w-[800px]">
-      <SectionHeader title="Today" />
-      {todayConversations.map((conv, index) => (
+      <SectionHeader title="Last 6 Hours" />
+      {recentConversations.map((conv, index) => (
         <ConversationEntry
           key={conv.id}
           conversation={conv}
           isFirst={index === 0}
-          isLast={index === todayConversations.length - 1}
-        />
-      ))}
-
-      <SectionHeader title={`Past ${timeFrame === 'today' ? '24 Hours' : '7 Days'}`} />
-      {pastConversations.map((conv, index) => (
-        <ConversationEntry
-          key={conv.id}
-          conversation={conv}
-          isFirst={index === 0}
-          isLast={index === pastConversations.length - 1}
+          isLast={index === recentConversations.length - 1}
         />
       ))}
     </div>

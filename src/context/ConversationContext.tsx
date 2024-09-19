@@ -22,6 +22,7 @@ interface ConversationContextType {
   setAutoClearDays: (days: number) => Promise<void>
   setIsAudioOn: (isOn: boolean) => Promise<void>
   isSaving: boolean
+  getWordCount: (transcript: string) => number
 }
 
 const ConversationContext = createContext<ConversationContextType | undefined>(undefined)
@@ -169,6 +170,10 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     [fetchLatestData],
   )
 
+  const getWordCount = useCallback((transcript: string): number => {
+    return transcript.trim().split(/\s+/).length
+  }, [])
+
   const contextValue: ConversationContextType = {
     conversations,
     currentConversation,
@@ -186,6 +191,7 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setAutoClearDays: Highlight.conversations.setAutoClearDays,
     setIsAudioOn: setIsAudioOnAndSave,
     isSaving,
+    getWordCount,
   }
 
   return <ConversationContext.Provider value={contextValue}>{children}</ConversationContext.Provider>

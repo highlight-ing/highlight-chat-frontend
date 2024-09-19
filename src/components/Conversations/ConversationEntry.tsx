@@ -1,6 +1,7 @@
 import React from 'react'
 import { VoiceSquare } from 'iconsax-react'
 import { ConversationData } from '@/types/conversations'
+import { useConversations } from '@/context/ConversationContext'
 
 interface ConversationEntryProps {
   conversation: ConversationData
@@ -26,11 +27,8 @@ function getRelativeTimeString(date: Date): string {
   }
 }
 
-function getWordCount(transcript: string): number {
-  return transcript.trim().split(/\s+/).length
-}
-
 export function ConversationEntry({ conversation, isFirst, isLast }: ConversationEntryProps) {
+  const { getWordCount } = useConversations()
   const isDefaultTitle = conversation.title.startsWith('Conversation ended at')
   const displayTitle =
     isDefaultTitle || conversation.title === '' ? getRelativeTimeString(conversation.timestamp) : conversation.title
