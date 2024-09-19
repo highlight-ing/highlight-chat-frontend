@@ -1,9 +1,9 @@
 import React from 'react'
-import { VoiceSquare } from 'iconsax-react'
 import { ConversationData } from '@/types/conversations'
 import { useConversations } from '@/context/ConversationContext'
 import Highlight from '@highlight-ai/app-runtime'
 import { EntryAttachment } from './EntryAttachment'
+import { ConversationsIcon } from '@/icons/icons' // Import the new icon
 
 interface ConversationEntryProps {
   conversation?: ConversationData
@@ -71,7 +71,7 @@ export function ConversationEntry({ conversation, isFirst, isLast, isShowMore = 
     >
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <VoiceSquare variant="Bold" size={28} color="#4CEDA0" />
+          <ConversationsIcon width={28} height={28} color="#4D8C6E" />
           <h3 className="text-[16px] font-medium text-white">{displayTitle}</h3>
         </div>
         <button
