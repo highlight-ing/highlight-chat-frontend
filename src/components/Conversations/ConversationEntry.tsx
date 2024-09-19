@@ -2,6 +2,7 @@ import React from 'react'
 import { VoiceSquare } from 'iconsax-react'
 import { ConversationData } from '@/types/conversations'
 import { useConversations } from '@/context/ConversationContext'
+import Highlight from '@highlight-ai/app-runtime'
 
 interface ConversationEntryProps {
   conversation?: ConversationData
@@ -32,13 +33,24 @@ export function ConversationEntry({ conversation, isFirst, isLast, isShowMore = 
   const { getWordCount } = useConversations()
   const roundedClasses = isFirst ? 'rounded-t-[20px]' : isLast ? 'rounded-b-[20px]' : ''
 
+  const handleShowMore = async () => {
+    try {
+      await Highlight.app.openApp('conversations')
+    } catch (error) {
+      console.error('Failed to open conversations app:', error)
+    }
+  }
+
   if (isShowMore) {
     return (
       <div
         className={`w-full border-t border-[#0F0F0F] bg-secondary p-6 transition-all duration-300 ease-in-out ${roundedClasses}`}
       >
         <div className="flex justify-center">
-          <button className="rounded-[6px] bg-tertiary px-5 py-2 font-medium text-secondary transition-colors duration-200 hover:bg-white/20">
+          <button
+            onClick={handleShowMore}
+            className="rounded-[6px] bg-tertiary px-5 py-2 font-medium text-secondary transition-colors duration-200 hover:bg-white/20"
+          >
             Show More
           </button>
         </div>
@@ -46,9 +58,11 @@ export function ConversationEntry({ conversation, isFirst, isLast, isShowMore = 
     )
   }
 
-  const isDefaultTitle = conversation.title.startsWith('Conversation ended at')
+  const isDefaultTitle = conversation?.title.startsWith('Conversation ended at')
   const displayTitle =
-    isDefaultTitle || conversation.title === '' ? getRelativeTimeString(conversation.timestamp) : conversation.title
+    isDefaultTitle || conversation?.title === ''
+      ? getRelativeTimeString(conversation?.timestamp ?? new Date())
+      : conversation?.title
 
   return (
     <div
@@ -70,7 +84,7 @@ export function ConversationEntry({ conversation, isFirst, isLast, isShowMore = 
         <VoiceSquare variant="Linear" size={42} color="#4CEDA0" className="mr-3" />
         <div className="flex flex-col justify-center">
           <span className="font-medium text-secondary">Conversation</span>
-          <span className="text-[12px] text-tertiary">{getWordCount(conversation.transcript)} Words</span>
+          <span className="text-[12px] text-tertiary">{getWordCount(conversation?.transcript ?? '')} Words</span>
         </div>
       </div>
     </div>
