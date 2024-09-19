@@ -80,6 +80,11 @@ export interface SpreadsheetAttachment {
   value: File
 }
 
+export interface ConversationAttachment {
+  type: 'conversation'
+  value: string
+}
+
 export type FileAttachment =
   | PdfAttachment
   | ImageAttachment
@@ -93,9 +98,10 @@ export type Attachment =
   | WindowAttachment
   | FileAttachment
   | WindowContextAttachment
+  | ConversationAttachment
 
 export type FileAttachmentType = 'image' | 'pdf' | 'spreadsheet' | 'text_file'
-export type AttachmentType = 'audio' | 'clipboard' | 'window' | 'window_context' | FileAttachmentType
+export type AttachmentType = 'audio' | 'clipboard' | 'window' | 'window_context' | 'conversation' | FileAttachmentType
 
 export interface ChatHistoryItem {
   app_id?: string | null
