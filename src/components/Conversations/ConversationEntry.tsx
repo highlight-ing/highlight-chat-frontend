@@ -3,6 +3,7 @@ import { VoiceSquare } from 'iconsax-react'
 import { ConversationData } from '@/types/conversations'
 import { useConversations } from '@/context/ConversationContext'
 import Highlight from '@highlight-ai/app-runtime'
+import { EntryAttachment } from './EntryAttachment'
 
 interface ConversationEntryProps {
   conversation?: ConversationData
@@ -80,13 +81,10 @@ export function ConversationEntry({ conversation, isFirst, isLast, isShowMore = 
           Share
         </button>
       </div>
-      <div className="flex max-w-[280px] items-start rounded-[14px] border border-tertiary p-2 text-[14px] text-subtle">
-        <VoiceSquare variant="Linear" size={42} color="#4CEDA0" className="mr-3" />
-        <div className="flex flex-col justify-center">
-          <span className="font-medium text-secondary">Conversation</span>
-          <span className="text-[12px] text-tertiary">{getWordCount(conversation?.transcript ?? '')} Words</span>
-        </div>
-      </div>
+      <EntryAttachment
+        transcript={conversation?.transcript ?? ''}
+        wordCount={getWordCount(conversation?.transcript ?? '')}
+      />
     </div>
   )
 }

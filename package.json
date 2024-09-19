@@ -24,6 +24,7 @@
     "@radix-ui/react-icons": "^1.3.0",
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-switch": "^1.1.0",
+    "@radix-ui/react-tooltip": "^1.1.2",
     "@squircle-js/react": "^1.2.0",
     "@supabase/supabase-js": "^2.44.4",
     "@tailwindcss/line-clamp": "^0.4.4",
