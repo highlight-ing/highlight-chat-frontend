@@ -1,4 +1,5 @@
 import useAuth from '@/hooks/useAuth'
+import { TestChatRequest } from '@/types/newChat'
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080/'
 
@@ -6,7 +7,7 @@ type ApiVersion = 'v3'
 
 interface FetchOptions {
   version?: ApiVersion
-  body?: FormData
+  body?: FormData | TestChatRequest
   method: 'GET' | 'POST' | 'DELETE'
   bearerToken: string
   signal?: AbortSignal
@@ -27,10 +28,11 @@ interface RequestOptions {
 const fetchRequest = async (route: string, { bearerToken, body, version, method, signal }: FetchOptions) => {
   return fetch(`${backendUrl}api/${version ?? 'v3'}/${route}`, {
     method: method,
-    body: body,
     headers: {
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${bearerToken}`,
     },
+    body: body instanceof FormData ? body : JSON.stringify(body),
     signal: signal,
   })
 }
@@ -56,7 +58,7 @@ export const useApi = () => {
     })
   }
 
-  const post = async (route: string, body: FormData, options?: Partial<RequestOptions>) => {
+  const post = async (route: string, body: FormData | TestChatRequest, options?: Partial<RequestOptions>) => {
     const accessToken = await getAccessToken()
     return fetchRequest(route, {
       bearerToken: accessToken,

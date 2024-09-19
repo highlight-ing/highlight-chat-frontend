@@ -1,6 +1,6 @@
 import { Prompt } from '@/types/supabase-helpers'
 import { ColorScheme } from '@/components/PersonalPrompts/customVariables'
-
+import { AttachedContext, AvailableContext } from './newChat'
 type WindowAttachment = {
   type: 'window'
   title: string
@@ -14,17 +14,9 @@ export type BaseMessage = {
 
 export type UserMessage = BaseMessage & {
   role: 'user'
-  context?: string
-  image_url?: string
-  ocr_text?: string
-  clipboard_text?: string
-  screenshot?: string
-  audio?: string
-  window?: WindowAttachment
-  file_title?: string
-  windows?: string[]
-  file_attachments?: Attachment[]
-  window_context?: string
+  content: string
+  attached_context?: AttachedContext
+  available_context?: AvailableContext
   factIndex?: number
   fact?: string
 }

@@ -5,13 +5,21 @@ import { useStore } from '@/providers/store-provider'
 import useAuth from './useAuth'
 import { useApi } from '@/hooks/useApi'
 import { Prompt } from '@/types/supabase-helpers'
-import { FileAttachment, FileAttachmentType, TextFileAttachment } from '@/types'
 import { useShallow } from 'zustand/react/shallow'
 import { useEffect, useRef } from 'react'
 import { parseAndHandleStreamChunk } from '@/utils/streamParser'
 import { trackEvent } from '@/utils/amplitude'
 import * as Sentry from '@sentry/react'
 import { processAttachments } from '@/utils/contextprocessor'
+import {
+  TestChatRequest,
+  AvailableContext,
+  AttachedContext,
+  AttachedConversationList,
+  AttachedConversation,
+  FileAttachment,
+  FileAttachmentList,
+} from '@/types/newChat'
 
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024 // 1MB in bytes
@@ -105,6 +113,12 @@ async function addAttachmentsToFormData(formData: FormData, attachments: any[]) 
   return { screenshot, audio, fileTitle, clipboardText, ocrText, windowContext }
 }
 
+function addAttachmentsToBody(
+  body: TestChatRequest,
+  available_context: AvailableContext,
+  attached_context: AttachedContext,
+) {}
+
 export const useSubmitQuery = () => {
   const { post } = useApi()
 
@@ -179,7 +193,7 @@ export const useSubmitQuery = () => {
 
   const fetchResponse = async (
     conversationId: string,
-    formData: FormData,
+    jsonBody: TestChatRequest,
     token: string,
     isPromptApp: boolean,
     promptApp?: Prompt,
@@ -188,9 +202,7 @@ export const useSubmitQuery = () => {
     const startTime = Date.now()
 
     try {
-      formData.append('conversation_id', conversationId)
-
-      const endpoint = isPromptApp ? 'chat/prompt-as-app' : 'chat/'
+      const endpoint = 'chat/completions'
 
       const abortController = new AbortController()
       abortControllerRef.current = abortController
@@ -201,7 +213,9 @@ export const useSubmitQuery = () => {
         }
       }
 
-      const response = await post(endpoint, formData, { version: 'v3' })
+      const response = await post(endpoint, jsonBody, {
+        version: 'v3',
+      })
       if (!response.ok) {
         throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`)
       }
@@ -346,7 +360,7 @@ export const useSubmitQuery = () => {
 
       // Log request to Amplitude
       trackEvent('HL_CHAT_BACKEND_API_REQUEST', {
-        endpoint: isPromptApp ? 'chat/prompt-as-app' : 'chat/',
+        endpoint: 'chat/completions',
         duration,
         success: !abortControllerRef.current?.signal.aborted,
       })
@@ -395,19 +409,89 @@ export const useSubmitQuery = () => {
       setInputIsDisabled(true)
 
       const fileAttachments = (processedAttachments as FileAttachment[]).filter(
-        (a) => a.type && fileAttachmentTypes.includes(a.type),
+        (a) => a.file_type && fileAttachmentTypes.includes(a.file_type),
       )
 
       const conversationId = getOrCreateConversationId()
       addConversationMessage(conversationId!, {
         role: 'user',
         content: query,
-        clipboard_text: clipboardText,
-        screenshot: screenshotUrl,
-        audio,
-        window: windowTitle ? { title: windowTitle, appIcon: appIcon, type: 'window' } : undefined,
-        windows: windows,
-        file_attachments: fileAttachments as unknown as FileAttachment[],
+        attached_context: {
+          context: [
+            ...(clipboardText
+              ? [
+                  {
+                    type: 'clipboard_text',
+                    id: undefined,
+                    text: clipboardText,
+                  },
+                ]
+              : []),
+            ...(screenshotUrl
+              ? [
+                  {
+                    type: 'screen_image',
+                    id: undefined,
+                    file_type: 'image/png',
+                    base64: screenshotUrl,
+                  },
+                ]
+              : []),
+            ...(audio
+              ? [
+                  {
+                    type: 'conversation',
+                    conversations: [
+                      {
+                        id: Math.random().toString(),
+                        title: 'Audio Transcript',
+                        words: audio.split(/\s+/).length,
+                        transcript: audio,
+                        started_at: new Date().toISOString(),
+                        ended_at: new Date().toISOString(),
+                      },
+                    ],
+                  },
+                ]
+              : []),
+            ...(fileAttachments.length > 0
+              ? [
+                  {
+                    type: 'file_attachment',
+                    attachments: fileAttachments.map((attachment) => ({
+                      id: attachment.id,
+                      file_type: attachment.file_type,
+                      name: attachment.name,
+                      content: attachment.content,
+                      words: attachment.words,
+                      created_at: attachment.created_at,
+                    })),
+                  },
+                ]
+              : []),
+          ],
+        },
+        available_context: {
+          id: undefined,
+          context: [
+            {
+              type: 'window_list',
+              name: windows,
+            },
+            ...(windowTitle
+              ? [
+                  {
+                    type: 'available_conversation' as const,
+                    id: undefined,
+                    title: windowTitle,
+                    words: 0,
+                    started_at: new Date().toISOString(),
+                    ended_at: new Date().toISOString(),
+                  },
+                ]
+              : []),
+          ],
+        },
       })
 
       setInput('')
@@ -415,27 +499,89 @@ export const useSubmitQuery = () => {
       updateLastMessageSentTimestamp()
       clearAttachments()
 
-      const formData = new FormData()
-      formData.append('prompt', query)
-      formData.append('windows', JSON.stringify(windows))
-
-      if (promptApp) {
-        formData.append('app_id', promptApp.external_id)
+      const jsonBody: TestChatRequest = {
+        prompt: query,
+        conversation_id: conversationId,
+        app_id: promptApp?.external_id,
+        attached_context: {
+          context: [],
+        },
+        available_context: {
+          id: undefined,
+          context: [],
+        },
       }
 
       if (aboutMe) {
-        formData.append('about_me', JSON.stringify(aboutMe))
+        jsonBody.attached_context!.context.push({
+          type: 'about_me',
+          id: undefined,
+          text: JSON.stringify(aboutMe),
+        })
       }
 
-      await addAttachmentsToFormData(formData, processedAttachments)
+      jsonBody.available_context!.context.push({
+        type: 'window_list',
+        name: windows,
+      })
 
-      // Add OCR text or raw contents to form data
+      if (screenshotUrl) {
+        jsonBody.attached_context!.context.push({
+          type: 'screen_image',
+          id: undefined,
+          file_type: 'image/png',
+          base64: screenshotUrl,
+        })
+      }
+
+      if (clipboardText) {
+        jsonBody.attached_context!.context.push({
+          type: 'clipboard_text',
+          id: undefined,
+          text: clipboardText,
+        })
+      }
+
       if (contentToUse) {
-        formData.append('ocr_text', contentToUse)
+        jsonBody.attached_context!.context.push({
+          type: 'ocr_text',
+          id: undefined,
+          text: contentToUse,
+        })
+      }
+
+      if (audio) {
+        jsonBody.attached_context!.context.push({
+          type: 'conversation',
+          conversations: [
+            {
+              id: Math.random().toString(),
+              title: 'Audio Transcript',
+              words: audio.split(/\s+/).length,
+              transcript: audio,
+              started_at: new Date().toISOString(),
+              ended_at: new Date().toISOString(),
+            },
+          ],
+        })
+      }
+
+      if (fileAttachments.length > 0) {
+        jsonBody.attached_context!.context.push({
+          type: 'file_attachment',
+          attachments: fileAttachments.map((attachment) => ({
+            id: attachment.id,
+            file_type: attachment.file_type,
+            name: attachment.name,
+            content: attachment.content,
+            words: attachment.words,
+            created_at: attachment.created_at,
+          })),
+        })
       }
 
       const accessToken = await getAccessToken()
-      await fetchResponse(conversationId!, formData, accessToken, !!promptApp, promptApp)
+      await fetchResponse(conversationId!, jsonBody, accessToken, !!promptApp, promptApp)
     }
   }
 
@@ -456,54 +602,66 @@ export const useSubmitQuery = () => {
     try {
       setInputIsDisabled(true)
 
-      const formData = new FormData()
-      formData.append('prompt', query)
+      const jsonBody: TestChatRequest = {
+        prompt: query,
+        conversation_id: getOrCreateConversationId(),
+        app_id: promptApp?.external_id,
+        attached_context: {
+          context: [],
+        },
+        available_context: {
+          id: undefined,
+          context: [],
+        },
+      }
 
-      const isPromptApp = !!promptApp
-
-      if (isPromptApp && promptApp!.external_id !== undefined) {
-        formData.append('app_id', promptApp!.external_id)
+      if (aboutMe) {
+        jsonBody.attached_context!.context.push({
+          type: 'about_me',
+          id: undefined,
+          text: JSON.stringify(aboutMe),
+        })
       }
 
       // Fetch windows information
       await Sentry.startSpan({ name: 'fetchWindows', op: 'function' }, async () => {
         const windows = await fetchWindows()
-        formData.append('windows', JSON.stringify(windows))
+        jsonBody.available_context!.context.push({
+          type: 'window_list',
+          name: windows,
+        })
       })
 
-      if (aboutMe) {
-        formData.append('about_me', JSON.stringify(aboutMe))
-      }
-
-      // TODO(umut): This is a hack to add the context to the form data.
       if (context) {
         if (context.image) {
-          formData.append('screenshot', context.image)
+          jsonBody.attached_context!.context.push({
+            type: 'screen_image',
+            id: undefined,
+            file_type: 'image/png',
+            base64: context.image,
+          })
         }
         if (context.window_context) {
-          formData.append('window_context', context.window_context)
+          jsonBody.attached_context!.context.push({
+            type: 'window_contents',
+            id: undefined,
+            text: context.window_context,
+          })
         }
       }
 
-      const { screenshot, audio, fileTitle, clipboardText, ocrText, windowContext } = await Sentry.startSpan(
-        { name: 'addAttachmentsToFormData', op: 'function' },
-        async () => {
-          return await addAttachmentsToFormData(formData, attachments)
-        },
-      )
+      // Process attachments
+      await Sentry.startSpan({ name: 'processAttachments', op: 'function' }, async () => {
+        for (const attachment of attachments) {
+          // TODO: Add logic to convert each attachment to the appropriate JSON structure
+          // and push it to jsonBody.attached_context!.context
+        }
+      })
 
-      const conversationId = getOrCreateConversationId()
-      addConversationMessage(conversationId!, {
+      addConversationMessage(jsonBody.conversation_id!, {
         role: 'user',
         content: query,
-        screenshot,
-        ocr_text: ocrText,
-        audio,
-        file_title: fileTitle,
-        clipboard_text: clipboardText,
-        windows: await fetchWindows(),
-        window_context: windowContext,
-        file_attachments: attachments.filter((attachment) => attachment.type === 'text_file'),
+        // Add other properties as needed
       })
 
       setInput('')
@@ -511,7 +669,7 @@ export const useSubmitQuery = () => {
       clearAttachments()
 
       const accessToken = await getAccessToken()
-      await fetchResponse(conversationId!, formData, accessToken, isPromptApp, promptApp)
+      await fetchResponse(jsonBody.conversation_id!, jsonBody, accessToken, !!promptApp, promptApp)
     } catch (error) {
       console.error('Error in handleSubmit: ', error)
       Sentry.captureException(error)
