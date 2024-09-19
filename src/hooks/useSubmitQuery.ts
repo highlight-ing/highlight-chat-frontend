@@ -15,10 +15,81 @@ import { buildFormData, FormDataInputs, AttachedContexts, AvailableContexts } fr
 import { trackEvent } from '@/utils/amplitude'
 import { processAttachments } from '@/utils/contextprocessor'
 import { FileAttachment } from '@/types'
+import { useUploadFile } from './useUploadFile'
+import { v4 as uuidv4 } from 'uuid'
+import { Attachment } from '@/types'
+
+// Create a type guard for FileAttachment
+function isFileAttachment(attachment: Attachment): attachment is FileAttachment {
+  return ['pdf', 'spreadsheet', 'text_file', 'image'].includes(attachment.type)
+}
+
+// Import necessary types from formDataUtils
+import {
+  TextFileAttachmentMetadata,
+  FileAttachmentMetadata,
+  ImageAttachmentMetadata,
+  PDFAttachment,
+  WindowContentsAttachment,
+} from '@/utils/formDataUtils'
+
+function createAttachmentMetadata(
+  attachment: FileAttachment,
+  fileId: string,
+):
+  | TextFileAttachmentMetadata
+  | FileAttachmentMetadata
+  | ImageAttachmentMetadata
+  | PDFAttachment
+  | WindowContentsAttachment {
+  switch (attachment.type) {
+    case 'text_file':
+      return {
+        type: 'text_file',
+        name: attachment.fileName || 'Unnamed text file',
+        text: attachment.value,
+        words: attachment.value.split(/\s+/).length,
+        created_at: new Date(),
+      }
+    case 'pdf':
+      return {
+        type: 'pdf',
+        name: 'PDF Document',
+        file_id: fileId,
+      }
+    case 'image':
+      return {
+        type: 'image',
+        file_id: fileId,
+      }
+    case 'spreadsheet':
+      return {
+        type: 'file_attachment',
+        name: 'Spreadsheet',
+        words: 0, // You might want to calculate this
+        created_at: new Date(),
+        file_type: 'spreadsheet',
+      }
+    case 'window_context':
+      return {
+        type: 'window_contents',
+        text: attachment.value,
+      }
+    default:
+      return {
+        type: 'file_attachment',
+        name: 'Unknown file',
+        words: 0,
+        created_at: new Date(),
+        file_type: 'unknown',
+      }
+  }
+}
 
 export const useSubmitQuery = () => {
   const { post } = useApi()
   const { getAccessToken } = useAuth()
+  const { uploadFile } = useUploadFile()
 
   const {
     addAttachment,
@@ -230,9 +301,7 @@ export const useSubmitQuery = () => {
     if (query || clipboardText || contentToUse || screenshotUrl || audio || hasFileAttachment) {
       setInputIsDisabled(true)
 
-      const fileAttachments = processedAttachments.filter((a) =>
-        ['pdf', 'spreadsheet', 'text_file', 'image'].includes(a.type),
-      )
+      const fileAttachments = attachments.filter(isFileAttachment)
 
       const conversationId = getOrCreateConversationId()
       addConversationMessage(conversationId, {
@@ -258,6 +327,37 @@ export const useSubmitQuery = () => {
         context: [],
       }
 
+      // Upload files first
+      const uploadedFiles = await Promise.all(
+        fileAttachments.map(async (attachment) => {
+          const fileName = uuidv4()
+          const file = new File([attachment.value], fileName)
+          const mimeType = file.type || 'application/octet-stream'
+          const uploadedFile = await uploadFile(
+            new File([attachment.value], fileName, { type: mimeType }),
+            conversationId,
+          )
+          return {
+            originalAttachment: attachment,
+            uploadedFile: uploadedFile,
+          }
+        }),
+      )
+
+      // Create a map of original attachments to file IDs
+      const attachmentToFileIdMap = new Map(
+        uploadedFiles.map(({ originalAttachment, uploadedFile }) => [originalAttachment, uploadedFile.file_id]),
+      )
+
+      // Now you can use this map to get the file ID for any file attachment
+      fileAttachments.forEach((attachment) => {
+        const fileId = attachmentToFileIdMap.get(attachment)
+        if (fileId) {
+          attachedContext.context.push(createAttachmentMetadata(attachment, fileId))
+        }
+      })
+
+      availableContexts.context.push({ type: 'image', file_id: attachmentToFileIdMap.get(screenshotUrl) })
       // Build FormData using the updated builder
       const formData = await buildFormData({
         prompt: query,
@@ -291,6 +391,23 @@ export const useSubmitQuery = () => {
 
       const conversationId = getOrCreateConversationId()
 
+      // Upload files first
+      const uploadedFiles = await Promise.all(
+        attachments.filter(isFileAttachment).map(async (attachment) => {
+          const fileName = uuidv4()
+          const file = new File([attachment.value], fileName)
+          const mimeType = file.type || 'application/octet-stream'
+          const uploadedFile = await uploadFile(
+            new File([attachment.value], fileName, { type: mimeType }),
+            conversationId,
+          )
+          return {
+            originalAttachment: attachment,
+            uploadedFile: uploadedFile,
+          }
+        }),
+      )
+
       // Extract and format attached_context_metadata
       const attachedContext: AttachedContexts = {
         context: [],
@@ -307,6 +424,7 @@ export const useSubmitQuery = () => {
         llmProvider: 'anthropic',
         attachedContext,
         availableContexts,
+        fileIds: uploadedFiles.filter(Boolean).map((file) => file.file_id), // Include file IDs
       })
 
       addConversationMessage(conversationId, {

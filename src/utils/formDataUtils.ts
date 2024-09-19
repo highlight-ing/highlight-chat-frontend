@@ -33,7 +33,6 @@ export interface FileAttachmentMetadata {
 
 export interface ImageAttachmentMetadata {
   type: 'image'
-  name: string
   file_id: string
 }
 
@@ -83,6 +82,11 @@ export interface ConversationAttachmentMetadata {
   words: number
   started_at: string
   ended_at: string
+}
+
+export interface SpreadsheetAttachment {
+  type: 'spreadsheet'
+  contents: string
 }
 
 export interface AttachedContexts {
