@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { ConversationData } from '@/types/conversations'
-import Highlight from '@highlight-ai/app-runtime'
+import Highlight, { ConversationData } from '@highlight-ai/app-runtime'
 import { useAudioPermission } from '@/hooks/useAudioPermission'
 
 const POLL_MIC_ACTIVITY = 300

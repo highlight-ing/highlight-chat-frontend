@@ -105,6 +105,7 @@ const config: Config = {
       backgroundColor: {
         primary: '#0F0F0F',
         secondary: '#191919',
+        tertiary: 'rgba(43, 43, 43, 1.0)',
         teal: '#00FAFF',
         'conv-primary': 'rgba(15, 15, 15, 1.0)',
         'conv-secondary': 'rgba(34, 34, 34, 1.0)',

@@ -1,6 +1,5 @@
 import React from 'react'
 import { useConversations } from '@/hooks/useConversations'
-import { ConversationData } from '@/types/conversations'
 import { VoiceSquare } from 'iconsax-react'
 import AnimatedVoiceSquare from './AnimatedVoiceSquare'
 

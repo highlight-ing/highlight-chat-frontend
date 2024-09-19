@@ -21,6 +21,7 @@ import ConversationsActive from '@/components/Conversations/ConversationsActive'
 import AudioTranscriptionComponent from '@/components/Conversations/AudioTranscriptionComponent'
 import { ConversationProvider } from '@/context/ConversationContext'
 import { ConversationsSettingsProvider } from '@/context/ConversationSettingsContext'
+import ConversationDisplay from '@/components/Conversations/ConversationDisplay'
 
 const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
   const [isVisible, setVisible] = useState(isShowing)
@@ -47,7 +48,10 @@ const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
         {isVisible && <Input isActiveChat={false} />}
       </div>
       <ConversationProvider>
-        <AudioTranscriptionComponent />
+        <div className="mx-auto w-full max-w-[800px]">
+          <AudioTranscriptionComponent />
+          <ConversationDisplay />
+        </div>
       </ConversationProvider>
       <Prompts userId={userId} />
     </div>
