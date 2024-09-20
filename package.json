@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@amplitude/analytics-browser": "^2.10.0",
-    "@headlessui/react": "^2.1.2",
+    "@headlessui/react": "^0.0.0-insiders.994303f",
     "@hello-pangea/dnd": "^16.6.0",
     "@highlight-ai/app-runtime": "^0.1.4",
     "@hookform/resolvers": "^3.9.0",
@@ -25,6 +25,9 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-switch": "^1.1.0",
     "@radix-ui/react-tooltip": "^1.1.2",
+    "@sentry/browser": "^8.30.0",
+    "@sentry/nextjs": "^8.30.0",
+    "@sentry/react": "^8.30.0",
     "@squircle-js/react": "^1.2.0",
     "@supabase/supabase-js": "^2.44.4",
     "@tailwindcss/line-clamp": "^0.4.4",

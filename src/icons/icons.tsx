@@ -141,3 +141,31 @@ export const ConversationsIcon = ({ width = 32, height = 32, color = '#4D8C6E' }
     </defs>
   </svg>
 )
+
+export const PersonalizeIcon = ({ size = 24, color = 'white' }: IconPropTypes) => {
+  return (
+    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M8 8.00004C9.84095 8.00004 11.3333 6.50766 11.3333 4.66671C11.3333 2.82576 9.84095 1.33337 8 1.33337C6.15905 1.33337 4.66667 2.82576 4.66667 4.66671C4.66667 6.50766 6.15905 8.00004 8 8.00004Z"
+        stroke={color}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9.42446 12.7632C9.1602 11.9715 9.47251 10.9958 10.3374 10.7238C10.7858 10.5879 11.3464 10.6999 11.6667 11.1237C11.971 10.6839 12.5475 10.5879 12.996 10.7238C13.8608 10.9878 14.1731 11.9715 13.9089 12.7632C13.5005 14.0188 12.0671 14.6666 11.6667 14.6666C11.2663 14.6666 9.84888 14.0268 9.42446 12.7632Z"
+        stroke={color}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M2.27332 14.6667C2.27332 12.0867 4.84 10 8 10"
+        stroke={color}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}

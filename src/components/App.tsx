@@ -18,6 +18,7 @@ import usePromptApps from '@/hooks/usePromptApps'
 import { useChatHistory } from '@/hooks/useChatHistory'
 import { Prompt } from '@/types/supabase-helpers'
 import { processAttachments } from '@/utils/contextprocessor'
+import * as Sentry from '@sentry/react'
 
 function useContextReceivedHandler(navigateToNewChat: () => void) {
   const {
@@ -49,7 +50,7 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
   useEffect(() => {
     const debouncedHandleSubmit = debounce(300, async (context: HighlightContext, promptApp?: Prompt) => {
       setInput(context.suggestion || '')
-      await handleIncomingContext(context, navigateToNewChat, promptApp)
+      await handleIncomingContext(context, promptApp)
     })
 
     const contextDestroyer = Highlight.app.addListener('onContext', async (context: HighlightContext) => {
@@ -60,7 +61,7 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
 
       //@ts-expect-error
       if (context.promptSlug) {
-        // @ts-expect-error
+        //@ts-expect-error
         res = await getPromptAppBySlug(context.promptSlug)
 
         const accessToken = await getAccessToken()
@@ -110,22 +111,22 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
 }
 
 /**
- * Hook that automatically registers the about me data when the app mounts.
+ * Hook that automatically registers the about me data when the app mounts or when a new message is sent.
  */
 function useAboutMeRegister() {
   const setAboutMe = useStore((state) => state.setAboutMe)
+  const lastMessageSentTimestamp = useStore((state) => state.lastMessageSentTimestamp)
 
   useEffect(() => {
     const getAboutMe = async () => {
       const aboutMe = await Highlight.user.getFacts()
+      console.log('About Me:', aboutMe)
       if (aboutMe?.length > 0) {
-        const aboutMeString = aboutMe.join('\n')
-        console.log('About Me:', aboutMeString)
-        setAboutMe(aboutMeString)
+        setAboutMe(aboutMe)
       }
     }
     getAboutMe()
-  }, [])
+  }, [lastMessageSentTimestamp])
 }
 
 /**
@@ -209,7 +210,34 @@ export default function App({ children }: { children: React.ReactNode }) {
       }
     }
 
+    const initializeSentry = async () => {
+      Sentry.init({
+        dsn: 'https://c37160a2ddfdb8148ee3da04c5fb007e@o150878.ingest.us.sentry.io/4507940451516416',
+        integrations: [Sentry.browserTracingIntegration()],
+        // Tracing
+        tracesSampleRate: 1.0, //  Capture 100% of the transactions
+        // Session Replay
+        replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
+        replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
+      })
+      // Get the access token using the useAuth hook
+      const accessToken = await getAccessToken()
+
+      // Decode the token to get the payload
+      const payload = decodeJwt(accessToken)
+
+      // Extract the user ID from the 'sub' field
+      const userId = payload.sub as string
+
+      if (!userId) {
+        throw new Error('User ID not found in token')
+      }
+
+      Sentry.setUser({ id: userId })
+    }
+
     initializeAmplitude()
+    initializeSentry()
   }, [])
 
   useContextReceivedHandler(navigateToNewChat)

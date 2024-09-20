@@ -197,18 +197,21 @@ export type Database = {
       }
       profiles: {
         Row: {
+          added_default_prompts: boolean | null
           created_at: string
           id: number
           user_id: string
           username: string | null
         }
         Insert: {
+          added_default_prompts?: boolean | null
           created_at?: string
           id?: number
           user_id: string
           username?: string | null
         }
         Update: {
+          added_default_prompts?: boolean | null
           created_at?: string
           id?: number
           user_id?: string
@@ -258,6 +261,7 @@ export type Database = {
           image: string | null
           is_handlebar_prompt: boolean
           name: string
+          preferred_attachment: string | null
           prompt_text: string | null
           prompt_url: string | null
           public: boolean
@@ -277,6 +281,7 @@ export type Database = {
           image?: string | null
           is_handlebar_prompt?: boolean
           name: string
+          preferred_attachment?: string | null
           prompt_text?: string | null
           prompt_url?: string | null
           public?: boolean
@@ -296,6 +301,7 @@ export type Database = {
           image?: string | null
           is_handlebar_prompt?: boolean
           name?: string
+          preferred_attachment?: string | null
           prompt_text?: string | null
           prompt_url?: string | null
           public?: boolean

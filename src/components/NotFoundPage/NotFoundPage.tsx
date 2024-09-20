@@ -1,5 +1,3 @@
-import Button from '../Button/Button'
-
 export default function NotFoundPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-bg-layer-1 px-4">

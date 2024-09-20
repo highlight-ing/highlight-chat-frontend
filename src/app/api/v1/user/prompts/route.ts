@@ -1,5 +1,76 @@
 import { authenticateApiUser } from '@/lib/api'
 import { PROMPTS_TABLE_SELECT_FIELDS, promptSelectMapper, supabaseAdmin } from '@/lib/supabase'
+import { nanoid } from 'nanoid'
+import slugify from 'slugify'
+
+async function checkIfDefaultPromptsAdded(userId: string) {
+  const supabase = supabaseAdmin()
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('user_id', userId)
+    .throwOnError()
+    .maybeSingle()
+
+  let hasAddedDefaultPrompts = profile?.added_default_prompts ?? false
+
+  if (hasAddedDefaultPrompts) {
+    return
+  }
+
+  // Update the user's profile
+
+  const { error: updateError } = await supabase.from('profiles').upsert(
+    {
+      user_id: userId,
+      added_default_prompts: true,
+    },
+    {
+      onConflict: 'user_id',
+    },
+  )
+
+  if (updateError) {
+    console.error('Error updating user profile:', updateError)
+  }
+
+  // Select the 4 default prompts
+  const { data: defaultPrompts } = await supabase
+    .from('prompts')
+    .select('*')
+    .in('id', [452, 453, 454, 455])
+    .throwOnError()
+
+  const newPrompts = defaultPrompts?.map(({ id, ...prompt }) => {
+    let slug = slugify(prompt.name, { lower: true })
+
+    slug += '-' + nanoid(12)
+
+    return {
+      ...prompt,
+      slug,
+      external_id: crypto.randomUUID(),
+      can_trend: false,
+      public_use_number: 0,
+      user_id: userId,
+      public: false,
+    }
+  })
+
+  if (!newPrompts) {
+    throw new Error('Error while mapping new prompts.')
+  }
+
+  // Pin the 4 default prompts to the user
+  const { error: insertError } = await supabase.from('prompts').insert(newPrompts)
+
+  if (insertError) {
+    console.error('Error inserting new default prompts:', insertError)
+  }
+
+  return
+}
 
 /**
  * API route that returns all prompts for the calling user (based on the authorization token)
@@ -20,6 +91,9 @@ export async function GET(request: Request) {
   if (!userId) {
     return Response.json({ error: 'Unauthorized, no subject in token' }, { status: 401 })
   }
+
+  // Check if the user has added the default prompts
+  await checkIfDefaultPromptsAdded(userId)
 
   // Select all prompts that the user has added
   const { data: selectResult, error } = await supabase
