@@ -197,7 +197,13 @@ export default (loadPrompts?: boolean) => {
       return prompt
     }
 
-    return getPromptAppBySlug(slug)
+    const result = await getPromptAppBySlug(slug)
+
+    if (result.error) {
+      return null
+    }
+
+    return result.promptApp
   }
 
   useEffect(() => {
