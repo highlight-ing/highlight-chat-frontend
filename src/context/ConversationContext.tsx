@@ -85,13 +85,9 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       },
     )
 
-    const removeSaveConversationListener = Highlight.app.addListener(
-      // @ts-ignore
-      'onConversationSaved',
-      () => {
-        console.log('Saving current conversation')
-      },
-    )
+    const removeSaveConversationListener = Highlight.app.addListener('onConversationSaved', () => {
+      console.log('Saving current conversation')
+    })
 
     const removeConversationSavedListener = Highlight.app.addListener('onConversationSaved', () => {
       setIsSaving(true)
@@ -143,11 +139,12 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, [fetchLatestData])
 
   const pollMicActivity = useCallback(async () => {
-    if (!isAudioPermissionEnabled || !isAudioOn) {
-      setMicActivity(0)
-      return
-    }
+    // if (!isAudioPermissionEnabled || !isAudioOn) {
+    //   setMicActivity(0)
+    //   return
+    // }
     const activity = await Highlight.user.getMicActivity(POLL_MIC_ACTIVITY)
+    console.log('Mic activity:', activity)
     setMicActivity(activity)
   }, [isAudioPermissionEnabled, isAudioOn])
 

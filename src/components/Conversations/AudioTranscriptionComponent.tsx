@@ -12,6 +12,7 @@ const INACTIVE_LINE_COLOR = 'rgba(72, 72, 72, 1)'
 
 export default function AudioTranscriptionComponent() {
   const [audioState, setAudioState] = useState<AudioState>('active')
+  const [visualState, setVisualState] = useState<AudioState>('active')
   const [isOn, setIsOn] = useState(true)
   const { micActivity, elapsedTime, currentConversation, isSaving } = useConversations()
 
@@ -19,14 +20,15 @@ export default function AudioTranscriptionComponent() {
 
   const slowDebounce = useDebouncedCallback(
     (newState: AudioState) => {
-      setAudioState(newState)
+      setVisualState(newState)
     },
-    2500, // 2.5 seconds debounce for going to inactive
+    2500, // 2.5 seconds debounce for visual changes
   )
 
   const fastDebounce = useDebouncedCallback(
     (newState: AudioState) => {
       setAudioState(newState)
+      setVisualState(newState)
     },
     100, // 100ms debounce for going to active
   )
@@ -34,12 +36,14 @@ export default function AudioTranscriptionComponent() {
   const updateAudioState = useCallback(() => {
     if (!isOn) {
       setAudioState('off')
+      setVisualState('off')
       setIsActive(false)
       return
     }
 
     if (isSaving) {
       setAudioState('saving')
+      setVisualState('saving')
       return
     }
 
@@ -48,6 +52,7 @@ export default function AudioTranscriptionComponent() {
       setIsActive(true)
       slowDebounce.cancel() // Cancel any pending slow debounce
     } else {
+      setAudioState('inactive')
       slowDebounce('inactive')
       setIsActive(false)
     }
@@ -91,7 +96,7 @@ export default function AudioTranscriptionComponent() {
     return (
       <>
         <div
-          className={`absolute left-[44px] transition-opacity duration-300 ease-in-out ${audioState === 'active' || audioState === 'saving' ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute left-[44px] transition-opacity duration-300 ease-in-out ${visualState === 'active' || visualState === 'saving' ? 'opacity-100' : 'opacity-0'}`}
         >
           <div className="flex items-center">
             <p className="w-[190px] overflow-hidden text-[16px] font-medium">
@@ -122,7 +127,7 @@ export default function AudioTranscriptionComponent() {
           </div>
         </div>
         <p
-          className={`absolute left-[44px] text-[16px] font-medium text-subtle transition-opacity duration-300 ease-in-out ${audioState === 'inactive' ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute left-[44px] text-[16px] font-medium text-subtle transition-opacity duration-300 ease-in-out ${visualState === 'inactive' ? 'opacity-100' : 'opacity-0'}`}
         >
           No active audio...
         </p>
@@ -144,7 +149,7 @@ export default function AudioTranscriptionComponent() {
     mx-auto flex w-full items-center justify-between rounded-[20px] p-6
     transition-all duration-300 ease-in-out
     ${
-      isActive || (audioState === 'saving' && isActive)
+      visualState === 'active' || visualState === 'saving'
         ? 'border border-conv-green bg-conv-green-20'
         : 'border border-conv-primary bg-conv-primary'
     }
@@ -157,8 +162,8 @@ export default function AudioTranscriptionComponent() {
           width={32}
           height={32}
           backgroundColor="transparent"
-          lineColor={isActive || (audioState === 'saving' && isActive) ? ACTIVE_LINE_COLOR : INACTIVE_LINE_COLOR}
-          shouldAnimate={isActive || (audioState === 'saving' && isActive)}
+          lineColor={visualState === 'active' || visualState === 'saving' ? ACTIVE_LINE_COLOR : INACTIVE_LINE_COLOR}
+          shouldAnimate={visualState === 'active' || visualState === 'saving'}
           transitionDuration={2500}
         />
         {getContent()}
