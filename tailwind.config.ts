@@ -1,7 +1,7 @@
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
-  darkMode: 'selector',
+  darkMode: ['selector', 'class'],
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -81,6 +81,18 @@ const config: Config = {
         'tertiary-70': '#262626',
         'tertiary-100': '#161617',
         'bg-layer-1': '#0f0f0f',
+        'conv-green': 'rgba(76, 237, 160, 1.0)',
+        'conv-green-90': 'rgba(76, 237, 160, 0.9)',
+        'conv-green-80': 'rgba(76, 237, 160, 0.8)',
+        'conv-green-70': 'rgba(76, 237, 160, 0.7)',
+        'conv-green-60': 'rgba(76, 237, 160, 0.6)',
+        'conv-green-50': 'rgba(76, 237, 160, 0.5)',
+        'conv-green-40': 'rgba(76, 237, 160, 0.4)',
+        'conv-green-30': 'rgba(76, 237, 160, 0.3)',
+        'conv-green-20': 'rgba(76, 237, 160, 0.2)',
+        'conv-green-10': 'rgba(76, 237, 160, 0.1)',
+        'conv-white': 'rgba(255, 255, 255, 1.0)',
+        'conv-current-preview': 'rgba(102, 141, 122, 1.0)',
       },
       textColor: {
         primary: '#EEEEEE',
@@ -93,19 +105,35 @@ const config: Config = {
       backgroundColor: {
         primary: '#0F0F0F',
         secondary: '#191919',
+        tertiary: 'rgba(43, 43, 43, 1.0)',
         teal: '#00FAFF',
+        'conv-primary': 'rgba(15, 15, 15, 1.0)',
+        'conv-secondary': 'rgba(34, 34, 34, 1.0)',
+        'conv-tertiary': 'rgba(25, 25, 25, 1.0)',
+        'conv-text-primary': '#EEEEEE',
+        'conv-text-secondary': '#B4B4B4',
+        'conv-text-tertiary': '#6E6E6E',
+        'conv-text-subtle': '#484848',
+        'conv-text-black': '#0F0F0F',
       },
       borderColor: {
         primary: '#00FAFF',
         secondary: '#444444',
         tertiary: '#222222',
+        'conv-primary': 'rgba(34, 34, 34, 1)',
+        'conv-light': 'rgba(255, 255, 255, 1.0)',
       },
       animation: {
         gentleScale: 'gentleScale 0.3s ease-in-out',
       },
+      borderRadius: {
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)',
+      },
     },
   },
-  plugins: [],
+  plugins: [require('tailwindcss-animate')],
   variants: {
     extend: {
       display: ['group-hover'],

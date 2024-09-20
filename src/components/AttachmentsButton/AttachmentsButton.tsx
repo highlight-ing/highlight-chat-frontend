@@ -275,7 +275,7 @@ export const AttachmentsButton = () => {
     {
       divider: true,
     },
-    audioMenuItem,
+    // audioMenuItem,
   ].filter(Boolean) as MenuItemType[]
 
   const acceptTypes =

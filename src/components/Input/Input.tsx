@@ -4,6 +4,7 @@ import { AttachmentsButton } from '../AttachmentsButton/AttachmentsButton'
 import { Attachment as AttachmentType } from '@/types'
 import { useSubmitQuery } from '../../hooks/useSubmitQuery'
 import { useStore } from '@/providers/store-provider'
+import { useInputFocus } from '@/context/InputFocusProvider'
 
 import styles from './chatinput.module.scss'
 import * as React from 'react'
@@ -29,7 +30,8 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   const storeInput = useStore((state) => state.input)
   const [input, setInput] = useState(storeInput ?? '')
 
-  const inputRef = useRef<HTMLTextAreaElement>(null)
+  const { inputRef } = useInputFocus()
+
   const { handleSubmit } = useSubmitQuery()
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

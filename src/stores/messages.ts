@@ -7,7 +7,7 @@ export interface MessagesState {
 
 export type MessagesSlice = MessagesState & {
   addConversationMessage: (conversationId: string, messages: Message) => void
-  updateLastConversationMessage: (conversationId: string, messages: Message) => void
+  updateLastConversationMessage: (conversationId: string, messages: Message, personalization?: boolean) => void
   updateConversationMessages: (conversationId: string, messages: Message[]) => void
   clearConversationMessages: (conversationId: string) => void
   setAllConversationMessages: (conversationMessages: Record<string, Message[]>) => void
@@ -29,7 +29,7 @@ export const createMessagesSlice: StateCreator<MessagesSlice> = (set, get) => ({
     openConversationMessages[conversationId].push(message)
     set({ conversationMessages: openConversationMessages })
   },
-  updateLastConversationMessage: (conversationId, message) => {
+  updateLastConversationMessage: (conversationId, message, personalization) => {
     const openConversationMessages = { ...get().conversationMessages }
     if (!openConversationMessages[conversationId]?.length) {
       return

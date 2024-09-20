@@ -101,6 +101,7 @@ export const useSubmitQuery = () => {
     addConversationMessage,
     updateLastConversationMessage,
     addToast,
+    updateLastMessageSentTimestamp,
     openModal,
     closeModal,
   } = useStore(
@@ -114,6 +115,7 @@ export const useSubmitQuery = () => {
       addConversationMessage: state.addConversationMessage,
       updateLastConversationMessage: state.updateLastConversationMessage,
       addToast: state.addToast,
+      updateLastMessageSentTimestamp: state.updateLastMessageSentTimestamp,
       openModal: state.openModal,
       closeModal: state.closeModal,
     })),
@@ -204,7 +206,10 @@ export const useSubmitQuery = () => {
         }
 
         const chunk = new TextDecoder().decode(value)
-        const { content, windowName } = await parseAndHandleStreamChunk(chunk, {
+
+        checkAbortSignal()
+
+        const { content, windowName, conversation, factIndex, fact } = await parseAndHandleStreamChunk(chunk, {
           showConfirmationModal,
           addToast,
         })
@@ -214,6 +219,40 @@ export const useSubmitQuery = () => {
           updateLastConversationMessage(conversationId, {
             role: 'assistant',
             content: accumulatedMessage,
+          })
+        }
+
+        if (conversation) {
+          const conversation_data = await Highlight.conversations.getConversationById(conversation)
+          if (conversation_data) {
+            addAttachment({
+              type: 'audio',
+              value: conversation_data.transcript,
+              duration: Math.floor(
+                (new Date(conversation_data.endedAt).getTime() - new Date(conversation_data.startedAt).getTime()) /
+                  60000,
+              ),
+            })
+          } else {
+            addToast({
+              title: 'Failed to request Conversation',
+              description: 'We were unable to request conversation with this ID',
+            })
+          }
+        }
+        console.log('incoming from parser factIndex: ', factIndex, 'fact: ', fact)
+        if (typeof factIndex === 'number' && fact) {
+          updateLastConversationMessage(conversationId, {
+            role: 'assistant',
+            content: accumulatedMessage,
+            factIndex: factIndex,
+            fact: fact,
+          })
+        } else if (fact) {
+          updateLastConversationMessage(conversationId, {
+            role: 'assistant',
+            content: accumulatedMessage,
+            fact: fact,
           })
         }
 
@@ -316,6 +355,8 @@ export const useSubmitQuery = () => {
       })
 
       setInput('')
+      // This will refresh the 'about me'
+      updateLastMessageSentTimestamp()
       clearAttachments()
 
       // Extract and format attached_context_metadata
@@ -436,6 +477,7 @@ export const useSubmitQuery = () => {
       })
 
       setInput('')
+      updateLastMessageSentTimestamp()
       clearAttachments()
 
       const accessToken = await getAccessToken()
