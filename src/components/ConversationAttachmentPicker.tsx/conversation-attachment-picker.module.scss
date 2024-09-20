@@ -1,0 +1,13 @@
+@import '@/variables.module';
+
+.iconContainer {
+  display: flex;
+  align-items: center ;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  background-color: $green-20;
+  color: $green-100;
+  border-radius: 10px;
+  border: 1px solid $light-10
+}

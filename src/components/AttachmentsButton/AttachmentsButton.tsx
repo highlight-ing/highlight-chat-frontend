@@ -13,6 +13,8 @@ import * as XLSX from 'xlsx'
 import mammoth from 'mammoth'
 import * as pptxtojson from 'pptxtojson'
 import { trackEvent } from '@/utils/amplitude'
+import { AttachmentPicker } from '../AttachmentPicker/AttachmentPicker'
+import { ConversationAttachmentPicker } from '../ConversationAttachmentPicker.tsx/ConversationAttachmentPicker'
 
 interface AudioDurationProps {
   duration: number
@@ -33,6 +35,7 @@ const AudioDuration = ({ duration, unit, onClick }: AudioDurationProps) => {
 export const AttachmentsButton = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [screenshotPickerVisible, setScreenshotPickerVisible] = useState(false)
+  const [conversationPickerVisible, setConversationPickerVisible] = useState(false)
 
   const { setFileInputRef, addAttachment } = useStore(
     useShallow((state) => ({
@@ -48,12 +51,6 @@ export const AttachmentsButton = () => {
   const handleAttachmentClick = () => {
     fileInputRef?.current?.click()
     trackEvent('HL Chat Attachments Button Clicked', {})
-  }
-
-  const onAddAudio = async (durationInMinutes: number) => {
-    const audio = await Highlight.user.getAudioForDuration(durationInMinutes * 60)
-    addAttachment({ type: 'audio', value: audio, duration: durationInMinutes })
-    trackEvent('HL Chat Attachment Added', { type: 'audio', durationInMinutes })
   }
 
   const readTextFile = async (file: File): Promise<string> => {
@@ -216,34 +213,6 @@ export const AttachmentsButton = () => {
     }
   }
 
-  const audioDurations: { duration: number; unit: 'hours' | 'minutes' }[] = [
-    { duration: 5, unit: 'minutes' },
-    { duration: 30, unit: 'minutes' },
-    { duration: 1, unit: 'hours' },
-    { duration: 2, unit: 'hours' },
-  ]
-
-  const audioMenuItem = {
-    label: (
-      <div className={styles.audioMenuItem}>
-        <div className={styles.menuItem}>
-          <Sound size={20} variant={'Bold'} />
-          Audio Memory
-        </div>
-        <div className={styles.audioDurationsContainer}>
-          {audioDurations.map(({ duration, unit }) => (
-            <AudioDuration
-              key={`${duration}-${unit}`}
-              duration={duration}
-              unit={unit}
-              onClick={async () => await onAddAudio(duration * (unit === 'hours' ? 60 : 1))}
-            />
-          ))}
-        </div>
-      </div>
-    ),
-  }
-
   const menuItems = [
     {
       label: (
@@ -273,9 +242,16 @@ export const AttachmentsButton = () => {
       onClick: onClickScreenshot,
     },
     {
-      divider: true,
+      label: (
+        <div className={styles.menuItem}>
+          <Sound variant="Bold" size={20} />
+          Audio
+        </div>
+      ),
+      onClick: () => {
+        setConversationPickerVisible(true)
+      },
     },
-    // audioMenuItem,
   ].filter(Boolean) as MenuItemType[]
 
   const acceptTypes =
@@ -296,7 +272,10 @@ export const AttachmentsButton = () => {
         {
           // @ts-ignore
           ({ isOpen }) => (
-            <Tooltip tooltip={isOpen || screenshotPickerVisible ? '' : 'Attach files & context'} position={'top'}>
+            <Tooltip
+              tooltip={isOpen || screenshotPickerVisible || conversationPickerVisible ? '' : 'Attach files & context'}
+              position={'top'}
+            >
               <ScreenshotAttachmentPicker
                 isVisible={screenshotPickerVisible}
                 onClose={() => {
@@ -305,6 +284,15 @@ export const AttachmentsButton = () => {
                 }}
                 onBack={openMenu}
               />
+              {conversationPickerVisible && (
+                <ConversationAttachmentPicker
+                  onClose={() => setConversationPickerVisible(false)}
+                  onBack={() => {
+                    setConversationPickerVisible(false)
+                    openMenu()
+                  }}
+                />
+              )}
               <button type="button" className={styles.button} id="attachments-button">
                 <PaperclipIcon />
                 <input
