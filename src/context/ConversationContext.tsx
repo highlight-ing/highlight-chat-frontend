@@ -64,6 +64,7 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       'onConversationsElapsedTimeUpdated',
       (time: number) => {
         if (isAudioOn) {
+          console.log('Updated elapsed time:', time)
           setElapsedTime(time)
         }
       },
@@ -131,9 +132,9 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const autoClearDays = await Highlight.conversations.getAutoClearDays()
       setAutoClearDays(autoClearDays)
 
-      // Load isAudioOn from appStorage
+      // Load isAudioOn from appStorage, default to true if undefined
       const storedIsAudioOn = await Highlight.appStorage.get(AUDIO_ENABLED_KEY)
-      setIsAudioOn(storedIsAudioOn !== null ? storedIsAudioOn : true)
+      setIsAudioOn(storedIsAudioOn === false ? false : true)
     }
     fetchInitialData()
   }, [fetchLatestData])
@@ -144,7 +145,6 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     //   return
     // }
     const activity = await Highlight.user.getMicActivity(POLL_MIC_ACTIVITY)
-    console.log('Mic activity:', activity)
     setMicActivity(activity)
   }, [isAudioPermissionEnabled, isAudioOn])
 

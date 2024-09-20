@@ -13,8 +13,7 @@ const INACTIVE_LINE_COLOR = 'rgba(72, 72, 72, 1)'
 export default function AudioTranscriptionComponent() {
   const [audioState, setAudioState] = useState<AudioState>('active')
   const [visualState, setVisualState] = useState<AudioState>('active')
-  const [isOn, setIsOn] = useState(true)
-  const { micActivity, elapsedTime, currentConversation, isSaving } = useConversations()
+  const { micActivity, elapsedTime, currentConversation, isSaving, isAudioOn, setIsAudioOn } = useConversations()
 
   const [isActive, setIsActive] = useState(false)
 
@@ -34,7 +33,7 @@ export default function AudioTranscriptionComponent() {
   )
 
   const updateAudioState = useCallback(() => {
-    if (!isOn) {
+    if (!isAudioOn) {
       setAudioState('off')
       setVisualState('off')
       setIsActive(false)
@@ -56,15 +55,15 @@ export default function AudioTranscriptionComponent() {
       slowDebounce('inactive')
       setIsActive(false)
     }
-  }, [isOn, micActivity, isSaving, fastDebounce, slowDebounce])
+  }, [isAudioOn, micActivity, isSaving, fastDebounce, slowDebounce])
 
   useEffect(() => {
     updateAudioState()
   }, [updateAudioState])
 
   const handleToggle = () => {
-    const newIsOn = !isOn
-    setIsOn(newIsOn)
+    const newIsOn = !isAudioOn
+    setIsAudioOn(newIsOn)
     setAudioState(newIsOn ? (micActivity > 0 ? 'active' : 'inactive') : 'off')
   }
 
@@ -169,7 +168,7 @@ export default function AudioTranscriptionComponent() {
         {getContent()}
       </div>
       {audioState !== 'noPermissions' ? (
-        <Switch checked={isOn} onCheckedChange={handleToggle} className="data-[state=checked]:bg-conv-green" />
+        <Switch checked={isAudioOn} onCheckedChange={handleToggle} className="data-[state=checked]:bg-conv-green" />
       ) : (
         <EnableConversationsButton onClick={() => setAudioState('inactive')} />
       )}
