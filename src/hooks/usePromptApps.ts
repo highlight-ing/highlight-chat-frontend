@@ -6,6 +6,7 @@ import {
   fetchPinnedPrompts,
   serverGetPromptByExternalId,
   serverGetPromptAppById,
+  getPromptAppBySlug,
 } from '@/utils/prompts'
 import useAuth from '@/hooks/useAuth'
 import { Prompt } from '@/types/supabase-helpers'
@@ -106,6 +107,12 @@ export default (loadPrompts?: boolean) => {
 
   const getPrompt = async (promptId: string | number) => {
     if (typeof promptId === 'number') {
+      // Check if the prompt is already in the local store
+      const prompt = prompts.find((prompt) => prompt.id === promptId)
+      if (prompt) {
+        return prompt
+      }
+
       const { promptApp } = await serverGetPromptAppById(promptId)
       return promptApp
     } else {
@@ -115,8 +122,15 @@ export default (loadPrompts?: boolean) => {
   }
 
   const getPromptByExternalId = async (externalId: string) => {
-    const { prompt } = await serverGetPromptByExternalId(externalId)
-    return prompt
+    // Check if the prompt is already in the local store
+    const prompt = prompts.find((prompt) => prompt.external_id === externalId)
+    if (prompt) {
+      return prompt
+    }
+
+    // If not, fetch it from the server
+    const { prompt: newPrompt } = await serverGetPromptByExternalId(externalId)
+    return newPrompt
   }
 
   const selectPrompt = async (promptExternalId: string, isNewConversation?: boolean, pinPrompt?: boolean) => {
@@ -177,12 +191,19 @@ export default (loadPrompts?: boolean) => {
   }
 
   const getPromptBySlug = async (slug: string) => {
-    let apps: Prompt[] = prompts
-    if (!isPromptsLoaded) {
-      apps = (await refreshPrompts()) ?? []
+    // Check if the prompt is already
+    const prompt = prompts.find((prompt) => prompt.slug === slug)
+    if (prompt) {
+      return prompt
     }
-    // @ts-ignore
-    return apps.find((app) => app.slug == slug)
+
+    const result = await getPromptAppBySlug(slug)
+
+    if (result.error) {
+      return null
+    }
+
+    return result.promptApp
   }
 
   useEffect(() => {
