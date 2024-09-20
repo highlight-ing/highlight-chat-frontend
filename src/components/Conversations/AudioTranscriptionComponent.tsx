@@ -125,7 +125,7 @@ export default function AudioTranscriptionComponent() {
               </span>
             </p>
             {audioState !== 'saving' && (
-              <p className="w-[300px] truncate text-[14px] text-conv-current-preview transition-opacity duration-300 ease-in-out">
+              <p className="w-[400px] truncate text-[14px] text-conv-current-preview transition-opacity duration-300 ease-in-out">
                 {currentConversationPreview}
               </p>
             )}
@@ -141,11 +141,11 @@ export default function AudioTranscriptionComponent() {
         >
           Turn on microphone to transcribe real time audio
         </p>
-        <p
+        {/* <p
           className={`absolute left-[44px] text-[16px] font-medium text-subtle transition-opacity duration-300 ease-in-out ${audioState === 'noPermissions' ? 'opacity-100' : 'opacity-0'}`}
         >
           Magically capture and transcribe audio with Highlight
-        </p>
+        </p> */}
       </>
     )
   }
