@@ -130,5 +130,5 @@ export default function useHandleConversationLoad() {
     }
 
     loadPrompt()
-  }, [conversationId, history, promptApp])
+  }, [conversationId, history])
 }
