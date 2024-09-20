@@ -64,7 +64,6 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       'onConversationsElapsedTimeUpdated',
       (time: number) => {
         if (isAudioOn) {
-          console.log('Updated elapsed time:', time)
           setElapsedTime(time)
         }
       },

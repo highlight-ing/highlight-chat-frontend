@@ -4,6 +4,7 @@ import EnableConversationsButton from './EnableConversationsButton'
 import AnimatedVoiceSquare from './AnimatedVoiceSquare'
 import { useConversations } from '@/context/ConversationContext'
 import { useDebouncedCallback } from 'use-debounce'
+import { Button } from '@/components/ui/button' // Make sure to import the Button component
 
 type AudioState = 'active' | 'inactive' | 'off' | 'noPermissions' | 'saving'
 
@@ -13,7 +14,8 @@ const INACTIVE_LINE_COLOR = 'rgba(72, 72, 72, 1)'
 export default function AudioTranscriptionComponent() {
   const [audioState, setAudioState] = useState<AudioState>('active')
   const [visualState, setVisualState] = useState<AudioState>('active')
-  const { micActivity, elapsedTime, currentConversation, isSaving, isAudioOn, setIsAudioOn } = useConversations()
+  const { micActivity, elapsedTime, currentConversation, isSaving, isAudioOn, setIsAudioOn, saveCurrentConversation } =
+    useConversations()
 
   const [isActive, setIsActive] = useState(false)
 
@@ -65,6 +67,10 @@ export default function AudioTranscriptionComponent() {
     const newIsOn = !isAudioOn
     setIsAudioOn(newIsOn)
     setAudioState(newIsOn ? (micActivity > 0 ? 'active' : 'inactive') : 'off')
+  }
+
+  const handleSave = async () => {
+    await saveCurrentConversation()
   }
 
   const formatElapsedTime = (seconds: number): string => {
@@ -119,7 +125,7 @@ export default function AudioTranscriptionComponent() {
               </span>
             </p>
             {audioState !== 'saving' && (
-              <p className="w-[400px] truncate text-[14px] text-conv-current-preview transition-opacity duration-300 ease-in-out">
+              <p className="w-[300px] truncate text-[14px] text-conv-current-preview transition-opacity duration-300 ease-in-out">
                 {currentConversationPreview}
               </p>
             )}
@@ -167,11 +173,18 @@ export default function AudioTranscriptionComponent() {
         />
         {getContent()}
       </div>
-      {audioState !== 'noPermissions' ? (
-        <Switch checked={isAudioOn} onCheckedChange={handleToggle} className="data-[state=checked]:bg-conv-green" />
-      ) : (
-        <EnableConversationsButton onClick={() => setAudioState('inactive')} />
-      )}
+      <div className="flex items-center gap-2">
+        {(visualState === 'active' || visualState === 'saving') && (
+          <Button onClick={handleSave} disabled={isSaving} className="px-3 py-1 text-sm">
+            {isSaving ? 'Saving...' : 'Save'}
+          </Button>
+        )}
+        {audioState !== 'noPermissions' ? (
+          <Switch checked={isAudioOn} onCheckedChange={handleToggle} className="data-[state=checked]:bg-conv-green" />
+        ) : (
+          <EnableConversationsButton onClick={() => setAudioState('inactive')} />
+        )}
+      </div>
     </div>
   )
 }

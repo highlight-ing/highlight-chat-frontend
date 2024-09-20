@@ -96,6 +96,10 @@ async function addAttachmentsToFormData(formData: FormData, attachments: any[]) 
           windowContext = attachment.value
           formData.append('window_context', attachment.value)
           break
+        case 'conversation':
+          audio = attachment.value
+          formData.append('audio', attachment.value)
+          break
         default:
           console.warn('Unknown attachment type:', attachment.type)
       }
