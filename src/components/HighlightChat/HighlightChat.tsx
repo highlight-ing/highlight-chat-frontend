@@ -18,7 +18,8 @@ import useHandleConversationLoad from '@/hooks/useHandleConversationLoad'
 import { useOnAppOpen } from '@/hooks/useOnAppOpen'
 import { useOnPromptChange } from '@/hooks/useOnPromptChange'
 import useOnExternalMessage from '@/hooks/useOnExternalMessage'
-import { useGetConversationTest } from '@/hooks/useGetConversationTest'
+import { InputFocusProvider } from '@/context/InputFocusProvider'
+
 /**
  * Hook that handles pasting from the clipboard.
  */
@@ -95,22 +96,23 @@ const HighlightChat = () => {
   useOnAppOpen()
   useOnPromptChange()
   useOnExternalMessage()
-  useGetConversationTest()
 
   return (
-    <div className={styles.page}>
-      <History showHistory={showHistory} setShowHistory={setShowHistory} />
-      <TopBar showHistory={showHistory} setShowHistory={setShowHistory} />
-      <div
-        className={`${styles.contents} ${showHistory ? styles.partial : styles.full} ${messages.length > 0 || inputIsDisabled || !!promptApp ? styles.justifyEnd : ''}`}
-      >
-        <ChatHeader isShowing={!isConversationLoading && !!promptApp && messages.length === 0} />
-        {(isChatting || (isConversationLoading && messages.length > 0)) && <Messages />}
-        {isConversationLoading && messages.length === 0 && !inputIsDisabled && <MessagesPlaceholder />}
-        <ChatHome isShowing={!isChatting && !promptApp && !isConversationLoading} />
-        {(isChatting || promptApp) && <Input isActiveChat={true} />}
+    <InputFocusProvider>
+      <div className={styles.page}>
+        <History showHistory={showHistory} setShowHistory={setShowHistory} />
+        <TopBar showHistory={showHistory} setShowHistory={setShowHistory} />
+        <div
+          className={`${styles.contents} ${showHistory ? styles.partial : styles.full} ${messages.length > 0 || inputIsDisabled || !!promptApp ? styles.justifyEnd : ''}`}
+        >
+          <ChatHeader isShowing={!isConversationLoading && !!promptApp && messages.length === 0} />
+          {(isChatting || (isConversationLoading && messages.length > 0)) && <Messages />}
+          {isConversationLoading && messages.length === 0 && !inputIsDisabled && <MessagesPlaceholder />}
+          <ChatHome isShowing={!isChatting && !promptApp && !isConversationLoading} />
+          {(isChatting || promptApp) && <Input isActiveChat={true} />}
+        </div>
       </div>
-    </div>
+    </InputFocusProvider>
   )
 }
 

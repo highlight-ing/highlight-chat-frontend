@@ -7,6 +7,7 @@ import { AttachmentType } from '@/types'
 import { useImageDownload } from '@/hooks/useImageDownload'
 import { trackEvent } from '@/utils/amplitude'
 import { useShallow } from 'zustand/react/shallow'
+import { VoiceSquare } from 'iconsax-react'
 
 interface BaseAttachmentProps {
   removeEnabled?: boolean
@@ -133,6 +134,12 @@ export const Attachment = ({
           <div className="align-center flex w-full justify-center gap-2 p-2">
             <DocumentText1 className="min-w-5 text-white" />
             <span className="inline-block max-w-40 truncate align-middle text-sm text-white">{value}</span>
+          </div>
+        )
+      case 'conversation':
+        return (
+          <div className="align-center flex w-full justify-center gap-2 p-2">
+            <VoiceSquare className="min-w-5 text-conv-green" />
           </div>
         )
       default:
