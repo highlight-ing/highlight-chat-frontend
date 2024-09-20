@@ -1,5 +1,12 @@
 import { useStore } from '@/providers/store-provider'
-import { addPromptToUser, countPromptView, fetchPrompts, fetchPinnedPrompts } from '@/utils/prompts'
+import {
+  addPromptToUser,
+  countPromptView,
+  fetchPrompts,
+  fetchPinnedPrompts,
+  serverGetPromptByExternalId,
+  serverGetPromptAppById,
+} from '@/utils/prompts'
 import useAuth from '@/hooks/useAuth'
 import { Prompt } from '@/types/supabase-helpers'
 import { useShallow } from 'zustand/react/shallow'
@@ -98,21 +105,18 @@ export default (loadPrompts?: boolean) => {
   }
 
   const getPrompt = async (promptId: string | number) => {
-    let apps: Prompt[] = prompts
-    if (!isPromptsLoaded) {
-      apps = (await refreshPrompts()) ?? []
+    if (typeof promptId === 'number') {
+      const { promptApp } = await serverGetPromptAppById(promptId)
+      return promptApp
+    } else {
+      const { prompt } = await serverGetPromptByExternalId(promptId)
+      return prompt
     }
-    // @ts-ignore
-    return apps.find((app) => app.id == promptId)
   }
 
   const getPromptByExternalId = async (externalId: string) => {
-    let apps: Prompt[] = prompts
-    if (!isPromptsLoaded) {
-      apps = (await refreshPrompts()) ?? []
-    }
-    // @ts-ignore
-    return apps.find((app) => app.external_id == externalId)
+    const { prompt } = await serverGetPromptByExternalId(externalId)
+    return prompt
   }
 
   const selectPrompt = async (promptExternalId: string, isNewConversation?: boolean, pinPrompt?: boolean) => {
