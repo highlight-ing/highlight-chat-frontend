@@ -28,13 +28,24 @@ export default function ConversationDisplay({ timeFrame = 'week' }: Conversation
     (conv) => conv.timestamp >= timeThreshold && getWordCount(conv.transcript) >= 50,
   )
 
+  const hasRecentConversations = recentConversations.length > 0
+
   return (
     <div className="mx-auto mt-6 w-full max-w-[800px]">
-      <SectionHeader title="Last 6 Hours" />
-      {recentConversations.map((conv, index) => (
-        <ConversationEntry key={conv.id} conversation={conv} isFirst={index === 0} isLast={false} />
-      ))}
-      <ConversationEntry isShowMore={true} isFirst={false} isLast={true} />
+      <SectionHeader title={hasRecentConversations ? 'Last 6 Hours' : 'No Conversations'} />
+      {hasRecentConversations && (
+        <>
+          {recentConversations.map((conv, index) => (
+            <ConversationEntry
+              key={conv.id}
+              conversation={conv}
+              isFirst={index === 0}
+              isLast={index === recentConversations.length - 1}
+            />
+          ))}
+          <ConversationEntry isShowMore={true} isFirst={false} isLast={true} />
+        </>
+      )}
     </div>
   )
 }

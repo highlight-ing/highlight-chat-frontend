@@ -37,7 +37,8 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [isAudioOn, setIsAudioOn] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
 
-  const isAudioPermissionEnabled = useAudioPermission()
+  const { isAudioPermissionEnabled, toggleAudioPermission, audioTranscriptState, checkAudioPermission } =
+    useAudioPermission()
 
   const setupListeners = useCallback(() => {
     const removeCurrentConversationListener = Highlight.app.addListener(
@@ -116,7 +117,8 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const fetchLatestData = useCallback(async () => {
     const allConversations = await Highlight.conversations.getAllConversations()
-    setConversations(allConversations)
+    // setConversations(allConversations)
+    setConversations([])
     const currentConv = await Highlight.conversations.getCurrentConversation()
     setCurrentConversation(currentConv)
     const elapsedTime = await Highlight.conversations.getElapsedTime()
@@ -131,12 +133,17 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const autoClearDays = await Highlight.conversations.getAutoClearDays()
       setAutoClearDays(autoClearDays)
 
-      // Load isAudioOn from appStorage, default to true if undefined
-      const storedIsAudioOn = await Highlight.appStorage.get(AUDIO_ENABLED_KEY)
-      setIsAudioOn(storedIsAudioOn === false ? false : true)
+      // Check audio permission
+      await checkAudioPermission()
+
+      // Load isAudioOn from appStorage, but only if not locked
+      if (audioTranscriptState !== 'locked') {
+        const storedIsAudioOn = await Highlight.appStorage.get(AUDIO_ENABLED_KEY)
+        setIsAudioOn(storedIsAudioOn === false ? false : true)
+      }
     }
     fetchInitialData()
-  }, [fetchLatestData])
+  }, [fetchLatestData, audioTranscriptState, checkAudioPermission])
 
   const pollMicActivity = useCallback(async () => {
     // if (!isAudioPermissionEnabled || !isAudioOn) {
@@ -154,8 +161,15 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const setIsAudioOnAndSave = useCallback(
     async (isOn: boolean) => {
+      if (audioTranscriptState === 'locked') {
+        console.warn('Cannot change audio state when locked')
+        return
+      }
+
+      await toggleAudioPermission(isOn)
       setIsAudioOn(isOn)
       await Highlight.appStorage.set(AUDIO_ENABLED_KEY, isOn)
+
       if (isOn) {
         await fetchLatestData()
       } else {
@@ -163,7 +177,7 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         setElapsedTime(0)
       }
     },
-    [fetchLatestData],
+    [fetchLatestData, audioTranscriptState, toggleAudioPermission],
   )
 
   const getWordCount = useCallback((transcript: string): number => {

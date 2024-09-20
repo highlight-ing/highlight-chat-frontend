@@ -12,9 +12,6 @@ import { useShallow } from 'zustand/react/shallow'
 import { trackEvent } from '@/utils/amplitude'
 import PersonalPrompts from '@/components/PersonalPrompts/PersonalPrompts'
 import TrendingPrompts from '@/components/TrendingPrompts/TrendingPrompts'
-import AudioTranscriptionComponent from '@/components/Conversations/AudioTranscriptionComponent'
-import { ConversationProvider } from '@/context/ConversationContext'
-import ConversationDisplay from '@/components/Conversations/ConversationDisplay'
 import Button from '../Button/Button'
 import { supabaseLoader } from '@/lib/supabase'
 import Image from 'next/image'
@@ -44,12 +41,6 @@ const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
         <InputHeading />
         {isVisible && <Input isActiveChat={false} />}
       </div>
-      <ConversationProvider>
-        <div className="mx-auto w-full max-w-[800px]">
-          <AudioTranscriptionComponent />
-          <ConversationDisplay />
-        </div>
-      </ConversationProvider>
       <Prompts userId={userId} />
     </div>
   )
