@@ -74,12 +74,12 @@ export function ConversationEntry({ conversation, isFirst, isLast, isShowMore = 
           <ConversationsIcon width={28} height={28} color="#4D8C6E" />
           <h3 className="text-[16px] font-medium text-white">{displayTitle}</h3>
         </div>
-        <button
+        {/* <button
           onClick={() => {}}
           className="rounded-[6px] bg-tertiary px-5 py-1 font-[13px] text-secondary transition-colors duration-200 hover:bg-white/20"
         >
           Share
-        </button>
+        </button> */}
       </div>
       <EntryAttachment
         transcript={conversation?.transcript ?? ''}
