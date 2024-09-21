@@ -19,7 +19,7 @@ export default function ConversationSimple() {
       await Highlight.app.openApp('conversations')
     } catch (error) {
       console.error('Failed to open conversations app:', error)
-      // You can add additional error handling here, such as showing a user-friendly error message
+      window.location.href = 'highlight://app/conversations'
     }
   }
 
