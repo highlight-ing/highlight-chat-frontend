@@ -60,7 +60,10 @@ export default function PinPromptModal({ id, context }: ModalObjectProps) {
         onClick: () => closeModal(id),
       }}
     >
-      <div>Pinning this action will add it to your pinned actions.</div>
+      <div>
+        By pinning this action, you'll have quick access to it whenever you summon Highlight. Pinned actions appear
+        prominently in your assistant, making them easily accessible for frequent use.
+      </div>
     </ConfirmationModal>
   )
 }
