@@ -40,8 +40,7 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [isAudioTranscripEnabled, setIsAudioTranscripEnabled] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
 
-  const { isAudioPermissionEnabled, toggleAudioPermission, audioTranscriptState, checkAudioPermission } =
-    useAudioPermission()
+  const { isAudioPermissionEnabled, toggleAudioPermission } = useAudioPermission()
 
   const setupListeners = useCallback(() => {
     const removeCurrentConversationListener = Highlight.app.addListener(
@@ -159,9 +158,10 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         const storedIsAudioOn = await Highlight.appStorage.get(AUDIO_ENABLED_KEY)
         setIsAudioOn(storedIsAudioOn)
       }
+
     }
     fetchInitialData()
-  }, [fetchLatestData, audioTranscriptState, checkAudioPermission])
+  }, [fetchLatestData])
 
   const pollMicActivity = useCallback(async () => {
     // if (!isAudioPermissionEnabled || !isAudioOn) {
@@ -179,11 +179,6 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const setIsAudioOnAndSave = useCallback(
     async (isOn: boolean) => {
-      if (audioTranscriptState === 'locked') {
-        console.warn('Cannot change audio state when locked')
-        return
-      }
-
       await toggleAudioPermission(isOn)
       setIsAudioOn(isOn)
       await Highlight.appStorage.set(AUDIO_ENABLED_KEY, isOn)
@@ -195,7 +190,7 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         setElapsedTime(0)
       }
     },
-    [fetchLatestData, audioTranscriptState, toggleAudioPermission],
+    [fetchLatestData, toggleAudioPermission],
   )
 
   const getWordCount = useCallback((transcript: string): number => {

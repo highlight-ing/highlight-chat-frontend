@@ -16,6 +16,7 @@ import Button from '../Button/Button'
 import { supabaseLoader } from '@/lib/supabase'
 import Image from 'next/image'
 import { Prompt } from '@/types/supabase-helpers'
+import ConversationSimple from '@/components/Conversations/ConversationSimple'
 
 const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
   const [isVisible, setVisible] = useState(isShowing)
@@ -40,6 +41,9 @@ const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
       <div className={styles.input}>
         <InputHeading />
         {isVisible && <Input isActiveChat={false} />}
+      </div>
+      <div className="">
+        <ConversationSimple />
       </div>
       <Prompts userId={userId} />
     </div>
