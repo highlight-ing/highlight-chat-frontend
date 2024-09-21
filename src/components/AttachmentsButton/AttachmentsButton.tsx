@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { ClipboardText, DocumentUpload, GalleryAdd, Sound } from 'iconsax-react'
+import { ClipboardText, DocumentUpload, GalleryAdd, VoiceSquare } from 'iconsax-react'
 import Highlight from '@highlight-ai/app-runtime'
 import { PaperclipIcon } from '@/icons/icons'
 import ContextMenu, { MenuItemType } from '../ContextMenu/ContextMenu'
 import { useStore } from '@/providers/store-provider'
-import { getDurationUnit } from '@/utils/string'
 import { ScreenshotAttachmentPicker } from '../ScreenshotAttachmentPicker/ScrenshotAttachmentPicker'
 import { useShallow } from 'zustand/react/shallow'
 import styles from './attachments-button.module.scss'
@@ -13,24 +12,7 @@ import * as XLSX from 'xlsx'
 import mammoth from 'mammoth'
 import * as pptxtojson from 'pptxtojson'
 import { trackEvent } from '@/utils/amplitude'
-import { AttachmentPicker } from '../AttachmentPicker/AttachmentPicker'
 import { ConversationAttachmentPicker } from '../ConversationAttachmentPicker.tsx/ConversationAttachmentPicker'
-
-interface AudioDurationProps {
-  duration: number
-  unit: 'hours' | 'minutes'
-  onClick?: () => void
-}
-
-const AudioDuration = ({ duration, unit, onClick }: AudioDurationProps) => {
-  const unitLabel = getDurationUnit(duration, unit, true)
-
-  return (
-    <div className={styles.audioDurationContainer} onClick={onClick}>
-      {duration} {unitLabel}
-    </div>
-  )
-}
 
 export const AttachmentsButton = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -217,7 +199,9 @@ export const AttachmentsButton = () => {
     {
       label: (
         <div className={styles.menuItem}>
-          <DocumentUpload size={20} variant={'Bold'} />
+          <div className={styles.iconWrapper}>
+            <DocumentUpload size={20} variant={'Bold'} />
+          </div>
           Upload from computer
         </div>
       ),
@@ -226,7 +210,9 @@ export const AttachmentsButton = () => {
     {
       label: (
         <div className={styles.menuItem}>
-          <ClipboardText size={20} variant={'Bold'} />
+          <div className={styles.iconWrapper}>
+            <ClipboardText size={20} variant={'Bold'} />
+          </div>
           Clipboard
         </div>
       ),
@@ -235,7 +221,9 @@ export const AttachmentsButton = () => {
     {
       label: (
         <div className={styles.menuItem}>
-          <GalleryAdd variant="Bold" size={20} />
+          <div className={styles.iconWrapper}>
+            <GalleryAdd variant="Bold" size={20} />
+          </div>
           Screenshot
         </div>
       ),
@@ -244,8 +232,10 @@ export const AttachmentsButton = () => {
     {
       label: (
         <div className={styles.menuItem}>
-          <Sound variant="Bold" size={20} />
-          Audio
+          <div className={styles.audioMenuItem}>
+            <VoiceSquare variant="Bold" size={20} />
+          </div>
+          Conversation
         </div>
       ),
       onClick: () => {

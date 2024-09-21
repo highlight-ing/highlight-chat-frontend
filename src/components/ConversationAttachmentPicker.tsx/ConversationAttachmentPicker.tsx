@@ -3,7 +3,9 @@ import { AttachmentPicker } from '../AttachmentPicker/AttachmentPicker'
 import { getTimeAgo, getWordCount } from '@/utils/string'
 import { getConversationDisplayTitle } from '@/utils/conversations'
 import styles from './conversation-attachment-picker.module.scss'
-import { VoiceSquare } from 'iconsax-react'
+import { Setting2, VoiceSquare } from 'iconsax-react'
+import { useStore } from '@/providers/store-provider'
+import { useShallow } from 'zustand/react/shallow'
 
 interface ConversationAttachmentPickerProps {
   onClose: () => void
@@ -13,34 +15,27 @@ interface ConversationAttachmentPickerProps {
 const MAX_NUM_CONVERSATION = 10
 
 export const ConversationAttachmentPicker = ({ onClose, onBack }: ConversationAttachmentPickerProps) => {
-  const { conversations, elapsedTime, currentConversation } = useConversations()
-
+  const { conversations, elapsedTime, currentConversation, isAudioTranscripEnabled, setIsAudioTranscriptEnabled } =
+    useConversations()
   const currentConversationTitle = 'Current Conversation'
   const currentConversationTimestamp = new Date(Date.now() - elapsedTime * 1000)
 
+  const { addAttachment } = useStore(
+    useShallow((state) => ({
+      addAttachment: state.addAttachment,
+    })),
+  )
+
   const currentConversationOptions = {
     imageComponent: (
-      <div />
-      // <IconContainer>
-      //   <VoiceSquare size={20} variant="Bold" />
-      // </IconContainer>
+      <div className={styles.iconContainer}>
+        <VoiceSquare size={20} variant="Bold" />
+      </div>
     ),
     title: currentConversationTitle,
     description: `Started ${getTimeAgo(currentConversationTimestamp)} | ${getWordCount(currentConversation)} Words`,
     onClick: () => {
-      // const attachment: ConversationAttachment = {
-      //   type: 'conversation',
-      //   value: currentTranscript,
-      //   timestamp: currentConversationTimestamp,
-      //   title: currentConversationTitle,
-      // }
-
-      // if (attachmentType === 'primary') {
-      //   updatePrimaryAttachment(attachment)
-      // } else {
-      //   addAttachment(attachment)
-      // }
-
+      addAttachment({ type: 'conversation', value: currentConversation })
       onClose()
     },
   }
@@ -57,55 +52,42 @@ export const ConversationAttachmentPicker = ({ onClose, onBack }: ConversationAt
       title: getConversationDisplayTitle(conversation),
       description: `${getWordCount(conversation.transcript)} Words`,
       onClick: () => {
-        // const attachment: ConversationAttachment = {
-        //   type: 'conversation',
-        //   value: conversation.transcript,
-        //   timestamp: conversation.timestamp,
-        //   title: getConversationDisplayTitle(conversation),
-        // }
-
-        // if (attachmentType === 'primary') {
-        //   updatePrimaryAttachment(attachment)
-        // } else {
-        //   addAttachment(attachment)
-        // }
-
+        addAttachment({
+          type: 'conversation',
+          value: conversation.transcript,
+        })
         onClose()
       },
     }))
 
   const enableAudioTranscriptOption = {
-    imageComponent: <div />,
-    // <IconContainer>
-    //   <Setting2 size={20} variant="Bold" />
-    // </IconContainer>
+    imageComponent: (
+      <div className={styles.iconContainer}>
+        <Setting2 size={20} variant="Bold" />
+      </div>
+    ),
     title: 'Enable Audio Transcript',
     description: 'Allow Highlight to transcribe your audio',
     onClick: () => {
-      // setAudioTranscriptPermission('attach')
+      setIsAudioTranscriptEnabled(true)
       onClose()
     },
   }
 
-  // const noConversationsOption = {
-  //   imageComponent: <Placeholder />,
-  //   title: formatMessage({ id: 'attachment-dropdown-no-conversations', defaultMessage: 'No conversations yet' }),
-  //   description: formatMessage({
-  //     id: 'attachment-dropdown-no-conversations-description',
-  //     defaultMessage: 'Transcribing...',
-  //   }),
-  //   onClick: onClose,
-  // }
+  const noConversationsOption = {
+    imageComponent: <div className={styles.placeholder} />,
+    title: 'No conversations yet',
+    description: 'Transcribing...',
+    onClick: onClose,
+  }
 
-  // const attachmentOptions = !microphoneAccess
-  //   ? [enableMicrophoneOption]
-  //   : !canDetectAudio
-  //     ? [enableAudioTranscriptOption, ...options]
-  //     : currentTranscript.length > 0
-  //       ? [currentConversationOptions, ...options]
-  //       : options.length > 0
-  //         ? options
-  //         : [noConversationsOption]
+  const attachmentOptions = !isAudioTranscripEnabled
+    ? [enableAudioTranscriptOption, ...options]
+    : currentConversation.length > 0
+      ? [currentConversationOptions, ...options]
+      : options.length > 0
+        ? options
+        : [noConversationsOption]
 
   return (
     <AttachmentPicker
@@ -113,7 +95,7 @@ export const ConversationAttachmentPicker = ({ onClose, onBack }: ConversationAt
       onBack={onBack}
       onClose={onClose}
       isVisible={true}
-      attachmentOptions={options}
+      attachmentOptions={attachmentOptions}
     />
   )
 }
