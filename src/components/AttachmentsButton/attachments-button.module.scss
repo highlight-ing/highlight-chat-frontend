@@ -6,10 +6,23 @@
   align-items: center;
 }
 
+.iconWrapper {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .audioMenuItem {
   display: flex;
-  gap: 8px;
-  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: $green-20;
+  color: $green-100;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
 }
 
 .audioDurationsContainer {

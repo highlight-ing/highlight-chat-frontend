@@ -8,6 +8,7 @@
   border-radius: 15px;
   padding: 8px;
   max-height: 500px;
+  width: 280px;
 }
 
 .header {
@@ -48,27 +49,27 @@
   overflow-y: auto;
 }
 
-.screenshotContainer {
-  display: flex;
-  align-items: center;
+.row {
+  display: flex ;
   padding: 7px 16px 7px 5px;
   cursor: pointer;
   gap: 10px;
   font-size: 16px;
   text-wrap: nowrap;
-  cursor: pointer;
   border-radius: 14px;
-  border: 1px solid $border-tertiary;
+  border:1px solid $border-tertiary;
   width: 100%;
-  max-width: 250px;
 
   &:hover {
     background-color: $background-hover;
   }
+}
 
-  &:hover {
-    opacity: 1;
-  }
+.textContainer {
+  max-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .title {
@@ -79,4 +80,11 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.description {
+  font-size: 10px;
+  font-weight: 350;
+  color: $text-tertiary;
+  line-height: 16px;
 }
