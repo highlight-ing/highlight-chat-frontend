@@ -150,14 +150,9 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const autoClearDays = await Highlight.conversations.getAutoClearDays()
       setAutoClearDays(autoClearDays)
 
-      // Check audio permission
-      await checkAudioPermission()
-
       // Load isAudioOn from appStorage, but only if not locked
-      if (audioTranscriptState !== 'locked') {
         const storedIsAudioOn = await Highlight.appStorage.get(AUDIO_ENABLED_KEY)
         setIsAudioOn(storedIsAudioOn)
-      }
 
     }
     fetchInitialData()
