@@ -1,61 +1,43 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import Highlight from '@highlight-ai/app-runtime'
 
-type AudioTranscriptState = 'attach' | 'detect' | 'locked'
-
-const POLL_INTERVAL = 500 // 500ms
+export const addAudioPermissionListener = (listener: (event: 'locked' | 'detect' | 'attach') => void): (() => void) => {
+  // @ts-ignore
+  globalThis.highlight?.internal?.requestAudioPermissionEvents()
+  return Highlight.app.addListener('onAudioPermissionUpdate', listener)
+}
 
 export const useAudioPermission = () => {
-  const [audioTranscriptState, setAudioTranscriptState] = useState<AudioTranscriptState>('detect')
   const [isAudioPermissionEnabled, setIsAudioPermissionEnabled] = useState<boolean>(false)
 
-  const checkAudioPermission = useCallback(async () => {
-    // console.log('Checking audio permission...') // Log when check starts
-    // try {
-    //   const isEnabled = await window.highlight.internal.isAudioTranscriptEnabled()
-    //   console.log('Audio permission check result:', isEnabled) // Log the result
-    //   setAudioTranscriptState(isEnabled ? 'attach' : 'detect')
-    //   setIsAudioPermissionEnabled(isEnabled)
-    // } catch (error) {
-    //   console.error('Error checking audio permission:', error)
-    //   setIsAudioPermissionEnabled(false)
-    // }
-  }, [])
+  const toggleAudioPermission = async (enable: boolean) => {
+    // @ts-ignore
+    globalThis.highlight?.internal?.setAudioTranscriptEnabled(enable)
+  }
 
   useEffect(() => {
-    // console.log('Setting up audio permission polling') // Log when effect runs
-    // checkAudioPermission() // Initial check
-    // const intervalId = setInterval(() => {
-    //   console.log('Polling audio permission...') // Log each time the interval fires
-    //   checkAudioPermission()
-    // }, POLL_INTERVAL)
-    // return () => {
-    //   console.log('Clearing audio permission polling') // Log when cleaning up
-    //   clearInterval(intervalId)
-    // }
-  }, [checkAudioPermission])
+    // Check initial audio permission state
+    ;(async () => {
+      try {
+        // @ts-ignore
+        const enabled = await globalThis.highlight?.internal?.isAudioTranscriptEnabled()
+        setIsAudioPermissionEnabled(enabled)
+      } catch (error) {
+        console.error('Error checking initial audio permission:', error)
+      }
+    })()
 
-  const toggleAudioPermission = async (enable: boolean) => {
-    if (audioTranscriptState === 'locked') {
-      console.warn('Cannot change audio state when locked')
-      return
-    }
+    // Set up listener for future changes
+    const removeListener = addAudioPermissionListener((event: 'locked' | 'detect' | 'attach') => {
+      if (event === 'locked') {
+        setIsAudioPermissionEnabled(false)
+      } else {
+        setIsAudioPermissionEnabled(true)
+      }
+    })
 
-    // console.log('Toggling audio permission:', enable) // Log toggle attempt
-    // try {
-    //   await window.highlight.internal.setAudioTranscriptEnabled(enable)
-    //   setIsAudioPermissionEnabled(enable)
-    //   setAudioTranscriptState(enable ? 'attach' : 'detect')
-    //   console.log('Audio permission toggled successfully') // Log successful toggle
-    // } catch (error) {
-    //   console.error('Error toggling audio permission:', error)
-    // }
-  }
+    return () => removeListener()
+  }, [])
 
-  return {
-    isAudioPermissionEnabled,
-    toggleAudioPermission,
-    audioTranscriptState,
-    checkAudioPermission,
-  }
+  return { isAudioPermissionEnabled, toggleAudioPermission }
 }
