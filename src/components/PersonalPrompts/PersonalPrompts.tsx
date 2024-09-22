@@ -132,7 +132,7 @@ function PreferredAttachment({ type }: { type: string }) {
   }
 
   return (
-    <div className="inline-flex h-[52px] w-full items-center justify-start gap-[51px] rounded-[14px] border border-[#222222] bg-[#191919] py-[7px] pl-[5px] pr-3">
+    <div className="inline-flex h-[52px] w-full items-center justify-start gap-[51px] rounded-[14px] border border-[#222222] py-[7px] pl-[5px] pr-3">
       <div className="flex h-[42px] items-center justify-start gap-2">
         <div className="flex h-[42px] w-[42px] items-center justify-center rounded-[10px] border border-white/0 p-[11px]">
           {icon}
