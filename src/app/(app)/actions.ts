@@ -47,6 +47,60 @@ export async function refreshTokens(refreshToken: string) {
 }
 
 /**
+ * Server action that checks if we should present the follow up feedback toast to the user.
+ * @returns true if we should present the toast
+ */
+export async function checkForFollowUpFeedback(accessToken: string) {
+  let userId: string
+  try {
+    userId = await validateUserAuth(accessToken)
+  } catch (error) {
+    console.warn('Error validating user auth', error)
+    return
+  }
+
+  const supabase = supabaseAdmin()
+
+  const { error, data } = await supabase
+    .from('follow_up_feedback')
+    .select('follow_up_shown')
+    .eq('user_id', userId)
+    .maybeSingle()
+
+  if (error) {
+    console.warn('Error checking for follow up feedback', error)
+    return
+  }
+
+  if (!data || data.follow_up_shown === true) {
+    return false
+  }
+
+  return true
+}
+
+/**
+ * Marks the follow up feedback as shown for the user (so they won't see it again)
+ */
+export async function markFollowUpFeedbackAsShown(accessToken: string) {
+  let userId: string
+  try {
+    userId = await validateUserAuth(accessToken)
+  } catch (error) {
+    console.warn('Error validating user auth', error)
+    return
+  }
+
+  const supabase = supabaseAdmin()
+
+  const { error } = await supabase.from('follow_up_feedback').update({ follow_up_shown: true }).eq('user_id', userId)
+
+  if (error) {
+    console.warn('Error marking follow up feedback as shown', error)
+  }
+}
+
+/**
  * Use's Highlight's userinfo endpoint to update the user's information in the HL Chat database
  */
 export async function updateUserInfo(accessToken: string) {

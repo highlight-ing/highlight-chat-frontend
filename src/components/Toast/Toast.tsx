@@ -3,8 +3,9 @@ import { type Toast } from '@/types'
 import styles from './toast.module.scss'
 import { useStore } from '@/providers/store-provider'
 import CloseButton from '@/components/CloseButton/CloseButton'
+import Button from '../Button/Button'
 
-const Toast: React.FC<React.PropsWithChildren<Toast>> = ({ children, ...toast }) => {
+const Toast: React.FC<React.PropsWithChildren<Toast>> = ({ children, onClose, ...toast }) => {
   const removeToast = useStore((state) => state.removeToast)
   const [show, setShow] = useState(false)
   const [isShowing, setIsShowing] = useState(true)
@@ -32,7 +33,11 @@ const Toast: React.FC<React.PropsWithChildren<Toast>> = ({ children, ...toast })
     }
   }
 
-  const onClose = () => {
+  const _onClose = () => {
+    if (onClose) {
+      onClose()
+    }
+
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current)
       timeoutRef.current = undefined
@@ -74,7 +79,14 @@ const Toast: React.FC<React.PropsWithChildren<Toast>> = ({ children, ...toast })
       </div>
       {toast.description && <span className={styles.description}>{toast.description}</span>}
       {children}
-      <CloseButton position={'8px'} onClick={onClose} />
+      {toast.action && (
+        <div className={styles.actions}>
+          <Button onClick={toast.action.onClick} size="medium" variant={toast.action.variant ?? 'secondary'}>
+            {toast.action.label ?? 'Got It'}
+          </Button>
+        </div>
+      )}
+      <CloseButton position={'8px'} onClick={_onClose} />
     </div>
   )
 }
