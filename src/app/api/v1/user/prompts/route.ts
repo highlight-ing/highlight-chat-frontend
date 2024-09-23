@@ -96,14 +96,11 @@ export async function GET(request: Request) {
   await checkIfDefaultPromptsAdded(userId)
 
   // Select all prompts that the user has added
-  // const { data: selectResult, error } = await supabase
-  //   .from('added_prompts')
-  //   .select(`prompts(${PROMPTS_TABLE_SELECT_FIELDS}, prompt_usages(created_at)), created_at`)
-  //   .eq('user_id', userId)
-  //   .order('created_at', { ascending: false })
-
-  let error: Error | undefined
-  let selectResult: any[] = []
+  const { data: selectResult, error } = await supabase
+    .from('added_prompts')
+    .select(`prompts(${PROMPTS_TABLE_SELECT_FIELDS}, prompt_usages(created_at)), created_at`)
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
 
   if (error) {
     return Response.json({ error: error.message }, { status: 500 })
