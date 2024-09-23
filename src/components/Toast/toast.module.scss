@@ -84,3 +84,11 @@
   font-weight: 350;
   color: $light-60;
 }
+
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+}

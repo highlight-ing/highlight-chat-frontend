@@ -1,5 +1,6 @@
 import { Prompt } from '@/types/supabase-helpers'
 import { ColorScheme } from '@/components/PersonalPrompts/customVariables'
+import { ButtonVariantType } from '@/components/Button/Button'
 
 type WindowAttachment = {
   type: 'window'
@@ -126,6 +127,12 @@ export interface ModalObjectProps {
   context?: Record<string, any>
 }
 
+export interface ToastAction {
+  label?: string | React.ReactElement
+  variant?: ButtonVariantType
+  onClick: (event: React.MouseEvent) => void
+}
+
 export interface Toast {
   id: string
   title?: string
@@ -133,6 +140,8 @@ export interface Toast {
   description?: string
   timeout?: number
   type?: 'default' | 'success' | 'error'
+  action?: ToastAction
+  onClose?: () => void
 }
 
 export interface SharedMessage {
