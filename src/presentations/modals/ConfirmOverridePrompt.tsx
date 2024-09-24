@@ -33,7 +33,7 @@ export default function ConfirmOverridePrompt({ id, context }: ModalObjectProps)
     >
       <div>
         <span className="text-red-400 font-medium">Warning:</span> Using this template will override your current
-        prompt.
+        action.
       </div>
     </ConfirmationModal>
   )
