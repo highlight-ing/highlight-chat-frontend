@@ -21,6 +21,8 @@ interface ConversationContextType {
   setAutoSaveTime: (time: number) => Promise<void>
   setAutoClearDays: (days: number) => Promise<void>
   setIsAudioOn: (isOn: boolean) => Promise<void>
+  isAudioTranscripEnabled: boolean
+  setIsAudioTranscriptEnabled: (enabled: boolean) => void
   isSaving: boolean
   getWordCount: (transcript: string) => number
 }
@@ -35,9 +37,10 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [autoClearDays, setAutoClearDays] = useState<number>(0)
   const [micActivity, setMicActivity] = useState(0)
   const [isAudioOn, setIsAudioOn] = useState(true)
+  const [isAudioTranscripEnabled, setIsAudioTranscripEnabled] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
 
-  const isAudioPermissionEnabled = useAudioPermission()
+  const { isAudioPermissionEnabled, toggleAudioPermission } = useAudioPermission()
 
   const setupListeners = useCallback(() => {
     const removeCurrentConversationListener = Highlight.app.addListener(
@@ -64,7 +67,6 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       'onConversationsElapsedTimeUpdated',
       (time: number) => {
         if (isAudioOn) {
-          console.log('Updated elapsed time:', time)
           setElapsedTime(time)
         }
       },
@@ -99,6 +101,20 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       }, 1000)
     })
 
+    // @ts-ignore
+    globalThis.highlight?.internal?.requestAudioPermissionEvents()
+    const removeAudioPermissionListener = Highlight.app.addListener(
+      'onAudioPermissionUpdate',
+      (permission: 'locked' | 'detect' | 'attach') => {
+        console.log('Audio permission updated')
+        if (permission === 'locked') {
+          setIsAudioTranscripEnabled(false)
+        } else {
+          setIsAudioTranscripEnabled(true)
+        }
+      },
+    )
+
     return () => {
       removeCurrentConversationListener()
       removeConversationsUpdatedListener()
@@ -107,6 +123,7 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       removeAutoClearUpdatedListener()
       removeSaveConversationListener()
       removeConversationSavedListener()
+      removeAudioPermissionListener()
     }
   }, [isAudioOn])
 
@@ -117,7 +134,8 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const fetchLatestData = useCallback(async () => {
     const allConversations = await Highlight.conversations.getAllConversations()
-    setConversations(allConversations)
+    // setConversations(allConversations)
+    setConversations([])
     const currentConv = await Highlight.conversations.getCurrentConversation()
     setCurrentConversation(currentConv)
     const elapsedTime = await Highlight.conversations.getElapsedTime()
@@ -132,9 +150,9 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const autoClearDays = await Highlight.conversations.getAutoClearDays()
       setAutoClearDays(autoClearDays)
 
-      // Load isAudioOn from appStorage, default to true if undefined
+      // Load isAudioOn from appStorage, but only if not locked
       const storedIsAudioOn = await Highlight.appStorage.get(AUDIO_ENABLED_KEY)
-      setIsAudioOn(storedIsAudioOn === false ? false : true)
+      setIsAudioOn(storedIsAudioOn)
     }
     fetchInitialData()
   }, [fetchLatestData])
@@ -155,8 +173,10 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const setIsAudioOnAndSave = useCallback(
     async (isOn: boolean) => {
+      await toggleAudioPermission(isOn)
       setIsAudioOn(isOn)
       await Highlight.appStorage.set(AUDIO_ENABLED_KEY, isOn)
+
       if (isOn) {
         await fetchLatestData()
       } else {
@@ -164,12 +184,17 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         setElapsedTime(0)
       }
     },
-    [fetchLatestData],
+    [fetchLatestData, toggleAudioPermission],
   )
 
   const getWordCount = useCallback((transcript: string): number => {
     return transcript.trim().split(/\s+/).length
   }, [])
+
+  const toggleAudioEnabled = (isEnabled: boolean) => {
+    // @ts-ignore
+    globalThis.highlight?.internal?.setAudioTranscriptEnabled(isEnabled)
+  }
 
   const contextValue: ConversationContextType = {
     conversations,
@@ -187,6 +212,8 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setAutoSaveTime: Highlight.conversations.setAutoSaveTime,
     setAutoClearDays: Highlight.conversations.setAutoClearDays,
     setIsAudioOn: setIsAudioOnAndSave,
+    isAudioTranscripEnabled,
+    setIsAudioTranscriptEnabled: toggleAudioEnabled,
     isSaving,
     getWordCount,
   }

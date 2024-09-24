@@ -360,6 +360,7 @@ export async function fetchPrompts(authToken: string) {
     .select(
       'id, external_id, name, description, prompt_text, prompt_url, created_at, slug, user_id, public, suggestion_prompt_text, video_url, image, is_handlebar_prompt, public_use_number, system_prompt, can_trend, user_images(file_extension), preferred_attachment, added_prompt_tags(tags(external_id, tag, slug))',
     )
+    .eq('user_id', userId)
 
   // Map the prompts to follow the original structure with tags.
   const mappedPrompts = prompts?.map(promptSelectMapper) ?? []
@@ -368,8 +369,18 @@ export async function fetchPrompts(authToken: string) {
     return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
   }
 
+  // Select trending prompts
+  const { data: trendingPrompts, error: trendingPromptsError } = await supabase
+    .from('prompts')
+    .select(
+      'id, external_id, name, description, prompt_text, prompt_url, created_at, slug, user_id, public, suggestion_prompt_text, video_url, image, is_handlebar_prompt, public_use_number, system_prompt, can_trend, user_images(file_extension), preferred_attachment, added_prompt_tags(tags(external_id, tag, slug))',
+    )
+    .eq('can_trend', true)
+
+  const mappedTrendingPrompts = trendingPrompts?.map(promptSelectMapper) ?? []
+
   return {
-    prompts: mappedPrompts,
+    prompts: [...mappedPrompts, ...mappedTrendingPrompts],
   }
 }
 
@@ -491,6 +502,40 @@ export async function removePromptFromUser(externalId: string, authToken: string
     console.error('Error removing prompt from user', deleteError)
     return { error: ERROR_MESSAGES.DATABASE_ERROR }
   }
+}
+
+export async function serverGetPromptByExternalId(externalId: string) {
+  const supabase = supabaseAdmin()
+
+  const { data: prompt, error } = await supabase
+    .from('prompts')
+    .select('*, user_images(file_extension)')
+    .eq('external_id', externalId)
+    .maybeSingle()
+
+  if (error) {
+    console.error('Error fetching prompt from Supabase', error)
+    return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
+  }
+
+  return { prompt }
+}
+
+export async function serverGetPromptAppById(id: number) {
+  const supabase = supabaseAdmin()
+
+  const { data: promptApp, error } = await supabase
+    .from('prompts')
+    .select('*, user_images(file_extension)')
+    .eq('id', id)
+    .maybeSingle()
+
+  if (error) {
+    console.error('Error fetching prompt app from Supabase', error)
+    return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
+  }
+
+  return { promptApp }
 }
 
 export async function getPromptAppBySlug(slug: string) {

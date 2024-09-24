@@ -1,31 +1,43 @@
 import { useState, useEffect } from 'react'
-import { getAudioSuperpowerEnabled, setAudioSuperpowerEnabled } from '@/utils/highlightService'
+import Highlight from '@highlight-ai/app-runtime'
+
+export const addAudioPermissionListener = (listener: (event: 'locked' | 'detect' | 'attach') => void): (() => void) => {
+  // @ts-ignore
+  globalThis.highlight?.internal?.requestAudioPermissionEvents()
+  return Highlight.app.addListener('onAudioPermissionUpdate', listener)
+}
 
 export const useAudioPermission = () => {
-  const [isAudioPermissionEnabled, setIsAudioPermissionEnabled] = useState<boolean | null>(null)
-
-  useEffect(() => {
-    const checkAudioPermission = async () => {
-      try {
-        const isEnabled = await getAudioSuperpowerEnabled()
-        setIsAudioPermissionEnabled(isEnabled)
-      } catch (error) {
-        console.error('Error checking audio permission:', error)
-        setIsAudioPermissionEnabled(false)
-      }
-    }
-
-    checkAudioPermission()
-  }, [])
+  const [isAudioPermissionEnabled, setIsAudioPermissionEnabled] = useState<boolean>(false)
 
   const toggleAudioPermission = async (enable: boolean) => {
-    try {
-      await setAudioSuperpowerEnabled(enable)
-      setIsAudioPermissionEnabled(enable)
-    } catch (error) {
-      console.error('Error toggling audio permission:', error)
-    }
+    // @ts-ignore
+    globalThis.highlight?.internal?.setAudioTranscriptEnabled(enable)
   }
+
+  useEffect(() => {
+    // Check initial audio permission state
+    ;(async () => {
+      try {
+        // @ts-ignore
+        const enabled = await globalThis.highlight?.internal?.isAudioTranscriptEnabled()
+        setIsAudioPermissionEnabled(enabled)
+      } catch (error) {
+        console.error('Error checking initial audio permission:', error)
+      }
+    })()
+
+    // Set up listener for future changes
+    const removeListener = addAudioPermissionListener((event: 'locked' | 'detect' | 'attach') => {
+      if (event === 'locked') {
+        setIsAudioPermissionEnabled(false)
+      } else {
+        setIsAudioPermissionEnabled(true)
+      }
+    })
+
+    return () => removeListener()
+  }, [])
 
   return { isAudioPermissionEnabled, toggleAudioPermission }
 }

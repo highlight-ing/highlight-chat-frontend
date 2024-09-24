@@ -1,7 +1,7 @@
 import styles from './trending-prompts.module.scss'
 import variables from '@/variables.module.scss'
 import { Prompt } from '@/types/supabase-helpers'
-import { Setting, ArchiveSlash, ArchiveAdd } from 'iconsax-react'
+import { Setting, ArchiveSlash, ArchiveAdd, Messages2 } from 'iconsax-react'
 import { useState, useEffect, useMemo } from 'react'
 import { PromptTag, PinnedPrompt } from '@/types'
 import { supabaseLoader } from '@/lib/supabase'
@@ -110,38 +110,25 @@ const TrendingPromptsItem = ({
           <h3>{name}</h3>
         </div>
         <div className={styles.trendingPromptsItemHeaderRight}>
-          <Tooltip
-            position={'bottom'}
-            tooltip={
-              <div className={'flex flex-col gap-1'}>
-                Pin to Assistant{'\n'}
-                <span className={'text-xs text-light-60'}>Show this prompt when you summon Highlight</span>
-              </div>
-            }
-          >
+          <Tooltip position={'bottom'} tooltip={`Start a chat with ${prompt.name}`}>
             <Button
+              className={styles.filledButton}
               size="icon"
               variant="tertiary"
-              className={styles.filledButton}
               onClick={(e) => {
                 e.stopPropagation()
-                openModal('pin-prompt', { prompt })
+                selectPrompt(prompt.external_id, true, false)
               }}
-              disabled={isPinned}
             >
-              {isPinned ? (
-                <ArchiveSlash color={variables.textPrimary} variant={'Bold'} size="16" />
-              ) : (
-                <ArchiveAdd color={variables.textPrimary} variant={'Bold'} size="16" />
-              )}
+              <Messages2 color={variables.textPrimary} variant={'Bold'} size="16" />
             </Button>
           </Tooltip>
           <Tooltip
             position={'bottom'}
             tooltip={
               <div className={'flex flex-col gap-1'}>
-                Preview Prompt {'\n'}
-                <span className={'text-xs text-light-60'}>Preview this prompt to find out how it works</span>
+                Preview Action {'\n'}
+                <span className={'text-xs text-light-60'}>Preview this action to find out how it works</span>
               </div>
             }
           >
@@ -157,17 +144,26 @@ const TrendingPromptsItem = ({
               Preview
             </Button>
           </Tooltip>
-          <Tooltip position={'bottom'} tooltip={`Start a chat with ${prompt.name}`}>
+          <Tooltip
+            position={'bottom'}
+            tooltip={
+              <div className={'flex flex-col gap-1'}>
+                Pin to Assistant{'\n'}
+                <span className={'text-xs text-light-60'}>Show this action when you summon Highlight</span>
+              </div>
+            }
+          >
             <Button
-              className={styles.filledButton}
               size="xsmall"
               variant="primary"
+              className={styles.filledButton}
               onClick={(e) => {
                 e.stopPropagation()
-                selectPrompt(prompt.external_id, true, false)
+                openModal('pin-prompt', { prompt })
               }}
+              disabled={isPinned}
             >
-              Chat
+              {isPinned ? 'Pinned' : 'Pin'}
             </Button>
           </Tooltip>
         </div>

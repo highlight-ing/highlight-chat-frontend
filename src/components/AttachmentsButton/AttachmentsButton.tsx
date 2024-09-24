@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { ClipboardText, DocumentUpload, GalleryAdd, Sound } from 'iconsax-react'
+import { ClipboardText, DocumentUpload, GalleryAdd, VoiceSquare } from 'iconsax-react'
 import Highlight from '@highlight-ai/app-runtime'
 import { PaperclipIcon } from '@/icons/icons'
 import ContextMenu, { MenuItemType } from '../ContextMenu/ContextMenu'
 import { useStore } from '@/providers/store-provider'
-import { getDurationUnit } from '@/utils/string'
 import { ScreenshotAttachmentPicker } from '../ScreenshotAttachmentPicker/ScrenshotAttachmentPicker'
 import { useShallow } from 'zustand/react/shallow'
 import styles from './attachments-button.module.scss'
@@ -13,26 +12,12 @@ import * as XLSX from 'xlsx'
 import mammoth from 'mammoth'
 import * as pptxtojson from 'pptxtojson'
 import { trackEvent } from '@/utils/amplitude'
-
-interface AudioDurationProps {
-  duration: number
-  unit: 'hours' | 'minutes'
-  onClick?: () => void
-}
-
-const AudioDuration = ({ duration, unit, onClick }: AudioDurationProps) => {
-  const unitLabel = getDurationUnit(duration, unit, true)
-
-  return (
-    <div className={styles.audioDurationContainer} onClick={onClick}>
-      {duration} {unitLabel}
-    </div>
-  )
-}
+import { ConversationAttachmentPicker } from '../ConversationAttachmentPicker.tsx/ConversationAttachmentPicker'
 
 export const AttachmentsButton = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [screenshotPickerVisible, setScreenshotPickerVisible] = useState(false)
+  const [conversationPickerVisible, setConversationPickerVisible] = useState(false)
 
   const { setFileInputRef, addAttachment } = useStore(
     useShallow((state) => ({
@@ -48,12 +33,6 @@ export const AttachmentsButton = () => {
   const handleAttachmentClick = () => {
     fileInputRef?.current?.click()
     trackEvent('HL Chat Attachments Button Clicked', {})
-  }
-
-  const onAddAudio = async (durationInMinutes: number) => {
-    const audio = await Highlight.user.getAudioForDuration(durationInMinutes * 60)
-    addAttachment({ type: 'audio', value: audio, duration: durationInMinutes })
-    trackEvent('HL Chat Attachment Added', { type: 'audio', durationInMinutes })
   }
 
   const readTextFile = async (file: File): Promise<string> => {
@@ -216,39 +195,13 @@ export const AttachmentsButton = () => {
     }
   }
 
-  const audioDurations: { duration: number; unit: 'hours' | 'minutes' }[] = [
-    { duration: 5, unit: 'minutes' },
-    { duration: 30, unit: 'minutes' },
-    { duration: 1, unit: 'hours' },
-    { duration: 2, unit: 'hours' },
-  ]
-
-  const audioMenuItem = {
-    label: (
-      <div className={styles.audioMenuItem}>
-        <div className={styles.menuItem}>
-          <Sound size={20} variant={'Bold'} />
-          Audio Memory
-        </div>
-        <div className={styles.audioDurationsContainer}>
-          {audioDurations.map(({ duration, unit }) => (
-            <AudioDuration
-              key={`${duration}-${unit}`}
-              duration={duration}
-              unit={unit}
-              onClick={async () => await onAddAudio(duration * (unit === 'hours' ? 60 : 1))}
-            />
-          ))}
-        </div>
-      </div>
-    ),
-  }
-
   const menuItems = [
     {
       label: (
         <div className={styles.menuItem}>
-          <DocumentUpload size={20} variant={'Bold'} />
+          <div className={styles.iconWrapper}>
+            <DocumentUpload size={20} variant={'Bold'} />
+          </div>
           Upload from computer
         </div>
       ),
@@ -257,7 +210,9 @@ export const AttachmentsButton = () => {
     {
       label: (
         <div className={styles.menuItem}>
-          <ClipboardText size={20} variant={'Bold'} />
+          <div className={styles.iconWrapper}>
+            <ClipboardText size={20} variant={'Bold'} />
+          </div>
           Clipboard
         </div>
       ),
@@ -266,16 +221,27 @@ export const AttachmentsButton = () => {
     {
       label: (
         <div className={styles.menuItem}>
-          <GalleryAdd variant="Bold" size={20} />
+          <div className={styles.iconWrapper}>
+            <GalleryAdd variant="Bold" size={20} />
+          </div>
           Screenshot
         </div>
       ),
       onClick: onClickScreenshot,
     },
     {
-      divider: true,
+      label: (
+        <div className={styles.menuItem}>
+          <div className={styles.audioMenuItem}>
+            <VoiceSquare variant="Bold" size={20} />
+          </div>
+          Conversation
+        </div>
+      ),
+      onClick: () => {
+        window.location.href = 'highlight://app/conversations'
+      },
     },
-    // audioMenuItem,
   ].filter(Boolean) as MenuItemType[]
 
   const acceptTypes =
@@ -296,7 +262,10 @@ export const AttachmentsButton = () => {
         {
           // @ts-ignore
           ({ isOpen }) => (
-            <Tooltip tooltip={isOpen || screenshotPickerVisible ? '' : 'Attach files & context'} position={'top'}>
+            <Tooltip
+              tooltip={isOpen || screenshotPickerVisible || conversationPickerVisible ? '' : 'Attach files & context'}
+              position={'top'}
+            >
               <ScreenshotAttachmentPicker
                 isVisible={screenshotPickerVisible}
                 onClose={() => {
@@ -305,6 +274,15 @@ export const AttachmentsButton = () => {
                 }}
                 onBack={openMenu}
               />
+              {conversationPickerVisible && (
+                <ConversationAttachmentPicker
+                  onClose={() => setConversationPickerVisible(false)}
+                  onBack={() => {
+                    setConversationPickerVisible(false)
+                    openMenu()
+                  }}
+                />
+              )}
               <button type="button" className={styles.button} id="attachments-button">
                 <PaperclipIcon />
                 <input

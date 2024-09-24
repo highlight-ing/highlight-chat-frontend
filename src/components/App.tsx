@@ -19,6 +19,7 @@ import { useChatHistory } from '@/hooks/useChatHistory'
 import { Prompt } from '@/types/supabase-helpers'
 import { processAttachments } from '@/utils/contextprocessor'
 import * as Sentry from '@sentry/react'
+import { checkForFollowUpFeedback, markFollowUpFeedbackAsShown } from '@/app/(app)/actions'
 
 function useContextReceivedHandler(navigateToNewChat: () => void) {
   const {
@@ -154,6 +155,50 @@ function useAuthChangeHandler() {
 }
 
 /**
+ * Hook that adds a follow up feedback toast to the app.
+ */
+function useShowFollowUpFeedbackToast() {
+  const { getAccessToken } = useAuth()
+  const addToast = useStore((state) => state.addToast)
+
+  async function onShown() {
+    const accessToken = await getAccessToken()
+    await markFollowUpFeedbackAsShown(accessToken)
+  }
+
+  const toast = {
+    title: "We'd love to talk to you!",
+    description: "We'll happily pay you for a quick call about the product",
+    timeout: 1000000,
+    action: {
+      label: 'Send details',
+      onClick: () => {
+        onShown()
+        window.open('https://forms.gle/8sWMKKZUdwUVoLdR8', '_blank')
+      },
+    },
+    onClose: async () => {
+      onShown()
+    },
+  }
+
+  useEffect(() => {
+    const checkToPresentToast = async () => {
+      const accessToken = await getAccessToken()
+
+      const shouldPresentToast = await checkForFollowUpFeedback(accessToken)
+
+      if (shouldPresentToast) {
+        console.log('[useShowFollowUpFeedbackToast] Presenting toast')
+        addToast(toast)
+      }
+    }
+
+    checkToPresentToast()
+  }, [])
+}
+
+/**
  * The main app component.
  *
  * This should hold all the providers.
@@ -243,6 +288,7 @@ export default function App({ children }: { children: React.ReactNode }) {
   useContextReceivedHandler(navigateToNewChat)
   useAboutMeRegister()
   useAuthChangeHandler()
+  useShowFollowUpFeedbackToast()
 
   return (
     <>

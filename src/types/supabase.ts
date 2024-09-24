@@ -133,6 +133,51 @@ export type Database = {
           },
         ]
       }
+      file_metadata: {
+        Row: {
+          conversation_id: string | null
+          created_at: string
+          file_id: string | null
+          file_type: string | null
+          id: string
+        }
+        Insert: {
+          conversation_id?: string | null
+          created_at?: string
+          file_id?: string | null
+          file_type?: string | null
+          id?: string
+        }
+        Update: {
+          conversation_id?: string | null
+          created_at?: string
+          file_id?: string | null
+          file_type?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      follow_up_feedback: {
+        Row: {
+          created_at: string
+          follow_up_shown: boolean
+          id: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          follow_up_shown?: boolean
+          id?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          follow_up_shown?: boolean
+          id?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       message: {
         Row: {
           audio: string | null

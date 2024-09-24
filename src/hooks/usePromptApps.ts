@@ -1,5 +1,13 @@
 import { useStore } from '@/providers/store-provider'
-import { addPromptToUser, countPromptView, fetchPrompts, fetchPinnedPrompts } from '@/utils/prompts'
+import {
+  addPromptToUser,
+  countPromptView,
+  fetchPrompts,
+  fetchPinnedPrompts,
+  serverGetPromptByExternalId,
+  serverGetPromptAppById,
+  getPromptAppBySlug,
+} from '@/utils/prompts'
 import useAuth from '@/hooks/useAuth'
 import { Prompt } from '@/types/supabase-helpers'
 import { useShallow } from 'zustand/react/shallow'
@@ -98,21 +106,31 @@ export default (loadPrompts?: boolean) => {
   }
 
   const getPrompt = async (promptId: string | number) => {
-    let apps: Prompt[] = prompts
-    if (!isPromptsLoaded) {
-      apps = (await refreshPrompts()) ?? []
+    if (typeof promptId === 'number') {
+      // Check if the prompt is already in the local store
+      const prompt = prompts.find((prompt) => prompt.id === promptId)
+      if (prompt) {
+        return prompt
+      }
+
+      const { promptApp } = await serverGetPromptAppById(promptId)
+      return promptApp
+    } else {
+      const { prompt } = await serverGetPromptByExternalId(promptId)
+      return prompt
     }
-    // @ts-ignore
-    return apps.find((app) => app.id == promptId)
   }
 
   const getPromptByExternalId = async (externalId: string) => {
-    let apps: Prompt[] = prompts
-    if (!isPromptsLoaded) {
-      apps = (await refreshPrompts()) ?? []
+    // Check if the prompt is already in the local store
+    const prompt = prompts.find((prompt) => prompt.external_id === externalId)
+    if (prompt) {
+      return prompt
     }
-    // @ts-ignore
-    return apps.find((app) => app.external_id == externalId)
+
+    // If not, fetch it from the server
+    const { prompt: newPrompt } = await serverGetPromptByExternalId(externalId)
+    return newPrompt
   }
 
   const selectPrompt = async (promptExternalId: string, isNewConversation?: boolean, pinPrompt?: boolean) => {
@@ -173,12 +191,19 @@ export default (loadPrompts?: boolean) => {
   }
 
   const getPromptBySlug = async (slug: string) => {
-    let apps: Prompt[] = prompts
-    if (!isPromptsLoaded) {
-      apps = (await refreshPrompts()) ?? []
+    // Check if the prompt is already
+    const prompt = prompts.find((prompt) => prompt.slug === slug)
+    if (prompt) {
+      return prompt
     }
-    // @ts-ignore
-    return apps.find((app) => app.slug == slug)
+
+    const result = await getPromptAppBySlug(slug)
+
+    if (result.error) {
+      return null
+    }
+
+    return result.promptApp
   }
 
   useEffect(() => {

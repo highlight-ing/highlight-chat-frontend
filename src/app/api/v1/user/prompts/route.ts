@@ -148,7 +148,7 @@ export async function GET(request: Request) {
 
   // Sort the most recent prompt usage to the top
   const filteredPromptsWithUsages = filteredPrompts.map((prompt) => {
-    const sorted = prompt.prompt_usages.sort((a, b) => {
+    const sorted = prompt.prompt_usages.sort((a: any, b: any) => {
       return b.created_at.localeCompare(a.created_at)
     })
     return {
