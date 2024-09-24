@@ -220,7 +220,7 @@ function PreferredAttachmentSetting() {
   }
 
   return (
-    <SettingOption label={'Preferred Attachment'} description={'The attachment type that your prompt relies on'}>
+    <SettingOption label={'Preferred Attachment'} description={'The attachment type that your action relies on'}>
       <ContextMenu
         key="templates-menu"
         items={[
@@ -477,7 +477,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
       {onboarding.isOnboarding && onboarding.index === 4 && (
         <OnboardingBox
           title="Save, publish, and share"
-          line2="There’s no limit to the number of prompts you can create and share, so have fun!"
+          line2="There’s no limit to the number of actions you can create and share, so have fun!"
           buttonText="Continue"
           bottomComponent={
             <div>
