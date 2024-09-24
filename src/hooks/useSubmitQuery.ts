@@ -167,10 +167,15 @@ export const useSubmitQuery = () => {
     })
   }
 
+  const checkAbortSignal = () => {
+    if (abortControllerRef.current?.signal.aborted) {
+      throw new Error('Chat message request aborted')
+    }
+  }
+
   const fetchResponse = async (
     conversationId: string,
     formData: FormData,
-    token: string,
     isPromptApp: boolean,
     promptApp?: Prompt,
   ) => {
@@ -201,13 +206,9 @@ export const useSubmitQuery = () => {
         const { done, value } = await reader.read()
         if (done) break
 
-        if (abortController.signal.aborted) {
-          throw new Error('Chat message request aborted')
-        }
+        checkAbortSignal()
 
         const chunk = new TextDecoder().decode(value)
-
-        checkAbortSignal()
 
         const { content, windowName, conversation, factIndex, fact } = await parseAndHandleStreamChunk(chunk, {
           showConfirmationModal,
@@ -398,7 +399,6 @@ export const useSubmitQuery = () => {
         }
       })
 
-      availableContexts.context.push({ type: 'image', file_id: attachmentToFileIdMap.get(screenshotUrl) })
       // Build FormData using the updated builder
       const formData = await buildFormData({
         prompt: query,
@@ -409,7 +409,7 @@ export const useSubmitQuery = () => {
       })
 
       const accessToken = await getAccessToken()
-      await fetchResponse(conversationId, formData, accessToken, !!promptApp, promptApp)
+      await fetchResponse(conversationId, formData, !!promptApp, promptApp)
     }
   }
 
@@ -458,6 +458,19 @@ export const useSubmitQuery = () => {
         context: [],
       }
 
+      // Create a map of original attachments to file IDs
+      const attachmentToFileIdMap = new Map(
+        uploadedFiles.map(({ originalAttachment, uploadedFile }) => [originalAttachment, uploadedFile.file_id]),
+      )
+
+      // Now you can use this map to get the file ID for any file attachment
+      attachments.filter(isFileAttachment).forEach((attachment) => {
+        const fileId = attachmentToFileIdMap.get(attachment)
+        if (fileId) {
+          attachedContext.context.push(createAttachmentMetadata(attachment, fileId))
+        }
+      })
+
       // Build FormData using the updated builder
       const formData = await buildFormData({
         prompt: query,
@@ -465,7 +478,6 @@ export const useSubmitQuery = () => {
         llmProvider: 'anthropic',
         attachedContext,
         availableContexts,
-        fileIds: uploadedFiles.filter(Boolean).map((file) => file.file_id), // Include file IDs
       })
 
       addConversationMessage(conversationId, {
@@ -481,7 +493,7 @@ export const useSubmitQuery = () => {
       clearAttachments()
 
       const accessToken = await getAccessToken()
-      await fetchResponse(conversationId, formData, accessToken, !!promptApp, promptApp)
+      await fetchResponse(conversationId, formData, !!promptApp, promptApp)
     } catch (error: any) {
       handleError(error, { method: 'handleSubmit' })
     } finally {
