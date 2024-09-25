@@ -74,7 +74,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   return (
     <div className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''}`} onClick={onClickContainer}>
       {attachments.length > 0 && (
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           {attachments.map((attachment: AttachmentType, index: number) => (
             <Attachment
               type={attachment.type}
@@ -90,9 +90,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
           ))}
         </div>
       )}
-      <div className={styles.attachmentsButtonContainer}>
-        <AttachmentsButton />
-      </div>
+      <AttachmentsButton />
       <textarea
         ref={inputRef}
         autoFocus={true}

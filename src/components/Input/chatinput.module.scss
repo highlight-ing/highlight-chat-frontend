@@ -26,11 +26,6 @@
   &.active {
     margin-bottom: 20px;
     max-width: $chat-body-width;
-
-    .attachmentsButtonContainer {
-      margin-top: auto;
-      margin-bottom: 0;
-    }
   }
 
   &:hover {
@@ -54,11 +49,6 @@
       user-select: none;
     }
   }
-}
-
-.attachmentsButtonContainer {
-  display: flex;
-  margin-bottom: auto;
 }
 
 .empty {
