@@ -24,7 +24,7 @@ export const createChatAttachmentsSlice: StateCreator<ChatAttachmentsSlice> = (s
     ...initialChatAttachmentsState,
     addAttachment: (attachment: Attachment) => {
       set((state) => ({
-        attachments: [...state.attachments.filter((a) => a.type !== attachment.type), attachment],
+        attachments: [...state.attachments, attachment],
       }))
     },
     removeAttachment: (attachmentType: string) =>

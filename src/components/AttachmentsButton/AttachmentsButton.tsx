@@ -82,74 +82,78 @@ export const AttachmentsButton = () => {
   ]
 
   const onAddFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      if (file.type.startsWith('image/')) {
-        addAttachment({
-          type: 'image',
-          value: URL.createObjectURL(file),
-          file: file,
-        })
-        trackEvent('HL Chat Attachment Added', { type: 'image', fileType: file.type })
-      } else if (file.type === 'application/pdf') {
-        addAttachment({
-          type: 'pdf',
-          value: file,
-        })
-        trackEvent('HL Chat Attachment Added', { type: 'pdf' })
-      } else if (
-        file.type === 'text/csv' ||
-        file.type === 'application/vnd.ms-excel' ||
-        file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-      ) {
-        addAttachment({
-          type: 'spreadsheet',
-          value: file,
-        })
-        trackEvent('HL Chat Attachment Added', { type: 'spreadsheet', fileType: file.type })
-      } else if (
-        file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
-        file.type === 'application/msword'
-      ) {
-        const arrayBuffer = await file.arrayBuffer()
-        const result = await mammoth.extractRawText({ arrayBuffer })
-        addAttachment({
-          type: 'text_file',
-          value: result.value,
-          fileName: file.name,
-        })
-        trackEvent('HL Chat Attachment Added', { type: 'text_file', fileType: file.type })
-      } else if (file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
-        const value = await extractTextFromPowerPoint(file)
-        addAttachment({
-          type: 'text_file',
-          value,
-          fileName: file.name,
-        })
-        trackEvent('HL Chat Attachment Added', { type: 'power_point', fileType: file.type })
-      } else if (
-        textBasedTypes.includes(file.type) ||
-        file.type.includes('application/') ||
-        file.type.includes('text/')
-      ) {
-        const value = await readTextFile(file)
-        addAttachment({
-          type: 'text_file',
-          value,
-          fileName: file.name,
-        })
-        trackEvent('HL Chat Attachment Added', { type: 'text_file', fileType: file.type })
-      } else {
-        try {
+    const files = e.target.files
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i]
+        // Process each file
+        if (file.type.startsWith('image/')) {
+          addAttachment({
+            type: 'image',
+            value: URL.createObjectURL(file),
+            file: file,
+          })
+          trackEvent('HL Chat Attachment Added', { type: 'image', fileType: file.type })
+        } else if (file.type === 'application/pdf') {
+          addAttachment({
+            type: 'pdf',
+            value: file,
+          })
+          trackEvent('HL Chat Attachment Added', { type: 'pdf' })
+        } else if (
+          file.type === 'text/csv' ||
+          file.type === 'application/vnd.ms-excel' ||
+          file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        ) {
+          addAttachment({
+            type: 'spreadsheet',
+            value: file,
+          })
+          trackEvent('HL Chat Attachment Added', { type: 'spreadsheet', fileType: file.type })
+        } else if (
+          file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+          file.type === 'application/msword'
+        ) {
+          const arrayBuffer = await file.arrayBuffer()
+          const result = await mammoth.extractRawText({ arrayBuffer })
+          addAttachment({
+            type: 'text_file',
+            value: result.value,
+            fileName: file.name,
+          })
+          trackEvent('HL Chat Attachment Added', { type: 'text_file', fileType: file.type })
+        } else if (file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
+          const value = await extractTextFromPowerPoint(file)
+          addAttachment({
+            type: 'text_file',
+            value,
+            fileName: file.name,
+          })
+          trackEvent('HL Chat Attachment Added', { type: 'power_point', fileType: file.type })
+        } else if (
+          textBasedTypes.includes(file.type) ||
+          file.type.includes('application/') ||
+          file.type.includes('text/')
+        ) {
           const value = await readTextFile(file)
           addAttachment({
             type: 'text_file',
             value,
             fileName: file.name,
           })
-          trackEvent('HL Chat Attachment Added', { type: 'file', fileType: file.type })
-        } catch (e) {
-          console.log('Error reading file', file.name, e)
+          trackEvent('HL Chat Attachment Added', { type: 'text_file', fileType: file.type })
+        } else {
+          try {
+            const value = await readTextFile(file)
+            addAttachment({
+              type: 'text_file',
+              value,
+              fileName: file.name,
+            })
+            trackEvent('HL Chat Attachment Added', { type: 'file', fileType: file.type })
+          } catch (e) {
+            console.log('Error reading file', file.name, e)
+          }
         }
       }
     }
@@ -291,6 +295,7 @@ export const AttachmentsButton = () => {
                   onChange={onAddFile}
                   accept={acceptTypes}
                   className={styles.hiddenInput}
+                  multiple
                 />
               </button>
             </Tooltip>

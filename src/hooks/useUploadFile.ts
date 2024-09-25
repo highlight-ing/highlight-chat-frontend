@@ -55,12 +55,6 @@ export const useUploadFile = () => {
       }
 
       const result = await response.json()
-      addToast({
-        title: 'File Uploaded',
-        description: `File ${result.metadata.filename} uploaded successfully`,
-        type: 'success',
-        timeout: 5000,
-      })
 
       return result.metadata
     } catch (error: any) {
