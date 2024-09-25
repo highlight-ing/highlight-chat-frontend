@@ -100,6 +100,7 @@ export type Database = {
           conversation_id: string
           created_at: string
           encrypted_content: string
+          file_ids: string[] | null
           id: string
           image_url: string | null
           role: string
@@ -109,6 +110,7 @@ export type Database = {
           conversation_id?: string
           created_at?: string
           encrypted_content: string
+          file_ids?: string[] | null
           id?: string
           image_url?: string | null
           role: string
@@ -118,6 +120,7 @@ export type Database = {
           conversation_id?: string
           created_at?: string
           encrypted_content?: string
+          file_ids?: string[] | null
           id?: string
           image_url?: string | null
           role?: string
@@ -514,7 +517,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      bulk_update_prompt_usages: {
+        Args: {
+          ids: number[]
+          public_use_numbers: number[]
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       HLChatDBAttachment: 'screenshot' | 'voice' | 'clipboard' | 'ocr'

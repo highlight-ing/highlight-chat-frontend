@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
       )
       .throwOnError()
 
-    // // Create object with promptId as key and count as value
+    // Create object with promptId as key and count as value
     const promptUsageCounts = unprocessedPromptUsages.reduce(
       (acc, promptUsage) => {
         acc[promptUsage.promptId] = (acc[promptUsage.promptId] || 0) + 1
@@ -47,26 +47,10 @@ export async function GET(req: NextRequest) {
       )
       .throwOnError()
 
-    let updatePromises: Promise<any>[] = []
-
-    // Loop through and increment the public_use_number
-    existingPromptUsageCounts?.forEach((promptUsage) => {
-      promptUsage.public_use_number += promptUsageCounts[promptUsage.id]
-
-      // Supabase needs to support bulk updating without inserts.
-      updatePromises.push(
-        new Promise((resolve, reject) => {
-          const promise = supabase
-            .from('prompts')
-            .update({ public_use_number: promptUsage.public_use_number })
-            .eq('id', promptUsage.id)
-
-          resolve(promise)
-        }),
-      )
+    await supabase.rpc('bulk_update_prompt_usages', {
+      ids: existingPromptUsageCounts?.map((x) => x.id) ?? [],
+      public_use_numbers: existingPromptUsageCounts?.map((x) => x.public_use_number + promptUsageCounts[x.id]) ?? [],
     })
-
-    await Promise.all(updatePromises)
 
     // Store the updated prompt usage counts
 
