@@ -11,7 +11,7 @@
 
 .inputContainer {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   padding: 8px;
   gap: 8px;
   background-color: $bg-second-layer;
@@ -49,6 +49,19 @@
       user-select: none;
     }
   }
+}
+
+.inputRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.attachmentsRow {
+  display: flex;
+  gap: 4px;
+  align-items: center;
 }
 
 .empty {

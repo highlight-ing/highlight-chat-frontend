@@ -73,8 +73,20 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
 
   return (
     <div className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''}`} onClick={onClickContainer}>
+      <div className={styles.inputRow}>
+        <AttachmentsButton />
+        <textarea
+          ref={inputRef}
+          autoFocus={true}
+          placeholder={`Ask ${promptName ? promptName : 'Highlight'} anything...`}
+          value={input}
+          rows={1}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+      </div>
       {attachments.length > 0 && (
-        <div className="flex items-center gap-2">
+        <div className={styles.attachmentsRow}>
           {attachments.map((attachment: AttachmentType, index: number) => (
             <Attachment
               type={attachment.type}
@@ -90,16 +102,6 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
           ))}
         </div>
       )}
-      <AttachmentsButton />
-      <textarea
-        ref={inputRef}
-        autoFocus={true}
-        placeholder={`Ask ${promptName ? promptName : 'Highlight'} anything...`}
-        value={input}
-        rows={1}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={handleKeyDown}
-      />
     </div>
   )
 }
