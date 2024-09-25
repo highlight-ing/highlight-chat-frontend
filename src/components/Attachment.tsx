@@ -149,7 +149,7 @@ export const Attachment = ({
     >
       <div className="group relative">
         {type === 'conversation' || type === 'audio' ? (
-          <div className="flex h-[52px] w-fit items-center gap-2.5 text-nowrap rounded-[10px] border border-tertiary bg-secondary p-[7px_16px_7px_5px] text-base">
+          <div className="flex h-[52px] w-fit items-center gap-2.5 text-nowrap rounded-[10px] border border-light-10 bg-secondary p-[7px_16px_7px_5px] text-base">
             <div className="rounded-md border border-light-10 bg-green-20 p-[10px]">
               <VoiceSquare className="min-w-5 text-conv-green" variant="Bold" size={20} />
             </div>
@@ -162,7 +162,7 @@ export const Attachment = ({
           </div>
         ) : (
           <div
-            className={`flex h-[52px] items-center justify-center rounded-[10px] border border-tertiary bg-secondary ${
+            className={`flex h-[52px] items-center justify-center rounded-[10px] border border-light-10 bg-secondary ${
               type === 'pdf' ? 'max-w-40' : 'max-w-20'
             } ${type !== 'image' ? 'min-w-12' : 'min-w-[52px]'} w-fit overflow-hidden`}
           >
