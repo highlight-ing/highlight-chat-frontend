@@ -46,6 +46,7 @@ export const useUploadFile = () => {
       const formData = new FormData()
       formData.append('file', file)
       formData.append('conversation_id', conversationId)
+      formData.append('file_type', file.type)
 
       const response = await post('file-upload/', formData, { version: 'v4', signal: abortController.signal })
 

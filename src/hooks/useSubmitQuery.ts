@@ -86,6 +86,22 @@ function createAttachmentMetadata(
   }
 }
 
+// Add this helper function at the top of the file
+function getFileType(attachment: FileAttachment): string {
+  switch (attachment.type) {
+    case 'pdf':
+      return 'application/pdf'
+    case 'image':
+      return attachment.fileName?.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg'
+    case 'spreadsheet':
+      return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    case 'text_file':
+      return 'text/plain'
+    default:
+      return 'application/octet-stream'
+  }
+}
+
 export const useSubmitQuery = () => {
   const { post } = useApi()
   const { getAccessToken } = useAuth()
@@ -372,9 +388,8 @@ export const useSubmitQuery = () => {
       // Upload files first
       const uploadedFiles = await Promise.all(
         fileAttachments.map(async (attachment) => {
-          const fileName = uuidv4()
-          const file = new File([attachment.value], fileName)
-          const mimeType = file.type || 'application/octet-stream'
+          const fileName = attachment.fileName || `${uuidv4()}.${attachment.type}`
+          const mimeType = getFileType(attachment)
           const uploadedFile = await uploadFile(
             new File([attachment.value], fileName, { type: mimeType }),
             conversationId,
@@ -435,9 +450,8 @@ export const useSubmitQuery = () => {
       // Upload files first
       const uploadedFiles = await Promise.all(
         attachments.filter(isFileAttachment).map(async (attachment) => {
-          const fileName = uuidv4()
-          const file = new File([attachment.value], fileName)
-          const mimeType = file.type || 'application/octet-stream'
+          const fileName = `${uuidv4()}.${attachment.type}`
+          const mimeType = getFileType(attachment)
           const uploadedFile = await uploadFile(
             new File([attachment.value], fileName, { type: mimeType }),
             conversationId,
