@@ -40,8 +40,6 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [isAudioTranscripEnabled, setIsAudioTranscripEnabled] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
 
-  const { isAudioPermissionEnabled, toggleAudioPermission } = useAudioPermission()
-
   const setupListeners = useCallback(() => {
     const removeCurrentConversationListener = Highlight.app.addListener(
       'onCurrentConversationUpdate',
@@ -151,21 +149,16 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       setAutoClearDays(autoClearDays)
 
       // Load isAudioOn from appStorage, but only if not locked
-        const storedIsAudioOn = await Highlight.appStorage.get(AUDIO_ENABLED_KEY)
-        setIsAudioOn(storedIsAudioOn)
-
+      const storedIsAudioOn = await Highlight.appStorage.get(AUDIO_ENABLED_KEY)
+      setIsAudioOn(storedIsAudioOn)
     }
     fetchInitialData()
   }, [fetchLatestData])
 
   const pollMicActivity = useCallback(async () => {
-    // if (!isAudioPermissionEnabled || !isAudioOn) {
-    //   setMicActivity(0)
-    //   return
-    // }
     const activity = await Highlight.user.getMicActivity(POLL_MIC_ACTIVITY)
     setMicActivity(activity)
-  }, [isAudioPermissionEnabled, isAudioOn])
+  }, [isAudioOn])
 
   useEffect(() => {
     const intervalId = setInterval(pollMicActivity, POLL_MIC_ACTIVITY)
@@ -174,7 +167,7 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const setIsAudioOnAndSave = useCallback(
     async (isOn: boolean) => {
-      await toggleAudioPermission(isOn)
+      await setIsAudioTranscripEnabled(isOn)
       setIsAudioOn(isOn)
       await Highlight.appStorage.set(AUDIO_ENABLED_KEY, isOn)
 
@@ -185,7 +178,7 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         setElapsedTime(0)
       }
     },
-    [fetchLatestData, toggleAudioPermission],
+    [fetchLatestData, setIsAudioTranscripEnabled],
   )
 
   const getWordCount = useCallback((transcript: string): number => {
