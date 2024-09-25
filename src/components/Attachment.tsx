@@ -106,8 +106,6 @@ export const Attachment = ({
         return <ClipboardText className="text-white" />
       case 'window_context':
         return <ClipboardText className="text-white" />
-      case 'audio':
-        return <Sound className="text-white" />
       case 'pdf':
         return (
           <div className="align-center flex w-full justify-center gap-2 p-2">
@@ -136,10 +134,11 @@ export const Attachment = ({
             <span className="inline-block max-w-40 truncate align-middle text-sm text-white">{value}</span>
           </div>
         )
+      case 'audio':
       case 'conversation':
         return (
           <div className="align-center flex w-full justify-center gap-2 p-2">
-            <VoiceSquare className="min-w-5 text-conv-green" />
+            <VoiceSquare className="min-w-5 text-conv-green" variant="Bold" />
           </div>
         )
       default:
@@ -156,7 +155,9 @@ export const Attachment = ({
     >
       <div className="group relative">
         <div
-          className={`flex h-12 items-center justify-center rounded-md border border-light-10 bg-light-20 ${
+          className={`flex h-12 items-center justify-center rounded-md border border-light-10 ${
+            type === 'audio' || type === 'conversation' ? 'bg-green-20' : 'bg-light-20'
+          } ${
             type === 'pdf' ? 'max-w-40' : 'max-w-20'
           } ${type !== 'image' ? 'min-w-12' : 'min-w-8'} w-fit overflow-hidden`}
         >
