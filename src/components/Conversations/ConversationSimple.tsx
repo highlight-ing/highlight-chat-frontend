@@ -25,11 +25,10 @@ export default function ConversationSimple() {
 
   return (
     <div
-      className={`mx-auto flex h-16 w-full items-center justify-between rounded-[20px] px-4 py-2 transition-all duration-300 ease-in-out ${
-        isAudioPermissionEnabled
-          ? 'border border-conv-green bg-conv-green-20'
-          : 'border border-conv-primary bg-conv-primary'
+      className={`mx-auto flex h-16 w-full items-center justify-between rounded-[20px] px-5 py-2 duration-300 ease-in-out ${
+        isAudioPermissionEnabled ? 'border-0 bg-conv-green-20' : 'border border-conv-primary bg-conv-primary'
       }`}
+      style={{ transition: 'background-color 300ms ease-in-out' }}
     >
       <div className="flex items-center gap-2">
         {isAudioPermissionEnabled ? (
@@ -51,30 +50,30 @@ export default function ConversationSimple() {
             transitionDuration={0}
           />
         )}
-        <p className="text-sm font-medium">
+        <p className="text-base font-medium">
           {isAudioPermissionEnabled ? 'View Conversations' : 'Enable Conversations'}
         </p>
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-6">
         <div
           className={`transition-opacity duration-300 ease-in-out ${isAudioPermissionEnabled ? 'opacity-100' : 'invisible opacity-0'}`}
         >
           <Button
             onClick={handleOpenClick}
-            className="h-7 w-24 border border-conv-green-40 bg-transparent px-3 py-0 text-xs text-conv-green hover:bg-conv-green-30"
+            className="h-7 w-[77px] border border-conv-green-40 bg-transparent px-3 py-0 text-xs text-conv-green hover:bg-conv-green-20"
           >
             Open
           </Button>
         </div>
         <div className="flex items-center">
-          <Label htmlFor="audio-switch" className="mr-2 w-7 text-right text-xs">
+          <Label htmlFor="audio-switch" className="mr-1.5 text-right text-xs font-normal text-light-40">
             {isAudioPermissionEnabled ? 'ON' : 'OFF'}
           </Label>
           <Switch
             id="audio-switch"
             checked={isAudioPermissionEnabled}
             onCheckedChange={handleToggle}
-            className="h-5 w-9 data-[state=checked]:bg-conv-green"
+            className="h-[26px] w-[49px] data-[state=checked]:bg-conv-green"
           />
         </div>
       </div>
