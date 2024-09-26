@@ -1,13 +1,12 @@
+import * as React from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { Attachment } from '../Attachment'
 import { AttachmentsButton } from '../AttachmentsButton/AttachmentsButton'
 import { Attachment as AttachmentType } from '@/types'
 import { useSubmitQuery } from '../../hooks/useSubmitQuery'
 import { useStore } from '@/providers/store-provider'
-import { useInputFocus } from '@/context/InputFocusProvider'
 
 import styles from './chatinput.module.scss'
-import * as React from 'react'
 import { getDisplayValue } from '@/utils/attachments'
 import { useShallow } from 'zustand/react/shallow'
 import { trackEvent } from '@/utils/amplitude'
@@ -30,7 +29,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   const storeInput = useStore((state) => state.input)
   const [input, setInput] = useState(storeInput ?? '')
 
-  const { inputRef } = useInputFocus()
+  const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const { handleSubmit } = useSubmitQuery()
 
@@ -94,6 +93,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
         <AttachmentsButton />
       </div>
       <textarea
+        id={'textarea-input'}
         ref={inputRef}
         autoFocus={true}
         placeholder={`Ask ${promptName ? promptName : 'Highlight'} anything...`}
@@ -104,4 +104,11 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
       />
     </div>
   )
+}
+
+export const useInputFocus = () => {
+  return () => {
+    const input = document.getElementById('textarea-input')
+    input?.focus()
+  }
 }
