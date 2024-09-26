@@ -98,7 +98,7 @@ export async function GET(request: Request) {
   // Select all prompts that the user has added
   const { data: selectResult, error } = await supabase
     .from('added_prompts')
-    .select(`prompts(${PROMPTS_TABLE_SELECT_FIELDS}, prompt_usages(created_at)), created_at`)
+    .select(`prompts(${PROMPTS_TABLE_SELECT_FIELDS}), created_at`)
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
 
@@ -109,7 +109,7 @@ export async function GET(request: Request) {
   // Select all prompts that the user owns
   const { data: ownedPrompts, error: ownedPromptsError } = await supabase
     .from('prompts')
-    .select(`${PROMPTS_TABLE_SELECT_FIELDS}, prompt_usages(created_at)`)
+    .select(`${PROMPTS_TABLE_SELECT_FIELDS}`)
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
 
@@ -146,15 +146,10 @@ export async function GET(request: Request) {
     return index === self.findIndex((t) => t.external_id === prompt.external_id)
   })
 
-  // Sort the most recent prompt usage to the top
   const filteredPromptsWithUsages = filteredPrompts.map((prompt) => {
-    const sorted = prompt.prompt_usages.sort((a: any, b: any) => {
-      return b.created_at.localeCompare(a.created_at)
-    })
     return {
       ...prompt,
-      prompt_usages: undefined,
-      last_usage: sorted[0]?.created_at ?? null,
+      last_usage: null,
     }
   })
 

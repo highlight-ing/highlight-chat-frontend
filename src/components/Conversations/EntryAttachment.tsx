@@ -2,7 +2,7 @@ import React from 'react'
 import { VoiceSquare } from 'iconsax-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useStore } from '@/providers/store-provider'
-import { useInputFocus } from '@/context/InputFocusProvider'
+import { useInputFocus } from '@/components/Input/Input'
 
 interface EntryAttachmentProps {
   transcript: string
@@ -11,7 +11,7 @@ interface EntryAttachmentProps {
 
 export function EntryAttachment({ transcript, wordCount }: EntryAttachmentProps) {
   const addAttachment = useStore((state) => state.addAttachment)
-  const { focusInput } = useInputFocus()
+  const focusInput = useInputFocus()
 
   const truncatedTranscript = transcript.split(' ').slice(0, 25).join(' ')
   const remainingWords = wordCount - 25
