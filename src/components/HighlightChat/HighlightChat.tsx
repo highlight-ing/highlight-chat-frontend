@@ -18,7 +18,6 @@ import useHandleConversationLoad from '@/hooks/useHandleConversationLoad'
 import { useOnAppOpen } from '@/hooks/useOnAppOpen'
 import { useOnPromptChange } from '@/hooks/useOnPromptChange'
 import useOnExternalMessage from '@/hooks/useOnExternalMessage'
-import { InputFocusProvider } from '@/context/InputFocusProvider'
 
 /**
  * Hook that handles pasting from the clipboard.
