@@ -98,21 +98,19 @@ const HighlightChat = () => {
   useOnExternalMessage()
 
   return (
-    <InputFocusProvider>
-      <div className={styles.page}>
-        <History showHistory={showHistory} setShowHistory={setShowHistory} />
-        <TopBar showHistory={showHistory} setShowHistory={setShowHistory} />
-        <div
-          className={`${styles.contents} ${showHistory ? styles.partial : styles.full} ${messages.length > 0 || inputIsDisabled || !!promptApp ? styles.justifyEnd : ''}`}
-        >
-          <ChatHeader isShowing={!isConversationLoading && !!promptApp && messages.length === 0} />
-          {(isChatting || (isConversationLoading && messages.length > 0)) && <Messages />}
-          {isConversationLoading && messages.length === 0 && !inputIsDisabled && <MessagesPlaceholder />}
-          <ChatHome isShowing={!isChatting && !promptApp && !isConversationLoading} />
-          {(isChatting || promptApp) && <Input isActiveChat={true} />}
-        </div>
+    <div className={styles.page}>
+      <History showHistory={showHistory} setShowHistory={setShowHistory} />
+      <TopBar showHistory={showHistory} setShowHistory={setShowHistory} />
+      <div
+        className={`${styles.contents} ${showHistory ? styles.partial : styles.full} ${messages.length > 0 || inputIsDisabled || !!promptApp ? styles.justifyEnd : ''}`}
+      >
+        <ChatHeader isShowing={!isConversationLoading && !!promptApp && messages.length === 0} />
+        {(isChatting || (isConversationLoading && messages.length > 0)) && <Messages />}
+        {isConversationLoading && messages.length === 0 && !inputIsDisabled && <MessagesPlaceholder />}
+        <ChatHome isShowing={!isChatting && !promptApp && !isConversationLoading} />
+        {(isChatting || promptApp) && <Input isActiveChat={true} />}
       </div>
-    </InputFocusProvider>
+    </div>
   )
 }
 
