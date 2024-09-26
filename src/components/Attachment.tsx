@@ -8,6 +8,7 @@ import { useImageDownload } from '@/hooks/useImageDownload'
 import { trackEvent } from '@/utils/amplitude'
 import { useShallow } from 'zustand/react/shallow'
 import { VoiceSquare } from 'iconsax-react'
+import { getWordCount } from '@/utils/string'
 
 interface BaseAttachmentProps {
   removeEnabled?: boolean
@@ -59,6 +60,7 @@ export const Attachment = ({
   }
 
   const renderAttachmentContent = () => {
+    const size = 20
     switch (type) {
       case 'image':
         if (isSharedImage && sharedImageUrl) {
@@ -91,7 +93,7 @@ export const Attachment = ({
               />
             )
           }
-          if (error) return <GallerySlash size={32} color="#FF8A65" />
+          if (error) return <GallerySlash color="#FF8A65" size={size} />
           return (
             <img
               className="transition-padding pointer-events-none flex h-12 w-auto max-w-20 items-center overflow-hidden rounded-sm object-cover opacity-50 transition-opacity duration-150 ease-in-out"
@@ -103,16 +105,13 @@ export const Attachment = ({
           )
         }
       case 'clipboard':
-        return <ClipboardText className="text-white" />
       case 'window_context':
-        return <ClipboardText className="text-white" />
-      case 'audio':
-        return <Sound className="text-white" />
+        return <ClipboardText className="text-secondary" variant="Bold" size={size} />
       case 'pdf':
         return (
           <div className="align-center flex w-full justify-center gap-2 p-2">
-            <Document className="min-w-5 text-white" />
-            <span className="inline-block max-w-40 truncate align-middle text-sm text-white">{value}</span>
+            <DocumentText1 className="min-w-5 text-secondary" variant="Bold" size={size} />
+            <span className="inline-block max-w-40 truncate align-middle text-sm text-secondary">{value}</span>
           </div>
         )
       case 'window':
@@ -125,25 +124,19 @@ export const Attachment = ({
                 className="h-[42px] w-[42px] bg-[url('../assets/window-border.png')] p-[2px]"
               />
             ) : (
-              <Keyboard className="text-white" />
+              <DocumentText1 className="text-white" variant="Bold" size={size} />
             )}
           </>
         )
       case 'text_file':
         return (
           <div className="align-center flex w-full justify-center gap-2 p-2">
-            <DocumentText1 className="min-w-5 text-white" />
+            <DocumentText1 className="min-w-5 text-white" variant="Bold" size={size} />
             <span className="inline-block max-w-40 truncate align-middle text-sm text-white">{value}</span>
           </div>
         )
-      case 'conversation':
-        return (
-          <div className="align-center flex w-full justify-center gap-2 p-2">
-            <VoiceSquare className="min-w-5 text-conv-green" />
-          </div>
-        )
       default:
-        return null
+        return <DocumentText1 className="text-white" variant="Bold" size={size} />
     }
   }
 
@@ -155,13 +148,27 @@ export const Attachment = ({
       disabled={!value || value.length === 0 || type === 'image'}
     >
       <div className="group relative">
-        <div
-          className={`flex h-12 items-center justify-center rounded-md border border-light-10 bg-light-20 ${
-            type === 'pdf' ? 'max-w-40' : 'max-w-20'
-          } ${type !== 'image' ? 'min-w-12' : 'min-w-8'} w-fit overflow-hidden`}
-        >
-          {renderAttachmentContent()}
-        </div>
+        {type === 'conversation' || type === 'audio' ? (
+          <div className="flex h-[52px] w-fit items-center gap-2.5 text-nowrap rounded-[10px] border border-light-10 bg-secondary p-[7px_16px_7px_5px] text-base">
+            <div className="rounded-md border border-light-10 bg-green-20 p-[10px]">
+              <VoiceSquare className="min-w-5 text-conv-green" variant="Bold" size={20} />
+            </div>
+            <div className="flex max-w-[180px] flex-col gap-1">
+              <span className="overflow-hid</div>den text-ellipsis whitespace-nowrap text-[13px] font-medium leading-4 text-secondary">
+                Conversation
+              </span>
+              <span className="text-[10px] font-[350] leading-4 text-tertiary">{getWordCount(value)} words</span>
+            </div>
+          </div>
+        ) : (
+          <div
+            className={`flex h-[52px] items-center justify-center rounded-[10px] border border-light-10 bg-secondary ${
+              type === 'pdf' ? 'max-w-40' : 'max-w-20'
+            } ${type !== 'image' ? 'min-w-12' : 'min-w-[52px]'} w-fit overflow-hidden`}
+          >
+            {renderAttachmentContent()}
+          </div>
+        )}
         {removeEnabled && (
           <div
             className="absolute right-[-8px] top-[-8px] hidden cursor-pointer rounded-full bg-light-20 p-0.5 text-light-80 group-hover:flex"
