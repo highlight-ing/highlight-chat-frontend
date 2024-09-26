@@ -6,10 +6,11 @@ import { useStore } from '@/providers/store-provider'
 import { useChatHistory } from '@/hooks/useChatHistory'
 
 const useOnExternalMessage = () => {
-  const { setConversationId, openModal, closeAllModals } = useStore((state) => ({
+  const { setConversationId, openModal, closeAllModals, isModalOpen } = useStore((state) => ({
     setConversationId: state.setConversationId,
     openModal: state.openModal,
     closeAllModals: state.closeAllModals,
+    isModalOpen: state.isModalOpen,
   }))
   const { refreshChatItem } = useChatHistory()
 
@@ -30,9 +31,17 @@ const useOnExternalMessage = () => {
         setConversationId(message.conversationId)
       } else if (message.type === 'customize-prompt') {
         console.log('Customize prompt message received for prompt:', message.prompt)
-        // TODO (SP) how should we handle this if you're currently editing another action for example?
-        closeAllModals()
-        openModal('edit-prompt', { prompt: message.prompt })
+
+        const openCustomizePromptModal = () => {
+          closeAllModals()
+          openModal('edit-prompt', { prompt: message.prompt })
+        }
+
+        if (isModalOpen('edit-prompt')) {
+          openModal('unsaved-changes', { onContinue: openCustomizePromptModal })
+        } else {
+          openCustomizePromptModal()
+        }
       }
     })
 
