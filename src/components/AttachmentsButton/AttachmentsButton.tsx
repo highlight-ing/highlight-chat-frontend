@@ -12,11 +12,13 @@ import mammoth from 'mammoth'
 import * as pptxtojson from 'pptxtojson'
 import { trackEvent } from '@/utils/amplitude'
 import { ConversationAttachmentPicker } from '../ConversationAttachmentPicker.tsx/ConversationAttachmentPicker'
+import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
 
 export const AttachmentsButton = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [screenshotPickerVisible, setScreenshotPickerVisible] = useState(false)
   const [conversationPickerVisible, setConversationPickerVisible] = useState(false)
+  const messages = useCurrentChatMessages()
 
   const { setFileInputRef, addAttachment } = useStore(
     useShallow((state) => ({
@@ -258,7 +260,7 @@ export const AttachmentsButton = () => {
   return (
     <>
       <ContextMenu
-        position="top"
+        position={messages.length > 0 ? 'top' : 'bottom'}
         triggerId="attachments-button"
         leftClick={true}
         items={menuItems}
