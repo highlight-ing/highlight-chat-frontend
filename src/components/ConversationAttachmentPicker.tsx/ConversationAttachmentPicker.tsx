@@ -50,7 +50,7 @@ export const ConversationAttachmentPicker = ({ onClose, onBack }: ConversationAt
         </div>
       ),
       title: getConversationDisplayTitle(conversation),
-      description: `${getWordCount(conversation.transcript)} Words`,
+      description: `Started ${getTimeAgo(currentConversationTimestamp)} | ${getWordCount(conversation.transcript)} Words`,
       onClick: () => {
         addAttachment({
           type: 'conversation',

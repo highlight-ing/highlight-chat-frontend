@@ -130,10 +130,19 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return () => removeListeners()
   }, [setupListeners])
 
+  useEffect(() => {
+    const getInitialAudioTranscriptEnabled = async () => {
+      // @ts-ignore
+      const enabled = await globalThis.highlight?.internal?.isAudioTranscriptEnabled()
+      setIsAudioTranscripEnabled(enabled)
+    }
+
+    getInitialAudioTranscriptEnabled()
+  }, [])
+
   const fetchLatestData = useCallback(async () => {
     const allConversations = await Highlight.conversations.getAllConversations()
-    // setConversations(allConversations)
-    setConversations([])
+    setConversations(allConversations)
     const currentConv = await Highlight.conversations.getCurrentConversation()
     setCurrentConversation(currentConv)
     const elapsedTime = await Highlight.conversations.getElapsedTime()
