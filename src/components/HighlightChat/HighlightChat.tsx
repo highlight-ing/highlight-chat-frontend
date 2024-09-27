@@ -75,11 +75,12 @@ function useHandleClipboardPaste() {
 
 const HighlightChat = () => {
   // STATE
-  const { inputIsDisabled, promptApp, isConversationLoading } = useStore(
+  const { inputIsDisabled, promptApp, isConversationLoading, selectedConversation } = useStore(
     useShallow((state) => ({
       inputIsDisabled: state.inputIsDisabled,
       promptApp: state.promptApp,
       isConversationLoading: state.isConversationLoading,
+      selectedConversation: state.selectedConversation,
     })),
   )
   const messages = useCurrentChatMessages()
@@ -99,13 +100,12 @@ const HighlightChat = () => {
 
   return (
     <div className={styles.page}>
-      <ConversationPreview />
+      <History showHistory={showHistory} setShowHistory={setShowHistory} />
       <TopBar showHistory={showHistory} setShowHistory={setShowHistory} />
+      {selectedConversation && <ConversationPreview />}
       <div
         className={`${styles.contents} ${showHistory ? styles.partial : styles.full} ${messages.length > 0 || inputIsDisabled || !!promptApp ? styles.justifyEnd : ''}`}
       >
-        <History showHistory={showHistory} setShowHistory={setShowHistory} />
-
         <ChatHeader isShowing={!isConversationLoading && !!promptApp && messages.length === 0} />
         {(isChatting || (isConversationLoading && messages.length > 0)) && <Messages />}
         {isConversationLoading && messages.length === 0 && !inputIsDisabled && <MessagesPlaceholder />}

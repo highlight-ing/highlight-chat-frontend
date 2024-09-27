@@ -78,7 +78,10 @@ export const ConversationAttachmentPicker = ({ onClose, onBack }: ConversationAt
     imageComponent: <div className={styles.placeholder} />,
     title: 'No conversations yet',
     description: 'Transcribing...',
-    onClick: onClose,
+    onClick: () => {
+      addAttachment({ type: 'conversation', value: 'this is a fake converastion' })
+      onClose()
+    },
   }
 
   const attachmentOptions = !isAudioTranscripEnabled

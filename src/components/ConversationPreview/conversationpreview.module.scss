@@ -17,6 +17,20 @@
   width: 445px;
   margin-bottom: 90px;
   gap: 12px;
+  position: relative;
+}
+
+.closeButton {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  display: none;
+  color: $text-secondary;
+  cursor: pointer;
+}
+
+.container:hover .closeButton {
+  display: block;
 }
 
 .header {
