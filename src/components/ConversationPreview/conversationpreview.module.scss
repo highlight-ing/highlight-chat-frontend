@@ -1,0 +1,71 @@
+@import '@/variables.module';
+
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-direction: column;
+  margin-top: 120px;
+}
+.container {
+  background-color: $green-20;
+  border-radius: 20px;
+  padding: 16px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 445px;
+  margin-bottom: 90px;
+  gap: 12px;
+}
+
+.header {
+  color: $text-secondary;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.conversationText {
+  color: $text-primary;
+  font-size: 15px;
+  line-height: 24px;
+  font-weight: 400;
+}
+
+.actionRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+}
+
+.buttonsContainer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: $text-subtle;
+  cursor: pointer;
+  
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+.buttonText {
+  font-size: 13px;
+  font-weight: 500 ;
+  line-height: 20px;
+  letter-spacing: -0.26;
+}
+
+.feedbackContainer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
