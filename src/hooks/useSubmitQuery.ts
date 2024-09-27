@@ -9,9 +9,18 @@ import { HighlightContext } from '@highlight-ai/app-runtime'
 import Highlight from '@highlight-ai/app-runtime'
 import * as Sentry from '@sentry/react'
 
-import { addAttachmentsToFormData, fetchWindows } from '@/utils/attachmentUtils'
+import { fetchWindows } from '@/utils/attachmentUtils'
 import { parseAndHandleStreamChunk } from '@/utils/streamParser'
-import { buildFormData, FormDataInputs, AttachedContexts, AvailableContexts } from '@/utils/formDataUtils'
+import {
+  buildFormData,
+  OCRTextAttachment,
+  WindowListAttachment,
+  ClipboardTextAttachment,
+  AboutMeAttachment,
+  ConversationAttachment,
+  AttachedContexts,
+  AvailableContexts,
+} from '@/utils/formDataUtils'
 import { trackEvent } from '@/utils/amplitude'
 import { processAttachments } from '@/utils/contextprocessor'
 import { FileAttachment } from '@/types'
@@ -34,26 +43,31 @@ import {
 } from '@/utils/formDataUtils'
 
 async function createAttachmentMetadata(
-  attachment: FileAttachment,
-  fileId: string,
+  attachment: FileAttachment | Attachment,
+  fileId?: string,
 ): Promise<
   | TextFileAttachmentMetadata
   | FileAttachmentMetadata
   | ImageAttachmentMetadata
   | PDFAttachment
+  | OCRTextAttachment
   | WindowContentsAttachment
+  | WindowListAttachment
+  | ClipboardTextAttachment
+  | AboutMeAttachment
+  | ConversationAttachment
 > {
   switch (attachment.type) {
     case 'pdf':
       return {
         type: 'pdf',
         name: attachment.value.name,
-        file_id: fileId,
+        file_id: fileId || '',
       }
     case 'image':
       return {
         type: 'image',
-        file_id: fileId,
+        file_id: fileId || '',
       }
     case 'text_file':
       return {
@@ -77,6 +91,9 @@ async function createAttachmentMetadata(
       return {
         type: 'window_contents',
         text: attachment.value,
+        name: '',
+        words: attachment.value.split(/\s+/).length,
+        created_at: new Date(),
       }
     default:
       return {
@@ -418,6 +435,9 @@ export const useSubmitQuery = () => {
         }
       })
 
+      console.log('attachedContext: ', attachedContext)
+      console.log('availableContexts: ', availableContexts)
+
       // Build FormData using the updated builder
       const formData = await buildFormData({
         prompt: query,
@@ -492,6 +512,17 @@ export const useSubmitQuery = () => {
       })
       await Promise.all(fileAttachmentsPromises)
 
+      // Add window list and conversation metadata here
+      const windowListAttachment =
+        // const nonFileAttachments = attachments.filter((a) => a.type !== 'text_file')
+        // nonFileAttachments.forEach(async (attachment) => {
+        //   const metadata = await createAttachmentMetadata(attachment)
+        //   availableContexts.context.push(metadata)
+        // })
+
+        console.log('attachedContext: ', attachedContext)
+      console.log('availableContexts: ', availableContexts)
+
       // Build FormData using the updated builder
       const formData = await buildFormData({
         prompt: query,
@@ -513,7 +544,6 @@ export const useSubmitQuery = () => {
       updateLastMessageSentTimestamp()
       clearAttachments()
 
-      const accessToken = await getAccessToken()
       await fetchResponse(conversationId, formData, !!promptApp, promptApp)
     } catch (error: any) {
       handleError(error, { method: 'handleSubmit' })

@@ -46,11 +46,17 @@ export interface PDFAttachment {
 export interface OCRTextAttachment {
   type: 'ocr_text'
   text: string
+  name: string
+  words: number
+  created_at: Date
 }
 
 export interface WindowContentsAttachment {
   type: 'window_contents'
   text: string
+  name: string
+  words: number
+  created_at: Date
 }
 
 export interface WindowListAttachment {
@@ -105,13 +111,7 @@ export interface AttachedContexts {
 }
 
 export interface AvailableContexts {
-  context: Array<
-    | TextFileAttachmentMetadata
-    | FileAttachmentMetadata
-    | ImageAttachmentMetadata
-    | PDFAttachment
-    | ConversationAttachmentMetadata
-  >
+  context: Array<WindowListAttachment | ConversationAttachmentMetadata>
 }
 
 export const buildFormData = async ({
