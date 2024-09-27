@@ -21,7 +21,7 @@ import { Attachment } from '@/types'
 
 // Create a type guard for FileAttachment
 function isFileAttachment(attachment: Attachment): attachment is FileAttachment {
-  return ['pdf', 'spreadsheet', 'text_file', 'image'].includes(attachment.type)
+  return ['pdf', 'image'].includes(attachment.type)
 }
 
 // Import necessary types from formDataUtils
@@ -33,16 +33,28 @@ import {
   WindowContentsAttachment,
 } from '@/utils/formDataUtils'
 
-function createAttachmentMetadata(
+async function createAttachmentMetadata(
   attachment: FileAttachment,
   fileId: string,
-):
+): Promise<
   | TextFileAttachmentMetadata
   | FileAttachmentMetadata
   | ImageAttachmentMetadata
   | PDFAttachment
-  | WindowContentsAttachment {
+  | WindowContentsAttachment
+> {
   switch (attachment.type) {
+    case 'pdf':
+      return {
+        type: 'pdf',
+        name: attachment.value.name,
+        file_id: fileId,
+      }
+    case 'image':
+      return {
+        type: 'image',
+        file_id: fileId,
+      }
     case 'text_file':
       return {
         type: 'text_file',
@@ -51,22 +63,13 @@ function createAttachmentMetadata(
         words: attachment.value.split(/\s+/).length,
         created_at: new Date(),
       }
-    case 'pdf':
-      return {
-        type: 'pdf',
-        name: 'PDF Document',
-        file_id: fileId,
-      }
-    case 'image':
-      return {
-        type: 'image',
-        file_id: fileId,
-      }
     case 'spreadsheet':
+      const text = await attachment.value.text()
+
       return {
         type: 'file_attachment',
         name: 'Spreadsheet',
-        words: 0, // You might want to calculate this
+        words: text.split(/\s+/).length,
         created_at: new Date(),
         file_type: 'spreadsheet',
       }
@@ -92,7 +95,7 @@ function getFileType(attachment: FileAttachment): string {
     case 'pdf':
       return 'application/pdf'
     case 'image':
-      return attachment.fileName?.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg'
+      return attachment.value?.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg'
     case 'spreadsheet':
       return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     case 'text_file':
@@ -388,7 +391,7 @@ export const useSubmitQuery = () => {
       // Upload files first
       const uploadedFiles = await Promise.all(
         fileAttachments.map(async (attachment) => {
-          const fileName = attachment.fileName || `${uuidv4()}.${attachment.type}`
+          const fileName = `${uuidv4()}.${attachment.type}`
           const mimeType = getFileType(attachment)
           const uploadedFile = await uploadFile(
             new File([attachment.value], fileName, { type: mimeType }),
@@ -407,10 +410,11 @@ export const useSubmitQuery = () => {
       )
 
       // Now you can use this map to get the file ID for any file attachment
-      fileAttachments.forEach((attachment) => {
+      fileAttachments.forEach(async (attachment) => {
         const fileId = attachmentToFileIdMap.get(attachment)
         if (fileId) {
-          attachedContext.context.push(createAttachmentMetadata(attachment, fileId))
+          const metadata = await createAttachmentMetadata(attachment, fileId)
+          attachedContext.context.push(metadata)
         }
       })
 
@@ -478,12 +482,15 @@ export const useSubmitQuery = () => {
       )
 
       // Now you can use this map to get the file ID for any file attachment
-      attachments.filter(isFileAttachment).forEach((attachment) => {
+      const fileAttachments = attachments.filter(isFileAttachment)
+      const fileAttachmentsPromises = fileAttachments.map(async (attachment) => {
         const fileId = attachmentToFileIdMap.get(attachment)
         if (fileId) {
-          attachedContext.context.push(createAttachmentMetadata(attachment, fileId))
+          const metadata = await createAttachmentMetadata(attachment, fileId)
+          attachedContext.context.push(metadata)
         }
       })
+      await Promise.all(fileAttachmentsPromises)
 
       // Build FormData using the updated builder
       const formData = await buildFormData({
