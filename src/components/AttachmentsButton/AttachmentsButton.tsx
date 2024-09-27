@@ -238,7 +238,7 @@ export const AttachmentsButton = () => {
         </div>
       ),
       onClick: () => {
-        window.location.href = 'highlight://app/conversations'
+        setConversationPickerVisible(true)
       },
     },
   ].filter(Boolean) as MenuItemType[]
