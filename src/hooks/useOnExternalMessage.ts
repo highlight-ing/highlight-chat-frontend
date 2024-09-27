@@ -6,8 +6,11 @@ import { useStore } from '@/providers/store-provider'
 import { useChatHistory } from '@/hooks/useChatHistory'
 
 const useOnExternalMessage = () => {
-  const { setConversationId } = useStore((state) => ({
+  const { setConversationId, openModal, closeAllModals, isModalOpen } = useStore((state) => ({
     setConversationId: state.setConversationId,
+    openModal: state.openModal,
+    closeAllModals: state.closeAllModals,
+    isModalOpen: state.isModalOpen,
   }))
   const { refreshChatItem } = useChatHistory()
 
@@ -26,6 +29,19 @@ const useOnExternalMessage = () => {
           return
         }
         setConversationId(message.conversationId)
+      } else if (message.type === 'customize-prompt') {
+        console.log('Customize prompt message received for prompt:', message.prompt)
+
+        const openCustomizePromptModal = () => {
+          closeAllModals()
+          openModal('edit-prompt', { prompt: message.prompt })
+        }
+
+        if (isModalOpen('edit-prompt')) {
+          openModal('unsaved-changes', { onContinue: openCustomizePromptModal })
+        } else {
+          openCustomizePromptModal()
+        }
       }
     })
 
@@ -33,7 +49,7 @@ const useOnExternalMessage = () => {
     return () => {
       removeListener()
     }
-  }, [setConversationId])
+  }, [setConversationId, openModal])
 }
 
 export default useOnExternalMessage

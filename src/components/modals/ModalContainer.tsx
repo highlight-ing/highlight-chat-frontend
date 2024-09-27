@@ -17,6 +17,7 @@ import ConfirmOverridePrompt from '@/presentations/modals/ConfirmOverridePrompt'
 import PromptAddedModal from '@/presentations/modals/PromptAddedModal'
 import CustomizePromptModal from '@/presentations/modals/CustomizePromptModal'
 import CreatePromptFromTemplateModal from '@/presentations/modals/CreatePromptFromTemplate'
+import UnsavedChangesModal from '@/presentations/modals/UnsavedChangesModal'
 
 type FunctionalComponent = (props: ModalObjectProps) => JSX.Element
 
@@ -37,6 +38,7 @@ const ModalMap: Record<string, FunctionalComponent> = {
   'prompt-added': PromptAddedModal,
   'customize-prompt': CustomizePromptModal,
   'create-prompt-from-template': CreatePromptFromTemplateModal,
+  'unsaved-changes': UnsavedChangesModal,
 }
 
 export const ModalContainer = () => {

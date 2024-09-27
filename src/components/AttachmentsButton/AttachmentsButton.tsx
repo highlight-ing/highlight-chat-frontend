@@ -8,7 +8,6 @@ import { ScreenshotAttachmentPicker } from '../ScreenshotAttachmentPicker/Screns
 import { useShallow } from 'zustand/react/shallow'
 import styles from './attachments-button.module.scss'
 import Tooltip from '@/components/Tooltip/Tooltip'
-import * as XLSX from 'xlsx'
 import mammoth from 'mammoth'
 import * as pptxtojson from 'pptxtojson'
 import { trackEvent } from '@/utils/amplitude'
@@ -200,17 +199,6 @@ export const AttachmentsButton = () => {
       label: (
         <div className={styles.menuItem}>
           <div className={styles.iconWrapper}>
-            <DocumentUpload size={20} variant={'Bold'} />
-          </div>
-          Upload from computer
-        </div>
-      ),
-      onClick: handleAttachmentClick,
-    },
-    {
-      label: (
-        <div className={styles.menuItem}>
-          <div className={styles.iconWrapper}>
             <ClipboardText size={20} variant={'Bold'} />
           </div>
           Clipboard
@@ -228,6 +216,17 @@ export const AttachmentsButton = () => {
         </div>
       ),
       onClick: onClickScreenshot,
+    },
+    {
+      label: (
+        <div className={styles.menuItem}>
+          <div className={styles.iconWrapper}>
+            <DocumentUpload size={20} variant={'Bold'} />
+          </div>
+          Upload file
+        </div>
+      ),
+      onClick: handleAttachmentClick,
     },
     {
       label: (
@@ -258,7 +257,13 @@ export const AttachmentsButton = () => {
 
   return (
     <>
-      <ContextMenu position="top" triggerId="attachments-button" leftClick={true} items={menuItems}>
+      <ContextMenu
+        position="top"
+        triggerId="attachments-button"
+        leftClick={true}
+        items={menuItems}
+        menuStyle={{ background: '#191919', borderColor: '#222222' }}
+      >
         {
           // @ts-ignore
           ({ isOpen }) => (
