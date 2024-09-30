@@ -80,6 +80,7 @@ export interface WindowContextAttachment {
   type: 'window_context'
   value: string
 }
+
 export interface SpreadsheetAttachment {
   type: 'spreadsheet'
   value: File

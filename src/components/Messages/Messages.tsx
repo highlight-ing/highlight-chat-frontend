@@ -61,12 +61,9 @@ const Messages = () => {
     <Scrollable className={styles.messagesContainer} ref={scrollContainerRef} onScroll={handleScroll}>
       <div className={styles.messages}>
         {messages.length > 0 &&
-          messages.map((message, index) => {
-            if (message.role === 'assistant' && !message.content?.trim()?.length) {
-              return ''
-            }
-            return <Message key={index} message={message} />
-          })}
+          messages
+            .filter((message) => !(message.role === 'assistant' && !message.content?.trim()?.length))
+            .map((message, index) => <Message key={index} message={message} />)}
         {inputIsDisabled &&
           (!messages.length ||
             messages[messages.length - 1].role !== 'assistant' ||

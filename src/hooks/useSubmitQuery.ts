@@ -24,13 +24,13 @@ import {
 } from '@/utils/formDataUtils'
 import { trackEvent } from '@/utils/amplitude'
 import { processAttachments } from '@/utils/contextprocessor'
-import { FileAttachment } from '@/types'
+import { FileAttachment, ImageAttachment, PdfAttachment } from '@/types'
 import { useUploadFile } from './useUploadFile'
 import { v4 as uuidv4 } from 'uuid'
 import { Attachment } from '@/types'
 
 // Create a type guard for FileAttachment
-function isFileAttachment(attachment: Attachment): attachment is FileAttachment {
+function isUploadableAttachment(attachment: Attachment): attachment is PdfAttachment | ImageAttachment {
   return ['pdf', 'image'].includes(attachment.type)
 }
 
@@ -42,6 +42,7 @@ import {
   PDFAttachment,
   WindowContentsAttachment,
 } from '@/utils/formDataUtils'
+import { getWordCount } from '@/utils/string'
 
 async function createAttachmentMetadata(
   attachment: FileAttachment | Attachment,
@@ -75,7 +76,7 @@ async function createAttachmentMetadata(
         type: 'text_file',
         name: attachment.fileName || 'Unnamed text file',
         text: attachment.value,
-        words: attachment.value.split(/\s+/).length,
+        words: getWordCount(attachment.value),
         created_at: new Date(),
       }
     case 'spreadsheet':
@@ -84,7 +85,7 @@ async function createAttachmentMetadata(
       return {
         type: 'file_attachment',
         name: 'Spreadsheet',
-        words: text.split(/\s+/).length,
+        words: getWordCount(text),
         created_at: new Date(),
         file_type: 'spreadsheet',
       }
@@ -93,8 +94,22 @@ async function createAttachmentMetadata(
         type: 'window_contents',
         text: attachment.value,
         name: '',
-        words: attachment.value.split(/\s+/).length,
+        words: getWordCount(attachment.value),
         created_at: new Date(),
+      }
+    case 'clipboard':
+      return {
+        type: 'clipboard_text',
+        text: attachment.value,
+      }
+    case 'audio': // TODO (SP) there should be no more audio attachments, just conversations. This is coming soon
+    case 'conversation': // TODO (SP) title, started at, and ended at need to be added to the conversation attachment type
+      return {
+        type: 'conversation',
+        title: 'conversation',
+        text: attachment.value,
+        started_at: new Date().toISOString(),
+        ended_at: new Date().toISOString(),
       }
     default:
       return {
@@ -108,7 +123,7 @@ async function createAttachmentMetadata(
 }
 
 // Add this helper function at the top of the file
-function getFileType(attachment: FileAttachment): string {
+function getFileType(attachment: Attachment): string {
   switch (attachment.type) {
     case 'pdf':
       return 'application/pdf'
@@ -278,7 +293,7 @@ export const useSubmitQuery = () => {
             })
           }
         }
-        console.log('incoming from parser factIndex: ', factIndex, 'fact: ', fact)
+
         if (typeof factIndex === 'number' && fact) {
           updateLastConversationMessage(conversationId, {
             role: 'assistant',
@@ -378,7 +393,7 @@ export const useSubmitQuery = () => {
     if (query || clipboardText || contentToUse || screenshotUrl || audio || hasFileAttachment) {
       setInputIsDisabled(true)
 
-      const fileAttachments = attachments.filter(isFileAttachment)
+      const fileAttachments = attachments.filter(isUploadableAttachment)
 
       const conversationId = getOrCreateConversationId()
       addConversationMessage(conversationId, {
@@ -424,7 +439,7 @@ export const useSubmitQuery = () => {
 
       // Create a map of original attachments to file IDs
       const attachmentToFileIdMap = new Map(
-        uploadedFiles.map(({ originalAttachment, uploadedFile }) => [originalAttachment, uploadedFile.file_id]),
+        uploadedFiles.map(({ originalAttachment, uploadedFile }) => [originalAttachment, uploadedFile?.file_id]),
       )
 
       // Now you can use this map to get the file ID for any file attachment
@@ -457,7 +472,6 @@ export const useSubmitQuery = () => {
 
       availableContexts.context.push(...conversationAttachments)
 
-      const windows = await fetchWindows()
       // Add window list and conversation metadata here
       const windowListAttachment: WindowListAttachment = {
         type: 'window_list',
@@ -486,7 +500,7 @@ export const useSubmitQuery = () => {
     promptApp?: Prompt,
     context?: { image?: string; window_context?: string },
   ) => {
-    console.log('handleSubmit triggered')
+    console.log('handleSubmit triggered', attachments)
 
     const query = input.trim()
 
@@ -500,22 +514,6 @@ export const useSubmitQuery = () => {
 
       const conversationId = getOrCreateConversationId()
 
-      // Upload files first
-      const uploadedFiles = await Promise.all(
-        attachments.filter(isFileAttachment).map(async (attachment) => {
-          const fileName = `${uuidv4()}.${attachment.type}`
-          const mimeType = getFileType(attachment)
-          const uploadedFile = await uploadFile(
-            new File([attachment.value], fileName, { type: mimeType }),
-            conversationId,
-          )
-          return {
-            originalAttachment: attachment,
-            uploadedFile: uploadedFile,
-          }
-        }),
-      )
-
       // Extract and format attached_context_metadata
       const attachedContext: AttachedContexts = {
         context: [],
@@ -525,21 +523,32 @@ export const useSubmitQuery = () => {
         context: [],
       }
 
-      // Create a map of original attachments to file IDs
-      const attachmentToFileIdMap = new Map(
-        uploadedFiles.map(({ originalAttachment, uploadedFile }) => [originalAttachment, uploadedFile.file_id]),
+      // Upload files first
+      const uploadFilePromises = await Promise.all(
+        attachments.filter(isUploadableAttachment).map(async (attachment) => {
+          const fileName = `${uuidv4()}.${attachment.type}`
+          const mimeType = getFileType(attachment)
+          const uploadedFile = await uploadFile(
+            new File([attachment.value], fileName, { type: mimeType }),
+            conversationId,
+          )
+
+          if (uploadedFile && uploadedFile.file_id) {
+            console.log('adding uploaded file to attachedContext', attachment.type)
+            const metadata = await createAttachmentMetadata(attachment, uploadedFile.file_id)
+            attachedContext.context.push(metadata)
+          }
+        }),
       )
 
-      // Now you can use this map to get the file ID for any file attachment
-      const fileAttachments = attachments.filter(isFileAttachment)
-      const fileAttachmentsPromises = fileAttachments.map(async (attachment) => {
-        const fileId = attachmentToFileIdMap.get(attachment)
-        if (fileId) {
-          const metadata = await createAttachmentMetadata(attachment, fileId)
-          attachedContext.context.push(metadata)
-        }
-      })
-      await Promise.all(fileAttachmentsPromises)
+      await Promise.all(uploadFilePromises)
+
+      // Add non-uploadable attachments to attachedContext
+      attachments
+        .filter((a) => !isUploadableAttachment(a))
+        .forEach(async (attachment) => {
+          attachedContext.context.push(await createAttachmentMetadata(attachment))
+        })
 
       const conversationData = await Highlight.conversations.getAllConversations()
       const conversationAttachments: Array<ConversationAttachmentMetadata> = conversationData.map((conversation) => ({
