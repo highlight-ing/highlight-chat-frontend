@@ -64,7 +64,7 @@ export const AttachmentPicker = ({ isVisible, onClose, onBack, header, attachmen
           <div ref={portalRef} className={styles.innerContainer} style={{ ...portalStyles }}>
             <div className={styles.header}>
               <ArrowCircleLeft variant="Bold" size={24} onClick={onBack} style={{ cursor: 'pointer' }} />
-              <span>{header}</span>
+              <span className={styles.headerText}>{header}</span>
               <CloseCircle variant="Bold" size={24} onClick={onClose} style={{ cursor: 'pointer' }} />
             </div>
             <div className={styles.rows}>
