@@ -8,13 +8,14 @@ import { useStore } from '@/providers/store-provider'
 import { useShallow } from 'zustand/react/shallow'
 
 interface ConversationAttachmentPickerProps {
+  isVisible: boolean
   onClose: () => void
   onBack: () => void
 }
 
-const MAX_NUM_CONVERSATION = 10
+const MAX_NUM_CONVERSATION = 20
 
-export const ConversationAttachmentPicker = ({ onClose, onBack }: ConversationAttachmentPickerProps) => {
+export const ConversationAttachmentPicker = ({ onClose, onBack, isVisible }: ConversationAttachmentPickerProps) => {
   const { conversations, elapsedTime, currentConversation, isAudioTranscripEnabled, setIsAudioTranscriptEnabled } =
     useConversations()
   const currentConversationTitle = 'Current Conversation'
@@ -94,7 +95,7 @@ export const ConversationAttachmentPicker = ({ onClose, onBack }: ConversationAt
       header="Attach Conversation"
       onBack={onBack}
       onClose={onClose}
-      isVisible={true}
+      isVisible={isVisible}
       attachmentOptions={attachmentOptions}
     />
   )

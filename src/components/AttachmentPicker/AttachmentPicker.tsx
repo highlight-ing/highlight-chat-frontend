@@ -1,11 +1,9 @@
-import { useStore } from '@/providers/store-provider'
-import Highlight from '@highlight-ai/app-runtime'
-
 import styles from './attachment-picker.module.scss'
 import { ReactElement, useEffect, useRef, useState } from 'react'
-import { trackEvent } from '@/utils/amplitude'
 import { ArrowCircleLeft, CloseCircle } from 'iconsax-react'
 import { Portal } from 'react-portal'
+import { calculatePositionedStyle } from '@/utils/components'
+import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
 
 export interface AttachmentOption {
   imageComponent: ReactElement
@@ -25,28 +23,25 @@ interface AttachmentPickerProps {
 export const AttachmentPicker = ({ isVisible, onClose, onBack, header, attachmentOptions }: AttachmentPickerProps) => {
   const [portalStyles, setPortalStyles] = useState<React.CSSProperties>({})
 
-  const addAttachment = useStore((state) => state.addAttachment)
-
   const containerRef = useRef<HTMLDivElement>(null)
   const portalRef = useRef<HTMLDivElement>(null)
+  const messages = useCurrentChatMessages()
 
   useEffect(() => {
-    if (!containerRef.current) return
-
-    const newStyles: React.CSSProperties = {
-      position: 'fixed',
+    function handleResize() {
+      if (!containerRef.current || !portalRef.current) {
+        return
+      }
+      const styles = calculatePositionedStyle(
+        containerRef.current,
+        portalRef.current,
+        messages.length > 0 ? 'top' : 'bottom',
+        20,
+      )
+      setPortalStyles(styles)
     }
 
-    const targetRect = containerRef.current.getBoundingClientRect()
-    newStyles.top = targetRect.top - 500
-    newStyles.left = targetRect.left
-
-    if (targetRect.top - 500 < 0) {
-      newStyles.top = 50
-      newStyles.maxHeight = targetRect.top
-    }
-
-    setPortalStyles(newStyles)
+    handleResize()
   }, [isVisible])
 
   useEffect(() => {
@@ -61,16 +56,6 @@ export const AttachmentPicker = ({ isVisible, onClose, onBack, header, attachmen
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [onClose])
-
-  const onAddScreenshot = async (screenshot: string, source: 'display' | 'window') => {
-    if (screenshot.length > 0) {
-      addAttachment({
-        type: 'image',
-        value: screenshot,
-      })
-      trackEvent('HL Chat Screenshot Attached', { source })
-    }
-  }
 
   return (
     <div ref={containerRef}>
