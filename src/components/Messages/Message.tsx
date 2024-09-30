@@ -53,7 +53,7 @@ const FactButton = ({ factIndex, fact }: { factIndex?: number; fact?: string }) 
     } else if (fact) {
       Highlight.user.addFact(fact)
     }
-    window.open('highlight://settings/about-me', '_blank')
+    window.open('highlight://about-me', '_blank')
   }
 
   if (clicked || (!factIndex && !fact)) {
