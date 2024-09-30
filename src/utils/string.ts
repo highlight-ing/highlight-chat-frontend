@@ -25,4 +25,6 @@ export const getTimeAgo = (timestamp: Date): string => {
   }
 }
 
-export const getWordCount = (text: string) => text.trim().split(/\s+/).length.toLocaleString()
+export const getWordCount = (text: string): number => text.trim().split(/\s+/).length
+
+export const getWordCountFormatted = (text: string): string => getWordCount(text).toLocaleString()

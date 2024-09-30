@@ -1,4 +1,4 @@
-import { ClipboardText, Document, Keyboard, Sound, GallerySlash, DocumentText1 } from 'iconsax-react'
+import { ClipboardText, GallerySlash, DocumentText1 } from 'iconsax-react'
 import { useState } from 'react'
 import { CloseIcon } from '../icons/icons'
 import Tooltip from './Tooltip/Tooltip'
@@ -8,7 +8,7 @@ import { useImageDownload } from '@/hooks/useImageDownload'
 import { trackEvent } from '@/utils/amplitude'
 import { useShallow } from 'zustand/react/shallow'
 import { VoiceSquare } from 'iconsax-react'
-import { getWordCount } from '@/utils/string'
+import { getWordCountFormatted } from '@/utils/string'
 
 interface BaseAttachmentProps {
   removeEnabled?: boolean
@@ -157,7 +157,9 @@ export const Attachment = ({
               <span className="overflow-hid</div>den text-ellipsis whitespace-nowrap text-[13px] font-medium leading-4 text-secondary">
                 Conversation
               </span>
-              <span className="text-[10px] font-[350] leading-4 text-tertiary">{getWordCount(value)} words</span>
+              <span className="text-[10px] font-[350] leading-4 text-tertiary">
+                {getWordCountFormatted(value)} words
+              </span>
             </div>
           </div>
         ) : (

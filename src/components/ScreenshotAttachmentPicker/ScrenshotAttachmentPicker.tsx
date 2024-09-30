@@ -2,10 +2,9 @@ import { useStore } from '@/providers/store-provider'
 import Highlight from '@highlight-ai/app-runtime'
 
 import styles from './screenshot-attachment-picker.module.scss'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { trackEvent } from '@/utils/amplitude'
-import { ArrowCircleLeft, CloseCircle } from 'iconsax-react'
-import { Portal } from 'react-portal'
+import { AttachmentPicker } from '../AttachmentPicker/AttachmentPicker'
 
 interface ScreenshotAttachmentPickerProps {
   isVisible: boolean
@@ -16,50 +15,14 @@ interface ScreenshotAttachmentPickerProps {
 export const ScreenshotAttachmentPicker = ({ isVisible, onClose, onBack }: ScreenshotAttachmentPickerProps) => {
   const [windows, setWindows] = useState<{ windowTitle: string; appIcon?: string }[]>([])
   const [displays, setDisplays] = useState<{ thumbnail: string }[]>([])
-  const [portalStyles, setPortalStyles] = useState<React.CSSProperties>({})
 
   const addAttachment = useStore((state) => state.addAttachment)
-
-  const containerRef = useRef<HTMLDivElement>(null)
-  const portalRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!containerRef.current) return
-
-    const newStyles: React.CSSProperties = {
-      position: 'fixed',
-    }
-
-    const targetRect = containerRef.current.getBoundingClientRect()
-    newStyles.top = targetRect.top - 500
-    newStyles.left = targetRect.left
-
-    if (targetRect.top - 500 < 0) {
-      newStyles.top = 50
-      newStyles.maxHeight = targetRect.top
-    }
-
-    setPortalStyles(newStyles)
-  }, [isVisible])
 
   useEffect(() => {
     if (isVisible) {
       trackEvent('HL Chat Screenshot Picker Opened', {})
     }
   }, [isVisible])
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (portalRef.current && !portalRef.current.contains(event.target as Node)) {
-        onClose()
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [onClose])
 
   const handleClose = () => {
     trackEvent('HL Chat Screenshot Picker Closed', {})
@@ -112,41 +75,27 @@ export const ScreenshotAttachmentPicker = ({ isVisible, onClose, onBack }: Scree
     }
   }, [isVisible])
 
+  const displayOptions = displays.map((display, index) => ({
+    imageComponent: <img src={display.thumbnail} className={`${styles.image} ${styles.displayImage}`} />,
+    title: `Display ${index + 1}`,
+    onClick: () => onClickDisplay(display.thumbnail),
+  }))
+
+  const windowOptions = windows.map((window) => ({
+    imageComponent: <img src={window.appIcon} className={`${styles.image} ${styles.appIcon}`} />,
+    title: window.windowTitle,
+    onClick: () => onClickWindow(window.windowTitle),
+  }))
+
+  const attachmentOptions = [...displayOptions, ...windowOptions]
+
   return (
-    <div ref={containerRef}>
-      <Portal>
-        {isVisible && (
-          <div ref={portalRef} className={styles.innerContainer} style={{ ...portalStyles }}>
-            <div className={styles.header}>
-              <ArrowCircleLeft variant="Bold" size={24} onClick={handleBack} style={{ cursor: 'pointer' }} />
-              <span>Attach Screenshot</span>
-              <CloseCircle variant="Bold" size={24} onClick={handleClose} style={{ cursor: 'pointer' }} />
-            </div>
-            <div className={styles.rows}>
-              {displays.map((display, index) => (
-                <div
-                  className={styles.screenshotContainer}
-                  onClick={() => onClickDisplay(display.thumbnail)}
-                  key={index}
-                >
-                  <img src={display.thumbnail} className={`${styles.image} ${styles.displayImage}`} />
-                  <div className={styles.title}>Display {index + 1}</div>
-                </div>
-              ))}
-              {windows.map((window, index) => (
-                <div
-                  className={styles.screenshotContainer}
-                  onClick={() => onClickWindow(window.windowTitle)}
-                  key={index}
-                >
-                  <img src={window.appIcon} className={`${styles.image} ${styles.appIcon}`} />
-                  <div className={styles.title}>{window.windowTitle}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </Portal>
-    </div>
+    <AttachmentPicker
+      header="Attach Screenshot"
+      onBack={handleBack}
+      onClose={handleClose}
+      isVisible={isVisible}
+      attachmentOptions={attachmentOptions}
+    />
   )
 }
