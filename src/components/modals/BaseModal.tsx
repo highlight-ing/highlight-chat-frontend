@@ -1,5 +1,7 @@
-import React, { PropsWithChildren, ReactElement, ReactNode, useEffect } from 'react'
+import React, { PropsWithChildren, ReactElement, ReactNode, useEffect, useState } from 'react'
 import CloseButton from '@/components/CloseButton/CloseButton'
+import Checkbox from '@/components/Checkbox/Checkbox'
+import Highlight from '@highlight-ai/app-runtime'
 
 import styles from './modals.module.scss'
 import { useStore } from '@/providers/store-provider'
@@ -26,6 +28,7 @@ export interface ModalProps {
   overlayStyle?: React.CSSProperties
   bodyClassName?: string
   closeButtonAlignment?: 'left' | 'right'
+  doNotShowAgainOption?: boolean
 }
 
 interface BaseModalProps {
@@ -50,8 +53,10 @@ const BaseModal = ({
   showClose,
   closeButtonAlignment,
   bodyClassName,
+  doNotShowAgainOption,
 }: PropsWithChildren<ModalProps & BaseModalProps>) => {
   const modals = useStore((state) => state.modals)
+  const [doNotShowAgain, setDoNotShowAgain] = useState(false)
 
   const close = (e: null | React.MouseEvent, force?: boolean) => {
     // @ts-ignore
@@ -71,6 +76,16 @@ const BaseModal = ({
       if (navigateOnClose && typeof navigateBackOrHome === 'function') {
         navigateBackOrHome()
       }
+    }
+  }
+
+  const toggleDoNotShowAgain = () => {
+    const newValue = !doNotShowAgain
+    setDoNotShowAgain(newValue)
+    if (newValue) {
+      Highlight.appStorage.set(`doNotShowModal.${id}`, newValue)
+    } else {
+      Highlight.appStorage.delete(`doNotShowModal.${id}`)
     }
   }
 
@@ -111,6 +126,11 @@ const BaseModal = ({
         <div className={`${styles.modalBody} ${bodyClassName ?? ''}`} id={`${id}-body`} style={bodyStyle}>
           {children}
         </div>
+        {doNotShowAgainOption && (
+          <div className={styles.doNotShowAgain} onClick={() => toggleDoNotShowAgain()}>
+            <Checkbox checked={doNotShowAgain} onChange={() => toggleDoNotShowAgain()} /> Do not show again
+          </div>
+        )}
       </div>
     </div>
   )
