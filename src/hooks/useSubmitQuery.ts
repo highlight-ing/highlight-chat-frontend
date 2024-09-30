@@ -200,7 +200,6 @@ export const useSubmitQuery = () => {
       }
 
       formData.append('conversation_id', conversationId)
-      console.log('tools: ', JSON.stringify(tools))
       formData.append('tools', JSON.stringify(tools))
 
       const endpoint = isPromptApp ? 'chat/prompt-as-app' : 'chat/'
