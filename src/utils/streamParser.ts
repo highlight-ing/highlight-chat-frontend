@@ -49,6 +49,11 @@ export async function parseAndHandleStreamChunk(chunk: string, { showConfirmatio
               }
             }
           }
+          if (jsonChunk.name === 'create_linear_ticket') {
+            const title = jsonChunk.input.title
+
+            console.log('Creating a linear ticket with the title:', title)
+          }
           if (jsonChunk.name === 'get_more_context_from_conversations') {
             if (contextConfirmed === null) {
               contextConfirmed = await showConfirmationModal(
