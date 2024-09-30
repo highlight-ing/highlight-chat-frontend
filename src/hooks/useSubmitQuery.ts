@@ -223,8 +223,11 @@ export const useSubmitQuery = () => {
       const abortController = new AbortController()
       abortControllerRef.current = abortController
 
-      const endpoint = isPromptApp ? 'chat/prompt-as-app' : 'chat/'
+      const endpoint = 'chat/'
 
+      if (isPromptApp && promptApp) {
+        formData.append('app_id', promptApp.external_id)
+      }
       const response = await post(endpoint, formData, { version: 'v4', signal: abortController.signal })
       if (!response.ok) {
         throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`)
