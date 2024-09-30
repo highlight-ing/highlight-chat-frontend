@@ -187,7 +187,11 @@ export default function AudioTranscriptionComponent() {
           </Button>
         )}
         {audioState !== 'noPermissions' ? (
-          <Switch checked={isAudioOn} onCheckedChange={handleToggle} className="data-[state=checked]:bg-conv-green" />
+          <Switch
+            checked={isAudioTranscripEnabled}
+            onCheckedChange={handleToggle}
+            className="data-[state=checked]:bg-conv-green"
+          />
         ) : (
           <EnableConversationsButton onClick={() => setAudioState('inactive')} />
         )}
