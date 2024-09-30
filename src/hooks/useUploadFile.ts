@@ -36,17 +36,36 @@ export const useUploadFile = () => {
     })
   }
 
-  const uploadFile = async (file: File, conversationId: string) => {
+  const uploadFile = async (fileOrUrl: File | string, conversationId: string) => {
     const startTime = Date.now()
 
     try {
       const abortController = new AbortController()
       abortControllerRef.current = abortController
 
+      let fileToUpload: File
+      let fileName: string
+      let fileType: string
+
+      if (typeof fileOrUrl === 'string') {
+        // It's a URL (could be a local URL)
+        const response = await fetch(fileOrUrl)
+        const blob = await response.blob()
+        fileName = fileOrUrl.split('/').pop() || 'file'
+        fileType = blob.type || 'application/octet-stream'
+        fileToUpload = new File([blob], fileName, { type: fileType })
+      } else if (fileOrUrl instanceof File) {
+        fileToUpload = fileOrUrl
+        fileName = fileOrUrl.name
+        fileType = fileOrUrl.type
+      } else {
+        throw new Error('Invalid file input')
+      }
+
       const formData = new FormData()
-      formData.append('file', file)
+      formData.append('file', fileToUpload)
       formData.append('conversation_id', conversationId)
-      formData.append('file_type', file.type)
+      formData.append('file_type', fileType)
 
       const response = await post('file-upload/', formData, { version: 'v4', signal: abortController.signal })
 

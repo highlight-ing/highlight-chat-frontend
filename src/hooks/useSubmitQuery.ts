@@ -388,7 +388,6 @@ export const useSubmitQuery = () => {
         screenshot: screenshotUrl,
         audio,
         window: windowTitle ? { title: windowTitle, appIcon, type: 'window' } : undefined,
-        windows,
         file_attachments: fileAttachments as unknown as FileAttachment[],
       })
 
@@ -503,12 +502,18 @@ export const useSubmitQuery = () => {
       // Upload files first
       const uploadedFiles = await Promise.all(
         attachments.filter(isFileAttachment).map(async (attachment) => {
-          const fileName = `${uuidv4()}.${attachment.type}`
-          const mimeType = getFileType(attachment)
-          const uploadedFile = await uploadFile(
-            new File([attachment.value], fileName, { type: mimeType }),
-            conversationId,
-          )
+          let fileOrUrl: File | string = attachment.value
+
+          // If it's a string, assume it's a URL (could be a local URL)
+          if (typeof attachment.value === 'string') {
+            fileOrUrl = attachment.value // Pass the URL directly
+          } else {
+            const fileName = `${uuidv4()}.${attachment.type}`
+            const mimeType = getFileType(attachment)
+            fileOrUrl = new File([attachment.value], fileName, { type: mimeType })
+          }
+
+          const uploadedFile = await uploadFile(fileOrUrl, conversationId)
           return {
             originalAttachment: attachment,
             uploadedFile: uploadedFile,
