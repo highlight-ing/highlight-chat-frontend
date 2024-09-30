@@ -6,6 +6,8 @@ import styles from './conversation-attachment-picker.module.scss'
 import { Setting2, VoiceSquare } from 'iconsax-react'
 import { useStore } from '@/providers/store-provider'
 import { useShallow } from 'zustand/react/shallow'
+import { useEffect } from 'react'
+import { trackEvent } from '@/utils/amplitude'
 
 interface ConversationAttachmentPickerProps {
   isVisible: boolean
@@ -26,6 +28,22 @@ export const ConversationAttachmentPicker = ({ onClose, onBack, isVisible }: Con
       addAttachment: state.addAttachment,
     })),
   )
+
+  useEffect(() => {
+    if (isVisible) {
+      trackEvent('HL Chat Conversation Picker Opened', {})
+    }
+  }, [isVisible])
+
+  const handleClose = () => {
+    trackEvent('HL Chat Conversation Picker Closed', {})
+    onClose()
+  }
+
+  const handleBack = () => {
+    onClose()
+    onBack()
+  }
 
   const currentConversationOptions = {
     imageComponent: (
@@ -93,8 +111,8 @@ export const ConversationAttachmentPicker = ({ onClose, onBack, isVisible }: Con
   return (
     <AttachmentPicker
       header="Attach Conversation"
-      onBack={onBack}
-      onClose={onClose}
+      onBack={handleBack}
+      onClose={handleClose}
       isVisible={isVisible}
       attachmentOptions={attachmentOptions}
     />

@@ -8,7 +8,7 @@ import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
 export interface AttachmentOption {
   imageComponent: ReactElement
   title: string
-  description: string
+  description?: string
   onClick: () => void
 }
 
@@ -73,7 +73,7 @@ export const AttachmentPicker = ({ isVisible, onClose, onBack, header, attachmen
                   {option.imageComponent}
                   <div className={styles.textContainer}>
                     <span className={styles.title}>{option.title}</span>
-                    <span className={styles.description}>{option.description}</span>
+                    {option.description && <span className={styles.description}>{option.description}</span>}
                   </div>
                 </div>
               ))}
