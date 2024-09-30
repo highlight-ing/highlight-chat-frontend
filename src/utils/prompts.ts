@@ -235,6 +235,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
       .from('prompts')
       .update(promptData)
       .eq('external_id', validated.data.externalId)
+      .eq('user_id', userId)
       .select('*, user_images(file_extension)')
       .maybeSingle()
 
