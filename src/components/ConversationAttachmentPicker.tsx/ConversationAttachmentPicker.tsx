@@ -1,7 +1,7 @@
 import { useConversations } from '@/context/ConversationContext'
 import { AttachmentPicker } from '../AttachmentPicker/AttachmentPicker'
-import { getTimeAgo, getWordCount } from '@/utils/string'
-import { getConversationDisplayTitle } from '@/utils/conversations'
+import { getTimeAgo, getWordCountFormatted } from '@/utils/string'
+import { getConversationDisplayTitle, getConversationSubtitle, isDefaultTitle } from '@/utils/conversations'
 import styles from './conversation-attachment-picker.module.scss'
 import { Setting2, VoiceSquare } from 'iconsax-react'
 import { useStore } from '@/providers/store-provider'
@@ -33,7 +33,7 @@ export const ConversationAttachmentPicker = ({ onClose, onBack }: ConversationAt
       </div>
     ),
     title: currentConversationTitle,
-    description: `Started ${getTimeAgo(currentConversationTimestamp)} | ${getWordCount(currentConversation)} Words`,
+    description: `Started ${getTimeAgo(currentConversationTimestamp)} | ${getWordCountFormatted(currentConversation)} Words`,
     onClick: () => {
       addAttachment({ type: 'conversation', value: currentConversation })
       onClose()
@@ -50,7 +50,7 @@ export const ConversationAttachmentPicker = ({ onClose, onBack }: ConversationAt
         </div>
       ),
       title: getConversationDisplayTitle(conversation),
-      description: `Started ${getTimeAgo(currentConversationTimestamp)} | ${getWordCount(conversation.transcript)} Words`,
+      description: getConversationSubtitle(conversation),
       onClick: () => {
         addAttachment({
           type: 'conversation',

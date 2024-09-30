@@ -24,7 +24,6 @@ interface ConversationContextType {
   isAudioTranscripEnabled: boolean
   setIsAudioTranscriptEnabled: (enabled: boolean) => void
   isSaving: boolean
-  getWordCount: (transcript: string) => number
 }
 
 const ConversationContext = createContext<ConversationContextType | undefined>(undefined)
@@ -190,10 +189,6 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     [fetchLatestData, setIsAudioTranscripEnabled],
   )
 
-  const getWordCount = useCallback((transcript: string): number => {
-    return transcript.trim().split(/\s+/).length
-  }, [])
-
   const toggleAudioEnabled = (isEnabled: boolean) => {
     // @ts-ignore
     globalThis.highlight?.internal?.setAudioTranscriptEnabled(isEnabled)
@@ -218,7 +213,6 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     isAudioTranscripEnabled,
     setIsAudioTranscriptEnabled: toggleAudioEnabled,
     isSaving,
-    getWordCount,
   }
 
   return <ConversationContext.Provider value={contextValue}>{children}</ConversationContext.Provider>
