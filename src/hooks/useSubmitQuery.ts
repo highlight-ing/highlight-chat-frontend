@@ -20,6 +20,7 @@ import {
   ConversationAttachment,
   AttachedContexts,
   AvailableContexts,
+  ConversationAttachmentMetadata,
 } from '@/utils/formDataUtils'
 import { trackEvent } from '@/utils/amplitude'
 import { processAttachments } from '@/utils/contextprocessor'
@@ -435,6 +436,35 @@ export const useSubmitQuery = () => {
         }
       })
 
+      const conversationData = await Highlight.conversations.getAllConversations()
+      const conversationAttachments: Array<ConversationAttachmentMetadata> = conversationData.map((conversation) => ({
+        type: 'conversation',
+        title: conversation.title,
+        words: conversation.transcript.split(/\s+/).length,
+        started_at:
+          typeof conversation.startedAt === 'number'
+            ? new Date(conversation.startedAt).toISOString()
+            : typeof conversation.startedAt === 'string'
+              ? conversation.startedAt
+              : conversation.startedAt.toISOString(),
+        ended_at:
+          typeof conversation.endedAt === 'number'
+            ? new Date(conversation.endedAt).toISOString()
+            : typeof conversation.endedAt === 'string'
+              ? conversation.endedAt
+              : conversation.endedAt.toISOString(),
+      }))
+
+      availableContexts.context.push(...conversationAttachments)
+
+      const windows = await fetchWindows()
+      // Add window list and conversation metadata here
+      const windowListAttachment: WindowListAttachment = {
+        type: 'window_list',
+        titles: windows,
+      }
+      availableContexts.context.push(windowListAttachment)
+
       console.log('attachedContext: ', attachedContext)
       console.log('availableContexts: ', availableContexts)
 
@@ -447,7 +477,6 @@ export const useSubmitQuery = () => {
         availableContexts,
       })
 
-      const accessToken = await getAccessToken()
       await fetchResponse(conversationId, formData, !!promptApp, promptApp)
     }
   }
@@ -512,15 +541,36 @@ export const useSubmitQuery = () => {
       })
       await Promise.all(fileAttachmentsPromises)
 
-      // Add window list and conversation metadata here
-      const windowListAttachment =
-        // const nonFileAttachments = attachments.filter((a) => a.type !== 'text_file')
-        // nonFileAttachments.forEach(async (attachment) => {
-        //   const metadata = await createAttachmentMetadata(attachment)
-        //   availableContexts.context.push(metadata)
-        // })
+      const conversationData = await Highlight.conversations.getAllConversations()
+      const conversationAttachments: Array<ConversationAttachmentMetadata> = conversationData.map((conversation) => ({
+        type: 'conversation',
+        title: conversation.title,
+        words: conversation.transcript.split(/\s+/).length,
+        started_at:
+          typeof conversation.startedAt === 'number'
+            ? new Date(conversation.startedAt).toISOString()
+            : typeof conversation.startedAt === 'string'
+              ? conversation.startedAt
+              : conversation.startedAt.toISOString(),
+        ended_at:
+          typeof conversation.endedAt === 'number'
+            ? new Date(conversation.endedAt).toISOString()
+            : typeof conversation.endedAt === 'string'
+              ? conversation.endedAt
+              : conversation.endedAt.toISOString(),
+      }))
 
-        console.log('attachedContext: ', attachedContext)
+      availableContexts.context.push(...conversationAttachments)
+
+      const windows = await fetchWindows()
+      // Add window list and conversation metadata here
+      const windowListAttachment: WindowListAttachment = {
+        type: 'window_list',
+        titles: windows,
+      }
+      availableContexts.context.push(windowListAttachment)
+
+      console.log('attachedContext: ', attachedContext)
       console.log('availableContexts: ', availableContexts)
 
       // Build FormData using the updated builder
