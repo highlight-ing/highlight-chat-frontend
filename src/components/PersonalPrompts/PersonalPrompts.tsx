@@ -59,8 +59,8 @@ const PersonalPrompts = ({ userId, prompts, pinnedPrompts }: PersonalPromptsProp
         </div>
         <div className={styles.personalPromptsHeaderRight}>
           <Button size="medium" variant="ghost-neutral" onClick={() => openModal('create-prompt')}>
-            <ElementPlus color={variables.tertiary} variant={'Bold'} size="16" />
             New Action
+            <ElementPlus color={variables.tertiary} variant={'Bold'} size="16" />
           </Button>
         </div>
       </div>
