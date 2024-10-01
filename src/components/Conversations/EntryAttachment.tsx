@@ -42,7 +42,7 @@ export function EntryAttachment({ conversation }: EntryAttachmentProps) {
             <VoiceSquare variant="Linear" size={42} color="#4CEDA0" className="mr-3" />
             <div className="flex flex-col items-start justify-center">
               <span className="font-medium text-secondary">Conversation</span>
-              <span className="text-[12px] text-tertiary">{wordCount} Words</span>
+              <span className="text-[12px] text-tertiary">{getWordCount(conversation.transcript)} Words</span>
             </div>
           </button>
         </TooltipTrigger>

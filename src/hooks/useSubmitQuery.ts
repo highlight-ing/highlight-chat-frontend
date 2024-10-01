@@ -244,21 +244,14 @@ export const useSubmitQuery = () => {
     const startTime = Date.now()
 
     try {
-      const tools = {
-        get_more_context_from_window: true,
-        get_more_context_from_conversation: false,
-        add_or_update_about_me_facts: false,
-        create_linear_ticket: false,
-      }
-
-      formData.append('conversation_id', conversationId)
-      formData.append('tools', JSON.stringify(tools))
-
-      const endpoint = isPromptApp ? 'chat/prompt-as-app' : 'chat/'
-
       const abortController = new AbortController()
       abortControllerRef.current = abortController
 
+      const endpoint = 'chat/'
+
+      if (isPromptApp && promptApp) {
+        formData.append('app_id', promptApp.external_id)
+      }
       const response = await post(endpoint, formData, { version: 'v4', signal: abortController.signal })
       if (!response.ok) {
         throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`)
@@ -422,7 +415,6 @@ export const useSubmitQuery = () => {
         screenshot: screenshotUrl,
         audio,
         window: windowTitle ? { title: windowTitle, appIcon, type: 'window' } : undefined,
-        windows,
         file_attachments: fileAttachments as unknown as FileAttachment[],
       })
 
@@ -545,12 +537,18 @@ export const useSubmitQuery = () => {
       // Upload files first
       const uploadFilePromises = await Promise.all(
         attachments.filter(isUploadableAttachment).map(async (attachment) => {
-          const fileName = `${uuidv4()}.${attachment.type}`
-          const mimeType = getFileType(attachment)
-          const uploadedFile = await uploadFile(
-            new File([attachment.value], fileName, { type: mimeType }),
-            conversationId,
-          )
+          let fileOrUrl: File | string = attachment.value
+
+          // If it's a string, assume it's a URL (could be a local URL)
+          if (typeof attachment.value === 'string') {
+            fileOrUrl = attachment.value // Pass the URL directly
+          } else {
+            const fileName = `${uuidv4()}.${attachment.type}`
+            const mimeType = getFileType(attachment)
+            fileOrUrl = new File([attachment.value], fileName, { type: mimeType })
+          }
+
+          const uploadedFile = await uploadFile(fileOrUrl, conversationId)
 
           if (uploadedFile && uploadedFile.file_id) {
             console.log('adding uploaded file to attachedContext', attachment.type)

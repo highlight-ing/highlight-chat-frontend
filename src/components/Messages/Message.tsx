@@ -133,8 +133,8 @@ export const Message = ({ message, isThinking }: MessageProps) => {
               {message.file_title && <Attachment type="pdf" value={message.file_title} />}
               {message.image_url && <Attachment type="image" value={message.image_url} />}
               {message.file_attachments &&
-                message.file_attachments.map((a) => {
-                  return <Attachment type={a.type} value={getDisplayValue(a)} />
+                message.file_attachments.map((a, index) => {
+                  return <Attachment type={a.type} value={getDisplayValue(a)} key={index} />
                 })}
               {message.window_context && <Attachment type="window_context" value={message.window_context} />}
             </div>
