@@ -104,6 +104,7 @@ async function createAttachmentMetadata(
       }
     case 'audio': // TODO (SP) there should be no more audio attachments, just conversations. This is coming soon
       return {
+        id: uuidv4(),
         type: 'conversation',
         title: 'conversation',
         text: attachment.value,
@@ -112,6 +113,7 @@ async function createAttachmentMetadata(
       }
     case 'conversation':
       return {
+        id: attachment.id,
         type: 'conversation',
         title: attachment.title,
         text: attachment.value,
@@ -464,6 +466,7 @@ export const useSubmitQuery = () => {
 
       const conversationData = await Highlight.conversations.getAllConversations()
       const conversationAttachments: Array<ConversationAttachmentMetadata> = conversationData.map((conversation) => ({
+        id: conversation.id,
         type: 'conversation',
         title: conversation.title,
         words: conversation.transcript.split(/\s+/).length,
@@ -569,6 +572,7 @@ export const useSubmitQuery = () => {
 
       const conversationData = await Highlight.conversations.getAllConversations()
       const conversationAttachments: Array<ConversationAttachmentMetadata> = conversationData.map((conversation) => ({
+        id: conversation.id,
         type: 'conversation',
         title: conversation.title,
         words: conversation.transcript.split(/\s+/).length,

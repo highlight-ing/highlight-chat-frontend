@@ -75,6 +75,7 @@ export interface AboutMeAttachment {
 }
 
 export interface ConversationAttachment {
+  id: string
   type: 'conversation'
   title: string
   text: string
@@ -83,6 +84,7 @@ export interface ConversationAttachment {
 }
 
 export interface ConversationAttachmentMetadata {
+  id: string
   type: 'conversation'
   title: string
   words: number
