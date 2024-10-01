@@ -12,10 +12,6 @@ export interface ConnectIntegrationModalContext {
 export default function ConnectIntegrationModal({ id, context }: ModalObjectProps) {
   const { type } = context as ConnectIntegrationModalContext
 
-  const closeModal = useStore((state) => state.closeModal)
-
-  const onOverride = async () => {}
-
   return (
     <Modal id={id} size="large">
       <div>

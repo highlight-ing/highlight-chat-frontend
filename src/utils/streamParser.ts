@@ -6,11 +6,12 @@ type StreamParserProps = {
   showConfirmationModal: (message: string) => Promise<boolean>
   addToast: (toast: Partial<Toast>) => void
   integrations: UseIntegrationsAPI
+  conversationId: string
 }
 
 export async function parseAndHandleStreamChunk(
   chunk: string,
-  { showConfirmationModal, addToast, integrations }: StreamParserProps,
+  { showConfirmationModal, addToast, integrations, conversationId }: StreamParserProps,
 ) {
   let contextConfirmed: boolean | null = null
   let accumulatedContent = ''
@@ -59,7 +60,7 @@ export async function parseAndHandleStreamChunk(
             const title = jsonChunk.input.title
 
             console.log('streamParser create_linear_ticket', title)
-            integrations.createLinearTicket(title)
+            integrations.createLinearTicket(conversationId, title)
           }
           if (jsonChunk.name === 'get_more_context_from_conversations') {
             if (contextConfirmed === null) {

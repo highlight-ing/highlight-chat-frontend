@@ -111,7 +111,6 @@ async function addAttachmentsToFormData(formData: FormData, attachments: any[]) 
 }
 
 export const useSubmitQuery = () => {
-  const integrations = useIntegrations()
   const { post } = useApi()
 
   const { addAttachment } = useStore(
@@ -150,6 +149,8 @@ export const useSubmitQuery = () => {
   const { getAccessToken } = useAuth()
   const conversationId = useStore((state) => state.conversationId)
   const conversationIdRef = useRef(conversationId)
+
+  const integrations = useIntegrations()
 
   const { openModal, closeModal } = useStore(
     useShallow((state) => ({
@@ -234,6 +235,7 @@ export const useSubmitQuery = () => {
           showConfirmationModal,
           addToast,
           integrations,
+          conversationId,
         })
 
         if (content) {

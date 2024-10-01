@@ -62,7 +62,11 @@ const Messages = () => {
       <div className={styles.messages}>
         {messages.length > 0 &&
           messages.map((message, index) => {
-            if (message.role === 'assistant' && !message.content?.trim()?.length) {
+            if (
+              message.role === 'assistant' &&
+              typeof message.content === 'string' &&
+              !message.content?.trim()?.length
+            ) {
               return ''
             }
             return <Message key={index} message={message} />
@@ -70,7 +74,8 @@ const Messages = () => {
         {inputIsDisabled &&
           (!messages.length ||
             messages[messages.length - 1].role !== 'assistant' ||
-            !messages[messages.length - 1].content?.trim()?.length) && <ThinkingMessage />}
+            (typeof messages[messages.length - 1].content === 'string' &&
+              !messages[messages.length - 1].content?.trim()?.length)) && <ThinkingMessage />}
       </div>
     </Scrollable>
   )
