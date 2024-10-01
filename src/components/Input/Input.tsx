@@ -1,13 +1,12 @@
+import * as React from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { Attachment } from '../Attachment'
 import { AttachmentsButton } from '../AttachmentsButton/AttachmentsButton'
 import { Attachment as AttachmentType } from '@/types'
 import { useSubmitQuery } from '../../hooks/useSubmitQuery'
 import { useStore } from '@/providers/store-provider'
-import { useInputFocus } from '@/context/InputFocusProvider'
 
 import styles from './chatinput.module.scss'
-import * as React from 'react'
 import { getDisplayValue } from '@/utils/attachments'
 import { useShallow } from 'zustand/react/shallow'
 import { trackEvent } from '@/utils/amplitude'
@@ -30,7 +29,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   const storeInput = useStore((state) => state.input)
   const [input, setInput] = useState(storeInput ?? '')
 
-  const { inputRef } = useInputFocus()
+  const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const { handleSubmit } = useSubmitQuery()
 
@@ -73,8 +72,21 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
 
   return (
     <div className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''}`} onClick={onClickContainer}>
+      <div className={styles.inputRow}>
+        <AttachmentsButton />
+        <textarea
+          id={'textarea-input'}
+          ref={inputRef}
+          autoFocus={true}
+          placeholder={`Ask ${promptName ? promptName : 'Highlight'} anything...`}
+          value={input}
+          rows={1}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+      </div>
       {attachments.length > 0 && (
-        <div className="flex gap-2">
+        <div className={styles.attachmentsRow}>
           {attachments.map((attachment: AttachmentType, index: number) => (
             <Attachment
               type={attachment.type}
@@ -90,18 +102,13 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
           ))}
         </div>
       )}
-      <div className={styles.attachmentsButtonContainer}>
-        <AttachmentsButton />
-      </div>
-      <textarea
-        ref={inputRef}
-        autoFocus={true}
-        placeholder={`Ask ${promptName ? promptName : 'Highlight'} anything...`}
-        value={input}
-        rows={1}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={handleKeyDown}
-      />
     </div>
   )
+}
+
+export const useInputFocus = () => {
+  return () => {
+    const input = document.getElementById('textarea-input')
+    input?.focus()
+  }
 }

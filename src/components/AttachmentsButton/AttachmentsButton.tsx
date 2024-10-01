@@ -8,16 +8,17 @@ import { ScreenshotAttachmentPicker } from '../ScreenshotAttachmentPicker/Screns
 import { useShallow } from 'zustand/react/shallow'
 import styles from './attachments-button.module.scss'
 import Tooltip from '@/components/Tooltip/Tooltip'
-import * as XLSX from 'xlsx'
 import mammoth from 'mammoth'
 import * as pptxtojson from 'pptxtojson'
 import { trackEvent } from '@/utils/amplitude'
 import { ConversationAttachmentPicker } from '../ConversationAttachmentPicker.tsx/ConversationAttachmentPicker'
+import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
 
 export const AttachmentsButton = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [screenshotPickerVisible, setScreenshotPickerVisible] = useState(false)
   const [conversationPickerVisible, setConversationPickerVisible] = useState(false)
+  const messages = useCurrentChatMessages()
 
   const { setFileInputRef, addAttachment } = useStore(
     useShallow((state) => ({
@@ -204,17 +205,6 @@ export const AttachmentsButton = () => {
       label: (
         <div className={styles.menuItem}>
           <div className={styles.iconWrapper}>
-            <DocumentUpload size={20} variant={'Bold'} />
-          </div>
-          Upload from computer
-        </div>
-      ),
-      onClick: handleAttachmentClick,
-    },
-    {
-      label: (
-        <div className={styles.menuItem}>
-          <div className={styles.iconWrapper}>
             <ClipboardText size={20} variant={'Bold'} />
           </div>
           Clipboard
@@ -236,6 +226,17 @@ export const AttachmentsButton = () => {
     {
       label: (
         <div className={styles.menuItem}>
+          <div className={styles.iconWrapper}>
+            <DocumentUpload size={20} variant={'Bold'} />
+          </div>
+          Upload file
+        </div>
+      ),
+      onClick: handleAttachmentClick,
+    },
+    {
+      label: (
+        <div className={styles.menuItem}>
           <div className={styles.audioMenuItem}>
             <VoiceSquare variant="Bold" size={20} />
           </div>
@@ -243,7 +244,7 @@ export const AttachmentsButton = () => {
         </div>
       ),
       onClick: () => {
-        window.location.href = 'highlight://app/conversations'
+        setConversationPickerVisible(true)
       },
     },
   ].filter(Boolean) as MenuItemType[]
@@ -262,7 +263,13 @@ export const AttachmentsButton = () => {
 
   return (
     <>
-      <ContextMenu position="top" triggerId="attachments-button" leftClick={true} items={menuItems}>
+      <ContextMenu
+        position={messages.length > 0 ? 'top' : 'bottom'}
+        triggerId="attachments-button"
+        leftClick={true}
+        items={menuItems}
+        menuStyle={{ background: '#191919', borderColor: '#222222' }}
+      >
         {
           // @ts-ignore
           ({ isOpen }) => (
@@ -270,24 +277,23 @@ export const AttachmentsButton = () => {
               tooltip={isOpen || screenshotPickerVisible || conversationPickerVisible ? '' : 'Attach files & context'}
               position={'top'}
             >
-              <ScreenshotAttachmentPicker
-                isVisible={screenshotPickerVisible}
-                onClose={() => {
-                  setScreenshotPickerVisible(false)
-                  trackEvent('HL Chat Screenshot Picker Closed', {})
-                }}
-                onBack={openMenu}
-              />
-              {conversationPickerVisible && (
+              <button type="button" className={styles.button} id="attachments-button">
+                <ScreenshotAttachmentPicker
+                  isVisible={screenshotPickerVisible}
+                  onClose={() => {
+                    setScreenshotPickerVisible(false)
+                    trackEvent('HL Chat Screenshot Picker Closed', {})
+                  }}
+                  onBack={openMenu}
+                />
                 <ConversationAttachmentPicker
+                  isVisible={conversationPickerVisible}
                   onClose={() => setConversationPickerVisible(false)}
                   onBack={() => {
                     setConversationPickerVisible(false)
                     openMenu()
                   }}
                 />
-              )}
-              <button type="button" className={styles.button} id="attachments-button">
                 <PaperclipIcon />
                 <input
                   type="file"

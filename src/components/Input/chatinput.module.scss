@@ -11,7 +11,7 @@
 
 .inputContainer {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   padding: 8px;
   gap: 8px;
   background-color: $bg-second-layer;
@@ -26,11 +26,6 @@
   &.active {
     margin-bottom: 20px;
     max-width: $chat-body-width;
-
-    .attachmentsButtonContainer {
-      margin-top: auto;
-      margin-bottom: 0;
-    }
   }
 
   &:hover {
@@ -56,9 +51,17 @@
   }
 }
 
-.attachmentsButtonContainer {
+.inputRow {
   display: flex;
-  margin-bottom: auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.attachmentsRow {
+  display: flex;
+  gap: 4px;
+  align-items: center;
 }
 
 .empty {

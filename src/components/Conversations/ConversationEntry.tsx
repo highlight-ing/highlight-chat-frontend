@@ -4,6 +4,7 @@ import { useConversations } from '@/context/ConversationContext'
 import Highlight from '@highlight-ai/app-runtime'
 import { EntryAttachment } from './EntryAttachment'
 import { ConversationsIcon } from '@/icons/icons' // Import the new icon
+import { getWordCount } from '@/utils/string'
 
 interface ConversationEntryProps {
   conversation?: ConversationData
@@ -31,7 +32,6 @@ function getRelativeTimeString(date: Date): string {
 }
 
 export function ConversationEntry({ conversation, isFirst, isLast, isShowMore = false }: ConversationEntryProps) {
-  const { getWordCount } = useConversations()
   const roundedClasses = isFirst ? 'rounded-t-[20px]' : isLast ? 'rounded-b-[20px]' : ''
 
   const handleShowMore = async () => {

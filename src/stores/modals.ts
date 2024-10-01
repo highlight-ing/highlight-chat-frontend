@@ -14,6 +14,7 @@ export type ModalsSlice = ModalsState & {
   setErrorModalOpen: (open: boolean) => void
   openErrorModal: (message: string) => void
   closeAllModals: () => void
+  isModalOpen: (id: string) => boolean
 }
 
 export const initialModalsState: ModalsState = {

@@ -13,6 +13,7 @@ import { Badge } from '@/components/Badge/Badge'
 import Tooltip from '@/components/Tooltip/Tooltip'
 import usePromptApps from '@/hooks/usePromptApps'
 import { useStore } from '@/providers/store-provider'
+import { PreferredAttachment } from '../prompts/PreferredAttachment/PreferredAttachment'
 
 const TrendingPrompts = ({
   userId,
@@ -92,7 +93,12 @@ const TrendingPromptsItem = ({
   }, [pinState])
 
   return (
-    <div className={`${styles.trendingPromptsItem} ${lastItem ? styles.lastItem : ''}`}>
+    <div
+      className={`${styles.trendingPromptsItem} ${lastItem ? styles.lastItem : ''}`}
+      onClick={() => {
+        openModal('customize-prompt', { prompt })
+      }}
+    >
       <div className={styles.trendingPromptsItemHeader}>
         <div className={styles.trendingPromptsItemHeaderLeft}>
           {prompt.image ? (
@@ -175,6 +181,7 @@ const TrendingPromptsItem = ({
           <p>No description</p>
         )}
       </div>
+      {prompt.preferred_attachment && <PreferredAttachment type={prompt.preferred_attachment} />}
       <div className={styles.trendingPromptsItemFooter}>
         <div className={styles.tagsContainer}>
           <Badge variant="disabled">{publicUseNumber ? `${publicUseNumber} Uses` : 'No uses'}</Badge>
