@@ -2,19 +2,20 @@ import React from 'react'
 import { VoiceSquare } from 'iconsax-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useStore } from '@/providers/store-provider'
-import { useInputFocus } from '@/context/InputFocusProvider'
+import { useInputFocus } from '@/components/Input/Input'
+import { ConversationData } from '@highlight-ai/app-runtime'
+import { getWordCount } from '@/utils/string'
 
 interface EntryAttachmentProps {
-  transcript: string
-  wordCount: number
+  conversation: ConversationData
 }
 
-export function EntryAttachment({ transcript, wordCount }: EntryAttachmentProps) {
+export function EntryAttachment({ conversation }: EntryAttachmentProps) {
   const addAttachment = useStore((state) => state.addAttachment)
-  const { focusInput } = useInputFocus()
+  const focusInput = useInputFocus()
 
-  const truncatedTranscript = transcript.split(' ').slice(0, 25).join(' ')
-  const remainingWords = wordCount - 25
+  const truncatedTranscript = conversation.transcript.split(' ').slice(0, 25).join(' ')
+  const remainingWords = getWordCount(conversation.transcript) - 25
 
   const tooltipContent =
     remainingWords > 0 ? `${truncatedTranscript}... plus ${remainingWords} words` : truncatedTranscript
@@ -22,7 +23,10 @@ export function EntryAttachment({ transcript, wordCount }: EntryAttachmentProps)
   const handleAttachConversation = () => {
     addAttachment({
       type: 'conversation',
-      value: transcript,
+      value: conversation.transcript,
+      title: conversation.title,
+      startedAt: conversation.startedAt,
+      endedAt: conversation.endedAt,
     })
     focusInput()
   }

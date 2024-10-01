@@ -20,6 +20,8 @@ interface ContextMenuProps {
   position: Position
   triggerId: string
   wrapperStyle?: React.CSSProperties
+  menuStyle?: React.CSSProperties
+  menuItemStyle?: React.CSSProperties
   hidden?: boolean
 }
 
@@ -31,6 +33,8 @@ const ContextMenu = ({
   items,
   offset = 0,
   wrapperStyle,
+  menuStyle,
+  menuItemStyle,
   hidden,
 }: PropsWithChildren<ContextMenuProps>) => {
   const [isOpen, setOpen] = useState(false)
@@ -96,7 +100,7 @@ const ContextMenu = ({
         : children}
       {isOpen && (
         <Portal>
-          <div className={styles.contextMenu} ref={elemRef} style={appliedStyle}>
+          <div className={styles.contextMenu} ref={elemRef} style={{ ...appliedStyle, ...menuStyle }}>
             {items.map((item, index) => {
               if (item.divider) {
                 return <div className="min-h-[1px] w-full bg-light-16" key={`divider-${index}`} />
@@ -109,6 +113,7 @@ const ContextMenu = ({
                     setOpen(false)
                     item?.onClick?.(e)
                   }}
+                  style={menuItemStyle}
                 >
                   {item.label}
                 </div>

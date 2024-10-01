@@ -103,13 +103,22 @@ async function createAttachmentMetadata(
         text: attachment.value,
       }
     case 'audio': // TODO (SP) there should be no more audio attachments, just conversations. This is coming soon
-    case 'conversation': // TODO (SP) title, started at, and ended at need to be added to the conversation attachment type
       return {
         type: 'conversation',
         title: 'conversation',
         text: attachment.value,
         started_at: new Date().toISOString(),
         ended_at: new Date().toISOString(),
+      }
+    case 'conversation':
+      return {
+        type: 'conversation',
+        title: attachment.title,
+        text: attachment.value,
+        started_at: new Date(attachment.startedAt).toISOString(),
+        ended_at: attachment.isCurrentConversation
+          ? new Date().toISOString()
+          : new Date(attachment.endedAt).toISOString(),
       }
     default:
       return {
@@ -235,10 +244,20 @@ export const useSubmitQuery = () => {
     const startTime = Date.now()
 
     try {
-      const abortController = new AbortController()
-      abortControllerRef.current = abortController
+      const tools = {
+        get_more_context_from_window: true,
+        get_more_context_from_conversation: false,
+        add_or_update_about_me_facts: false,
+        create_linear_ticket: false,
+      }
+
+      formData.append('conversation_id', conversationId)
+      formData.append('tools', JSON.stringify(tools))
 
       const endpoint = isPromptApp ? 'chat/prompt-as-app' : 'chat/'
+
+      const abortController = new AbortController()
+      abortControllerRef.current = abortController
 
       const response = await post(endpoint, formData, { version: 'v4', signal: abortController.signal })
       if (!response.ok) {

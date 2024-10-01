@@ -89,6 +89,10 @@ export interface SpreadsheetAttachment {
 export interface ConversationAttachment {
   type: 'conversation'
   value: string
+  title: string
+  startedAt: Date
+  endedAt: Date
+  isCurrentConversation?: boolean
 }
 
 export type FileAttachment =

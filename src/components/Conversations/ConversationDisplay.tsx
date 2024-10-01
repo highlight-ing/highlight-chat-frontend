@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { ConversationEntry } from './ConversationEntry'
 import { SectionHeader } from './SectionHeader'
 import { useConversations } from '@/context/ConversationContext'
+import { getWordCount } from '@/utils/string'
 
 type TimeFrame = 'today' | 'week' | 'two-weeks' | 'month'
 
@@ -10,7 +11,7 @@ interface ConversationDisplayProps {
 }
 
 export default function ConversationDisplay({ timeFrame = 'week' }: ConversationDisplayProps) {
-  const { conversations, getWordCount } = useConversations()
+  const { conversations } = useConversations()
   const [timeThreshold, setTimeThreshold] = useState(new Date())
 
   const updateTimeThreshold = useCallback(() => {

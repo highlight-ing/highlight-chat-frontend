@@ -1,7 +1,5 @@
 import React from 'react'
-import { ConversationData } from '@/types/conversations'
-import { useConversations } from '@/context/ConversationContext'
-import Highlight from '@highlight-ai/app-runtime'
+import Highlight, { ConversationData } from '@highlight-ai/app-runtime'
 import { EntryAttachment } from './EntryAttachment'
 import { ConversationsIcon } from '@/icons/icons' // Import the new icon
 
@@ -31,7 +29,6 @@ function getRelativeTimeString(date: Date): string {
 }
 
 export function ConversationEntry({ conversation, isFirst, isLast, isShowMore = false }: ConversationEntryProps) {
-  const { getWordCount } = useConversations()
   const roundedClasses = isFirst ? 'rounded-t-[20px]' : isLast ? 'rounded-b-[20px]' : ''
 
   const handleShowMore = async () => {
@@ -81,10 +78,7 @@ export function ConversationEntry({ conversation, isFirst, isLast, isShowMore = 
           Share
         </button> */}
       </div>
-      <EntryAttachment
-        transcript={conversation?.transcript ?? ''}
-        wordCount={getWordCount(conversation?.transcript ?? '')}
-      />
+      {conversation && <EntryAttachment conversation={conversation} />}
     </div>
   )
 }

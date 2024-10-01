@@ -14,8 +14,15 @@ const INACTIVE_LINE_COLOR = 'rgba(72, 72, 72, 1)'
 export default function AudioTranscriptionComponent() {
   const [audioState, setAudioState] = useState<AudioState>('active')
   const [visualState, setVisualState] = useState<AudioState>('active')
-  const { micActivity, elapsedTime, currentConversation, isSaving, isAudioOn, setIsAudioOn, saveCurrentConversation } =
-    useConversations()
+  const {
+    micActivity,
+    elapsedTime,
+    currentConversation,
+    isAudioTranscripEnabled,
+    setIsAudioTranscriptEnabled,
+    isSaving,
+    saveCurrentConversation,
+  } = useConversations()
 
   const [isActive, setIsActive] = useState(false)
 
@@ -35,7 +42,7 @@ export default function AudioTranscriptionComponent() {
   )
 
   const updateAudioState = useCallback(() => {
-    if (!isAudioOn) {
+    if (!isAudioTranscripEnabled) {
       setAudioState('off')
       setVisualState('off')
       setIsActive(false)
@@ -57,15 +64,15 @@ export default function AudioTranscriptionComponent() {
       slowDebounce('inactive')
       setIsActive(false)
     }
-  }, [isAudioOn, micActivity, isSaving, fastDebounce, slowDebounce])
+  }, [isAudioTranscripEnabled, micActivity, isSaving, fastDebounce, slowDebounce])
 
   useEffect(() => {
     updateAudioState()
   }, [updateAudioState])
 
   const handleToggle = () => {
-    const newIsOn = !isAudioOn
-    setIsAudioOn(newIsOn)
+    const newIsOn = !isAudioTranscripEnabled
+    setIsAudioTranscriptEnabled(newIsOn)
     setAudioState(newIsOn ? (micActivity > 0 ? 'active' : 'inactive') : 'off')
   }
 
@@ -180,7 +187,11 @@ export default function AudioTranscriptionComponent() {
           </Button>
         )}
         {audioState !== 'noPermissions' ? (
-          <Switch checked={isAudioOn} onCheckedChange={handleToggle} className="data-[state=checked]:bg-conv-green" />
+          <Switch
+            checked={isAudioTranscripEnabled}
+            onCheckedChange={handleToggle}
+            className="data-[state=checked]:bg-conv-green"
+          />
         ) : (
           <EnableConversationsButton onClick={() => setAudioState('inactive')} />
         )}
