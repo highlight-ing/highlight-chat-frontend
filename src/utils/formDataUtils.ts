@@ -131,12 +131,12 @@ export const buildFormData = async ({
   formData.append('llm_provider', llmProvider)
 
   // Append attached_context_metadata
-  const attachedContextMetadata = JSON.stringify({ attached_context: attachedContext })
-  formData.append('attached_context_metadata', attachedContextMetadata)
+  const attachedContextMetadata = JSON.stringify(attachedContext)
+  formData.append('attached_context', attachedContextMetadata)
 
   // Append available_context_metadata
-  const availableContextMetadata = JSON.stringify({ available_contexts: availableContexts })
-  formData.append('available_context_metadata', availableContextMetadata)
+  const availableContextMetadata = JSON.stringify(availableContexts)
+  formData.append('available_context', availableContextMetadata)
 
   return formData
 }
