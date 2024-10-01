@@ -486,6 +486,17 @@ export const useSubmitQuery = () => {
 
       availableContexts.context.push(...conversationAttachments)
 
+      if (rawContents) {
+        const windowContentsAttachment: WindowContentsAttachment = {
+          type: 'window_contents',
+          text: rawContents,
+          name: 'Window Contents',
+          words: getWordCount(rawContents),
+          created_at: new Date(),
+        }
+        attachedContext.context.push(windowContentsAttachment)
+      }
+
       // Add window list and conversation metadata here
       const windowListAttachment: WindowListAttachment = {
         type: 'window_list',
@@ -591,6 +602,17 @@ export const useSubmitQuery = () => {
       }))
 
       availableContexts.context.push(...conversationAttachments)
+
+      if (context?.window_context) {
+        const windowContentsAttachment: WindowContentsAttachment = {
+          type: 'window_contents',
+          text: context?.window_context,
+          name: 'Window Contents',
+          words: getWordCount(context?.window_context),
+          created_at: new Date(),
+        }
+        attachedContext.context.push(windowContentsAttachment)
+      }
 
       const windows = await fetchWindows()
       // Add window list and conversation metadata here
