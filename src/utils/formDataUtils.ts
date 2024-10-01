@@ -22,15 +22,6 @@ export interface TextFileAttachmentMetadata {
   created_at: Date
 }
 
-// Can be PDF, or spreadsheets
-export interface FileAttachmentMetadata {
-  name: string
-  type: 'file_attachment'
-  words: number
-  created_at: Date
-  file_type: string
-}
-
 export interface ImageAttachmentMetadata {
   type: 'image'
   file_id: string
@@ -94,13 +85,12 @@ export interface ConversationAttachmentMetadata {
 
 export interface SpreadsheetAttachment {
   type: 'spreadsheet'
-  contents: string
+  content: string
 }
 
 export interface AttachedContexts {
   context: Array<
     | TextFileAttachmentMetadata
-    | FileAttachmentMetadata
     | ImageAttachmentMetadata
     | PDFAttachment
     | OCRTextAttachment
@@ -109,6 +99,7 @@ export interface AttachedContexts {
     | ClipboardTextAttachment
     | AboutMeAttachment
     | ConversationAttachment
+    | SpreadsheetAttachment
   >
 }
 

@@ -37,10 +37,10 @@ function isUploadableAttachment(attachment: Attachment): attachment is PdfAttach
 // Import necessary types from formDataUtils
 import {
   TextFileAttachmentMetadata,
-  FileAttachmentMetadata,
   ImageAttachmentMetadata,
   PDFAttachment,
   WindowContentsAttachment,
+  SpreadsheetAttachment,
 } from '@/utils/formDataUtils'
 import { getWordCount } from '@/utils/string'
 
@@ -49,7 +49,6 @@ async function createAttachmentMetadata(
   fileId?: string,
 ): Promise<
   | TextFileAttachmentMetadata
-  | FileAttachmentMetadata
   | ImageAttachmentMetadata
   | PDFAttachment
   | OCRTextAttachment
@@ -58,6 +57,8 @@ async function createAttachmentMetadata(
   | ClipboardTextAttachment
   | AboutMeAttachment
   | ConversationAttachment
+  | SpreadsheetAttachment
+  | undefined
 > {
   switch (attachment.type) {
     case 'pdf':
@@ -83,11 +84,8 @@ async function createAttachmentMetadata(
       const text = await attachment.value.text()
 
       return {
-        type: 'file_attachment',
-        name: 'Spreadsheet',
-        words: getWordCount(text),
-        created_at: new Date(),
-        file_type: 'spreadsheet',
+        type: 'spreadsheet',
+        content: text,
       }
     case 'window_context':
       return {
@@ -123,13 +121,8 @@ async function createAttachmentMetadata(
           : new Date(attachment.endedAt).toISOString(),
       }
     default:
-      return {
-        type: 'file_attachment',
-        name: 'Unknown file',
-        words: 0,
-        created_at: new Date(),
-        file_type: 'unknown',
-      }
+      console.error('Unknown attachment type:', attachment.type)
+      return undefined
   }
 }
 
