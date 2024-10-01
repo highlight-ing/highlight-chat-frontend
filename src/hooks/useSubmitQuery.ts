@@ -12,6 +12,7 @@ import { parseAndHandleStreamChunk } from '@/utils/streamParser'
 import { trackEvent } from '@/utils/amplitude'
 import * as Sentry from '@sentry/react'
 import { processAttachments } from '@/utils/contextprocessor'
+import { useIntegrations } from './useIntegrations'
 
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024 // 1MB in bytes
@@ -110,6 +111,7 @@ async function addAttachmentsToFormData(formData: FormData, attachments: any[]) 
 }
 
 export const useSubmitQuery = () => {
+  const integrations = useIntegrations()
   const { post } = useApi()
 
   const { addAttachment } = useStore(
@@ -231,6 +233,7 @@ export const useSubmitQuery = () => {
         const { content, windowName, conversation, factIndex, fact } = await parseAndHandleStreamChunk(chunk, {
           showConfirmationModal,
           addToast,
+          integrations,
         })
 
         if (content) {
