@@ -114,6 +114,10 @@ export type Attachment =
 export type FileAttachmentType = 'image' | 'pdf' | 'spreadsheet' | 'text_file'
 export type AttachmentType = 'audio' | 'clipboard' | 'window' | 'window_context' | 'conversation' | FileAttachmentType
 
+export function isFileAttachmentType(type: string): type is FileAttachmentType {
+  return ['image', 'pdf', 'spreadsheet', 'text_file'].includes(type)
+}
+
 export interface ChatHistoryItem {
   app_id?: string | null
   created_at: string
