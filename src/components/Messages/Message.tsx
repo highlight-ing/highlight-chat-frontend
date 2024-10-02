@@ -22,6 +22,7 @@ import { getDisplayValue } from '@/utils/attachments'
 import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
 import { MessageText } from 'iconsax-react'
 import { useStore } from '@/providers/store-provider'
+import { AttachedContextCContextTypes } from '@/utils/formDataUtils'
 
 const hasAttachment = (message: UserMessage) => {
   return (
@@ -32,7 +33,8 @@ const hasAttachment = (message: UserMessage) => {
     message.file_title ||
     message.audio ||
     message.image_url ||
-    (message.file_attachments && message.file_attachments.length > 0)
+    (message.file_attachments && message.file_attachments.length > 0) ||
+    (message.attached_context?.length ?? 0) > 0
   )
 }
 
@@ -96,6 +98,25 @@ export const Message = ({ message, isThinking }: MessageProps) => {
   const promptApp = useStore((state) => state.promptApp)
   const { factIndex, fact } = message
 
+  const renderAttachment = (attachment: AttachedContextCContextTypes) => {
+    switch (attachment.type) {
+      case 'image':
+        // return <Attachment type="image" value={attachment.value} />
+        return <div>Image</div>
+      case 'clipboard_text':
+        return <Attachment type="clipboard" value={attachment.text} />
+      case 'pdf':
+      case 'spreadsheet':
+      case 'text_file':
+        return <Attachment type={attachment.type} value={attachment.name} />
+      case 'window_contents':
+      case 'ocr_text':
+        return <Attachment type="window_context" value={attachment.name} />
+      case 'conversation':
+        return <Attachment type="conversation" value={attachment.title} />
+    }
+  }
+
   return (
     <div className={`${styles.messageContainer} ${message.role === 'user' ? styles.self : ''}`}>
       {message.role === 'assistant' && (
@@ -124,19 +145,27 @@ export const Message = ({ message, isThinking }: MessageProps) => {
         <div className={styles.message}>
           {message.role === 'user' && hasAttachment(message as UserMessage) && (
             <div className={`flex gap-2`}>
-              {message.screenshot && <Attachment type="image" value={message.screenshot} />}
-              {message.audio && <Attachment type="audio" value={message.audio} />}
-              {message.window && message.window?.title && (
-                <Attachment type="window" value={message.window.title} appIcon={message.window.appIcon} />
+              {message.attached_context && message.attached_context.length > 0 ? (
+                message.attached_context?.map((attachment, index) => (
+                  <div key={index}>{renderAttachment(attachment)}</div>
+                ))
+              ) : (
+                <>
+                  {message.screenshot && <Attachment type="image" value={message.screenshot} />}
+                  {message.audio && <Attachment type="audio" value={message.audio} />}
+                  {message.window && message.window?.title && (
+                    <Attachment type="window" value={message.window.title} appIcon={message.window.appIcon} />
+                  )}
+                  {message.clipboard_text && <Attachment type="clipboard" value={message.clipboard_text} />}
+                  {message.file_title && <Attachment type="pdf" value={message.file_title} />}
+                  {message.image_url && <Attachment type="image" value={message.image_url} />}
+                  {message.file_attachments &&
+                    message.file_attachments.map((a, index) => {
+                      return <Attachment type={a.type} value={getDisplayValue(a)} key={index} />
+                    })}
+                  {message.window_context && <Attachment type="window_context" value={message.window_context} />}
+                </>
               )}
-              {message.clipboard_text && <Attachment type="clipboard" value={message.clipboard_text} />}
-              {message.file_title && <Attachment type="pdf" value={message.file_title} />}
-              {message.image_url && <Attachment type="image" value={message.image_url} />}
-              {message.file_attachments &&
-                message.file_attachments.map((a, index) => {
-                  return <Attachment type={a.type} value={getDisplayValue(a)} key={index} />
-                })}
-              {message.window_context && <Attachment type="window_context" value={message.window_context} />}
             </div>
           )}
           <div className={styles.messageBody}>

@@ -70,6 +70,7 @@ export default function useHandleConversationLoad() {
               clipboard_text: message.clipboard_text,
               image_url: message.image_url,
               window_context: message.window_context,
+              attached_context: message.attached_context,
             } as UserMessage
           } else {
             return baseMessage as AssistantMessage

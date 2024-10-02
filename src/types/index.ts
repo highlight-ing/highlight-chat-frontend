@@ -1,6 +1,7 @@
 import { Prompt } from '@/types/supabase-helpers'
 import { ColorScheme } from '@/components/PersonalPrompts/customVariables'
 import { ButtonVariantType } from '@/components/Button/Button'
+import { AttachedContextCContextTypes } from '@/utils/formDataUtils'
 
 type WindowAttachment = {
   type: 'window'
@@ -28,6 +29,7 @@ export type UserMessage = BaseMessage & {
   window_context?: string
   factIndex?: number
   fact?: string
+  attached_context?: AttachedContextCContextTypes[]
 }
 
 export type AssistantMessage = BaseMessage & {

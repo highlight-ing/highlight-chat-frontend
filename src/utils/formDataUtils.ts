@@ -86,21 +86,23 @@ export interface ConversationAttachmentMetadata {
 export interface SpreadsheetAttachment {
   type: 'spreadsheet'
   content: string
+  name: string
 }
 
+export type AttachedContextCContextTypes =
+  | TextFileAttachmentMetadata
+  | ImageAttachmentMetadata
+  | PDFAttachment
+  | OCRTextAttachment
+  | WindowContentsAttachment
+  | WindowListAttachment
+  | ClipboardTextAttachment
+  | AboutMeAttachment
+  | ConversationAttachment
+  | SpreadsheetAttachment
+
 export interface AttachedContexts {
-  context: Array<
-    | TextFileAttachmentMetadata
-    | ImageAttachmentMetadata
-    | PDFAttachment
-    | OCRTextAttachment
-    | WindowContentsAttachment
-    | WindowListAttachment
-    | ClipboardTextAttachment
-    | AboutMeAttachment
-    | ConversationAttachment
-    | SpreadsheetAttachment
-  >
+  context: AttachedContextCContextTypes[]
 }
 
 export interface AvailableContexts {
