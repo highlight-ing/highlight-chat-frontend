@@ -1,8 +1,6 @@
 'use server'
 
-import { validateUserAuth } from '@/lib/auth'
-
-const HIGHLIGHT_BACKEND_BASE_URL = 'http://localhost:8787/v1'
+const HIGHLIGHT_BACKEND_BASE_URL = 'http://localhost:8787'
 
 const ERROR_MESSAGES = {
   INVALID_AUTH_TOKEN: 'Invalid authorization token. Try refreshing Highlight Chat.',
@@ -11,17 +9,10 @@ const ERROR_MESSAGES = {
 /**
  * Returns the latest Linear API token for the given user by their ID.
  */
-export async function getLinearTokenForUser(accessToken: string) {
-  let userId: string
-  try {
-    userId = await validateUserAuth(accessToken)
-  } catch (error) {
-    return { error: ERROR_MESSAGES.INVALID_AUTH_TOKEN }
-  }
-
-  const response = await fetch(`${HIGHLIGHT_BACKEND_BASE_URL}/linear/token/${userId}`, {
+export async function getLinearTokenForUser(hlAccessToken: string) {
+  const response = await fetch(`${HIGHLIGHT_BACKEND_BASE_URL}/v1/linear/token`, {
     headers: {
-      Authorization: `Token ${process.env.HIGHLIGHT_CHAT_API_TOKEN}`,
+      Authorization: `Bearer ${hlAccessToken}`,
     },
   })
 
@@ -49,7 +40,55 @@ export async function getLinearTokenForUser(accessToken: string) {
  * Creates a magic sign in link for Linear.
  * We will redirect the user to this link to create a connection.
  */
-export async function createMagicLinkForLinear(accessToken: string) {}
+export async function createMagicLinkForLinear(accessToken: string) {
+  const response = await fetch(
+    `${HIGHLIGHT_BACKEND_BASE_URL}/v1/auth/magiclink?redirect_uri=https://auth.highlight.ing/connect/linear`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  )
+
+  if (!response.ok) {
+    console.warn('Failed to create Linear connect link', response.status, await response.text())
+    throw new Error('Failed to create Linear connect link')
+  }
+
+  let data
+  try {
+    data = await response.json()
+  } catch (e) {
+    console.warn('Failed to parse response as JSON', e, await response.text())
+    throw e
+  }
+
+  return data.url
+}
+
+export async function checkLinearConnectionStatus(accessToken: string) {
+  const response = await fetch(`${HIGHLIGHT_BACKEND_BASE_URL}/v1/linear`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  })
+
+  if (!response.ok) {
+    console.warn('Failed to check if Linear is connected', response.status, await response.text())
+    throw new Error('Failed to check if Linear is connected')
+  }
+
+  let data
+  try {
+    data = await response.json()
+  } catch (e) {
+    console.warn('Failed to parse response as JSON', e, await response.text())
+    throw e
+  }
+
+  return data.connected
+}
 
 export async function createLinearClientForUser(userId: string) {
   // Make an outgoing fetch request to Highlight backend to get the user's Linear API key
