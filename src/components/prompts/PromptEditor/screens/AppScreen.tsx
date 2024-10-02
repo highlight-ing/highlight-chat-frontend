@@ -3,6 +3,8 @@ import IntelliPrompt from '../IntelliPrompt'
 import styles from '../prompteditor.module.scss'
 import { useEffect } from 'react'
 import OnboardingBox from '../OnboardingBox'
+import { Switch } from '@/components/catalyst/switch'
+import { LinearIcon } from '@/icons/icons'
 
 function OnboardingIndex0() {
   const { setOnboarding } = usePromptEditorStore()
@@ -103,9 +105,42 @@ export default function AppScreen() {
 
   return (
     <>
-      <span className={onboarding.isOnboarding && onboarding.index === 0 ? styles.onboardingBlock : ''}>
-        <IntelliPrompt value={promptEditorData.appPrompt} onChange={(e) => setPromptEditorData({ appPrompt: e })} />
-      </span>
+      <div className="flex h-full justify-between">
+        <div className="flex-1">
+          <span className={onboarding.isOnboarding && onboarding.index === 0 ? styles.onboardingBlock : ''}>
+            <IntelliPrompt value={promptEditorData.appPrompt} onChange={(e) => setPromptEditorData({ appPrompt: e })} />
+          </span>
+        </div>
+
+        <div className="max-w-96 basis-1/3 p-[17px]">
+          <h3 className="text-base font-semibold text-white">Automations</h3>
+          <p className="text-xs font-normal leading-tight text-[#6e6e6e]">
+            Add automations to your actions to allow Highlight to do things for you.
+          </p>
+          <div className="inline-flex h-[87px] w-[323px] flex-col items-start justify-start gap-3 rounded-2xl bg-[#222222] p-3">
+            <div className="inline-flex h-6 items-start justify-between self-stretch">
+              <div className="flex items-center justify-start pr-[69px]">
+                <div className="inline-flex items-center justify-start gap-2 self-stretch">
+                  <div className="flex h-6 w-6 items-center justify-center">
+                    <LinearIcon />
+                  </div>
+                  <div className="text-[13px] font-medium leading-normal text-[#eeeeee]">Create Linear Issue</div>
+                </div>
+              </div>
+              <div className="flex items-center justify-start gap-2">
+                <div className="flex h-[26px] items-center justify-end gap-1.5">
+                  <Switch color={'cyan'} disabled={false} />
+                </div>
+              </div>
+            </div>
+            <div className="inline-flex items-center justify-start gap-2.5 self-stretch border-t border-white/0 pt-2">
+              <div className="shrink grow basis-0 text-xs font-normal leading-tight text-[#6e6e6e]">
+                Allows your action to create a Linear issue on behalf of the user.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       {onboarding.isOnboarding && onboarding.index === 0 && <OnboardingIndex0 />}
       {onboarding.isOnboarding && onboarding.index === 1 && <OnboardingIndex1 />}
       {onboarding.isOnboarding && onboarding.index === 2 && <OnboardingIndex2 />}

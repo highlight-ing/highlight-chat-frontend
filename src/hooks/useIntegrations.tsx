@@ -10,7 +10,7 @@ import InputField from '@/components/TextInput/InputField'
 import TextArea from '@/components/TextInput/TextArea'
 import { LinearClient, Team } from '@linear/sdk'
 import { LinearIcon } from '@/icons/icons'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 

@@ -1,6 +1,6 @@
 'use server'
 
-const HIGHLIGHT_BACKEND_BASE_URL = 'http://localhost:8787'
+const HIGHLIGHT_BACKEND_BASE_URL = 'https://backend.workers.highlight.ing'
 
 const ERROR_MESSAGES = {
   INVALID_AUTH_TOKEN: 'Invalid authorization token. Try refreshing Highlight Chat.',
