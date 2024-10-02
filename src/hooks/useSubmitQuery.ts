@@ -225,7 +225,7 @@ export const useSubmitQuery = () => {
 
       checkAbortSignal()
 
-      addConversationMessage(conversationId!, { role: 'assistant', content: '' })
+      addConversationMessage(conversationId!, { id: Date.now().toString(), role: 'assistant', content: '' })
 
       let accumulatedMessage = ''
 
@@ -352,6 +352,7 @@ export const useSubmitQuery = () => {
           timeout: 15000,
         })
       }
+      throw error // Re-throw the error so it's caught in handleSubmit
     } finally {
       const endTime = Date.now()
       const duration = endTime - startTime
@@ -412,6 +413,7 @@ export const useSubmitQuery = () => {
 
       const conversationId = getOrCreateConversationId()
       addConversationMessage(conversationId!, {
+        id: Date.now().toString(),
         role: 'user',
         content: query,
         clipboard_text: clipboardText,
@@ -455,8 +457,9 @@ export const useSubmitQuery = () => {
     input: string,
     promptApp?: Prompt,
     context?: { image?: string; window_context?: string },
+    isRetry: boolean = false,
   ) => {
-    console.log('handleSubmit triggered')
+    console.log('handleSubmit triggered', isRetry ? '(retry)' : '')
 
     const query = input.trim()
 
@@ -465,8 +468,36 @@ export const useSubmitQuery = () => {
       return
     }
 
+    const conversationId = getOrCreateConversationId()
+    const messageId = isRetry ? undefined : Date.now().toString()
+
     try {
       setInputIsDisabled(true)
+
+      if (!isRetry) {
+        // Add the user message only if it's not a retry
+        addConversationMessage(conversationId!, {
+          id: messageId!,
+          role: 'user',
+          content: query,
+        })
+      }
+
+      // Update or add the assistant message
+      const assistantMessageId = isRetry ? undefined : (Date.now() + 1).toString()
+      if (isRetry) {
+        updateLastConversationMessage(conversationId!, {
+          role: 'assistant',
+          content: '',
+          error: false,
+        })
+      } else {
+        addConversationMessage(conversationId!, {
+          id: assistantMessageId!,
+          role: 'assistant',
+          content: '',
+        })
+      }
 
       const formData = new FormData()
       formData.append('prompt', query)
@@ -504,29 +535,39 @@ export const useSubmitQuery = () => {
         },
       )
 
-      const conversationId = getOrCreateConversationId()
-      addConversationMessage(conversationId!, {
-        role: 'user',
-        content: query,
-        screenshot,
-        ocr_text: ocrText,
-        audio,
-        file_title: fileTitle,
-        clipboard_text: clipboardText,
-        windows: await fetchWindows(),
-        window_context: windowContext,
-        file_attachments: attachments.filter((attachment) => attachment.type === 'text_file'),
-      })
+      // addConversationMessage(conversationId!, {
+      //   id: messageId,
+      //   role: 'user',
+      //   content: query,
+      //   screenshot,
+      //   ocr_text: ocrText,
+      //   audio,
+      //   file_title: fileTitle,
+      //   clipboard_text: clipboardText,
+      //   windows: await fetchWindows(),
+      //   window_context: windowContext,
+      //   file_attachments: attachments.filter((attachment) => attachment.type === 'text_file'),
+      // })
 
       setInput('')
       updateLastMessageSentTimestamp()
       clearAttachments()
 
       const accessToken = await getAccessToken()
+
       await fetchResponse(conversationId!, formData, accessToken, isPromptApp, promptApp)
+      console.log('Successfully made the request')
     } catch (error) {
       console.error('Error in handleSubmit: ', error)
       Sentry.captureException(error)
+
+      // Update the assistant message with an error
+      updateLastConversationMessage(conversationId!, {
+        error: true,
+        content: 'An error occurred while processing your request. Please try again.',
+      })
+
+      console.log('Error making the request')
     } finally {
       setInputIsDisabled(false)
     }

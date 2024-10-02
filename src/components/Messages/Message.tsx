@@ -39,6 +39,8 @@ const hasAttachment = (message: UserMessage) => {
 interface MessageProps {
   isThinking?: boolean
   message: MessageType
+  onRetry?: () => void
+  onDelete?: () => void
 }
 
 const FactButton = ({ factIndex, fact }: { factIndex?: number; fact?: string }) => {
@@ -92,7 +94,7 @@ const preprocessLaTeX = (content: string) => {
   return inlineProcessedContent
 }
 
-export const Message = ({ message, isThinking }: MessageProps) => {
+export const Message = ({ message, isThinking, onRetry, onDelete }: MessageProps) => {
   const promptApp = useStore((state) => state.promptApp)
   const { factIndex, fact } = message
 
@@ -201,6 +203,16 @@ export const Message = ({ message, isThinking }: MessageProps) => {
             >
               {typeof message.content === 'string' ? preprocessLaTeX(message.content) : ''}
             </Markdown>
+            {message.error && (
+              <div className={styles.errorActions}>
+                <button className={styles.retryButton} onClick={onRetry}>
+                  Retry
+                </button>
+                <button className={styles.deleteButton} onClick={onDelete}>
+                  Delete
+                </button>
+              </div>
+            )}
           </div>
           {factIndex || fact ? <FactButton factIndex={factIndex} fact={fact} /> : null}
         </div>

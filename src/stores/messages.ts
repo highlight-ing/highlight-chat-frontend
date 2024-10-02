@@ -1,61 +1,73 @@
 import { StateCreator } from 'zustand'
-import { Message } from '@/types'
+import { Message, UserMessage, AssistantMessage } from '@/types'
 
 export interface MessagesState {
   conversationMessages: Record<string, Message[]>
+  failedMessage: string | null
 }
 
 export type MessagesSlice = MessagesState & {
-  addConversationMessage: (conversationId: string, messages: Message) => void
-  updateLastConversationMessage: (conversationId: string, messages: Message, personalization?: boolean) => void
+  addConversationMessage: (conversationId: string, message: Message) => void
+  updateLastConversationMessage: (conversationId: string, message: Partial<Message>, personalization?: boolean) => void
   updateConversationMessages: (conversationId: string, messages: Message[]) => void
   clearConversationMessages: (conversationId: string) => void
   setAllConversationMessages: (conversationMessages: Record<string, Message[]>) => void
   clearAllConversationMessages: () => void
   clearAllOtherConversationMessages: (conversationId: string) => void
+  deleteMessage: (conversationId: string, messageId: string) => void
 }
 
 export const initialMessagesState: MessagesState = {
   conversationMessages: {},
+  failedMessage: null,
 }
 
 export const createMessagesSlice: StateCreator<MessagesSlice> = (set, get) => ({
   ...initialMessagesState,
   addConversationMessage: (conversationId, message) => {
-    const openConversationMessages = { ...get().conversationMessages }
-    if (!openConversationMessages[conversationId]) {
-      openConversationMessages[conversationId] = []
-    }
-    openConversationMessages[conversationId].push(message)
-    set({ conversationMessages: openConversationMessages })
+    set((state) => {
+      const openConversationMessages = { ...state.conversationMessages }
+      if (!openConversationMessages[conversationId]) {
+        openConversationMessages[conversationId] = []
+      }
+      openConversationMessages[conversationId].push(message)
+      return { conversationMessages: openConversationMessages }
+    })
   },
   updateLastConversationMessage: (conversationId, message, personalization) => {
-    const openConversationMessages = { ...get().conversationMessages }
-    if (!openConversationMessages[conversationId]?.length) {
-      return
-    }
-    const lastMessageIndex = openConversationMessages[conversationId].findLastIndex((msg) => msg.role === message.role)
-    if (lastMessageIndex === -1) {
-      get().addConversationMessage(conversationId, message)
-    } else {
-      openConversationMessages
-    }
-    openConversationMessages[conversationId] = [...openConversationMessages[conversationId].slice(0, -1), message]
-    set({ conversationMessages: openConversationMessages })
+    set((state) => {
+      const openConversationMessages = { ...state.conversationMessages }
+      if (!openConversationMessages[conversationId]?.length) {
+        return state
+      }
+      const lastMessageIndex = openConversationMessages[conversationId].length - 1
+      const lastMessage = openConversationMessages[conversationId][lastMessageIndex]
+
+      openConversationMessages[conversationId][lastMessageIndex] = {
+        ...lastMessage,
+        ...message,
+        id: lastMessage.id,
+        role: lastMessage.role,
+        error: message.error !== undefined ? message.error : lastMessage.error,
+      }
+
+      return { conversationMessages: openConversationMessages }
+    })
   },
   updateConversationMessages: (conversationId, messages) => {
-    const openConversationMessages = { ...get().conversationMessages }
-    openConversationMessages[conversationId] = messages
-    set({ conversationMessages: openConversationMessages })
+    set((state) => ({
+      conversationMessages: {
+        ...state.conversationMessages,
+        [conversationId]: messages,
+      },
+    }))
   },
   clearConversationMessages: (conversationId) => {
-    const conversations = get().conversationMessages
-    if (!conversations[conversationId]) {
-      return
-    }
-    const openConversationMessages = { ...conversations }
-    delete openConversationMessages[conversationId]
-    set({ conversationMessages: openConversationMessages })
+    set((state) => {
+      const openConversationMessages = { ...state.conversationMessages }
+      delete openConversationMessages[conversationId]
+      return { conversationMessages: openConversationMessages }
+    })
   },
   setAllConversationMessages: (conversationMessages) => {
     set({ conversationMessages: conversationMessages })
@@ -64,8 +76,22 @@ export const createMessagesSlice: StateCreator<MessagesSlice> = (set, get) => ({
     set({ conversationMessages: {} })
   },
   clearAllOtherConversationMessages: (conversationId) => {
-    const conversationMessages: Record<string, Message[]> = {}
-    conversationMessages[conversationId] = get().conversationMessages[conversationId]
-    set({ conversationMessages })
+    set((state) => ({
+      conversationMessages: {
+        [conversationId]: state.conversationMessages[conversationId] || [],
+      },
+    }))
+  },
+  deleteMessage: (conversationId, messageId) => {
+    set((state) => {
+      const openConversationMessages = { ...state.conversationMessages }
+      if (!openConversationMessages[conversationId]) {
+        return state
+      }
+      openConversationMessages[conversationId] = openConversationMessages[conversationId].filter(
+        (msg) => msg.id !== messageId,
+      )
+      return { conversationMessages: openConversationMessages }
+    })
   },
 })

@@ -11,9 +11,11 @@ type WindowAttachment = {
 export type BaseMessage = {
   role: 'user' | 'assistant'
   content?: string
+  error?: boolean // Add this line
 }
 
 export type UserMessage = BaseMessage & {
+  id: string
   role: 'user'
   context?: string
   image_url?: string
@@ -31,6 +33,7 @@ export type UserMessage = BaseMessage & {
 }
 
 export type AssistantMessage = BaseMessage & {
+  id: string
   role: 'assistant'
   factIndex?: number
   fact?: string
