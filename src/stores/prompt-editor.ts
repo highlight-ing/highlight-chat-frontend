@@ -19,6 +19,10 @@ export interface PromptEditorOnboarding {
   hasOnboardedOnceBefore: boolean
 }
 
+export interface EnabledAutomations {
+  createLinearIssue: boolean
+}
+
 export interface PromptEditorData {
   externalId?: string
   slug: string
@@ -32,6 +36,7 @@ export interface PromptEditorData {
   image?: string
   uploadingImage?: File
   preferredAttachment?: PreferredAttachment
+  enabledAutomations?: EnabledAutomations
 }
 
 export interface PromptEditorState {
@@ -153,6 +158,9 @@ export const initialPromptEditorState: PromptEditorState = {
     visibility: 'private',
     tags: [],
     preferredAttachment: 'default',
+    enabledAutomations: {
+      createLinearIssue: false,
+    },
   },
   needSave: false,
   saving: false,

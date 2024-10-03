@@ -18,6 +18,7 @@ import PromptAddedModal from '@/presentations/modals/PromptAddedModal'
 import CustomizePromptModal from '@/presentations/modals/CustomizePromptModal'
 import CreatePromptFromTemplateModal from '@/presentations/modals/CreatePromptFromTemplate'
 import UnsavedChangesModal from '@/presentations/modals/UnsavedChangesModal'
+import ConnectIntegrationModal from '@/presentations/modals/ConnectIntegrationModal'
 
 type FunctionalComponent = (props: ModalObjectProps) => JSX.Element
 
@@ -39,6 +40,7 @@ const ModalMap: Record<string, FunctionalComponent> = {
   'customize-prompt': CustomizePromptModal,
   'create-prompt-from-template': CreatePromptFromTemplateModal,
   'unsaved-changes': UnsavedChangesModal,
+  'connect-integration': ConnectIntegrationModal,
 }
 
 export const ModalContainer = () => {

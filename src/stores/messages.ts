@@ -13,6 +13,7 @@ export type MessagesSlice = MessagesState & {
   setAllConversationMessages: (conversationMessages: Record<string, Message[]>) => void
   clearAllConversationMessages: () => void
   clearAllOtherConversationMessages: (conversationId: string) => void
+  getLastConversationMessage: (conversationId: string) => Message | undefined
 }
 
 export const initialMessagesState: MessagesState = {
@@ -67,5 +68,12 @@ export const createMessagesSlice: StateCreator<MessagesSlice> = (set, get) => ({
     const conversationMessages: Record<string, Message[]> = {}
     conversationMessages[conversationId] = get().conversationMessages[conversationId]
     set({ conversationMessages })
+  },
+  getLastConversationMessage: (conversationId) => {
+    const conversationMessages = get().conversationMessages
+    if (!conversationMessages[conversationId]?.length) {
+      return undefined
+    }
+    return conversationMessages[conversationId][conversationMessages[conversationId].length - 1]
   },
 })

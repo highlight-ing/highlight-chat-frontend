@@ -12,6 +12,7 @@ import { parseAndHandleStreamChunk } from '@/utils/streamParser'
 import { trackEvent } from '@/utils/amplitude'
 import * as Sentry from '@sentry/react'
 import { processAttachments } from '@/utils/contextprocessor'
+import { useIntegrations } from './useIntegrations'
 
 async function compressImageIfNeeded(file: File): Promise<File> {
   const ONE_MB = 1 * 1024 * 1024 // 1MB in bytes
@@ -149,6 +150,8 @@ export const useSubmitQuery = () => {
   const conversationId = useStore((state) => state.conversationId)
   const conversationIdRef = useRef(conversationId)
 
+  const integrations = useIntegrations()
+
   const { openModal, closeModal } = useStore(
     useShallow((state) => ({
       openModal: state.openModal,
@@ -196,7 +199,7 @@ export const useSubmitQuery = () => {
         get_more_context_from_window: true,
         get_more_context_from_conversation: false,
         add_or_update_about_me_facts: false,
-        create_linear_ticket: false,
+        create_linear_ticket: promptApp?.linear_integration_enabled ?? false,
       }
 
       formData.append('conversation_id', conversationId)
@@ -239,6 +242,8 @@ export const useSubmitQuery = () => {
         const { content, windowName, conversation, factIndex, fact } = await parseAndHandleStreamChunk(chunk, {
           showConfirmationModal,
           addToast,
+          integrations,
+          conversationId,
         })
 
         if (content) {

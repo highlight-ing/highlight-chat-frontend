@@ -35,6 +35,11 @@ const SavePromptSchema = z.object({
   videoUrl: videoUrlSchema,
   tags: z.array(z.object({ value: z.string(), label: z.string() })).optional(),
   preferredAttachment: PreferredAttachmentSchema.nullish(),
+  enabledAutomations: z
+    .object({
+      createLinearIssue: z.boolean(),
+    })
+    .optional(),
 })
 
 export type SavePromptData = z.infer<typeof SavePromptSchema>
@@ -159,7 +164,10 @@ export async function savePrompt(formData: FormData, authToken: string) {
     videoUrl: formData.get('videoUrl'),
     tags: JSON.parse(formData.get('tags') as string),
     preferredAttachment: formData.get('preferredAttachment'),
+    enabledAutomations: JSON.parse(formData.get('enabledAutomations') as string),
   })
+
+  console.log('enabled automations', validated.data?.enabledAutomations)
 
   if (!validated.success) {
     console.warn('Invalid prompt data recieved.', validated.error)
@@ -226,6 +234,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
     image: newImageId ?? undefined,
     is_handlebar_prompt: true,
     preferred_attachment: validated.data.preferredAttachment,
+    linear_integration_enabled: validated.data.enabledAutomations?.createLinearIssue ?? false,
   }
 
   if (validated.data.externalId) {
@@ -359,7 +368,7 @@ export async function fetchPrompts(authToken: string) {
   const { data: prompts, error: promptsError } = await supabase
     .from('prompts')
     .select(
-      'id, external_id, name, description, prompt_text, prompt_url, created_at, slug, user_id, public, suggestion_prompt_text, video_url, image, is_handlebar_prompt, public_use_number, system_prompt, can_trend, user_images(file_extension), preferred_attachment, added_prompt_tags(tags(external_id, tag, slug))',
+      'id, external_id, name, description, prompt_text, prompt_url, created_at, slug, user_id, public, suggestion_prompt_text, video_url, image, is_handlebar_prompt, public_use_number, system_prompt, can_trend, user_images(file_extension), preferred_attachment, added_prompt_tags(tags(external_id, tag, slug)), linear_integration_enabled',
     )
     .eq('user_id', userId)
 
@@ -374,7 +383,7 @@ export async function fetchPrompts(authToken: string) {
   const { data: trendingPrompts, error: trendingPromptsError } = await supabase
     .from('prompts')
     .select(
-      'id, external_id, name, description, prompt_text, prompt_url, created_at, slug, user_id, public, suggestion_prompt_text, video_url, image, is_handlebar_prompt, public_use_number, system_prompt, can_trend, user_images(file_extension), preferred_attachment, added_prompt_tags(tags(external_id, tag, slug))',
+      'id, external_id, name, description, prompt_text, prompt_url, created_at, slug, user_id, public, suggestion_prompt_text, video_url, image, is_handlebar_prompt, public_use_number, system_prompt, can_trend, user_images(file_extension), preferred_attachment, added_prompt_tags(tags(external_id, tag, slug)), linear_integration_enabled',
     )
     .eq('can_trend', true)
 
