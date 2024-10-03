@@ -15,7 +15,7 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 export interface UseIntegrationsAPI {
-  createLinearTicket: (conversationId: string, title: string) => Promise<void>
+  createLinearTicket: (conversationId: string, title: string, description: string) => Promise<void>
 }
 
 function MessageWithComponent({ content, children }: { content: string; children: React.ReactNode }) {
@@ -102,9 +102,11 @@ type LinearTicketFormData = z.infer<typeof linearTicketFormSchema>
 
 function LinearTicketFormComponent({
   title,
+  description,
   onSubmitSuccess,
 }: {
   title: string
+  description: string
   onSubmitSuccess: (issueUrl: string) => void
 }) {
   const {
@@ -116,6 +118,7 @@ function LinearTicketFormComponent({
     resolver: zodResolver(linearTicketFormSchema),
     defaultValues: {
       title,
+      description,
     },
   })
 
@@ -213,7 +216,7 @@ function LinearTicketSuccessComponent({ issueUrl }: { issueUrl: string }) {
   )
 }
 
-function CreateLinearTicketComponent({ title }: { title: string }) {
+function CreateLinearTicketComponent({ title, description }: { title: string; description: string }) {
   const [state, setState] = useState<'loading' | 'connect' | 'form' | 'success'>('loading')
   const [issueUrl, setIssueUrl] = useState<string>()
 
@@ -247,7 +250,9 @@ function CreateLinearTicketComponent({ title }: { title: string }) {
   return (
     <div>
       {state === 'connect' && <LinearConnectionComponent onConnect={onConnect} />}
-      {state === 'form' && <LinearTicketFormComponent title={title} onSubmitSuccess={onSubmitSuccess} />}
+      {state === 'form' && (
+        <LinearTicketFormComponent title={title} description={description} onSubmitSuccess={onSubmitSuccess} />
+      )}
       {state === 'success' && issueUrl && <LinearTicketSuccessComponent issueUrl={issueUrl} />}
     </div>
   )
@@ -257,7 +262,7 @@ export function useIntegrations(): UseIntegrationsAPI {
   const getLastConversationMessage = useStore((state) => state.getLastConversationMessage)
   const updateLastConversationMessage = useStore((state) => state.updateLastConversationMessage)
 
-  async function createLinearTicket(conversationId: string, title: string) {
+  async function createLinearTicket(conversationId: string, title: string, description: string) {
     const lastMessage = getLastConversationMessage(conversationId)
 
     // Update the last message to show the Linear ticket component which will handle checking for authentication,
@@ -265,7 +270,7 @@ export function useIntegrations(): UseIntegrationsAPI {
     updateLastConversationMessage(conversationId!, {
       content: (
         <MessageWithComponent content={lastMessage?.content as string}>
-          <CreateLinearTicketComponent title={title} />
+          <CreateLinearTicketComponent title={title} description={description} />
         </MessageWithComponent>
       ),
       role: 'assistant',

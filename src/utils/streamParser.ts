@@ -57,10 +57,10 @@ export async function parseAndHandleStreamChunk(
             }
           }
           if (jsonChunk.name === 'create_linear_ticket') {
-            const title = jsonChunk.input.title
+            const title = jsonChunk.input.title ?? ''
+            const description = jsonChunk.input.description ?? ''
 
-            console.log('streamParser create_linear_ticket', title)
-            integrations.createLinearTicket(conversationId, title)
+            integrations.createLinearTicket(conversationId, title, description)
           }
           if (jsonChunk.name === 'get_more_context_from_conversations') {
             if (contextConfirmed === null) {
