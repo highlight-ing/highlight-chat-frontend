@@ -2,16 +2,13 @@ import { ClipboardText, GallerySlash, DocumentText1 } from 'iconsax-react'
 import { useState } from 'react'
 import { CloseIcon } from '../icons/icons'
 import Tooltip from './Tooltip/Tooltip'
-import { useStore } from '@/providers/store-provider'
 import { AttachmentType } from '@/types'
 import { useImageDownload } from '@/hooks/useImageDownload'
-import { trackEvent } from '@/utils/amplitude'
-import { useShallow } from 'zustand/react/shallow'
 import { VoiceSquare } from 'iconsax-react'
 import { getWordCountFormatted } from '@/utils/string'
 
 interface BaseAttachmentProps {
-  removeEnabled?: boolean
+  onRemove?: () => void
   value: string
   isSharedImage?: boolean
   sharedImageUrl?: string // Add this line
@@ -32,32 +29,17 @@ type AttachmentProps = WindowAttachmentProps | OtherAttachmentProps
 export const Attachment = ({
   type,
   value,
-  removeEnabled = false,
+  onRemove,
   isSharedImage = false,
   sharedImageUrl,
   ...props
 }: AttachmentProps) => {
   const appIcon = (props as WindowAttachmentProps).appIcon
-  const isFile = (props as OtherAttachmentProps).isFile
   const [isImageLoaded, setIsImageLoaded] = useState(false)
-  const { removeAttachment, fileInputRef } = useStore(
-    useShallow((state) => ({
-      removeAttachment: state.removeAttachment,
-      fileInputRef: state.fileInputRef,
-    })),
-  )
 
   const { imageUrl, isLoading, error } = useImageDownload(
     type === 'image' && !value.startsWith('data:image') && !value.startsWith('blob:') ? value : null,
   )
-
-  const onRemoveAttachment = () => {
-    removeAttachment(type)
-    if (fileInputRef?.current && isFile) {
-      fileInputRef.current.value = ''
-    }
-    trackEvent('HL Chat Attachment Removed', { type })
-  }
 
   const renderAttachmentContent = () => {
     const size = 20
@@ -171,10 +153,10 @@ export const Attachment = ({
             {renderAttachmentContent()}
           </div>
         )}
-        {removeEnabled && (
+        {onRemove && (
           <div
             className="absolute right-[-8px] top-[-8px] hidden cursor-pointer rounded-full bg-light-20 p-0.5 text-light-80 group-hover:flex"
-            onClick={onRemoveAttachment}
+            onClick={onRemove}
           >
             <CloseIcon size={16} />
           </div>

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { Attachment } from '../Attachment'
 import { AttachmentsButton } from '../AttachmentsButton/AttachmentsButton'
-import { Attachment as AttachmentType } from '@/types'
+import { Attachment as AttachmentType, isFileAttachmentType } from '@/types'
 import { useSubmitQuery } from '../../hooks/useSubmitQuery'
 import { useStore } from '@/providers/store-provider'
 
@@ -17,12 +17,14 @@ const MAX_INPUT_HEIGHT = 160
  * This is the main Highlight Chat input box, not a reusable Input component.
  */
 export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
-  const { attachments, inputIsDisabled, promptName, promptApp } = useStore(
+  const { attachments, inputIsDisabled, promptName, promptApp, removeAttachment, fileInputRef } = useStore(
     useShallow((state) => ({
       attachments: state.attachments,
       inputIsDisabled: state.inputIsDisabled,
       promptName: state.promptName,
       promptApp: state.promptApp,
+      removeAttachment: state.removeAttachment,
+      fileInputRef: state.fileInputRef,
     })),
   )
 
@@ -70,6 +72,15 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
     }
   }, [])
 
+  const onRemoveAttachment = (attachment: AttachmentType) => {
+    if (isFileAttachmentType(attachment.type) && fileInputRef?.current) {
+      fileInputRef.current.value = ''
+    }
+
+    removeAttachment(attachment)
+    trackEvent('HL Chat Attachment Removed', { type: attachment.type })
+  }
+
   return (
     <div className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''}`} onClick={onClickContainer}>
       <div className={styles.inputRow}>
@@ -96,7 +107,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
                 (attachment.type === 'image' && !!attachment.file) ||
                 attachment.type === 'spreadsheet'
               }
-              removeEnabled
+              onRemove={() => onRemoveAttachment(attachment)}
               key={index}
             />
           ))}
