@@ -40,7 +40,7 @@ function VariablesEditorButton() {
       tooltip={
         onboarding.isOnboarding ? undefined : (
           <div className={'flex flex-col gap-1'}>
-            <span>Advanced Variables Editor</span>
+            <span>System Prompt</span>
             <span className={'text-xs text-light-60'}>
               Edit the system prompt to control what context variables are included.
             </span>
@@ -52,7 +52,7 @@ function VariablesEditorButton() {
         onClick={() => setSelectedScreen('variables')}
         className={`${styles.tab} ${onboarding.isOnboarding ? styles.disabled : ''}`}
       >
-        Variables Editor
+        System Prompt
       </div>
     </Tooltip>
   )

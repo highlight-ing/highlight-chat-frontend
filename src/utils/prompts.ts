@@ -35,6 +35,11 @@ const SavePromptSchema = z.object({
   videoUrl: videoUrlSchema,
   tags: z.array(z.object({ value: z.string(), label: z.string() })).optional(),
   preferredAttachment: PreferredAttachmentSchema.nullish(),
+  enabledAutomations: z
+    .object({
+      createLinearIssue: z.boolean(),
+    })
+    .optional(),
 })
 
 export type SavePromptData = z.infer<typeof SavePromptSchema>
@@ -159,7 +164,10 @@ export async function savePrompt(formData: FormData, authToken: string) {
     videoUrl: formData.get('videoUrl'),
     tags: JSON.parse(formData.get('tags') as string),
     preferredAttachment: formData.get('preferredAttachment'),
+    enabledAutomations: JSON.parse(formData.get('enabledAutomations') as string),
   })
+
+  console.log('enabled automations', validated.data?.enabledAutomations)
 
   if (!validated.success) {
     console.warn('Invalid prompt data recieved.', validated.error)
@@ -226,6 +234,7 @@ export async function savePrompt(formData: FormData, authToken: string) {
     image: newImageId ?? undefined,
     is_handlebar_prompt: true,
     preferred_attachment: validated.data.preferredAttachment,
+    linear_integration_enabled: validated.data.enabledAutomations?.createLinearIssue ?? false,
   }
 
   if (validated.data.externalId) {
