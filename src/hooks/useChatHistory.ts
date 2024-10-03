@@ -25,7 +25,7 @@ export const useChatHistory = (): {
 
   const fetchResponse = async () => {
     try {
-      const response = await get('history/', { version: 'v3' })
+      const response = await get('history/', { version: 'v4' })
       if (!response.ok) {
         throw new Error('Network response was not ok')
       }
@@ -53,7 +53,7 @@ export const useChatHistory = (): {
     addOpenConversation?: boolean,
   ): Promise<ChatHistoryItem | null> => {
     try {
-      const response = await get(`history/${conversationId}`, { version: 'v3' })
+      const response = await get(`history/${conversationId}`, { version: 'v4' })
       if (!response.ok) {
         throw new Error('Network response was not ok')
       }

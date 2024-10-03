@@ -11,6 +11,7 @@ type WindowAttachment = {
 
 export type BaseMessage = {
   role: 'user' | 'assistant'
+  version?: string
   content?: string
 }
 

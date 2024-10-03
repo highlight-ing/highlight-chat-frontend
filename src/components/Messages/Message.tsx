@@ -145,7 +145,7 @@ export const Message = ({ message, isThinking }: MessageProps) => {
         <div className={styles.message}>
           {message.role === 'user' && hasAttachment(message as UserMessage) && (
             <div className={`flex gap-2`}>
-              {message.attached_context && message.attached_context.length > 0 ? (
+              {message.version === 'v4' && message.attached_context && message.attached_context.length > 0 ? (
                 message.attached_context?.map((attachment, index) => (
                   <div key={index}>{renderAttachment(attachment)}</div>
                 ))
