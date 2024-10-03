@@ -72,7 +72,7 @@
   width: 100%;
   background-color: var(--Background-Secondary, #191919);
   transition: background-color 0.3s ease;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid #0F0F0F;
 
   &:hover {
     background-color: $tertiary-100;

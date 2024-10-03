@@ -195,7 +195,15 @@ export const useSubmitQuery = () => {
     const startTime = Date.now()
 
     try {
+      const tools = {
+        get_more_context_from_window: true,
+        get_more_context_from_conversation: false,
+        add_or_update_about_me_facts: false,
+        create_linear_ticket: false,
+      }
+
       formData.append('conversation_id', conversationId)
+      formData.append('tools', JSON.stringify(tools))
 
       const endpoint = isPromptApp ? 'chat/prompt-as-app' : 'chat/'
 

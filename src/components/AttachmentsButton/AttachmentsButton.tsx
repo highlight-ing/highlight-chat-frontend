@@ -240,7 +240,7 @@ export const AttachmentsButton = () => {
         </div>
       ),
       onClick: () => {
-        window.location.href = 'highlight://app/conversations'
+        setConversationPickerVisible(true)
       },
     },
   ].filter(Boolean) as MenuItemType[]
@@ -273,24 +273,23 @@ export const AttachmentsButton = () => {
               tooltip={isOpen || screenshotPickerVisible || conversationPickerVisible ? '' : 'Attach files & context'}
               position={'top'}
             >
-              <ScreenshotAttachmentPicker
-                isVisible={screenshotPickerVisible}
-                onClose={() => {
-                  setScreenshotPickerVisible(false)
-                  trackEvent('HL Chat Screenshot Picker Closed', {})
-                }}
-                onBack={openMenu}
-              />
-              {conversationPickerVisible && (
+              <button type="button" className={styles.button} id="attachments-button">
+                <ScreenshotAttachmentPicker
+                  isVisible={screenshotPickerVisible}
+                  onClose={() => {
+                    setScreenshotPickerVisible(false)
+                    trackEvent('HL Chat Screenshot Picker Closed', {})
+                  }}
+                  onBack={openMenu}
+                />
                 <ConversationAttachmentPicker
+                  isVisible={conversationPickerVisible}
                   onClose={() => setConversationPickerVisible(false)}
                   onBack={() => {
                     setConversationPickerVisible(false)
                     openMenu()
                   }}
                 />
-              )}
-              <button type="button" className={styles.button} id="attachments-button">
                 <PaperclipIcon />
                 <input
                   type="file"
