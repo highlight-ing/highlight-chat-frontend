@@ -199,7 +199,7 @@ export const useSubmitQuery = () => {
         get_more_context_from_window: true,
         get_more_context_from_conversation: false,
         add_or_update_about_me_facts: false,
-        create_linear_ticket: false,
+        create_linear_ticket: promptApp?.linear_integration_enabled ?? false,
       }
 
       formData.append('conversation_id', conversationId)

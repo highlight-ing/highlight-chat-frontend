@@ -76,6 +76,7 @@ export type Database = {
           title: string
           updated_at: string | null
           user_id: string | null
+          version: string | null
         }
         Insert: {
           app_id?: string | null
@@ -84,6 +85,7 @@ export type Database = {
           title: string
           updated_at?: string | null
           user_id?: string | null
+          version?: string | null
         }
         Update: {
           app_id?: string | null
@@ -92,6 +94,7 @@ export type Database = {
           title?: string
           updated_at?: string | null
           user_id?: string | null
+          version?: string | null
         }
         Relationships: []
       }
@@ -308,6 +311,7 @@ export type Database = {
           id: number
           image: string | null
           is_handlebar_prompt: boolean
+          linear_integration_enabled: boolean | null
           name: string
           preferred_attachment: string | null
           prompt_text: string | null
@@ -328,6 +332,7 @@ export type Database = {
           id?: number
           image?: string | null
           is_handlebar_prompt?: boolean
+          linear_integration_enabled?: boolean | null
           name: string
           preferred_attachment?: string | null
           prompt_text?: string | null
@@ -348,6 +353,7 @@ export type Database = {
           id?: number
           image?: string | null
           is_handlebar_prompt?: boolean
+          linear_integration_enabled?: boolean | null
           name?: string
           preferred_attachment?: string | null
           prompt_text?: string | null
