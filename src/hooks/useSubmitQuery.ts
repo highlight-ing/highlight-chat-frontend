@@ -175,20 +175,18 @@ export const useSubmitQuery = () => {
     })),
   )
 
-  const setInput = useStore((state) => state.setInput)
-
-  const abortControllerRef = useRef<AbortController>()
-  const conversationId = useStore((state) => state.conversationId)
-  const conversationIdRef = useRef(conversationId)
-
-  const integrations = useIntegrations()
-
   const { openModal, closeModal } = useStore(
     useShallow((state) => ({
       openModal: state.openModal,
       closeModal: state.closeModal,
     })),
   )
+
+  const setInput = useStore((state) => state.setInput)
+  const conversationId = useStore((state) => state.conversationId)
+  const conversationIdRef = useRef(conversationId)
+  const abortControllerRef = useRef<AbortController>()
+  const integrations = useIntegrations()
 
   // Centralized Error Handling
   const handleError = (error: any, context: any) => {
@@ -257,7 +255,7 @@ export const useSubmitQuery = () => {
       formData.append('conversation_id', conversationId)
       formData.append('tools', JSON.stringify(tools))
 
-      const endpoint = isPromptApp ? 'chat/prompt-as-app' : 'chat/'
+      const endpoint = 'chat/'
 
       const abortController = new AbortController()
       abortControllerRef.current = abortController
