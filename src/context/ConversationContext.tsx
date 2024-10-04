@@ -41,7 +41,6 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       'onCurrentConversationUpdate',
       (conversation: string) => {
         if (isAudioTranscripEnabled) {
-          console.log('New current conversation:', conversation)
           setCurrentConversation(conversation)
         }
       },
@@ -51,7 +50,6 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       'onConversationsUpdated',
       (updatedConversations: ConversationData[]) => {
         if (isAudioTranscripEnabled) {
-          console.log('Updated conversations:', updatedConversations)
           setConversations(updatedConversations)
         }
       },
@@ -69,7 +67,6 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const removeAutoSaveUpdatedListener = Highlight.app.addListener(
       'onConversationsAutoSaveUpdated',
       (time: number) => {
-        console.log('Updated auto-save time:', time)
         setAutoSaveTime(time)
       },
     )
@@ -77,7 +74,6 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const removeAutoClearUpdatedListener = Highlight.app.addListener(
       'onConversationsAutoClearUpdated',
       (days: number) => {
-        console.log('Updated auto-clear days:', days)
         setAutoClearDays(days)
       },
     )
@@ -100,7 +96,6 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const removeAudioPermissionListener = Highlight.app.addListener(
       'onAudioPermissionUpdate',
       (permission: 'locked' | 'detect' | 'attach') => {
-        console.log('Audio permission updated')
         if (permission === 'locked') {
           setIsAudioTranscripEnabled(false)
         } else {

@@ -6,12 +6,14 @@ import { AttachmentType } from '@/types'
 import { useImageDownload } from '@/hooks/useImageDownload'
 import { VoiceSquare } from 'iconsax-react'
 import { getWordCountFormatted } from '@/utils/string'
+import { useStore } from '@/providers/store-provider'
 
 interface BaseAttachmentProps {
   onRemove?: () => void
   value: string
   isSharedImage?: boolean
   sharedImageUrl?: string // Add this line
+  version?: string
 }
 
 interface WindowAttachmentProps extends BaseAttachmentProps {
@@ -32,13 +34,16 @@ export const Attachment = ({
   onRemove,
   isSharedImage = false,
   sharedImageUrl,
+  version,
   ...props
 }: AttachmentProps) => {
   const appIcon = (props as WindowAttachmentProps).appIcon
   const [isImageLoaded, setIsImageLoaded] = useState(false)
+  const conversationId = version === 'v4' ? useStore((state) => state.conversationId) : undefined
 
   const { imageUrl, isLoading, error } = useImageDownload(
     type === 'image' && !value.startsWith('data:image') && !value.startsWith('blob:') ? value : null,
+    conversationId,
   )
 
   const renderAttachmentContent = () => {

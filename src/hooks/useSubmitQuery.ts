@@ -87,6 +87,7 @@ async function createAttachmentMetadata(
       return {
         type: 'spreadsheet',
         content: text,
+        name: attachment.value.name,
       }
     case 'window_context':
       return {
@@ -177,7 +178,6 @@ export const useSubmitQuery = () => {
   const setInput = useStore((state) => state.setInput)
 
   const abortControllerRef = useRef<AbortController>()
-  const { getAccessToken } = useAuth()
   const conversationId = useStore((state) => state.conversationId)
   const conversationIdRef = useRef(conversationId)
 
@@ -473,7 +473,7 @@ export const useSubmitQuery = () => {
         const fileId = attachmentToFileIdMap.get(attachment)
         if (fileId) {
           const metadata = await createAttachmentMetadata(attachment, fileId)
-          attachedContext.context.push(metadata)
+          if (metadata) attachedContext.context.push(metadata)
         }
       })
 
@@ -580,7 +580,7 @@ export const useSubmitQuery = () => {
           if (uploadedFile && uploadedFile.file_id) {
             console.log('adding uploaded file to attachedContext', attachment.type)
             const metadata = await createAttachmentMetadata(attachment, uploadedFile.file_id)
-            attachedContext.context.push(metadata)
+            if (metadata) attachedContext.context.push(metadata)
           }
         }),
       )
@@ -591,7 +591,8 @@ export const useSubmitQuery = () => {
       attachments
         .filter((a) => !isUploadableAttachment(a))
         .forEach(async (attachment) => {
-          attachedContext.context.push(await createAttachmentMetadata(attachment))
+          const metadata = await createAttachmentMetadata(attachment)
+          if (metadata) attachedContext.context.push(metadata)
         })
 
       const conversationData = await Highlight.conversations.getAllConversations()
@@ -649,10 +650,12 @@ export const useSubmitQuery = () => {
 
       addConversationMessage(conversationId, {
         role: 'user',
+        version: 'v4',
         content: query,
         screenshot: context?.image,
         window_context: context?.window_context,
         file_attachments: attachments.filter((a) => a.type === 'text_file'),
+        attached_context: attachedContext.context,
       })
 
       setInput('')

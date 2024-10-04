@@ -117,11 +117,34 @@ export const useApi = () => {
     return URL.createObjectURL(blob)
   }
 
+  const getImageByFileId = async (fileId: string, conversationId: string, options?: Partial<RequestOptions>) => {
+    const accessToken = await getAccessToken()
+    const response = await fetchRequest(`file/${conversationId}/${fileId}`, {
+      bearerToken: accessToken,
+      method: 'GET',
+      version: options?.version,
+      signal: options?.signal,
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch image')
+    }
+
+    const data = await response.json()
+
+    if (data.type === 'image') {
+      return data.value
+    } else {
+      console.error('File is not an image')
+    }
+  }
+
   return {
     get,
     post,
     deleteRequest: deleteRequest,
     getImage,
     getSharedImage,
+    getImageByFileId,
   }
 }
