@@ -3,6 +3,8 @@ import IntelliPrompt from '../IntelliPrompt'
 import styles from '../prompteditor.module.scss'
 import { useEffect } from 'react'
 import OnboardingBox from '../OnboardingBox'
+import { Switch } from '@/components/catalyst/switch'
+import { LinearIcon } from '@/icons/icons'
 
 function OnboardingIndex0() {
   const { setOnboarding } = usePromptEditorStore()
@@ -98,14 +100,62 @@ function OnboardingIndex3() {
   )
 }
 
+function ToggleSwitch({ checked, onToggle }: { checked: boolean; onToggle: (checked: boolean) => void }) {
+  return (
+    <div className="flex items-center space-x-2">
+      <div className="text-right text-xs font-normal leading-snug text-white/40">{checked ? 'ON' : 'OFF'}</div>
+      <Switch checked={checked} color={'cyan'} onChange={onToggle} />
+    </div>
+  )
+}
+
 export default function AppScreen() {
   const { promptEditorData, setPromptEditorData, onboarding } = usePromptEditorStore()
 
   return (
     <>
-      <span className={onboarding.isOnboarding && onboarding.index === 0 ? styles.onboardingBlock : ''}>
-        <IntelliPrompt value={promptEditorData.appPrompt} onChange={(e) => setPromptEditorData({ appPrompt: e })} />
-      </span>
+      <div className="flex h-full justify-between">
+        <div className="flex-1">
+          <span className={onboarding.isOnboarding && onboarding.index === 0 ? styles.onboardingBlock : ''}>
+            <IntelliPrompt value={promptEditorData.appPrompt} onChange={(e) => setPromptEditorData({ appPrompt: e })} />
+          </span>
+        </div>
+
+        <div className="max-w-96 basis-1/3 border-l border-[#ffffff0d] p-[17px]">
+          <div className="flex flex-col space-y-[6px]">
+            <h3 className="text-base font-semibold text-white">Automations</h3>
+            <p className="text-xs font-normal leading-tight text-[#6e6e6e]">
+              Add automations to your actions to allow Highlight to do things for you.
+            </p>
+          </div>
+
+          <div className="mt-[29px] flex flex-col space-y-3 rounded-2xl bg-[#222222] p-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <div className="overflow-clip rounded-[6px]">
+                  <LinearIcon />
+                </div>
+                <h4 className="text-[13px] font-medium leading-normal text-[#eeeeee]">Create Linear Issue</h4>
+              </div>
+              <ToggleSwitch
+                checked={promptEditorData.enabledAutomations?.createLinearIssue || false}
+                onToggle={(checked) => {
+                  setPromptEditorData({
+                    enabledAutomations: {
+                      ...promptEditorData.enabledAutomations,
+                      createLinearIssue: checked,
+                    },
+                  })
+                }}
+              />
+            </div>
+            <div className="border-t border-white/5" />
+            <p className="text-xs font-normal leading-tight text-[#6e6e6e]">
+              Create a Linear issue using the prompt output
+            </p>
+          </div>
+        </div>
+      </div>
       {onboarding.isOnboarding && onboarding.index === 0 && <OnboardingIndex0 />}
       {onboarding.isOnboarding && onboarding.index === 1 && <OnboardingIndex1 />}
       {onboarding.isOnboarding && onboarding.index === 2 && <OnboardingIndex2 />}

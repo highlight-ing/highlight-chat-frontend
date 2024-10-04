@@ -28,6 +28,7 @@ import { FileAttachment, ImageAttachment, PdfAttachment } from '@/types'
 import { useUploadFile } from './useUploadFile'
 import { v4 as uuidv4 } from 'uuid'
 import { Attachment } from '@/types'
+import { useIntegrations } from './useIntegrations'
 
 // Create a type guard for FileAttachment
 function isUploadableAttachment(attachment: Attachment): attachment is PdfAttachment | ImageAttachment {
@@ -158,8 +159,6 @@ export const useSubmitQuery = () => {
     updateLastConversationMessage,
     addToast,
     updateLastMessageSentTimestamp,
-    openModal,
-    closeModal,
   } = useStore(
     useShallow((state) => ({
       addAttachment: state.addAttachment,
@@ -172,15 +171,24 @@ export const useSubmitQuery = () => {
       updateLastConversationMessage: state.updateLastConversationMessage,
       addToast: state.addToast,
       updateLastMessageSentTimestamp: state.updateLastMessageSentTimestamp,
-      openModal: state.openModal,
-      closeModal: state.closeModal,
     })),
   )
 
   const setInput = useStore((state) => state.setInput)
+
+  const abortControllerRef = useRef<AbortController>()
+  const { getAccessToken } = useAuth()
   const conversationId = useStore((state) => state.conversationId)
   const conversationIdRef = useRef(conversationId)
-  const abortControllerRef = useRef<AbortController>()
+
+  const integrations = useIntegrations()
+
+  const { openModal, closeModal } = useStore(
+    useShallow((state) => ({
+      openModal: state.openModal,
+      closeModal: state.closeModal,
+    })),
+  )
 
   // Centralized Error Handling
   const handleError = (error: any, context: any) => {
@@ -239,10 +247,20 @@ export const useSubmitQuery = () => {
     const startTime = Date.now()
 
     try {
+      const tools = {
+        get_more_context_from_window: true,
+        get_more_context_from_conversation: false,
+        add_or_update_about_me_facts: false,
+        create_linear_ticket: promptApp?.linear_integration_enabled ?? false,
+      }
+
+      formData.append('conversation_id', conversationId)
+      formData.append('tools', JSON.stringify(tools))
+
+      const endpoint = isPromptApp ? 'chat/prompt-as-app' : 'chat/'
+
       const abortController = new AbortController()
       abortControllerRef.current = abortController
-
-      const endpoint = 'chat/'
 
       if (isPromptApp && promptApp) {
         formData.append('app_id', promptApp.external_id)
@@ -272,6 +290,8 @@ export const useSubmitQuery = () => {
         const { content, windowName, conversation, factIndex, fact } = await parseAndHandleStreamChunk(chunk, {
           showConfirmationModal,
           addToast,
+          integrations,
+          conversationId,
         })
 
         if (content) {

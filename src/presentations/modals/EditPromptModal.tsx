@@ -33,6 +33,9 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
         tags: prompt.tags as PromptTag[],
         systemPrompt: prompt.system_prompt ?? DEFAULT_SYSTEM_PROMPT,
         preferredAttachment: PreferredAttachmentSchema.nullish().parse(prompt.preferred_attachment) ?? 'default',
+        enabledAutomations: {
+          createLinearIssue: prompt.linear_integration_enabled ?? false,
+        },
       },
       true,
     )

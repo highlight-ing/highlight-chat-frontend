@@ -5,9 +5,10 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { editor, IDisposable } from 'monaco-editor'
 import { buildSuggestions } from '@/lib/IntelliPrompt'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
-import { TemplatesTool } from '@/components/prompts/PromptEditor/Toolbar/TemplatesTool'
-import { VariablesTool } from '@/components/prompts/PromptEditor/Toolbar/VariablesTool'
 import { trackEvent } from '@/utils/amplitude'
+import editorStyles from './EditorOverride.module.scss'
+import { TemplatesTool } from './Toolbar/TemplatesTool'
+import { VariablesTool } from './Toolbar/VariablesTool'
 
 function Loading() {
   return <span className="text-sm text-gray-500">Loading editor...</span>
@@ -306,6 +307,7 @@ export default function IntelliPrompt({
           readOnly: onboarding.isOnboarding || readOnly,
           fontSize: 14,
         }}
+        className={editorStyles.position}
       />
     </>
   )
