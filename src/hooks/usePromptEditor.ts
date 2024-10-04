@@ -58,6 +58,10 @@ export function usePromptEditor() {
       formData.append('uploadingImage', promptEditorData.uploadingImage)
     }
 
+    if (promptEditorData.enabledAutomations) {
+      formData.append('enabledAutomations', JSON.stringify(promptEditorData.enabledAutomations))
+    }
+
     const accessToken = await getAccessToken()
     const res = await savePrompt(formData, accessToken)
 
