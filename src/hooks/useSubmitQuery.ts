@@ -650,6 +650,7 @@ export const useSubmitQuery = () => {
 
       addConversationMessage(conversationId, {
         role: 'user',
+        version: 'v4',
         content: query,
         screenshot: context?.image,
         window_context: context?.window_context,

@@ -24,7 +24,7 @@ export const useImageDownload = (imageId: string | null, conversationId?: string
       try {
         let url = ''
         if (conversationId) {
-          await getImageByFileId(imageId, conversationId, { version: 'v4' })
+          url = await getImageByFileId(imageId, conversationId, { version: 'v4' })
         } else {
           url = await getImage(imageId, { version: 'v3' })
         }
