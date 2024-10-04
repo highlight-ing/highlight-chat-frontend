@@ -2,6 +2,7 @@ import { Prompt } from '@/types/supabase-helpers'
 import { ColorScheme } from '@/components/PersonalPrompts/customVariables'
 import { ButtonVariantType } from '@/components/Button/Button'
 import { AttachedContextCContextTypes } from '@/utils/formDataUtils'
+import { ReactNode } from 'react'
 
 type WindowAttachment = {
   type: 'window'
@@ -12,7 +13,7 @@ type WindowAttachment = {
 export type BaseMessage = {
   role: 'user' | 'assistant'
   version?: string
-  content?: string
+  content?: string | ReactNode
 }
 
 export type UserMessage = BaseMessage & {
@@ -241,3 +242,8 @@ export interface LLMMessage {
 }
 
 export type CopyState = 'idle' | 'copying' | 'copied' | 'hiding'
+
+/**
+ * All the types of integrations that we support.
+ */
+export type IntegrationType = 'linear'

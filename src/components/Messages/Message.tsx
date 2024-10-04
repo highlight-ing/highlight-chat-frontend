@@ -230,12 +230,17 @@ export const Message = ({ message, isThinking }: MessageProps) => {
             >
               {typeof message.content === 'string' ? preprocessLaTeX(message.content) : ''}
             </Markdown>
+            {typeof message.content !== 'string' && message.content}
           </div>
           {factIndex || fact ? <FactButton factIndex={factIndex} fact={fact} /> : null}
         </div>
       ) : (
         <span className={styles.thinking}>
-          <TypedText text={message.content ?? ''} cursor={false} speed={1.5} />
+          {typeof message.content === 'string' ? (
+            <TypedText text={message.content} cursor={false} speed={1.5} />
+          ) : (
+            message.content
+          )}
         </span>
       )}
     </div>

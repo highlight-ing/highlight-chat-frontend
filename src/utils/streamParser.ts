@@ -1,11 +1,18 @@
 import { Toast } from '@/types'
+import { createLinearTicket } from './integrations'
+import { UseIntegrationsAPI } from '@/hooks/useIntegrations'
 
 type StreamParserProps = {
   showConfirmationModal: (message: string) => Promise<boolean>
   addToast: (toast: Partial<Toast>) => void
+  integrations: UseIntegrationsAPI
+  conversationId: string
 }
 
-export async function parseAndHandleStreamChunk(chunk: string, { showConfirmationModal, addToast }: StreamParserProps) {
+export async function parseAndHandleStreamChunk(
+  chunk: string,
+  { showConfirmationModal, addToast, integrations, conversationId }: StreamParserProps,
+) {
   let contextConfirmed: boolean | null = null
   let accumulatedContent = ''
   let factIndex = null
@@ -48,6 +55,12 @@ export async function parseAndHandleStreamChunk(chunk: string, { showConfirmatio
                 }
               }
             }
+          }
+          if (jsonChunk.name === 'create_linear_ticket') {
+            const title = jsonChunk.input.title ?? ''
+            const description = jsonChunk.input.description ?? ''
+
+            integrations.createLinearTicket(conversationId, title, description)
           }
           if (jsonChunk.name === 'get_more_context_from_conversations') {
             if (contextConfirmed === null) {
