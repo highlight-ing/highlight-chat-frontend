@@ -101,8 +101,7 @@ export const Message = ({ message, isThinking }: MessageProps) => {
   const renderAttachment = (attachment: AttachedContextCContextTypes) => {
     switch (attachment.type) {
       case 'image':
-        // return <Attachment type="image" value={attachment.value} />
-        return <div>Image</div>
+        return <Attachment type="image" value={attachment.file_id} version={message.version} />
       case 'clipboard_text':
         return <Attachment type="clipboard" value={attachment.text} />
       case 'pdf':
