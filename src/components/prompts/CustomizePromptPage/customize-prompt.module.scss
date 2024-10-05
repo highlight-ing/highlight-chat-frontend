@@ -58,10 +58,10 @@
   flex-direction: column;
   width: 100%;
   border-radius: 8px;
-  max-height: 300px;
-
+  min-height: calc(50vh - 100px);
+  max-height: calc(80vh - 100px);
+  overflow-y: auto;
 }
-
 
 .customizePromptsItem {
   display: flex;
