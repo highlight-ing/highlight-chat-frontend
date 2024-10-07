@@ -307,6 +307,7 @@ export type Database = {
           can_trend: boolean | null
           created_at: string
           description: string | null
+          email_integration_enabled: boolean | null
           external_id: string
           id: number
           image: string | null
@@ -328,6 +329,7 @@ export type Database = {
           can_trend?: boolean | null
           created_at?: string
           description?: string | null
+          email_integration_enabled?: boolean | null
           external_id?: string
           id?: number
           image?: string | null
@@ -349,6 +351,7 @@ export type Database = {
           can_trend?: boolean | null
           created_at?: string
           description?: string | null
+          email_integration_enabled?: boolean | null
           external_id?: string
           id?: number
           image?: string | null

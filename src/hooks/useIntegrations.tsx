@@ -14,8 +14,15 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 
+export interface CreateMailtoLinkInput {
+  email?: string
+  subject?: string
+  body?: string
+}
+
 export interface UseIntegrationsAPI {
   createLinearTicket: (conversationId: string, title: string, description: string) => Promise<void>
+  createMailtoLink: (conversationId: string, input: CreateMailtoLinkInput) => Promise<void>
 }
 
 function MessageWithComponent({ content, children }: { content: string; children: React.ReactNode }) {
@@ -258,6 +265,29 @@ function CreateLinearTicketComponent({ title, description }: { title: string; de
   )
 }
 
+function CreateMailtoLinkComponent({ email = '', subject = '', body = '' }: CreateMailtoLinkInput) {
+  function onSendEmail() {
+    window.open(
+      `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+      '_blank',
+    )
+  }
+
+  return (
+    <div className="mt-2">
+      <a
+        href={`mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`}
+        target="_blank"
+      >
+        test
+      </a>
+      <Button size={'medium'} variant={'primary'} onClick={onSendEmail}>
+        Send Email
+      </Button>
+    </div>
+  )
+}
+
 export function useIntegrations(): UseIntegrationsAPI {
   const getLastConversationMessage = useStore((state) => state.getLastConversationMessage)
   const updateLastConversationMessage = useStore((state) => state.updateLastConversationMessage)
@@ -277,5 +307,19 @@ export function useIntegrations(): UseIntegrationsAPI {
     })
   }
 
-  return { createLinearTicket }
+  async function createMailtoLink(conversationId: string, input: CreateMailtoLinkInput) {
+    const lastMessage = getLastConversationMessage(conversationId)
+
+    // Update the last message to show the mailto link component which will handle creating the link
+    updateLastConversationMessage(conversationId!, {
+      content: (
+        <MessageWithComponent content={lastMessage?.content as string}>
+          <CreateMailtoLinkComponent {...input} />
+        </MessageWithComponent>
+      ),
+      role: 'assistant',
+    })
+  }
+
+  return { createLinearTicket, createMailtoLink }
 }

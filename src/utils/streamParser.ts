@@ -62,6 +62,9 @@ export async function parseAndHandleStreamChunk(
 
             integrations.createLinearTicket(conversationId, title, description)
           }
+          if (jsonChunk.name === 'create_mailto_link') {
+            integrations.createMailtoLink(conversationId, jsonChunk.input)
+          }
           if (jsonChunk.name === 'get_more_context_from_conversations') {
             if (contextConfirmed === null) {
               contextConfirmed = await showConfirmationModal(
