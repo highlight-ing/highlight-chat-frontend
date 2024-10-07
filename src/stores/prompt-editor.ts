@@ -21,6 +21,7 @@ export interface PromptEditorOnboarding {
 
 export interface EnabledAutomations {
   createLinearIssue: boolean
+  createNotionPage: boolean
 }
 
 export interface PromptEditorData {
@@ -36,7 +37,7 @@ export interface PromptEditorData {
   image?: string
   uploadingImage?: File
   preferredAttachment?: PreferredAttachment
-  enabledAutomations?: EnabledAutomations
+  enabledAutomations: EnabledAutomations
 }
 
 export interface PromptEditorState {
@@ -160,6 +161,7 @@ export const initialPromptEditorState: PromptEditorState = {
     preferredAttachment: 'default',
     enabledAutomations: {
       createLinearIssue: false,
+      createNotionPage: false,
     },
   },
   needSave: false,

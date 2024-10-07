@@ -4,7 +4,7 @@ import styles from '../prompteditor.module.scss'
 import { useEffect } from 'react'
 import OnboardingBox from '../OnboardingBox'
 import { Switch } from '@/components/catalyst/switch'
-import { LinearIcon } from '@/icons/icons'
+import { LinearIcon, NotionIcon } from '@/icons/icons'
 
 function OnboardingIndex0() {
   const { setOnboarding } = usePromptEditorStore()
@@ -109,6 +109,34 @@ function ToggleSwitch({ checked, onToggle }: { checked: boolean; onToggle: (chec
   )
 }
 
+function IntegrationToggle({
+  checked,
+  onToggle,
+  title,
+  description,
+  icon,
+}: {
+  icon: React.ReactNode
+  checked: boolean
+  onToggle: (checked: boolean) => void
+  title: string
+  description: string
+}) {
+  return (
+    <div className="mt-[29px] flex flex-col space-y-3 rounded-2xl bg-[#222222] p-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <div className="overflow-clip rounded-[6px]">{icon}</div>
+          <h4 className="text-[13px] font-medium leading-normal text-[#eeeeee]">{title}</h4>
+        </div>
+        <ToggleSwitch checked={checked} onToggle={onToggle} />
+      </div>
+      <div className="border-t border-white/5" />
+      <p className="text-xs font-normal leading-tight text-[#6e6e6e]">{description}</p>
+    </div>
+  )
+}
+
 export default function AppScreen() {
   const { promptEditorData, setPromptEditorData, onboarding } = usePromptEditorStore()
 
@@ -129,31 +157,35 @@ export default function AppScreen() {
             </p>
           </div>
 
-          <div className="mt-[29px] flex flex-col space-y-3 rounded-2xl bg-[#222222] p-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <div className="overflow-clip rounded-[6px]">
-                  <LinearIcon />
-                </div>
-                <h4 className="text-[13px] font-medium leading-normal text-[#eeeeee]">Create Linear Issue</h4>
-              </div>
-              <ToggleSwitch
-                checked={promptEditorData.enabledAutomations?.createLinearIssue || false}
-                onToggle={(checked) => {
-                  setPromptEditorData({
-                    enabledAutomations: {
-                      ...promptEditorData.enabledAutomations,
-                      createLinearIssue: checked,
-                    },
-                  })
-                }}
-              />
-            </div>
-            <div className="border-t border-white/5" />
-            <p className="text-xs font-normal leading-tight text-[#6e6e6e]">
-              Create a Linear issue using the prompt output
-            </p>
-          </div>
+          <IntegrationToggle
+            icon={<LinearIcon />}
+            checked={promptEditorData.enabledAutomations?.createLinearIssue || false}
+            onToggle={(checked) => {
+              setPromptEditorData({
+                enabledAutomations: {
+                  ...promptEditorData.enabledAutomations,
+                  createLinearIssue: checked,
+                },
+              })
+            }}
+            title="Create Linear Issue"
+            description="Create a Linear issue using the prompt output"
+          />
+
+          <IntegrationToggle
+            icon={<NotionIcon />}
+            checked={promptEditorData.enabledAutomations?.createNotionPage || false}
+            onToggle={(checked) => {
+              setPromptEditorData({
+                enabledAutomations: {
+                  ...promptEditorData.enabledAutomations,
+                  createNotionPage: checked,
+                },
+              })
+            }}
+            title="Create Notion Page"
+            description="Create a Notion page using the prompt output"
+          />
         </div>
       </div>
       {onboarding.isOnboarding && onboarding.index === 0 && <OnboardingIndex0 />}

@@ -305,8 +305,10 @@ export type Database = {
       prompts: {
         Row: {
           can_trend: boolean | null
+          create_notion_page_integration_enabled: boolean | null
           created_at: string
           description: string | null
+          email_integration_enabled: boolean | null
           external_id: string
           id: number
           image: string | null
@@ -326,8 +328,10 @@ export type Database = {
         }
         Insert: {
           can_trend?: boolean | null
+          create_notion_page_integration_enabled?: boolean | null
           created_at?: string
           description?: string | null
+          email_integration_enabled?: boolean | null
           external_id?: string
           id?: number
           image?: string | null
@@ -347,8 +351,10 @@ export type Database = {
         }
         Update: {
           can_trend?: boolean | null
+          create_notion_page_integration_enabled?: boolean | null
           created_at?: string
           description?: string | null
+          email_integration_enabled?: boolean | null
           external_id?: string
           id?: number
           image?: string | null

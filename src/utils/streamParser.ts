@@ -1,5 +1,4 @@
 import { Toast } from '@/types'
-import { createLinearTicket } from './integrations'
 import { UseIntegrationsAPI } from '@/hooks/useIntegrations'
 
 type StreamParserProps = {
@@ -62,6 +61,14 @@ export async function parseAndHandleStreamChunk(
 
             integrations.createLinearTicket(conversationId, title, description)
           }
+          if (jsonChunk.name === 'create_notion_page') {
+            const title = jsonChunk.input.title ?? ''
+            const description = jsonChunk.input.description ?? undefined
+            const content = jsonChunk.input.content ?? ''
+
+            integrations.createNotionPage(conversationId, { title, description, content })
+          }
+
           if (jsonChunk.name === 'get_more_context_from_conversations') {
             if (contextConfirmed === null) {
               contextConfirmed = await showConfirmationModal(
