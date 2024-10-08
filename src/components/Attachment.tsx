@@ -95,6 +95,7 @@ export const Attachment = ({
       case 'window_context':
         return <ClipboardText className="text-secondary" variant="Bold" size={size} />
       case 'pdf':
+      case 'text_file':
         return (
           <div className="align-center flex w-full justify-center gap-2 p-2">
             <DocumentText1 className="min-w-5 text-secondary" variant="Bold" size={size} />
@@ -114,13 +115,6 @@ export const Attachment = ({
               <DocumentText1 className="text-white" variant="Bold" size={size} />
             )}
           </>
-        )
-      case 'text_file':
-        return (
-          <div className="align-center flex w-full justify-center gap-2 p-2">
-            <DocumentText1 className="min-w-5 text-white" variant="Bold" size={size} />
-            <span className="inline-block max-w-40 truncate align-middle text-sm text-white">{value}</span>
-          </div>
         )
       default:
         return <DocumentText1 className="text-white" variant="Bold" size={size} />
@@ -152,7 +146,7 @@ export const Attachment = ({
         ) : (
           <div
             className={`flex h-[52px] items-center justify-center rounded-[10px] border border-light-10 bg-secondary ${
-              type === 'pdf' ? 'max-w-40' : 'max-w-20'
+              type === 'pdf' || type === 'text_file' ? 'max-w-40' : 'max-w-20'
             } ${type !== 'image' ? 'min-w-12' : 'min-w-[52px]'} w-fit overflow-hidden`}
           >
             {renderAttachmentContent()}
