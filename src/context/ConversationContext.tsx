@@ -41,7 +41,6 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       'onCurrentConversationUpdate',
       (conversation: string) => {
         if (isAudioTranscripEnabled) {
-          console.log('New current conversation:', conversation)
           setCurrentConversation(conversation)
         }
       },
@@ -51,7 +50,6 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       'onConversationsUpdated',
       (updatedConversations: ConversationData[]) => {
         if (isAudioTranscripEnabled) {
-          console.log('Updated conversations:', updatedConversations)
           setConversations(updatedConversations)
         }
       },
