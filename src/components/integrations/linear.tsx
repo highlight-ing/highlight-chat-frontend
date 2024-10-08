@@ -12,72 +12,7 @@ import { useForm } from 'react-hook-form'
 import { LinearIcon } from '@/icons/icons'
 import Button from '../Button/Button'
 import { z } from 'zod'
-
-export function LinearConnectionComponent({ onConnect }: { onConnect: () => void }) {
-  const [connectLink, setConnectLink] = useState<string>('')
-  const [connectClicked, setConnectClicked] = useState(false)
-
-  async function checkConnectionStatus() {
-    // @ts-ignore
-    const hlToken = (await highlight.internal.getAuthorizationToken()) as string
-
-    const connected = await checkLinearConnectionStatus(hlToken)
-
-    if (connected) {
-      onConnect()
-    }
-  }
-
-  useEffect(() => {
-    if (connectClicked) {
-      // Create an interval that checks the connection status every 5 seconds
-      const interval = setInterval(() => {
-        checkConnectionStatus()
-      }, 5000)
-
-      return () => clearInterval(interval)
-    }
-  }, [connectClicked])
-
-  useEffect(() => {
-    async function getConnectLink() {
-      // Fetch the latest Highlight authorization token (only available to Highlight Chat)
-      try {
-        // @ts-ignore
-        const token = (await highlight.internal.getAuthorizationToken()) as string
-
-        const connectLink = await createMagicLinkForLinear(token)
-        setConnectLink(connectLink)
-      } catch (e) {
-        console.warn('Error getting authorization token', e)
-        return
-      }
-    }
-
-    getConnectLink()
-  }, [])
-
-  return (
-    <div className="mt-2 flex flex-col gap-2">
-      <p>You'll need to connect your Linear account first.</p>
-      <Button
-        disabled={!connectLink}
-        size="small"
-        variant="primary-outline"
-        onClick={() => {
-          setConnectClicked(true)
-          window.open(connectLink, '_blank')
-        }}
-      >
-        <LinearIcon size={16} /> Connect Linear
-      </Button>
-
-      <small onClick={checkConnectionStatus} className="cursor-pointer underline">
-        Check connection status
-      </small>
-    </div>
-  )
-}
+import { SetupConnectionComponent } from './integration-auth'
 
 const linearTicketFormSchema = z.object({
   title: z.string().min(1),
@@ -235,7 +170,15 @@ export function CreateLinearTicketComponent({ title, description }: { title: str
 
   return (
     <div>
-      {state === 'connect' && <LinearConnectionComponent onConnect={onConnect} />}
+      {state === 'connect' && (
+        <SetupConnectionComponent
+          name={'Linear'}
+          checkConnectionStatus={checkLinearConnectionStatus}
+          onConnect={onConnect}
+          icon={<LinearIcon size={16} />}
+          createMagicLink={createMagicLinkForLinear}
+        />
+      )}
       {state === 'form' && (
         <LinearTicketFormComponent title={title} description={description} onSubmitSuccess={onSubmitSuccess} />
       )}
