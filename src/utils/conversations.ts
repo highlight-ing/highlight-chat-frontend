@@ -1,6 +1,6 @@
 import { ConversationData } from '@highlight-ai/app-runtime'
 import { getTimeAgo, getWordCountFormatted } from './string'
-
+//Making sure that properties in conversation are not undefined
 export const isDefaultTitle = (conversation?: ConversationData): boolean => {
   if (!conversation || typeof conversation.title !== 'string') {
     return false
