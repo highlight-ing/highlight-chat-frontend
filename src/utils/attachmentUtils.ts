@@ -73,6 +73,7 @@ export const addAttachmentsToFormData = async (
           formData.append('pdf', attachment.value)
           break
         case 'audio':
+        case 'conversation':
           audio = attachment.value
           formData.append('audio', attachment.value)
           break

@@ -112,7 +112,7 @@ export const Message = ({ message, isThinking }: MessageProps) => {
       case 'ocr_text':
         return <Attachment type="window_context" value={attachment.name} />
       case 'conversation':
-        return <Attachment type="conversation" value={attachment.title} />
+        return <Attachment type="conversation" value={attachment.text} />
     }
   }
 
