@@ -371,7 +371,7 @@ export const useSubmitQuery = () => {
           conversationId,
           isPromptApp,
           duration,
-          endpoint: isPromptApp ? 'chat/prompt-as-app' : 'chat/',
+          endpoint: 'chat/',
         })
       }
     } finally {
@@ -379,7 +379,7 @@ export const useSubmitQuery = () => {
       const duration = endTime - startTime
 
       trackEvent('HL_CHAT_BACKEND_API_REQUEST', {
-        endpoint: isPromptApp ? 'chat/prompt-as-app' : 'chat/',
+        endpoint: 'chat/',
         duration,
         success: !abortControllerRef.current?.signal.aborted,
       })
@@ -389,6 +389,8 @@ export const useSubmitQuery = () => {
     }
   }
 
+  // This function no longer be required as the first response from the assistant will
+  // be created within the assistant preview window
   const handleIncomingContext = async (context: HighlightContext, promptApp?: Prompt) => {
     console.log('Received context:', context)
 
@@ -515,9 +517,6 @@ export const useSubmitQuery = () => {
       }
       availableContexts.context.push(windowListAttachment)
 
-      console.log('attachedContext: ', attachedContext)
-      console.log('availableContexts: ', availableContexts)
-
       // Build FormData using the updated builder
       const formData = await buildFormData({
         prompt: query,
@@ -536,8 +535,6 @@ export const useSubmitQuery = () => {
     promptApp?: Prompt,
     context?: { image?: string; window_context?: string },
   ) => {
-    console.log('handleSubmit triggered', attachments)
-
     const query = input.trim()
 
     if (!query) {
@@ -576,7 +573,6 @@ export const useSubmitQuery = () => {
           const uploadedFile = await uploadFile(fileOrUrl, conversationId)
 
           if (uploadedFile && uploadedFile.file_id) {
-            console.log('adding uploaded file to attachedContext', attachment.type)
             const metadata = await createAttachmentMetadata(attachment, uploadedFile.file_id)
             if (metadata) attachedContext.context.push(metadata)
           }
@@ -633,9 +629,6 @@ export const useSubmitQuery = () => {
         titles: windows,
       }
       availableContexts.context.push(windowListAttachment)
-
-      console.log('attachedContext: ', attachedContext)
-      console.log('availableContexts: ', availableContexts)
 
       // Build FormData using the updated builder
       const formData = await buildFormData({

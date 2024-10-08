@@ -130,13 +130,8 @@ export const useApi = () => {
       throw new Error('Failed to fetch image')
     }
 
-    const data = await response.json()
-
-    if (data.type === 'image') {
-      return data.value
-    } else {
-      console.error('File is not an image')
-    }
+    const data = await response.blob()
+    return URL.createObjectURL(data)
   }
 
   return {

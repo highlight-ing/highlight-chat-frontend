@@ -13,6 +13,7 @@ import * as pptxtojson from 'pptxtojson'
 import { trackEvent } from '@/utils/amplitude'
 import { ConversationAttachmentPicker } from '../ConversationAttachmentPicker.tsx/ConversationAttachmentPicker'
 import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
+import { MAX_NUMBER_OF_ATTACHMENTS } from '@/stores/chat-attachments'
 
 export const AttachmentsButton = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -20,12 +21,17 @@ export const AttachmentsButton = () => {
   const [conversationPickerVisible, setConversationPickerVisible] = useState(false)
   const messages = useCurrentChatMessages()
 
-  const { setFileInputRef, addAttachment } = useStore(
+  const { attachments, setFileInputRef, addAttachment } = useStore(
     useShallow((state) => ({
+      attachments: state.attachments,
       addAttachment: state.addAttachment,
       setFileInputRef: state.setFileInputRef,
     })),
   )
+
+  useEffect(() => {
+    console.log('attachments length', attachments.length)
+  }, [attachments])
 
   useEffect(() => {
     setFileInputRef(fileInputRef)
@@ -261,6 +267,8 @@ export const AttachmentsButton = () => {
     }
   }
 
+  const isDisabled = attachments.length >= MAX_NUMBER_OF_ATTACHMENTS
+
   return (
     <>
       <ContextMenu
@@ -269,15 +277,26 @@ export const AttachmentsButton = () => {
         leftClick={true}
         items={menuItems}
         menuStyle={{ background: '#191919', borderColor: '#222222' }}
+        disabled={isDisabled}
       >
         {
           // @ts-ignore
           ({ isOpen }) => (
             <Tooltip
-              tooltip={isOpen || screenshotPickerVisible || conversationPickerVisible ? '' : 'Attach files & context'}
+              tooltip={
+                isDisabled
+                  ? 'Max number of attahments added'
+                  : isOpen || screenshotPickerVisible || conversationPickerVisible
+                    ? ''
+                    : 'Attach files & context'
+              }
               position={'top'}
             >
-              <button type="button" className={styles.button} id="attachments-button">
+              <button
+                type="button"
+                className={`${styles.button} ${isDisabled ? styles.disabledButton : ''}`}
+                id="attachments-button"
+              >
                 <ScreenshotAttachmentPicker
                   isVisible={screenshotPickerVisible}
                   onClose={() => {
