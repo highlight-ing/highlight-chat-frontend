@@ -30,10 +30,6 @@ export const AttachmentsButton = () => {
   )
 
   useEffect(() => {
-    console.log('attachments length', attachments.length)
-  }, [attachments])
-
-  useEffect(() => {
     setFileInputRef(fileInputRef)
   }, [fileInputRef])
 
