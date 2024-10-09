@@ -1,10 +1,7 @@
 import React from 'react'
-import { ConversationData } from '@/types/conversations'
-import { useConversations } from '@/context/ConversationContext'
-import Highlight from '@highlight-ai/app-runtime'
+import Highlight, { ConversationData } from '@highlight-ai/app-runtime'
 import { EntryAttachment } from './EntryAttachment'
 import { ConversationsIcon } from '@/icons/icons' // Import the new icon
-import { getWordCount } from '@/utils/string'
 
 interface ConversationEntryProps {
   conversation?: ConversationData
@@ -81,10 +78,7 @@ export function ConversationEntry({ conversation, isFirst, isLast, isShowMore = 
           Share
         </button> */}
       </div>
-      <EntryAttachment
-        transcript={conversation?.transcript ?? ''}
-        wordCount={getWordCount(conversation?.transcript ?? '')}
-      />
+      {conversation && <EntryAttachment conversation={conversation} />}
     </div>
   )
 }

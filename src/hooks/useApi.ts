@@ -1,8 +1,8 @@
 import useAuth from '@/hooks/useAuth'
 
-const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080/'
+const backendUrl = 'http://localhost:8080/' //process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080/'
 
-type ApiVersion = 'v3'
+type ApiVersion = 'v3' | 'v4'
 
 interface FetchOptions {
   version?: ApiVersion
@@ -117,11 +117,29 @@ export const useApi = () => {
     return URL.createObjectURL(blob)
   }
 
+  const getImageByFileId = async (fileId: string, conversationId: string, options?: Partial<RequestOptions>) => {
+    const accessToken = await getAccessToken()
+    const response = await fetchRequest(`file/${conversationId}/${fileId}`, {
+      bearerToken: accessToken,
+      method: 'GET',
+      version: options?.version,
+      signal: options?.signal,
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch image')
+    }
+
+    const data = await response.blob()
+    return URL.createObjectURL(data)
+  }
+
   return {
     get,
     post,
     deleteRequest: deleteRequest,
     getImage,
     getSharedImage,
+    getImageByFileId,
   }
 }

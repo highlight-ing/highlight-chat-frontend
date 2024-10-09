@@ -1,6 +1,7 @@
 import { Prompt } from '@/types/supabase-helpers'
 import { ColorScheme } from '@/components/PersonalPrompts/customVariables'
 import { ButtonVariantType } from '@/components/Button/Button'
+import { AttachedContextContextTypes } from '@/utils/formDataUtils'
 import { ReactNode } from 'react'
 
 type WindowAttachment = {
@@ -11,6 +12,7 @@ type WindowAttachment = {
 
 export type BaseMessage = {
   role: 'user' | 'assistant'
+  version?: string
   content?: string | ReactNode
 }
 
@@ -29,6 +31,7 @@ export type UserMessage = BaseMessage & {
   window_context?: string
   factIndex?: number
   fact?: string
+  attached_context?: AttachedContextContextTypes[]
 }
 
 export type AssistantMessage = BaseMessage & {
@@ -72,6 +75,11 @@ export interface ClipboardAttachment {
   value: string
 }
 
+export interface SelectedTextAttachment {
+  type: 'selected_text'
+  value: string
+}
+
 export interface TextFileAttachment {
   type: 'text_file'
   value: string
@@ -81,14 +89,20 @@ export interface WindowContextAttachment {
   type: 'window_context'
   value: string
 }
+
 export interface SpreadsheetAttachment {
   type: 'spreadsheet'
   value: File
 }
 
 export interface ConversationAttachment {
+  id: string
   type: 'conversation'
   value: string
+  title: string
+  startedAt: Date
+  endedAt: Date
+  isCurrentConversation?: boolean
 }
 
 export type FileAttachment =
@@ -101,13 +115,25 @@ export type FileAttachment =
 export type Attachment =
   | AudioAttachment
   | ClipboardAttachment
+  | SelectedTextAttachment
   | WindowAttachment
   | FileAttachment
   | WindowContextAttachment
   | ConversationAttachment
 
 export type FileAttachmentType = 'image' | 'pdf' | 'spreadsheet' | 'text_file'
-export type AttachmentType = 'audio' | 'clipboard' | 'window' | 'window_context' | 'conversation' | FileAttachmentType
+export type AttachmentType =
+  | 'audio'
+  | 'clipboard'
+  | 'selected_text'
+  | 'window'
+  | 'window_context'
+  | 'conversation'
+  | FileAttachmentType
+
+export function isFileAttachmentType(type: string): type is FileAttachmentType {
+  return ['image', 'pdf', 'spreadsheet', 'text_file'].includes(type)
+}
 
 export interface ChatHistoryItem {
   app_id?: string | null

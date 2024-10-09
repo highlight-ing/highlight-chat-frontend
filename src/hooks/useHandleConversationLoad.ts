@@ -42,7 +42,7 @@ export default function useHandleConversationLoad() {
         conversationLoadsRef.current[conversationId] = (conversationLoadsRef.current[conversationId] ?? 0) + 1
         const response = await get(`history/${conversationId}/messages`, {
           signal: abortController.signal,
-          version: 'v3',
+          version: 'v4',
         })
         if (!response.ok) {
           // @TODO Error handling
@@ -52,7 +52,7 @@ export default function useHandleConversationLoad() {
 
         checkAbortSignal()
 
-        const { messages } = await response.json()
+        const { version, messages } = await response.json()
 
         checkAbortSignal()
 
@@ -60,6 +60,7 @@ export default function useHandleConversationLoad() {
           const baseMessage: BaseMessage = {
             role: message.role,
             content: message.content,
+            version,
           }
 
           if (message.role === 'user') {
@@ -70,6 +71,8 @@ export default function useHandleConversationLoad() {
               clipboard_text: message.clipboard_text,
               image_url: message.image_url,
               window_context: message.window_context,
+              audio: message.audio,
+              attached_context: message.attached_context,
             } as UserMessage
           } else {
             return baseMessage as AssistantMessage

@@ -1,15 +1,5 @@
+import { ConversationData } from '@highlight-ai/app-runtime'
 import { v4 as uuidv4 } from 'uuid'
-export interface ConversationData {
-  id: string // UUID
-  title: string
-  summary: string
-  timestamp: Date
-  topic: string
-  transcript: string
-  summarized: boolean
-  shareLink: string
-  userId: string
-}
 
 export type FormatType = 'CardTranscript' | 'DialogueTranscript'
 
@@ -22,6 +12,8 @@ export const createConversation = (transcript: string): ConversationData => {
     topic: '',
     transcript: transcript,
     timestamp: new Date(),
+    startedAt: new Date(),
+    endedAt: new Date(),
     summarized: false,
     shareLink: '',
     userId: '',

@@ -1,20 +1,19 @@
-import { ClipboardText, GallerySlash, DocumentText1 } from 'iconsax-react'
+import { ClipboardText, GallerySlash, DocumentText1, Smallcaps } from 'iconsax-react'
 import { useState } from 'react'
 import { CloseIcon } from '../icons/icons'
 import Tooltip from './Tooltip/Tooltip'
-import { useStore } from '@/providers/store-provider'
 import { AttachmentType } from '@/types'
 import { useImageDownload } from '@/hooks/useImageDownload'
-import { trackEvent } from '@/utils/amplitude'
-import { useShallow } from 'zustand/react/shallow'
 import { VoiceSquare } from 'iconsax-react'
 import { getWordCountFormatted } from '@/utils/string'
+import { useStore } from '@/providers/store-provider'
 
 interface BaseAttachmentProps {
-  removeEnabled?: boolean
+  onRemove?: () => void
   value: string
   isSharedImage?: boolean
   sharedImageUrl?: string // Add this line
+  version?: string
 }
 
 interface WindowAttachmentProps extends BaseAttachmentProps {
@@ -32,32 +31,20 @@ type AttachmentProps = WindowAttachmentProps | OtherAttachmentProps
 export const Attachment = ({
   type,
   value,
-  removeEnabled = false,
+  onRemove,
   isSharedImage = false,
   sharedImageUrl,
+  version,
   ...props
 }: AttachmentProps) => {
   const appIcon = (props as WindowAttachmentProps).appIcon
-  const isFile = (props as OtherAttachmentProps).isFile
   const [isImageLoaded, setIsImageLoaded] = useState(false)
-  const { removeAttachment, fileInputRef } = useStore(
-    useShallow((state) => ({
-      removeAttachment: state.removeAttachment,
-      fileInputRef: state.fileInputRef,
-    })),
-  )
+  const conversationId = version === 'v4' ? useStore((state) => state.conversationId) : undefined
 
   const { imageUrl, isLoading, error } = useImageDownload(
     type === 'image' && !value.startsWith('data:image') && !value.startsWith('blob:') ? value : null,
+    conversationId,
   )
-
-  const onRemoveAttachment = () => {
-    removeAttachment(type)
-    if (fileInputRef?.current && isFile) {
-      fileInputRef.current.value = ''
-    }
-    trackEvent('HL Chat Attachment Removed', { type })
-  }
 
   const renderAttachmentContent = () => {
     const size = 20
@@ -105,9 +92,9 @@ export const Attachment = ({
           )
         }
       case 'clipboard':
-      case 'window_context':
         return <ClipboardText className="text-secondary" variant="Bold" size={size} />
       case 'pdf':
+      case 'text_file':
         return (
           <div className="align-center flex w-full justify-center gap-2 p-2">
             <DocumentText1 className="min-w-5 text-secondary" variant="Bold" size={size} />
@@ -115,6 +102,7 @@ export const Attachment = ({
           </div>
         )
       case 'window':
+      case 'window_context':
         return (
           <>
             {appIcon ? (
@@ -124,19 +112,14 @@ export const Attachment = ({
                 className="h-[42px] w-[42px] bg-[url('../assets/window-border.png')] p-[2px]"
               />
             ) : (
-              <DocumentText1 className="text-white" variant="Bold" size={size} />
+              <DocumentText1 className="text-secondary" variant="Bold" size={size} />
             )}
           </>
         )
-      case 'text_file':
-        return (
-          <div className="align-center flex w-full justify-center gap-2 p-2">
-            <DocumentText1 className="min-w-5 text-white" variant="Bold" size={size} />
-            <span className="inline-block max-w-40 truncate align-middle text-sm text-white">{value}</span>
-          </div>
-        )
+      case 'selected_text':
+        return <Smallcaps className="text-secondary" variant="Bold" size={size} />
       default:
-        return <DocumentText1 className="text-white" variant="Bold" size={size} />
+        return <DocumentText1 className="text-secondary" variant="Bold" size={size} />
     }
   }
 
@@ -158,23 +141,23 @@ export const Attachment = ({
                 Conversation
               </span>
               <span className="text-[10px] font-[350] leading-4 text-tertiary">
-                {getWordCountFormatted(value)} words
+                {value && `${getWordCountFormatted(value)} words`}
               </span>
             </div>
           </div>
         ) : (
           <div
             className={`flex h-[52px] items-center justify-center rounded-[10px] border border-light-10 bg-secondary ${
-              type === 'pdf' ? 'max-w-40' : 'max-w-20'
+              type === 'pdf' || type === 'text_file' ? 'max-w-40' : 'max-w-20'
             } ${type !== 'image' ? 'min-w-12' : 'min-w-[52px]'} w-fit overflow-hidden`}
           >
             {renderAttachmentContent()}
           </div>
         )}
-        {removeEnabled && (
+        {onRemove && (
           <div
             className="absolute right-[-8px] top-[-8px] hidden cursor-pointer rounded-full bg-light-20 p-0.5 text-light-80 group-hover:flex"
-            onClick={onRemoveAttachment}
+            onClick={onRemove}
           >
             <CloseIcon size={16} />
           </div>
