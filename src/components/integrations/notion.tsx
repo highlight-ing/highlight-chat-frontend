@@ -23,7 +23,6 @@ import { emptyTextBlock, mapNotionDecorations } from '@/utils/notion'
 interface CreateNotionPageComponentProps {
   title: string
   content: string
-  onSuccess: (url?: string) => void
 }
 
 const notionPageFormSchema = z.object({
@@ -76,7 +75,15 @@ function ParentItemDropdown({
   )
 }
 
-function FormComponent({ title, content, onSuccess }: CreateNotionPageComponentProps) {
+function FormComponent({
+  title,
+  content,
+  onSuccess,
+}: {
+  title: string
+  content: string
+  onSuccess: (url?: string) => void
+}) {
   const [notionToken, setNotionToken] = useState<string | null>(null)
   const [parentItems, setParentItems] = useState<NotionParentItem[]>([])
   const [selectedParentItem, setSelectedParentItem] = useState<ItemWithDecorations | null>(null)
