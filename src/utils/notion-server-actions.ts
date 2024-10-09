@@ -1,12 +1,8 @@
 'use server'
 
-import { Client, isFullPageOrDatabase } from '@notionhq/client'
-import {
-  DatabaseObjectResponse,
-  PageObjectResponse,
-  PartialPageObjectResponse,
-  RichTextItemResponse,
-} from '@notionhq/client/build/src/api-endpoints'
+import { NotionParentItem } from '@/types'
+import { Client, isFullPage, isFullPageOrDatabase } from '@notionhq/client'
+import { markdownToBlocks } from '@tryfabric/martian'
 
 const HIGHLIGHT_BACKEND_BASE_URL = 'https://backend.highlightai.com'
 
@@ -98,12 +94,6 @@ export async function checkNotionConnectionStatus(accessToken: string) {
   return data.connected
 }
 
-interface ParentItem {
-  type: 'database' | 'page'
-  id: string
-  title: RichTextItemResponse[]
-}
-
 /**
  * Gets the parent items (pages and databases) for the given Notion access token.
  * These are items that we can create a child (sub-page) for.
@@ -117,7 +107,7 @@ export async function getNotionParentItems(accessToken: string) {
 
   const fullResults = response.results.filter(isFullPageOrDatabase)
 
-  const parentItems: ParentItem[] = []
+  const parentItems: NotionParentItem[] = []
 
   fullResults.forEach((result) => {
     for (const property of Object.values(result.properties)) {
@@ -131,9 +121,61 @@ export async function getNotionParentItems(accessToken: string) {
     }
   })
 
-  console.log('Parent items:', JSON.stringify(parentItems))
+  return parentItems
+}
 
-  // console.log('Databases:', JSON.stringify(response.results))
+interface CreateNotionPageParams {
+  accessToken: string
+  parent: NotionParentItem
+  title: string
+  content: string
+}
 
-  return notion.users.list({})
+/**
+ * Creates a new Notion page with the given title and content.
+ * @returns the URL of the created page, or null if it failed
+ */
+export async function createNotionPage({ accessToken, parent, title, content }: CreateNotionPageParams) {
+  const notion = new Client({
+    auth: accessToken,
+  })
+
+  const blocks = markdownToBlocks(content, {
+    notionLimits: {
+      onError: (err) => {
+        console.error('Error converting markdown to blocks', err)
+      },
+    },
+  })
+
+  // TS bs, so stupid
+  type IdRequest = string | string
+  const apiParent:
+    | {
+        page_id: IdRequest
+        type?: 'page_id'
+      }
+    | {
+        database_id: IdRequest
+        type?: 'database_id'
+      } =
+    parent.type === 'page' ? { type: 'page_id', page_id: parent.id } : { type: 'database_id', database_id: parent.id }
+
+  const response = await notion.pages.create({
+    parent: apiParent,
+    properties: {
+      title: {
+        title: [{ text: { content: title } }],
+      },
+    },
+    //@ts-ignore
+    children: blocks,
+  })
+
+  if (!isFullPage(response)) {
+    console.warn('Notion returned a non-full page', response)
+    return null
+  }
+
+  return response.url
 }

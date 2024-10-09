@@ -1,9 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import InputField from '../TextInput/InputField'
-import TextArea from '../TextInput/TextArea'
-import Button from '../Button/Button'
+import InputField from '@/components/TextInput/InputField'
+import TextArea from '@/components/TextInput/TextArea'
+import Button from '@/components/Button/Button'
 import { useEffect, useState } from 'react'
 import { NotionIcon } from '@/icons/icons'
 import { SetupConnectionComponent } from './integration-auth'
@@ -12,27 +12,80 @@ import {
   createMagicLinkForNotion,
   getNotionTokenForUser,
   getNotionParentItems,
+  createNotionPage,
 } from '@/utils/notion-server-actions'
-import { markdownToBlocks } from '@tryfabric/martian'
-import { Client } from '@notionhq/client'
 import { Text } from 'react-notion-x'
+import ContextMenu, { MenuItemType } from '../ContextMenu/ContextMenu'
+import { NotionParentItem } from '@/types'
+import { ArrowDown2 } from 'iconsax-react'
+import { emptyTextBlock, mapNotionDecorations } from '@/utils/notion'
 
 interface CreateNotionPageComponentProps {
   title: string
-  description?: string
   content: string
+  onSuccess: (url?: string) => void
 }
 
 const notionPageFormSchema = z.object({
   title: z.string().min(1),
-  description: z.string(),
   content: z.string(),
 })
 
 type NotionPageFormData = z.infer<typeof notionPageFormSchema>
+type ItemWithDecorations = ReturnType<typeof mapNotionDecorations>[number]
 
-function FormComponent({ title, description, content }: CreateNotionPageComponentProps) {
+function ParentItemDropdown({
+  items,
+  onSelect,
+}: {
+  items: NotionParentItem[]
+  onSelect: (item: ItemWithDecorations) => void
+}) {
+  const itemsWithDecorations = mapNotionDecorations(items)
+
+  const contextMenuItems: MenuItemType[] = itemsWithDecorations.map((item) => {
+    return {
+      label: <Text value={item.decorations} block={emptyTextBlock} />,
+      onClick: () => {
+        onSelect(item)
+        setSelectedItem(item)
+      },
+    }
+  })
+
+  const [selectedItem, setSelectedItem] = useState<ItemWithDecorations | null>(itemsWithDecorations[0])
+
+  return (
+    <ContextMenu
+      key="templates-menu"
+      items={contextMenuItems}
+      position={'bottom'}
+      triggerId={`set-parent-item`}
+      leftClick={true}
+    >
+      {
+        // @ts-ignore
+        ({ isOpen }) => (
+          <Button id="set-parent-item" size={'medium'} variant={'tertiary'}>
+            <ArrowDown2 size={16} />
+            {selectedItem ? <Text value={selectedItem.decorations} block={emptyTextBlock} /> : 'Error Loading Items'}
+          </Button>
+        )
+      }
+    </ContextMenu>
+  )
+}
+
+function FormComponent({ title, content, onSuccess }: CreateNotionPageComponentProps) {
   const [notionToken, setNotionToken] = useState<string | null>(null)
+  const [parentItems, setParentItems] = useState<NotionParentItem[]>([])
+  const [selectedParentItem, setSelectedParentItem] = useState<ItemWithDecorations | null>(null)
+
+  async function loadParentItems(token: string) {
+    const items = await getNotionParentItems(token)
+    console.log('Loaded parent items', items)
+    setParentItems(items)
+  }
 
   useEffect(() => {
     async function getLinearToken() {
@@ -46,6 +99,7 @@ function FormComponent({ title, description, content }: CreateNotionPageComponen
         return
       }
 
+      loadParentItems(token)
       setNotionToken(token)
     }
 
@@ -61,59 +115,61 @@ function FormComponent({ title, description, content }: CreateNotionPageComponen
     resolver: zodResolver(notionPageFormSchema),
     defaultValues: {
       title,
-      description,
       content,
     },
   })
 
   async function onSubmit(data: NotionPageFormData) {
+    console.log('Submitting form', data)
     if (!notionToken) {
       // TODO (Julian): Add more advanced error message here
       console.warn('Token not set, please try again later.')
       return
     }
 
-    const users = await getNotionParentItems(notionToken)
-    console.log(users)
+    if (!selectedParentItem) {
+      console.warn('Parent item not selected')
+      return
+    }
 
-    const blocks = markdownToBlocks(data.content, {
-      notionLimits: {
-        onError: (err) => {
-          console.error('Error converting markdown to blocks', err)
-        },
-      },
+    const response = await createNotionPage({
+      accessToken: notionToken,
+      parent: selectedParentItem,
+      title: data.title,
+      content: data.content,
     })
 
-    console.log(blocks)
+    onSuccess(response ?? undefined)
   }
 
   return (
     <div className="mt-2">
-      <form className="flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
-        <InputField size={'xxlarge'} label={'Title'} placeholder={'Issue Title'} {...register('title')} />
-        <InputField
-          size={'xxlarge'}
-          label={'Description'}
-          placeholder={'Issue Description'}
-          {...register('description')}
-        />
-        <TextArea
-          rows={5}
-          size={'xxlarge'}
-          label={'Markdown Content'}
-          placeholder={'Page Content'}
-          {...register('content')}
-        />
-        <Button size={'medium'} variant={'primary'} type={'submit'}>
-          Create Page
-        </Button>
-      </form>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium">Parent Item</span>
+        <span className="text-xs text-gray-500">You must select a parent item to create the page in</span>
+        {parentItems.length > 0 && <ParentItemDropdown items={parentItems} onSelect={setSelectedParentItem} />}
+        {parentItems.length === 0 && <span>Loading Items...</span>}
+        <form className="flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
+          <InputField size={'xxlarge'} label={'Title'} placeholder={'Issue Title'} {...register('title')} />
+          <TextArea
+            rows={5}
+            size={'xxlarge'}
+            label={'Markdown Content'}
+            placeholder={'Page Content'}
+            {...register('content')}
+          />
+          <Button size={'medium'} variant={'primary'} type={'submit'}>
+            Create Page
+          </Button>
+        </form>
+      </div>
     </div>
   )
 }
 
-export function CreateNotionPageComponent({ title, description, content }: CreateNotionPageComponentProps) {
+export function CreateNotionPageComponent({ title, content }: CreateNotionPageComponentProps) {
   const [state, setState] = useState<'loading' | 'connect' | 'form' | 'success'>('loading')
+  const [url, setUrl] = useState<string | undefined>(undefined)
 
   useEffect(() => {
     // On mount, check to see if the user has setup Linear integration
@@ -137,6 +193,11 @@ export function CreateNotionPageComponent({ title, description, content }: Creat
     setState('form')
   }
 
+  function onSuccess(url?: string) {
+    setState('success')
+    setUrl(url)
+  }
+
   return (
     <div>
       {state === 'connect' && (
@@ -148,7 +209,15 @@ export function CreateNotionPageComponent({ title, description, content }: Creat
           createMagicLink={createMagicLinkForNotion}
         />
       )}
-      {state === 'form' && <FormComponent title={title} description={description} content={content} />}
+      {state === 'form' && <FormComponent title={title} content={content} onSuccess={onSuccess} />}
+      {state === 'success' && url && (
+        <span>
+          Page created successfully:{' '}
+          <a href={url} target="_blank">
+            {url}
+          </a>
+        </span>
+      )}
     </div>
   )
 }

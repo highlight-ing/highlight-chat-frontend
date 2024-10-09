@@ -2,6 +2,7 @@ import { Prompt } from '@/types/supabase-helpers'
 import { ColorScheme } from '@/components/PersonalPrompts/customVariables'
 import { ButtonVariantType } from '@/components/Button/Button'
 import { ReactNode } from 'react'
+import { RichTextItemResponse } from '@notionhq/client/build/src/api-endpoints'
 
 type WindowAttachment = {
   type: 'window'
@@ -233,4 +234,10 @@ export type CopyState = 'idle' | 'copying' | 'copied' | 'hiding'
 /**
  * All the types of integrations that we support.
  */
-export type IntegrationType = 'linear'
+export type IntegrationType = 'linear' | 'notion'
+
+export interface NotionParentItem {
+  type: 'database' | 'page'
+  id: string
+  title: RichTextItemResponse[]
+}
