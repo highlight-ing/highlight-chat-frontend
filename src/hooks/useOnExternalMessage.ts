@@ -63,6 +63,44 @@ const useOnExternalMessage = () => {
                 window_context: ocrScreenContents,
               })
             }
+          } else if (message.toolUse.name === 'get_more_context_from_conversation') {
+            const conversation = await Highlight.conversations.getConversationById(message.toolUse.input.conversation)
+            if (!conversation) {
+              console.error('Failed to open conversation from external event:', message.toolUse.input.conversation)
+              addToast({
+                title: 'Error',
+                description: `Failed to fetch conversation. Please try again.`,
+                type: 'error',
+                timeout: 5000,
+              })
+              return
+            } else {
+              addToast({
+                title: 'Conversation Fetched',
+                description: `Conversation fetched successfully.`,
+                type: 'success',
+                timeout: 5000,
+              })
+              addAttachment({
+                id: conversation.id,
+                type: 'conversation',
+                title: conversation.title,
+                value: conversation.transcript,
+                startedAt: conversation.startedAt,
+                endedAt: conversation.endedAt,
+              })
+
+              await handleSubmit("Here's the conversation you requested.", undefined, {
+                conversation: {
+                  id: conversation.id,
+                  type: 'conversation',
+                  title: conversation.title,
+                  text: conversation.transcript,
+                  started_at: conversation.startedAt,
+                  ended_at: conversation.endedAt,
+                },
+              })
+            }
           }
         }
       } else if (message.type === 'customize-prompt') {
