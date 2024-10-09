@@ -60,6 +60,11 @@ export interface ClipboardTextAttachment {
   text: string
 }
 
+export interface SelectedTextAttachment {
+  type: 'selected_text'
+  text: string
+}
+
 export interface AboutMeAttachment {
   type: 'about_me'
   text: string
@@ -89,7 +94,7 @@ export interface SpreadsheetAttachment {
   name: string
 }
 
-export type AttachedContextCContextTypes =
+export type AttachedContextContextTypes =
   | TextFileAttachmentMetadata
   | ImageAttachmentMetadata
   | PDFAttachment
@@ -97,12 +102,13 @@ export type AttachedContextCContextTypes =
   | WindowContentsAttachment
   | WindowListAttachment
   | ClipboardTextAttachment
+  | SelectedTextAttachment
   | AboutMeAttachment
   | ConversationAttachment
   | SpreadsheetAttachment
 
 export interface AttachedContexts {
-  context: AttachedContextCContextTypes[]
+  context: AttachedContextContextTypes[]
 }
 
 export interface AvailableContexts {

@@ -22,6 +22,7 @@ export function EntryAttachment({ conversation }: EntryAttachmentProps) {
 
   const handleAttachConversation = () => {
     addAttachment({
+      id: conversation.id,
       type: 'conversation',
       value: conversation.transcript,
       title: conversation.title,

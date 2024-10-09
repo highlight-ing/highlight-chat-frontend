@@ -1,4 +1,4 @@
-import { ClipboardText, GallerySlash, DocumentText1 } from 'iconsax-react'
+import { ClipboardText, GallerySlash, DocumentText1, Smallcaps } from 'iconsax-react'
 import { useState } from 'react'
 import { CloseIcon } from '../icons/icons'
 import Tooltip from './Tooltip/Tooltip'
@@ -92,7 +92,6 @@ export const Attachment = ({
           )
         }
       case 'clipboard':
-      case 'window_context':
         return <ClipboardText className="text-secondary" variant="Bold" size={size} />
       case 'pdf':
       case 'text_file':
@@ -103,6 +102,7 @@ export const Attachment = ({
           </div>
         )
       case 'window':
+      case 'window_context':
         return (
           <>
             {appIcon ? (
@@ -112,12 +112,14 @@ export const Attachment = ({
                 className="h-[42px] w-[42px] bg-[url('../assets/window-border.png')] p-[2px]"
               />
             ) : (
-              <DocumentText1 className="text-white" variant="Bold" size={size} />
+              <DocumentText1 className="text-secondary" variant="Bold" size={size} />
             )}
           </>
         )
+      case 'selected_text':
+        return <Smallcaps className="text-secondary" variant="Bold" size={size} />
       default:
-        return <DocumentText1 className="text-white" variant="Bold" size={size} />
+        return <DocumentText1 className="text-secondary" variant="Bold" size={size} />
     }
   }
 
@@ -139,7 +141,7 @@ export const Attachment = ({
                 Conversation
               </span>
               <span className="text-[10px] font-[350] leading-4 text-tertiary">
-                {getWordCountFormatted(value)} words
+                {value && `${getWordCountFormatted(value)} words`}
               </span>
             </div>
           </div>

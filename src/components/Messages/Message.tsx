@@ -22,7 +22,7 @@ import { getDisplayValue } from '@/utils/attachments'
 import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
 import { MessageText } from 'iconsax-react'
 import { useStore } from '@/providers/store-provider'
-import { AttachedContextCContextTypes } from '@/utils/formDataUtils'
+import { AttachedContextContextTypes } from '@/utils/formDataUtils'
 
 const hasAttachment = (message: UserMessage) => {
   return (
@@ -98,7 +98,7 @@ export const Message = ({ message, isThinking }: MessageProps) => {
   const promptApp = useStore((state) => state.promptApp)
   const { factIndex, fact } = message
 
-  const renderAttachment = (attachment: AttachedContextCContextTypes) => {
+  const renderAttachment = (attachment: AttachedContextContextTypes) => {
     switch (attachment.type) {
       case 'image':
         return <Attachment type="image" value={attachment.file_id} version={message.version} />
@@ -109,10 +109,12 @@ export const Message = ({ message, isThinking }: MessageProps) => {
       case 'text_file':
         return <Attachment type={attachment.type} value={attachment.name} />
       case 'window_contents':
-      case 'ocr_text':
+        // case 'ocr_text':
         return <Attachment type="window_context" value={attachment.name} />
       case 'conversation':
         return <Attachment type="conversation" value={attachment.text} />
+      case 'selected_text':
+        return <Attachment type="selected_text" value={attachment.text} />
     }
   }
 
