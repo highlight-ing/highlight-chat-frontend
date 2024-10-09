@@ -533,7 +533,7 @@ export const useSubmitQuery = () => {
   const handleSubmit = async (
     input: string,
     promptApp?: Prompt,
-    context?: { image?: string; window_context?: string },
+    context?: { image?: string; window_context?: string; conversation?: ConversationAttachment },
   ) => {
     const query = input.trim()
 
@@ -620,6 +620,18 @@ export const useSubmitQuery = () => {
           created_at: new Date(),
         }
         attachedContext.context.push(windowContentsAttachment)
+      }
+
+      if (context?.conversation) {
+        const conversationAttachment: ConversationAttachment = {
+          id: context.conversation.id,
+          type: 'conversation',
+          title: context.conversation.title,
+          text: context.conversation.text,
+          started_at: context.conversation.started_at,
+          ended_at: context.conversation.ended_at,
+        }
+        attachedContext.context.push(conversationAttachment)
       }
 
       const windows = await fetchWindows()
