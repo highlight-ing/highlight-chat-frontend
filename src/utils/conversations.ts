@@ -9,13 +9,23 @@ export const isDefaultTitle = (conversation?: ConversationData): boolean => {
 }
 
 export const getConversationDisplayTitle = (conversation?: ConversationData): string => {
+  let title = ''
   if (!conversation) {
-    return ''
+    return 'Conversation'
   }
-  if (typeof conversation.title !== 'string' || isDefaultTitle(conversation) || conversation.title === '') {
-    return conversation.timestamp instanceof Date ? getTimeAgo(conversation.timestamp) : ''
+
+  if (
+    conversation.startedAt &&
+    (typeof conversation.title !== 'string' || isDefaultTitle(conversation) || conversation.title === '')
+  ) {
+    title = getTimeAgo(conversation.startedAt)
   }
-  return conversation.title
+
+  if (title === '') {
+    title = conversation.title
+  }
+
+  return title
 }
 
 export const getConversationSubtitle = (conversation?: ConversationData): string => {
