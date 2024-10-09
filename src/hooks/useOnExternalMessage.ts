@@ -96,8 +96,8 @@ const useOnExternalMessage = () => {
                   type: 'conversation',
                   title: conversation.title,
                   text: conversation.transcript,
-                  started_at: conversation.startedAt,
-                  ended_at: conversation.endedAt,
+                  started_at: conversation.startedAt.toISOString(),
+                  ended_at: conversation.endedAt.toISOString(),
                 },
               })
             }
