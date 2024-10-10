@@ -485,6 +485,9 @@ export async function addPromptToUser(externalId: string, authToken: string) {
   }
 }
 
+/**
+ * This function should probably be renamed to unpinPromptFromUser
+ */
 export async function removePromptFromUser(externalId: string, authToken: string) {
   let userId: string
   try {

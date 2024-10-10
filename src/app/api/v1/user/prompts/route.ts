@@ -1,7 +1,7 @@
 import { authenticateApiUser } from '@/lib/api'
 import { PROMPTS_TABLE_SELECT_FIELDS, promptSelectMapper, supabaseAdmin } from '@/lib/supabase'
-import { nanoid } from 'nanoid'
-import slugify from 'slugify'
+
+const DEFAULT_PROMPT_IDS = [452, 453, 454, 455]
 
 async function checkIfDefaultPromptsAdded(userId: string) {
   const supabase = supabaseAdmin()
@@ -35,38 +35,13 @@ async function checkIfDefaultPromptsAdded(userId: string) {
     console.error('Error updating user profile:', updateError)
   }
 
-  // Select the 4 default prompts
-  const { data: defaultPrompts } = await supabase
-    .from('prompts')
-    .select('*')
-    .in('id', [452, 453, 454, 455])
-    .throwOnError()
-
-  const newPrompts = defaultPrompts?.map(({ id, ...prompt }) => {
-    let slug = slugify(prompt.name, { lower: true })
-
-    slug += '-' + nanoid(12)
-
-    return {
-      ...prompt,
-      slug,
-      external_id: crypto.randomUUID(),
-      can_trend: false,
-      public_use_number: 0,
-      user_id: userId,
-      public: false,
-    }
-  })
-
-  if (!newPrompts) {
-    throw new Error('Error while mapping new prompts.')
-  }
-
   // Pin the 4 default prompts to the user
-  const { error: insertError } = await supabase.from('prompts').insert(newPrompts)
+  const { error: insertError } = await supabase
+    .from('added_prompts')
+    .insert(DEFAULT_PROMPT_IDS.map((id) => ({ user_id: userId, prompt_id: id })))
 
   if (insertError) {
-    console.error('Error inserting new default prompts:', insertError)
+    console.error('Error pinning default prompts:', insertError)
   }
 
   return
