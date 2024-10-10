@@ -1,9 +1,11 @@
 import { usePromptEditorStore } from '@/stores/prompt-editor'
-import { savePrompt } from '@/utils/prompts'
+import { removePromptFromUser, savePrompt } from '@/utils/prompts'
 import useAuth from './useAuth'
 import { usePromptsStore } from '@/stores/prompts'
 import { useEffect, useState } from 'react'
 import { useStore } from '@/providers/store-provider'
+import { DEFAULT_PROMPT_EXTERNAL_IDS } from '@/lib/promptapps'
+import usePromptApps from './usePromptApps'
 
 export function usePromptEditor() {
   // STATE
@@ -15,6 +17,7 @@ export function usePromptEditor() {
   const { updatePrompt, addPrompt } = usePromptsStore()
   const addToast = useStore((state) => state.addToast)
   const { getAccessToken } = useAuth()
+  const { refreshPinnedPrompts } = usePromptApps()
 
   // EFFECTS
   useEffect(() => {
@@ -35,7 +38,18 @@ export function usePromptEditor() {
     const formData = new FormData()
 
     if (promptEditorData.externalId) {
-      formData.append('externalId', promptEditorData.externalId)
+      // This logic handles default prompts being forked.
+      // Check if the externalId is in the DEFAULT_PROMPT_EXTERNAL_IDS array
+      if (DEFAULT_PROMPT_EXTERNAL_IDS.includes(promptEditorData.externalId)) {
+        // We want the prompt to have a new externalId since we're essentially forking it.
+
+        // Unpin the prompt
+        const accessToken = await getAccessToken()
+        await removePromptFromUser(promptEditorData.externalId, accessToken)
+        refreshPinnedPrompts()
+      } else {
+        formData.append('externalId', promptEditorData.externalId)
+      }
     }
 
     formData.append('slug', promptEditorData.slug)
