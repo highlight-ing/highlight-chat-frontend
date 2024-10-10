@@ -1,0 +1,79 @@
+@import '@/variables.module';
+
+.checkboxContainer {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.hiddenCheckbox {
+  border: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.styledCheckbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  transition: background-color 150ms, border 150ms;
+  background-color: $light-10;
+  border: 1px solid $light-20;
+  cursor: pointer;
+
+  svg {
+    visibility: hidden;
+    fill: $primary-60;
+    //    visibility: ${({ $checked }) => ($checked ? 'visible' : 'hidden')};
+    //    fill: ${({ theme, $checked, $disabled }) =>
+    //      $checked ? ($disabled ? theme.brand.primary['40'] : theme.background['first-layer']) : theme.brand.primary['60']};
+  }
+
+  &.disabled {
+    background-color: $light-5;
+    border: 1px solid $light-10;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  &.checked {
+    background-color: $primary-60;
+    border: none;
+
+    svg {
+      visibility: visible;
+      fill: $dark-100;
+    }
+
+    &:hover {
+      background-color: $primary-80;
+    }
+
+    &.disabled {
+      background-color: $light-100;
+
+      svg {
+        fill: $primary-40;
+      }
+    }
+  }
+
+  &:hover {
+    background-color: $light-20;
+    border-color: $light-40;
+
+    svg {
+      visibility: visible;
+    }
+  }
+}

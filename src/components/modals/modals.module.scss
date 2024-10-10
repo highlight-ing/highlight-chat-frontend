@@ -91,3 +91,20 @@
   padding: 20px;
   gap: 16px;
 }
+
+.doNotShowAgain {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  line-height: 1.4;
+  gap: 8px;
+  background-color: $dark-10;
+  color: $light-20;
+  font-size: 14px;
+  padding: 16px;
+  cursor: pointer;
+
+  &:hover {
+    color: $light-60;
+  }
+}

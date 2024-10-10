@@ -19,6 +19,7 @@ import Tooltip from '@/components/Tooltip/Tooltip'
 import usePromptApps from '@/hooks/usePromptApps'
 import { useStore } from '@/providers/store-provider'
 import { PreferredAttachment } from '../prompts/PreferredAttachment/PreferredAttachment'
+import { useUnpinPromptAction } from '@/presentations/modals/UnpinPromptModal'
 
 type PromptWithPin = Prompt & { isPinned?: boolean }
 
@@ -97,6 +98,7 @@ const PersonalPromptsItem = ({ prompt, colorScheme, isOwner, isPublic }: Persona
   const [isHovered, setIsHovered] = useState(false)
   const { selectPrompt } = usePromptApps()
   const openModal = useStore((state) => state.openModal)
+  const { unpinPrompt } = useUnpinPromptAction()
 
   return (
     <div
@@ -274,7 +276,9 @@ const PersonalPromptsItem = ({ prompt, colorScheme, isOwner, isPublic }: Persona
                 }}
                 onClick={(e) => {
                   e.stopPropagation()
-                  openModal('unpin-prompt', { prompt })
+                  openModal('unpin-prompt', { prompt }, () => {
+                    unpinPrompt(prompt)
+                  })
                 }}
                 hidden={!isHovered}
               >

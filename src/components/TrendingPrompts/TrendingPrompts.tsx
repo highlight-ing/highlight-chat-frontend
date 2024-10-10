@@ -14,6 +14,7 @@ import Tooltip from '@/components/Tooltip/Tooltip'
 import usePromptApps from '@/hooks/usePromptApps'
 import { useStore } from '@/providers/store-provider'
 import { PreferredAttachment } from '../prompts/PreferredAttachment/PreferredAttachment'
+import { usePinPromptAction } from '@/presentations/modals/PinPromptModal'
 
 const TrendingPrompts = ({
   userId,
@@ -86,6 +87,7 @@ const TrendingPromptsItem = ({
 }) => {
   const openModal = useStore((state) => state.openModal)
   const { selectPrompt } = usePromptApps()
+  const { pinPrompt } = usePinPromptAction()
   const [isPinned, setIsPinned] = useState(pinState)
 
   useEffect(() => {
@@ -165,7 +167,9 @@ const TrendingPromptsItem = ({
               className={styles.filledButton}
               onClick={(e) => {
                 e.stopPropagation()
-                openModal('pin-prompt', { prompt })
+                openModal('pin-prompt', { prompt }, () => {
+                  pinPrompt(prompt)
+                })
               }}
               disabled={isPinned}
             >
