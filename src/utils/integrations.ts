@@ -8,3 +8,5 @@ export function getIntegrationLanguage(type: IntegrationType) {
       return 'Notion'
   }
 }
+
+export const integrationFunctionNames = ['create_linear_ticket', 'create_notion_page']

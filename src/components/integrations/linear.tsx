@@ -109,31 +109,24 @@ export function LinearTicketFormComponent({
   }, [])
 
   return (
-    <div className="mt-2">
-      <form className="flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
-        <InputField size={'medium'} label={'Title'} placeholder={'Issue Title'} {...register('title')} />
-        <TextArea
-          size={'medium'}
-          label={'Description'}
-          placeholder={'Issue Description'}
-          {...register('description')}
-        />
-        <Button size={'medium'} variant={'primary'} type={'submit'}>
-          Create Ticket
-        </Button>
-      </form>
-    </div>
+    <form className="flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
+      <InputField size={'medium'} label={'Title'} placeholder={'Issue Title'} {...register('title')} />
+      <TextArea size={'medium'} label={'Description'} placeholder={'Issue Description'} {...register('description')} />
+      <Button size={'medium'} variant={'primary'} type={'submit'}>
+        Create Ticket
+      </Button>
+    </form>
   )
 }
 
 export function LinearTicketSuccessComponent({ issueUrl }: { issueUrl: string }) {
   return (
-    <div className="mt-2">
+    <>
       Linear issue created:{' '}
       <a href={issueUrl} target="_blank">
         View Issue
       </a>
-    </div>
+    </>
   )
 }
 
@@ -169,7 +162,7 @@ export function CreateLinearTicketComponent({ title, description }: { title: str
   }
 
   return (
-    <div>
+    <div className="mt-2">
       {state === 'connect' && (
         <SetupConnectionComponent
           name={'Linear'}

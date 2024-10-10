@@ -4,7 +4,7 @@ import { z } from 'zod'
 import InputField from '@/components/TextInput/InputField'
 import TextArea from '@/components/TextInput/TextArea'
 import Button from '@/components/Button/Button'
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { NotionIcon } from '@/icons/icons'
 import { SetupConnectionComponent } from './integration-auth'
 import {
@@ -19,6 +19,7 @@ import ContextMenu, { MenuItemType } from '../ContextMenu/ContextMenu'
 import { NotionParentItem } from '@/types'
 import { ArrowDown2 } from 'iconsax-react'
 import { emptyTextBlock, mapNotionDecorations } from '@/utils/notion'
+import Markdown from 'react-markdown'
 
 interface CreateNotionPageComponentProps {
   title: string
@@ -27,7 +28,6 @@ interface CreateNotionPageComponentProps {
 
 const notionPageFormSchema = z.object({
   title: z.string().min(1),
-  content: z.string(),
 })
 
 type NotionPageFormData = z.infer<typeof notionPageFormSchema>
@@ -40,6 +40,7 @@ function ParentItemDropdown({
   items: NotionParentItem[]
   onSelect: (item: ItemWithDecorations) => void
 }) {
+  const triggerId = useId()
   const itemsWithDecorations = mapNotionDecorations(items)
 
   const contextMenuItems: MenuItemType[] = itemsWithDecorations.map((item) => {
@@ -59,17 +60,14 @@ function ParentItemDropdown({
       key="templates-menu"
       items={contextMenuItems}
       position={'bottom'}
-      triggerId={`set-parent-item`}
+      triggerId={triggerId}
       leftClick={true}
     >
       {
-        // @ts-ignore
-        ({ isOpen }) => (
-          <Button id="set-parent-item" size={'medium'} variant={'tertiary'}>
-            <ArrowDown2 size={16} />
-            {selectedItem ? <Text value={selectedItem.decorations} block={emptyTextBlock} /> : 'Error Loading Items'}
-          </Button>
-        )
+        <Button id={triggerId} size={'medium'} variant={'tertiary'}>
+          <ArrowDown2 size={16} />
+          {selectedItem ? <Text value={selectedItem.decorations} block={emptyTextBlock} /> : 'Error Loading Items'}
+        </Button>
       }
     </ContextMenu>
   )
@@ -86,12 +84,12 @@ function FormComponent({
 }) {
   const [notionToken, setNotionToken] = useState<string | null>(null)
   const [parentItems, setParentItems] = useState<NotionParentItem[]>([])
-  const [selectedParentItem, setSelectedParentItem] = useState<ItemWithDecorations | null>(null)
+  const [selectedParentItem, setSelectedParentItem] = useState<NotionParentItem | null>(null)
 
   async function loadParentItems(token: string) {
     const items = await getNotionParentItems(token)
-    console.log('Loaded parent items', items)
     setParentItems(items)
+    setSelectedParentItem(items[0])
   }
 
   useEffect(() => {
@@ -117,12 +115,11 @@ function FormComponent({
     register,
     handleSubmit,
     watch,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<NotionPageFormData>({
     resolver: zodResolver(notionPageFormSchema),
     defaultValues: {
       title,
-      content,
     },
   })
 
@@ -143,33 +140,25 @@ function FormComponent({
       accessToken: notionToken,
       parent: selectedParentItem,
       title: data.title,
-      content: data.content,
+      content,
     })
 
     onSuccess(response ?? undefined)
   }
 
   return (
-    <div className="mt-2">
-      <div className="flex flex-col gap-2">
-        <span className="text-sm font-medium">Parent Item</span>
-        <span className="text-xs text-gray-500">You must select a parent item to create the page in</span>
-        {parentItems.length > 0 && <ParentItemDropdown items={parentItems} onSelect={setSelectedParentItem} />}
-        {parentItems.length === 0 && <span>Loading Items...</span>}
-        <form className="flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
-          <InputField size={'xxlarge'} label={'Title'} placeholder={'Issue Title'} {...register('title')} />
-          <TextArea
-            rows={5}
-            size={'xxlarge'}
-            label={'Markdown Content'}
-            placeholder={'Page Content'}
-            {...register('content')}
-          />
-          <Button size={'medium'} variant={'primary'} type={'submit'}>
-            Create Page
-          </Button>
-        </form>
-      </div>
+    <div className="flex flex-col gap-2">
+      <span className="text-sm font-medium">Parent Item</span>
+      <span className="text-xs text-gray-500">You must select a parent item to create the page in</span>
+      {parentItems.length > 0 && <ParentItemDropdown items={parentItems} onSelect={setSelectedParentItem} />}
+      {parentItems.length === 0 && <span>Loading Items...</span>}
+      <form className="flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
+        <InputField size={'xxlarge'} label={'Title'} placeholder={'Issue Title'} {...register('title')} />
+        <Markdown>{content}</Markdown>
+        <Button size={'medium'} variant={'primary'} type={'submit'} disabled={isSubmitting}>
+          Create Page
+        </Button>
+      </form>
     </div>
   )
 }
@@ -206,7 +195,7 @@ export function CreateNotionPageComponent({ title, content }: CreateNotionPageCo
   }
 
   return (
-    <div>
+    <div className="mt-2">
       {state === 'connect' && (
         <SetupConnectionComponent
           name={'Notion'}

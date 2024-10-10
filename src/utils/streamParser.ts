@@ -1,5 +1,6 @@
 import { Toast } from '@/types'
 import { UseIntegrationsAPI } from '@/hooks/useIntegrations'
+import { integrationFunctionNames } from './integrations'
 
 type StreamParserProps = {
   showConfirmationModal: (message: string) => Promise<boolean>
@@ -32,6 +33,12 @@ export async function parseAndHandleStreamChunk(
       switch (jsonChunk.type) {
         case 'text':
           accumulatedContent += jsonChunk.content
+          break
+
+        case 'loading':
+          if (integrationFunctionNames.includes(jsonChunk.name)) {
+            integrations.showLoading(conversationId)
+          }
           break
 
         // We can define each tool use with different names

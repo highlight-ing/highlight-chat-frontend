@@ -1,6 +1,7 @@
 import { CreateLinearTicketComponent } from '@/components/integrations/linear'
 import { CreateNotionPageComponent } from '@/components/integrations/notion'
 import { useStore } from '@/providers/store-provider'
+import { useEffect, useState } from 'react'
 
 interface CreateNotionPageParams {
   title: string
@@ -11,6 +12,7 @@ interface CreateNotionPageParams {
 export interface UseIntegrationsAPI {
   createLinearTicket: (conversationId: string, title: string, description: string) => Promise<void>
   createNotionPage: (conversationId: string, params: CreateNotionPageParams) => Promise<void>
+  showLoading: (conversationId: string) => Promise<void>
 }
 
 function MessageWithComponent({ content, children }: { content: string; children?: React.ReactNode }) {
@@ -22,18 +24,37 @@ function MessageWithComponent({ content, children }: { content: string; children
   )
 }
 
+function LoadingComponent() {
+  const [text, setText] = useState('Loading...')
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setText('Still loading...')
+    }, 5000)
+
+    return () => clearTimeout(timeout)
+  }, [])
+
+  return <p className="mt-2 text-sm text-gray-500">{text}</p>
+}
+// Holds the previous content of the conversation to be able to append to it
+const previousContent = new Map<string, string>()
+
 export function useIntegrations(): UseIntegrationsAPI {
   const getLastConversationMessage = useStore((state) => state.getLastConversationMessage)
   const updateLastConversationMessage = useStore((state) => state.updateLastConversationMessage)
 
   async function createLinearTicket(conversationId: string, title: string, description: string) {
-    const lastMessage = getLastConversationMessage(conversationId)
+    const lastMessage = previousContent.get(conversationId)
 
+    if (!lastMessage) {
+      throw new Error('No last message found for conversation')
+    }
     // Update the last message to show the Linear ticket component which will handle checking for authentication,
     // creating the ticket, and showing the success message.
     updateLastConversationMessage(conversationId!, {
       content: (
-        <MessageWithComponent content={lastMessage?.content as string}>
+        <MessageWithComponent content={lastMessage}>
           <CreateLinearTicketComponent title={title} description={description} />
         </MessageWithComponent>
       ),
@@ -42,13 +63,17 @@ export function useIntegrations(): UseIntegrationsAPI {
   }
 
   async function createNotionPage(conversationId: string, params: CreateNotionPageParams) {
-    const lastMessage = getLastConversationMessage(conversationId)
+    const lastMessage = previousContent.get(conversationId)
+
+    if (!lastMessage) {
+      throw new Error('No last message found for conversation')
+    }
 
     // Update the last message to show the Notion page component which will handle checking for authentication,
     // creating the page, and showing the success message.
     updateLastConversationMessage(conversationId!, {
       content: (
-        <MessageWithComponent content={lastMessage?.content as string}>
+        <MessageWithComponent content={lastMessage}>
           <CreateNotionPageComponent {...params} />
         </MessageWithComponent>
       ),
@@ -56,5 +81,21 @@ export function useIntegrations(): UseIntegrationsAPI {
     })
   }
 
-  return { createLinearTicket, createNotionPage }
+  async function showLoading(conversationId: string) {
+    const lastMessage = getLastConversationMessage(conversationId)
+    const textContents = lastMessage?.content as string
+
+    previousContent.set(conversationId, textContents)
+
+    updateLastConversationMessage(conversationId!, {
+      content: (
+        <MessageWithComponent content={textContents}>
+          <LoadingComponent />
+        </MessageWithComponent>
+      ),
+      role: 'assistant',
+    })
+  }
+
+  return { createLinearTicket, createNotionPage, showLoading }
 }

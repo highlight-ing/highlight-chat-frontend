@@ -69,7 +69,7 @@ export function SetupConnectionComponent({
   }, [])
 
   return (
-    <div className="mt-2 flex flex-col gap-2">
+    <div className="flex flex-col gap-2">
       <p>You'll need to connect your {name} account first.</p>
       <Button
         disabled={!connectLink}
