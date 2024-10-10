@@ -223,10 +223,10 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
                 </a>
               ) : currentConversation?.shared_conversations && currentConversation.shared_conversations.length > 0 ? (
                 <a
-                  href={`https://chat.hl.ing/share/${currentConversation.shared_conversations[0].id}`}
+                  href={`https://highlightai.com/share/${currentConversation.shared_conversations[0].id}`}
                   target={'_blank'}
                 >
-                  chat.hl.ing/share/{currentConversation.shared_conversations[0].id}
+                  highlightai.com/share/{currentConversation.shared_conversations[0].id}
                 </a>
               ) : (
                 <a href={`https://chat.hl.ing`}>chat.hl.ing</a>
