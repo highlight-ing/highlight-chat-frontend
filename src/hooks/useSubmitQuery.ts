@@ -244,12 +244,14 @@ export const useSubmitQuery = () => {
     setInputIsDisabled(true)
     const startTime = Date.now()
 
+    console.log('promptApp: ', promptApp)
     try {
       const tools = {
         get_more_context_from_window: true,
         get_more_context_from_conversation: false,
         add_or_update_about_me_facts: false,
         create_linear_ticket: promptApp?.linear_integration_enabled ?? false,
+        create_notion_page: promptApp?.create_notion_page_integration_enabled ?? false,
       }
 
       formData.append('conversation_id', conversationId)

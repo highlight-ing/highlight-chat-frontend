@@ -1,15 +1,12 @@
 import { IntegrationType } from '@/types'
-import { getLinearTokenForUser } from './linear-server-actions'
 
 export function getIntegrationLanguage(type: IntegrationType) {
   switch (type) {
     case 'linear':
       return 'Linear'
+    case 'notion':
+      return 'Notion'
   }
 }
 
-export async function createLinearTicket(accessToken: string, title: string) {
-  // Check to see if the user has a linear integration
-
-  const linearToken = await getLinearTokenForUser(accessToken)
-}
+export const integrationFunctionNames = ['create_linear_ticket', 'create_notion_page']

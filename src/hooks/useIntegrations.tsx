@@ -1,24 +1,21 @@
-import {
-  checkLinearConnectionStatus,
-  createMagicLinkForLinear,
-  getLinearTokenForUser,
-} from '@/utils/linear-server-actions'
+import { CreateLinearTicketComponent } from '@/components/integrations/linear'
+import { CreateNotionPageComponent } from '@/components/integrations/notion'
 import { useStore } from '@/providers/store-provider'
-import { useEffect, useRef, useState } from 'react'
-import Button from '@/components/Button/Button'
-import InputField from '@/components/TextInput/InputField'
-import TextArea from '@/components/TextInput/TextArea'
-import { LinearClient, Team } from '@linear/sdk'
-import { LinearIcon } from '@/icons/icons'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect, useState } from 'react'
+
+interface CreateNotionPageParams {
+  title: string
+  description: string
+  content: string
+}
 
 export interface UseIntegrationsAPI {
   createLinearTicket: (conversationId: string, title: string, description: string) => Promise<void>
+  createNotionPage: (conversationId: string, params: CreateNotionPageParams) => Promise<void>
+  showLoading: (conversationId: string) => Promise<void>
 }
 
-function MessageWithComponent({ content, children }: { content: string; children: React.ReactNode }) {
+function MessageWithComponent({ content, children }: { content: string; children?: React.ReactNode }) {
   return (
     <div>
       <p>{content}</p>
@@ -27,249 +24,37 @@ function MessageWithComponent({ content, children }: { content: string; children
   )
 }
 
-function LinearConnectionComponent({ onConnect }: { onConnect: () => void }) {
-  const [connectLink, setConnectLink] = useState<string>('')
-  const [connectClicked, setConnectClicked] = useState(false)
-
-  async function checkConnectionStatus() {
-    // @ts-ignore
-    const hlToken = (await highlight.internal.getAuthorizationToken()) as string
-
-    const connected = await checkLinearConnectionStatus(hlToken)
-
-    if (connected) {
-      onConnect()
-    }
-  }
+function LoadingComponent() {
+  const [text, setText] = useState('Loading...')
 
   useEffect(() => {
-    if (connectClicked) {
-      // Create an interval that checks the connection status every 5 seconds
-      const interval = setInterval(() => {
-        checkConnectionStatus()
-      }, 5000)
+    const timeout = setTimeout(() => {
+      setText('Still loading...')
+    }, 5000)
 
-      return () => clearInterval(interval)
-    }
-  }, [connectClicked])
-
-  useEffect(() => {
-    async function getConnectLink() {
-      // Fetch the latest Highlight authorization token (only available to Highlight Chat)
-      try {
-        // @ts-ignore
-        const token = (await highlight.internal.getAuthorizationToken()) as string
-
-        const connectLink = await createMagicLinkForLinear(token)
-        setConnectLink(connectLink)
-      } catch (e) {
-        console.warn('Error getting authorization token', e)
-        return
-      }
-    }
-
-    getConnectLink()
+    return () => clearTimeout(timeout)
   }, [])
 
-  return (
-    <div className="mt-2 flex flex-col gap-2">
-      <p>You'll need to connect your Linear account first.</p>
-      <Button
-        disabled={!connectLink}
-        size="small"
-        variant="primary-outline"
-        onClick={() => {
-          setConnectClicked(true)
-          window.open(connectLink, '_blank')
-        }}
-      >
-        <LinearIcon size={16} /> Connect Linear
-      </Button>
-
-      <small onClick={checkConnectionStatus} className="cursor-pointer underline">
-        Check connection status
-      </small>
-    </div>
-  )
+  return <p className="mt-2 text-sm text-gray-500">{text}</p>
 }
-
-const linearTicketFormSchema = z.object({
-  title: z.string().min(1),
-  description: z.string(),
-})
-
-type LinearTicketFormData = z.infer<typeof linearTicketFormSchema>
-
-function LinearTicketFormComponent({
-  title,
-  description,
-  onSubmitSuccess,
-}: {
-  title: string
-  description: string
-  onSubmitSuccess: (issueUrl: string) => void
-}) {
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<LinearTicketFormData>({
-    resolver: zodResolver(linearTicketFormSchema),
-    defaultValues: {
-      title,
-      description,
-    },
-  })
-
-  const client = useRef<LinearClient>()
-  const [linearApiToken, setLinearApiToken] = useState<string>()
-  const [linearTeams, setLinearTeams] = useState<Team[]>()
-
-  async function onSubmit(data: LinearTicketFormData) {
-    const teams = await client.current?.teams()
-    const team = teams?.nodes[0]
-    if (team?.id) {
-      const issuePayload = await client.current?.createIssue({
-        teamId: team.id,
-        title: data.title,
-        description: data.description,
-      })
-
-      const issueUrl = (await issuePayload?.issue)?.url
-      if (issueUrl) {
-        onSubmitSuccess(issueUrl)
-      } else {
-        console.warn('Something went wrong, no issue URL returned')
-      }
-    }
-  }
-
-  useEffect(() => {
-    if (!linearApiToken) {
-      return
-    }
-
-    client.current = new LinearClient({
-      accessToken: linearApiToken,
-    })
-
-    async function getLinearTeams() {
-      if (!client.current) {
-        return
-      }
-
-      const me = await client.current.viewer
-
-      const teams = await me.teams()
-      console.log('teams', teams.nodes)
-      setLinearTeams(teams.nodes)
-    }
-
-    getLinearTeams()
-  }, [linearApiToken])
-
-  useEffect(() => {
-    async function getLinearToken() {
-      // @ts-ignore
-      const hlToken = (await highlight.internal.getAuthorizationToken()) as string
-
-      const token = await getLinearTokenForUser(hlToken)
-
-      if (!token) {
-        console.warn('Something is wrong, no Linear token found for user but we are in the Linear form')
-        return
-      }
-
-      setLinearApiToken(token)
-    }
-
-    getLinearToken()
-  }, [])
-
-  return (
-    <div className="mt-2">
-      <form className="flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
-        <InputField size={'medium'} label={'Title'} placeholder={'Issue Title'} {...register('title')} />
-        <TextArea
-          size={'medium'}
-          label={'Description'}
-          placeholder={'Issue Description'}
-          {...register('description')}
-        />
-        <Button size={'medium'} variant={'primary'} type={'submit'}>
-          Create Ticket
-        </Button>
-      </form>
-    </div>
-  )
-}
-
-function LinearTicketSuccessComponent({ issueUrl }: { issueUrl: string }) {
-  return (
-    <div className="mt-2">
-      Linear issue created:{' '}
-      <a href={issueUrl} target="_blank">
-        View Issue
-      </a>
-    </div>
-  )
-}
-
-function CreateLinearTicketComponent({ title, description }: { title: string; description: string }) {
-  const [state, setState] = useState<'loading' | 'connect' | 'form' | 'success'>('loading')
-  const [issueUrl, setIssueUrl] = useState<string>()
-
-  useEffect(() => {
-    // On mount, check to see if the user has setup Linear integration
-    async function checkStatus() {
-      // @ts-ignore
-      const hlToken = (await highlight.internal.getAuthorizationToken()) as string
-
-      const connected = await checkLinearConnectionStatus(hlToken)
-
-      if (connected) {
-        setState('form')
-      } else {
-        setState('connect')
-      }
-    }
-
-    checkStatus()
-  }, [])
-
-  function onConnect() {
-    setState('form')
-  }
-
-  function onSubmitSuccess(issueUrl: string) {
-    setIssueUrl(issueUrl)
-    setState('success')
-  }
-
-  return (
-    <div>
-      {state === 'connect' && <LinearConnectionComponent onConnect={onConnect} />}
-      {state === 'form' && (
-        <LinearTicketFormComponent title={title} description={description} onSubmitSuccess={onSubmitSuccess} />
-      )}
-      {state === 'success' && issueUrl && <LinearTicketSuccessComponent issueUrl={issueUrl} />}
-    </div>
-  )
-}
+// Holds the previous content of the conversation to be able to append to it
+const previousContent = new Map<string, string>()
 
 export function useIntegrations(): UseIntegrationsAPI {
   const getLastConversationMessage = useStore((state) => state.getLastConversationMessage)
   const updateLastConversationMessage = useStore((state) => state.updateLastConversationMessage)
 
   async function createLinearTicket(conversationId: string, title: string, description: string) {
-    const lastMessage = getLastConversationMessage(conversationId)
+    const lastMessage = previousContent.get(conversationId)
 
+    if (!lastMessage) {
+      throw new Error('No last message found for conversation')
+    }
     // Update the last message to show the Linear ticket component which will handle checking for authentication,
     // creating the ticket, and showing the success message.
     updateLastConversationMessage(conversationId!, {
       content: (
-        <MessageWithComponent content={lastMessage?.content as string}>
+        <MessageWithComponent content={lastMessage}>
           <CreateLinearTicketComponent title={title} description={description} />
         </MessageWithComponent>
       ),
@@ -277,5 +62,40 @@ export function useIntegrations(): UseIntegrationsAPI {
     })
   }
 
-  return { createLinearTicket }
+  async function createNotionPage(conversationId: string, params: CreateNotionPageParams) {
+    const lastMessage = previousContent.get(conversationId)
+
+    if (!lastMessage) {
+      throw new Error('No last message found for conversation')
+    }
+
+    // Update the last message to show the Notion page component which will handle checking for authentication,
+    // creating the page, and showing the success message.
+    updateLastConversationMessage(conversationId!, {
+      content: (
+        <MessageWithComponent content={lastMessage}>
+          <CreateNotionPageComponent {...params} />
+        </MessageWithComponent>
+      ),
+      role: 'assistant',
+    })
+  }
+
+  async function showLoading(conversationId: string) {
+    const lastMessage = getLastConversationMessage(conversationId)
+    const textContents = lastMessage?.content as string
+
+    previousContent.set(conversationId, textContents)
+
+    updateLastConversationMessage(conversationId!, {
+      content: (
+        <MessageWithComponent content={textContents}>
+          <LoadingComponent />
+        </MessageWithComponent>
+      ),
+      role: 'assistant',
+    })
+  }
+
+  return { createLinearTicket, createNotionPage, showLoading }
 }

@@ -3,7 +3,7 @@
 import Button from '@/components/Button/Button'
 import InputField from '@/components/TextInput/InputField'
 import styles from '../prompteditor.module.scss'
-import { PropsWithChildren, ReactElement, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import TextArea from '@/components/TextInput/TextArea'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { Switch } from '@/components/catalyst/switch'
@@ -26,6 +26,7 @@ import { trackEvent } from '@/utils/amplitude'
 import ContextMenu from '@/components/ContextMenu/ContextMenu'
 import Tooltip from '@/components/Tooltip/Tooltip'
 import { ArrowDown2, ArrowUp2 } from 'iconsax-react'
+import SettingOption from '@/components/SettingOption/SettingOption'
 
 function AppIcon() {
   return (
@@ -269,23 +270,6 @@ const SettingsSchema = z.object({
   description: z.string().min(1, { message: 'Description is required' }),
   tags: z.array(z.object({ value: z.string(), label: z.string() })).optional(),
 })
-
-// {visibility: 'public' | 'private', onToggle: (visibility: 'public' | 'private') => void}
-const SettingOption = ({
-  children,
-  label,
-  description,
-}: PropsWithChildren<{ label: string | ReactElement; description: string | ReactElement }>) => {
-  return (
-    <div className={styles.settingOption}>
-      <div className={'flex flex-col gap-1'}>
-        <h1 className={'text-light-100'}>{label}</h1>
-        <span className={'text-light-60'}>{description}</span>
-      </div>
-      {children}
-    </div>
-  )
-}
 
 const VisibilityToggle = ({
   visibility,

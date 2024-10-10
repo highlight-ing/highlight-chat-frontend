@@ -1,6 +1,6 @@
 import { Toast } from '@/types'
-import { createLinearTicket } from './integrations'
 import { UseIntegrationsAPI } from '@/hooks/useIntegrations'
+import { integrationFunctionNames } from './integrations'
 
 type StreamParserProps = {
   showConfirmationModal: (message: string) => Promise<boolean>
@@ -35,6 +35,12 @@ export async function parseAndHandleStreamChunk(
           accumulatedContent += jsonChunk.content
           break
 
+        case 'loading':
+          if (integrationFunctionNames.includes(jsonChunk.name)) {
+            integrations.showLoading(conversationId)
+          }
+          break
+
         // We can define each tool use with different names
         case 'tool_use':
           if (jsonChunk.name === 'get_more_context_from_window' || jsonChunk.name === 'get_more_context') {
@@ -62,6 +68,14 @@ export async function parseAndHandleStreamChunk(
 
             integrations.createLinearTicket(conversationId, title, description)
           }
+          if (jsonChunk.name === 'create_notion_page') {
+            const title = jsonChunk.input.title ?? ''
+            const description = jsonChunk.input.description ?? undefined
+            const content = jsonChunk.input.content ?? ''
+
+            integrations.createNotionPage(conversationId, { title, description, content })
+          }
+
           if (jsonChunk.name === 'get_more_context_from_conversations') {
             if (contextConfirmed === null) {
               contextConfirmed = await showConfirmationModal(

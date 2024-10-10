@@ -1,6 +1,6 @@
 'use server'
 
-const HIGHLIGHT_BACKEND_BASE_URL = 'https://backend.workers.highlight.ing'
+const HIGHLIGHT_BACKEND_BASE_URL = 'https://backend.highlightai.com'
 
 const ERROR_MESSAGES = {
   INVALID_AUTH_TOKEN: 'Invalid authorization token. Try refreshing Highlight Chat.',

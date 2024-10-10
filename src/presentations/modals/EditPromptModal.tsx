@@ -35,6 +35,7 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
         preferredAttachment: PreferredAttachmentSchema.nullish().parse(prompt.preferred_attachment) ?? 'default',
         enabledAutomations: {
           createLinearIssue: prompt.linear_integration_enabled ?? false,
+          createNotionPage: prompt.create_notion_page_integration_enabled ?? false,
         },
       },
       true,
