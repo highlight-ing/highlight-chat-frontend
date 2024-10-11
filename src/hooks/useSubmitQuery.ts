@@ -248,8 +248,8 @@ export const useSubmitQuery = () => {
     try {
       const tools = {
         get_more_context_from_window: true,
-        get_more_context_from_conversation: false,
-        add_or_update_about_me_facts: false,
+        get_more_context_from_conversation: true,
+        add_or_update_about_me_facts: true,
         create_linear_ticket: promptApp?.linear_integration_enabled ?? false,
         create_notion_page: promptApp?.create_notion_page_integration_enabled ?? false,
       }
