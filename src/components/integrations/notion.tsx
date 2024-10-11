@@ -148,7 +148,7 @@ function FormComponent({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className={`${styles.inputField} flex flex-col gap-2 p-[20px]`}>
+      <div className={`${styles.notionInputField} flex flex-col gap-2 bg-inherit p-[20px]`}>
         <span className="text-sm font-medium">Parent Item</span>
         <span className="text-xs text-gray-500">You must select a parent item to create the page in</span>
         {parentItems.length > 0 && <ParentItemDropdown items={parentItems} onSelect={setSelectedParentItem} />}
