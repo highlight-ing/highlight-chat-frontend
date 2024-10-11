@@ -28,6 +28,25 @@
   }
 }
 
+.notionInputField {
+  border: 1px solid $light-10;
+  border-radius: 10px;
+  font-weight: 350;
+
+  &::placeholder {
+    color: $light-40;
+  }
+
+  &:hover {
+    border-color: $light-20;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $light-40;
+  }
+}
+
 .inputField {
   background-color: $light-5;
   border: 1px solid $light-10;

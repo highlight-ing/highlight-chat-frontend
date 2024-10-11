@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import InputField from '@/components/TextInput/InputField'
-import TextArea from '@/components/TextInput/TextArea'
 import Button from '@/components/Button/Button'
 import { useEffect, useId, useState } from 'react'
 import { NotionIcon } from '@/icons/icons'
@@ -20,6 +19,7 @@ import { NotionParentItem } from '@/types'
 import { ArrowDown2 } from 'iconsax-react'
 import { emptyTextBlock, mapNotionDecorations } from '@/utils/notion'
 import Markdown from 'react-markdown'
+import styles from '../TextInput/inputfield.module.scss'
 
 interface CreateNotionPageComponentProps {
   title: string
@@ -148,13 +148,21 @@ function FormComponent({
 
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-sm font-medium">Parent Item</span>
-      <span className="text-xs text-gray-500">You must select a parent item to create the page in</span>
-      {parentItems.length > 0 && <ParentItemDropdown items={parentItems} onSelect={setSelectedParentItem} />}
-      {parentItems.length === 0 && <span>Loading Items...</span>}
+      <div className={`${styles.notionInputField} flex flex-col gap-2 bg-inherit p-[20px]`}>
+        <span className="text-sm font-medium">Parent Item</span>
+        <span className="text-xs text-gray-500">You must select a parent item to create the page in</span>
+        {parentItems.length > 0 && <ParentItemDropdown items={parentItems} onSelect={setSelectedParentItem} />}
+        {parentItems.length === 0 && <span>Loading Items...</span>}
+      </div>
       <form className="flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
         <InputField size={'xxlarge'} label={'Title'} placeholder={'Issue Title'} {...register('title')} />
-        <Markdown>{content}</Markdown>
+        <div className={'relative flex flex-col gap-2'}>
+          <span className={`${styles.inputLabel} ${styles.inline} ${styles.visible}`}>Page Contents</span>
+
+          <div className={`${styles.inputField} p-[20px]`}>
+            <Markdown>{content}</Markdown>
+          </div>
+        </div>
         <Button size={'medium'} variant={'primary'} type={'submit'} disabled={isSubmitting}>
           Create Page
         </Button>
