@@ -5,8 +5,10 @@ import { useEffect } from 'react'
 import { useStore } from '@/providers/store-provider'
 import { useChatHistory } from '@/hooks/useChatHistory'
 import { useSubmitQuery } from '@/hooks/useSubmitQuery'
+import { useIntegrations } from './useIntegrations'
 
 const useOnExternalMessage = () => {
+  const integrations = useIntegrations()
   const { setConversationId, openModal, closeAllModals, isModalOpen } = useStore((state) => ({
     setConversationId: state.setConversationId,
     openModal: state.openModal,
@@ -37,6 +39,8 @@ const useOnExternalMessage = () => {
           return
         }
         setConversationId(message.conversationId)
+
+        console.log(message.toolUse, message.toolUse?.type)
         // Handle toolUse if present
         if (message.toolUse && message.toolUse.type === 'tool_use') {
           if (message.toolUse.name === 'get_more_context_from_window') {
@@ -63,6 +67,19 @@ const useOnExternalMessage = () => {
                 window_context: ocrScreenContents,
               })
             }
+          } else if (message.toolUse.name === 'create_linear_ticket') {
+            console.log('Creating linear ticket', message.conversationId)
+            integrations.createLinearTicket(
+              message.conversationId,
+              message.toolUse.input.title ?? '',
+              message.toolUse.input.description ?? '',
+            )
+          } else if (message.toolUse.name === 'create_notion_page') {
+            integrations.createNotionPage(message.conversationId, {
+              title: message.toolUse.input.title,
+              description: message.toolUse.input.description ?? '',
+              content: message.toolUse.input.content ?? '',
+            })
           } else if (message.toolUse.name === 'get_more_context_from_conversation') {
             const conversation = await Highlight.conversations.getConversationById(message.toolUse.input.conversation)
             if (!conversation) {
@@ -74,7 +91,7 @@ const useOnExternalMessage = () => {
                 timeout: 5000,
               })
               return
-            } else {
+            } else if (message.toolUse) {
               addToast({
                 title: 'Conversation Fetched',
                 description: `Conversation fetched successfully.`,

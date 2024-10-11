@@ -45,11 +45,12 @@ export function useIntegrations(): UseIntegrationsAPI {
   const updateLastConversationMessage = useStore((state) => state.updateLastConversationMessage)
 
   async function createLinearTicket(conversationId: string, title: string, description: string) {
-    const lastMessage = previousContent.get(conversationId)
+    let lastMessage = previousContent.get(conversationId)
 
     if (!lastMessage) {
-      throw new Error('No last message found for conversation')
+      lastMessage = getLastConversationMessage(conversationId)?.content as string
     }
+
     // Update the last message to show the Linear ticket component which will handle checking for authentication,
     // creating the ticket, and showing the success message.
     updateLastConversationMessage(conversationId!, {
@@ -63,10 +64,10 @@ export function useIntegrations(): UseIntegrationsAPI {
   }
 
   async function createNotionPage(conversationId: string, params: CreateNotionPageParams) {
-    const lastMessage = previousContent.get(conversationId)
+    let lastMessage = previousContent.get(conversationId)
 
     if (!lastMessage) {
-      throw new Error('No last message found for conversation')
+      lastMessage = getLastConversationMessage(conversationId)?.content as string
     }
 
     // Update the last message to show the Notion page component which will handle checking for authentication,
