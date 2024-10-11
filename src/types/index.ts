@@ -267,3 +267,5 @@ export interface NotionParentItem {
   id: string
   title: RichTextItemResponse[]
 }
+
+export type PreferredAttachment = 'audio' | 'default' | 'screen' | 'page-text' | 'clipboard'
