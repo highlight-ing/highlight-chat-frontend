@@ -76,6 +76,7 @@ export type Database = {
           title: string
           updated_at: string | null
           user_id: string | null
+          version: string | null
         }
         Insert: {
           app_id?: string | null
@@ -84,6 +85,7 @@ export type Database = {
           title: string
           updated_at?: string | null
           user_id?: string | null
+          version?: string | null
         }
         Update: {
           app_id?: string | null
@@ -92,6 +94,7 @@ export type Database = {
           title?: string
           updated_at?: string | null
           user_id?: string | null
+          version?: string | null
         }
         Relationships: []
       }
@@ -302,12 +305,15 @@ export type Database = {
       prompts: {
         Row: {
           can_trend: boolean | null
+          create_notion_page_integration_enabled: boolean | null
           created_at: string
           description: string | null
+          email_integration_enabled: boolean | null
           external_id: string
           id: number
           image: string | null
           is_handlebar_prompt: boolean
+          linear_integration_enabled: boolean | null
           name: string
           preferred_attachment: string | null
           prompt_text: string | null
@@ -322,12 +328,15 @@ export type Database = {
         }
         Insert: {
           can_trend?: boolean | null
+          create_notion_page_integration_enabled?: boolean | null
           created_at?: string
           description?: string | null
+          email_integration_enabled?: boolean | null
           external_id?: string
           id?: number
           image?: string | null
           is_handlebar_prompt?: boolean
+          linear_integration_enabled?: boolean | null
           name: string
           preferred_attachment?: string | null
           prompt_text?: string | null
@@ -342,12 +351,15 @@ export type Database = {
         }
         Update: {
           can_trend?: boolean | null
+          create_notion_page_integration_enabled?: boolean | null
           created_at?: string
           description?: string | null
+          email_integration_enabled?: boolean | null
           external_id?: string
           id?: number
           image?: string | null
           is_handlebar_prompt?: boolean
+          linear_integration_enabled?: boolean | null
           name?: string
           preferred_attachment?: string | null
           prompt_text?: string | null

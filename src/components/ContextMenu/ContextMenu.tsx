@@ -26,6 +26,7 @@ interface ContextMenuProps {
 }
 
 const ContextMenu = ({
+  disabled,
   children,
   triggerId,
   position,
@@ -62,6 +63,10 @@ const ContextMenu = ({
   )
 
   useEffect(() => {
+    if (disabled) {
+      return
+    }
+
     const onTrigger = (e: MouseEvent) => {
       const target = e.target as HTMLElement
       const triggerContainsTarget = document.getElementById(triggerId)?.contains(target)
@@ -75,7 +80,7 @@ const ContextMenu = ({
     return () => {
       document.removeEventListener(leftClick ? 'click' : 'contextmenu', onTrigger)
     }
-  }, [isOpen, triggerId, leftClick])
+  }, [isOpen, triggerId, disabled, leftClick])
 
   useEffect(() => {
     document.addEventListener('click', onClickOutsideListener)
@@ -91,6 +96,13 @@ const ContextMenu = ({
       recalculatePosition()
     }
   }, [isOpen])
+
+  if (disabled) {
+    return typeof children === 'function'
+      ? // @ts-ignore
+        children({ isOpen })
+      : children
+  }
 
   return (
     <div className={`relative h-fit w-fit ${hidden ? 'hidden' : ''}`} ref={containerRef} style={wrapperStyle}>

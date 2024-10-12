@@ -14,12 +14,14 @@ import Image from 'next/image'
 import { supabaseLoader } from '@/lib/supabase'
 
 // Custom Variables for styling
-import CSS_VARIABLES from './customVariables'
+import CSS_VARIABLES, { ColorScheme } from './customVariables'
 import Tooltip from '@/components/Tooltip/Tooltip'
 import usePromptApps from '@/hooks/usePromptApps'
 import { useStore } from '@/providers/store-provider'
 import { PreferredAttachment } from '../prompts/PreferredAttachment/PreferredAttachment'
 import { useUnpinPromptAction } from '@/presentations/modals/UnpinPromptModal'
+import { usePromptEditorStore } from '@/stores/prompt-editor'
+import { DEFAULT_PROMPT_EXTERNAL_IDS } from '@/lib/promptapps'
 
 type PromptWithPin = Prompt & { isPinned?: boolean }
 
@@ -60,8 +62,8 @@ const PersonalPrompts = ({ userId, prompts, pinnedPrompts }: PersonalPromptsProp
         </div>
         <div className={styles.personalPromptsHeaderRight}>
           <Button size="medium" variant="ghost-neutral" onClick={() => openModal('create-prompt')}>
-            <ElementPlus color={variables.tertiary} variant={'Bold'} size="16" />
             New Action
+            <ElementPlus color={variables.tertiary} variant={'Bold'} size="16" />
           </Button>
         </div>
       </div>
@@ -90,6 +92,77 @@ const PersonalPrompts = ({ userId, prompts, pinnedPrompts }: PersonalPromptsProp
         })}
       </div>
     </div>
+  )
+}
+
+/**
+ * If the prompt is a default prompt, show the edit button
+ */
+const DefaultActionEdit = ({
+  id,
+  isHovered,
+  colorScheme,
+  prompt,
+}: {
+  id: string
+  isHovered: boolean
+  colorScheme: ColorScheme
+  prompt: Prompt
+}) => {
+  const openModal = useStore((state) => state.openModal)
+  const { setNeedSave, setSettingsHasNoErrors } = usePromptEditorStore()
+  const { setSelectedScreen, setPromptEditorData, clearPromptEditorData, setOnboarding } = usePromptEditorStore()
+
+  if (!DEFAULT_PROMPT_EXTERNAL_IDS.includes(id)) {
+    return <></>
+  }
+
+  return (
+    <Tooltip position={'bottom'} tooltip={'Edit prompt'}>
+      <Button
+        size="icon"
+        variant="ghost-neutral"
+        style={{
+          border: `1px solid ${isHovered ? colorScheme.button.hoverBorderColor : colorScheme.button.borderColor}`,
+        }}
+        onClick={async (e) => {
+          e.stopPropagation()
+
+          clearPromptEditorData()
+          setOnboarding({ isOnboarding: false, index: 0 })
+          setSelectedScreen('startWithTemplate')
+          setPromptEditorData({
+            externalId: prompt.external_id,
+            appPrompt: prompt.prompt_text ?? '',
+            name: prompt.name,
+            description: prompt.description ?? '',
+            image: `${prompt.image}.${prompt.user_images?.file_extension}`,
+          })
+          openModal('create-prompt-from-template')
+
+          if (!prompt.image) {
+            return
+          }
+
+          const imageUrl = supabaseLoader({
+            src: `user_content/${prompt.image}.${prompt.user_images?.file_extension}`,
+            width: 24,
+          })
+
+          // Fetch the image file
+          const imageFile = await fetch(imageUrl).then((res) => res.blob())
+
+          // Convert the image to a file
+          const uploadingImage = new File([imageFile], prompt.image, { type: imageFile.type })
+          setNeedSave(true)
+          setSettingsHasNoErrors(true)
+          setPromptEditorData({ uploadingImage })
+        }}
+        hidden={!isHovered}
+      >
+        <Edit2 color={colorScheme.button.textColor} variant={'Bold'} size="16" />
+      </Button>
+    </Tooltip>
   )
 }
 
@@ -213,6 +286,7 @@ const PersonalPromptsItem = ({ prompt, colorScheme, isOwner, isPublic }: Persona
           </Tooltip>
         </div>
         <div className={styles.personalPromptsItemFooterRightButtons}>
+          <DefaultActionEdit id={prompt.external_id} isHovered={isHovered} colorScheme={colorScheme} prompt={prompt} />
           {isOwner ? (
             <>
               <Tooltip position={'bottom'} tooltip={<span className={'text-rose-400'}>Delete prompt</span>}>

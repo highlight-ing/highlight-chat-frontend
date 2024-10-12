@@ -1,11 +1,18 @@
 import { Toast } from '@/types'
+import { UseIntegrationsAPI } from '@/hooks/useIntegrations'
+import { integrationFunctionNames } from './integrations'
 
 type StreamParserProps = {
   showConfirmationModal: (message: string) => Promise<boolean>
   addToast: (toast: Partial<Toast>) => void
+  integrations: UseIntegrationsAPI
+  conversationId: string
 }
 
-export async function parseAndHandleStreamChunk(chunk: string, { showConfirmationModal, addToast }: StreamParserProps) {
+export async function parseAndHandleStreamChunk(
+  chunk: string,
+  { showConfirmationModal, addToast, integrations, conversationId }: StreamParserProps,
+) {
   let contextConfirmed: boolean | null = null
   let accumulatedContent = ''
   let factIndex = null
@@ -26,6 +33,12 @@ export async function parseAndHandleStreamChunk(chunk: string, { showConfirmatio
       switch (jsonChunk.type) {
         case 'text':
           accumulatedContent += jsonChunk.content
+          break
+
+        case 'loading':
+          if (integrationFunctionNames.includes(jsonChunk.name)) {
+            integrations.showLoading(conversationId)
+          }
           break
 
         // We can define each tool use with different names
@@ -49,6 +62,20 @@ export async function parseAndHandleStreamChunk(chunk: string, { showConfirmatio
               }
             }
           }
+          if (jsonChunk.name === 'create_linear_ticket') {
+            const title = jsonChunk.input.title ?? ''
+            const description = jsonChunk.input.description ?? ''
+
+            integrations.createLinearTicket(conversationId, title, description)
+          }
+          if (jsonChunk.name === 'create_notion_page') {
+            const title = jsonChunk.input.title ?? ''
+            const description = jsonChunk.input.description ?? undefined
+            const content = jsonChunk.input.content ?? ''
+
+            integrations.createNotionPage(conversationId, { title, description, content })
+          }
+
           if (jsonChunk.name === 'get_more_context_from_conversations') {
             if (contextConfirmed === null) {
               contextConfirmed = await showConfirmationModal(

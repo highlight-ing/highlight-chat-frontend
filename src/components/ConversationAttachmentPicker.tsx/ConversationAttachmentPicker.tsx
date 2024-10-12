@@ -1,20 +1,23 @@
 import { useConversations } from '@/context/ConversationContext'
 import { AttachmentPicker } from '../AttachmentPicker/AttachmentPicker'
-import { getTimeAgo, getWordCount } from '@/utils/string'
-import { getConversationDisplayTitle } from '@/utils/conversations'
+import { getTimeAgo, getWordCountFormatted } from '@/utils/string'
+import { getConversationDisplayTitle, getConversationSubtitle } from '@/utils/conversations'
 import styles from './conversation-attachment-picker.module.scss'
 import { Setting2, VoiceSquare } from 'iconsax-react'
 import { useStore } from '@/providers/store-provider'
 import { useShallow } from 'zustand/react/shallow'
+import { useEffect } from 'react'
+import { trackEvent } from '@/utils/amplitude'
 
 interface ConversationAttachmentPickerProps {
+  isVisible: boolean
   onClose: () => void
   onBack: () => void
 }
 
-const MAX_NUM_CONVERSATION = 10
+const MAX_NUM_CONVERSATION = 20
 
-export const ConversationAttachmentPicker = ({ onClose, onBack }: ConversationAttachmentPickerProps) => {
+export const ConversationAttachmentPicker = ({ onClose, onBack, isVisible }: ConversationAttachmentPickerProps) => {
   const { conversations, elapsedTime, currentConversation, isAudioTranscripEnabled, setIsAudioTranscriptEnabled } =
     useConversations()
   const currentConversationTitle = 'Current Conversation'
@@ -26,6 +29,22 @@ export const ConversationAttachmentPicker = ({ onClose, onBack }: ConversationAt
     })),
   )
 
+  useEffect(() => {
+    if (isVisible) {
+      trackEvent('HL Chat Conversation Picker Opened', {})
+    }
+  }, [isVisible])
+
+  const handleClose = () => {
+    trackEvent('HL Chat Conversation Picker Closed', {})
+    onClose()
+  }
+
+  const handleBack = () => {
+    onClose()
+    onBack()
+  }
+
   const currentConversationOptions = {
     imageComponent: (
       <div className={styles.iconContainer}>
@@ -33,9 +52,17 @@ export const ConversationAttachmentPicker = ({ onClose, onBack }: ConversationAt
       </div>
     ),
     title: currentConversationTitle,
-    description: `Started ${getTimeAgo(currentConversationTimestamp)} | ${getWordCount(currentConversation)} Words`,
+    description: `Started ${getTimeAgo(currentConversationTimestamp)} | ${getWordCountFormatted(currentConversation)} Words`,
     onClick: () => {
-      addAttachment({ type: 'conversation', value: currentConversation })
+      addAttachment({
+        id: '',
+        type: 'conversation',
+        value: currentConversation,
+        title: 'Current Conversation',
+        startedAt: currentConversationTimestamp,
+        endedAt: new Date(),
+        isCurrentConversation: true,
+      })
       onClose()
     },
   }
@@ -50,11 +77,15 @@ export const ConversationAttachmentPicker = ({ onClose, onBack }: ConversationAt
         </div>
       ),
       title: getConversationDisplayTitle(conversation),
-      description: `${getWordCount(conversation.transcript)} Words`,
+      description: getConversationSubtitle(conversation),
       onClick: () => {
         addAttachment({
+          id: conversation.id,
           type: 'conversation',
           value: conversation.transcript,
+          title: conversation.title,
+          startedAt: conversation.startedAt,
+          endedAt: conversation.endedAt,
         })
         onClose()
       },
@@ -92,9 +123,9 @@ export const ConversationAttachmentPicker = ({ onClose, onBack }: ConversationAt
   return (
     <AttachmentPicker
       header="Attach Conversation"
-      onBack={onBack}
-      onClose={onClose}
-      isVisible={true}
+      onBack={handleBack}
+      onClose={handleClose}
+      isVisible={isVisible}
       attachmentOptions={attachmentOptions}
     />
   )

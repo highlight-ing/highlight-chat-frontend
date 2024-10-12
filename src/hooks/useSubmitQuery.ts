@@ -1,124 +1,156 @@
-import { type HighlightContext } from '@highlight-ai/app-runtime'
-import Highlight from '@highlight-ai/app-runtime'
-import imageCompression from 'browser-image-compression'
+// src/hooks/useSubmitQuery.ts
+import { useEffect, useRef } from 'react'
 import { useStore } from '@/providers/store-provider'
 import useAuth from './useAuth'
 import { useApi } from '@/hooks/useApi'
 import { Prompt } from '@/types/supabase-helpers'
-import { FileAttachment, FileAttachmentType, TextFileAttachment } from '@/types'
 import { useShallow } from 'zustand/react/shallow'
-import { useEffect, useRef } from 'react'
-import { parseAndHandleStreamChunk } from '@/utils/streamParser'
-import { trackEvent } from '@/utils/amplitude'
+import { HighlightContext } from '@highlight-ai/app-runtime'
+import Highlight from '@highlight-ai/app-runtime'
 import * as Sentry from '@sentry/react'
+
+import { fetchWindows } from '@/utils/attachmentUtils'
+import { parseAndHandleStreamChunk } from '@/utils/streamParser'
+import {
+  buildFormData,
+  OCRTextAttachment,
+  WindowListAttachment,
+  ClipboardTextAttachment,
+  AboutMeAttachment,
+  ConversationAttachment,
+  AttachedContexts,
+  AvailableContexts,
+  ConversationAttachmentMetadata,
+} from '@/utils/formDataUtils'
+import { trackEvent } from '@/utils/amplitude'
 import { processAttachments } from '@/utils/contextprocessor'
+import { FileAttachment, ImageAttachment, PdfAttachment } from '@/types'
+import { useUploadFile } from './useUploadFile'
+import { v4 as uuidv4 } from 'uuid'
+import { Attachment } from '@/types'
+import { useIntegrations } from './useIntegrations'
 
-async function compressImageIfNeeded(file: File): Promise<File> {
-  const ONE_MB = 1 * 1024 * 1024 // 1MB in bytes
-  if (file.size <= ONE_MB) {
-    return file
-  }
-
-  const options = {
-    maxSizeMB: 1,
-    maxWidthOrHeight: 1920,
-    useWebWorker: true,
-  }
-
-  try {
-    return await imageCompression(file, options)
-  } catch (error) {
-    console.error('Error compressing image:', error)
-    return file
-  }
+// Create a type guard for FileAttachment
+function isUploadableAttachment(attachment: Attachment): attachment is PdfAttachment | ImageAttachment {
+  return ['pdf', 'image'].includes(attachment.type)
 }
 
-async function fetchWindows() {
-  const windows = await Highlight.user.getWindows()
-  return windows.map((window) => window.windowTitle)
-}
+// Import necessary types from formDataUtils
+import {
+  TextFileAttachmentMetadata,
+  ImageAttachmentMetadata,
+  PDFAttachment,
+  WindowContentsAttachment,
+  SpreadsheetAttachment,
+} from '@/utils/formDataUtils'
+import { getWordCount } from '@/utils/string'
 
-async function readFileAsBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onloadend = () => resolve(reader.result as string)
-    reader.onerror = reject
-    reader.readAsDataURL(file)
-  })
-}
-
-async function addAttachmentsToFormData(formData: FormData, attachments: any[]) {
-  console.log('addAttachmentsToFormData')
-  let screenshot, audio, fileTitle, clipboardText, ocrText, windowContext
-
-  for (const attachment of attachments) {
-    if (attachment?.value) {
-      switch (attachment.type) {
-        case 'text_file':
-          formData.append('text_file', attachment.fileName + '\n' + attachment.value)
-          break
-        case 'image':
-        case 'screenshot':
-          screenshot = attachment.value
-          if (attachment.file) {
-            const compressedFile = await compressImageIfNeeded(attachment.file)
-            const base64data = await readFileAsBase64(compressedFile)
-            const mimeType = compressedFile.type || 'image/png'
-            const base64WithMimeType = `data:${mimeType};base64,${base64data.split(',')[1]}`
-            formData.append('base64_image', base64WithMimeType)
-          } else if (typeof attachment.value === 'string' && attachment.value.startsWith('data:image')) {
-            formData.append('base64_image', attachment.value)
-          } else {
-            console.error('Unsupported image format:', attachment.value)
-          }
-          break
-        case 'pdf':
-          fileTitle = attachment.value.name
-          formData.append('pdf', attachment.value)
-          break
-        case 'audio':
-          audio = attachment.value
-          formData.append('audio', attachment.value)
-          break
-        case 'spreadsheet':
-          fileTitle = attachment.value.name
-          formData.append('spreadsheet', attachment.value)
-          break
-        case 'clipboard':
-          clipboardText = attachment.value
-          formData.append('clipboard_text', attachment.value)
-          break
-        case 'ocr':
-          ocrText = attachment.value
-          formData.append('ocr_text', attachment.value)
-          break
-        case 'window_context':
-          windowContext = attachment.value
-          formData.append('window_context', attachment.value)
-          break
-        case 'conversation':
-          audio = attachment.value
-          formData.append('audio', attachment.value)
-          break
-        default:
-          console.warn('Unknown attachment type:', attachment.type)
+async function createAttachmentMetadata(
+  attachment: FileAttachment | Attachment,
+  fileId?: string,
+): Promise<
+  | TextFileAttachmentMetadata
+  | ImageAttachmentMetadata
+  | PDFAttachment
+  | OCRTextAttachment
+  | WindowContentsAttachment
+  | WindowListAttachment
+  | ClipboardTextAttachment
+  | AboutMeAttachment
+  | ConversationAttachment
+  | SpreadsheetAttachment
+  | undefined
+> {
+  switch (attachment.type) {
+    case 'pdf':
+      return {
+        type: 'pdf',
+        name: attachment.value.name,
+        file_id: fileId || '',
       }
-    }
-  }
+    case 'image':
+      return {
+        type: 'image',
+        file_id: fileId || '',
+      }
+    case 'text_file':
+      return {
+        type: 'text_file',
+        name: attachment.fileName || 'Unnamed text file',
+        text: attachment.value,
+        words: getWordCount(attachment.value),
+        created_at: new Date(),
+      }
+    case 'spreadsheet':
+      const text = await attachment.value.text()
 
-  return { screenshot, audio, fileTitle, clipboardText, ocrText, windowContext }
+      return {
+        type: 'spreadsheet',
+        content: text,
+        name: attachment.value.name,
+      }
+    case 'window_context':
+      return {
+        type: 'window_contents',
+        text: attachment.value,
+        name: '',
+        words: getWordCount(attachment.value),
+        created_at: new Date(),
+      }
+    case 'clipboard':
+      return {
+        type: 'clipboard_text',
+        text: attachment.value,
+      }
+    case 'audio': // TODO (SP) there should be no more audio attachments, just conversations. This is coming soon
+      return {
+        id: uuidv4(),
+        type: 'conversation',
+        title: 'conversation',
+        text: attachment.value,
+        started_at: new Date().toISOString(),
+        ended_at: new Date().toISOString(),
+      }
+    case 'conversation':
+      return {
+        id: attachment.id,
+        type: 'conversation',
+        title: attachment.title,
+        text: attachment.value,
+        started_at: new Date(attachment.startedAt).toISOString(),
+        ended_at: attachment.isCurrentConversation
+          ? new Date().toISOString()
+          : new Date(attachment.endedAt).toISOString(),
+      }
+    default:
+      console.error('Unknown attachment type:', attachment.type)
+      return undefined
+  }
+}
+
+// Add this helper function at the top of the file
+function getFileType(attachment: Attachment): string {
+  switch (attachment.type) {
+    case 'pdf':
+      return 'application/pdf'
+    case 'image':
+      return attachment.value?.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg'
+    case 'spreadsheet':
+      return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    case 'text_file':
+      return 'text/plain'
+    default:
+      return 'application/octet-stream'
+  }
 }
 
 export const useSubmitQuery = () => {
   const { post } = useApi()
-
-  const { addAttachment } = useStore(
-    useShallow((state) => ({
-      addAttachment: state.addAttachment,
-    })),
-  )
+  const { getAccessToken } = useAuth()
+  const { uploadFile } = useUploadFile()
 
   const {
+    addAttachment,
     getOrCreateConversationId,
     attachments,
     clearAttachments,
@@ -130,6 +162,7 @@ export const useSubmitQuery = () => {
     updateLastMessageSentTimestamp,
   } = useStore(
     useShallow((state) => ({
+      addAttachment: state.addAttachment,
       getOrCreateConversationId: state.getOrCreateConversationId,
       attachments: state.attachments,
       clearAttachments: state.clearAttachments,
@@ -142,19 +175,34 @@ export const useSubmitQuery = () => {
     })),
   )
 
-  const setInput = useStore((state) => state.setInput)
-
-  const abortControllerRef = useRef<AbortController>()
-  const { getAccessToken } = useAuth()
-  const conversationId = useStore((state) => state.conversationId)
-  const conversationIdRef = useRef(conversationId)
-
   const { openModal, closeModal } = useStore(
     useShallow((state) => ({
       openModal: state.openModal,
       closeModal: state.closeModal,
     })),
   )
+
+  const setInput = useStore((state) => state.setInput)
+  const conversationId = useStore((state) => state.conversationId)
+  const conversationIdRef = useRef(conversationId)
+  const abortControllerRef = useRef<AbortController>()
+  const integrations = useIntegrations()
+
+  // Centralized Error Handling
+  const handleError = (error: any, context: any) => {
+    console.error('Error:', error)
+    Sentry.captureException(error, { extra: context })
+    trackEvent('HL_CHAT_BACKEND_API_ERROR', {
+      ...context,
+      errorMessage: error.message,
+    })
+    addToast({
+      title: 'Unexpected Error',
+      description: `${error?.message}`,
+      type: 'error',
+      timeout: 15000,
+    })
+  }
 
   const showConfirmationModal = (message: string): Promise<boolean> => {
     return new Promise((resolve) => {
@@ -181,39 +229,43 @@ export const useSubmitQuery = () => {
     })
   }
 
+  const checkAbortSignal = () => {
+    if (abortControllerRef.current?.signal.aborted) {
+      throw new Error('Chat message request aborted')
+    }
+  }
+
   const fetchResponse = async (
     conversationId: string,
     formData: FormData,
-    token: string,
     isPromptApp: boolean,
     promptApp?: Prompt,
   ) => {
     setInputIsDisabled(true)
     const startTime = Date.now()
 
+    console.log('promptApp: ', promptApp)
     try {
       const tools = {
         get_more_context_from_window: true,
         get_more_context_from_conversation: false,
         add_or_update_about_me_facts: false,
-        create_linear_ticket: false,
+        create_linear_ticket: promptApp?.linear_integration_enabled ?? false,
+        create_notion_page: promptApp?.create_notion_page_integration_enabled ?? false,
       }
 
       formData.append('conversation_id', conversationId)
       formData.append('tools', JSON.stringify(tools))
 
-      const endpoint = isPromptApp ? 'chat/prompt-as-app' : 'chat/'
+      const endpoint = 'chat/'
 
       const abortController = new AbortController()
       abortControllerRef.current = abortController
 
-      const checkAbortSignal = () => {
-        if (abortController.signal.aborted) {
-          throw new Error('Chat message request aborted')
-        }
+      if (isPromptApp && promptApp) {
+        formData.append('app_id', promptApp.external_id)
       }
-
-      const response = await post(endpoint, formData, { version: 'v3' })
+      const response = await post(endpoint, formData, { version: 'v4', signal: abortController.signal })
       if (!response.ok) {
         throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`)
       }
@@ -223,22 +275,23 @@ export const useSubmitQuery = () => {
         throw new Error('No reader available')
       }
 
-      checkAbortSignal()
-
-      addConversationMessage(conversationId!, { role: 'assistant', content: '' })
+      addConversationMessage(conversationId, { role: 'assistant', content: '' })
 
       let accumulatedMessage = ''
 
-      while (!abortController.signal.aborted) {
+      while (true) {
         const { done, value } = await reader.read()
         if (done) break
-        const chunk = new TextDecoder().decode(value)
 
         checkAbortSignal()
+
+        const chunk = new TextDecoder().decode(value)
 
         const { content, windowName, conversation, factIndex, fact } = await parseAndHandleStreamChunk(chunk, {
           showConfirmationModal,
           addToast,
+          integrations,
+          conversationId,
         })
 
         if (content) {
@@ -267,7 +320,7 @@ export const useSubmitQuery = () => {
             })
           }
         }
-        console.log('incoming from parser factIndex: ', factIndex, 'fact: ', fact)
+
         if (typeof factIndex === 'number' && fact) {
           updateLastConversationMessage(conversationId, {
             role: 'assistant',
@@ -289,76 +342,46 @@ export const useSubmitQuery = () => {
           if (contextGranted && screenshotGranted) {
             addToast({
               title: 'Context Granted',
-              description: 'Context granted for ' + windowName,
+              description: `Context granted for ${windowName}`,
               type: 'success',
               timeout: 5000,
             })
             const screenshot = await Highlight.user.getWindowScreenshot(windowName)
-            addAttachment({
-              type: 'image',
-              value: screenshot,
-            })
+            addAttachment({ type: 'image', value: screenshot })
 
             const windowContext = await Highlight.user.getWindowContext(windowName)
             const ocrScreenContents = windowContext.application.focusedWindow.rawContents
               ? windowContext.application.focusedWindow.rawContents
               : windowContext.environment.ocrScreenContents || ''
-            addAttachment({
-              type: 'window_context',
-              value: ocrScreenContents,
-            })
+            addAttachment({ type: 'window_context', value: ocrScreenContents })
 
-            handleSubmit("Here's the context you requested.", promptApp, {
+            await handleSubmit("Here's the context you requested.", promptApp, {
               image: screenshot,
               window_context: ocrScreenContents,
             })
           }
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       const endTime = Date.now()
       const duration = (endTime - startTime) / 1000
 
-      // @ts-ignore
-      console.error('Error fetching response:', error.stack ?? error.message)
-
-      // @ts-ignore
       if (error.message.includes('aborted')) {
         console.log('Skipping message request, aborted')
       } else {
-        // Log to Sentry
-        Sentry.captureException(error, {
-          extra: {
-            conversationId,
-            isPromptApp,
-            duration,
-            endpoint: isPromptApp ? 'chat/prompt-as-app' : 'chat/',
-          },
-        })
-
-        // Log to Amplitude
-        trackEvent('HL_CHAT_BACKEND_API_ERROR', {
-          endpoint: isPromptApp ? 'chat/prompt-as-app' : 'chat/',
+        handleError(error, {
+          conversationId,
+          isPromptApp,
           duration,
-          // @ts-ignore
-          errorMessage: error.message,
-        })
-
-        addToast({
-          title: 'Unexpected Error',
-          // @ts-ignore
-          description: `${error?.message}`,
-          type: 'error',
-          timeout: 15000,
+          endpoint: 'chat/',
         })
       }
     } finally {
       const endTime = Date.now()
       const duration = endTime - startTime
 
-      // Log request to Amplitude
       trackEvent('HL_CHAT_BACKEND_API_REQUEST', {
-        endpoint: isPromptApp ? 'chat/prompt-as-app' : 'chat/',
+        endpoint: 'chat/',
         duration,
         success: !abortControllerRef.current?.signal.aborted,
       })
@@ -368,57 +391,47 @@ export const useSubmitQuery = () => {
     }
   }
 
+  // This function no longer be required as the first response from the assistant will
+  // be created within the assistant preview window
   const handleIncomingContext = async (context: HighlightContext, promptApp?: Prompt) => {
-    console.log('Received context inside handleIncomingContext: ', context)
-    console.log('Got attachment count: ', context.attachments?.length)
-    context.attachments?.forEach((attachment) => {
-      console.log('Attachment: ', JSON.stringify(attachment))
-    })
+    console.log('Received context:', context)
 
     if (!context.application) {
       console.log('No application data in context, ignoring.')
       return
     }
 
-    const query = context.suggestion || ''
-    const screenshotUrl = context.attachments?.find((a) => a.type === 'screenshot')?.value
-    const clipboardText = context.attachments?.find((a) => a.type === 'clipboard')?.value
-    const audio = context.attachments?.find((a) => a.type === 'audio')?.value
-    const windowTitle = context.application?.focusedWindow?.title
-    // @ts-ignore
-    const appIcon = context.application?.appIcon
-    const rawContents = context.application?.focusedWindow?.rawContents
+    const { suggestion: query = '', attachments: rawAttachments = [], application, environment } = context
 
-    // Extract OCR content
-    const ocrText = context.environment?.ocrScreenContents
-
-    // Use rawContents if available, otherwise use ocrText
+    const screenshotUrl = rawAttachments.find((a) => a.type === 'screenshot')?.value
+    const clipboardText = rawAttachments.find((a) => a.type === 'clipboard')?.value
+    const audio = rawAttachments.find((a) => a.type === 'audio')?.value
+    const windowTitle = application.focusedWindow?.title
+    const appIcon = application.appIcon
+    const rawContents = application.focusedWindow?.rawContents
+    const ocrText = environment?.ocrScreenContents
     const contentToUse = rawContents || ocrText
 
-    const fileAttachmentTypes = ['pdf', 'spreadsheet', 'text_file', 'image']
+    const processedAttachments = processAttachments(rawAttachments)
+    const hasFileAttachment = processedAttachments.some((a) =>
+      ['pdf', 'spreadsheet', 'text_file', 'image'].includes(a.type),
+    )
 
-    const processedAttachments = processAttachments(context.attachments || [])
-    const hasFileAttachment = processedAttachments.some((a: { type: string }) => fileAttachmentTypes.includes(a.type))
-
-    // Fetch windows information
     const windows = await fetchWindows()
 
     if (query || clipboardText || contentToUse || screenshotUrl || audio || hasFileAttachment) {
       setInputIsDisabled(true)
 
-      const fileAttachments = (processedAttachments as FileAttachment[]).filter(
-        (a) => a.type && fileAttachmentTypes.includes(a.type),
-      )
+      const fileAttachments = attachments.filter(isUploadableAttachment)
 
       const conversationId = getOrCreateConversationId()
-      addConversationMessage(conversationId!, {
+      addConversationMessage(conversationId, {
         role: 'user',
         content: query,
         clipboard_text: clipboardText,
         screenshot: screenshotUrl,
         audio,
-        window: windowTitle ? { title: windowTitle, appIcon: appIcon, type: 'window' } : undefined,
-        windows: windows,
+        window: windowTitle ? { title: windowTitle, appIcon, type: 'window' } : undefined,
         file_attachments: fileAttachments as unknown as FileAttachment[],
       })
 
@@ -427,37 +440,103 @@ export const useSubmitQuery = () => {
       updateLastMessageSentTimestamp()
       clearAttachments()
 
-      const formData = new FormData()
-      formData.append('prompt', query)
-      formData.append('windows', JSON.stringify(windows))
-
-      if (promptApp) {
-        formData.append('app_id', promptApp.external_id)
+      // Extract and format attached_context_metadata
+      const attachedContext: AttachedContexts = {
+        context: [],
       }
 
-      if (aboutMe) {
-        formData.append('about_me', JSON.stringify(aboutMe))
+      const availableContexts: AvailableContexts = {
+        context: [],
       }
 
-      await addAttachmentsToFormData(formData, processedAttachments)
+      // Upload files first
+      const uploadedFiles = await Promise.all(
+        fileAttachments.map(async (attachment) => {
+          const fileName = `${uuidv4()}.${attachment.type}`
+          const mimeType = getFileType(attachment)
+          const uploadedFile = await uploadFile(
+            new File([attachment.value], fileName, { type: mimeType }),
+            conversationId,
+          )
+          return {
+            originalAttachment: attachment,
+            uploadedFile: uploadedFile,
+          }
+        }),
+      )
 
-      // Add OCR text or raw contents to form data
-      if (contentToUse) {
-        formData.append('ocr_text', contentToUse)
+      // Create a map of original attachments to file IDs
+      const attachmentToFileIdMap = new Map(
+        uploadedFiles.map(({ originalAttachment, uploadedFile }) => [originalAttachment, uploadedFile?.file_id]),
+      )
+
+      // Now you can use this map to get the file ID for any file attachment
+      fileAttachments.forEach(async (attachment) => {
+        const fileId = attachmentToFileIdMap.get(attachment)
+        if (fileId) {
+          const metadata = await createAttachmentMetadata(attachment, fileId)
+          if (metadata) attachedContext.context.push(metadata)
+        }
+      })
+
+      const conversationData = await Highlight.conversations.getAllConversations()
+      const conversationAttachments: Array<ConversationAttachmentMetadata> = conversationData.map((conversation) => ({
+        id: conversation.id,
+        type: 'conversation',
+        title: conversation.title,
+        words: conversation.transcript.split(/\s+/).length,
+        started_at:
+          typeof conversation.startedAt === 'number'
+            ? new Date(conversation.startedAt).toISOString()
+            : typeof conversation.startedAt === 'string'
+              ? conversation.startedAt
+              : conversation.startedAt.toISOString(),
+        ended_at:
+          typeof conversation.endedAt === 'number'
+            ? new Date(conversation.endedAt).toISOString()
+            : typeof conversation.endedAt === 'string'
+              ? conversation.endedAt
+              : conversation.endedAt.toISOString(),
+      }))
+
+      availableContexts.context.push(...conversationAttachments)
+
+      if (rawContents) {
+        const windowContentsAttachment: WindowContentsAttachment = {
+          type: 'window_contents',
+          text: rawContents,
+          name: 'Window Contents',
+          words: getWordCount(rawContents),
+          created_at: new Date(),
+        }
+        attachedContext.context.push(windowContentsAttachment)
       }
 
-      const accessToken = await getAccessToken()
-      await fetchResponse(conversationId!, formData, accessToken, !!promptApp, promptApp)
+      // Add window list and conversation metadata here
+      const windowListAttachment: WindowListAttachment = {
+        type: 'window_list',
+        titles: windows,
+      }
+      availableContexts.context.push(windowListAttachment)
+
+      // Build FormData using the updated builder
+      const formData = await buildFormData({
+        prompt: query,
+        conversationId,
+        llmProvider: 'anthropic',
+        attachedContext,
+        availableContexts,
+      })
+
+      await fetchResponse(conversationId, formData, !!promptApp, promptApp)
     }
   }
 
   const handleSubmit = async (
     input: string,
     promptApp?: Prompt,
-    context?: { image?: string; window_context?: string },
+    context?: { image?: string; window_context?: string; conversation?: ConversationAttachment },
   ) => {
-    console.log('handleSubmit triggered')
-
     const query = input.trim()
 
     if (!query) {
@@ -468,65 +547,129 @@ export const useSubmitQuery = () => {
     try {
       setInputIsDisabled(true)
 
-      const formData = new FormData()
-      formData.append('prompt', query)
+      const conversationId = getOrCreateConversationId()
 
-      const isPromptApp = !!promptApp
-
-      if (isPromptApp && promptApp!.external_id !== undefined) {
-        formData.append('app_id', promptApp!.external_id)
+      // Extract and format attached_context_metadata
+      const attachedContext: AttachedContexts = {
+        context: [],
       }
 
-      // Fetch windows information
-      await Sentry.startSpan({ name: 'fetchWindows', op: 'function' }, async () => {
-        const windows = await fetchWindows()
-        formData.append('windows', JSON.stringify(windows))
-      })
-
-      if (aboutMe) {
-        formData.append('about_me', JSON.stringify(aboutMe))
+      const availableContexts: AvailableContexts = {
+        context: [],
       }
 
-      // TODO(umut): This is a hack to add the context to the form data.
-      if (context) {
-        if (context.image) {
-          formData.append('screenshot', context.image)
-        }
-        if (context.window_context) {
-          formData.append('window_context', context.window_context)
-        }
-      }
+      // Upload files first
+      const uploadFilePromises = await Promise.all(
+        attachments.filter(isUploadableAttachment).map(async (attachment) => {
+          let fileOrUrl: File | string = attachment.value
 
-      const { screenshot, audio, fileTitle, clipboardText, ocrText, windowContext } = await Sentry.startSpan(
-        { name: 'addAttachmentsToFormData', op: 'function' },
-        async () => {
-          return await addAttachmentsToFormData(formData, attachments)
-        },
+          // If it's a string, assume it's a URL (could be a local URL)
+          if (typeof attachment.value === 'string') {
+            fileOrUrl = attachment.value // Pass the URL directly
+          } else {
+            const fileName = `${uuidv4()}.${attachment.type}`
+            const mimeType = getFileType(attachment)
+            fileOrUrl = new File([attachment.value], fileName, { type: mimeType })
+          }
+
+          const uploadedFile = await uploadFile(fileOrUrl, conversationId)
+
+          if (uploadedFile && uploadedFile.file_id) {
+            const metadata = await createAttachmentMetadata(attachment, uploadedFile.file_id)
+            if (metadata) attachedContext.context.push(metadata)
+          }
+        }),
       )
 
-      const conversationId = getOrCreateConversationId()
-      addConversationMessage(conversationId!, {
+      await Promise.all(uploadFilePromises)
+
+      // Add non-uploadable attachments to attachedContext
+      attachments
+        .filter((a) => !isUploadableAttachment(a))
+        .forEach(async (attachment) => {
+          const metadata = await createAttachmentMetadata(attachment)
+          if (metadata) attachedContext.context.push(metadata)
+        })
+
+      const conversationData = await Highlight.conversations.getAllConversations()
+      const conversationAttachments: Array<ConversationAttachmentMetadata> = conversationData.map((conversation) => ({
+        id: conversation.id,
+        type: 'conversation',
+        title: conversation.title,
+        words: conversation.transcript.split(/\s+/).length,
+        started_at:
+          typeof conversation.startedAt === 'number'
+            ? new Date(conversation.startedAt).toISOString()
+            : typeof conversation.startedAt === 'string'
+              ? conversation.startedAt
+              : conversation.startedAt.toISOString(),
+        ended_at:
+          typeof conversation.endedAt === 'number'
+            ? new Date(conversation.endedAt).toISOString()
+            : typeof conversation.endedAt === 'string'
+              ? conversation.endedAt
+              : conversation.endedAt.toISOString(),
+      }))
+
+      availableContexts.context.push(...conversationAttachments)
+
+      if (context?.window_context) {
+        const windowContentsAttachment: WindowContentsAttachment = {
+          type: 'window_contents',
+          text: context?.window_context,
+          name: 'Window Contents',
+          words: getWordCount(context?.window_context),
+          created_at: new Date(),
+        }
+        attachedContext.context.push(windowContentsAttachment)
+      }
+
+      if (context?.conversation) {
+        const conversationAttachment: ConversationAttachment = {
+          id: context.conversation.id,
+          type: 'conversation',
+          title: context.conversation.title,
+          text: context.conversation.text,
+          started_at: context.conversation.started_at,
+          ended_at: context.conversation.ended_at,
+        }
+        attachedContext.context.push(conversationAttachment)
+      }
+
+      const windows = await fetchWindows()
+      // Add window list and conversation metadata here
+      const windowListAttachment: WindowListAttachment = {
+        type: 'window_list',
+        titles: windows,
+      }
+      availableContexts.context.push(windowListAttachment)
+
+      // Build FormData using the updated builder
+      const formData = await buildFormData({
+        prompt: query,
+        conversationId,
+        llmProvider: 'anthropic',
+        attachedContext,
+        availableContexts,
+      })
+
+      addConversationMessage(conversationId, {
         role: 'user',
+        version: 'v4',
         content: query,
-        screenshot,
-        ocr_text: ocrText,
-        audio,
-        file_title: fileTitle,
-        clipboard_text: clipboardText,
-        windows: await fetchWindows(),
-        window_context: windowContext,
-        file_attachments: attachments.filter((attachment) => attachment.type === 'text_file'),
+        screenshot: context?.image,
+        window_context: context?.window_context,
+        file_attachments: attachments.filter((a) => a.type === 'text_file'),
+        attached_context: attachedContext.context,
       })
 
       setInput('')
       updateLastMessageSentTimestamp()
       clearAttachments()
 
-      const accessToken = await getAccessToken()
-      await fetchResponse(conversationId!, formData, accessToken, isPromptApp, promptApp)
-    } catch (error) {
-      console.error('Error in handleSubmit: ', error)
-      Sentry.captureException(error)
+      await fetchResponse(conversationId, formData, !!promptApp, promptApp)
+    } catch (error: any) {
+      handleError(error, { method: 'handleSubmit' })
     } finally {
       setInputIsDisabled(false)
     }

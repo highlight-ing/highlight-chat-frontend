@@ -108,7 +108,9 @@ export const createStore = (initState: StoreState = defaultState) => {
         partialize: (state) => ({
           // This is the "Prompt Editor" onboarding, we persist this state because
           // we want to only show the onboarding once automatically.
-          onboarding: state.onboarding,
+          onboarding: {
+            hasOnboardedOnceBefore: state.onboarding.hasOnboardedOnceBefore,
+          },
           /**
            * Store the auth state in persistent storage.
            */

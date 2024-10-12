@@ -13,6 +13,7 @@ import * as pptxtojson from 'pptxtojson'
 import { trackEvent } from '@/utils/amplitude'
 import { ConversationAttachmentPicker } from '../ConversationAttachmentPicker.tsx/ConversationAttachmentPicker'
 import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
+import { MAX_NUMBER_OF_ATTACHMENTS } from '@/stores/chat-attachments'
 
 export const AttachmentsButton = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -20,8 +21,9 @@ export const AttachmentsButton = () => {
   const [conversationPickerVisible, setConversationPickerVisible] = useState(false)
   const messages = useCurrentChatMessages()
 
-  const { setFileInputRef, addAttachment } = useStore(
+  const { attachments, setFileInputRef, addAttachment } = useStore(
     useShallow((state) => ({
+      attachments: state.attachments,
       addAttachment: state.addAttachment,
       setFileInputRef: state.setFileInputRef,
     })),
@@ -83,74 +85,78 @@ export const AttachmentsButton = () => {
   ]
 
   const onAddFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      if (file.type.startsWith('image/')) {
-        addAttachment({
-          type: 'image',
-          value: URL.createObjectURL(file),
-          file: file,
-        })
-        trackEvent('HL Chat Attachment Added', { type: 'image', fileType: file.type })
-      } else if (file.type === 'application/pdf') {
-        addAttachment({
-          type: 'pdf',
-          value: file,
-        })
-        trackEvent('HL Chat Attachment Added', { type: 'pdf' })
-      } else if (
-        file.type === 'text/csv' ||
-        file.type === 'application/vnd.ms-excel' ||
-        file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-      ) {
-        addAttachment({
-          type: 'spreadsheet',
-          value: file,
-        })
-        trackEvent('HL Chat Attachment Added', { type: 'spreadsheet', fileType: file.type })
-      } else if (
-        file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
-        file.type === 'application/msword'
-      ) {
-        const arrayBuffer = await file.arrayBuffer()
-        const result = await mammoth.extractRawText({ arrayBuffer })
-        addAttachment({
-          type: 'text_file',
-          value: result.value,
-          fileName: file.name,
-        })
-        trackEvent('HL Chat Attachment Added', { type: 'text_file', fileType: file.type })
-      } else if (file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
-        const value = await extractTextFromPowerPoint(file)
-        addAttachment({
-          type: 'text_file',
-          value,
-          fileName: file.name,
-        })
-        trackEvent('HL Chat Attachment Added', { type: 'power_point', fileType: file.type })
-      } else if (
-        textBasedTypes.includes(file.type) ||
-        file.type.includes('application/') ||
-        file.type.includes('text/')
-      ) {
-        const value = await readTextFile(file)
-        addAttachment({
-          type: 'text_file',
-          value,
-          fileName: file.name,
-        })
-        trackEvent('HL Chat Attachment Added', { type: 'text_file', fileType: file.type })
-      } else {
-        try {
+    const files = e.target.files
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i]
+        // Process each file
+        if (file.type.startsWith('image/')) {
+          addAttachment({
+            type: 'image',
+            value: URL.createObjectURL(file),
+            file: file,
+          })
+          trackEvent('HL Chat Attachment Added', { type: 'image', fileType: file.type })
+        } else if (file.type === 'application/pdf') {
+          addAttachment({
+            type: 'pdf',
+            value: file,
+          })
+          trackEvent('HL Chat Attachment Added', { type: 'pdf' })
+        } else if (
+          file.type === 'text/csv' ||
+          file.type === 'application/vnd.ms-excel' ||
+          file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        ) {
+          addAttachment({
+            type: 'spreadsheet',
+            value: file,
+          })
+          trackEvent('HL Chat Attachment Added', { type: 'spreadsheet', fileType: file.type })
+        } else if (
+          file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+          file.type === 'application/msword'
+        ) {
+          const arrayBuffer = await file.arrayBuffer()
+          const result = await mammoth.extractRawText({ arrayBuffer })
+          addAttachment({
+            type: 'text_file',
+            value: result.value,
+            fileName: file.name,
+          })
+          trackEvent('HL Chat Attachment Added', { type: 'text_file', fileType: file.type })
+        } else if (file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
+          const value = await extractTextFromPowerPoint(file)
+          addAttachment({
+            type: 'text_file',
+            value,
+            fileName: file.name,
+          })
+          trackEvent('HL Chat Attachment Added', { type: 'power_point', fileType: file.type })
+        } else if (
+          textBasedTypes.includes(file.type) ||
+          file.type.includes('application/') ||
+          file.type.includes('text/')
+        ) {
           const value = await readTextFile(file)
           addAttachment({
             type: 'text_file',
             value,
             fileName: file.name,
           })
-          trackEvent('HL Chat Attachment Added', { type: 'file', fileType: file.type })
-        } catch (e) {
-          console.log('Error reading file', file.name, e)
+          trackEvent('HL Chat Attachment Added', { type: 'text_file', fileType: file.type })
+        } else {
+          try {
+            const value = await readTextFile(file)
+            addAttachment({
+              type: 'text_file',
+              value,
+              fileName: file.name,
+            })
+            trackEvent('HL Chat Attachment Added', { type: 'file', fileType: file.type })
+          } catch (e) {
+            console.log('Error reading file', file.name, e)
+          }
         }
       }
     }
@@ -240,7 +246,7 @@ export const AttachmentsButton = () => {
         </div>
       ),
       onClick: () => {
-        window.location.href = 'highlight://app/conversations'
+        setConversationPickerVisible(true)
       },
     },
   ].filter(Boolean) as MenuItemType[]
@@ -257,6 +263,8 @@ export const AttachmentsButton = () => {
     }
   }
 
+  const isDisabled = attachments.length >= MAX_NUMBER_OF_ATTACHMENTS
+
   return (
     <>
       <ContextMenu
@@ -265,32 +273,42 @@ export const AttachmentsButton = () => {
         leftClick={true}
         items={menuItems}
         menuStyle={{ background: '#191919', borderColor: '#222222' }}
+        disabled={isDisabled}
       >
         {
           // @ts-ignore
           ({ isOpen }) => (
             <Tooltip
-              tooltip={isOpen || screenshotPickerVisible || conversationPickerVisible ? '' : 'Attach files & context'}
+              tooltip={
+                isDisabled
+                  ? 'Max number of attahments added'
+                  : isOpen || screenshotPickerVisible || conversationPickerVisible
+                    ? ''
+                    : 'Attach files & context'
+              }
               position={'top'}
             >
-              <ScreenshotAttachmentPicker
-                isVisible={screenshotPickerVisible}
-                onClose={() => {
-                  setScreenshotPickerVisible(false)
-                  trackEvent('HL Chat Screenshot Picker Closed', {})
-                }}
-                onBack={openMenu}
-              />
-              {conversationPickerVisible && (
+              <button
+                type="button"
+                className={`${styles.button} ${isDisabled ? styles.disabledButton : ''}`}
+                id="attachments-button"
+              >
+                <ScreenshotAttachmentPicker
+                  isVisible={screenshotPickerVisible}
+                  onClose={() => {
+                    setScreenshotPickerVisible(false)
+                    trackEvent('HL Chat Screenshot Picker Closed', {})
+                  }}
+                  onBack={openMenu}
+                />
                 <ConversationAttachmentPicker
+                  isVisible={conversationPickerVisible}
                   onClose={() => setConversationPickerVisible(false)}
                   onBack={() => {
                     setConversationPickerVisible(false)
                     openMenu()
                   }}
                 />
-              )}
-              <button type="button" className={styles.button} id="attachments-button">
                 <PaperclipIcon />
                 <input
                   type="file"
@@ -298,6 +316,7 @@ export const AttachmentsButton = () => {
                   onChange={onAddFile}
                   accept={acceptTypes}
                   className={styles.hiddenInput}
+                  multiple
                 />
               </button>
             </Tooltip>
