@@ -512,6 +512,14 @@ export const useSubmitQuery = () => {
         attachedContext.context.push(windowContentsAttachment)
       }
 
+      if (aboutMe) {
+        const aboutMeAttachment: AboutMeAttachment = {
+          type: 'about_me',
+          text: aboutMe.join('\n'),
+        }
+        attachedContext.context.push(aboutMeAttachment)
+      }
+
       // Add window list and conversation metadata here
       const windowListAttachment: WindowListAttachment = {
         type: 'window_list',
@@ -622,6 +630,14 @@ export const useSubmitQuery = () => {
           created_at: new Date(),
         }
         attachedContext.context.push(windowContentsAttachment)
+      }
+
+      if (aboutMe) {
+        const aboutMeAttachment: AboutMeAttachment = {
+          type: 'about_me',
+          text: aboutMe.join('\n'),
+        }
+        attachedContext.context.push(aboutMeAttachment)
       }
 
       if (context?.conversation) {
