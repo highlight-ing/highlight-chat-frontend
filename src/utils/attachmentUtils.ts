@@ -28,9 +28,15 @@ export const readFileAsBase64 = async (file: File): Promise<string> => {
   })
 }
 
+// Handle window list
+// PS(umut): Switched this to native windows since we don't need base64 encoded window icons.
 export async function fetchWindows() {
-  const windows = await Highlight.user.getWindows()
-  return windows.map((window) => window.windowTitle)
+  const windows = await Highlight.user.getNativeWindows()
+  // Filter out windows with null or empty titles, then map to the desired format
+  const windowTitles = windows
+    .filter((window) => window.title !== null && window.title !== '')
+    .map((window) => ({ title: window.title, appName: window.appName, pid: window.pid }))
+  return windowTitles
 }
 
 export const addAttachmentsToFormData = async (
