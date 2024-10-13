@@ -52,7 +52,7 @@ export interface WindowContentsAttachment {
 
 export interface WindowListAttachment {
   type: 'window_list'
-  titles: Array<string>
+  titles: Array<{ title: string; appName: string; pid: number }>
 }
 
 export interface ClipboardTextAttachment {
