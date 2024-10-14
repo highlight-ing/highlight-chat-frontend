@@ -29,6 +29,7 @@ import { useUploadFile } from './useUploadFile'
 import { v4 as uuidv4 } from 'uuid'
 import { Attachment } from '@/types'
 import { useIntegrations } from './useIntegrations'
+import { formatDateForConversation } from '@/utils/string'
 
 // Create a type guard for FileAttachment
 function isUploadableAttachment(attachment: Attachment): attachment is PdfAttachment | ImageAttachment {
@@ -480,24 +481,18 @@ export const useSubmitQuery = () => {
       })
 
       const conversationData = await Highlight.conversations.getAllConversations()
-      const conversationAttachments: Array<ConversationAttachmentMetadata> = conversationData.map((conversation) => ({
-        id: conversation.id,
-        type: 'conversation',
-        title: conversation.title,
-        words: conversation.transcript.split(/\s+/).length,
-        started_at:
-          typeof conversation.startedAt === 'number'
-            ? new Date(conversation.startedAt).toISOString()
-            : typeof conversation.startedAt === 'string'
-              ? conversation.startedAt
-              : conversation.startedAt.toISOString(),
-        ended_at:
-          typeof conversation.endedAt === 'number'
-            ? new Date(conversation.endedAt).toISOString()
-            : typeof conversation.endedAt === 'string'
-              ? conversation.endedAt
-              : conversation.endedAt.toISOString(),
-      }))
+      const conversationAttachments: Array<ConversationAttachmentMetadata> = conversationData
+        .filter((conversation) => {
+          return Object.entries(conversation).every(([key, value]) => key !== undefined && value !== undefined)
+        })
+        .map((conversation) => ({
+          id: conversation.id,
+          type: 'conversation',
+          title: conversation.title,
+          words: conversation.transcript ? conversation.transcript.split(/\s+/).length : 0,
+          started_at: formatDateForConversation(conversation.startedAt),
+          ended_at: formatDateForConversation(conversation.endedAt),
+        }))
 
       availableContexts.context.push(...conversationAttachments)
 
@@ -600,24 +595,18 @@ export const useSubmitQuery = () => {
         })
 
       const conversationData = await Highlight.conversations.getAllConversations()
-      const conversationAttachments: Array<ConversationAttachmentMetadata> = conversationData.map((conversation) => ({
-        id: conversation.id,
-        type: 'conversation',
-        title: conversation.title,
-        words: conversation.transcript.split(/\s+/).length,
-        started_at:
-          typeof conversation.startedAt === 'number'
-            ? new Date(conversation.startedAt).toISOString()
-            : typeof conversation.startedAt === 'string'
-              ? conversation.startedAt
-              : conversation.startedAt.toISOString(),
-        ended_at:
-          typeof conversation.endedAt === 'number'
-            ? new Date(conversation.endedAt).toISOString()
-            : typeof conversation.endedAt === 'string'
-              ? conversation.endedAt
-              : conversation.endedAt.toISOString(),
-      }))
+      const conversationAttachments: Array<ConversationAttachmentMetadata> = conversationData
+        .filter((conversation) => {
+          return Object.entries(conversation).every(([key, value]) => key !== undefined && value !== undefined)
+        })
+        .map((conversation) => ({
+          id: conversation.id,
+          type: 'conversation',
+          title: conversation.title,
+          words: conversation.transcript ? conversation.transcript.split(/\s+/).length : 0,
+          started_at: formatDateForConversation(conversation.startedAt),
+          ended_at: formatDateForConversation(conversation.endedAt),
+        }))
 
       availableContexts.context.push(...conversationAttachments)
 
