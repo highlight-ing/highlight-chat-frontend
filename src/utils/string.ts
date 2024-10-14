@@ -28,3 +28,11 @@ export const getTimeAgo = (timestamp: Date): string => {
 export const getWordCount = (text: string): number => text.trim().split(/\s+/).length
 
 export const getWordCountFormatted = (text: string): string => getWordCount(text).toLocaleString()
+
+// Helper function to format date for conversation
+export const formatDateForConversation = (date: number | string | Date): string => {
+  if (date === undefined) return ''
+  if (typeof date === 'number') return new Date(date).toISOString()
+  if (typeof date === 'string') return date
+  return date.toISOString()
+}
