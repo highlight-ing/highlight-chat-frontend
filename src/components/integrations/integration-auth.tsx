@@ -3,7 +3,7 @@
  */
 
 import { useEffect, useState } from 'react'
-import Button from '../Button/Button'
+import Button from '@/components/Button/Button'
 
 /**
  * @param name - The name of the integration
@@ -25,7 +25,6 @@ export function SetupConnectionComponent({
   onConnect: () => void
   icon: React.ReactNode
 }) {
-  const [connectLink, setConnectLink] = useState<string>('')
   const [connectClicked, setConnectClicked] = useState(false)
 
   async function _checkConnectionStatus() {
@@ -50,36 +49,45 @@ export function SetupConnectionComponent({
     }
   }, [connectClicked])
 
-  useEffect(() => {
-    async function getConnectLink() {
-      // Fetch the latest Highlight authorization token (only available to Highlight Chat)
-      try {
-        // @ts-ignore
-        const token = (await highlight.internal.getAuthorizationToken()) as string
+  async function _createMagicLink() {
+    // Setting up a magic link requires that the user is logged in and has an email address setup
+    // ensure this is the case.
 
-        const connectLink = await createMagicLink(token)
-        setConnectLink(connectLink)
-      } catch (e) {
-        console.warn('Error getting authorization token', e)
-        return
-      }
+    console.log('clicked created magic link')
+    let checkResult
+
+    try {
+      // @ts-ignore
+      checkResult = (await highlight.internal.validateEmailOrSetup()) as boolean
+      console.log('checkResult', checkResult)
+    } catch (e) {
+      console.warn('Error ensuring user is logged in and has an email address', e)
+      return
     }
 
-    getConnectLink()
-  }, [])
+    if (!checkResult) {
+      console.warn('User is not logged in and/or dismissed the email setup')
+      return
+    }
+
+    // Fetch the latest Highlight authorization token (only available to Highlight Chat)
+    try {
+      // @ts-ignore
+      const token = (await highlight.internal.getAuthorizationToken()) as string
+
+      const connectLink = await createMagicLink(token)
+      setConnectClicked(true)
+      window.open(connectLink, '_blank')
+    } catch (e) {
+      console.warn('Error getting authorization token', e)
+      return
+    }
+  }
 
   return (
     <div className="flex flex-col gap-2">
       <p>You'll need to connect your {name} account first.</p>
-      <Button
-        disabled={!connectLink}
-        size="small"
-        variant="primary-outline"
-        onClick={() => {
-          setConnectClicked(true)
-          window.open(connectLink, '_blank')
-        }}
-      >
+      <Button size="small" variant="primary-outline" onClick={_createMagicLink}>
         {icon} Connect {name}
       </Button>
 
