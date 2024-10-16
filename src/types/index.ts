@@ -12,9 +12,12 @@ type WindowAttachment = {
 }
 
 export type BaseMessage = {
+  id: string
+  conversation_id: string
   role: 'user' | 'assistant'
   version?: string
   content?: string | ReactNode
+  given_feedback?: string | null
 }
 
 export type UserMessage = BaseMessage & {
@@ -33,12 +36,14 @@ export type UserMessage = BaseMessage & {
   factIndex?: number
   fact?: string
   attached_context?: AttachedContextContextTypes[]
+  given_feedback?: string | null
 }
 
 export type AssistantMessage = BaseMessage & {
   role: 'assistant'
   factIndex?: number
   fact?: string
+  given_feedback?: string | null
 }
 
 export type Message = UserMessage | AssistantMessage
@@ -194,9 +199,17 @@ export interface SharedChat {
   messages: Message[]
 }
 
-export type AssistantMessageButtonType = 'Copy' | 'Share' | 'Save' | 'SendFeedback'
+export type AssistantMessageButtonType =
+  | 'Copy'
+  | 'Share'
+  | 'Save'
+  | 'SendFeedback'
+  | 'Open'
+  | 'Like'
+  | 'Dislike'
+  | 'LikeDislikeUpdate'
 
-export type AssistantMessageButtonStatus = 'idle' | 'success'
+export type AssistantMessageButtonStatus = 'idle' | 'success' | 'error'
 
 export type AssistantMessageButtonConfig = {
   type: AssistantMessageButtonType

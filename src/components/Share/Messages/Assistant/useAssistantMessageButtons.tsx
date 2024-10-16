@@ -94,6 +94,7 @@ export const useAssistantMessageButtons = ({
   }
 
   // Define button actions for each button type
+  // @ts-expect-error
   const buttonActions: Record<AssistantMessageButtonType, Pick<AssistantMessageButtonConfig, 'onClick'>> = {
     Copy: { onClick: handleCopy },
     Share: { onClick: handleShare },

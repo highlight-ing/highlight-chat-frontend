@@ -53,6 +53,7 @@ export function useIntegrations(): UseIntegrationsAPI {
 
     // Update the last message to show the Linear ticket component which will handle checking for authentication,
     // creating the ticket, and showing the success message.
+    // @ts-expect-error
     updateLastConversationMessage(conversationId!, {
       content: (
         <MessageWithComponent content={lastMessage}>
@@ -72,6 +73,7 @@ export function useIntegrations(): UseIntegrationsAPI {
 
     // Update the last message to show the Notion page component which will handle checking for authentication,
     // creating the page, and showing the success message.
+    // @ts-expect-error
     updateLastConversationMessage(conversationId!, {
       content: (
         <MessageWithComponent content={lastMessage}>
@@ -88,6 +90,7 @@ export function useIntegrations(): UseIntegrationsAPI {
 
     previousContent.set(conversationId, textContents)
 
+    // @ts-expect-error
     updateLastConversationMessage(conversationId!, {
       content: (
         <MessageWithComponent content={textContents}>

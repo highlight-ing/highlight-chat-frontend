@@ -11,7 +11,7 @@ interface RequestOptions {
 
 export const getSharedConversation = async (id: string, options?: RequestOptions): Promise<SharedChat | null> => {
   try {
-    const response = await fetch(`${backendUrl}api/${options?.version ?? 'v1'}/share-link/${id}`, {
+    const response = await fetch(`${backendUrl}/api/${options?.version ?? 'v1'}/share-link/${id}`, {
       method: 'GET',
       signal: options?.signal,
     })

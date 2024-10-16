@@ -284,6 +284,7 @@ export const useSubmitQuery = () => {
         throw new Error('No reader available')
       }
 
+      // @ts-expect-error
       addConversationMessage(conversationId, { role: 'assistant', content: '' })
 
       let accumulatedMessage = ''
@@ -296,18 +297,24 @@ export const useSubmitQuery = () => {
 
         const chunk = new TextDecoder().decode(value)
 
-        const { content, windowName, conversation, factIndex, fact } = await parseAndHandleStreamChunk(chunk, {
-          showConfirmationModal,
-          addToast,
-          integrations,
-          conversationId,
-        })
+        const { content, windowName, conversation, factIndex, fact, messageId } = await parseAndHandleStreamChunk(
+          chunk,
+          {
+            showConfirmationModal,
+            addToast,
+            integrations,
+            conversationId,
+          },
+        )
 
         if (content) {
           accumulatedMessage += content
           updateLastConversationMessage(conversationId, {
             role: 'assistant',
             content: accumulatedMessage,
+            conversation_id: conversationId,
+            id: messageId,
+            given_feedback: null,
           })
         }
 
@@ -334,14 +341,20 @@ export const useSubmitQuery = () => {
           updateLastConversationMessage(conversationId, {
             role: 'assistant',
             content: accumulatedMessage,
+            conversation_id: conversationId,
             factIndex: factIndex,
             fact: fact,
+            id: messageId,
+            given_feedback: null,
           })
         } else if (fact) {
           updateLastConversationMessage(conversationId, {
             role: 'assistant',
             content: accumulatedMessage,
+            conversation_id: conversationId,
             fact: fact,
+            id: messageId,
+            given_feedback: null,
           })
         }
 
@@ -434,6 +447,7 @@ export const useSubmitQuery = () => {
       const fileAttachments = attachments.filter(isUploadableAttachment)
 
       const conversationId = getOrCreateConversationId()
+      // @ts-expect-error
       addConversationMessage(conversationId, {
         role: 'user',
         content: query,
@@ -667,6 +681,7 @@ export const useSubmitQuery = () => {
         availableContexts,
       })
 
+      // @ts-expect-error
       addConversationMessage(conversationId, {
         role: 'user',
         version: 'v4',

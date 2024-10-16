@@ -58,9 +58,12 @@ export default function useHandleConversationLoad() {
 
         const mappedMessages = messages.map((message: any) => {
           const baseMessage: BaseMessage = {
+            id: message.id,
             role: message.role,
             content: message.content,
             version,
+            conversation_id: conversationId,
+            given_feedback: message.given_feedback,
           }
 
           if (message.role === 'user') {

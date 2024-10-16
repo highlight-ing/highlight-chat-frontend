@@ -17,6 +17,8 @@ export async function parseAndHandleStreamChunk(
   let accumulatedContent = ''
   let factIndex = null
   let fact = null
+  let messageId = null
+
   // Split the chunk into individual data objects
   const dataObjects = chunk.split(/\n(?=data: )/)
 
@@ -33,6 +35,7 @@ export async function parseAndHandleStreamChunk(
       switch (jsonChunk.type) {
         case 'text':
           accumulatedContent += jsonChunk.content
+          messageId = jsonChunk.message_id
           break
 
         case 'loading':
@@ -58,6 +61,7 @@ export async function parseAndHandleStreamChunk(
                   conversation: null,
                   factIndex: null,
                   fact: null,
+                  messageId: messageId,
                 }
               }
             }
@@ -91,6 +95,7 @@ export async function parseAndHandleStreamChunk(
                   conversation: conversation,
                   factIndex: null,
                   fact: null,
+                  messageId: messageId,
                 }
               }
             }
@@ -106,6 +111,7 @@ export async function parseAndHandleStreamChunk(
                 conversation: null,
                 factIndex: factIndex,
                 fact: fact,
+                messageId: messageId,
               }
             }
             // This will add the fact to the end of the array
@@ -117,6 +123,7 @@ export async function parseAndHandleStreamChunk(
                 conversation: null,
                 factIndex: null,
                 fact: fact,
+                messageId: messageId,
               }
             }
           }
@@ -124,7 +131,14 @@ export async function parseAndHandleStreamChunk(
 
         case 'done':
           // Message is complete, return the accumulated content and attachments added
-          return { content: accumulatedContent, windowName: null, conversation: null, factIndex: null, fact: null }
+          return {
+            content: accumulatedContent,
+            windowName: null,
+            conversation: null,
+            factIndex: null,
+            fact: null,
+            messageId: messageId,
+          }
 
         case 'message_delta':
           // Handle message delta if needed
@@ -156,5 +170,12 @@ export async function parseAndHandleStreamChunk(
   }
 
   // If we haven't returned yet, return the accumulated content and attachments added
-  return { content: accumulatedContent, windowName: null, conversation: null, factIndex: null, fact: null }
+  return {
+    content: accumulatedContent,
+    windowName: null,
+    conversation: null,
+    factIndex: null,
+    fact: null,
+    messageId: messageId,
+  }
 }

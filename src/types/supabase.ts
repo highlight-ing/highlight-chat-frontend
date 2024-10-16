@@ -1,4 +1,10 @@
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
   public: {
@@ -24,18 +30,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'added_tags_prompt_id_fkey'
-            columns: ['prompt_id']
+            foreignKeyName: "added_tags_prompt_id_fkey"
+            columns: ["prompt_id"]
             isOneToOne: false
-            referencedRelation: 'prompts'
-            referencedColumns: ['id']
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'added_tags_tag_id_fkey'
-            columns: ['tag_id']
+            foreignKeyName: "added_tags_tag_id_fkey"
+            columns: ["tag_id"]
             isOneToOne: false
-            referencedRelation: 'tags'
-            referencedColumns: ['id']
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -60,11 +66,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'added_prompts_prompt_id_fkey'
-            columns: ['prompt_id']
+            foreignKeyName: "added_prompts_prompt_id_fkey"
+            columns: ["prompt_id"]
             isOneToOne: false
-            referencedRelation: 'prompts'
-            referencedColumns: ['id']
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -131,11 +137,65 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'encrypted_messages_conversation_id_fkey'
-            columns: ['conversation_id']
+            foreignKeyName: "encrypted_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
             isOneToOne: false
-            referencedRelation: 'conversation'
-            referencedColumns: ['id']
+            referencedRelation: "conversation"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feedback: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          external_id: string
+          feedback: string | null
+          feedback_type: string
+          id: number
+          message_id: string
+          rating: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          conversation_id?: string
+          created_at?: string
+          external_id?: string
+          feedback?: string | null
+          feedback_type?: string
+          id?: number
+          message_id?: string
+          rating: number
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          external_id?: string
+          feedback?: string | null
+          feedback_type?: string
+          id?: number
+          message_id?: string
+          rating?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversation"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedback_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "encrypted_messages"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -238,11 +298,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'message_conversation_id_fkey'
-            columns: ['conversation_id']
+            foreignKeyName: "message_conversation_id_fkey"
+            columns: ["conversation_id"]
             isOneToOne: false
-            referencedRelation: 'conversation'
-            referencedColumns: ['id']
+            referencedRelation: "conversation"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -294,11 +354,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'prompt_usages_prompt_id_fkey'
-            columns: ['prompt_id']
+            foreignKeyName: "prompt_usages_prompt_id_fkey"
+            columns: ["prompt_id"]
             isOneToOne: false
-            referencedRelation: 'prompts'
-            referencedColumns: ['id']
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -374,22 +434,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'prompts_image_fkey'
-            columns: ['image']
+            foreignKeyName: "prompts_image_fkey"
+            columns: ["image"]
             isOneToOne: false
-            referencedRelation: 'user_images'
-            referencedColumns: ['external_id']
+            referencedRelation: "user_images"
+            referencedColumns: ["external_id"]
           },
         ]
       }
       shared_conversation_messages: {
         Row: {
+          attached_context: Json[] | null
           audio: string | null
+          available_context: Json[] | null
           clipboard_text: string | null
           content: string | null
           context: string | null
           conversation_id: string
           created_at: string
+          file_ids: string[] | null
           id: number
           image_url: string | null
           ocr_text: string | null
@@ -399,12 +462,15 @@ export type Database = {
           windows: string[] | null
         }
         Insert: {
+          attached_context?: Json[] | null
           audio?: string | null
+          available_context?: Json[] | null
           clipboard_text?: string | null
           content?: string | null
           context?: string | null
           conversation_id?: string
           created_at?: string
+          file_ids?: string[] | null
           id?: number
           image_url?: string | null
           ocr_text?: string | null
@@ -414,12 +480,15 @@ export type Database = {
           windows?: string[] | null
         }
         Update: {
+          attached_context?: Json[] | null
           audio?: string | null
+          available_context?: Json[] | null
           clipboard_text?: string | null
           content?: string | null
           context?: string | null
           conversation_id?: string
           created_at?: string
+          file_ids?: string[] | null
           id?: number
           image_url?: string | null
           ocr_text?: string | null
@@ -430,11 +499,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'shared_conversation_messages_conversation_id_fkey'
-            columns: ['conversation_id']
+            foreignKeyName: "shared_conversation_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
             isOneToOne: false
-            referencedRelation: 'shared_conversations'
-            referencedColumns: ['id']
+            referencedRelation: "shared_conversations"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -465,11 +534,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'shared_conversations_original_conversation_id_fkey'
-            columns: ['original_conversation_id']
+            foreignKeyName: "shared_conversations_original_conversation_id_fkey"
+            columns: ["original_conversation_id"]
             isOneToOne: false
-            referencedRelation: 'conversation'
-            referencedColumns: ['id']
+            referencedRelation: "conversation"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -538,8 +607,8 @@ export type Database = {
       }
     }
     Enums: {
-      HLChatDBAttachment: 'screenshot' | 'voice' | 'clipboard' | 'ocr'
-      HLChatPromptTags: 'value' | 'label'
+      HLChatDBAttachment: "screenshot" | "voice" | "clipboard" | "ocr"
+      HLChatPromptTags: "value" | "label"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -547,23 +616,27 @@ export type Database = {
   }
 }
 
-type PublicSchema = Database[Extract<keyof Database, 'public'>]
+type PublicSchema = Database[Extract<keyof Database, "public">]
 
 export type Tables<
-  PublicTableNameOrOptions extends keyof (PublicSchema['Tables'] & PublicSchema['Views']) | { schema: keyof Database },
+  PublicTableNameOrOptions extends
+    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
+    | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof (Database[PublicTableNameOrOptions['schema']]['Tables'] &
-        Database[PublicTableNameOrOptions['schema']]['Views'])
+    ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
+        Database[PublicTableNameOrOptions["schema"]]["Views"])
     : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[PublicTableNameOrOptions['schema']]['Tables'] &
-      Database[PublicTableNameOrOptions['schema']]['Views'])[TableName] extends {
+  ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
+      Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (PublicSchema['Tables'] & PublicSchema['Views'])
-    ? (PublicSchema['Tables'] & PublicSchema['Views'])[PublicTableNameOrOptions] extends {
+  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
+        PublicSchema["Views"])
+    ? (PublicSchema["Tables"] &
+        PublicSchema["Views"])[PublicTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -571,18 +644,20 @@ export type Tables<
     : never
 
 export type TablesInsert<
-  PublicTableNameOrOptions extends keyof PublicSchema['Tables'] | { schema: keyof Database },
+  PublicTableNameOrOptions extends
+    | keyof PublicSchema["Tables"]
+    | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions['schema']]['Tables']
+    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions['schema']]['Tables'][TableName] extends {
+  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema['Tables']
-    ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
+  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
+    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -590,18 +665,20 @@ export type TablesInsert<
     : never
 
 export type TablesUpdate<
-  PublicTableNameOrOptions extends keyof PublicSchema['Tables'] | { schema: keyof Database },
+  PublicTableNameOrOptions extends
+    | keyof PublicSchema["Tables"]
+    | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions['schema']]['Tables']
+    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions['schema']]['Tables'][TableName] extends {
+  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema['Tables']
-    ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
+  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
+    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -609,12 +686,29 @@ export type TablesUpdate<
     : never
 
 export type Enums<
-  PublicEnumNameOrOptions extends keyof PublicSchema['Enums'] | { schema: keyof Database },
+  PublicEnumNameOrOptions extends
+    | keyof PublicSchema["Enums"]
+    | { schema: keyof Database },
   EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicEnumNameOrOptions['schema']]['Enums']
+    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
 > = PublicEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicEnumNameOrOptions['schema']]['Enums'][EnumName]
-  : PublicEnumNameOrOptions extends keyof PublicSchema['Enums']
-    ? PublicSchema['Enums'][PublicEnumNameOrOptions]
+  ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
+    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof PublicSchema["CompositeTypes"]
+    | { schema: keyof Database },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
+    ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never

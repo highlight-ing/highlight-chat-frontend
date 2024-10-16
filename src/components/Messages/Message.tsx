@@ -23,6 +23,7 @@ import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
 import { MessageText } from 'iconsax-react'
 import { useStore } from '@/providers/store-provider'
 import { AttachedContextContextTypes } from '@/utils/formDataUtils'
+import AssistantMessageButton from './AssistantMessageButton'
 
 const hasAttachment = (message: UserMessage) => {
   return (
@@ -96,7 +97,26 @@ const preprocessLaTeX = (content: string) => {
 
 export const Message = ({ message, isThinking }: MessageProps) => {
   const promptApp = useStore((state) => state.promptApp)
+  const openModal = useStore((state) => state.openModal)
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const { factIndex, fact } = message
+
+  const copyMessage = (content: string) => {
+    navigator.clipboard.writeText(content)
+    setCopyStatus('success')
+    setTimeout(() => {
+      setCopyStatus('idle')
+    }, 2000)
+  }
+
+  const handleSendFeedbackModal = (e: any, rating: string) => {
+    e.stopPropagation()
+    if (message.given_feedback !== null) {
+      openModal('update-feedback', { id: 'update-feedback', header: 'Update Feedback', message, rating })
+    } else {
+      openModal('send-feedback', { id: 'send-feedback', header: 'Give Feedback', message, rating })
+    }
+  }
 
   const renderAttachment = (attachment: AttachedContextContextTypes) => {
     switch (attachment.type) {
@@ -145,7 +165,7 @@ export const Message = ({ message, isThinking }: MessageProps) => {
       {!isThinking ? (
         <div className={styles.message}>
           {message.role === 'user' && hasAttachment(message as UserMessage) && (
-            <div className={`flex gap-2`}>
+            <div className={`mb-2 flex gap-2`}>
               {message.version === 'v4' && message.attached_context && message.attached_context.length > 0 ? (
                 message.attached_context?.map((attachment, index) => (
                   <div key={index}>{renderAttachment(attachment)}</div>
@@ -232,6 +252,27 @@ export const Message = ({ message, isThinking }: MessageProps) => {
               {typeof message.content === 'string' ? preprocessLaTeX(message.content) : ''}
             </Markdown>
             {typeof message.content !== 'string' && message.content}
+            <div className="mt-2 flex gap-2">
+              <AssistantMessageButton
+                type="Copy"
+                onClick={() => copyMessage(message.content as string)}
+                status={copyStatus}
+              />
+              {message.id && message.role === 'assistant' && (
+                <>
+                  <AssistantMessageButton
+                    type="Like"
+                    onClick={(e) => handleSendFeedbackModal(e, 'like')}
+                    status="idle"
+                  />
+                  <AssistantMessageButton
+                    type="Dislike"
+                    onClick={(e) => handleSendFeedbackModal(e, 'dislike')}
+                    status="idle"
+                  />
+                </>
+              )}
+            </div>
           </div>
           {factIndex || fact ? <FactButton factIndex={factIndex} fact={fact} /> : null}
         </div>
