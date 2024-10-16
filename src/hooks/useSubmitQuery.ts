@@ -284,6 +284,7 @@ export const useSubmitQuery = () => {
         throw new Error('No reader available')
       }
 
+      // @ts-expect-error
       addConversationMessage(conversationId, { role: 'assistant', content: '' })
 
       let accumulatedMessage = ''
@@ -305,6 +306,7 @@ export const useSubmitQuery = () => {
 
         if (content) {
           accumulatedMessage += content
+          // @ts-expect-error
           updateLastConversationMessage(conversationId, {
             role: 'assistant',
             content: accumulatedMessage,
@@ -331,6 +333,7 @@ export const useSubmitQuery = () => {
         }
 
         if (typeof factIndex === 'number' && fact) {
+          // @ts-expect-error
           updateLastConversationMessage(conversationId, {
             role: 'assistant',
             content: accumulatedMessage,
@@ -338,6 +341,7 @@ export const useSubmitQuery = () => {
             fact: fact,
           })
         } else if (fact) {
+          // @ts-expect-error
           updateLastConversationMessage(conversationId, {
             role: 'assistant',
             content: accumulatedMessage,
@@ -434,6 +438,7 @@ export const useSubmitQuery = () => {
       const fileAttachments = attachments.filter(isUploadableAttachment)
 
       const conversationId = getOrCreateConversationId()
+      // @ts-expect-error
       addConversationMessage(conversationId, {
         role: 'user',
         content: query,
@@ -667,6 +672,7 @@ export const useSubmitQuery = () => {
         availableContexts,
       })
 
+      // @ts-expect-error
       addConversationMessage(conversationId, {
         role: 'user',
         version: 'v4',

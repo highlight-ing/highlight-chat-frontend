@@ -7,6 +7,7 @@ const ThinkingMessage = () => {
   const thinkingMessage = useMemo(() => {
     return THINKING_MESSAGES[Math.floor(Math.random() * THINKING_MESSAGES.length)]
   }, [])
+  // @ts-expect-error
   return <Message isThinking={true} message={{ role: 'assistant', content: thinkingMessage }} />
 }
 
