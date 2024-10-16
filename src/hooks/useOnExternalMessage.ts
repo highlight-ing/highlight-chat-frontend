@@ -120,6 +120,18 @@ const useOnExternalMessage = () => {
             }
           }
         }
+
+        if (message.shareAction) {
+          // Submit a message with the notion tool enabled
+          await handleSubmit(
+            'Create a new Notion page inferring the title and content from the conversation.',
+            undefined,
+            undefined,
+            {
+              create_notion_page: message.shareAction === 'notion',
+            },
+          )
+        }
       } else if (message.type === 'customize-prompt') {
         console.log('Customize prompt message received for prompt:', message.prompt)
 

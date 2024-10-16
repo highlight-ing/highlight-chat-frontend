@@ -145,6 +145,11 @@ function getFileType(attachment: Attachment): string {
   }
 }
 
+interface ToolOverrides {
+  create_linear_ticket?: boolean
+  create_notion_page?: boolean
+}
+
 export const useSubmitQuery = () => {
   const { post } = useApi()
   const { getAccessToken } = useAuth()
@@ -241,6 +246,7 @@ export const useSubmitQuery = () => {
     formData: FormData,
     isPromptApp: boolean,
     promptApp?: Prompt,
+    toolOverrides?: ToolOverrides,
   ) => {
     setInputIsDisabled(true)
     const startTime = Date.now()
@@ -251,8 +257,10 @@ export const useSubmitQuery = () => {
         get_more_context_from_window: true,
         get_more_context_from_conversation: false,
         add_or_update_about_me_facts: false,
-        create_linear_ticket: promptApp?.linear_integration_enabled ?? false,
-        create_notion_page: promptApp?.create_notion_page_integration_enabled ?? false,
+        create_linear_ticket:
+          (promptApp?.linear_integration_enabled ?? false) || (toolOverrides?.create_linear_ticket ?? false),
+        create_notion_page:
+          (promptApp?.create_notion_page_integration_enabled ?? false) || (toolOverrides?.create_notion_page ?? false),
       }
 
       formData.append('conversation_id', conversationId)
@@ -539,6 +547,7 @@ export const useSubmitQuery = () => {
     input: string,
     promptApp?: Prompt,
     context?: { image?: string; window_context?: string; conversation?: ConversationAttachment },
+    toolOverrides?: ToolOverrides,
   ) => {
     const query = input.trim()
 
@@ -672,7 +681,7 @@ export const useSubmitQuery = () => {
       updateLastMessageSentTimestamp()
       clearAttachments()
 
-      await fetchResponse(conversationId, formData, !!promptApp, promptApp)
+      await fetchResponse(conversationId, formData, !!promptApp, promptApp, toolOverrides)
     } catch (error: any) {
       handleError(error, { method: 'handleSubmit' })
     } finally {
