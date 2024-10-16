@@ -49,7 +49,8 @@ export async function GET(req: NextRequest) {
 
     await supabase.rpc('bulk_update_prompt_usages', {
       ids: existingPromptUsageCounts?.map((x) => x.id) ?? [],
-      public_use_numbers: existingPromptUsageCounts?.map((x) => x.public_use_number + promptUsageCounts[x.id]) ?? [],
+      public_use_numbers:
+        existingPromptUsageCounts?.map((x) => x.public_use_number + (promptUsageCounts?.[x?.id ?? 0] ?? 0)) ?? [],
     })
 
     // Store the updated prompt usage counts
