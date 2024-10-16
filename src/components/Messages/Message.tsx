@@ -109,9 +109,13 @@ export const Message = ({ message, isThinking }: MessageProps) => {
     }, 2000)
   }
 
-  const handleSendFeedbackModal = (e: any) => {
+  const handleSendFeedbackModal = (e: any, rating: string) => {
     e.stopPropagation()
-    openModal('send-feedback', { id: 'send-feedback', header: 'Give Feedback', message })
+    if (message.given_feedback !== null) {
+      openModal('update-feedback', { id: 'update-feedback', header: 'Update Feedback', message, rating })
+    } else {
+      openModal('send-feedback', { id: 'send-feedback', header: 'Give Feedback', message, rating })
+    }
   }
 
   const renderAttachment = (attachment: AttachedContextContextTypes) => {
@@ -255,7 +259,18 @@ export const Message = ({ message, isThinking }: MessageProps) => {
                 status={copyStatus}
               />
               {message.id && message.role === 'assistant' && (
-                <AssistantMessageButton type="LikeDislike" onClick={handleSendFeedbackModal} status="idle" />
+                <>
+                  <AssistantMessageButton
+                    type="Like"
+                    onClick={(e) => handleSendFeedbackModal(e, 'like')}
+                    status="idle"
+                  />
+                  <AssistantMessageButton
+                    type="Dislike"
+                    onClick={(e) => handleSendFeedbackModal(e, 'dislike')}
+                    status="idle"
+                  />
+                </>
               )}
             </div>
           </div>

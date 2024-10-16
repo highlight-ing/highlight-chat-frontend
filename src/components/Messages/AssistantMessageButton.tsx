@@ -1,6 +1,6 @@
 import React from 'react'
 import styles from './message.module.scss'
-import { Copy, Send2, ExportCircle, LikeDislike } from 'iconsax-react'
+import { Copy, Send2, ExportCircle, LikeDislike, Like1, Dislike } from 'iconsax-react'
 import { AssistantMessageButtonType, AssistantMessageButtonStatus } from '@/types'
 
 interface AssistantMessageButtonProps {
@@ -14,7 +14,11 @@ const AssistantMessageButton: React.FC<AssistantMessageButtonProps> = ({ type, o
     switch (type) {
       case 'Copy':
         return <Copy variant="Bold" size={20} />
-      case 'LikeDislike':
+      case 'Like':
+        return <Like1 variant="Bold" size={20} />
+      case 'Dislike':
+        return <Dislike variant="Bold" size={20} />
+      case 'LikeDislikeUpdate':
         return <LikeDislike variant="Bold" size={20} />
       case 'Share':
         return <Send2 variant="Bold" size={20} />
@@ -27,8 +31,12 @@ const AssistantMessageButton: React.FC<AssistantMessageButtonProps> = ({ type, o
     switch (buttonType) {
       case 'Copy':
         return 'Copy'
-      case 'LikeDislike':
+      case 'Like':
         return 'Give Feedback'
+      case 'Dislike':
+        return 'Give Feedback'
+      case 'LikeDislikeUpdate':
+        return 'Update Feedback'
       case 'Share':
         return 'Share'
       case 'Open':
@@ -41,8 +49,12 @@ const AssistantMessageButton: React.FC<AssistantMessageButtonProps> = ({ type, o
       switch (type) {
         case 'Copy':
           return 'Copied!'
-        case 'LikeDislike':
+        case 'Like':
           return 'Feedback Submitted'
+        case 'Dislike':
+          return 'Feedback Submitted'
+        case 'LikeDislikeUpdate':
+          return 'Feedback Updated'
         case 'Share':
           return 'Shared!'
         case 'Open':
@@ -55,7 +67,7 @@ const AssistantMessageButton: React.FC<AssistantMessageButtonProps> = ({ type, o
   return (
     <button className={styles.assistantMessageButton} onClick={onClick}>
       <div className={styles.iconWrapper}>{getIcon()}</div>
-      <div className={styles.buttonText}>{getText()}</div>
+      {type !== 'Like' && type !== 'Dislike' ? <div className={styles.buttonText}>{getText()}</div> : null}
     </button>
   )
 }

@@ -63,6 +63,7 @@ export default function useHandleConversationLoad() {
             content: message.content,
             version,
             conversation_id: conversationId,
+            given_feedback: message.given_feedback,
           }
 
           if (message.role === 'user') {

@@ -19,7 +19,8 @@ import CustomizePromptModal from '@/presentations/modals/CustomizePromptModal'
 import CreatePromptFromTemplateModal from '@/presentations/modals/CreatePromptFromTemplate'
 import UnsavedChangesModal from '@/presentations/modals/UnsavedChangesModal'
 import ConnectIntegrationModal from '@/presentations/modals/ConnectIntegrationModal'
-import SendFeedbackModal, { SendFeedbackModalProps } from '@/presentations/modals/SendFeedback'
+import SendFeedbackModal, { SendFeedbackModalProps } from '@/presentations/modals/SendFeedbackModal'
+import UpdateFeedbackModal, { UpdateFeedbackModalProps } from '@/presentations/modals/UpdateFeedbackModal'
 
 type FunctionalComponent = (props: ModalObjectProps) => JSX.Element
 
@@ -43,6 +44,9 @@ const ModalMap: Record<string, FunctionalComponent> = {
   'unsaved-changes': UnsavedChangesModal,
   'connect-integration': ConnectIntegrationModal,
   'send-feedback': ({ context }: ModalObjectProps) => <SendFeedbackModal {...(context as SendFeedbackModalProps)} />,
+  'update-feedback': ({ context }: ModalObjectProps) => (
+    <UpdateFeedbackModal {...(context as UpdateFeedbackModalProps)} />
+  ),
 }
 
 export const ModalContainer = () => {

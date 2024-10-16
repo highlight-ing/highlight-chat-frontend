@@ -72,10 +72,10 @@ const Messages = () => {
           })}
         {inputIsDisabled &&
           (!messages.length ||
-            messages[messages.length - 1].role !== 'assistant' ||
-            (typeof messages[messages.length - 1].content === 'string' &&
+            messages[messages.length - 1]?.role !== 'assistant' ||
+            (typeof messages[messages.length - 1]?.content === 'string' &&
               //@ts-ignore
-              !messages[messages.length - 1].content?.trim().length)) && <ThinkingMessage />}
+              !messages[messages.length - 1]?.content?.trim()?.length)) && <ThinkingMessage />}
       </div>
     </Scrollable>
   )

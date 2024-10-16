@@ -17,6 +17,7 @@ export type BaseMessage = {
   role: 'user' | 'assistant'
   version?: string
   content?: string | ReactNode
+  given_feedback?: string | null
 }
 
 export type UserMessage = BaseMessage & {
@@ -35,12 +36,14 @@ export type UserMessage = BaseMessage & {
   factIndex?: number
   fact?: string
   attached_context?: AttachedContextContextTypes[]
+  given_feedback?: string | null
 }
 
 export type AssistantMessage = BaseMessage & {
   role: 'assistant'
   factIndex?: number
   fact?: string
+  given_feedback?: string | null
 }
 
 export type Message = UserMessage | AssistantMessage
@@ -196,7 +199,15 @@ export interface SharedChat {
   messages: Message[]
 }
 
-export type AssistantMessageButtonType = 'Copy' | 'Share' | 'Save' | 'SendFeedback' | 'Open' | 'LikeDislike'
+export type AssistantMessageButtonType =
+  | 'Copy'
+  | 'Share'
+  | 'Save'
+  | 'SendFeedback'
+  | 'Open'
+  | 'Like'
+  | 'Dislike'
+  | 'LikeDislikeUpdate'
 
 export type AssistantMessageButtonStatus = 'idle' | 'success' | 'error'
 

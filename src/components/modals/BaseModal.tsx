@@ -1,5 +1,6 @@
 import React, { PropsWithChildren, ReactElement, ReactNode, useEffect } from 'react'
 import CloseButton from '@/components/CloseButton/CloseButton'
+import LoadingModal from '@/components/modals/LoadingModal'
 
 import styles from './modals.module.scss'
 import { useStore } from '@/providers/store-provider'
@@ -8,6 +9,7 @@ type SizeType = 'xsmall' | 'small' | 'medium' | 'large' | 'xlarge' | 'fullscreen
 
 export interface ModalProps {
   id: string
+  isLoading?: boolean
   close?: () => void
   size: SizeType
   exitOnClick?: boolean
@@ -38,6 +40,7 @@ const BaseModal = ({
   size,
   style,
   header,
+  isLoading,
   exitOnClick,
   exitOnEscape,
   onClose,
@@ -79,7 +82,7 @@ const BaseModal = ({
       if (exitOnEscape === false) {
         return
       }
-      if (modals[modals.length - 1].id !== id) {
+      if (modals?.[modals.length - 1]?.id !== id) {
         return
       }
       if (e.key === 'Escape') {
@@ -109,7 +112,7 @@ const BaseModal = ({
         {showClose !== false && <CloseButton onClick={(e) => close(e, true)} alignment={closeButtonAlignment} />}
         {header && <div className={styles.modalHeader}>{header}</div>}
         <div className={`${styles.modalBody} ${bodyClassName ?? ''}`} id={`${id}-body`} style={bodyStyle}>
-          {children}
+          {isLoading ? <LoadingModal /> : children}
         </div>
       </div>
     </div>
