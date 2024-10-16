@@ -1,15 +1,19 @@
-import styles from '@/presentations/modals/modals.module.scss'
-import Button from '@/components/Button/Button'
-import Modal from '@/components/modals/Modal'
 import React, { type PropsWithChildren } from 'react'
 import { trackEvent } from '@/utils/amplitude'
 import { Message } from '@/types'
 import { useStore } from '@/providers/store-provider'
 import { useState, useEffect } from 'react'
 import { z } from 'zod'
-import { Dislike, Like1, LikeDislike } from 'iconsax-react'
 import client from '@/utils/api-client'
 import useAuth from '@/hooks/useAuth'
+
+// Components
+import Button from '@/components/Button/Button'
+import Modal from '@/components/modals/Modal'
+import FeedbackRatingButtons from '@/components/Feedback/FeedbackRatingButtons'
+import FeedbackTypeSelect from '@/components/Feedback/FeedbackTypeSelect'
+import FeedbackTextarea from '@/components/Feedback/FeedbackTextarea'
+import FeedbackDisclosure from '@/components/Feedback/FeedbackDisclosure'
 
 export interface UpdateFeedbackModalProps {
   id: string
@@ -20,7 +24,7 @@ export interface UpdateFeedbackModalProps {
 }
 
 const Rating = z.number().int().min(-1).max(1)
-const FeedbackType = z.enum([
+const FeedbackNegativeType = z.enum([
   'other',
   'ui-bug',
   'harmful-content',
@@ -28,6 +32,18 @@ const FeedbackType = z.enum([
   'did-not-follow-instructions',
   'not-factually-accurate',
 ])
+
+const FeedbackPositiveType = z.enum([
+  'other',
+  'helpful-content',
+  'accurate-response',
+  'clear-explanation',
+  'creative-solution',
+  'time-saving',
+  'learned-something-new',
+  'improved-understanding',
+])
+
 const FeedbackDetails = z.string().max(1000).nullable()
 
 const UpdateFeedbackModal = ({
@@ -46,7 +62,8 @@ const UpdateFeedbackModal = ({
   const [rating, setRating] = useState<z.infer<typeof Rating>>(
     initialRating === 'like' ? 1 : initialRating === 'dislike' ? -1 : 0,
   )
-  const [feedbackType, setFeedbackType] = useState<z.infer<typeof FeedbackType>>('other')
+  const [feedbackType, setFeedbackType] =
+    useState<z.infer<typeof FeedbackNegativeType | typeof FeedbackPositiveType>>('other')
   const [feedbackDetails, setFeedbackDetails] = useState<z.infer<typeof FeedbackDetails>>('')
 
   const handleCloseModal = (e: any) => {
@@ -83,7 +100,7 @@ const UpdateFeedbackModal = ({
       }
       if (data) {
         setRating(initialRating === 'like' ? 1 : initialRating === 'dislike' ? -1 : 0)
-        setFeedbackType(data.feedback_type as z.infer<typeof FeedbackType>)
+        setFeedbackType(data.feedback_type as z.infer<typeof FeedbackNegativeType | typeof FeedbackPositiveType>)
         setFeedbackDetails(data.feedback)
       }
     } catch (error) {
@@ -172,93 +189,14 @@ const UpdateFeedbackModal = ({
     }
   }
 
-  const buttonStyle = (buttonRating: z.infer<typeof Rating>) => ({
-    borderRadius: '50%',
-    padding: '10px',
-    border: '1px solid #e5e5e5',
-    backgroundColor: rating === buttonRating ? getBackgroundColor(buttonRating) : '',
-    transition: 'background-color 0.3s',
-    cursor: 'pointer',
-  })
-
-  const getBackgroundColor = (buttonRating: z.infer<typeof Rating>) => {
-    switch (buttonRating) {
-      case -1:
-        return '#ef4444' // red-500
-      case 0:
-        return '#eab308' // yellow-500
-      case 1:
-        return '#22c55e' // green-500
-      default:
-        return '' // neutral-200
-    }
-  }
-
   return (
     <Modal id={id} size={'small'} header={header ?? 'Update Feedback'} isLoading={isFetching}>
       <div className="left-0 flex flex-col justify-start gap-4">
-        <div className="flex flex-col gap-1">
-          <h5 className="text-sm font-medium text-gray-200">Rating</h5>
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <button
-              style={buttonStyle(-1)}
-              onClick={() => setRating(-1)}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f87171')} // red-400
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = rating === -1 ? '#ef4444' : '')}
-            >
-              <Dislike size={24} color={'white'} />
-            </button>
-            <button
-              style={buttonStyle(0)}
-              onClick={() => setRating(0)}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#facc15')} // yellow-400
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = rating === 0 ? '#eab308' : '')}
-            >
-              <LikeDislike size={24} color={'white'} />
-            </button>
-            <button
-              style={buttonStyle(1)}
-              onClick={() => setRating(1)}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#4ade80')} // green-400
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = rating === 1 ? '#22c55e' : '')}
-            >
-              <Like1 size={24} color={'white'} />
-            </button>
-          </div>
-        </div>
-        <div className="flex flex-col gap-1">
-          <h5 className="text-sm font-medium text-gray-200">What type of issue do you wish to report? (optional)</h5>
-          <select
-            className="w-full rounded-md border border-neutral-800 bg-neutral-800 p-2 text-sm text-white"
-            value={feedbackType}
-            onChange={(e) => setFeedbackType(e.target.value as z.infer<typeof FeedbackType>)}
-          >
-            <option value="other">Other</option>
-            <option value="ui-bug">UI Bug</option>
-            <option value="harmful-content">Harmful Content</option>
-            <option value="overactive-refusal">Overactive Refusal</option>
-            <option value="did-not-follow-instructions">Did not follow instructions</option>
-            <option value="not-factually-accurate">Not factually accurate</option>
-          </select>
-        </div>
-        <div className="flex flex-col gap-1">
-          <h5 className="text-sm font-medium text-gray-200">Please provide details: (optional)</h5>
-          <textarea
-            value={feedbackDetails ?? ''}
-            onChange={(e) => setFeedbackDetails(e.target.value || null)}
-            placeholder="Details of your issue..."
-            className="w-full rounded-md border border-neutral-800 bg-neutral-800 p-2 text-sm text-white"
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <p className="text-xs text-gray-400">
-            Submitting this feedback will send the current conversation to Highlight and store it with your feedback for
-            future improvements to our models. When you submit feedback and provide us permission, we disassociate
-            inputs and outputs from your user ID to use them for training and improving our models.{' '}
-          </p>
-          <a className="text-xs text-blue-600 underline" href="https://highlightai.com/privacy" target="_blank">
-            Learn More
-          </a>
+        <div className="flex flex-col gap-2">
+          <FeedbackRatingButtons rating={rating} setRating={setRating} />
+          <FeedbackTypeSelect rating={rating} feedbackType={feedbackType} setFeedbackType={setFeedbackType} />
+          <FeedbackTextarea feedbackDetails={feedbackDetails} setFeedbackDetails={setFeedbackDetails} />
+          <FeedbackDisclosure />
         </div>
       </div>
       <div className="flex w-full justify-end gap-4">
@@ -266,7 +204,7 @@ const UpdateFeedbackModal = ({
           Cancel
         </Button>
         <Button size={'medium'} variant={'primary'} onClick={handleSendFeedback} disabled={isLoading}>
-          Update Feedback
+          Send Feedback
         </Button>
       </div>
     </Modal>
