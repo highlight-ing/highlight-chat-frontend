@@ -137,7 +137,7 @@ export const Message = ({ message, isThinking }: MessageProps) => {
         return <Attachment type="selected_text" value={attachment.text} />
     }
   }
-
+  console.log('message: ', message)
   return (
     <div className={`${styles.messageContainer} ${message.role === 'user' ? styles.self : ''}`}>
       {message.role === 'assistant' && (

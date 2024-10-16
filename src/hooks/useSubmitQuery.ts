@@ -297,19 +297,24 @@ export const useSubmitQuery = () => {
 
         const chunk = new TextDecoder().decode(value)
 
-        const { content, windowName, conversation, factIndex, fact } = await parseAndHandleStreamChunk(chunk, {
-          showConfirmationModal,
-          addToast,
-          integrations,
-          conversationId,
-        })
+        const { content, windowName, conversation, factIndex, fact, messageId } = await parseAndHandleStreamChunk(
+          chunk,
+          {
+            showConfirmationModal,
+            addToast,
+            integrations,
+            conversationId,
+          },
+        )
 
         if (content) {
           accumulatedMessage += content
-          // @ts-expect-error
           updateLastConversationMessage(conversationId, {
             role: 'assistant',
             content: accumulatedMessage,
+            conversation_id: conversationId,
+            id: messageId,
+            given_feedback: null,
           })
         }
 
@@ -333,19 +338,23 @@ export const useSubmitQuery = () => {
         }
 
         if (typeof factIndex === 'number' && fact) {
-          // @ts-expect-error
           updateLastConversationMessage(conversationId, {
             role: 'assistant',
             content: accumulatedMessage,
+            conversation_id: conversationId,
             factIndex: factIndex,
             fact: fact,
+            id: messageId,
+            given_feedback: null,
           })
         } else if (fact) {
-          // @ts-expect-error
           updateLastConversationMessage(conversationId, {
             role: 'assistant',
             content: accumulatedMessage,
+            conversation_id: conversationId,
             fact: fact,
+            id: messageId,
+            given_feedback: null,
           })
         }
 
