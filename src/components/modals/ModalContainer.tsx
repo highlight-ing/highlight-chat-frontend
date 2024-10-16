@@ -19,6 +19,7 @@ import CustomizePromptModal from '@/presentations/modals/CustomizePromptModal'
 import CreatePromptFromTemplateModal from '@/presentations/modals/CreatePromptFromTemplate'
 import UnsavedChangesModal from '@/presentations/modals/UnsavedChangesModal'
 import ConnectIntegrationModal from '@/presentations/modals/ConnectIntegrationModal'
+import SendFeedbackModal, { SendFeedbackModalProps } from '@/presentations/modals/SendFeedback'
 
 type FunctionalComponent = (props: ModalObjectProps) => JSX.Element
 
@@ -41,6 +42,7 @@ const ModalMap: Record<string, FunctionalComponent> = {
   'create-prompt-from-template': CreatePromptFromTemplateModal,
   'unsaved-changes': UnsavedChangesModal,
   'connect-integration': ConnectIntegrationModal,
+  'send-feedback': ({ context }: ModalObjectProps) => <SendFeedbackModal {...(context as SendFeedbackModalProps)} />,
 }
 
 export const ModalContainer = () => {

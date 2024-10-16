@@ -47,7 +47,6 @@
     border-radius: 12px;
     padding: 16px;
     background-color: $light-5;
-    gap: 16px;
     width: 100%;
   }
 }
@@ -177,4 +176,50 @@
   font-size: 15px;
   font-weight: 500;
   color: $light-80;
+}
+
+.assistantMessageButton {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 4px;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: $light-5;
+  }
+
+  &.success {
+    animation: gentleScale 0.3s ease-in-out;
+  }
+}
+
+.iconWrapper {
+  color: $light-40;
+  transition: color 0.3s;
+
+  &.success {
+    color: $green-40;
+  }
+}
+
+.buttonText {
+  margin-left: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: $light-40;
+  transition: color 0.3s;
+
+  &.success {
+    color: $green-40;
+  }
+}
+
+@keyframes gentleScale {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }

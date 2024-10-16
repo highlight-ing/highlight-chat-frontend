@@ -30,6 +30,22 @@ If the database schema in the Highlight Chat Supabase project changes, you can g
 npm run gen:supabase-types
 ```
 
+### Getting the Backend Schema
+
+If the backend schema changes, you can get the new schema by running:
+
+**NOTE:** This requires you to run the backend locally. If you don't have access to the backend, use the second command.
+
+```bash
+npm run backend:get
+```
+
+or
+
+```bash
+npm run backend:prod
+```
+
 ## Deployment
 
 This project is deployed using Vercel on pushes to the main branch.

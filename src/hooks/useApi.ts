@@ -1,6 +1,6 @@
 import useAuth from '@/hooks/useAuth'
 
-const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080/'
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080'
 
 type ApiVersion = 'v3' | 'v4'
 
@@ -25,7 +25,7 @@ interface RequestOptions {
 }
 
 const fetchRequest = async (route: string, { bearerToken, body, version, method, signal }: FetchOptions) => {
-  return fetch(`${backendUrl}api/${version ?? 'v3'}/${route}`, {
+  return fetch(`${backendUrl}/api/${version ?? 'v3'}/${route}`, {
     method: method,
     body: body,
     headers: {
@@ -36,7 +36,7 @@ const fetchRequest = async (route: string, { bearerToken, body, version, method,
 }
 
 const fetchPublicRequest = async (route: string, { body, version, method, signal }: PublicFetchOptions) => {
-  return fetch(`${backendUrl}api/${version ?? 'v3'}/${route}`, {
+  return fetch(`${backendUrl}/api/${version ?? 'v3'}/${route}`, {
     method: method,
     body: body,
     signal: signal,

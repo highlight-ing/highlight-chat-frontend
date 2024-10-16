@@ -17,7 +17,6 @@ const Messages = () => {
     })),
   )
   const messages = useCurrentChatMessages()
-
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const isUserScrolledRef = useRef<boolean>(false)
 

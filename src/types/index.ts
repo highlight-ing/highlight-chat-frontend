@@ -12,6 +12,8 @@ type WindowAttachment = {
 }
 
 export type BaseMessage = {
+  id: string
+  conversation_id: string
   role: 'user' | 'assistant'
   version?: string
   content?: string | ReactNode
@@ -194,9 +196,9 @@ export interface SharedChat {
   messages: Message[]
 }
 
-export type AssistantMessageButtonType = 'Copy' | 'Share' | 'Save' | 'SendFeedback'
+export type AssistantMessageButtonType = 'Copy' | 'Share' | 'Save' | 'SendFeedback' | 'Open' | 'LikeDislike'
 
-export type AssistantMessageButtonStatus = 'idle' | 'success'
+export type AssistantMessageButtonStatus = 'idle' | 'success' | 'error'
 
 export type AssistantMessageButtonConfig = {
   type: AssistantMessageButtonType
