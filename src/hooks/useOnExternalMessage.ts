@@ -123,14 +123,23 @@ const useOnExternalMessage = () => {
 
         if (message.shareAction) {
           // Submit a message with the notion tool enabled
-          await handleSubmit(
-            'Create a new Notion page inferring the title and content from the conversation.',
-            undefined,
-            undefined,
-            {
-              create_notion_page: message.shareAction === 'notion',
-            },
-          )
+          let prompt
+
+          switch (message.shareAction) {
+            case 'notion':
+              prompt = 'Create a new Notion page inferring the title and content from the conversation.'
+              break
+            case 'linear':
+              prompt = 'Create a new Linear ticket inferring the title and description from the conversation.'
+              break
+            default:
+              return
+          }
+
+          await handleSubmit(prompt, undefined, undefined, {
+            create_notion_page: message.shareAction === 'notion',
+            create_linear_ticket: message.shareAction === 'linear',
+          })
         }
       } else if (message.type === 'customize-prompt') {
         console.log('Customize prompt message received for prompt:', message.prompt)
