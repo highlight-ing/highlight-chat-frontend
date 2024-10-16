@@ -149,7 +149,7 @@ export default function AppScreen() {
           </span>
         </div>
 
-        <div className="max-w-96 basis-1/3 border-l border-[#ffffff0d] p-[17px]">
+        {/* <div className="max-w-96 basis-1/3 border-l border-[#ffffff0d] p-[17px]">
           <div className="flex flex-col space-y-[6px]">
             <h3 className="text-base font-semibold text-white">Automations</h3>
             <p className="text-xs font-normal leading-tight text-[#6e6e6e]">
@@ -186,7 +186,7 @@ export default function AppScreen() {
             title="Create Notion Page"
             description="Create a Notion page using the prompt output"
           />
-        </div>
+        </div> */}
       </div>
       {onboarding.isOnboarding && onboarding.index === 0 && <OnboardingIndex0 />}
       {onboarding.isOnboarding && onboarding.index === 1 && <OnboardingIndex1 />}
