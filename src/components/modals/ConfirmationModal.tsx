@@ -17,6 +17,7 @@ export interface ConfirmationModalProps {
     onClick: (e: React.MouseEvent) => void
     variant?: ButtonVariantType
   }
+  doNotShowAgainOption?: boolean
 }
 
 const ConfirmationModal = ({
@@ -25,9 +26,16 @@ const ConfirmationModal = ({
   header,
   primaryAction,
   secondaryAction,
+  doNotShowAgainOption,
 }: PropsWithChildren<ConfirmationModalProps>) => {
   return (
-    <Modal id={id} size={'small'} header={header ?? 'Are you sure?'} bodyClassName={styles.confirmationModal}>
+    <Modal
+      id={id}
+      size={'small'}
+      header={header ?? 'Are you sure?'}
+      bodyClassName={styles.confirmationModal}
+      doNotShowAgainOption={doNotShowAgainOption}
+    >
       <div className="flex flex-col items-center gap-1">{children}</div>
       <div className={styles.divider} />
       <div className="flex gap-4">
