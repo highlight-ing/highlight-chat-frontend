@@ -253,11 +253,13 @@ export const Message = ({ message, isThinking }: MessageProps) => {
             </Markdown>
             {typeof message.content !== 'string' && message.content}
             <div className="mt-2 flex gap-2">
-              <AssistantMessageButton
-                type="Copy"
-                onClick={() => copyMessage(message.content as string)}
-                status={copyStatus}
-              />
+              {typeof message.content === 'string' && (
+                <AssistantMessageButton
+                  type="Copy"
+                  onClick={() => copyMessage(message.content as string)}
+                  status={copyStatus}
+                />
+              )}
               {message.id && message.role === 'assistant' && (
                 <>
                   <AssistantMessageButton

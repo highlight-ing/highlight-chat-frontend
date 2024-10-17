@@ -86,6 +86,8 @@ function FormComponent({
   const [parentItems, setParentItems] = useState<NotionParentItem[]>([])
   const [selectedParentItem, setSelectedParentItem] = useState<NotionParentItem | null>(null)
 
+  const contentWithFooter = content + '\n\nCreated with [Highlight](https://highlightai.com)'
+
   async function loadParentItems(token: string) {
     const items = await getNotionParentItems(token)
     setParentItems(items)
@@ -140,7 +142,7 @@ function FormComponent({
       accessToken: notionToken,
       parent: selectedParentItem,
       title: data.title,
-      content,
+      content: contentWithFooter,
     })
 
     onSuccess(response ?? undefined)
@@ -160,7 +162,7 @@ function FormComponent({
           <span className={`${styles.inputLabel} ${styles.inline} ${styles.visible}`}>Page Contents</span>
 
           <div className={`${styles.inputField} p-[20px]`}>
-            <Markdown>{content}</Markdown>
+            <Markdown>{contentWithFooter}</Markdown>
           </div>
         </div>
         <Button size={'medium'} variant={'primary'} type={'submit'} disabled={isSubmitting}>

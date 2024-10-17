@@ -39,7 +39,7 @@ export function LinearTicketFormComponent({
     resolver: zodResolver(linearTicketFormSchema),
     defaultValues: {
       title,
-      description,
+      description: description + '\n\nCreated with [Highlight](https://highlightai.com)',
     },
   })
 
