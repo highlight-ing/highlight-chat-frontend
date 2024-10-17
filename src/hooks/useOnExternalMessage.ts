@@ -6,6 +6,8 @@ import { useStore } from '@/providers/store-provider'
 import { useChatHistory } from '@/hooks/useChatHistory'
 import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 import { useIntegrations } from './useIntegrations'
+import { DEFAULT_PROMPT_EXTERNAL_IDS } from '@/lib/promptapps'
+import useForkDefaultAction from './useForkDefaultAction'
 
 const useOnExternalMessage = () => {
   const integrations = useIntegrations()
@@ -23,6 +25,7 @@ const useOnExternalMessage = () => {
     addAttachment: state.addAttachment,
   }))
   const { handleSubmit } = useSubmitQuery()
+  const { forkDefaultAction } = useForkDefaultAction()
 
   useEffect(() => {
     const removeListener = Highlight.app.addListener('onExternalMessage', async (caller: string, message: any) => {
@@ -146,6 +149,13 @@ const useOnExternalMessage = () => {
 
         const openCustomizePromptModal = () => {
           closeAllModals()
+
+          // Check if the prompt is one of the hardcoded ones
+          if (DEFAULT_PROMPT_EXTERNAL_IDS.includes(message.prompt.external_id)) {
+            forkDefaultAction(message.prompt)
+            return
+          }
+
           openModal('edit-prompt', { prompt: message.prompt })
         }
 
