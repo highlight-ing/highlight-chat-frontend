@@ -168,8 +168,6 @@ export async function savePrompt(formData: FormData, authToken: string) {
     enabledAutomations: JSON.parse(formData.get('enabledAutomations') as string),
   })
 
-  console.log('enabled automations', validated.data?.enabledAutomations)
-
   if (!validated.success) {
     console.warn('Invalid prompt data recieved.', validated.error)
     return { error: ERROR_MESSAGES.INVALID_PROMPT_DATA, zodErrors: validated.error }
