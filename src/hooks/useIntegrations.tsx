@@ -2,6 +2,7 @@ import { CreateLinearTicketComponent } from '@/components/integrations/linear'
 import { CreateNotionPageComponent } from '@/components/integrations/notion'
 import { useStore } from '@/providers/store-provider'
 import { useEffect, useState } from 'react'
+import { useSubmitQuery } from './useSubmitQuery'
 
 interface CreateNotionPageParams {
   title: string

@@ -110,8 +110,14 @@ export function LinearTicketFormComponent({
 
   return (
     <form className="flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
-      <InputField size={'medium'} label={'Title'} placeholder={'Issue Title'} {...register('title')} />
-      <TextArea size={'medium'} label={'Description'} placeholder={'Issue Description'} {...register('description')} />
+      <InputField size={'xxlarge'} label={'Title'} placeholder={'Issue Title'} {...register('title')} />
+      <TextArea
+        rows={4}
+        size={'xxlarge'}
+        label={'Description'}
+        placeholder={'Issue Description'}
+        {...register('description')}
+      />
       <Button size={'medium'} variant={'primary'} type={'submit'}>
         Create Ticket
       </Button>
