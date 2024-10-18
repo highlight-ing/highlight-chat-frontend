@@ -42,8 +42,8 @@ const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
         <InputHeading />
         {isVisible && <Input isActiveChat={false} />}
       </div>
-      <ConversationSimple />
-      <Prompts userId={userId} />
+      {/* <ConversationSimple /> */}
+      {/* <Prompts userId={userId} /> */}
     </div>
   )
 }

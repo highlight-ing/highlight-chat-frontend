@@ -10,28 +10,19 @@
 }
 
 .inputContainer {
+  background-color: $background-hover;
+  cursor: text;
+  border-radius: 20px;
+  width: 100%;
+  animation: fadeIn 400ms forwards;
+}
+
+.inputWrapper {
+  padding: 10px;
   display: flex;
   flex-direction: column;
-  padding: 8px;
   gap: 8px;
-  background-color: $bg-second-layer;
-  border: 1px solid $light-10;
-  cursor: text;
-  border-radius: 12px;
-  width: 100%;
-  flex-shrink: 0;
-  bottom: 16px;
-  animation: fadeIn 400ms forwards;
-
-  &.active {
-    margin-bottom: 20px;
-    max-width: $chat-body-width;
-  }
-
-  &:hover {
-    border-color: $light-20;
-  }
-
+  
   textarea {
     flex: 1;
     background-color: transparent;
@@ -49,11 +40,13 @@
       user-select: none;
     }
   }
+  
 }
 
 .inputRow {
   display: flex;
   align-items: center;
+  justify-content: between;
   gap: 8px;
   width: 100%;
 }
