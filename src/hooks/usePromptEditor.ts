@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react'
 import { useStore } from '@/providers/store-provider'
 import { DEFAULT_PROMPT_EXTERNAL_IDS } from '@/lib/promptapps'
 import usePromptApps from './usePromptApps'
+import Highlight from '@highlight-ai/app-runtime'
+import { z } from 'zod'
 
 export function usePromptEditor() {
   // STATE
@@ -59,6 +61,40 @@ export function usePromptEditor() {
     formData.append('systemPrompt', promptEditorData.systemPrompt)
     formData.append('visibility', promptEditorData.visibility)
     formData.append('tags', JSON.stringify(promptEditorData.tags ?? []))
+
+    if ((promptEditorData.tags?.length ?? 0) < 1) {
+      // Use an LLM inference to generate new tags
+
+      const zodSchema = z.object({
+        tags: z.array(
+          z.string({
+            description: 'A tag for the prompt',
+          }),
+        ),
+      })
+
+      const res = Highlight.inference.getStructuredTextPrediction(zodSchema, [
+        {
+          role: 'system',
+          content: `You are a specialized tag selector for LLM system prompts. Your task is to analyze the given system prompt and select the most appropriate tag from a predefined list. Follow these guidelines:
+
+            1. Carefully read and understand the entire system prompt provided.
+            2. Consider the main focus, purpose, and potential applications of the prompt.
+            3. Select the single most relevant tag from this list:
+              writing, journal, mental health, creative writing, story, essay, self-discovery, high school, middle school, elementary, college, business, social media, resume, dating, coding, fiction, non-fiction, poetry, children, adults, teens, self-improvement, productivity, marketing, academic, research, analysis, brainstorming, summarization
+              
+              System prompt to analyze:
+              ${promptEditorData.systemPrompt}
+              `,
+        },
+      ])
+
+      for await (const tagResult of res) {
+        console.log('Generated tag:', tagResult)
+      }
+
+      console.log('res', res)
+    }
 
     if (promptEditorData.preferredAttachment) {
       formData.append('preferredAttachment', promptEditorData.preferredAttachment)
