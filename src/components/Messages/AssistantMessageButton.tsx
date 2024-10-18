@@ -2,6 +2,7 @@ import React from 'react'
 import styles from './message.module.scss'
 import { Copy, Send2, ExportCircle, LikeDislike, Like1, Dislike } from 'iconsax-react'
 import { AssistantMessageButtonType, AssistantMessageButtonStatus } from '@/types'
+import { LinearIcon, NotionIcon } from '@/icons/icons'
 
 interface AssistantMessageButtonProps {
   type: AssistantMessageButtonType
@@ -14,6 +15,10 @@ const AssistantMessageButton: React.FC<AssistantMessageButtonProps> = ({ type, o
     switch (type) {
       case 'Copy':
         return <Copy variant="Bold" size={20} />
+      case 'Notion':
+        return <NotionIcon size={20} />
+      case 'Linear':
+        return <LinearIcon size={20} />
       case 'Like':
         return <Like1 variant="Bold" size={20} />
       case 'Dislike':
@@ -31,6 +36,10 @@ const AssistantMessageButton: React.FC<AssistantMessageButtonProps> = ({ type, o
     switch (buttonType) {
       case 'Copy':
         return 'Copy'
+      case 'Notion':
+        return 'Create Notion'
+      case 'Linear':
+        return 'Create Linear'
       case 'Like':
         return 'Give Feedback'
       case 'Dislike':

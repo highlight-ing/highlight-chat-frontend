@@ -24,6 +24,8 @@ import { MessageText } from 'iconsax-react'
 import { useStore } from '@/providers/store-provider'
 import { AttachedContextContextTypes } from '@/utils/formDataUtils'
 import AssistantMessageButton from './AssistantMessageButton'
+import { useIntegrations } from '@/hooks/useIntegrations'
+import { useIntegration } from '@/hooks/useIntegration'
 
 const hasAttachment = (message: UserMessage) => {
   return (
@@ -100,6 +102,7 @@ export const Message = ({ message, isThinking }: MessageProps) => {
   const openModal = useStore((state) => state.openModal)
   const [copyStatus, setCopyStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const { factIndex, fact } = message
+  const { createAction } = useIntegration()
 
   const copyMessage = (content: string) => {
     navigator.clipboard.writeText(content)
@@ -259,6 +262,12 @@ export const Message = ({ message, isThinking }: MessageProps) => {
                   onClick={() => copyMessage(message.content as string)}
                   status={copyStatus}
                 />
+              )}
+              {typeof message.content === 'string' && message.role === 'assistant' && (
+                <>
+                  <AssistantMessageButton type="Notion" onClick={() => createAction('notion')} status={'idle'} />
+                  <AssistantMessageButton type="Linear" onClick={() => createAction('linear')} status={'idle'} />
+                </>
               )}
               {message.id && message.role === 'assistant' && (
                 <>

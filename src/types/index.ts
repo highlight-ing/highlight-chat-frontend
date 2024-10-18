@@ -201,6 +201,8 @@ export interface SharedChat {
 
 export type AssistantMessageButtonType =
   | 'Copy'
+  | 'Notion'
+  | 'Linear'
   | 'Share'
   | 'Save'
   | 'SendFeedback'
