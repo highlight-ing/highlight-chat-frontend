@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Attachment } from '../Attachment'
 import { Attachment as AttachmentType, isFileAttachmentType } from '@/types'
 import { useSubmitQuery } from '../../hooks/useSubmitQuery'
@@ -11,9 +11,9 @@ import { useShallow } from 'zustand/react/shallow'
 import { trackEvent } from '@/utils/amplitude'
 import { AnimatePresence, motion, MotionConfig, Transition } from 'framer-motion'
 import useMeasure from 'react-use-measure'
-import InputActions from './InputActions'
 import { AttachmentsMenuButton } from '../attachment-menus/AttachmentsMenuMenu'
 import { ConversationsMenu } from '../attachment-menus/ConversationsMenu'
+import InputPromptActions from './InputPromptActions'
 
 const MAX_INPUT_HEIGHT = 160
 
@@ -125,7 +125,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
               autoFocus={true}
               onFocus={() => setIsInputFocused(true)}
               onBlur={handleBlur}
-              placeholder={`Ask ${promptName ? promptName : 'Highlight'} anything...`}
+              placeholder={`Ask ${promptName ? promptName : 'Highlight AI'} anything...`}
               value={input}
               rows={1}
               onChange={(e) => setInput(e.target.value)}
@@ -134,7 +134,6 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
 
             <div className="flex items-center gap-2">
               <AttachmentsMenuButton />
-
               <ConversationsMenu />
             </div>
           </div>
@@ -165,7 +164,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
             )}
           </AnimatePresence>
 
-          <InputActions isInputFocused={isInputFocused} />
+          <InputPromptActions isInputFocused={isInputFocused} />
         </div>
       </motion.div>
     </MotionConfig>
