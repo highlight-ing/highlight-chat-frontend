@@ -1,7 +1,6 @@
 import * as React from 'react'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Attachment } from '../Attachment'
-import { AttachmentsButton } from '../AttachmentsButton/AttachmentsButton'
 import { Attachment as AttachmentType, isFileAttachmentType } from '@/types'
 import { useSubmitQuery } from '../../hooks/useSubmitQuery'
 import { useStore } from '@/providers/store-provider'
@@ -10,12 +9,12 @@ import styles from './chatinput.module.scss'
 import { getDisplayValue } from '@/utils/attachments'
 import { useShallow } from 'zustand/react/shallow'
 import { trackEvent } from '@/utils/amplitude'
-import { AnimatePresence, motion, MotionConfig, Transition, Variants } from 'framer-motion'
+import { AnimatePresence, motion, MotionConfig, Transition } from 'framer-motion'
 import useMeasure from 'react-use-measure'
 import InputActions from './InputActions'
-import { ConversationAttachmentPicker } from '../ConversationAttachmentPicker.tsx/ConversationAttachmentPicker'
-import { useConversations } from '@/context/ConversationContext'
-import AnimatedVoiceSquare from '../Conversations/AnimatedVoiceSquare'
+import { ClipboardAndFileMenu } from '../AttachmentMenu/ClipboardAndFileMenu'
+import { ConversationsMenu } from '../AttachmentMenu/ConversationsMenu'
+import { AttachmentsButton } from '../AttachmentsButton/AttachmentsButton'
 
 const MAX_INPUT_HEIGHT = 160
 
@@ -34,15 +33,26 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
     })),
   )
 
-  const { isAudioTranscripEnabled } = useConversations()
   const [isInputFocused, setIsInputFocused] = useState(false)
-  const [isInputInteraction, setIsInputInteraction] = useState(false)
-  const [conversationPickerVisible, setConversationPickerVisible] = useState(false)
+  const [isInteractingWithInput, setIsInteractingWithInput] = useState(false)
 
   const storeInput = useStore((state) => state.input)
   const [input, setInput] = useState(storeInput ?? '')
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const timeoutRef = useRef(null)
+
+  const handleBlur = () => {
+    timeoutRef.current = setTimeout(() => {
+      setIsInputFocused(false)
+    }, 100) // Adjust delay as needed
+  }
+
+  const handleIconFocus = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+    }
+  }
 
   const { handleSubmit } = useSubmitQuery()
 
@@ -54,7 +64,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
     }
   }
 
-  const onClickContainer = (e: React.MouseEvent) => {
+  const onClickContainer = () => {
     inputRef.current?.focus()
     trackEvent('HL Chat Input Focused', {})
   }
@@ -76,13 +86,10 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   useEffect(() => {
     const onFocus = () => {
       inputRef.current?.focus()
-      console.log('HERE')
     }
     window.addEventListener('focus', onFocus)
-    setIsInputFocused(true)
     return () => {
       window.removeEventListener('focus', onFocus)
-      setIsInputFocused(false)
     }
   }, [])
 
@@ -96,20 +103,20 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   }
 
   const [ref, bounds] = useMeasure()
-  const [attachmentRowRef, attachmentRowBounds] = useMeasure()
 
-  const transition: Transition = { type: 'spring', duration: 0.25, bounce: 0 }
+  const transition: Transition = { type: 'spring', duration: 0.25, bounce: 0.3 }
 
   return (
     <MotionConfig transition={transition}>
       <motion.div
-        onMouseDown={() => setIsInputInteraction(true)}
-        onMouseUp={() => setIsInputInteraction(false)}
+        layout
+        initial={{ height: 56 }}
         animate={{ height: bounds.height }}
         transition={{ ...transition, delay: isInputFocused ? 0 : 0.1 }}
         className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''}`}
         onClick={onClickContainer}
-        layout
+        onFocus={handleIconFocus}
+        onMouseDown={(e) => e.preventDefault()}
       >
         <div ref={ref} className={`${styles.inputWrapper} flex-col justify-between`}>
           <div className={styles.inputRow}>
@@ -119,58 +126,29 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
               ref={inputRef}
               autoFocus={true}
               onFocus={() => setIsInputFocused(true)}
-              onBlur={() => {
-                if (!isInputInteraction) {
-                  setIsInputFocused(false)
-                }
-              }}
+              onBlur={handleBlur}
               placeholder={`Ask ${promptName ? promptName : 'Highlight'} anything...`}
               value={input}
               rows={1}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
             />
-            <AttachmentsButton />
 
             <div className="flex items-center gap-2">
-              {isAudioTranscripEnabled ? (
-                <div onClick={() => setConversationPickerVisible(true)}>
-                  <AnimatedVoiceSquare
-                    width={24}
-                    height={24}
-                    backgroundColor="transparent"
-                    lineColor="rgba(76, 237, 160, 1.0)"
-                    shouldAnimate={true}
-                    transitionDuration={2500}
-                  />
-                  <ConversationAttachmentPicker
-                    isVisible={conversationPickerVisible}
-                    onClose={() => setConversationPickerVisible(false)}
-                    onBack={() => {
-                      setConversationPickerVisible(false)
-                    }}
-                  />
-                </div>
-              ) : (
-                <AnimatedVoiceSquare
-                  width={24}
-                  height={24}
-                  backgroundColor="transparent"
-                  lineColor="rgba(76, 237, 160, 1.0)"
-                  shouldAnimate={false}
-                  transitionDuration={0}
-                />
-              )}
+              <ClipboardAndFileMenu />
+
+              <ConversationsMenu />
             </div>
           </div>
+
           <AnimatePresence mode="popLayout">
             {attachments.length > 0 && (
-              <div ref={attachmentRowRef} className={styles.attachmentsRow}>
+              <div className={styles.attachmentsRow}>
                 {attachments.map((attachment: AttachmentType, index: number) => (
                   <motion.div
-                    initial={{ opacity: 0, filter: 'blur(4px)', y: -10 }}
-                    animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
-                    exit={{ opacity: 0, filter: 'blur(4px)', y: -10 }}
+                    initial={{ opacity: 0, filter: 'blur(4px)', x: 10 }}
+                    animate={{ opacity: 1, filter: 'blur(0px)', x: 0 }}
+                    transition={{ ...transition, delay: 0.1 }}
                   >
                     <Attachment
                       type={attachment.type}
@@ -188,6 +166,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
               </div>
             )}
           </AnimatePresence>
+
           <InputActions isInputFocused={isInputFocused} />
         </div>
       </motion.div>

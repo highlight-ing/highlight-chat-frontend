@@ -6,24 +6,24 @@ const InputActionItem = ({ title }: { title: string }) => {
     hidden: {
       opacity: 0,
       filter: 'blur(4px)',
-      y: -10,
+      x: 10,
     },
     show: {
       opacity: 1,
       filter: 'blur(0px)',
-      y: 0,
+      x: 0,
     },
     exit: {
       opacity: 0,
       filter: 'blur(4px)',
-      y: -10,
+      x: 10,
     },
   }
 
   return (
     <motion.div
       variants={actionItemVariants}
-      className="flex w-full cursor-pointer items-center gap-2 rounded-2xl px-4 py-2 hover:bg-black/20"
+      className="flex w-full cursor-pointer items-center gap-2 rounded-2xl px-4 py-2 transition-[background-color] duration-150 hover:bg-black/20"
     >
       <SearchIcon />
       <h3>{`${title}:`}</h3>
