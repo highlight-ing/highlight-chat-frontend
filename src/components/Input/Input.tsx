@@ -12,6 +12,10 @@ import { useShallow } from 'zustand/react/shallow'
 import { trackEvent } from '@/utils/amplitude'
 import { AnimatePresence, motion, MotionConfig, Transition, Variants } from 'framer-motion'
 import useMeasure from 'react-use-measure'
+import InputActions from './InputActions'
+import { ConversationAttachmentPicker } from '../ConversationAttachmentPicker.tsx/ConversationAttachmentPicker'
+import { useConversations } from '@/context/ConversationContext'
+import AnimatedVoiceSquare from '../Conversations/AnimatedVoiceSquare'
 
 const MAX_INPUT_HEIGHT = 160
 
@@ -29,7 +33,11 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
       fileInputRef: state.fileInputRef,
     })),
   )
+
+  const { isAudioTranscripEnabled } = useConversations()
   const [isInputFocused, setIsInputFocused] = useState(false)
+  const [isInputInteraction, setIsInputInteraction] = useState(false)
+  const [conversationPickerVisible, setConversationPickerVisible] = useState(false)
 
   const storeInput = useStore((state) => state.input)
   const [input, setInput] = useState(storeInput ?? '')
@@ -88,119 +96,99 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   }
 
   const [ref, bounds] = useMeasure()
-
-  const actionItemContainerVariants: Variants = {
-    show: {
-      transition: {
-        staggerChildren: 0.05,
-      },
-    },
-    exit: {
-      transition: {
-        staggerChildren: 0.05,
-        staggerDirection: -1,
-      },
-    },
-  }
-
-  const actionItemVariants: Variants = {
-    hidden: {
-      opacity: 0,
-      filter: 'blur(4px)',
-      y: -10,
-    },
-    show: {
-      opacity: 1,
-      filter: 'blur(0px)',
-      y: 0,
-    },
-    exit: {
-      opacity: 0,
-      filter: 'blur(4px)',
-      y: -10,
-    },
-  }
+  const [attachmentRowRef, attachmentRowBounds] = useMeasure()
 
   const transition: Transition = { type: 'spring', duration: 0.25, bounce: 0 }
 
   return (
     <MotionConfig transition={transition}>
       <motion.div
+        onMouseDown={() => setIsInputInteraction(true)}
+        onMouseUp={() => setIsInputInteraction(false)}
         animate={{ height: bounds.height }}
-        transition={{ ...transition, delay: isInputFocused ? 0 : 0.05 }}
+        transition={{ ...transition, delay: isInputFocused ? 0 : 0.1 }}
         className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''}`}
         onClick={onClickContainer}
+        layout
       >
-        <div ref={ref} className={styles.inputWrapper}>
+        <div ref={ref} className={`${styles.inputWrapper} flex-col justify-between`}>
           <div className={styles.inputRow}>
-            <AttachmentsButton />
             <SearchIcon size={24} />
             <textarea
               id={'textarea-input'}
               ref={inputRef}
               autoFocus={true}
               onFocus={() => setIsInputFocused(true)}
-              onBlur={() => setIsInputFocused(false)}
+              onBlur={() => {
+                if (!isInputInteraction) {
+                  setIsInputFocused(false)
+                }
+              }}
               placeholder={`Ask ${promptName ? promptName : 'Highlight'} anything...`}
               value={input}
               rows={1}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
             />
-          </div>
-          {attachments.length > 0 && (
-            <div className={styles.attachmentsRow}>
-              {attachments.map((attachment: AttachmentType, index: number) => (
-                <Attachment
-                  type={attachment.type}
-                  value={getDisplayValue(attachment)}
-                  isFile={
-                    attachment.type === 'pdf' ||
-                    (attachment.type === 'image' && !!attachment.file) ||
-                    attachment.type === 'spreadsheet'
-                  }
-                  onRemove={() => onRemoveAttachment(attachment)}
-                  key={index}
+            <AttachmentsButton />
+
+            <div className="flex items-center gap-2">
+              {isAudioTranscripEnabled ? (
+                <div onClick={() => setConversationPickerVisible(true)}>
+                  <AnimatedVoiceSquare
+                    width={24}
+                    height={24}
+                    backgroundColor="transparent"
+                    lineColor="rgba(76, 237, 160, 1.0)"
+                    shouldAnimate={true}
+                    transitionDuration={2500}
+                  />
+                  <ConversationAttachmentPicker
+                    isVisible={conversationPickerVisible}
+                    onClose={() => setConversationPickerVisible(false)}
+                    onBack={() => {
+                      setConversationPickerVisible(false)
+                    }}
+                  />
+                </div>
+              ) : (
+                <AnimatedVoiceSquare
+                  width={24}
+                  height={24}
+                  backgroundColor="transparent"
+                  lineColor="rgba(76, 237, 160, 1.0)"
+                  shouldAnimate={false}
+                  transitionDuration={0}
                 />
-              ))}
+              )}
             </div>
-          )}
+          </div>
           <AnimatePresence mode="popLayout">
-            {isInputFocused && (
-              <motion.div
-                variants={actionItemContainerVariants}
-                initial="hidden"
-                animate="show"
-                exit="exit"
-                className="space-y-1"
-              >
-                <motion.div
-                  variants={actionItemVariants}
-                  className="flex w-full cursor-pointer items-center gap-2 rounded-2xl px-4 py-2 hover:bg-black/20"
-                >
-                  <SearchIcon />
-                  <h3>Summarize:</h3>
-                  <p className="text-white/40">what I'm seeing</p>
-                </motion.div>
-                <motion.div
-                  variants={actionItemVariants}
-                  className="flex w-full cursor-pointer items-center gap-2 rounded-2xl px-4 py-2 hover:bg-black/20"
-                >
-                  <SearchIcon />
-                  <h3>Explain:</h3>
-                  <p className="text-white/40">what I'm seeing</p>
-                </motion.div>
-                <motion.div
-                  variants={actionItemVariants}
-                  className="flex w-full cursor-pointer items-center gap-2 rounded-2xl px-4 py-2 hover:bg-black/20"
-                >
-                  <SearchIcon />
-                  <h3>Rewrite:</h3>
-                  <p className="text-white/40">what I'm seeing</p>
-                </motion.div>
-              </motion.div>
+            {attachments.length > 0 && (
+              <div ref={attachmentRowRef} className={styles.attachmentsRow}>
+                {attachments.map((attachment: AttachmentType, index: number) => (
+                  <motion.div
+                    initial={{ opacity: 0, filter: 'blur(4px)', y: -10 }}
+                    animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
+                    exit={{ opacity: 0, filter: 'blur(4px)', y: -10 }}
+                  >
+                    <Attachment
+                      type={attachment.type}
+                      value={getDisplayValue(attachment)}
+                      isFile={
+                        attachment.type === 'pdf' ||
+                        (attachment.type === 'image' && !!attachment.file) ||
+                        attachment.type === 'spreadsheet'
+                      }
+                      onRemove={() => onRemoveAttachment(attachment)}
+                      key={index}
+                    />
+                  </motion.div>
+                ))}
+              </div>
             )}
           </AnimatePresence>
+          <InputActions isInputFocused={isInputFocused} />
         </div>
       </motion.div>
     </MotionConfig>
@@ -214,15 +202,9 @@ export const useInputFocus = () => {
   }
 }
 
-function SearchIcon(props: { size?: number }) {
+export const SearchIcon = ({ size }: { size?: number }) => {
   return (
-    <svg
-      width={props.size ?? 24}
-      height={props.size ?? 24}
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg width={size ?? 24} height={size ?? 24} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
         d="M11.01 20.02C15.9861 20.02 20.02 15.9861 20.02 11.01C20.02 6.03391 15.9861 2 11.01 2C6.03391 2 2 6.03391 2 11.01C2 15.9861 6.03391 20.02 11.01 20.02Z"
         fill="#B4B4B4"
