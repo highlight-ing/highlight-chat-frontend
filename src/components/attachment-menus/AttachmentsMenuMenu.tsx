@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react'
-import { ClipboardText, DocumentUpload } from 'iconsax-react'
+import { useEffect, useRef, useState } from 'react'
+import { ClipboardText, DocumentUpload, GalleryAdd } from 'iconsax-react'
 import Highlight from '@highlight-ai/app-runtime'
 import { PaperclipIcon } from '@/icons/icons'
 import ContextMenu, { MenuItemType } from '../ContextMenu/ContextMenu'
@@ -12,10 +12,12 @@ import * as pptxtojson from 'pptxtojson'
 import { trackEvent } from '@/utils/amplitude'
 import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
 import { MAX_NUMBER_OF_ATTACHMENTS } from '@/stores/chat-attachments'
+import { ScreenshotAttachmentPicker } from '../ScreenshotAttachmentPicker/ScrenshotAttachmentPicker'
 
-export const ClipboardAndFileMenu = () => {
+export const AttachmentsMenuButton = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const messages = useCurrentChatMessages()
+  const [screenshotPickerVisible, setScreenshotPickerVisible] = useState(false)
 
   const { attachments, setFileInputRef, addAttachment } = useStore(
     useShallow((state) => ({
@@ -158,6 +160,19 @@ export const ClipboardAndFileMenu = () => {
     }
   }
 
+  const onClickScreenshot = async () => {
+    const hasScreenshotPermission = await Highlight.permissions.requestScreenshotPermission()
+
+    if (!hasScreenshotPermission) {
+      console.log('Screenshot permission denied')
+      trackEvent('HL Chat Permission Denied', { type: 'screenshot' })
+      return
+    }
+
+    setScreenshotPickerVisible(true)
+    trackEvent('HL Chat Screenshot Picker Opened', {})
+  }
+
   const onAddClipboard = async () => {
     const hasClipboardReadPermission = await Highlight.permissions.requestClipboardReadPermission()
 
@@ -201,6 +216,17 @@ export const ClipboardAndFileMenu = () => {
       label: (
         <div className={styles.menuItem}>
           <div className={styles.iconWrapper}>
+            <GalleryAdd variant="Bold" size={20} />
+          </div>
+          Screenshot
+        </div>
+      ),
+      onClick: onClickScreenshot,
+    },
+    {
+      label: (
+        <div className={styles.menuItem}>
+          <div className={styles.iconWrapper}>
             <DocumentUpload size={20} variant={'Bold'} />
           </div>
           Upload file
@@ -214,6 +240,15 @@ export const ClipboardAndFileMenu = () => {
     'text/*,image/*,application/*,application/pdf,application/json,application/xml,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.presentationml.presentation,.txt,.rtf,.md,.markdown,.mdown,.mkdn,.mdwn,.mkd,.org,.rst,.tex,.log,.ini,.cfg,.conf,.yml,.yaml,.toml,.json,.xml,.csv,.tsv,.js,.jsx,.ts,.tsx,.py,.rb,.rs,.swift,.java,.kt,.go,.php,.pl,.sh,.bash,.zsh,.fish,.sql,.html,.htm,.xhtml,.css,.scss,.sass,.less,.svg,.cjs,.mjs,.cts,.mts,.vue,.svelte,.astro,.c,.cpp,.h,.hpp,.cs,.fs,.vb,.r,.jl,.lua,.m,.mm,.scala,.groovy,.dart,.asm,.s,.elm,.erl,.ex,.exs,.hs,.lhs,.lisp,.clj,.cljs,.cljc,.edn,.ml,.mli,.ps1,.psm1,.psd1,.proto,.graphql,.gql,.bat,.cmd,.awk,.sed,.vim,.emacs,.el,.dockerfile,.dockerignore,.gitignore,.gitattributes,.env,.env.local,.env.development,.env.test,.env.production,.babelrc,.eslintrc,.prettierrc,.stylelintrc,.htaccess,.nginx,.apache2'
 
   const isDisabled = attachments.length >= MAX_NUMBER_OF_ATTACHMENTS
+
+  const openMenu = () => {
+    const element = document.getElementById('attachments-button')
+    if (element) {
+      setTimeout(() => {
+        element.click()
+      }, 50)
+    }
+  }
 
   return (
     <>
@@ -237,6 +272,14 @@ export const ClipboardAndFileMenu = () => {
                 className={`${styles.button} ${isDisabled ? styles.disabledButton : ''}`}
                 id="clipboard-and-file-menu"
               >
+                <ScreenshotAttachmentPicker
+                  isVisible={screenshotPickerVisible}
+                  onClose={() => {
+                    setScreenshotPickerVisible(false)
+                    trackEvent('HL Chat Screenshot Picker Closed', {})
+                  }}
+                  onBack={openMenu}
+                />
                 <PaperclipIcon />
                 <input
                   type="file"

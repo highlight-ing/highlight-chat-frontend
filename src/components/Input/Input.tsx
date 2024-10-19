@@ -12,9 +12,8 @@ import { trackEvent } from '@/utils/amplitude'
 import { AnimatePresence, motion, MotionConfig, Transition } from 'framer-motion'
 import useMeasure from 'react-use-measure'
 import InputActions from './InputActions'
-import { ClipboardAndFileMenu } from '../AttachmentMenu/ClipboardAndFileMenu'
-import { ConversationsMenu } from '../AttachmentMenu/ConversationsMenu'
-import { AttachmentsButton } from '../AttachmentsButton/AttachmentsButton'
+import { AttachmentsMenuButton } from '../attachment-menus/AttachmentsMenuMenu'
+import { ConversationsMenu } from '../attachment-menus/ConversationsMenu'
 
 const MAX_INPUT_HEIGHT = 160
 
@@ -34,13 +33,12 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   )
 
   const [isInputFocused, setIsInputFocused] = useState(false)
-  const [isInteractingWithInput, setIsInteractingWithInput] = useState(false)
 
   const storeInput = useStore((state) => state.input)
   const [input, setInput] = useState(storeInput ?? '')
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
-  const timeoutRef = useRef(null)
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const handleBlur = () => {
     timeoutRef.current = setTimeout(() => {
@@ -135,7 +133,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
             />
 
             <div className="flex items-center gap-2">
-              <ClipboardAndFileMenu />
+              <AttachmentsMenuButton />
 
               <ConversationsMenu />
             </div>

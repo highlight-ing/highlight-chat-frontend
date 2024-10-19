@@ -12,11 +12,10 @@ export default function ConversationToggle() {
   }
 
   return (
-    <div className={`${styles.menuItem} gap-2`}>
+    <div onClick={handleToggle} className={`${styles.menuItem} gap-2`}>
       <Switch
         id="audio-switch"
         checked={isAudioTranscripEnabled}
-        onCheckedChange={handleToggle}
         className="h-[24px] w-[45px] data-[state=checked]:bg-conv-green"
       />
       <p>{isAudioTranscripEnabled ? 'Disable Conversations' : 'Enable Conversations'}</p>
