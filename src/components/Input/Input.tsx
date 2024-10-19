@@ -15,8 +15,6 @@ import { AttachmentsMenuButton } from '../attachment-menus/AttachmentsMenuMenu'
 import { ConversationsMenu } from '../attachment-menus/ConversationsMenu'
 import InputPromptActions from './InputPromptActions'
 
-const MAX_INPUT_HEIGHT = 160
-
 /**
  * This is the main Highlight Chat input box, not a reusable Input component.
  */
@@ -68,27 +66,12 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   }
 
   useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.style.height = '0px'
-      const scrollHeight = inputRef.current.scrollHeight
-
-      const newHeight = scrollHeight > MAX_INPUT_HEIGHT ? MAX_INPUT_HEIGHT : scrollHeight
-      inputRef.current.style.height = newHeight + 'px'
-    }
-  }, [inputRef, input])
-
-  useEffect(() => {
     setInput(storeInput)
   }, [storeInput])
 
   useEffect(() => {
-    const onFocus = () => {
-      inputRef.current?.focus()
-    }
-    window.addEventListener('focus', onFocus)
-    return () => {
-      window.removeEventListener('focus', onFocus)
-    }
+    const timeout = setTimeout(() => inputRef.current?.focus(), 100)
+    return () => clearTimeout(timeout)
   }, [])
 
   const onRemoveAttachment = (attachment: AttachmentType) => {
@@ -108,7 +91,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
     <MotionConfig transition={transition}>
       <motion.div
         layout
-        initial={{ height: 56 }}
+        initial={{ height: 'auto' }}
         animate={{ height: bounds.height }}
         transition={{ ...transition, delay: isInputFocused ? 0 : 0.1 }}
         className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''}`}
@@ -122,7 +105,6 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
             <textarea
               id={'textarea-input'}
               ref={inputRef}
-              autoFocus={true}
               onFocus={() => setIsInputFocused(true)}
               onBlur={handleBlur}
               placeholder={`Ask ${promptName ? promptName : 'Highlight AI'} anything...`}
@@ -140,7 +122,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
 
           <AnimatePresence mode="popLayout">
             {attachments.length > 0 && (
-              <div className={`${styles.attachmentsRow} ${isActiveChat ? 'pb-1.5' : ''}`}>
+              <div className={`${styles.attachmentsRow} ${isActiveChat ? 'pb-1' : ''}`}>
                 {attachments.map((attachment: AttachmentType, index: number) => (
                   <motion.div
                     initial={{ opacity: 0, filter: 'blur(4px)', x: 10 }}
