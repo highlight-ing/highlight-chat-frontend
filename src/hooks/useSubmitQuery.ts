@@ -253,6 +253,7 @@ export const useSubmitQuery = () => {
 
     console.log('promptApp: ', promptApp)
     try {
+      // @deprecated
       const tools = {
         get_more_context_from_window: false,
         get_more_context_from_conversation: false,
@@ -265,6 +266,7 @@ export const useSubmitQuery = () => {
 
       formData.append('conversation_id', conversationId)
       formData.append('tools', JSON.stringify(tools))
+      formData.append('origin', 'https://chat.highlight.ing')
 
       const endpoint = 'chat/'
 
