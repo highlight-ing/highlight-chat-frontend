@@ -140,7 +140,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
 
           <AnimatePresence mode="popLayout">
             {attachments.length > 0 && (
-              <div className={styles.attachmentsRow}>
+              <div className={`${styles.attachmentsRow} ${isActiveChat ? 'pb-1.5' : ''}`}>
                 {attachments.map((attachment: AttachmentType, index: number) => (
                   <motion.div
                     initial={{ opacity: 0, filter: 'blur(4px)', x: 10 }}
@@ -164,7 +164,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
             )}
           </AnimatePresence>
 
-          <InputPromptActions isInputFocused={isInputFocused} />
+          {!isActiveChat && <InputPromptActions isInputFocused={isInputFocused} />}
         </div>
       </motion.div>
     </MotionConfig>
