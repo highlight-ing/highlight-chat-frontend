@@ -10,7 +10,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 const ChatHeader = ({ isShowing }: { isShowing: boolean }) => {
-  // const { myPrompts } = usePromptApps()
   const router = useRouter()
 
   const { startNewConversation, promptApp, promptName, promptDescription, userId, clearPrompt } = useStore(

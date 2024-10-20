@@ -65,9 +65,13 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   }
 
   useEffect(() => {
-    const timeout = setTimeout(() => inputRef.current?.focus(), 150)
-    return () => clearTimeout(timeout)
-  }, [])
+    if (inputRef.current) {
+      const timeout = setTimeout(() => {
+        inputRef.current?.focus()
+      }, 150)
+      return () => clearTimeout(timeout)
+    }
+  }, [inputRef.current])
 
   const onRemoveAttachment = (attachment: AttachmentType) => {
     if (isFileAttachmentType(attachment.type) && fileInputRef?.current) {
@@ -92,7 +96,6 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
         className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''}`}
         onClick={onClickContainer}
         onFocus={handleIconFocus}
-        onMouseDown={(e) => e.preventDefault()}
       >
         <div ref={ref} className={`${styles.inputWrapper} flex-col justify-between`}>
           <div className={styles.inputRow}>
