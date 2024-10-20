@@ -5,6 +5,7 @@ import styles from './screenshot.module.scss'
 import { useEffect, useState } from 'react'
 import { trackEvent } from '@/utils/amplitude'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export const ScreenshotAttachments = () => {
   const [windows, setWindows] = useState<{ windowTitle: string; appIcon?: string }[]>([])
@@ -63,7 +64,22 @@ export const ScreenshotAttachments = () => {
   const attachmentOptions = [...displayOptions, ...windowOptions]
 
   if (attachmentOptions && attachmentOptions?.length === 0) {
-    return null
+    return (
+      <>
+        <DropdownMenuItem>
+          <Skeleton className={`${styles.image} ${styles.displayImage}`} />
+          <Skeleton className="bg-hover h-3.5 w-1/3" />
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Skeleton className={`${styles.image} ${styles.displayImage}`} />
+          <Skeleton className="bg-hover h-3.5 w-1/3" />
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Skeleton className={`${styles.image} ${styles.displayImage}`} />
+          <Skeleton className="bg-hover h-3.5 w-1/3" />
+        </DropdownMenuItem>
+      </>
+    )
   }
 
   return (
