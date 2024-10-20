@@ -2,7 +2,7 @@
 import React from 'react'
 import { Switch } from '@/components/ui/switch'
 import { useConversations } from '@/context/ConversationContext'
-import { Label } from '../ui/label'
+import { Label } from '@/components/ui/label'
 
 export default function ConversationToggle() {
   const { isAudioTranscripEnabled, setIsAudioTranscriptEnabled } = useConversations()

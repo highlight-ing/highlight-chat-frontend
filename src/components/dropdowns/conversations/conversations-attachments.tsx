@@ -5,15 +5,11 @@ import { Setting2, VoiceSquare } from 'iconsax-react'
 import { useStore } from '@/providers/store-provider'
 import { useShallow } from 'zustand/react/shallow'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
-import AnimatedVoiceSquare from '../Conversations/AnimatedVoiceSquare'
-
-interface ConversationAttachmentPickerProps {
-  onClose: () => void
-}
+import AnimatedVoiceSquare from '@/components/Conversations/AnimatedVoiceSquare'
 
 const MAX_NUM_CONVERSATION = 20
 
-export const ConversationAttachments = ({ onClose }: ConversationAttachmentPickerProps) => {
+export const ConversationAttachments = () => {
   const { conversations, elapsedTime, currentConversation, isAudioTranscripEnabled, setIsAudioTranscriptEnabled } =
     useConversations()
   const currentConversationTitle = 'Active Audio'
@@ -50,7 +46,6 @@ export const ConversationAttachments = ({ onClose }: ConversationAttachmentPicke
         endedAt: new Date(),
         isCurrentConversation: true,
       })
-      onClose()
     },
   }
 

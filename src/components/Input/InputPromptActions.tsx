@@ -5,6 +5,8 @@ import usePromptApps from '@/hooks/usePromptApps'
 import { PinnedPrompt } from '@/types'
 import Image from 'next/image'
 import { supabaseLoader } from '@/lib/supabase'
+import { Prompt } from '@/types/supabase-helpers'
+import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 
 const actionItemVariants: Variants = {
   hidden: {
@@ -25,10 +27,13 @@ const actionItemVariants: Variants = {
 }
 
 const InputActionItem = ({ prompt }: { prompt: PinnedPrompt }) => {
+  const { selectPrompt } = usePromptApps()
+
   return (
     <motion.div
       variants={actionItemVariants}
       className="flex w-full cursor-pointer items-center gap-2 rounded-2xl px-4 py-2 transition-[background-color] duration-150 hover:bg-black/20"
+      onClick={() => selectPrompt(prompt.external_id, false)}
     >
       {prompt.image && (
         <Image
@@ -62,7 +67,16 @@ const actionItemContainerVariants: Variants = {
 
 const InputPromptActions = ({ isInputFocused }: { isInputFocused: boolean }) => {
   const { pinnedPrompts } = usePromptApps()
-  const visiblePrompts = useMemo(() => pinnedPrompts.slice(0, 4), [pinnedPrompts])
+  const visiblePrompts = useMemo(() => {
+    const uniquePrompts = pinnedPrompts.reduce((acc: Array<PinnedPrompt>, curr) => {
+      const externalIds = acc.map((prompt) => prompt.external_id)
+      if (!externalIds.includes(curr.external_id)) acc.push(curr)
+      return acc
+    }, [])
+    return uniquePrompts.slice(0, 4)
+  }, [pinnedPrompts])
+
+  if (!pinnedPrompts || visiblePrompts.length == 0) return null
 
   return (
     <AnimatePresence mode="popLayout">
@@ -73,7 +87,7 @@ const InputPromptActions = ({ isInputFocused }: { isInputFocused: boolean }) => 
           initial="hidden"
           animate="show"
           exit="exit"
-          className="space-y-1"
+          className="mt-2 space-y-1"
         >
           {visiblePrompts.map((prompt) => (
             <InputActionItem prompt={prompt} />

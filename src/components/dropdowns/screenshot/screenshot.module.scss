@@ -1,0 +1,102 @@
+@import '@/variables.module';
+
+.innerContainer {
+  display: flex;
+  flex-direction: column;
+  background-color: $background-secondary;
+  border: 1px solid $border-tertiary;
+  border-radius: 15px;
+  padding: 8px;
+  max-height: 500px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+  color: $text-secondary;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+.image {
+  transition:
+  opacity 150ms ease,
+  padding 150ms ease;
+    object-fit: cover;
+    border-radius: 8px;
+  opacity: 0.8;
+}
+
+.appIcon {
+  width: 47px;
+  height: 47px;
+  border: none;
+}
+
+.displayImage {
+  width: 72px;
+  height: 47px;
+  border: 1px solid $light-10;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+}
+
+.screenshotContainer {
+  display: flex;
+  align-items: center;
+  padding: 7px 16px 7px 5px;
+  cursor: pointer;
+  gap: 10px;
+  font-size: 16px;
+  text-wrap: nowrap;
+  cursor: pointer;
+  border-radius: 14px;
+  border: 1px solid $border-tertiary;
+  width: 100%;
+  max-width: 250px;
+
+  &:hover {
+    background-color: $background-hover;
+  }
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.title {
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 500;
+  color: $text-secondary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+
+  &:hover {
+    background-color: $light-10;
+  }
+}
+
+.disabledButton {
+  opacity: 0.5;
+  &:hover {
+    background-color: transparent;
+  }
+}

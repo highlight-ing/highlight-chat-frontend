@@ -12,8 +12,7 @@ import { trackEvent } from '@/utils/amplitude'
 import { AnimatePresence, motion, MotionConfig, Transition } from 'framer-motion'
 import useMeasure from 'react-use-measure'
 import InputPromptActions from './InputPromptActions'
-import { AttachmentsMenuButton } from '../ClipboardAndFileDropdown/AttachmentsMenuMenu'
-import { ConversationsDropdown } from '../conversations-dropdown'
+import { AttachmentDropdowns } from '../dropdowns/attachment-dropdowns'
 
 /**
  * This is the main Highlight Chat input box, not a reusable Input component.
@@ -33,7 +32,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   const [isInputFocused, setIsInputFocused] = useState(false)
 
   const storeInput = useStore((state) => state.input)
-  const [input, setInput] = useState(storeInput ?? '')
+  const setStoreInput = useStore((state) => state.setInput)
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -55,8 +54,8 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (!inputIsDisabled && e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      handleSubmit(input, promptApp)
-      setInput('')
+      handleSubmit(storeInput, promptApp)
+      setStoreInput('')
     }
   }
 
@@ -66,11 +65,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   }
 
   useEffect(() => {
-    setInput(storeInput)
-  }, [storeInput])
-
-  useEffect(() => {
-    const timeout = setTimeout(() => inputRef.current?.focus(), 100)
+    const timeout = setTimeout(() => inputRef.current?.focus(), 150)
     return () => clearTimeout(timeout)
   }, [])
 
@@ -108,16 +103,13 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
               onFocus={() => setIsInputFocused(true)}
               onBlur={handleBlur}
               placeholder={`Ask ${promptName ? promptName : 'Highlight AI'} anything...`}
-              value={input}
+              value={storeInput}
               rows={1}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => setStoreInput(e.target.value)}
               onKeyDown={handleKeyDown}
             />
 
-            <div className="flex items-center gap-2">
-              <AttachmentsMenuButton />
-              <ConversationsDropdown inputRef={inputRef} isInputFocused={isInputFocused} />
-            </div>
+            <AttachmentDropdowns isInputFocused={isInputFocused} inputRef={inputRef} />
           </div>
 
           <AnimatePresence mode="popLayout">
