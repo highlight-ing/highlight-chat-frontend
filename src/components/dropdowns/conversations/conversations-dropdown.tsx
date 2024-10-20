@@ -44,7 +44,10 @@ export const ConversationsDropdown = ({ onCloseAutoFocus }: ConversationsDropdow
         tooltip={isDisabled ? 'Max number of attahments added' : isOpen ? '' : 'Attach a conversation'}
         position={'top'}
       >
-        <DropdownMenuTrigger className={`${styles.button} ${isDisabled ? styles.disabledButton : ''}`}>
+        <DropdownMenuTrigger
+          disabled={isDisabled}
+          className={`${styles.button} ${isDisabled ? styles.disabledButton : ''}`}
+        >
           {isAudioTranscripEnabled ? (
             <AnimatedVoiceSquare
               width={24}

@@ -209,7 +209,10 @@ export const ClipboardFileDropdown = ({ onCloseAutoFocus }: ClipboardFileDropdow
           tooltip={isDisabled ? 'Max number of attahments added' : isOpen ? '' : 'Attach clipboard & files'}
           position={'top'}
         >
-          <DropdownMenuTrigger className={`${styles.button} ${isDisabled ? styles.disabledButton : ''}`}>
+          <DropdownMenuTrigger
+            disabled={isDisabled}
+            className={`${styles.button} ${isDisabled ? styles.disabledButton : ''}`}
+          >
             <PaperclipIcon />
           </DropdownMenuTrigger>
         </Tooltip>

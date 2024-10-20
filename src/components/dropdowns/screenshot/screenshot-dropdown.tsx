@@ -41,7 +41,10 @@ export const ScreenshotDropdown = ({ onCloseAutoFocus }: ScreenshotDropdownProps
         tooltip={isDisabled ? 'Max number of attahments added' : isOpen ? '' : 'Attach a screenshot'}
         position={'top'}
       >
-        <DropdownMenuTrigger className={`${styles.button} ${isDisabled ? styles.disabledButton : ''}`}>
+        <DropdownMenuTrigger
+          disabled={isDisabled}
+          className={`${styles.button} ${isDisabled ? styles.disabledButton : ''}`}
+        >
           <Gallery variant="Bold" size={24} className="text-tertiary" />
         </DropdownMenuTrigger>
       </Tooltip>

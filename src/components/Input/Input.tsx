@@ -73,6 +73,16 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
     }
   }, [inputRef.current])
 
+  useEffect(() => {
+    const onFocus = () => {
+      inputRef.current?.focus()
+    }
+    window.addEventListener('focus', onFocus)
+    return () => {
+      window.removeEventListener('focus', onFocus)
+    }
+  }, [])
+
   const onRemoveAttachment = (attachment: AttachmentType) => {
     if (isFileAttachmentType(attachment.type) && fileInputRef?.current) {
       fileInputRef.current.value = ''
@@ -138,6 +148,17 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
                   </motion.div>
                 ))}
               </div>
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence>
+            {!isActiveChat && isInputFocused && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="w-full border-t border-[#191919]"
+              />
             )}
           </AnimatePresence>
 
