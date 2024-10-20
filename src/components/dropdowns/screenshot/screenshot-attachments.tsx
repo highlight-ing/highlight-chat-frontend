@@ -4,6 +4,7 @@ import Highlight from '@highlight-ai/app-runtime'
 import styles from './screenshot.module.scss'
 import { useEffect, useState } from 'react'
 import { trackEvent } from '@/utils/amplitude'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 export const ScreenshotAttachments = () => {
   const [windows, setWindows] = useState<{ windowTitle: string; appIcon?: string }[]>([])
@@ -66,7 +67,7 @@ export const ScreenshotAttachments = () => {
   }
 
   return (
-    <>
+    <ScrollArea className="h-[324px] w-full">
       {attachmentOptions.map((option, index) => (
         <DropdownMenuItem key={index} onClick={option.onClick}>
           {option.imageComponent}
@@ -75,6 +76,6 @@ export const ScreenshotAttachments = () => {
           </div>
         </DropdownMenuItem>
       ))}
-    </>
+    </ScrollArea>
   )
 }

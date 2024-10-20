@@ -6,6 +6,7 @@ import { useStore } from '@/providers/store-provider'
 import { useShallow } from 'zustand/react/shallow'
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import AnimatedVoiceSquare from '@/components/Conversations/AnimatedVoiceSquare'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 const MAX_NUM_CONVERSATION = 20
 
@@ -99,7 +100,7 @@ export const ConversationAttachments = () => {
         : [noConversationsOption]
 
   return (
-    <>
+    <ScrollArea className="h-72 w-full">
       {attachmentOptions.map((option, index) => (
         <DropdownMenuItem key={index} onClick={option.onClick}>
           {option.imageComponent}
@@ -109,6 +110,6 @@ export const ConversationAttachments = () => {
           </div>
         </DropdownMenuItem>
       ))}
-    </>
+    </ScrollArea>
   )
 }
