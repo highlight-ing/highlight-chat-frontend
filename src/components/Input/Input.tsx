@@ -11,9 +11,9 @@ import { useShallow } from 'zustand/react/shallow'
 import { trackEvent } from '@/utils/amplitude'
 import { AnimatePresence, motion, MotionConfig, Transition } from 'framer-motion'
 import useMeasure from 'react-use-measure'
-import { AttachmentsMenuButton } from '../attachment-menus/AttachmentsMenuMenu'
-import { ConversationsMenu } from '../attachment-menus/ConversationsMenu'
 import InputPromptActions from './InputPromptActions'
+import { AttachmentsMenuButton } from '../ClipboardAndFileDropdown/AttachmentsMenuMenu'
+import { ConversationsDropdown } from '../conversations-dropdown'
 
 /**
  * This is the main Highlight Chat input box, not a reusable Input component.
@@ -116,7 +116,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
 
             <div className="flex items-center gap-2">
               <AttachmentsMenuButton />
-              <ConversationsMenu />
+              <ConversationsDropdown inputRef={inputRef} isInputFocused={isInputFocused} />
             </div>
           </div>
 
