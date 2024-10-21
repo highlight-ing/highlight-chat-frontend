@@ -68,15 +68,15 @@ export const ScreenshotAttachments = () => {
       <>
         <DropdownMenuItem>
           <Skeleton className={`${styles.image} ${styles.displayImage}`} />
-          <Skeleton className="bg-hover h-3.5 w-1/3" />
+          <Skeleton className="bg-hover h-3.5 w-1/3 rounded-sm" />
         </DropdownMenuItem>
         <DropdownMenuItem>
           <Skeleton className={`${styles.image} ${styles.displayImage}`} />
-          <Skeleton className="bg-hover h-3.5 w-1/3" />
+          <Skeleton className="bg-hover h-3.5 w-1/3 rounded-sm" />
         </DropdownMenuItem>
         <DropdownMenuItem>
           <Skeleton className={`${styles.image} ${styles.displayImage}`} />
-          <Skeleton className="bg-hover h-3.5 w-1/3" />
+          <Skeleton className="bg-hover h-3.5 w-1/3 rounded-sm" />
         </DropdownMenuItem>
       </>
     )

@@ -5,7 +5,7 @@
   flex-direction: column;
   background-color: $background-secondary;
   border: 1px solid $border-tertiary;
-  border-radius: 15px;
+  border-radius: 16px;
   padding: 8px;
   max-height: 500px;
 }
@@ -25,7 +25,7 @@
   opacity 150ms ease,
   padding 150ms ease;
     object-fit: cover;
-    border-radius: 8px;
+    border-radius: 12px;
   opacity: 0.8;
 }
 

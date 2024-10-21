@@ -224,7 +224,7 @@ export const ClipboardFileDropdown = ({ onCloseAutoFocus }: ClipboardFileDropdow
           className="space-y-2"
         >
           <DropdownMenuItem onClick={onAddClipboard}>
-            <div className="bg-hover grid size-8 grow-0 place-items-center rounded-[10px] border border-light-10 text-secondary">
+            <div className="bg-hover grid size-9 place-items-center rounded-[12px] border border-light-10 text-secondary">
               <ClipboardText size={16} variant={'Bold'} />
             </div>
             <div className="flex flex-col">
@@ -232,7 +232,7 @@ export const ClipboardFileDropdown = ({ onCloseAutoFocus }: ClipboardFileDropdow
             </div>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={handleAttachmentClick}>
-            <div className="bg-hover grid size-8 grow-0 place-items-center rounded-[10px] border border-light-10 text-secondary">
+            <div className="bg-hover grid size-9 place-items-center rounded-[12px] border border-light-10 text-secondary">
               <DocumentUpload size={16} variant={'Bold'} />
             </div>
             <div className="flex flex-col">
