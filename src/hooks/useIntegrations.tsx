@@ -41,6 +41,7 @@ function LoadingComponent() {
 
   return <p className="mt-2 text-sm text-gray-500">{text}</p>
 }
+
 // Holds the previous content of the conversation to be able to append to it
 const previousContent = new Map<string, string>()
 // Holds the name of the integration and if the authorization check is pending
@@ -100,6 +101,20 @@ export function useIntegrations(): UseIntegrationsAPI {
     const textContents = lastMessage?.content as string
 
     previousContent.set(conversationId, textContents)
+
+    if (functionName === 'highlight_search') {
+      // @ts-expect-error
+      updateLastConversationMessage(conversationId!, {
+        content: (
+          <MessageWithComponent content={textContents}>
+            <div className="mt-2">
+              <LoadingComponent />
+            </div>
+          </MessageWithComponent>
+        ),
+        role: 'assistant',
+      })
+    }
 
     // The two if blocks below handle the case where the user needs to connect their integration
     // We have a map that stores a Promise for each integration that is pending.
