@@ -40,7 +40,7 @@ export async function parseAndHandleStreamChunk(
 
         case 'loading':
           if (integrationFunctionNames.includes(jsonChunk.name) && jsonChunk.loaded === false) {
-            integrations.showLoading(conversationId)
+            integrations.showLoading(conversationId, jsonChunk.name)
           }
           break
 

@@ -91,9 +91,9 @@ export function SetupConnectionComponent({
         {icon} Connect {name}
       </Button>
 
-      <small onClick={_checkConnectionStatus} className="cursor-pointer underline">
+      {/* <small onClick={_checkConnectionStatus} className="cursor-pointer underline">
         Check connection status
-      </small>
+      </small> */}
     </div>
   )
 }
