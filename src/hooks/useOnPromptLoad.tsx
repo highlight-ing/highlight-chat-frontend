@@ -11,11 +11,7 @@ export function useOnPromptLoad() {
 
   useEffect(() => {
     if (promptApp && messages.length === 0) {
-      if (!input || (input.length === 0 && (promptApp?.description || promptApp?.name))) {
-        handleSubmit(promptApp?.description ?? promptApp?.name)
-      } else {
-        handleSubmit(input)
-      }
+      handleSubmit(input, promptApp)
     }
   }, [promptApp, input, messages])
 }

@@ -13,6 +13,7 @@ import { AnimatePresence, motion, MotionConfig, Transition } from 'framer-motion
 import useMeasure from 'react-use-measure'
 import InputPromptActions from './InputPromptActions'
 import { AttachmentDropdowns } from '../dropdowns/attachment-dropdowns'
+import InputFooter from './InputFooter'
 
 /**
  * This is the main Highlight Chat input box, not a reusable Input component.
@@ -94,15 +95,15 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
 
   const [ref, bounds] = useMeasure()
 
-  const transition: Transition = { type: 'spring', duration: 0.25, bounce: 0.3 }
+  const inputTransition: Transition = { type: 'spring', duration: 0.25, bounce: 0.3 }
 
   return (
-    <MotionConfig transition={transition}>
+    <MotionConfig transition={inputTransition}>
       <motion.div
         layout
         initial={{ height: 68 }}
         animate={isInputFocused || attachments.length > 0 ? { height: bounds.height } : { height: 68 }}
-        transition={{ ...transition, delay: isInputFocused ? 0 : 0.1 }}
+        transition={{ ...inputTransition, delay: isInputFocused ? 0 : 0.1 }}
         className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''}`}
         onClick={onClickContainer}
         onFocus={handleIconFocus}
@@ -132,7 +133,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
                   <motion.div
                     initial={{ opacity: 0, filter: 'blur(4px)', x: 10 }}
                     animate={{ opacity: 1, filter: 'blur(0px)', x: 0 }}
-                    transition={{ ...transition, delay: 0.1 }}
+                    transition={{ ...inputTransition, delay: 0.1 }}
                   >
                     <Attachment
                       type={attachment.type}
@@ -163,6 +164,19 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
           </AnimatePresence>
 
           {!isActiveChat && <InputPromptActions isInputFocused={isInputFocused} />}
+
+          <AnimatePresence mode="popLayout">
+            {!isActiveChat && isInputFocused && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="w-full border-t border-[#191919]"
+              />
+            )}
+          </AnimatePresence>
+
+          {!isActiveChat && <InputFooter isInputFocused={isInputFocused} />}
         </div>
       </motion.div>
     </MotionConfig>

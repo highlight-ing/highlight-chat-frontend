@@ -9,17 +9,17 @@ const actionItemVariants: Variants = {
   hidden: {
     opacity: 0,
     filter: 'blur(4px)',
-    x: 10,
+    y: -10,
   },
   show: {
     opacity: 1,
     filter: 'blur(0px)',
-    x: 0,
+    y: 0,
   },
   exit: {
     opacity: 0,
     filter: 'blur(4px)',
-    x: 10,
+    y: -10,
   },
 }
 
@@ -52,6 +52,7 @@ const actionItemContainerVariants: Variants = {
   show: {
     transition: {
       staggerChildren: 0.05,
+      delayChildren: 0.01,
     },
   },
   exit: {
