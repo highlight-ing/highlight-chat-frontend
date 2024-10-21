@@ -100,8 +100,8 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
     <MotionConfig transition={transition}>
       <motion.div
         layout
-        initial={{ height: 'auto' }}
-        animate={{ height: bounds.height }}
+        initial={{ height: 68 }}
+        animate={isInputFocused || attachments.length > 0 ? { height: bounds.height } : { height: 68 }}
         transition={{ ...transition, delay: isInputFocused ? 0 : 0.1 }}
         className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''}`}
         onClick={onClickContainer}

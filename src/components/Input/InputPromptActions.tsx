@@ -1,12 +1,9 @@
 import { AnimatePresence, motion, Variants } from 'framer-motion'
-import { SearchIcon } from './Input'
 import { useMemo } from 'react'
 import usePromptApps from '@/hooks/usePromptApps'
 import { PinnedPrompt } from '@/types'
 import Image from 'next/image'
 import { supabaseLoader } from '@/lib/supabase'
-import { Prompt } from '@/types/supabase-helpers'
-import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 
 const actionItemVariants: Variants = {
   hidden: {
