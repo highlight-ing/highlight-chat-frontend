@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { Attachment } from '../Attachment'
 import { Attachment as AttachmentType, isFileAttachmentType } from '@/types'
@@ -31,69 +30,56 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
       fileInputRef: state.fileInputRef,
     })),
   )
-
-  const [isInputFocused, setIsInputFocused] = useState(false)
-
   const storeInput = useStore((state) => state.input)
   const setStoreInput = useStore((state) => state.setInput)
-
-  const inputRef = useRef<HTMLTextAreaElement>(null)
-  const inputBlurTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-
-  const handleIconFocus = () => {
-    if (inputBlurTimeoutRef.current) {
-      clearTimeout(inputBlurTimeoutRef.current)
-    }
-  }
-
   const { handleSubmit } = useSubmitQuery()
+  const [isInputFocused, setIsInputFocused] = useState(false)
 
-  const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (!inputIsDisabled && e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSubmit(storeInput, promptApp)
-      setStoreInput('')
-    }
-  }
-
-  const onClickContainer = () => {
-    inputRef.current?.focus()
-    trackEvent('HL Chat Input Focused', {})
-  }
+  let inputRef = useRef<HTMLTextAreaElement>(null)
+  let inputBlurTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Use to handle the auto closing when the window is focused
   // and to prevent toggling the input focus when pressing a dropdown
   useEffect(() => {
     let windowFocusTimeout: NodeJS.Timeout | null
+
     const onWindowFocus = () => {
       windowFocusTimeout = setTimeout(() => {
         inputRef.current?.focus()
         setIsInputFocused(true)
       }, 100)
     }
+
     const onInputFocus = () => {
       if (inputBlurTimeoutRef.current) {
         clearTimeout(inputBlurTimeoutRef.current)
       }
       setIsInputFocused(true)
     }
+
     const onInputBlur = () => {
       inputBlurTimeoutRef.current = setTimeout(() => {
         setIsInputFocused(false)
       }, 100)
     }
+
     const inputElement = inputRef.current
+
     if (inputElement) {
       inputElement.addEventListener('focus', onInputFocus)
       inputElement.addEventListener('blur', onInputBlur)
     }
+
     window.addEventListener('focus', onWindowFocus)
+
     return () => {
       window.removeEventListener('focus', onWindowFocus)
+
       if (inputElement) {
         inputElement.removeEventListener('focus', onInputFocus)
         inputElement.removeEventListener('blur', onInputBlur)
       }
+
       if (windowFocusTimeout) clearTimeout(windowFocusTimeout)
       if (inputBlurTimeoutRef.current) clearTimeout(inputBlurTimeoutRef.current)
     }
@@ -111,6 +97,25 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
       window.removeEventListener('keydown', handleEsc)
     }
   }, [inputRef, setIsInputFocused])
+
+  const handleNonInputFocus = () => {
+    if (inputBlurTimeoutRef.current) {
+      clearTimeout(inputBlurTimeoutRef.current)
+    }
+  }
+
+  const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (!inputIsDisabled && e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSubmit(storeInput, promptApp)
+      setStoreInput('')
+    }
+  }
+
+  const onClickContainer = () => {
+    inputRef.current?.focus()
+    trackEvent('HL Chat Input Focused', {})
+  }
 
   const onRemoveAttachment = (attachment: AttachmentType) => {
     if (isFileAttachmentType(attachment.type) && fileInputRef?.current) {
@@ -135,7 +140,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
           transition={{ ...inputTransition, delay: isInputFocused ? 0 : 0.1 }}
           className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''}`}
           onClick={onClickContainer}
-          onFocus={handleIconFocus}
+          onFocus={handleNonInputFocus}
         >
           <div ref={ref} className={`${styles.inputWrapper} flex-col justify-between`}>
             <div className={styles.inputRow}>
