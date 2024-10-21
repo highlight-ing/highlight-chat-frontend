@@ -24,7 +24,7 @@ export const ConversationAttachments = () => {
 
   const currentConversationOptions = {
     imageComponent: (
-      <div className="grid size-8 place-items-center rounded-[10px] border border-light-10 bg-green-20 text-green">
+      <div className="grid size-9 place-items-center rounded-[12px] border border-light-10 bg-green-20 text-green">
         <AnimatedVoiceSquare
           width={16}
           height={16}
@@ -55,7 +55,7 @@ export const ConversationAttachments = () => {
     .slice(0, MAX_NUM_CONVERSATION)
     .map((conversation) => ({
       imageComponent: (
-        <div className="grid size-8 grow-0 place-items-center rounded-[10px] border border-light-10 bg-green-20 text-green">
+        <div className="grid size-9 grow-0 place-items-center rounded-[12px] border border-light-10 bg-green-20 text-green">
           <VoiceSquare size={16} variant="Bold" />
         </div>
       ),
@@ -75,7 +75,7 @@ export const ConversationAttachments = () => {
 
   const enableAudioTranscriptOption = {
     imageComponent: (
-      <div className="grid size-8 grow-0 place-items-center rounded-[10px] border border-light-10 bg-green-20 text-green">
+      <div className="grid size-9 grow-0 place-items-center rounded-[12px] border border-light-10 bg-green-20 text-green">
         <Setting2 size={16} variant="Bold" />
       </div>
     ),
@@ -100,7 +100,7 @@ export const ConversationAttachments = () => {
         : [noConversationsOption]
 
   return (
-    <ScrollArea className="h-72 w-full">
+    <ScrollArea className="flex h-72 w-full flex-col gap-1 space-y-1">
       {attachmentOptions.map((option, index) => (
         <DropdownMenuItem key={index} onClick={option.onClick}>
           {option.imageComponent}
