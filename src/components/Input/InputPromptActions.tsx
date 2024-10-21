@@ -63,7 +63,7 @@ const actionItemContainerVariants: Variants = {
   },
 }
 
-const InputPromptActions = ({ isInputFocused }: { isInputFocused: boolean }) => {
+const InputPromptActions = () => {
   const { pinnedPrompts } = usePromptApps()
   const visiblePrompts = useMemo(() => {
     const uniquePrompts = pinnedPrompts.reduce((acc: Array<PinnedPrompt>, curr) => {
@@ -76,35 +76,27 @@ const InputPromptActions = ({ isInputFocused }: { isInputFocused: boolean }) => 
 
   if (!pinnedPrompts || visiblePrompts.length == 0) {
     return (
-      <AnimatePresence mode="popLayout">
-        {isInputFocused && (
-          <motion.div variants={actionItemVariants} initial="hidden" animate="show" exit="exit" className="px-4">
-            <div className="flex w-full items-center gap-2 rounded-2xl px-4 py-2 transition-[background-color] duration-150">
-              <h3 className="text-sm text-tertiary">Loading shortcuts...</h3>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <motion.div variants={actionItemVariants} initial="hidden" animate="show" exit="exit" className="px-4">
+        <div className="flex w-full items-center gap-2 rounded-2xl px-4 py-2 transition-[background-color] duration-150">
+          <h3 className="text-sm text-tertiary">Loading shortcuts...</h3>
+        </div>
+      </motion.div>
     )
   }
 
   return (
-    <AnimatePresence mode="popLayout">
-      {isInputFocused && (
-        <motion.div
-          layout
-          variants={actionItemContainerVariants}
-          initial="hidden"
-          animate="show"
-          exit="exit"
-          className="space-y-1 px-4"
-        >
-          {visiblePrompts.map((prompt) => (
-            <InputActionItem prompt={prompt} />
-          ))}
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <motion.div
+      layout
+      variants={actionItemContainerVariants}
+      initial="hidden"
+      animate="show"
+      exit="exit"
+      className="space-y-1 px-4"
+    >
+      {visiblePrompts.map((prompt) => (
+        <InputActionItem prompt={prompt} />
+      ))}
+    </motion.div>
   )
 }
 
