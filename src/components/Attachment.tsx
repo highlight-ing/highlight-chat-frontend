@@ -93,17 +93,15 @@ export const Attachment = ({
         }
       case 'clipboard':
         return (
-          <div className="flex h-[48px] items-center gap-2.5 text-nowrap rounded-[16px] border border-light-10 bg-secondary p-[5px] pr-3 text-base">
-            <div className="bg-hover grid h-9 w-9 shrink-0 place-items-center rounded-[12px] border border-light-10 text-secondary">
-              <ClipboardText className="text-secondary" variant="Bold" size={16} />
-            </div>
+          <div className="flex h-[48px] items-center gap-2.5 text-nowrap rounded-[16px] border border-light-10 bg-secondary px-2.5 text-base">
+            <ClipboardText className="min-w-5 text-secondary" variant="Bold" size={size} />
             <span className="inline-block align-middle text-sm text-secondary">Clipboard</span>
           </div>
         )
       case 'pdf':
       case 'text_file':
         return (
-          <div className="align-center flex w-full justify-center gap-2 p-2">
+          <div className="align-center flex w-full justify-center gap-2 p-2 pl-2.5">
             <DocumentText1 className="min-w-5 text-secondary" variant="Bold" size={size} />
             <span className="inline-block max-w-40 truncate align-middle text-sm text-secondary">{value}</span>
           </div>
