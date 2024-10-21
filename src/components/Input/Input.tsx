@@ -167,18 +167,18 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
 
             {!isActiveChat && <InputPromptActions isInputFocused={isInputFocused} />}
 
-            {/* <AnimatePresence mode="popLayout"> */}
-            {/*   {!isActiveChat && isInputFocused && ( */}
-            {/*     <motion.div */}
-            {/*       initial={{ opacity: 0 }} */}
-            {/*       animate={{ opacity: 1 }} */}
-            {/*       exit={{ opacity: 0 }} */}
-            {/*       className="w-full border-t border-[#191919]" */}
-            {/*     /> */}
-            {/*   )} */}
-            {/* </AnimatePresence> */}
-            {/**/}
-            {/* {!isActiveChat && <InputFooter isInputFocused={isInputFocused} />} */}
+            <AnimatePresence mode="popLayout">
+              {!isActiveChat && isInputFocused && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="w-full border-t border-[#191919]"
+                />
+              )}
+            </AnimatePresence>
+
+            {!isActiveChat && <InputFooter isInputFocused={isInputFocused} />}
           </div>
         </motion.div>
 

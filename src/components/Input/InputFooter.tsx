@@ -1,5 +1,6 @@
 import { PlusIcon } from '@radix-ui/react-icons'
 import { AnimatePresence, motion, Variants } from 'framer-motion'
+import { useStore } from '@/providers/store-provider'
 
 const footerVariants: Variants = {
   hidden: {
@@ -21,16 +22,29 @@ const footerVariants: Variants = {
 }
 
 const InputFooter = ({ isInputFocused }: { isInputFocused: boolean }) => {
+  const openModal = useStore((state) => state.openModal)
+
   return (
     <AnimatePresence mode="popLayout">
       {isInputFocused && (
-        <motion.div layout variants={footerVariants} initial="hidden" animate="show" exit="exit" className="px-2">
-          <div className="flex items-center gap-2 px-4 pt-1 text-sm font-medium text-subtle">
+        <motion.div
+          layout
+          variants={footerVariants}
+          initial="hidden"
+          animate="show"
+          exit="exit"
+          className="px-4 pt-1.5"
+        >
+          <button
+            type="button"
+            onClick={() => openModal('create-prompt')}
+            className="flex items-center gap-2 rounded-xl px-3 py-1.5 text-sm font-medium text-subtle hover:bg-secondary"
+          >
             <div className="grid size-5 place-items-center rounded-full bg-conv-text-subtle text-[#1f1f1f]">
               <PlusIcon />
             </div>
             <span>Create Shortcut</span>
-          </div>
+          </button>
         </motion.div>
       )}
     </AnimatePresence>
