@@ -100,7 +100,7 @@ export const ConversationAttachments = () => {
         : [noConversationsOption]
 
   return (
-    <ScrollArea className="flex h-72 w-full flex-col gap-1 space-y-1">
+    <ScrollArea className="flex h-60 w-full flex-col gap-1 space-y-1">
       {attachmentOptions.map((option, index) => (
         <DropdownMenuItem key={index} onClick={option.onClick}>
           {option.imageComponent}

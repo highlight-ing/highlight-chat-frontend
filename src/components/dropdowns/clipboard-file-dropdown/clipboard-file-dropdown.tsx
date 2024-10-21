@@ -221,22 +221,28 @@ export const ClipboardFileDropdown = ({ onCloseAutoFocus }: ClipboardFileDropdow
           sideOffset={18}
           align="end"
           alignOffset={-98}
-          className="space-y-2"
+          className="w-44 p-0"
         >
-          <DropdownMenuItem onClick={onAddClipboard}>
-            <div className="bg-hover grid size-9 place-items-center rounded-[12px] border border-light-10 text-secondary">
-              <ClipboardText size={16} variant={'Bold'} />
+          <DropdownMenuItem
+            onClick={handleAttachmentClick}
+            className="mt-0 h-12 border-none p-0 first:rounded-b-none last:rounded-t-none"
+          >
+            <div className="grid place-items-center pl-2.5 text-secondary">
+              <DocumentUpload size={20} variant={'Bold'} />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-medium text-secondary">Upload File</span>
+            </div>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={onAddClipboard}
+            className="h-12 border-none p-0 first:rounded-b-none last:rounded-t-none"
+          >
+            <div className="grid place-items-center pl-2.5 text-secondary">
+              <ClipboardText size={20} variant={'Bold'} />
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-medium text-secondary">Clipboard</span>
-            </div>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleAttachmentClick}>
-            <div className="bg-hover grid size-9 place-items-center rounded-[12px] border border-light-10 text-secondary">
-              <DocumentUpload size={16} variant={'Bold'} />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-medium text-secondary">Upload file</span>
             </div>
           </DropdownMenuItem>
         </DropdownMenuContent>

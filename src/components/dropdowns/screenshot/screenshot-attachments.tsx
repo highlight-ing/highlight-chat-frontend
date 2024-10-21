@@ -83,7 +83,7 @@ export const ScreenshotAttachments = () => {
   }
 
   return (
-    <ScrollArea className="h-[324px] w-full">
+    <ScrollArea className="h-[276px] w-full">
       {attachmentOptions.map((option, index) => (
         <DropdownMenuItem key={index} onClick={option.onClick}>
           {option.imageComponent}

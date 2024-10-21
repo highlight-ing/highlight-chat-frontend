@@ -76,7 +76,19 @@ const InputPromptActions = ({ isInputFocused }: { isInputFocused: boolean }) => 
     return uniquePrompts.slice(0, 4)
   }, [pinnedPrompts])
 
-  if (!pinnedPrompts || visiblePrompts.length == 0) return null
+  if (!pinnedPrompts || visiblePrompts.length == 0) {
+    return (
+      <AnimatePresence mode="popLayout">
+        {isInputFocused && (
+          <motion.div variants={actionItemVariants} initial="hidden" animate="show" exit="exit" className="px-4">
+            <div className="flex w-full items-center gap-2 rounded-2xl px-4 py-2 transition-[background-color] duration-150">
+              <h3 className="text-sm text-tertiary">Loading shortcuts...</h3>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    )
+  }
 
   return (
     <AnimatePresence mode="popLayout">

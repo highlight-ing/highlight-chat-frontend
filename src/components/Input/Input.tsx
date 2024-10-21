@@ -151,7 +151,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
             )}
           </AnimatePresence>
 
-          <AnimatePresence>
+          <AnimatePresence mode="popLayout">
             {!isActiveChat && isInputFocused && (
               <motion.div
                 initial={{ opacity: 0 }}
