@@ -174,30 +174,8 @@ function FormComponent({
 }
 
 export function CreateNotionPageComponent({ title, content }: CreateNotionPageComponentProps) {
-  const [state, setState] = useState<'loading' | 'connect' | 'form' | 'success'>('loading')
+  const [state, setState] = useState<'form' | 'success'>('form')
   const [url, setUrl] = useState<string | undefined>(undefined)
-
-  useEffect(() => {
-    // On mount, check to see if the user has setup Linear integration
-    async function checkStatus() {
-      // @ts-ignore
-      const hlToken = (await highlight.internal.getAuthorizationToken()) as string
-
-      const connected = await checkNotionConnectionStatus(hlToken)
-
-      if (connected) {
-        setState('form')
-      } else {
-        setState('connect')
-      }
-    }
-
-    checkStatus()
-  }, [])
-
-  function onConnect() {
-    setState('form')
-  }
 
   function onSuccess(url?: string) {
     setState('success')
@@ -206,15 +184,6 @@ export function CreateNotionPageComponent({ title, content }: CreateNotionPageCo
 
   return (
     <div className="mt-2">
-      {state === 'connect' && (
-        <SetupConnectionComponent
-          name={'Notion'}
-          checkConnectionStatus={checkNotionConnectionStatus}
-          onConnect={onConnect}
-          icon={<NotionIcon size={16} />}
-          createMagicLink={createMagicLinkForNotion}
-        />
-      )}
       {state === 'form' && <FormComponent title={title} content={content} onSuccess={onSuccess} />}
       {state === 'success' && url && (
         <span>

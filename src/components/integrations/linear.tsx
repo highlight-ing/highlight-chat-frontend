@@ -1,18 +1,12 @@
-import {
-  checkLinearConnectionStatus,
-  createMagicLinkForLinear,
-  getLinearTokenForUser,
-} from '@/utils/linear-server-actions'
+import { getLinearTokenForUser } from '@/utils/linear-server-actions'
 import { useEffect, useRef, useState } from 'react'
 import InputField from '../TextInput/InputField'
 import TextArea from '../TextInput/TextArea'
 import { LinearClient, Team } from '@linear/sdk'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { LinearIcon } from '@/icons/icons'
 import Button from '../Button/Button'
 import { z } from 'zod'
-import { SetupConnectionComponent } from './integration-auth'
 
 const linearTicketFormSchema = z.object({
   title: z.string().min(1),
@@ -34,7 +28,7 @@ export function LinearTicketFormComponent({
     register,
     handleSubmit,
     watch,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<LinearTicketFormData>({
     resolver: zodResolver(linearTicketFormSchema),
     defaultValues: {
@@ -118,7 +112,7 @@ export function LinearTicketFormComponent({
         placeholder={'Issue Description'}
         {...register('description')}
       />
-      <Button size={'medium'} variant={'primary'} type={'submit'}>
+      <Button size={'medium'} variant={'primary'} type={'submit'} disabled={isSubmitting}>
         Create Ticket
       </Button>
     </form>
@@ -137,30 +131,8 @@ export function LinearTicketSuccessComponent({ issueUrl }: { issueUrl: string })
 }
 
 export function CreateLinearTicketComponent({ title, description }: { title: string; description: string }) {
-  const [state, setState] = useState<'loading' | 'connect' | 'form' | 'success'>('loading')
+  const [state, setState] = useState<'form' | 'success'>('form')
   const [issueUrl, setIssueUrl] = useState<string>()
-
-  useEffect(() => {
-    // On mount, check to see if the user has setup Linear integration
-    async function checkStatus() {
-      // @ts-ignore
-      const hlToken = (await highlight.internal.getAuthorizationToken()) as string
-
-      const connected = await checkLinearConnectionStatus(hlToken)
-
-      if (connected) {
-        setState('form')
-      } else {
-        setState('connect')
-      }
-    }
-
-    checkStatus()
-  }, [])
-
-  function onConnect() {
-    setState('form')
-  }
 
   function onSubmitSuccess(issueUrl: string) {
     setIssueUrl(issueUrl)
@@ -169,15 +141,6 @@ export function CreateLinearTicketComponent({ title, description }: { title: str
 
   return (
     <div className="mt-2">
-      {state === 'connect' && (
-        <SetupConnectionComponent
-          name={'Linear'}
-          checkConnectionStatus={checkLinearConnectionStatus}
-          onConnect={onConnect}
-          icon={<LinearIcon size={16} />}
-          createMagicLink={createMagicLinkForLinear}
-        />
-      )}
       {state === 'form' && (
         <LinearTicketFormComponent title={title} description={description} onSubmitSuccess={onSubmitSuccess} />
       )}
