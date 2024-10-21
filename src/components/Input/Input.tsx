@@ -85,6 +85,19 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
     }
   }, [])
 
+  useEffect(() => {
+    function handleEsc(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setIsInputFocused(false)
+        inputRef.current?.blur()
+      }
+    }
+    window.addEventListener('keydown', handleEsc)
+    return () => {
+      window.removeEventListener('keydown', handleEsc)
+    }
+  }, [inputRef, setIsInputFocused])
+
   const onRemoveAttachment = (attachment: AttachmentType) => {
     if (isFileAttachmentType(attachment.type) && fileInputRef?.current) {
       fileInputRef.current.value = ''
