@@ -32,7 +32,7 @@ const areAttachmentsEqual = (a: Attachment, b: Attachment) => {
   return false
 }
 
-export const MAX_NUMBER_OF_ATTACHMENTS = 5
+export const MAX_NUMBER_OF_ATTACHMENTS = 4
 
 export const createChatAttachmentsSlice: StateCreator<ChatAttachmentsSlice> = (set) => {
   return {

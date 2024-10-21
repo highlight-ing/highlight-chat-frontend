@@ -13,6 +13,7 @@ import { Prompt } from '@/types/supabase-helpers'
 import { useShallow } from 'zustand/react/shallow'
 import { useEffect, useMemo, useState } from 'react'
 import { trackEvent } from '@/utils/amplitude'
+import { useSubmitQuery } from './useSubmitQuery'
 
 let loadPromptsPromise: Promise<Prompt[]> | null = null
 

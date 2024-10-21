@@ -10,28 +10,26 @@
 }
 
 .inputContainer {
-  display: flex;
-  flex-direction: column;
-  padding: 8px;
-  gap: 8px;
-  background-color: $bg-second-layer;
-  border: 1px solid $light-10;
+  background-color: $background-hover;
   cursor: text;
-  border-radius: 12px;
+  border-radius: 24px;
   width: 100%;
-  flex-shrink: 0;
-  bottom: 16px;
   animation: fadeIn 400ms forwards;
-
+  overflow: visible;
+  
   &.active {
     margin-bottom: 20px;
     max-width: $chat-body-width;
   }
+}
 
-  &:hover {
-    border-color: $light-20;
-  }
-
+.inputWrapper {
+  padding: 16px 0px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 56px;
+  
   textarea {
     flex: 1;
     background-color: transparent;
@@ -39,6 +37,7 @@
     font-size: 15px;
     resize: none;
     outline: none;
+    
 
     &:focus {
       outline: none;
@@ -49,19 +48,23 @@
       user-select: none;
     }
   }
+  
 }
 
 .inputRow {
   display: flex;
   align-items: center;
+  justify-content: between;
   gap: 8px;
   width: 100%;
+  padding: 0 16px 0 24px;
 }
 
 .attachmentsRow {
   display: flex;
   gap: 4px;
   align-items: center;
+  padding: 0px 16px;
 }
 
 .empty {

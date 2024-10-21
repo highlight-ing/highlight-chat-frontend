@@ -7,7 +7,7 @@
   position: fixed;
   opacity: 0;
   padding-top: 8vh;
-  padding-bottom: 36px;
+  padding-bottom: 12px;
   pointer-events: none;
   min-width: min(800px, 95%);
   max-width: min(800px, 95%);
@@ -37,7 +37,7 @@
 .input {
   display: flex;
   flex-direction: column;
-  gap: 48px;
+  gap: 65px;
   opacity: 0;
   transform: scale(0.75);
   transition: opacity 150ms ease, transform 150ms ease;

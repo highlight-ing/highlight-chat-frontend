@@ -39,3 +39,14 @@ export const getConversationSubtitle = (conversation?: ConversationData): string
   const startedAt = conversation.startedAt instanceof Date ? getTimeAgo(conversation.startedAt) : ''
   return `Started ${startedAt} | ${wordCount} Words`
 }
+
+export const getConversationWordCount = (conversation?: ConversationData): string => {
+  if (!conversation) {
+    return ''
+  }
+  const wordCount = typeof conversation.transcript === 'string' ? getWordCountFormatted(conversation.transcript) : '0'
+  if (isDefaultTitle(conversation)) {
+    return `${wordCount} Words`
+  }
+  return `${wordCount} Words`
+}

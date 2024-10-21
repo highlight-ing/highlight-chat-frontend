@@ -18,6 +18,7 @@ import useHandleConversationLoad from '@/hooks/useHandleConversationLoad'
 import { useOnAppOpen } from '@/hooks/useOnAppOpen'
 import { useOnPromptChange } from '@/hooks/useOnPromptChange'
 import useOnExternalMessage from '@/hooks/useOnExternalMessage'
+import { useOnPromptLoad } from '@/hooks/useOnPromptLoad'
 
 /**
  * Hook that handles pasting from the clipboard.
@@ -95,6 +96,7 @@ const HighlightChat = () => {
   useOnAppOpen()
   useOnPromptChange()
   useOnExternalMessage()
+  useOnPromptLoad()
 
   return (
     <div className={styles.page}>

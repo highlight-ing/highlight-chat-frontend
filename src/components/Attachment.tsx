@@ -92,11 +92,16 @@ export const Attachment = ({
           )
         }
       case 'clipboard':
-        return <ClipboardText className="text-secondary" variant="Bold" size={size} />
+        return (
+          <div className="flex h-[48px] items-center gap-2.5 text-nowrap rounded-[16px] border border-light-10 bg-secondary px-2.5 text-base">
+            <ClipboardText className="min-w-5 text-secondary" variant="Bold" size={size} />
+            <span className="inline-block align-middle text-sm text-secondary">Clipboard</span>
+          </div>
+        )
       case 'pdf':
       case 'text_file':
         return (
-          <div className="align-center flex w-full justify-center gap-2 p-2">
+          <div className="align-center flex w-full justify-center gap-2 p-2 pl-2.5">
             <DocumentText1 className="min-w-5 text-secondary" variant="Bold" size={size} />
             <span className="inline-block max-w-40 truncate align-middle text-sm text-secondary">{value}</span>
           </div>
@@ -132,24 +137,19 @@ export const Attachment = ({
     >
       <div className="group relative">
         {type === 'conversation' || type === 'audio' ? (
-          <div className="flex h-[52px] w-fit items-center gap-2.5 text-nowrap rounded-[10px] border border-light-10 bg-secondary p-[7px_16px_7px_5px] text-base">
-            <div className="rounded-md border border-light-10 bg-green-20 p-[10px]">
-              <VoiceSquare className="min-w-5 text-conv-green" variant="Bold" size={20} />
+          <div className="flex h-[48px] w-40 items-center gap-2.5 text-nowrap rounded-[16px] border border-light-10 bg-secondary p-[5px] text-base leading-none">
+            <div className="grid size-9 grow-0 place-items-center rounded-[12px] border border-light-10 bg-green-20 text-green">
+              <VoiceSquare size={16} variant="Bold" />
             </div>
-            <div className="flex max-w-[180px] flex-col gap-1">
-              <span className="overflow-hid</div>den text-ellipsis whitespace-nowrap text-[13px] font-medium leading-4 text-secondary">
-                Conversation
-              </span>
-              <span className="text-[10px] font-[350] leading-4 text-tertiary">
-                {value && `${getWordCountFormatted(value)} words`}
-              </span>
+            <div className="flex flex-col">
+              <span className="text-sm font-medium text-secondary">Conversation</span>
+              {value && <span className="text-xs text-tertiary">{`${getWordCountFormatted(value)} words`}</span>}
             </div>
           </div>
         ) : (
           <div
-            className={`flex h-[52px] items-center justify-center rounded-[10px] border border-light-10 bg-secondary ${
-              type === 'pdf' || type === 'text_file' ? 'max-w-40' : 'max-w-20'
-            } ${type !== 'image' ? 'min-w-12' : 'min-w-[52px]'} w-fit overflow-hidden`}
+            className={`flex h-[48px] items-center justify-center rounded-[16px] border border-light-10 bg-secondary ${type === 'pdf' || type === 'text_file' ? 'max-w-40' : ''
+              } ${type !== 'image' ? 'min-w-12' : 'min-w-[52px]'} w-fit overflow-hidden`}
           >
             {renderAttachmentContent()}
           </div>
