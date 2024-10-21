@@ -15,6 +15,7 @@ import InputPromptActions from './InputPromptActions'
 import { AttachmentDropdowns } from '../dropdowns/attachment-dropdowns'
 import InputFooter from './InputFooter'
 import { BoxAdd } from 'iconsax-react'
+import { InputDivider } from './InputDivider'
 
 /**
  * This is the main Highlight Chat input box, not a reusable Input component.
@@ -37,17 +38,11 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   const setStoreInput = useStore((state) => state.setInput)
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
-
-  const handleBlur = () => {
-    timeoutRef.current = setTimeout(() => {
-      setIsInputFocused(false)
-    }, 100) // Adjust delay as needed
-  }
+  const inputBlurTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const handleIconFocus = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
+    if (inputBlurTimeoutRef.current) {
+      clearTimeout(inputBlurTimeoutRef.current)
     }
   }
 
@@ -66,24 +61,43 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
     trackEvent('HL Chat Input Focused', {})
   }
 
+  // Use to handle the auto closing when the window is focused
+  // and to prevent toggling the input focus when pressing a dropdown
   useEffect(() => {
-    if (inputRef.current) {
-      const timeout = setTimeout(() => {
+    let windowFocusTimeout: NodeJS.Timeout | null
+    const onWindowFocus = () => {
+      windowFocusTimeout = setTimeout(() => {
         inputRef.current?.focus()
-      }, 150)
-      return () => clearTimeout(timeout)
+        setIsInputFocused(true)
+      }, 100)
     }
-  }, [inputRef.current])
-
-  useEffect(() => {
-    const onFocus = () => {
-      inputRef.current?.focus()
+    const onInputFocus = () => {
+      if (inputBlurTimeoutRef.current) {
+        clearTimeout(inputBlurTimeoutRef.current)
+      }
+      setIsInputFocused(true)
     }
-    window.addEventListener('focus', onFocus)
+    const onInputBlur = () => {
+      inputBlurTimeoutRef.current = setTimeout(() => {
+        setIsInputFocused(false)
+      }, 100)
+    }
+    const inputElement = inputRef.current
+    if (inputElement) {
+      inputElement.addEventListener('focus', onInputFocus)
+      inputElement.addEventListener('blur', onInputBlur)
+    }
+    window.addEventListener('focus', onWindowFocus)
     return () => {
-      window.removeEventListener('focus', onFocus)
+      window.removeEventListener('focus', onWindowFocus)
+      if (inputElement) {
+        inputElement.removeEventListener('focus', onInputFocus)
+        inputElement.removeEventListener('blur', onInputBlur)
+      }
+      if (windowFocusTimeout) clearTimeout(windowFocusTimeout)
+      if (inputBlurTimeoutRef.current) clearTimeout(inputBlurTimeoutRef.current)
     }
-  }, [])
+  }, [inputRef, inputBlurTimeoutRef])
 
   useEffect(() => {
     function handleEsc(e: KeyboardEvent) {
@@ -129,15 +143,12 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
               <textarea
                 id={'textarea-input'}
                 ref={inputRef}
-                onFocus={() => setIsInputFocused(true)}
-                onBlur={handleBlur}
                 placeholder={`Ask ${promptName ? promptName : 'Highlight AI'} anything...`}
                 value={storeInput}
                 rows={1}
                 onChange={(e) => setStoreInput(e.target.value)}
                 onKeyDown={handleKeyDown}
               />
-
               <AttachmentDropdowns isInputFocused={isInputFocused} inputRef={inputRef} />
             </div>
 
@@ -169,29 +180,14 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
 
             <AnimatePresence mode="popLayout">
               {!isActiveChat && isInputFocused && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="w-full border-t border-[#191919]"
-                />
+                <>
+                  <InputDivider />
+                  <InputPromptActions />
+                  <InputDivider />
+                  <InputFooter />
+                </>
               )}
             </AnimatePresence>
-
-            {!isActiveChat && <InputPromptActions isInputFocused={isInputFocused} />}
-
-            <AnimatePresence mode="popLayout">
-              {!isActiveChat && isInputFocused && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="w-full border-t border-[#191919]"
-                />
-              )}
-            </AnimatePresence>
-
-            {!isActiveChat && <InputFooter isInputFocused={isInputFocused} />}
           </div>
         </motion.div>
 
