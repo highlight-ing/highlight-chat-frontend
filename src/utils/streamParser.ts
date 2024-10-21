@@ -39,7 +39,9 @@ export async function parseAndHandleStreamChunk(
           break
 
         case 'loading':
-          if (integrationFunctionNames.includes(jsonChunk.name) && jsonChunk.loaded === false) {
+          if (jsonChunk.name === 'highlight_search') {
+            integrations.showLoading(conversationId, jsonChunk.name)
+          } else if (integrationFunctionNames.includes(jsonChunk.name) && jsonChunk.loaded === false) {
             integrations.showLoading(conversationId, jsonChunk.name)
           }
           break
