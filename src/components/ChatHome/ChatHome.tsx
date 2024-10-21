@@ -37,10 +37,14 @@ const ChatHome = ({ isShowing }: { isShowing: boolean }) => {
   }, [isShowing])
 
   return (
-    <div className={`${styles.chatHomeContainer} ${isShowing ? styles.show : ''}`}>
+    <div className={`${styles.chatHomeContainer} ${isShowing ? styles.show : ''} h-full justify-between`}>
       <div className={styles.input}>
         <InputHeading />
         {isVisible && <Input isActiveChat={false} />}
+      </div>
+      <div className="mx-auto flex items-center gap-1 font-semibold text-subtle">
+        <HighlightIcon size={20} color="#484848" />
+        <p>Highlight AI</p>
       </div>
       {/* <ConversationSimple /> */}
       {/* <Prompts userId={userId} /> */}

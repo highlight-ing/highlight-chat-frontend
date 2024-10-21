@@ -14,6 +14,7 @@ import useMeasure from 'react-use-measure'
 import InputPromptActions from './InputPromptActions'
 import { AttachmentDropdowns } from '../dropdowns/attachment-dropdowns'
 import InputFooter from './InputFooter'
+import { BoxAdd } from 'iconsax-react'
 
 /**
  * This is the main Highlight Chat input box, not a reusable Input component.
@@ -99,86 +100,102 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
 
   return (
     <MotionConfig transition={inputTransition}>
-      <motion.div
-        layout
-        initial={{ height: 68 }}
-        animate={isInputFocused || attachments.length > 0 ? { height: bounds.height } : { height: 68 }}
-        transition={{ ...inputTransition, delay: isInputFocused ? 0 : 0.1 }}
-        className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''}`}
-        onClick={onClickContainer}
-        onFocus={handleIconFocus}
-      >
-        <div ref={ref} className={`${styles.inputWrapper} flex-col justify-between`}>
-          <div className={styles.inputRow}>
-            <SearchIcon size={24} />
-            <textarea
-              id={'textarea-input'}
-              ref={inputRef}
-              onFocus={() => setIsInputFocused(true)}
-              onBlur={handleBlur}
-              placeholder={`Ask ${promptName ? promptName : 'Highlight AI'} anything...`}
-              value={storeInput}
-              rows={1}
-              onChange={(e) => setStoreInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
+      <div className="flex w-full flex-col items-center gap-8">
+        <motion.div
+          layout
+          initial={{ height: 68 }}
+          animate={isInputFocused || attachments.length > 0 ? { height: bounds.height } : { height: 68 }}
+          transition={{ ...inputTransition, delay: isInputFocused ? 0 : 0.1 }}
+          className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''}`}
+          onClick={onClickContainer}
+          onFocus={handleIconFocus}
+        >
+          <div ref={ref} className={`${styles.inputWrapper} flex-col justify-between`}>
+            <div className={styles.inputRow}>
+              <SearchIcon size={24} />
+              <textarea
+                id={'textarea-input'}
+                ref={inputRef}
+                onFocus={() => setIsInputFocused(true)}
+                onBlur={handleBlur}
+                placeholder={`Ask ${promptName ? promptName : 'Highlight AI'} anything...`}
+                value={storeInput}
+                rows={1}
+                onChange={(e) => setStoreInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+              />
 
-            <AttachmentDropdowns isInputFocused={isInputFocused} inputRef={inputRef} />
+              <AttachmentDropdowns isInputFocused={isInputFocused} inputRef={inputRef} />
+            </div>
+
+            <AnimatePresence mode="popLayout">
+              {attachments.length > 0 && (
+                <div className={`${styles.attachmentsRow} ${isActiveChat ? 'pb-1' : ''}`}>
+                  {attachments.map((attachment: AttachmentType, index: number) => (
+                    <motion.div
+                      initial={{ opacity: 0, filter: 'blur(4px)', x: 10 }}
+                      animate={{ opacity: 1, filter: 'blur(0px)', x: 0 }}
+                      transition={{ ...inputTransition, delay: 0.15 }}
+                    >
+                      <Attachment
+                        type={attachment.type}
+                        value={getDisplayValue(attachment)}
+                        isFile={
+                          attachment.type === 'pdf' ||
+                          (attachment.type === 'image' && !!attachment.file) ||
+                          attachment.type === 'spreadsheet'
+                        }
+                        onRemove={() => onRemoveAttachment(attachment)}
+                        key={index}
+                      />
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </AnimatePresence>
+
+            <AnimatePresence mode="popLayout">
+              {!isActiveChat && isInputFocused && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="w-full border-t border-[#191919]"
+                />
+              )}
+            </AnimatePresence>
+
+            {!isActiveChat && <InputPromptActions isInputFocused={isInputFocused} />}
+
+            {/* <AnimatePresence mode="popLayout"> */}
+            {/*   {!isActiveChat && isInputFocused && ( */}
+            {/*     <motion.div */}
+            {/*       initial={{ opacity: 0 }} */}
+            {/*       animate={{ opacity: 1 }} */}
+            {/*       exit={{ opacity: 0 }} */}
+            {/*       className="w-full border-t border-[#191919]" */}
+            {/*     /> */}
+            {/*   )} */}
+            {/* </AnimatePresence> */}
+            {/**/}
+            {/* {!isActiveChat && <InputFooter isInputFocused={isInputFocused} />} */}
           </div>
+        </motion.div>
 
-          <AnimatePresence mode="popLayout">
-            {attachments.length > 0 && (
-              <div className={`${styles.attachmentsRow} ${isActiveChat ? 'pb-1' : ''}`}>
-                {attachments.map((attachment: AttachmentType, index: number) => (
-                  <motion.div
-                    initial={{ opacity: 0, filter: 'blur(4px)', x: 10 }}
-                    animate={{ opacity: 1, filter: 'blur(0px)', x: 0 }}
-                    transition={{ ...inputTransition, delay: 0.1 }}
-                  >
-                    <Attachment
-                      type={attachment.type}
-                      value={getDisplayValue(attachment)}
-                      isFile={
-                        attachment.type === 'pdf' ||
-                        (attachment.type === 'image' && !!attachment.file) ||
-                        attachment.type === 'spreadsheet'
-                      }
-                      onRemove={() => onRemoveAttachment(attachment)}
-                      key={index}
-                    />
-                  </motion.div>
-                ))}
-              </div>
-            )}
-          </AnimatePresence>
-
-          <AnimatePresence mode="popLayout">
-            {!isActiveChat && isInputFocused && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="w-full border-t border-[#191919]"
-              />
-            )}
-          </AnimatePresence>
-
-          {!isActiveChat && <InputPromptActions isInputFocused={isInputFocused} />}
-
-          <AnimatePresence mode="popLayout">
-            {!isActiveChat && isInputFocused && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="w-full border-t border-[#191919]"
-              />
-            )}
-          </AnimatePresence>
-
-          {!isActiveChat && <InputFooter isInputFocused={isInputFocused} />}
-        </div>
-      </motion.div>
+        {/* <AnimatePresence> */}
+        {/*   {!isInputFocused && !isActiveChat && ( */}
+        {/*     <motion.button */}
+        {/*       initial={{ opacity: 0 }} */}
+        {/*       animate={{ opacity: 1 }} */}
+        {/*       exit={{ opacity: 0 }} */}
+        {/*       className="hover:bg-hover flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary transition-colors" */}
+        {/*     > */}
+        {/*       <span>Browse Shortcuts</span> */}
+        {/*       <BoxAdd size={20} variant="Bold" className="opacity-80" /> */}
+        {/*     </motion.button> */}
+        {/*   )} */}
+        {/* </AnimatePresence> */}
+      </div>
     </MotionConfig>
   )
 }
