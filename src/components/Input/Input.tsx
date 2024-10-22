@@ -3,6 +3,7 @@ import { Attachment } from '../Attachment'
 import { Attachment as AttachmentType, isFileAttachmentType } from '@/types'
 import { useSubmitQuery } from '../../hooks/useSubmitQuery'
 import { useStore } from '@/providers/store-provider'
+import Highlight from '@highlight-ai/app-runtime'
 
 import styles from './chatinput.module.scss'
 import { getDisplayValue } from '@/utils/attachments'
@@ -195,21 +196,33 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
           </div>
         </motion.div>
 
-        <AnimatePresence>
-          {!isInputFocused && !isActiveChat && (
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="hover:bg-hover flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary transition-colors"
-            >
-              <span>Browse Shortcuts</span>
-              <BoxAdd size={20} variant="Bold" className="opacity-80" />
-            </motion.button>
-          )}
-        </AnimatePresence>
+        <AnimatePresence>{!isInputFocused && !isActiveChat && <BrowseShortcutsButton />}</AnimatePresence>
       </div>
     </MotionConfig>
+  )
+}
+
+function BrowseShortcutsButton() {
+  const handleOpenClick = async () => {
+    try {
+      await Highlight.app.openApp('prompts')
+    } catch (error) {
+      console.error('Failed to open the prompts app:', error)
+      window.location.href = 'highlight://app/prompts'
+    }
+  }
+
+  return (
+    <motion.button
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={handleOpenClick}
+      className="hover:bg-hover flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary transition-colors"
+    >
+      <span>Browse Shortcuts</span>
+      <BoxAdd size={20} variant="Bold" className="opacity-80" />
+    </motion.button>
   )
 }
 
