@@ -93,15 +93,12 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
     })
 
     const attachmentDestroyer = Highlight.app.addListener('onConversationAttachment', (attachment: string) => {
-      console.log('[useContextReceivedHandler] Received conversation attachment:', attachment)
-
       addAttachment({
         type: 'audio',
         value: attachment,
         duration: 0,
       })
 
-      console.log('[useContextReceivedHandler] Added attachment:', attachment)
     })
 
     return () => {
@@ -121,7 +118,6 @@ function useAboutMeRegister() {
   useEffect(() => {
     const getAboutMe = async () => {
       const aboutMe = await Highlight.user.getFacts()
-      console.log('About Me:', aboutMe)
       if (aboutMe?.length > 0) {
         setAboutMe(aboutMe)
       }
@@ -141,8 +137,6 @@ function useAuthChangeHandler() {
 
   useEffect(() => {
     const subscription = Highlight.app.addListener('onAuthUpdate', async () => {
-      console.log('[useAuth] onAuthUpdate was fired from HL runtime, requesting new tokens.')
-
       // Force new tokens
       await getAccessToken(true)
 
@@ -189,7 +183,6 @@ function useShowFollowUpFeedbackToast() {
       const shouldPresentToast = await checkForFollowUpFeedback(accessToken)
 
       if (shouldPresentToast) {
-        console.log('[useShowFollowUpFeedbackToast] Presenting toast')
         addToast(toast)
       }
     }
