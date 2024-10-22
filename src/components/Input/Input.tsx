@@ -30,10 +30,9 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
       fileInputRef: state.fileInputRef,
     })),
   )
-  const storeInput = useStore((state) => state.input)
-  const setStoreInput = useStore((state) => state.setInput)
   const { handleSubmit } = useSubmitQuery()
   const [isInputFocused, setIsInputFocused] = useState(false)
+  const [input, setInput] = useState('')
 
   let inputRef = useRef<HTMLTextAreaElement>(null)
   let inputBlurTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -107,8 +106,8 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (!inputIsDisabled && e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      handleSubmit(storeInput, promptApp)
-      setStoreInput('')
+      handleSubmit(input, promptApp)
+      setInput('')
     }
   }
 
@@ -149,9 +148,9 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
                 id={'textarea-input'}
                 ref={inputRef}
                 placeholder={`Ask ${promptName ? promptName : 'Highlight AI'} anything...`}
-                value={storeInput}
+                value={input}
                 rows={1}
-                onChange={(e) => setStoreInput(e.target.value)}
+                onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
               />
               <AttachmentDropdowns isInputFocused={isInputFocused} inputRef={inputRef} />
@@ -187,7 +186,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
               {!isActiveChat && isInputFocused && (
                 <>
                   <InputDivider />
-                  <InputPromptActions />
+                  <InputPromptActions input={input} />
                   <InputDivider />
                   <InputFooter />
                 </>
