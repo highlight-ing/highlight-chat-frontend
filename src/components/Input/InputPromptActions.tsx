@@ -4,6 +4,7 @@ import usePromptApps from '@/hooks/usePromptApps'
 import { PinnedPrompt } from '@/types'
 import Image from 'next/image'
 import { supabaseLoader } from '@/lib/supabase'
+import { useStore } from '@/providers/store-provider'
 
 const actionItemVariants: Variants = {
   hidden: {
@@ -23,14 +24,22 @@ const actionItemVariants: Variants = {
   },
 }
 
-const InputActionItem = ({ prompt }: { prompt: PinnedPrompt }) => {
+const InputActionItem = ({ prompt, input }: { prompt: PinnedPrompt; input: string }) => {
   const { selectPrompt } = usePromptApps()
+  const setStoreInput = useStore((state) => state.setInput)
+
+  const handleClick = () => {
+    if (input) {
+      setStoreInput(input)
+    }
+    selectPrompt(prompt.external_id, false)
+  }
 
   return (
     <motion.div
       variants={actionItemVariants}
       className="flex w-full cursor-pointer items-center gap-2 rounded-2xl px-2 py-2 transition-[background-color] duration-150 hover:bg-black/20"
-      onClick={() => selectPrompt(prompt.external_id, false)}
+      onClick={handleClick}
     >
       {prompt.image && (
         <Image
@@ -63,14 +72,16 @@ const actionItemContainerVariants: Variants = {
   },
 }
 
-const InputPromptActions = () => {
+const InputPromptActions = ({ input }: { input: string }) => {
   const { pinnedPrompts } = usePromptApps()
   const visiblePrompts = useMemo(() => {
     const uniquePrompts = pinnedPrompts.reduce((acc: Array<PinnedPrompt>, curr) => {
       const externalIds = acc.map((prompt) => prompt.external_id)
       if (!externalIds.includes(curr.external_id)) acc.push(curr)
+
       return acc
     }, [])
+
     return uniquePrompts.slice(0, 4)
   }, [pinnedPrompts])
 
@@ -94,7 +105,7 @@ const InputPromptActions = () => {
       className="space-y-1 px-4"
     >
       {visiblePrompts.map((prompt) => (
-        <InputActionItem prompt={prompt} />
+        <InputActionItem prompt={prompt} input={input} />
       ))}
     </motion.div>
   )
