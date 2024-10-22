@@ -1,10 +1,9 @@
-import { AnimatePresence, motion, Variants } from 'framer-motion'
+import { motion, Variants } from 'framer-motion'
 import { useMemo } from 'react'
 import usePromptApps from '@/hooks/usePromptApps'
 import { PinnedPrompt } from '@/types'
 import Image from 'next/image'
 import { supabaseLoader } from '@/lib/supabase'
-import { useStore } from '@/providers/store-provider'
 
 const actionItemVariants: Variants = {
   hidden: {
@@ -24,14 +23,10 @@ const actionItemVariants: Variants = {
   },
 }
 
-const InputActionItem = ({ prompt, input }: { prompt: PinnedPrompt; input: string }) => {
+const InputActionItem = ({ prompt }: { prompt: PinnedPrompt }) => {
   const { selectPrompt } = usePromptApps()
-  const setStoreInput = useStore((state) => state.setInput)
 
   const handleClick = () => {
-    if (input) {
-      setStoreInput(input)
-    }
     selectPrompt(prompt.external_id, false)
   }
 
@@ -72,7 +67,7 @@ const actionItemContainerVariants: Variants = {
   },
 }
 
-const InputPromptActions = ({ input }: { input: string }) => {
+const InputPromptActions = () => {
   const { pinnedPrompts } = usePromptApps()
   const visiblePrompts = useMemo(() => {
     const uniquePrompts = pinnedPrompts.reduce((acc: Array<PinnedPrompt>, curr) => {
@@ -105,7 +100,7 @@ const InputPromptActions = ({ input }: { input: string }) => {
       className="space-y-1 px-4"
     >
       {visiblePrompts.map((prompt) => (
-        <InputActionItem prompt={prompt} input={input} />
+        <InputActionItem prompt={prompt} />
       ))}
     </motion.div>
   )
