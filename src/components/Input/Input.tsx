@@ -186,7 +186,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
               {!isActiveChat && isInputFocused && (
                 <>
                   <InputDivider />
-                  <InputPromptActions input={input} />
+                  <InputPromptActions />
                   <InputDivider />
                   <InputFooter />
                 </>
