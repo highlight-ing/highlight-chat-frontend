@@ -149,6 +149,18 @@ const useOnExternalMessage = () => {
         } else {
           openCustomizePromptModal()
         }
+      } else if (message.type === 'create-prompt') {
+        console.log('Create prompt message received')
+        const openCreatePromptModal = () => {
+          closeAllModals()
+          openModal('create-prompt')
+        }
+
+        if (isModalOpen('create-prompt')) {
+          openModal('unsaved-changes', { onContinue: openCreatePromptModal })
+        } else {
+          openCreatePromptModal()
+        }
       }
     })
 
