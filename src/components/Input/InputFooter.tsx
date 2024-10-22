@@ -1,6 +1,29 @@
-import { PlusIcon } from '@radix-ui/react-icons'
-import { AnimatePresence, motion, Variants } from 'framer-motion'
+import { motion, Variants } from 'framer-motion'
 import { useStore } from '@/providers/store-provider'
+import Highlight from '@highlight-ai/app-runtime'
+import { BoxAdd, AddCircle } from 'iconsax-react'
+
+function BrowseShortcutsFooterButton() {
+  const handleOpenClick = async () => {
+    try {
+      await Highlight.app.openApp('prompts')
+    } catch (error) {
+      console.error('Failed to open the prompts app:', error)
+      window.location.href = 'highlight://app/prompts'
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleOpenClick}
+      className="group flex items-center gap-2 pl-0.5 text-sm font-medium text-subtle transition-colors hover:text-secondary"
+    >
+      <BoxAdd size={20} variant="Bold" />
+      <span>Browse Shortcuts</span>
+    </button>
+  )
+}
 
 const footerVariants: Variants = {
   hidden: {
@@ -25,17 +48,23 @@ const InputFooter = () => {
   const openModal = useStore((state) => state.openModal)
 
   return (
-    <motion.div layout variants={footerVariants} initial="hidden" animate="show" exit="exit" className="px-4 pt-1.5">
+    <motion.div
+      layout
+      variants={footerVariants}
+      initial="hidden"
+      animate="show"
+      exit="exit"
+      className="flex items-center gap-5 px-6 pt-1.5"
+    >
       <button
         type="button"
         onClick={() => openModal('create-prompt')}
-        className="flex items-center gap-2 rounded-xl px-3 py-1.5 text-sm font-medium text-subtle hover:bg-secondary"
+        className="group flex items-center gap-2 pl-0.5 text-sm font-medium text-subtle transition-colors hover:text-secondary"
       >
-        <div className="grid size-5 place-items-center rounded-full bg-conv-text-subtle text-[#1f1f1f]">
-          <PlusIcon />
-        </div>
+        <AddCircle size={20} variant="Bold" />
         <span>Create Shortcut</span>
       </button>
+      <BrowseShortcutsFooterButton />
     </motion.div>
   )
 }

@@ -195,19 +195,19 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
           </div>
         </motion.div>
 
-        {/* <AnimatePresence> */}
-        {/*   {!isInputFocused && !isActiveChat && ( */}
-        {/*     <motion.button */}
-        {/*       initial={{ opacity: 0 }} */}
-        {/*       animate={{ opacity: 1 }} */}
-        {/*       exit={{ opacity: 0 }} */}
-        {/*       className="hover:bg-hover flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary transition-colors" */}
-        {/*     > */}
-        {/*       <span>Browse Shortcuts</span> */}
-        {/*       <BoxAdd size={20} variant="Bold" className="opacity-80" /> */}
-        {/*     </motion.button> */}
-        {/*   )} */}
-        {/* </AnimatePresence> */}
+        <AnimatePresence>
+          {!isInputFocused && !isActiveChat && (
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="hover:bg-hover flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary transition-colors"
+            >
+              <span>Browse Shortcuts</span>
+              <BoxAdd size={20} variant="Bold" className="opacity-80" />
+            </motion.button>
+          )}
+        </AnimatePresence>
       </div>
     </MotionConfig>
   )
