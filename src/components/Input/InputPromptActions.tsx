@@ -100,7 +100,7 @@ const InputPromptActions = () => {
       className="space-y-1 px-4"
     >
       {visiblePrompts.map((prompt) => (
-        <InputActionItem prompt={prompt} />
+        <InputActionItem key={prompt.external_id} prompt={prompt} />
       ))}
     </motion.div>
   )

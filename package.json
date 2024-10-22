@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@amplitude/analytics-browser": "^2.10.0",
-    "@headlessui/react": "^0.0.0-insiders.994303f",
+    "@headlessui/react": "2.1.10",
     "@hello-pangea/dnd": "^16.6.0",
     "@highlight-ai/app-runtime": "^0.1.5",
     "@hookform/resolvers": "^3.9.0",
