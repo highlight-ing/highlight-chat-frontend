@@ -7,6 +7,7 @@ import { supabaseLoader } from '@/lib/supabase'
 import { Archive, Edit2 } from 'iconsax-react'
 import Tooltip from '../Tooltip/Tooltip'
 import { useStore } from '@/providers/store-provider'
+import { ScrollArea } from '../ui/scroll-area'
 
 const actionItemVariants: Variants = {
   hidden: {
@@ -132,9 +133,11 @@ const InputPromptActions = () => {
 
   return (
     <motion.div layout variants={actionItemContainerVariants} initial="hidden" animate="show" exit="exit">
-      {visiblePrompts.map((prompt) => (
-        <InputActionItem key={prompt.external_id} prompt={prompt} />
-      ))}
+      <ScrollArea viewportClassName="max-h-52">
+        {visiblePrompts.map((prompt) => (
+          <InputActionItem key={prompt.external_id} prompt={prompt} />
+        ))}
+      </ScrollArea>
     </motion.div>
   )
 }
