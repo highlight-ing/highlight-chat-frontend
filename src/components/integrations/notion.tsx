@@ -4,22 +4,14 @@ import { z } from 'zod'
 import InputField from '@/components/TextInput/InputField'
 import Button from '@/components/Button/Button'
 import { useEffect, useId, useState } from 'react'
-import { NotionIcon } from '@/icons/icons'
-import { SetupConnectionComponent } from './integration-auth'
-import {
-  checkNotionConnectionStatus,
-  createMagicLinkForNotion,
-  getNotionTokenForUser,
-  getNotionParentItems,
-  createNotionPage,
-} from '@/utils/notion-server-actions'
+import { getNotionTokenForUser, getNotionParentItems, createNotionPage } from '@/utils/notion-server-actions'
 import { Text } from 'react-notion-x'
-import ContextMenu, { MenuItemType } from '../ContextMenu/ContextMenu'
 import { NotionParentItem } from '@/types'
-import { ArrowDown2 } from 'iconsax-react'
-import { emptyTextBlock, mapNotionDecorations } from '@/utils/notion'
+import { ArrowDown2, ArrowUp2, Grid6, Document } from 'iconsax-react'
+import { emptyTextBlock, getDecorations, mapNotionDecorations } from '@/utils/notion'
 import Markdown from 'react-markdown'
 import styles from '../TextInput/inputfield.module.scss'
+import NotionDropdown from '../dropdowns/notion/notion-dropdown'
 
 interface CreateNotionPageComponentProps {
   title: string
@@ -31,45 +23,52 @@ const notionPageFormSchema = z.object({
 })
 
 type NotionPageFormData = z.infer<typeof notionPageFormSchema>
-type ItemWithDecorations = ReturnType<typeof mapNotionDecorations>[number]
 
 function ParentItemDropdown({
   items,
   onSelect,
 }: {
   items: NotionParentItem[]
-  onSelect: (item: ItemWithDecorations) => void
+  onSelect: (item: NotionParentItem) => void
 }) {
   const triggerId = useId()
-  const itemsWithDecorations = mapNotionDecorations(items)
 
-  const contextMenuItems: MenuItemType[] = itemsWithDecorations.map((item) => {
-    return {
-      label: <Text value={item.decorations} block={emptyTextBlock} />,
-      onClick: () => {
-        onSelect(item)
-        setSelectedItem(item)
-      },
-    }
-  })
+  const [selectedItem, setSelectedItem] = useState<NotionParentItem | null>(items[0])
 
-  const [selectedItem, setSelectedItem] = useState<ItemWithDecorations | null>(itemsWithDecorations[0])
+  const handleItemSelect = (item: NotionParentItem) => {
+    setSelectedItem(item)
+    onSelect(item)
+  }
 
   return (
-    <ContextMenu
+    <NotionDropdown
+      onItemSelect={handleItemSelect}
+      items={items}
       key="templates-menu"
-      items={contextMenuItems}
       position={'bottom'}
       triggerId={triggerId}
       leftClick={true}
     >
       {
-        <Button id={triggerId} size={'medium'} variant={'tertiary'}>
-          <ArrowDown2 size={16} />
-          {selectedItem ? <Text value={selectedItem.decorations} block={emptyTextBlock} /> : 'Error Loading Items'}
-        </Button>
+        // @ts-ignore
+        ({ isOpen }) => (
+          <Button id={triggerId} size={'medium'} variant={'tertiary'}>
+            {selectedItem?.type === 'database' ? (
+              <Grid6 variant="Bold" size={16} />
+            ) : (
+              <Document variant="Bold" size={16} />
+            )}
+            {selectedItem ? (
+              <Text value={getDecorations(selectedItem.title)} block={emptyTextBlock} />
+            ) : (
+              'Error Loading Items'
+            )}
+            {isOpen && <ArrowDown2 size={16} />}
+            {!isOpen && <ArrowUp2 size={16} />}
+          </Button>
+        )
       }
-    </ContextMenu>
+    </NotionDropdown>
   )
 }
 
@@ -86,10 +85,12 @@ function FormComponent({
   const [parentItems, setParentItems] = useState<NotionParentItem[]>([])
   const [selectedParentItem, setSelectedParentItem] = useState<NotionParentItem | null>(null)
 
-  const contentWithFooter = content + '\n\nCreated with [Highlight](https://highlightai.com)'
+  const contentWithFooter =
+    content.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1') + '\n\nCreated with [Highlight](https://highlightai.com)'
 
   async function loadParentItems(token: string) {
     const items = await getNotionParentItems(token)
+    console.log(items)
     setParentItems(items)
     setSelectedParentItem(items[0])
   }
@@ -151,7 +152,7 @@ function FormComponent({
   return (
     <div className="flex flex-col gap-2">
       <div className={`${styles.notionInputField} flex flex-col gap-2 bg-inherit p-[20px]`}>
-        <span className="text-sm font-medium">Page</span>
+        <span className="text-sm font-medium">Parent</span>
         <span className="text-xs text-gray-500">You must select a parent item to create the page in</span>
         {parentItems.length > 0 && <ParentItemDropdown items={parentItems} onSelect={setSelectedParentItem} />}
         {parentItems.length === 0 && <span>Loading Items...</span>}
@@ -162,7 +163,17 @@ function FormComponent({
           <span className={`${styles.inputLabel} ${styles.inline} ${styles.visible}`}>Page Contents</span>
 
           <div className={`${styles.inputField} p-[20px]`}>
-            <Markdown>{contentWithFooter}</Markdown>
+            <Markdown
+              components={{
+                a: ({ href, children }) => (
+                  <a href={href} target="_blank">
+                    {children}
+                  </a>
+                ),
+              }}
+            >
+              {contentWithFooter}
+            </Markdown>
           </div>
         </div>
         <Button size={'medium'} variant={'primary'} type={'submit'} disabled={isSubmitting}>
