@@ -55,13 +55,13 @@ const InputActionItem = ({ prompt }: { prompt: PinnedPrompt }) => {
 const actionItemContainerVariants: Variants = {
   show: {
     transition: {
-      staggerChildren: 0.05,
+      staggerChildren: 0.04,
       delayChildren: 0.01,
     },
   },
   exit: {
     transition: {
-      staggerChildren: 0.05,
+      staggerChildren: 0.02,
       staggerDirection: -1,
     },
   },
@@ -77,7 +77,7 @@ const InputPromptActions = () => {
       return acc
     }, [])
 
-    return uniquePrompts.slice(0, 4)
+    return uniquePrompts
   }, [pinnedPrompts])
 
   if (!pinnedPrompts || visiblePrompts.length == 0) {
