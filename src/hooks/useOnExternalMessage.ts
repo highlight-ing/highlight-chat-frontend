@@ -9,6 +9,7 @@ import { useIntegrations } from './useIntegrations'
 import { DEFAULT_PROMPT_EXTERNAL_IDS } from '@/lib/promptapps'
 import useForkDefaultAction from './useForkDefaultAction'
 import { useIntegration } from './useIntegration'
+import usePromptApps from './usePromptApps'
 
 const useOnExternalMessage = () => {
   const integrations = useIntegrations()
@@ -28,6 +29,7 @@ const useOnExternalMessage = () => {
   const { handleSubmit } = useSubmitQuery()
   const { forkDefaultAction } = useForkDefaultAction()
   const { createAction } = useIntegration()
+  const { selectPrompt } = usePromptApps()
 
   useEffect(() => {
     const removeListener = Highlight.app.addListener('onExternalMessage', async (caller: string, message: any) => {
@@ -161,6 +163,8 @@ const useOnExternalMessage = () => {
         } else {
           openCreatePromptModal()
         }
+      } else if (message.type === 'use-prompt') {
+        selectPrompt(message.prompt.external_id, true, true)
       } else {
         console.log('Unknown message type received:', JSON.stringify(message, null, 2))
       }
