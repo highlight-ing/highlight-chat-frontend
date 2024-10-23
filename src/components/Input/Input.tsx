@@ -186,7 +186,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
             <AnimatePresence mode="popLayout">
               {!isActiveChat && isInputFocused && (
                 <>
-                  <InputDivider />
+                  <InputDivider className="mt-2" />
                   <InputPromptActions />
                   <InputDivider />
                   <InputFooter />
@@ -196,7 +196,9 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
           </div>
         </motion.div>
 
-        <AnimatePresence>{!isInputFocused && !isActiveChat && <BrowseShortcutsButton />}</AnimatePresence>
+        <AnimatePresence mode="popLayout">
+          {!isInputFocused && !isActiveChat && <BrowseShortcutsButton />}
+        </AnimatePresence>
       </div>
     </MotionConfig>
   )
