@@ -143,7 +143,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
           onFocus={handleNonInputFocus}
         >
           <div ref={ref} className={`${styles.inputWrapper} flex-col justify-between`}>
-            <div className={styles.inputRow}>
+            <div className={`${styles.inputRow} mb-2`}>
               <SearchIcon size={24} />
               <textarea
                 id={'textarea-input'}

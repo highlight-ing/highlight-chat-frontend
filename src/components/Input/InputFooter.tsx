@@ -54,12 +54,12 @@ const InputFooter = () => {
       initial="hidden"
       animate="show"
       exit="exit"
-      className="flex items-center gap-5 px-6 pt-1.5"
+      className="flex items-center gap-5 px-6 pt-3"
     >
       <button
         type="button"
         onClick={() => openModal('create-prompt')}
-        className="group flex items-center gap-2 pl-0.5 text-sm font-medium text-subtle transition-colors hover:text-secondary"
+        className="group flex items-center gap-2 text-sm font-medium text-subtle transition-colors hover:text-secondary"
       >
         <AddCircle size={20} variant="Bold" />
         <span>Create Shortcut</span>
