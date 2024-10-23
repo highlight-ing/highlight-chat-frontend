@@ -23,6 +23,7 @@
     "@hello-pangea/dnd": "^16.6.0",
     "@highlight-ai/app-runtime": "^0.1.5",
     "@hookform/resolvers": "^3.9.0",
+    "@intercom/messenger-js-sdk": "^0.0.14",
     "@linear/sdk": "^30.0.0",
     "@monaco-editor/react": "^4.6.0",
     "@notionhq/client": "^2.2.15",
