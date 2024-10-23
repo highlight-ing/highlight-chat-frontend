@@ -161,6 +161,8 @@ const useOnExternalMessage = () => {
         } else {
           openCreatePromptModal()
         }
+      } else {
+        console.log('Unknown message type received:', JSON.stringify(message, null, 2))
       }
     })
 
