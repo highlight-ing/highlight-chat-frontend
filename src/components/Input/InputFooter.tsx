@@ -54,7 +54,7 @@ const InputFooter = () => {
       initial="hidden"
       animate="show"
       exit="exit"
-      className="flex items-center gap-5 px-6 pt-3"
+      className="flex items-center gap-5 rounded-full bg-[#1f1f1f] px-6 pt-3"
     >
       <button
         type="button"
