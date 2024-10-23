@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { supabaseLoader } from '@/lib/supabase'
 import { Archive, Edit2 } from 'iconsax-react'
 import Tooltip from '../Tooltip/Tooltip'
+import { useStore } from '@/providers/store-provider'
 
 const actionItemVariants: Variants = {
   hidden: {
@@ -27,6 +28,7 @@ const actionItemVariants: Variants = {
 
 const InputActionItem = ({ prompt }: { prompt: PinnedPrompt }) => {
   const { selectPrompt } = usePromptApps()
+  const openModal = useStore((state) => state.openModal)
 
   function handlePromptClick() {
     selectPrompt(prompt.external_id, false)
@@ -34,12 +36,12 @@ const InputActionItem = ({ prompt }: { prompt: PinnedPrompt }) => {
 
   function handleEditPromptClick(e: MouseEvent) {
     e.stopPropagation()
-    alert('EDIT')
+    openModal('edit-prompt', { prompt })
   }
 
   function handleUnpinPromptClick(e: MouseEvent) {
     e.stopPropagation()
-    alert('UNPIN')
+    openModal('unpin-prompt', { prompt })
   }
 
   return (
