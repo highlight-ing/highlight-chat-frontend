@@ -143,7 +143,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
           onFocus={handleNonInputFocus}
         >
           <div ref={ref} className={`${styles.inputWrapper} flex-col justify-between`}>
-            <div className={`${styles.inputRow} mb-2`}>
+            <div className={`${styles.inputRow}`}>
               <SearchIcon size={24} />
               <textarea
                 id={'textarea-input'}
@@ -159,7 +159,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
 
             <AnimatePresence mode="popLayout">
               {attachments.length > 0 && (
-                <div className={`${styles.attachmentsRow} ${isActiveChat ? 'pb-1' : ''}`}>
+                <div className={`${styles.attachmentsRow} mt-1.5`}>
                   {attachments.map((attachment: AttachmentType, index: number) => (
                     <motion.div
                       initial={{ opacity: 0, filter: 'blur(4px)', x: 10 }}
@@ -186,7 +186,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
             <AnimatePresence mode="popLayout">
               {!isActiveChat && isInputFocused && (
                 <>
-                  <InputDivider className="mt-2" />
+                  <InputDivider className="mt-3" />
                   <InputPromptActions />
                   <InputDivider />
                   <InputFooter />
