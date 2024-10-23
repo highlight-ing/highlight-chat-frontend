@@ -48,7 +48,7 @@ const InputActionItem = ({ prompt }: { prompt: PinnedPrompt }) => {
   return (
     <motion.div
       variants={actionItemVariants}
-      className="hover:bg-hover group flex h-10 w-full cursor-pointer items-center justify-between gap-2 rounded-lg pl-6 pr-4 transition-[background-color] duration-150 first:rounded-t-none last:rounded-b-none"
+      className="hover:bg-hover group flex h-10 w-full cursor-pointer items-center justify-between gap-2 pl-6 pr-4 transition-[background-color] duration-150"
       onClick={handlePromptClick}
     >
       <div className="flex items-center gap-2">
@@ -133,7 +133,7 @@ const InputPromptActions = () => {
 
   return (
     <motion.div layout variants={actionItemContainerVariants} initial="hidden" animate="show" exit="exit">
-      <ScrollArea viewportClassName="max-h-52">
+      <ScrollArea type="scroll" scrollHideDelay={100} viewportClassName="max-h-52">
         {visiblePrompts.map((prompt) => (
           <InputActionItem key={prompt.external_id} prompt={prompt} />
         ))}
