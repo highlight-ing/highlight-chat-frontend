@@ -5,5 +5,5 @@ export default function IntercomChat() {
     app_id: 'wrpa50zk',
   })
 
-  return <div>Example App</div>
+  return null
 }
