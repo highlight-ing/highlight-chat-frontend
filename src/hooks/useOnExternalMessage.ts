@@ -165,6 +165,8 @@ const useOnExternalMessage = () => {
         }
       } else if (message.type === 'use-prompt') {
         selectPrompt(message.prompt.external_id, true, true)
+      } else {
+        console.log('Unknown message type received:', JSON.stringify(message, null, 2))
       }
     })
 
