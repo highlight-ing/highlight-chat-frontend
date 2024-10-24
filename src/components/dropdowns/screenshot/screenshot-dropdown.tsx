@@ -8,6 +8,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/compon
 import { Gallery } from 'iconsax-react'
 import { ScreenshotAttachments } from './screenshot-attachments'
 import { AttachmentDropdownsContext } from '../attachment-dropdowns'
+import { trackEvent } from '@/utils/amplitude'
+import Highlight from '@highlight-ai/app-runtime'
 
 interface ScreenshotDropdownProps {
   onCloseAutoFocus: (e: Event) => void
@@ -33,6 +35,18 @@ export const ScreenshotDropdown = ({ onCloseAutoFocus }: ScreenshotDropdownProps
     if (activeDropdown !== dropdownId) setIsOpen(false)
   }, [activeDropdown, setIsOpen])
 
+  const onClickScreenshot = async () => {
+    const hasScreenshotPermission = await Highlight.permissions.requestScreenshotPermission()
+
+    if (!hasScreenshotPermission) {
+      console.log('Screenshot permission denied')
+      trackEvent('HL Chat Permission Denied', { type: 'screenshot' })
+      return
+    }
+
+    trackEvent('HL Chat Screenshot Picker Opened', {})
+  }
+
   const isDisabled = attachments.length >= MAX_NUMBER_OF_ATTACHMENTS
 
   return (
@@ -43,6 +57,7 @@ export const ScreenshotDropdown = ({ onCloseAutoFocus }: ScreenshotDropdownProps
       >
         <DropdownMenuTrigger
           disabled={isDisabled}
+          onClick={onClickScreenshot}
           className={`${styles.button} ${isDisabled ? styles.disabledButton : ''}`}
         >
           <Gallery variant="Bold" size={24} className="text-tertiary" />
