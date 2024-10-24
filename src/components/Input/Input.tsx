@@ -4,7 +4,6 @@ import { Attachment as AttachmentType, isFileAttachmentType } from '@/types'
 import { useSubmitQuery } from '../../hooks/useSubmitQuery'
 import { useStore } from '@/providers/store-provider'
 import Highlight from '@highlight-ai/app-runtime'
-
 import styles from './chatinput.module.scss'
 import { getDisplayValue } from '@/utils/attachments'
 import { useShallow } from 'zustand/react/shallow'
@@ -16,6 +15,8 @@ import { AttachmentDropdowns } from '../dropdowns/attachment-dropdowns'
 import InputFooter from './InputFooter'
 import { BoxAdd } from 'iconsax-react'
 import { InputDivider } from './InputDivider'
+
+const MAX_INPUT_HEIGHT = 160
 
 /**
  * This is the main Highlight Chat input box, not a reusable Input component.
@@ -98,6 +99,16 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
     }
   }, [inputRef, setIsInputFocused])
 
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.style.height = '24px'
+      const scrollHeight = inputRef.current.scrollHeight
+
+      const newHeight = scrollHeight > MAX_INPUT_HEIGHT ? MAX_INPUT_HEIGHT : scrollHeight
+      inputRef.current.style.height = newHeight + 'px'
+    }
+  }, [inputRef, input])
+
   const handleNonInputFocus = () => {
     if (inputBlurTimeoutRef.current) {
       clearTimeout(inputBlurTimeoutRef.current)
@@ -136,24 +147,28 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
         <motion.div
           layout
           initial={{ height: 68 }}
-          animate={isInputFocused || attachments.length > 0 ? { height: bounds.height } : { height: 68 }}
-          transition={{ ...inputTransition, delay: isInputFocused ? 0 : 0.1 }}
-          className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''}`}
+          animate={{ height: bounds.height }}
+          transition={{ ...inputTransition, duration: isInputFocused ? 0.2 : 0.25, delay: isInputFocused ? 0 : 0.15 }}
+          className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''} min-h-[68px]`}
           onClick={onClickContainer}
           onFocus={handleNonInputFocus}
         >
           <div ref={ref} className={`${styles.inputWrapper} flex-col justify-between`}>
-            <div className={`${styles.inputRow}`}>
-              <SearchIcon size={24} />
-              <textarea
-                id={'textarea-input'}
-                ref={inputRef}
-                placeholder={`Ask ${promptName ? promptName : 'Highlight AI'} anything...`}
-                value={input}
-                rows={1}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-              />
+            <div className="flex w-full items-end justify-between gap-2 pl-6 pr-4">
+              <div className="grid h-9 place-items-center">
+                <SearchIcon size={24} />
+              </div>
+              <div className="h-auto w-full">
+                <textarea
+                  id={'textarea-input'}
+                  ref={inputRef}
+                  placeholder={`Ask ${promptName ? promptName : 'Highlight AI'} anything...`}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="h-6 max-h-[120px] w-full resize-none overflow-y-auto leading-6"
+                />
+              </div>
               <AttachmentDropdowns isInputFocused={isInputFocused} inputRef={inputRef} />
             </div>
 
@@ -220,7 +235,7 @@ function BrowseShortcutsButton() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={handleOpenClick}
-      className="hover:bg-hover flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary transition-colors"
+      className="flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary transition-colors hover:bg-hover"
     >
       <span>Browse Shortcuts</span>
       <BoxAdd size={20} variant="Bold" className="opacity-80" />
