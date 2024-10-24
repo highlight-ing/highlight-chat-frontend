@@ -15,6 +15,7 @@ import { AttachmentDropdowns } from '../dropdowns/attachment-dropdowns'
 import InputFooter from './InputFooter'
 import { BoxAdd } from 'iconsax-react'
 import { InputDivider } from './InputDivider'
+import { cn } from '@/lib/utils'
 
 const MAX_INPUT_HEIGHT = 160
 
@@ -211,15 +212,13 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
           </div>
         </motion.div>
 
-        <AnimatePresence mode="popLayout">
-          {!isInputFocused && !isActiveChat && <BrowseShortcutsButton />}
-        </AnimatePresence>
+        {!isActiveChat && <BrowseShortcutsButton isInputFocused={isInputFocused} />}
       </div>
     </MotionConfig>
   )
 }
 
-function BrowseShortcutsButton() {
+function BrowseShortcutsButton({ isInputFocused }: { isInputFocused: boolean }) {
   const handleOpenClick = async () => {
     try {
       await Highlight.app.openApp('prompts')
@@ -230,16 +229,19 @@ function BrowseShortcutsButton() {
   }
 
   return (
-    <motion.button
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+    <button
       onClick={handleOpenClick}
-      className="flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary transition-colors hover:bg-hover"
+      disabled={isInputFocused}
+      className={cn(
+        'flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary opacity-0 transition hover:bg-hover',
+        {
+          'opacity-100': !isInputFocused,
+        },
+      )}
     >
       <span>Browse Shortcuts</span>
       <BoxAdd size={20} variant="Bold" className="opacity-80" />
-    </motion.button>
+    </button>
   )
 }
 
