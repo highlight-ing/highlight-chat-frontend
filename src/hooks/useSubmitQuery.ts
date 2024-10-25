@@ -253,11 +253,7 @@ export const useSubmitQuery = () => {
 
     console.log('promptApp: ', promptApp)
     try {
-      // @deprecated
       const tools = {
-        get_more_context_from_window: false,
-        get_more_context_from_conversation: false,
-        add_or_update_about_me_facts: false,
         create_linear_ticket:
           (promptApp?.linear_integration_enabled ?? false) || (toolOverrides?.create_linear_ticket ?? false),
         create_notion_page:
