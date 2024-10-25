@@ -262,6 +262,7 @@ export const useSubmitQuery = () => {
           (promptApp?.linear_integration_enabled ?? false) || (toolOverrides?.create_linear_ticket ?? false),
         create_notion_page:
           (promptApp?.create_notion_page_integration_enabled ?? false) || (toolOverrides?.create_notion_page ?? false),
+        create_google_calendar_event: promptApp?.create_gcal_event_integration_enabled ?? false,
       }
 
       formData.append('conversation_id', conversationId)
@@ -328,7 +329,7 @@ export const useSubmitQuery = () => {
               value: conversation_data.transcript,
               duration: Math.floor(
                 (new Date(conversation_data.endedAt).getTime() - new Date(conversation_data.startedAt).getTime()) /
-                60000,
+                  60000,
               ),
             })
           } else {

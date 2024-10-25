@@ -6,10 +6,6 @@ import { markdownToBlocks } from '@tryfabric/martian'
 
 const HIGHLIGHT_BACKEND_BASE_URL = 'https://backend.highlightai.com'
 
-const ERROR_MESSAGES = {
-  INVALID_AUTH_TOKEN: 'Invalid authorization token. Try refreshing Highlight Chat.',
-}
-
 /**
  * Returns the latest Notion API token for the given user by their ID.
  */

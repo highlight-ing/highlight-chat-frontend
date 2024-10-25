@@ -82,6 +82,16 @@ export async function parseAndHandleStreamChunk(
             integrations.createNotionPage(conversationId, { title, description, content })
           }
 
+          if (jsonChunk.name === 'create_google_calendar_event') {
+            const summary = jsonChunk.input.summary ?? ''
+            const location = jsonChunk.input.location ?? undefined
+            const description = jsonChunk.input.description ?? undefined
+            const start = jsonChunk.input.start ?? undefined
+            const end = jsonChunk.input.end ?? undefined
+
+            integrations.createGoogleCalendarEvent(conversationId, { summary, location, description, start, end })
+          }
+
           if (jsonChunk.name === 'get_more_context_from_conversations') {
             if (contextConfirmed === null) {
               contextConfirmed = await showConfirmationModal(
