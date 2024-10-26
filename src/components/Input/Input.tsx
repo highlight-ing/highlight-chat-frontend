@@ -122,7 +122,6 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
     if (!inputIsDisabled && e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleSubmit(input, promptApp)
-      setInput('')
     }
   }
 
@@ -210,7 +209,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
               {!isActiveChat && isInputFocused && (
                 <div className="pt-3">
                   <InputDivider />
-                  <InputPromptActions />
+                  <InputPromptActions input={input} />
                   <InputDivider />
                   <InputFooter />
                 </div>

@@ -27,11 +27,14 @@ const actionItemVariants: Variants = {
   },
 }
 
-const InputActionItem = ({ prompt }: { prompt: PinnedPrompt }) => {
+const InputActionItem = ({ prompt, input }: { prompt: PinnedPrompt; input: string }) => {
   const { selectPrompt } = usePromptApps()
   const openModal = useStore((state) => state.openModal)
+  const setStoreInput = useStore((state) => state.setInput)
 
   function handlePromptClick() {
+    setStoreInput(input)
+    console.log(input)
     selectPrompt(prompt.external_id, false)
   }
 
@@ -108,7 +111,7 @@ const actionItemContainerVariants: Variants = {
   },
 }
 
-const InputPromptActions = () => {
+const InputPromptActions = ({ input }: { input: string }) => {
   const { pinnedPrompts } = usePromptApps()
   const visiblePrompts = useMemo(() => {
     const uniquePrompts = pinnedPrompts.reduce((acc: Array<PinnedPrompt>, curr) => {
@@ -135,7 +138,7 @@ const InputPromptActions = () => {
     <motion.div layout variants={actionItemContainerVariants} initial="hidden" animate="show" exit="exit">
       <ScrollArea type="scroll" scrollHideDelay={100} viewportClassName="max-h-52">
         {visiblePrompts.map((prompt) => (
-          <InputActionItem key={prompt.external_id} prompt={prompt} />
+          <InputActionItem key={prompt.external_id} prompt={prompt} input={input} />
         ))}
       </ScrollArea>
     </motion.div>
