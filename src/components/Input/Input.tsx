@@ -23,16 +23,18 @@ const MAX_INPUT_HEIGHT = 160
  * This is the main Highlight Chat input box, not a reusable Input component.
  */
 export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
-  const { attachments, inputIsDisabled, promptName, promptApp, removeAttachment, fileInputRef } = useStore(
-    useShallow((state) => ({
-      attachments: state.attachments,
-      inputIsDisabled: state.inputIsDisabled,
-      promptName: state.promptName,
-      promptApp: state.promptApp,
-      removeAttachment: state.removeAttachment,
-      fileInputRef: state.fileInputRef,
-    })),
-  )
+  const { attachments, inputIsDisabled, promptName, promptApp, removeAttachment, fileInputRef, isConversationLoading } =
+    useStore(
+      useShallow((state) => ({
+        attachments: state.attachments,
+        inputIsDisabled: state.inputIsDisabled,
+        promptName: state.promptName,
+        promptApp: state.promptApp,
+        removeAttachment: state.removeAttachment,
+        fileInputRef: state.fileInputRef,
+        isConversationLoading: state.isConversationLoading,
+      })),
+    )
   const { handleSubmit } = useSubmitQuery()
   const [isInputFocused, setIsInputFocused] = useState(false)
   const [input, setInput] = useState('')
@@ -141,6 +143,8 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   const [ref, bounds] = useMeasure()
 
   const inputTransition: Transition = { type: 'spring', duration: 0.25, bounce: 0.3 }
+
+  console.log('CONVERSATION LOADING', isConversationLoading)
 
   return (
     <MotionConfig transition={inputTransition}>
