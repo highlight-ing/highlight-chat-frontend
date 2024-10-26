@@ -122,6 +122,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
     if (!inputIsDisabled && e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleSubmit(input, promptApp)
+      setInput('')
     }
   }
 
