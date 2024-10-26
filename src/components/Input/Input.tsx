@@ -166,7 +166,11 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
                   id={'textarea-input'}
                   ref={inputRef}
                   disabled={isConversationLoading}
-                  placeholder={`Ask ${promptName ? promptName : 'Highlight AI'} anything...`}
+                  placeholder={
+                    isConversationLoading
+                      ? 'Loading new chat...'
+                      : `Ask ${promptName ? promptName : 'Highlight AI'} anything...`
+                  }
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
