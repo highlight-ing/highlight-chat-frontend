@@ -23,16 +23,18 @@ const MAX_INPUT_HEIGHT = 160
  * This is the main Highlight Chat input box, not a reusable Input component.
  */
 export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
-  const { attachments, inputIsDisabled, promptName, promptApp, removeAttachment, fileInputRef } = useStore(
-    useShallow((state) => ({
-      attachments: state.attachments,
-      inputIsDisabled: state.inputIsDisabled,
-      promptName: state.promptName,
-      promptApp: state.promptApp,
-      removeAttachment: state.removeAttachment,
-      fileInputRef: state.fileInputRef,
-    })),
-  )
+  const { attachments, inputIsDisabled, promptName, promptApp, removeAttachment, fileInputRef, isConversationLoading } =
+    useStore(
+      useShallow((state) => ({
+        attachments: state.attachments,
+        inputIsDisabled: state.inputIsDisabled,
+        promptName: state.promptName,
+        promptApp: state.promptApp,
+        removeAttachment: state.removeAttachment,
+        fileInputRef: state.fileInputRef,
+        isConversationLoading: state.isConversationLoading,
+      })),
+    )
   const { handleSubmit } = useSubmitQuery()
   const [isInputFocused, setIsInputFocused] = useState(false)
   const [input, setInput] = useState('')
@@ -163,7 +165,12 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
                 <textarea
                   id={'textarea-input'}
                   ref={inputRef}
-                  placeholder={`Ask ${promptName ? promptName : 'Highlight AI'} anything...`}
+                  disabled={isConversationLoading}
+                  placeholder={
+                    isConversationLoading
+                      ? 'Loading new chat...'
+                      : `Ask ${promptName ? promptName : 'Highlight AI'} anything...`
+                  }
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}

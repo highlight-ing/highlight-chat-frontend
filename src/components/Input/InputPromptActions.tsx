@@ -48,7 +48,7 @@ const InputActionItem = ({ prompt }: { prompt: PinnedPrompt }) => {
   return (
     <motion.div
       variants={actionItemVariants}
-      className="hover:bg-hover group flex h-10 w-full cursor-pointer items-center justify-between gap-2 pl-6 pr-4 transition-[background-color] duration-150"
+      className="group flex h-10 w-full cursor-pointer items-center justify-between gap-2 pl-6 pr-4 transition-[background-color] duration-150 hover:bg-hover"
       onClick={handlePromptClick}
     >
       <div className="flex items-center gap-2">
