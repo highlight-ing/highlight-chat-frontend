@@ -144,8 +144,6 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
 
   const inputTransition: Transition = { type: 'spring', duration: 0.25, bounce: 0.3 }
 
-  console.log('CONVERSATION LOADING', isConversationLoading)
-
   return (
     <MotionConfig transition={inputTransition}>
       <div className="flex w-full flex-col items-center gap-8">
@@ -167,6 +165,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
                 <textarea
                   id={'textarea-input'}
                   ref={inputRef}
+                  disabled={isConversationLoading}
                   placeholder={`Ask ${promptName ? promptName : 'Highlight AI'} anything...`}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
