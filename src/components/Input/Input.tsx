@@ -165,9 +165,9 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
                 <textarea
                   id={'textarea-input'}
                   ref={inputRef}
-                  disabled={isConversationLoading}
+                  disabled={isConversationLoading || inputIsDisabled}
                   placeholder={
-                    isConversationLoading
+                    isConversationLoading || inputIsDisabled
                       ? 'Loading new chat...'
                       : `Ask ${promptName ? promptName : 'Highlight AI'} anything...`
                   }
