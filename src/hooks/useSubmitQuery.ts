@@ -563,7 +563,7 @@ export const useSubmitQuery = () => {
   ) => {
     const query = input.trim()
 
-    if (!query && !promptApp) {
+    if (!query || query === '') {
       console.log('No query provided, ignoring.')
       return
     }
