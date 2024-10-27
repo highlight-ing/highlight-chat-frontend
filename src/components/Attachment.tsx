@@ -41,6 +41,7 @@ export const Attachment = ({
   const [isImageLoaded, setIsImageLoaded] = useState(false)
   const conversationId = version === 'v4' ? useStore((state) => state.conversationId) : undefined
   const isConversationLoading = useStore((state) => state.isConversationLoading)
+  const inputIsDisabled = useStore((state) => state.inputIsDisabled)
 
   const { imageUrl, isLoading, error } = useImageDownload(
     type === 'image' && !value.startsWith('data:image') && !value.startsWith('blob:') ? value : null,
@@ -160,7 +161,7 @@ export const Attachment = ({
           <button
             type="button"
             aria-label="Remove attachment"
-            disabled={isConversationLoading || isImageLoaded}
+            disabled={isConversationLoading || inputIsDisabled}
             className="absolute right-[-8px] top-[-8px] hidden rounded-full bg-light-20 p-0.5 text-light-80 disabled:opacity-40 group-hover:flex"
             onClick={onRemove}
           >
