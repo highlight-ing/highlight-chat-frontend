@@ -563,10 +563,10 @@ export const useSubmitQuery = () => {
   ) => {
     const query = input.trim()
 
-    if (!query && !promptApp) {
-      console.log('No query provided, ignoring.')
-      return
-    }
+    // if (!query && !promptApp) {
+    //   console.log('No query provided, ignoring.')
+    //   return
+    // }
 
     try {
       setInputIsDisabled(true)
