@@ -13,7 +13,7 @@ import useMeasure from 'react-use-measure'
 import InputPromptActions from './InputPromptActions'
 import { AttachmentDropdowns } from '../dropdowns/attachment-dropdowns'
 import InputFooter from './InputFooter'
-import { BoxAdd } from 'iconsax-react'
+import { BoxAdd, VoiceSquare } from 'iconsax-react'
 import { InputDivider } from './InputDivider'
 import { cn } from '@/lib/utils'
 
@@ -23,18 +23,27 @@ const MAX_INPUT_HEIGHT = 160
  * This is the main Highlight Chat input box, not a reusable Input component.
  */
 export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
-  const { attachments, inputIsDisabled, promptName, promptApp, removeAttachment, fileInputRef, isConversationLoading } =
-    useStore(
-      useShallow((state) => ({
-        attachments: state.attachments,
-        inputIsDisabled: state.inputIsDisabled,
-        promptName: state.promptName,
-        promptApp: state.promptApp,
-        removeAttachment: state.removeAttachment,
-        fileInputRef: state.fileInputRef,
-        isConversationLoading: state.isConversationLoading,
-      })),
-    )
+  const {
+    attachments,
+    inputIsDisabled,
+    promptName,
+    promptApp,
+    removeAttachment,
+    fileInputRef,
+    isConversationLoading,
+    isConversationAttachmentLoading,
+  } = useStore(
+    useShallow((state) => ({
+      attachments: state.attachments,
+      inputIsDisabled: state.inputIsDisabled,
+      promptName: state.promptName,
+      promptApp: state.promptApp,
+      removeAttachment: state.removeAttachment,
+      fileInputRef: state.fileInputRef,
+      isConversationLoading: state.isConversationLoading,
+      isConversationAttachmentLoading: state.isConversationAttachmentLoading,
+    })),
+  )
   const { handleSubmit } = useSubmitQuery()
   const [isInputFocused, setIsInputFocused] = useState(false)
   const [input, setInput] = useState('')
@@ -183,25 +192,37 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
             <AnimatePresence mode="popLayout">
               {attachments.length > 0 && (
                 <div className={`${styles.attachmentsRow} mt-1.5`}>
-                  {attachments.map((attachment: AttachmentType, index: number) => (
-                    <motion.div
-                      initial={{ opacity: 0, filter: 'blur(4px)', y: -5 }}
-                      animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
-                      transition={{ ...inputTransition, delay: 0.15 }}
-                    >
-                      <Attachment
-                        type={attachment.type}
-                        value={getDisplayValue(attachment)}
-                        isFile={
-                          attachment.type === 'pdf' ||
-                          (attachment.type === 'image' && !!attachment.file) ||
-                          attachment.type === 'spreadsheet'
-                        }
-                        onRemove={() => onRemoveAttachment(attachment)}
-                        key={index}
-                      />
-                    </motion.div>
-                  ))}
+                  {isConversationAttachmentLoading ? (
+                    <div className="flex h-[48px] w-40 items-center gap-2.5 text-nowrap rounded-[16px] border border-light-10 bg-secondary p-[5px] text-base leading-none">
+                      <div className="grid size-9 grow-0 place-items-center rounded-[12px] border border-light-10 bg-hover text-secondary">
+                        <VoiceSquare size={16} variant="Bold" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium text-secondary">Conversation</span>
+                        <span className="text-xs text-tertiary">Loading...</span>
+                      </div>
+                    </div>
+                  ) : (
+                    attachments.map((attachment: AttachmentType, index: number) => (
+                      <motion.div
+                        initial={{ opacity: 0, filter: 'blur(4px)', y: -5 }}
+                        animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
+                        transition={{ ...inputTransition, delay: 0.15 }}
+                      >
+                        <Attachment
+                          type={attachment.type}
+                          value={getDisplayValue(attachment)}
+                          isFile={
+                            attachment.type === 'pdf' ||
+                            (attachment.type === 'image' && !!attachment.file) ||
+                            attachment.type === 'spreadsheet'
+                          }
+                          onRemove={() => onRemoveAttachment(attachment)}
+                          key={index}
+                        />
+                      </motion.div>
+                    ))
+                  )}
                 </div>
               )}
             </AnimatePresence>
