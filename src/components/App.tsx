@@ -95,7 +95,12 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
     })
 
     const attachmentDestroyer = Highlight.app.addListener('onConversationAttachment', (attachment: string) => {
+      startNewConversation()
+
+      clearPrompt()
+
       router.push('/')
+      trackEvent('HL Chat New Conversation Started', {})
 
       addAttachment({
         type: 'audio',
