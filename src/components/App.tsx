@@ -48,6 +48,8 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
 
   const { handleIncomingContext } = useSubmitQuery()
 
+  const router = useRouter()
+
   useEffect(() => {
     const debouncedHandleSubmit = debounce(300, async (context: HighlightContext, promptApp?: Prompt) => {
       setInput(context.suggestion || '')
@@ -93,7 +95,8 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
     })
 
     const attachmentDestroyer = Highlight.app.addListener('onConversationAttachment', (attachment: string) => {
-      console.log('ATTACHMENT FROM CONVERSATION')
+      router.push('/')
+
       addAttachment({
         type: 'audio',
         value: attachment,
