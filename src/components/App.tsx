@@ -94,13 +94,15 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
       debouncedHandleSubmit(newContext, res?.promptApp ?? undefined)
     })
 
-    const attachmentDestroyer = Highlight.app.addListener('onConversationAttachment', (attachment: string) => {
+    const attachmentDestroyer = Highlight.app.addListener('onConversationAttachment', async (attachment: string) => {
       startNewConversation()
 
       clearPrompt()
 
       router.push('/')
       trackEvent('HL Chat New Conversation Started', {})
+
+      await new Promise((resolve) => setTimeout(resolve, 1000))
 
       addAttachment({
         type: 'audio',
