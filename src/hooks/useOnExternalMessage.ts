@@ -10,8 +10,10 @@ import { DEFAULT_PROMPT_EXTERNAL_IDS } from '@/lib/promptapps'
 import useForkDefaultAction from './useForkDefaultAction'
 import { useIntegration } from './useIntegration'
 import usePromptApps from './usePromptApps'
+import { useRouter } from 'next/navigation'
 
 const useOnExternalMessage = () => {
+  const router = useRouter()
   const integrations = useIntegrations()
   const { setConversationId, openModal, closeAllModals, isModalOpen } = useStore((state) => ({
     setConversationId: state.setConversationId,
@@ -105,6 +107,7 @@ const useOnExternalMessage = () => {
                 type: 'success',
                 timeout: 5000,
               })
+              router.push('/')
               addAttachment({
                 id: conversation.id,
                 type: 'conversation',
