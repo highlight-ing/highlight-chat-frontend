@@ -31,6 +31,7 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
     setPrompt,
     closeAllModals,
     clearPrompt,
+    setConversationAttachmentLoading,
   } = useStore(
     useShallow((state) => ({
       addAttachment: state.addAttachment,
@@ -41,6 +42,7 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
       setPrompt: state.setPrompt,
       closeAllModals: state.closeAllModals,
       clearPrompt: state.clearPrompt,
+      setConversationAttachmentLoading: state.setConversationAttachmentLoading,
     })),
   )
 
@@ -95,14 +97,15 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
     })
 
     const attachmentDestroyer = Highlight.app.addListener('onConversationAttachment', async (attachment: string) => {
+      setConversationAttachmentLoading(true)
       startNewConversation()
-
       clearPrompt()
 
       router.push('/')
       trackEvent('HL Chat New Conversation Started', {})
 
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 800))
+      setConversationAttachmentLoading(false)
 
       addAttachment({
         type: 'audio',
