@@ -104,8 +104,7 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
       router.push('/')
       trackEvent('HL Chat New Conversation Started', {})
 
-      await new Promise((resolve) => setTimeout(resolve, 800))
-      setConversationAttachmentLoading(false)
+      await new Promise((resolve) => setTimeout(resolve, 600))
 
       addAttachment({
         type: 'audio',
