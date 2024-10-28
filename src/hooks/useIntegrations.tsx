@@ -225,6 +225,8 @@ export function useIntegrations(): UseIntegrationsAPI {
 
       const connected = await checkGoogleConnectionStatus(hlToken)
 
+      console.log('Google Connected', connected)
+
       if (!connected) {
         const promise = new Promise<void>((resolve) => {
           // @ts-expect-error

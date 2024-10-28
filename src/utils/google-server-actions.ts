@@ -1,3 +1,8 @@
+'use server'
+
+import type { CreateGoogleCalendarEventParams } from '@/hooks/useIntegrations'
+import { google } from 'googleapis'
+
 const HIGHLIGHT_BACKEND_BASE_URL = 'https://backend.highlightai.com'
 
 export async function checkGoogleConnectionStatus(accessToken: string) {
@@ -45,12 +50,12 @@ export async function getGoogleTokenForUser(hlAccessToken: string) {
 
   const data = await response.json()
 
-  if (!data.token) {
+  if (!data.accessToken) {
     console.error('Failed to get Google token for user. No token found in response body.')
     throw new Error('Failed to get Google token for user. No token found in response body.')
   }
 
-  return data.token as string
+  return data.accessToken as string
 }
 
 /**
@@ -82,4 +87,40 @@ export async function createMagicLinkForGoogle(accessToken: string) {
   }
 
   return data.url
+}
+
+export async function createGoogleCalendarEvent(accessToken: string, data: CreateGoogleCalendarEventParams) {
+  const gToken = await getGoogleTokenForUser(accessToken)
+
+  const oauth2Client = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    process.env.GOOGLE_REDIRECT_URL,
+  )
+
+  oauth2Client.setCredentials({
+    access_token: gToken,
+  })
+
+  const calendar = google.calendar({ version: 'v3', auth: oauth2Client })
+
+  const startDate = data.start ? new Date(data.start).toISOString() : new Date().toISOString()
+  const endDate = data.end ? new Date(data.end).toISOString() : new Date(startDate).toISOString()
+
+  const event = await calendar.events.insert({
+    auth: oauth2Client,
+    calendarId: 'primary',
+    requestBody: {
+      summary: data.summary,
+      description: data.description,
+      start: {
+        dateTime: startDate,
+      },
+      end: {
+        dateTime: endDate,
+      },
+    },
+  })
+
+  return event.data.htmlLink
 }
