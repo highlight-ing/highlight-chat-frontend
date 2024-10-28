@@ -253,11 +253,7 @@ export const useSubmitQuery = () => {
 
     console.log('promptApp: ', promptApp)
     try {
-      // @deprecated
       const tools = {
-        get_more_context_from_window: false,
-        get_more_context_from_conversation: false,
-        add_or_update_about_me_facts: false,
         create_linear_ticket:
           (promptApp?.linear_integration_enabled ?? false) || (toolOverrides?.create_linear_ticket ?? false),
         create_notion_page:
@@ -328,7 +324,7 @@ export const useSubmitQuery = () => {
               value: conversation_data.transcript,
               duration: Math.floor(
                 (new Date(conversation_data.endedAt).getTime() - new Date(conversation_data.startedAt).getTime()) /
-                60000,
+                  60000,
               ),
             })
           } else {
@@ -567,7 +563,7 @@ export const useSubmitQuery = () => {
   ) => {
     const query = input.trim()
 
-    if (!query && !promptApp) {
+    if (!query || query === '') {
       console.log('No query provided, ignoring.')
       return
     }

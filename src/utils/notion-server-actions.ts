@@ -110,6 +110,17 @@ export async function getNotionParentItems(accessToken: string) {
   const parentItems: NotionParentItem[] = []
 
   fullResults.forEach((result) => {
+    if (result.object === 'database') {
+      parentItems.push({
+        type: result.object,
+        id: result.id,
+        title: result.title,
+      })
+      return
+    }
+
+    console.log(result)
+
     for (const property of Object.values(result.properties)) {
       if (property.type === 'title' && Array.isArray(property.title)) {
         parentItems.push({
