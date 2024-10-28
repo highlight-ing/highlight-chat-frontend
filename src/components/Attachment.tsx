@@ -140,7 +140,7 @@ export const Attachment = ({
       <div className="group relative">
         {type === 'conversation' || type === 'audio' ? (
           <div className="flex h-[48px] w-40 items-center gap-2.5 text-nowrap rounded-[16px] border border-light-10 bg-secondary p-[5px] text-base leading-none">
-            <div className="grid size-9 grow-0 place-items-center rounded-[12px] border border-light-10 bg-green-20 text-green">
+            <div className="grid size-9 grow-0 place-items-center rounded-[12px] bg-green-20 text-green">
               <VoiceSquare size={16} variant="Bold" />
             </div>
             <div className="flex flex-col">
@@ -150,9 +150,8 @@ export const Attachment = ({
           </div>
         ) : (
           <div
-            className={`flex h-[48px] items-center justify-center rounded-[16px] border border-light-10 bg-secondary ${
-              type === 'pdf' || type === 'text_file' ? 'max-w-40' : ''
-            } ${type !== 'image' ? 'min-w-12' : 'min-w-[52px]'} w-fit overflow-hidden`}
+            className={`flex h-[48px] items-center justify-center rounded-[16px] border border-light-10 bg-secondary ${type === 'pdf' || type === 'text_file' ? 'max-w-40' : ''
+              } ${type !== 'image' ? 'min-w-12' : 'min-w-[52px]'} w-fit overflow-hidden`}
           >
             {renderAttachmentContent()}
           </div>

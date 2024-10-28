@@ -74,7 +74,7 @@ export const ConversationsDropdown = ({ onCloseAutoFocus }: ConversationsDropdow
         sideOffset={18}
         align="end"
         alignOffset={-10}
-        className="space-y-2"
+        className="w-64 space-y-2"
       >
         <ConversationToggle />
         <ConversationAttachments />
