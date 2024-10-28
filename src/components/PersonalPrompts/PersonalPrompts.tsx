@@ -57,7 +57,7 @@ const PersonalPrompts = ({ userId, prompts, pinnedPrompts }: PersonalPromptsProp
     <div className={styles.personalPromptsContainer}>
       <div className={styles.personalPromptsHeader}>
         <div className={styles.personalPromptsHeaderLeft}>
-          <h2>Pinned Actions</h2>
+          <h2>Pinned Shortcuts</h2>
         </div>
         <div className={styles.personalPromptsHeaderRight}>
           <Button size="medium" variant="ghost-neutral" onClick={() => openModal('create-prompt')}>

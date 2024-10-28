@@ -36,7 +36,7 @@ const TrendingPrompts = ({
     <div className={styles.trendingPromptsContainer}>
       {prompts.length > 0 && (
         <div className={styles.trendingPromptsHeader}>
-          <h2>Top 10 Trending Actions</h2>
+          <h2>Top 10 Trending Shortcuts</h2>
           <div className={styles.trendingPrompts}>
             {mergedPrompts.map((item, index) => {
               return (

@@ -91,7 +91,7 @@ export const TemplatesTool = ({ hidden }: { hidden: boolean }) => {
                 <div className={'flex flex-col gap-1'}>
                   <span>Explore template examples</span>
                   <span className={'text-xs text-light-60'}>
-                    New to actions? Check out some templates to get started.
+                    New to shortcuts? Check out some templates to get started.
                   </span>
                 </div>
               )

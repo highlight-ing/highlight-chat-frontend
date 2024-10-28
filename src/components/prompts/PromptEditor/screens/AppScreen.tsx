@@ -16,8 +16,8 @@ function OnboardingIndex0() {
   return (
     <OnboardingBox
       title="Welcome to the Highlight Editor"
-      line1={`The Highlight editor is designed to help you write actions to create any kind of AI app you can imagine.`}
-      line2={`Think of actions as instructions for Highlight to think, act, and behave however you want it to.`}
+      line1={`The Highlight editor is designed to help you write shortcuts to create any kind of AI app you can imagine.`}
+      line2={`Think of shortcuts as instructions for Highlight to think, act, and behave however you want it to.`}
       buttonText="Continue"
       onClick={handleContinue}
     />
@@ -29,7 +29,7 @@ function OnboardingIndex1() {
 
   useEffect(() => {
     setPromptEditorData({
-      appPrompt: `{{! These are comments, they won't effect the output of your app }}\n{{! Some tips for writing actions. }}\nSummarize my meeting notes`,
+      appPrompt: `{{! These are comments, they won't effect the output of your app }}\n{{! Some tips for writing shortcuts. }}\nSummarize my meeting notes`,
     })
   }, [])
 
@@ -39,9 +39,9 @@ function OnboardingIndex1() {
 
   return (
     <OnboardingBox
-      title="Actions are easy to create"
-      line1={`Actions can be as simple as a short sentence. In the example above, we’ve written an action for summarizing meeting notes.`}
-      line2={`This action is instructing Highlight to take the meeting notes you give it and summarize it for you.`}
+      title="Shortcuts are easy to create"
+      line1={`Shortcuts can be as simple as a short sentence. In the example above, we’ve written an shortcut for summarizing meeting notes.`}
+      line2={`This shortcut is instructing Highlight to take the meeting notes you give it and summarize it for you.`}
       buttonText="Continue"
       onClick={handleContinue}
     />
@@ -53,7 +53,7 @@ function OnboardingIndex2() {
 
   useEffect(() => {
     setPromptEditorData({
-      appPrompt: `{{! These are comments, they won't effect the output of your app }}\n{{! Some tips for writing actions. }}\nSummarize my meeting notes and list out all decisions and action items as a bullet list`,
+      appPrompt: `{{! These are comments, they won't effect the output of your app }}\n{{! Some tips for writing shortcuts. }}\nSummarize my meeting notes and list out all decisions and shortcut items as a bullet list`,
     })
   }, [])
 
@@ -65,7 +65,7 @@ function OnboardingIndex2() {
     <OnboardingBox
       title="The key is to be as specific as possible"
       line1={`The most important thing to remember is to include the details. Highlight is super smart -- but it can’t read your mind just yet 😉`}
-      line2={`You’ll notice in the example above we’ve added some details to the action for Highlight to format the meeting notes in a specific way.`}
+      line2={`You’ll notice in the example above we’ve added some details to the shortcut for Highlight to format the meeting notes in a specific way.`}
       buttonText="Continue"
       onClick={handleContinue}
     />
@@ -77,7 +77,7 @@ function OnboardingIndex3() {
 
   useEffect(() => {
     setPromptEditorData({
-      appPrompt: `{{! These are comments, they won't effect the output of your app }}\n{{! Some tips for writing actions. }}\nSummarize my meeting notes using the audio and/or clipboard text that is provided.\nList out all decisions and action items as a bullet list.`,
+      appPrompt: `{{! These are comments, they won't effect the output of your app }}\n{{! Some tips for writing shortcuts. }}\nSummarize my meeting notes using the audio and/or clipboard text that is provided.\nList out all decisions and shortcut items as a bullet list.`,
     })
   }, [])
 
@@ -91,9 +91,9 @@ function OnboardingIndex3() {
 
   return (
     <OnboardingBox
-      title="Add context to give your actions superpowers"
-      line1={`With Highlight, you’re able to include context in your actions so that Highlight can understand what you’re talking about. `}
-      line2={`In our example, we’ve now updated the action to use any audio or text from our clipboard that is provided to generate the summary.`}
+      title="Add context to give your shortcuts superpowers"
+      line1={`With Highlight, you’re able to include context in your shortcuts so that Highlight can understand what you’re talking about. `}
+      line2={`In our example, we’ve now updated the shortcut to use any audio or text from our clipboard that is provided to generate the summary.`}
       buttonText="Continue"
       onClick={handleContinue}
     />
@@ -153,7 +153,7 @@ export default function AppScreen() {
           <div className="flex flex-col space-y-[6px]">
             <h3 className="text-base font-semibold text-white">Automations</h3>
             <p className="text-xs font-normal leading-tight text-[#6e6e6e]">
-              Add automations to your actions to allow Highlight to do things for you.
+              Add automations to your shortcuts to allow Highlight to do things for you.
             </p>
           </div>
 
