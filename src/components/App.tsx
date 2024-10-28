@@ -93,12 +93,12 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
     })
 
     const attachmentDestroyer = Highlight.app.addListener('onConversationAttachment', (attachment: string) => {
+      console.log('ATTACHMENT FROM CONVERSATION')
       addAttachment({
         type: 'audio',
         value: attachment,
         duration: 0,
       })
-
     })
 
     return () => {
