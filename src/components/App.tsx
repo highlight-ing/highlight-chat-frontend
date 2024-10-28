@@ -31,7 +31,6 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
     setPrompt,
     closeAllModals,
     clearPrompt,
-    setConversationAttachmentLoading,
   } = useStore(
     useShallow((state) => ({
       addAttachment: state.addAttachment,
@@ -42,7 +41,6 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
       setPrompt: state.setPrompt,
       closeAllModals: state.closeAllModals,
       clearPrompt: state.clearPrompt,
-      setConversationAttachmentLoading: state.setConversationAttachmentLoading,
     })),
   )
 
@@ -97,7 +95,6 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
     })
 
     const attachmentDestroyer = Highlight.app.addListener('onConversationAttachment', async (attachment: string) => {
-      setConversationAttachmentLoading(true)
       startNewConversation()
       clearPrompt()
 
