@@ -555,6 +555,24 @@ export const useSubmitQuery = () => {
     }
   }
 
+  const validateConversationId = async (initialConversationId: string) => {
+    const { get } = useApi()
+
+    try {
+      const response = await get(`conversation/${initialConversationId}/exists`, { version: 'v4' })
+      if (!response.ok) throw new Error('Network response was not ok')
+
+      const data = (await response.json()) as { id: string }
+
+      return data.id
+    } catch (error: any) {
+      handleError(error, { method: 'validateConversationId' })
+      // Return new conversation ID if there's an error with the end point
+      const newId = uuidv4()
+      return newId
+    }
+  }
+
   const handleSubmit = async (
     input: string,
     promptApp?: Prompt,
@@ -571,7 +589,8 @@ export const useSubmitQuery = () => {
     try {
       setInputIsDisabled(true)
 
-      const conversationId = getOrCreateConversationId()
+      const initialConversationId = getOrCreateConversationId()
+      const conversationId = await validateConversationId(initialConversationId)
 
       // Extract and format attached_context_metadata
       const attachedContext: AttachedContexts = {
