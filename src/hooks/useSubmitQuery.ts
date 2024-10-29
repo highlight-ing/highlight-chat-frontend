@@ -151,13 +151,13 @@ interface ToolOverrides {
 }
 
 export const useSubmitQuery = () => {
-  const { post } = useApi()
+  const { get, post } = useApi()
   const { getAccessToken } = useAuth()
   const { uploadFile } = useUploadFile()
 
   const {
     addAttachment,
-    getOrCreateConversationId,
+    storeConversationId,
     attachments,
     clearAttachments,
     setInputIsDisabled,
@@ -166,10 +166,11 @@ export const useSubmitQuery = () => {
     updateLastConversationMessage,
     addToast,
     updateLastMessageSentTimestamp,
+    setConversationId,
   } = useStore(
     useShallow((state) => ({
       addAttachment: state.addAttachment,
-      getOrCreateConversationId: state.getOrCreateConversationId,
+      storeConversationId: state.conversationId,
       attachments: state.attachments,
       clearAttachments: state.clearAttachments,
       setInputIsDisabled: state.setInputIsDisabled,
@@ -178,6 +179,7 @@ export const useSubmitQuery = () => {
       updateLastConversationMessage: state.updateLastConversationMessage,
       addToast: state.addToast,
       updateLastMessageSentTimestamp: state.updateLastMessageSentTimestamp,
+      setConversationId: state.setConversationId,
     })),
   )
 
@@ -238,6 +240,29 @@ export const useSubmitQuery = () => {
   const checkAbortSignal = () => {
     if (abortControllerRef.current?.signal.aborted) {
       throw new Error('Chat message request aborted')
+    }
+  }
+
+  const createAndValidateConversationId = async () => {
+    const newConversationId = uuidv4()
+
+    try {
+      const response = await get(`conversation/${newConversationId}/exists`, { version: 'v4' })
+      if (!response.ok) throw new Error('Could not validate conversation ID. Generating a new one...')
+      const data = (await response.json()) as { id: string }
+
+      const idIsTheSame = newConversationId === data.id
+      console.log(`${idIsTheSame ? 'The same' : 'A new'} conversation ID was returned`)
+
+      setConversationId(data.id)
+      return data.id
+    } catch (error: any) {
+      handleError(error, { method: 'validateConversationId' })
+      // Return new conversation ID if there's an error with the end point
+      console.log('Generating new conversation ID from: validateConversationId')
+      const newId = uuidv4()
+      setConversationId(newId)
+      return newId
     }
   }
 
@@ -444,7 +469,11 @@ export const useSubmitQuery = () => {
 
       const fileAttachments = attachments.filter(isUploadableAttachment)
 
-      const conversationId = getOrCreateConversationId()
+      let conversationId = storeConversationId
+      if (!conversationId) {
+        conversationId = await createAndValidateConversationId()
+      }
+
       // @ts-expect-error
       addConversationMessage(conversationId, {
         role: 'user',
@@ -571,7 +600,10 @@ export const useSubmitQuery = () => {
     try {
       setInputIsDisabled(true)
 
-      const conversationId = getOrCreateConversationId()
+      let conversationId = storeConversationId
+      if (!conversationId) {
+        conversationId = await createAndValidateConversationId()
+      }
 
       // Extract and format attached_context_metadata
       const attachedContext: AttachedContexts = {
