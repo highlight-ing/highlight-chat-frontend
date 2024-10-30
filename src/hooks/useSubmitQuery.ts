@@ -151,7 +151,7 @@ interface ToolOverrides {
 }
 
 export const useSubmitQuery = () => {
-  const { get, post } = useApi()
+  const { post } = useApi()
   const { getAccessToken } = useAuth()
   const { uploadFile } = useUploadFile()
 
@@ -166,7 +166,6 @@ export const useSubmitQuery = () => {
     updateLastConversationMessage,
     addToast,
     updateLastMessageSentTimestamp,
-    setConversationId,
   } = useStore(
     useShallow((state) => ({
       addAttachment: state.addAttachment,
@@ -179,7 +178,6 @@ export const useSubmitQuery = () => {
       updateLastConversationMessage: state.updateLastConversationMessage,
       addToast: state.addToast,
       updateLastMessageSentTimestamp: state.updateLastMessageSentTimestamp,
-      setConversationId: state.setConversationId,
     })),
   )
 
@@ -240,29 +238,6 @@ export const useSubmitQuery = () => {
   const checkAbortSignal = () => {
     if (abortControllerRef.current?.signal.aborted) {
       throw new Error('Chat message request aborted')
-    }
-  }
-
-  const createAndValidateConversationId = async () => {
-    const newConversationId = uuidv4()
-
-    try {
-      const response = await get(`conversation/${newConversationId}/exists`, { version: 'v4' })
-      if (!response.ok) throw new Error('Could not validate conversation ID. Generating a new one...')
-      const data = (await response.json()) as { id: string }
-
-      const idIsTheSame = newConversationId === data.id
-      console.log(`${idIsTheSame ? 'The same' : 'A new'} conversation ID was returned`)
-
-      setConversationId(data.id)
-      return data.id
-    } catch (error: any) {
-      handleError(error, { method: 'validateConversationId' })
-      // Return new conversation ID if there's an error with the end point
-      console.log('Generating new conversation ID from: validateConversationId')
-      const newId = uuidv4()
-      setConversationId(newId)
-      return newId
     }
   }
 

@@ -1,6 +1,7 @@
 import { StateCreator } from 'zustand'
+import { v4 as uuidv4 } from 'uuid'
 import { Store } from '.'
-import { ChatHistoryItem } from '@/types'
+import { ChatHistoryItem, Message } from '@/types'
 
 /**
  * Store that deals with the current conversation.
@@ -14,6 +15,7 @@ export interface ConversationState {
 
 export type ConversationSlice = ConversationState & {
   resetConversationId: () => void
+  getOrCreateConversationId: () => string
   startNewConversation: () => void
   getConversationId: () => string | undefined
   setConversationId: (conversationId: string) => void
@@ -33,6 +35,13 @@ export const initialConversationState: ConversationState = {
 export const createConversationSlice: StateCreator<Store, [], [], ConversationSlice> = (set, get) => ({
   ...initialConversationState,
   resetConversationId: () => set({ conversationId: undefined }),
+  getOrCreateConversationId: () => {
+    if (!get().conversationId) {
+      const newId = uuidv4()
+      set({ conversationId: newId })
+    }
+    return get().conversationId!
+  },
   setConversationId: (conversationId: string) => {
     set({ conversationId })
   },
@@ -74,11 +83,11 @@ export const createConversationSlice: StateCreator<Store, [], [], ConversationSl
     const updatedConversations = conversations.map((conv) =>
       conv.id === conversationId
         ? {
-            ...conv,
-            shared_conversations: shareId
-              ? [{ created_at: new Date().toISOString(), id: shareId, title: conv.title }]
-              : [],
-          }
+          ...conv,
+          shared_conversations: shareId
+            ? [{ created_at: new Date().toISOString(), id: shareId, title: conv.title }]
+            : [],
+        }
         : conv,
     )
     set({ openConversations: updatedConversations })
@@ -88,11 +97,11 @@ export const createConversationSlice: StateCreator<Store, [], [], ConversationSl
     const updatedHistory = history.map((conv) =>
       conv.id === conversationId
         ? {
-            ...conv,
-            shared_conversations: shareId
-              ? [{ created_at: new Date().toISOString(), id: shareId, title: conv.title }]
-              : [],
-          }
+          ...conv,
+          shared_conversations: shareId
+            ? [{ created_at: new Date().toISOString(), id: shareId, title: conv.title }]
+            : [],
+        }
         : conv,
     )
     set({ history: updatedHistory })

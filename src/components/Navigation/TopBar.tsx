@@ -69,6 +69,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
 
   const onSelectChat = async (chat: ChatHistoryItem) => {
     setConversationId(chat.id)
+    trackEvent('HL Chat Tab', { action: 'Select' })
   }
 
   const onDragTabEnd = (result: any) => {
@@ -85,6 +86,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
     removeOpenConversation(conversation.id)
     startNewConversation()
     clearPrompt()
+    trackEvent('HL Chat Tab', { action: 'Close' })
   }
 
   const onToggleShareModal = () => {
