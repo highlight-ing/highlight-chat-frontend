@@ -59,7 +59,6 @@ export function ChatHome({ isShowing }: { isShowing: boolean }) {
       <div className="flex flex-col gap-16">
         <InputHeading />
         {isVisible && <Input isActiveChat={false} />}
-        <LatestConversation />
       </div>
 
       <div className="mx-auto flex items-center gap-1 font-semibold text-subtle">

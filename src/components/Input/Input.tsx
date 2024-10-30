@@ -17,6 +17,7 @@ import { InputDivider } from './InputDivider'
 import { cn } from '@/lib/utils'
 import { OpenAppButton } from '../buttons/open-app-button'
 import { CreateShortcutButton } from '../buttons/create-shortcut-button'
+import { LatestConversation } from '../ChatHome/LatestConversation'
 
 const MAX_INPUT_HEIGHT = 160
 
@@ -221,32 +222,38 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
         </motion.div>
 
         {!isActiveChat && (
-          <div className="flex items-center gap-4">
-            <OpenAppButton
-              appId="prompts"
-              disabled={isInputFocused}
-              className={cn(
-                'flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary opacity-0 transition hover:bg-hover',
-                {
-                  'opacity-100': !isInputFocused,
-                },
-              )}
-            >
-              <span>Browse Shortcuts</span>
-              <BoxAdd size={20} variant="Bold" className="opacity-80" />
-            </OpenAppButton>
-            <CreateShortcutButton
-              disabled={isInputFocused}
-              className={cn(
-                'flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary opacity-0 transition hover:bg-hover',
-                {
-                  'opacity-100': !isInputFocused,
-                },
-              )}
-            >
-              <span>Create Shortcut</span>
-              <AddCircle size={20} variant="Bold" className="opacity-80" />
-            </CreateShortcutButton>
+          <div onClick={onClickContainer} className="flex w-full flex-col items-center space-y-16">
+            <div className="flex items-center gap-4">
+              <OpenAppButton
+                appId="prompts"
+                disabled={isInputFocused}
+                className={cn(
+                  'flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary opacity-0 transition hover:bg-hover',
+                  {
+                    'opacity-100': !isInputFocused,
+                  },
+                )}
+              >
+                <span>Browse Shortcuts</span>
+                <BoxAdd size={20} variant="Bold" className="opacity-80" />
+              </OpenAppButton>
+              <CreateShortcutButton
+                disabled={isInputFocused}
+                className={cn(
+                  'flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary opacity-0 transition hover:bg-hover',
+                  {
+                    'opacity-100': !isInputFocused,
+                  },
+                )}
+              >
+                <span>Create Shortcut</span>
+                <AddCircle size={20} variant="Bold" className="opacity-80" />
+              </CreateShortcutButton>
+            </div>
+
+            <div className={cn('w-full transition-transform', { '-translate-y-16': isInputFocused })}>
+              <LatestConversation />
+            </div>
           </div>
         )}
       </div>

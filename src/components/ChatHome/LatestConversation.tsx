@@ -6,6 +6,7 @@ import { formatConversationDuration, formatConversationEndDate } from './utils'
 import Tooltip from '../Tooltip/Tooltip'
 import { useStore } from '@/providers/store-provider'
 import { ConversationData } from '@highlight-ai/app-runtime'
+import { useShallow } from 'zustand/react/shallow'
 
 function NoAudioNote() {
   return (
@@ -24,10 +25,33 @@ function NoAudioNote() {
   )
 }
 
+function OpenConversationButton(props: {}) {
+  function handleClick() {}
+
+  return (
+    <button
+      type="button"
+      aria-label="Open Conversation"
+      onClick={handleClick}
+      className="rounded-[6px] bg-white/[8%] px-6 py-1 text-xs text-secondary transition-colors hover:bg-white/15"
+    >
+      Open
+    </button>
+  )
+}
+
 function ChatWithConversationButton(props: { conversation: ConversationData }) {
-  const addAttachment = useStore((state) => state.addAttachment)
+  const { clearPrompt, addAttachment, startNewConversation } = useStore(
+    useShallow((state) => ({
+      clearPrompt: state.clearPrompt,
+      addAttachment: state.addAttachment,
+      startNewConversation: state.startNewConversation,
+    })),
+  )
 
   function handleClick() {
+    clearPrompt()
+    startNewConversation()
     addAttachment({
       id: props.conversation.id,
       type: 'conversation',
@@ -38,7 +62,16 @@ function ChatWithConversationButton(props: { conversation: ConversationData }) {
     })
   }
 
-  return <button onClick={handleClick}>Chat</button>
+  return (
+    <button
+      type="button"
+      aria-label="Chat"
+      onClick={handleClick}
+      className="rounded-[6px] bg-white/[8%] px-6 py-1 text-xs text-secondary transition-colors hover:bg-white/15"
+    >
+      Chat
+    </button>
+  )
 }
 
 export function LatestConversation() {
@@ -94,6 +127,7 @@ export function LatestConversation() {
         </div>
       </div>
       <div className="flex items-center gap-3 opacity-0 transition-opacity group-hover:opacity-100">
+        <OpenConversationButton />
         <ChatWithConversationButton conversation={mostRecentConversation.conversation} />
       </div>
     </div>
