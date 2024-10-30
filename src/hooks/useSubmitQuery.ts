@@ -157,7 +157,7 @@ export const useSubmitQuery = () => {
 
   const {
     addAttachment,
-    storeConversationId,
+    getConversationId,
     attachments,
     clearAttachments,
     setInputIsDisabled,
@@ -170,7 +170,7 @@ export const useSubmitQuery = () => {
   } = useStore(
     useShallow((state) => ({
       addAttachment: state.addAttachment,
-      storeConversationId: state.conversationId,
+      getConversationId: state.getConversationId,
       attachments: state.attachments,
       clearAttachments: state.clearAttachments,
       setInputIsDisabled: state.setInputIsDisabled,
@@ -469,7 +469,7 @@ export const useSubmitQuery = () => {
 
       const fileAttachments = attachments.filter(isUploadableAttachment)
 
-      let conversationId = storeConversationId
+      let conversationId = getConversationId()
       if (!conversationId) {
         conversationId = await createAndValidateConversationId()
       }
@@ -600,7 +600,7 @@ export const useSubmitQuery = () => {
     try {
       setInputIsDisabled(true)
 
-      let conversationId = storeConversationId
+      let conversationId = getConversationId()
       if (!conversationId) {
         conversationId = await createAndValidateConversationId()
       }

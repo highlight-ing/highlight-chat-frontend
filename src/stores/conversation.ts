@@ -15,6 +15,7 @@ export interface ConversationState {
 export type ConversationSlice = ConversationState & {
   resetConversationId: () => void
   startNewConversation: () => void
+  getConversationId: () => string | undefined
   setConversationId: (conversationId: string) => void
   setOpenConversations: (conversations: ChatHistoryItem[]) => void
   addOrUpdateOpenConversation: (conversation: ChatHistoryItem) => void
@@ -40,6 +41,7 @@ export const createConversationSlice: StateCreator<Store, [], [], ConversationSl
     get().clearInput()
     get().clearAttachments()
   },
+  getConversationId: () => get().conversationId,
   setOpenConversations: (conversations: ChatHistoryItem[]) => {
     set({ openConversations: conversations })
   },
