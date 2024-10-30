@@ -157,7 +157,7 @@ export const useSubmitQuery = () => {
 
   const {
     addAttachment,
-    getOrCreateConversationId,
+    getConversationId,
     attachments,
     clearAttachments,
     setInputIsDisabled,
@@ -169,7 +169,7 @@ export const useSubmitQuery = () => {
   } = useStore(
     useShallow((state) => ({
       addAttachment: state.addAttachment,
-      getOrCreateConversationId: state.getOrCreateConversationId,
+      getConversationId: state.getConversationId,
       attachments: state.attachments,
       clearAttachments: state.clearAttachments,
       setInputIsDisabled: state.setInputIsDisabled,
@@ -444,7 +444,11 @@ export const useSubmitQuery = () => {
 
       const fileAttachments = attachments.filter(isUploadableAttachment)
 
-      const conversationId = getOrCreateConversationId()
+      let conversationId = getConversationId()
+      if (!conversationId) {
+        conversationId = await createAndValidateConversationId()
+      }
+
       // @ts-expect-error
       addConversationMessage(conversationId, {
         role: 'user',
@@ -571,7 +575,10 @@ export const useSubmitQuery = () => {
     try {
       setInputIsDisabled(true)
 
-      const conversationId = getOrCreateConversationId()
+      let conversationId = getConversationId()
+      if (!conversationId) {
+        conversationId = await createAndValidateConversationId()
+      }
 
       // Extract and format attached_context_metadata
       const attachedContext: AttachedContexts = {
