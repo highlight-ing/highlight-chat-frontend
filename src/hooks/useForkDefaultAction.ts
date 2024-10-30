@@ -33,13 +33,19 @@ export default function useForkDefaultAction() {
       })
 
       // Fetch the image file
-      const imageFile = await fetch(imageUrl).then((res) => res.blob())
 
-      // Convert the image to a file
-      const uploadingImage = new File([imageFile], prompt.image, { type: imageFile.type })
+      let imageFile
+      try {
+        imageFile = await fetch(imageUrl).then((res) => res.blob())
+        // Convert the image to a file
+        const uploadingImage = new File([imageFile], prompt.image, { type: imageFile.type })
+        setPromptEditorData({ uploadingImage })
+      } catch (error) {
+        console.error('Error fetching image file:', error)
+      }
+
       setNeedSave(true)
       setSettingsHasNoErrors(true)
-      setPromptEditorData({ uploadingImage })
     },
   }
 }
