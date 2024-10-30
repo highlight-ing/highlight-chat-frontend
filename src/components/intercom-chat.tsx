@@ -8,7 +8,7 @@ export default function IntercomChat() {
         const highlightUserEmail = await window.highlight?.user?.getEmail()
 
         Intercom({
-          app_id: 'wrpa50zk',
+          app_id: 'ibrkc80g',
           name: highlightUserEmail,
         })
       }
