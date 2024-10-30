@@ -6,6 +6,7 @@ import { HighlightIcon } from '@/icons/icons'
 import { useShallow } from 'zustand/react/shallow'
 import { trackEvent } from '@/utils/amplitude'
 import { cn } from '@/lib/utils'
+import { LatestConversation } from './LatestConversation'
 
 function InputHeading() {
   const { promptName, promptDescription } = useStore(
@@ -48,13 +49,17 @@ export function ChatHome({ isShowing }: { isShowing: boolean }) {
 
   return (
     <div
-      className={cn('flex h-full w-[min(800px,95%)] flex-col justify-between gap-6 pb-3 pt-[8vh] opacity-0', {
-        'pointer-events-auto opacity-100': isShowing,
-      })}
+      className={cn(
+        'pointer-events-none fixed flex h-full w-[min(800px,95%)] flex-col justify-between gap-6 pb-3 pt-[8vh] opacity-0',
+        {
+          'pointer-events-auto relative opacity-100': isShowing,
+        },
+      )}
     >
       <div className="flex flex-col gap-16">
         <InputHeading />
         {isVisible && <Input isActiveChat={false} />}
+        <LatestConversation />
       </div>
 
       <div className="mx-auto flex items-center gap-1 font-semibold text-subtle">

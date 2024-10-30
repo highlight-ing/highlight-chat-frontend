@@ -1,6 +1,7 @@
 import { motion, Variants } from 'framer-motion'
 import { BoxAdd, AddCircle } from 'iconsax-react'
-import { BrowseShortcutsButton, CreateShortcutButton } from './ShortcutsActions'
+import { CreateShortcutButton } from '../buttons/create-shortcut-button'
+import { OpenAppButton } from '../buttons/open-app-button'
 
 const footerVariants: Variants = {
   hidden: {
@@ -31,10 +32,13 @@ const InputFooter = () => {
       exit="exit"
       className="flex items-center gap-5 rounded-full bg-[#1f1f1f] px-6 pt-3"
     >
-      <BrowseShortcutsButton className="flex items-center gap-2 pl-0.5 text-sm font-medium text-subtle transition-colors hover:text-secondary">
+      <OpenAppButton
+        appId="prompts"
+        className="flex items-center gap-2 pl-0.5 text-sm font-medium text-subtle transition-colors hover:text-secondary"
+      >
         <BoxAdd size={20} variant="Bold" />
         <span>Browse Shortcuts</span>
-      </BrowseShortcutsButton>
+      </OpenAppButton>
       <CreateShortcutButton className="flex items-center gap-2 text-sm font-medium text-subtle transition-colors hover:text-secondary">
         <AddCircle size={20} variant="Bold" />
         <span>Create Shortcut</span>

@@ -15,7 +15,8 @@ import InputFooter from './InputFooter'
 import { AddCircle, BoxAdd } from 'iconsax-react'
 import { InputDivider } from './InputDivider'
 import { cn } from '@/lib/utils'
-import { BrowseShortcutsButton, CreateShortcutButton } from './ShortcutsActions'
+import { OpenAppButton } from '../buttons/open-app-button'
+import { CreateShortcutButton } from '../buttons/create-shortcut-button'
 
 const MAX_INPUT_HEIGHT = 160
 
@@ -221,7 +222,8 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
 
         {!isActiveChat && (
           <div className="flex items-center gap-4">
-            <BrowseShortcutsButton
+            <OpenAppButton
+              appId="prompts"
               disabled={isInputFocused}
               className={cn(
                 'flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary opacity-0 transition hover:bg-hover',
@@ -232,7 +234,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
             >
               <span>Browse Shortcuts</span>
               <BoxAdd size={20} variant="Bold" className="opacity-80" />
-            </BrowseShortcutsButton>
+            </OpenAppButton>
             <CreateShortcutButton
               disabled={isInputFocused}
               className={cn(
