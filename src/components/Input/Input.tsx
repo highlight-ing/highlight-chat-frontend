@@ -132,7 +132,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
     }
   }
 
-  const onClickContainer = () => {
+  const focusInput = () => {
     inputRef.current?.focus()
     trackEvent('HL Chat Input Focused', {})
   }
@@ -159,8 +159,8 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
           animate={{ height: bounds.height }}
           transition={{ ...inputTransition, duration: isInputFocused ? 0.2 : 0.25, delay: isInputFocused ? 0 : 0.15 }}
           className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''} min-h-[68px]`}
-          onClick={onClickContainer}
           onFocus={handleNonInputFocus}
+          onClick={focusInput}
         >
           <div ref={ref} className={`${styles.inputWrapper} flex-col justify-between`}>
             <div className="flex w-full items-end justify-between gap-2 pl-6 pr-4">
@@ -226,7 +226,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
         </motion.div>
 
         {!isActiveChat && (
-          <div onClick={onClickContainer} className="flex w-full flex-col items-center space-y-16">
+          <div className="flex w-full flex-col items-center space-y-16">
             <div className="flex items-center gap-4">
               <OpenAppButton
                 appId="prompts"
@@ -256,7 +256,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
             </div>
 
             <div className={cn('w-full transition-transform', { '-translate-y-16': isInputFocused })}>
-              <LatestConversation />
+              <LatestConversation focusInput={focusInput} />
             </div>
           </div>
         )}

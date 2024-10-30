@@ -80,7 +80,7 @@ function ChatWithConversationButton(props: { conversation: ConversationData }) {
   )
 }
 
-export function LatestConversation() {
+export function LatestConversation(props: { focusInput: () => void }) {
   const { conversations } = useConversations()
 
   const mostRecentConversation = useMemo(() => {
@@ -132,7 +132,10 @@ export function LatestConversation() {
           </Tooltip>
         </div>
       </div>
-      <div className="flex items-center gap-3 opacity-0 transition-opacity group-hover:opacity-100">
+      <div
+        onClick={props.focusInput}
+        className="flex items-center gap-3 opacity-0 transition-opacity group-hover:opacity-100"
+      >
         {/* <OpenConversationButton conversation={mostRecentConversation.conversation} /> */}
         <ChatWithConversationButton conversation={mostRecentConversation.conversation} />
       </div>
