@@ -69,6 +69,10 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
       }, 100)
     }
 
+    const input = document.getElementById('textarea-input')
+    input?.focus()
+    setIsInputFocused(true)
+
     const inputElement = inputRef.current
 
     if (inputElement) {
@@ -165,7 +169,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
               </div>
               <div className="h-auto w-full">
                 <textarea
-                  id={'textarea-input'}
+                  id="textarea-input"
                   ref={inputRef}
                   disabled={isConversationLoading || inputIsDisabled}
                   placeholder={

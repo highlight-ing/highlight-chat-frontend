@@ -54,7 +54,8 @@ export const useOnAppOpen = () => {
         }
       }
 
-      if (isActiveApp && inputAvailable) {
+      if (isActiveApp) {
+        router.push('/')
         startNewConversation()
         clearPrompt()
       }
