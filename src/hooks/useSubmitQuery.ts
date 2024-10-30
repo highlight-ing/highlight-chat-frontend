@@ -1,7 +1,6 @@
 // src/hooks/useSubmitQuery.ts
 import { useEffect, useRef } from 'react'
 import { useStore } from '@/providers/store-provider'
-import useAuth from './useAuth'
 import { useApi } from '@/hooks/useApi'
 import { Prompt } from '@/types/supabase-helpers'
 import { useShallow } from 'zustand/react/shallow'
@@ -151,13 +150,13 @@ interface ToolOverrides {
 }
 
 export const useSubmitQuery = () => {
-  const { post } = useApi()
-  const { getAccessToken } = useAuth()
+  const { get, post } = useApi()
   const { uploadFile } = useUploadFile()
 
   const {
     addAttachment,
     getConversationId,
+    setConversationId,
     attachments,
     clearAttachments,
     setInputIsDisabled,
@@ -170,6 +169,7 @@ export const useSubmitQuery = () => {
     useShallow((state) => ({
       addAttachment: state.addAttachment,
       getConversationId: state.getConversationId,
+      setConversationId: state.setConversationId,
       attachments: state.attachments,
       clearAttachments: state.clearAttachments,
       setInputIsDisabled: state.setInputIsDisabled,
@@ -233,6 +233,30 @@ export const useSubmitQuery = () => {
         },
       })
     })
+  }
+
+  // Validates conversation ID's that are generated in HL Chat
+  const createAndValidateConversationId = async () => {
+    const newConversationId = uuidv4()
+    try {
+      const response = await get(`conversation/${newConversationId}/exists`, { version: 'v4' })
+      if (!response.ok) throw new Error('Could not validate conversation ID. Generating a new one...')
+
+      const data = (await response.json()) as { id: string }
+      const idIsTheSame = newConversationId === data.id
+      console.log(`${idIsTheSame ? 'The same' : 'ID exists! A new'} conversation ID was returned`)
+
+      setConversationId(data.id)
+      return data.id
+    } catch (error: any) {
+      handleError(error, { method: 'validateConversationId' })
+      // Return new conversation ID if there's an error with the end point
+      console.log('Error. Generating new conversation ID...')
+      const newId = uuidv4()
+
+      setConversationId(newId)
+      return newId
+    }
   }
 
   const checkAbortSignal = () => {
