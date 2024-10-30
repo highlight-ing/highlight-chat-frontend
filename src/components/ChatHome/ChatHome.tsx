@@ -50,7 +50,6 @@ export default function ChatHome({ isShowing }: { isShowing: boolean }) {
       <div className={styles.input}>
         <InputHeading />
         {isVisible && <Input isActiveChat={false} />}
-        <div>Test</div>
       </div>
 
       <div className="mx-auto flex items-center gap-1 font-semibold text-subtle">
