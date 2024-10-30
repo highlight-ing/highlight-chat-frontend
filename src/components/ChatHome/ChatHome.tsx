@@ -1,10 +1,11 @@
-import styles from './chathome.module.scss'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useStore } from '@/providers/store-provider'
 import { Input } from '@/components/Input/Input'
 import { HighlightIcon } from '@/icons/icons'
+
 import { useShallow } from 'zustand/react/shallow'
 import { trackEvent } from '@/utils/amplitude'
+import { cn } from '@/lib/utils'
 
 function InputHeading() {
   const { promptName, promptDescription } = useStore(
@@ -30,7 +31,7 @@ function InputHeading() {
   )
 }
 
-export default function ChatHome({ isShowing }: { isShowing: boolean }) {
+export function ChatHome({ isShowing }: { isShowing: boolean }) {
   const [isVisible, setVisible] = useState(isShowing)
 
   useEffect(() => {
@@ -46,8 +47,12 @@ export default function ChatHome({ isShowing }: { isShowing: boolean }) {
   }, [isShowing])
 
   return (
-    <div className={`${styles.chatHomeContainer} ${isShowing ? styles.show : ''} h-full justify-between`}>
-      <div className={styles.input}>
+    <div
+      className={cn('flex h-full w-[min(800px,95%)] flex-col justify-between gap-6 pb-3 pt-[8vh] opacity-0', {
+        'pointer-events-auto opacity-100': isShowing,
+      })}
+    >
+      <div className="flex flex-col gap-16">
         <InputHeading />
         {isVisible && <Input isActiveChat={false} />}
       </div>
