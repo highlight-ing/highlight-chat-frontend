@@ -7,6 +7,7 @@ import Tooltip from '../Tooltip/Tooltip'
 import { useStore } from '@/providers/store-provider'
 import { ConversationData } from '@highlight-ai/app-runtime'
 import { useShallow } from 'zustand/react/shallow'
+import Highlight from '@highlight-ai/app-runtime'
 
 function NoAudioNote() {
   return (
@@ -25,8 +26,13 @@ function NoAudioNote() {
   )
 }
 
-function OpenConversationButton(props: {}) {
-  function handleClick() {}
+function OpenConversationButton(props: { conversation: ConversationData }) {
+  async function handleClick() {
+    await Highlight.app.openApp('conversations')
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    // TODO: Trigger conversations to open this conversation
+  }
 
   return (
     <button
@@ -127,7 +133,7 @@ export function LatestConversation() {
         </div>
       </div>
       <div className="flex items-center gap-3 opacity-0 transition-opacity group-hover:opacity-100">
-        <OpenConversationButton />
+        {/* <OpenConversationButton conversation={mostRecentConversation.conversation} /> */}
         <ChatWithConversationButton conversation={mostRecentConversation.conversation} />
       </div>
     </div>
