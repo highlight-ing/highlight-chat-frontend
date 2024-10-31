@@ -452,8 +452,6 @@ export async function addPromptToUser(externalId: string, authToken: string) {
   // Check if the user already has the prompt
   const supabase = supabaseAdmin()
 
-  console.log({ userId, externalId })
-
   const { data: addedPrompt } = await supabase
     .from('added_prompts')
     .select(`*, prompts!inner (*)`)
