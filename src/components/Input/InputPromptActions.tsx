@@ -112,19 +112,17 @@ const actionItemContainerVariants: Variants = {
 }
 
 const InputPromptActions = ({ input }: { input: string }) => {
-  const { pinnedPrompts } = usePromptApps()
-  const visiblePrompts = useMemo(() => {
-    const uniquePrompts = pinnedPrompts.reduce((acc: Array<PinnedPrompt>, curr) => {
-      const externalIds = acc.map((prompt) => prompt.external_id)
-      if (!externalIds.includes(curr.external_id)) acc.push(curr)
+  const { isLoadingPrompts, pinnedPrompts } = usePromptApps()
+  const userId = useStore((state) => state.userId)
 
-      return acc
-    }, [])
+  const uniquePrompts = pinnedPrompts.reduce((acc: Array<PinnedPrompt>, curr) => {
+    const externalIds = acc.map((prompt) => prompt.external_id)
+    if (!externalIds.includes(curr.external_id)) acc.push(curr)
 
-    return uniquePrompts
-  }, [pinnedPrompts])
+    return acc
+  }, [])
 
-  if (!pinnedPrompts || visiblePrompts.length == 0) {
+  if (isLoadingPrompts || !userId) {
     return (
       <motion.div variants={actionItemVariants} initial="hidden" animate="show" exit="exit">
         <div className="flex w-full items-center gap-2 rounded-2xl px-6 py-2 transition-[background-color] duration-150">
@@ -134,10 +132,20 @@ const InputPromptActions = ({ input }: { input: string }) => {
     )
   }
 
+  if (!uniquePrompts || uniquePrompts.length === 0) {
+    return (
+      <motion.div variants={actionItemVariants} initial="hidden" animate="show" exit="exit">
+        <div className="flex w-full items-center gap-2 rounded-2xl px-6 py-2 transition-[background-color] duration-150">
+          <h3 className="text-sm text-tertiary">No pinned shortcuts.</h3>
+        </div>
+      </motion.div>
+    )
+  }
+
   return (
     <motion.div layout variants={actionItemContainerVariants} initial="hidden" animate="show" exit="exit">
       <ScrollArea type="scroll" scrollHideDelay={100} viewportClassName="max-h-52">
-        {visiblePrompts.map((prompt) => (
+        {uniquePrompts.map((prompt) => (
           <InputActionItem key={prompt.external_id} prompt={prompt} input={input} />
         ))}
       </ScrollArea>
