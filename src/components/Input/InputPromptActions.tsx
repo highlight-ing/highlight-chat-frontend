@@ -112,12 +112,13 @@ const actionItemContainerVariants: Variants = {
 }
 
 const InputPromptActions = ({ input }: { input: string }) => {
-  const { isLoadingPrompts, pinnedPrompts } = usePromptApps()
+  const { isLoadingPrompts, pinnedPrompts } = usePromptApps(true)
   const userId = useStore((state) => state.userId)
 
   const uniquePrompts = pinnedPrompts.reduce((acc: Array<PinnedPrompt>, curr) => {
     const externalIds = acc.map((prompt) => prompt.external_id)
     if (!externalIds.includes(curr.external_id)) acc.push(curr)
+    else console.log('Duplicate prompt found:', curr.external_id)
 
     return acc
   }, [])
