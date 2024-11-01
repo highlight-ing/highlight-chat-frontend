@@ -463,6 +463,11 @@ export const useSubmitQuery = () => {
 
     const windows = await fetchWindows()
 
+    if (!query || query === '') {
+      console.log('No query provided, ignoring.')
+      return
+    }
+
     if (query || clipboardText || contentToUse || screenshotUrl || audio || hasFileAttachment) {
       setInputIsDisabled(true)
 
