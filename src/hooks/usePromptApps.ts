@@ -213,6 +213,12 @@ export default (loadPrompts?: boolean) => {
     refreshPrompts()
   }, [loadPrompts])
 
+  useEffect(() => {
+    if (isPromptsLoaded) {
+      setLoadingPrompts(false)
+    }
+  }, [isPromptsLoaded])
+
   return {
     isLoadingPrompts,
     prompts,

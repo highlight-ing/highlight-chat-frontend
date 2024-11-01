@@ -112,7 +112,7 @@ const actionItemContainerVariants: Variants = {
 }
 
 const InputPromptActions = ({ input }: { input: string }) => {
-  const { isLoadingPrompts, pinnedPrompts } = usePromptApps(true)
+  const { isLoadingPrompts, pinnedPrompts } = usePromptApps()
   const userId = useStore((state) => state.userId)
 
   const uniquePrompts = pinnedPrompts.reduce((acc: Array<PinnedPrompt>, curr) => {
@@ -122,6 +122,8 @@ const InputPromptActions = ({ input }: { input: string }) => {
 
     return acc
   }, [])
+
+  console.log({ isLoadingPrompts, pinnedPrompts })
 
   if (isLoadingPrompts || !userId) {
     return (
