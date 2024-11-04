@@ -111,8 +111,8 @@ const HighlightChat = () => {
         {isConversationLoading && messages.length === 0 && !inputIsDisabled && <MessagesPlaceholder />}
         <ChatHome isShowing={!isChatting && !promptApp && !isConversationLoading} />
         {(isChatting || promptApp) && <Input isActiveChat={true} />}
+        <IntercomChat />
       </div>
-      <IntercomChat />
     </div>
   )
 }

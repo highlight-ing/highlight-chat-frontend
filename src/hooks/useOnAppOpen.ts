@@ -16,9 +16,6 @@ export const useOnAppOpen = () => {
   const startNewConversation = useStore((state) => state.startNewConversation)
   const clearPrompt = useStore((state) => state.clearPrompt)
   const { selectPrompt, getPromptBySlug } = usePromptApps()
-  const input = useStore((state) => state.input)
-
-  const inputAvailable = input && input !== ''
 
   useEffect(() => {
     const onOpen = async (eventOpts: boolean | AppOpenEventOptions) => {
@@ -35,7 +32,7 @@ export const useOnAppOpen = () => {
           return
         } else if (eventOpts?.action?.type === 'navigate') {
           const navigateOptions = eventOpts.action.options as NavigateOptions
-          if (navigateOptions.route.startsWith('/new') && inputAvailable) {
+          if (navigateOptions.route.startsWith('/new')) {
             const param = navigateOptions.route.split('/').pop()
             if (param && param !== 'new') {
               const shouldPin = param.includes('pin=true')
