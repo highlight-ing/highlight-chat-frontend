@@ -8,6 +8,7 @@ import TextArea from '../TextInput/TextArea'
 import Button from '../Button/Button'
 import { createGoogleCalendarEvent } from '@/utils/google-server-actions'
 import { ConfigProvider, DatePicker } from 'antd'
+import dayjs from 'dayjs'
 
 const { RangePicker } = DatePicker
 
@@ -32,6 +33,7 @@ export function GcalEventFormComponent({
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<GcalEventFormData>({
     resolver: zodResolver(gcalEventFormSchema),
@@ -39,8 +41,8 @@ export function GcalEventFormComponent({
       summary: data.summary,
       location: data.location,
       description: data.description,
-      start: data.start,
-      end: data.end,
+      start: data.start ?? new Date().toISOString(),
+      end: data.end ?? new Date().toISOString(),
     },
   })
 
@@ -61,7 +63,7 @@ export function GcalEventFormComponent({
         rows={4}
         size={'xxlarge'}
         label={'Description'}
-        placeholder={'Issue Description'}
+        placeholder={'Event Description'}
         {...register('description')}
       />
       <ConfigProvider
@@ -79,10 +81,15 @@ export function GcalEventFormComponent({
           },
         }}
       >
-        <RangePicker onChange={(value) => console.log(value)} showTime />
+        <RangePicker
+          value={[dayjs(watch('start')), dayjs(watch('end'))]}
+          onChange={(value) => {
+            setValue('start', value?.[0]?.toISOString())
+            setValue('end', value?.[1]?.toISOString())
+          }}
+          showTime
+        />
       </ConfigProvider>
-      <InputField size={'xxlarge'} label={'Start'} placeholder={'Event Start'} {...register('start')} />
-      <InputField size={'xxlarge'} label={'End'} placeholder={'Event End'} {...register('end')} />
       <Button size={'medium'} variant={'primary'} type={'submit'} disabled={isSubmitting}>
         Create Event
       </Button>
