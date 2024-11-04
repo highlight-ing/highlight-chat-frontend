@@ -40,6 +40,8 @@ export const Attachment = ({
   const appIcon = (props as WindowAttachmentProps).appIcon
   const [isImageLoaded, setIsImageLoaded] = useState(false)
   const conversationId = version === 'v4' ? useStore((state) => state.conversationId) : undefined
+  const isConversationLoading = useStore((state) => state.isConversationLoading)
+  const inputIsDisabled = useStore((state) => state.inputIsDisabled)
 
   const { imageUrl, isLoading, error } = useImageDownload(
     type === 'image' && !value.startsWith('data:image') && !value.startsWith('blob:') ? value : null,
@@ -138,7 +140,7 @@ export const Attachment = ({
       <div className="group relative">
         {type === 'conversation' || type === 'audio' ? (
           <div className="flex h-[48px] w-40 items-center gap-2.5 text-nowrap rounded-[16px] border border-light-10 bg-secondary p-[5px] text-base leading-none">
-            <div className="grid size-9 grow-0 place-items-center rounded-[12px] border border-light-10 bg-green-20 text-green">
+            <div className="grid size-9 grow-0 place-items-center rounded-[12px] bg-green-20 text-green">
               <VoiceSquare size={16} variant="Bold" />
             </div>
             <div className="flex flex-col">
@@ -155,12 +157,15 @@ export const Attachment = ({
           </div>
         )}
         {onRemove && (
-          <div
-            className="absolute right-[-8px] top-[-8px] hidden cursor-pointer rounded-full bg-light-20 p-0.5 text-light-80 group-hover:flex"
+          <button
+            type="button"
+            aria-label="Remove attachment"
+            disabled={isConversationLoading || inputIsDisabled}
+            className="absolute right-[-8px] top-[-8px] hidden rounded-full bg-light-20 p-0.5 text-light-80 disabled:opacity-40 group-hover:flex"
             onClick={onRemove}
           >
             <CloseIcon size={16} />
-          </div>
+          </button>
         )}
       </div>
     </Tooltip>

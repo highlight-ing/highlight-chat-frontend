@@ -8,7 +8,7 @@ import TopBar from '@/components/Navigation/TopBar'
 import Messages from '@/components/Messages/Messages'
 import History from '@/components/History/History'
 import { useStore } from '@/providers/store-provider'
-import ChatHome from '@/components/ChatHome/ChatHome'
+import { ChatHome } from '@/components/ChatHome/ChatHome'
 import ChatHeader from '@/components/ChatHeader/ChatHeader'
 import { useShallow } from 'zustand/react/shallow'
 import MessagesPlaceholder from '@/components/Messages/MessagesPlaceholder'
@@ -111,8 +111,8 @@ const HighlightChat = () => {
         {isConversationLoading && messages.length === 0 && !inputIsDisabled && <MessagesPlaceholder />}
         <ChatHome isShowing={!isChatting && !promptApp && !isConversationLoading} />
         {(isChatting || promptApp) && <Input isActiveChat={true} />}
+        <IntercomChat />
       </div>
-      <IntercomChat />
     </div>
   )
 }

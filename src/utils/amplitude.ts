@@ -7,7 +7,7 @@ interface EventProperties {
 
 interface QueuedEvent {
   eventType: string
-  eventProperties: EventProperties
+  eventProperties?: EventProperties
 }
 
 let isInitialized = false
@@ -54,7 +54,7 @@ export const initAmplitudeAnonymous = () => {
   }
 }
 
-const trackEventInternal = (eventType: string, eventProperties: EventProperties): void => {
+const trackEventInternal = (eventType: string, eventProperties?: EventProperties): void => {
   if (typeof window !== 'undefined') {
     if (isInitialized) {
       amplitude.track(eventType, eventProperties)
@@ -64,6 +64,6 @@ const trackEventInternal = (eventType: string, eventProperties: EventProperties)
   }
 }
 
-export const trackEvent = (eventType: string, eventProperties: EventProperties): void => {
+export const trackEvent = (eventType: string, eventProperties?: EventProperties): void => {
   trackEventInternal(eventType, eventProperties)
 }

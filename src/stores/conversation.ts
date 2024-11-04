@@ -17,6 +17,7 @@ export type ConversationSlice = ConversationState & {
   resetConversationId: () => void
   getOrCreateConversationId: () => string
   startNewConversation: () => void
+  getConversationId: () => string | undefined
   setConversationId: (conversationId: string) => void
   setOpenConversations: (conversations: ChatHistoryItem[]) => void
   addOrUpdateOpenConversation: (conversation: ChatHistoryItem) => void
@@ -49,6 +50,7 @@ export const createConversationSlice: StateCreator<Store, [], [], ConversationSl
     get().clearInput()
     get().clearAttachments()
   },
+  getConversationId: () => get().conversationId,
   setOpenConversations: (conversations: ChatHistoryItem[]) => {
     set({ openConversations: conversations })
   },
@@ -81,11 +83,11 @@ export const createConversationSlice: StateCreator<Store, [], [], ConversationSl
     const updatedConversations = conversations.map((conv) =>
       conv.id === conversationId
         ? {
-            ...conv,
-            shared_conversations: shareId
-              ? [{ created_at: new Date().toISOString(), id: shareId, title: conv.title }]
-              : [],
-          }
+          ...conv,
+          shared_conversations: shareId
+            ? [{ created_at: new Date().toISOString(), id: shareId, title: conv.title }]
+            : [],
+        }
         : conv,
     )
     set({ openConversations: updatedConversations })
@@ -95,11 +97,11 @@ export const createConversationSlice: StateCreator<Store, [], [], ConversationSl
     const updatedHistory = history.map((conv) =>
       conv.id === conversationId
         ? {
-            ...conv,
-            shared_conversations: shareId
-              ? [{ created_at: new Date().toISOString(), id: shareId, title: conv.title }]
-              : [],
-          }
+          ...conv,
+          shared_conversations: shareId
+            ? [{ created_at: new Date().toISOString(), id: shareId, title: conv.title }]
+            : [],
+        }
         : conv,
     )
     set({ history: updatedHistory })

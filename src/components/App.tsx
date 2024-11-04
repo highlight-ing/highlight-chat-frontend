@@ -48,6 +48,8 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
 
   const { handleIncomingContext } = useSubmitQuery()
 
+  const router = useRouter()
+
   useEffect(() => {
     const debouncedHandleSubmit = debounce(300, async (context: HighlightContext, promptApp?: Prompt) => {
       setInput(context.suggestion || '')
@@ -92,13 +94,20 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
       debouncedHandleSubmit(newContext, res?.promptApp ?? undefined)
     })
 
-    const attachmentDestroyer = Highlight.app.addListener('onConversationAttachment', (attachment: string) => {
+    const attachmentDestroyer = Highlight.app.addListener('onConversationAttachment', async (attachment: string) => {
+      startNewConversation()
+      clearPrompt()
+
+      router.push('/')
+      trackEvent('HL Chat New Conversation Started', {})
+
+      await new Promise((resolve) => setTimeout(resolve, 600))
+
       addAttachment({
         type: 'audio',
         value: attachment,
         duration: 0,
       })
-
     })
 
     return () => {

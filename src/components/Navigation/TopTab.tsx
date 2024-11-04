@@ -63,6 +63,7 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
                 label: 'Reload',
                 onClick: () => {
                   clearConversationMessages(conversation.id)
+                  trackEvent('HL Chat Tab', { action: 'Reload' })
                 },
               },
             ]
@@ -84,6 +85,7 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
                   }
                   setOpenConversations([conversation])
                   clearAllOtherConversationMessages(conversation.id)
+                  trackEvent('HL Chat Tab', { action: 'Close all others' })
                 },
               },
               {
@@ -94,6 +96,7 @@ const TopTab = React.forwardRef<HTMLDivElement, TopTabProps>(
                   if (conversationId) {
                     startNewConversation()
                   }
+                  trackEvent('HL Chat Tab', { action: 'Close all' })
                 },
               },
             ]

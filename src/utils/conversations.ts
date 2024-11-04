@@ -14,12 +14,12 @@ export const getConversationDisplayTitle = (conversation?: ConversationData): st
     return 'Conversation'
   }
 
-  if (
-    conversation.startedAt &&
-    (typeof conversation.title !== 'string' || isDefaultTitle(conversation) || conversation.title === '')
-  ) {
-    title = getTimeAgo(conversation.startedAt)
-  }
+  // if (
+  //   conversation.startedAt &&
+  //   (typeof conversation.title !== 'string' || isDefaultTitle(conversation) || conversation.title === '')
+  // ) {
+  //   title = getTimeAgo(conversation.startedAt)
+  // }
 
   if (title === '') {
     title = conversation.title

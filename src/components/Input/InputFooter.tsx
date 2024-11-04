@@ -1,29 +1,7 @@
 import { motion, Variants } from 'framer-motion'
-import { useStore } from '@/providers/store-provider'
-import Highlight from '@highlight-ai/app-runtime'
 import { BoxAdd, AddCircle } from 'iconsax-react'
-
-function BrowseShortcutsFooterButton() {
-  const handleOpenClick = async () => {
-    try {
-      await Highlight.app.openApp('prompts')
-    } catch (error) {
-      console.error('Failed to open the prompts app:', error)
-      window.location.href = 'highlight://app/prompts'
-    }
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={handleOpenClick}
-      className="group flex items-center gap-2 pl-0.5 text-sm font-medium text-subtle transition-colors hover:text-secondary"
-    >
-      <BoxAdd size={20} variant="Bold" />
-      <span>Browse Shortcuts</span>
-    </button>
-  )
-}
+import { CreateShortcutButton } from '../buttons/create-shortcut-button'
+import { OpenAppButton } from '../buttons/open-app-button'
 
 const footerVariants: Variants = {
   hidden: {
@@ -45,8 +23,6 @@ const footerVariants: Variants = {
 }
 
 const InputFooter = () => {
-  const openModal = useStore((state) => state.openModal)
-
   return (
     <motion.div
       layout
@@ -56,15 +32,17 @@ const InputFooter = () => {
       exit="exit"
       className="flex items-center gap-5 rounded-full bg-[#1f1f1f] px-6 pt-3"
     >
-      <button
-        type="button"
-        onClick={() => openModal('create-prompt')}
-        className="group flex items-center gap-2 text-sm font-medium text-subtle transition-colors hover:text-secondary"
+      <OpenAppButton
+        appId="prompts"
+        className="flex items-center gap-2 pl-0.5 text-sm font-medium text-subtle transition-colors hover:text-secondary"
       >
+        <BoxAdd size={20} variant="Bold" />
+        <span>Browse Shortcuts</span>
+      </OpenAppButton>
+      <CreateShortcutButton className="flex items-center gap-2 text-sm font-medium text-subtle transition-colors hover:text-secondary">
         <AddCircle size={20} variant="Bold" />
         <span>Create Shortcut</span>
-      </button>
-      <BrowseShortcutsFooterButton />
+      </CreateShortcutButton>
     </motion.div>
   )
 }

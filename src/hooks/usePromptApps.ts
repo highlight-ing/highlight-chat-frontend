@@ -13,7 +13,6 @@ import { Prompt } from '@/types/supabase-helpers'
 import { useShallow } from 'zustand/react/shallow'
 import { useEffect, useMemo, useState } from 'react'
 import { trackEvent } from '@/utils/amplitude'
-import { useSubmitQuery } from './useSubmitQuery'
 
 let loadPromptsPromise: Promise<Prompt[]> | null = null
 
@@ -213,6 +212,12 @@ export default (loadPrompts?: boolean) => {
     }
     refreshPrompts()
   }, [loadPrompts])
+
+  useEffect(() => {
+    if (isPromptsLoaded) {
+      setLoadingPrompts(false)
+    }
+  }, [isPromptsLoaded])
 
   return {
     isLoadingPrompts,

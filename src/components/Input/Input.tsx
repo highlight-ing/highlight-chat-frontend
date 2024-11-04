@@ -3,7 +3,6 @@ import { Attachment } from '../Attachment'
 import { Attachment as AttachmentType, isFileAttachmentType } from '@/types'
 import { useSubmitQuery } from '../../hooks/useSubmitQuery'
 import { useStore } from '@/providers/store-provider'
-import Highlight from '@highlight-ai/app-runtime'
 import styles from './chatinput.module.scss'
 import { getDisplayValue } from '@/utils/attachments'
 import { useShallow } from 'zustand/react/shallow'
@@ -13,9 +12,12 @@ import useMeasure from 'react-use-measure'
 import InputPromptActions from './InputPromptActions'
 import { AttachmentDropdowns } from '../dropdowns/attachment-dropdowns'
 import InputFooter from './InputFooter'
-import { BoxAdd } from 'iconsax-react'
+import { AddCircle, BoxAdd } from 'iconsax-react'
 import { InputDivider } from './InputDivider'
 import { cn } from '@/lib/utils'
+import { OpenAppButton } from '../buttons/open-app-button'
+import { CreateShortcutButton } from '../buttons/create-shortcut-button'
+import { LatestConversation } from '../ChatHome/LatestConversation'
 
 const MAX_INPUT_HEIGHT = 160
 
@@ -23,16 +25,18 @@ const MAX_INPUT_HEIGHT = 160
  * This is the main Highlight Chat input box, not a reusable Input component.
  */
 export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
-  const { attachments, inputIsDisabled, promptName, promptApp, removeAttachment, fileInputRef } = useStore(
-    useShallow((state) => ({
-      attachments: state.attachments,
-      inputIsDisabled: state.inputIsDisabled,
-      promptName: state.promptName,
-      promptApp: state.promptApp,
-      removeAttachment: state.removeAttachment,
-      fileInputRef: state.fileInputRef,
-    })),
-  )
+  const { attachments, inputIsDisabled, promptName, promptApp, removeAttachment, fileInputRef, isConversationLoading } =
+    useStore(
+      useShallow((state) => ({
+        attachments: state.attachments,
+        inputIsDisabled: state.inputIsDisabled,
+        promptName: state.promptName,
+        promptApp: state.promptApp,
+        removeAttachment: state.removeAttachment,
+        fileInputRef: state.fileInputRef,
+        isConversationLoading: state.isConversationLoading,
+      })),
+    )
   const { handleSubmit } = useSubmitQuery()
   const [isInputFocused, setIsInputFocused] = useState(false)
   const [input, setInput] = useState('')
@@ -64,6 +68,10 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
         setIsInputFocused(false)
       }, 100)
     }
+
+    const input = document.getElementById('textarea-input')
+    input?.focus()
+    setIsInputFocused(true)
 
     const inputElement = inputRef.current
 
@@ -124,7 +132,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
     }
   }
 
-  const onClickContainer = () => {
+  const focusInput = () => {
     inputRef.current?.focus()
     trackEvent('HL Chat Input Focused', {})
   }
@@ -151,8 +159,8 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
           animate={{ height: bounds.height }}
           transition={{ ...inputTransition, duration: isInputFocused ? 0.2 : 0.25, delay: isInputFocused ? 0 : 0.15 }}
           className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''} min-h-[68px]`}
-          onClick={onClickContainer}
           onFocus={handleNonInputFocus}
+          onClick={focusInput}
         >
           <div ref={ref} className={`${styles.inputWrapper} flex-col justify-between`}>
             <div className="flex w-full items-end justify-between gap-2 pl-6 pr-4">
@@ -161,9 +169,14 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
               </div>
               <div className="h-auto w-full">
                 <textarea
-                  id={'textarea-input'}
+                  id="textarea-input"
                   ref={inputRef}
-                  placeholder={`Ask ${promptName ? promptName : 'Highlight AI'} anything...`}
+                  disabled={isConversationLoading || inputIsDisabled}
+                  placeholder={
+                    isConversationLoading || inputIsDisabled
+                      ? 'Loading new chat...'
+                      : `Ask ${promptName ? promptName : 'Highlight AI'} anything...`
+                  }
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
@@ -203,7 +216,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
               {!isActiveChat && isInputFocused && (
                 <div className="pt-3">
                   <InputDivider />
-                  <InputPromptActions />
+                  <InputPromptActions input={input} />
                   <InputDivider />
                   <InputFooter />
                 </div>
@@ -212,36 +225,43 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
           </div>
         </motion.div>
 
-        {!isActiveChat && <BrowseShortcutsButton isInputFocused={isInputFocused} />}
+        {!isActiveChat && (
+          <div className="flex w-full flex-col items-center space-y-16">
+            <div className="flex items-center gap-4">
+              <OpenAppButton
+                appId="prompts"
+                disabled={isInputFocused}
+                className={cn(
+                  'flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary opacity-0 transition hover:bg-hover',
+                  {
+                    'opacity-100': !isInputFocused,
+                  },
+                )}
+              >
+                <span>Browse Shortcuts</span>
+                <BoxAdd size={20} variant="Bold" className="opacity-80" />
+              </OpenAppButton>
+              <CreateShortcutButton
+                disabled={isInputFocused}
+                className={cn(
+                  'flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary opacity-0 transition hover:bg-hover',
+                  {
+                    'opacity-100': !isInputFocused,
+                  },
+                )}
+              >
+                <span>Create Shortcut</span>
+                <AddCircle size={20} variant="Bold" className="opacity-80" />
+              </CreateShortcutButton>
+            </div>
+
+            <div className={cn('w-full transition-transform', { '-translate-y-16': isInputFocused })}>
+              <LatestConversation focusInput={focusInput} />
+            </div>
+          </div>
+        )}
       </div>
     </MotionConfig>
-  )
-}
-
-function BrowseShortcutsButton({ isInputFocused }: { isInputFocused: boolean }) {
-  const handleOpenClick = async () => {
-    try {
-      await Highlight.app.openApp('prompts')
-    } catch (error) {
-      console.error('Failed to open the prompts app:', error)
-      window.location.href = 'highlight://app/prompts'
-    }
-  }
-
-  return (
-    <button
-      onClick={handleOpenClick}
-      disabled={isInputFocused}
-      className={cn(
-        'flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary opacity-0 transition hover:bg-hover',
-        {
-          'opacity-100': !isInputFocused,
-        },
-      )}
-    >
-      <span>Browse Shortcuts</span>
-      <BoxAdd size={20} variant="Bold" className="opacity-80" />
-    </button>
   )
 }
 
