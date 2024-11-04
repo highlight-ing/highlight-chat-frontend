@@ -123,8 +123,6 @@ const InputPromptActions = ({ input }: { input: string }) => {
     return acc
   }, [])
 
-  console.log({ isLoadingPrompts, pinnedPrompts })
-
   if (isLoadingPrompts || !userId) {
     return (
       <motion.div variants={actionItemVariants} initial="hidden" animate="show" exit="exit">
