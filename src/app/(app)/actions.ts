@@ -149,3 +149,23 @@ export async function updateUserInfo(accessToken: string) {
     console.warn('Error updating user info', error)
   }
 }
+
+/**
+ * Fetches 'appIcon' from supabase "app_icons" table using appName as the key
+ */
+export const fetchAppIcon = async (appName: string) => {
+  const supabase = supabaseAdmin()
+
+  const { data: icon, error } = await supabase
+    .from('app_icons')
+    .select('app_icon')
+    .eq('app_name', appName)
+    .maybeSingle()
+
+  if (error) {
+    console.error('Error fetching app icon:', error)
+    return null
+  }
+
+  return icon?.app_icon || null
+}

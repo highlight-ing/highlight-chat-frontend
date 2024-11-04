@@ -74,6 +74,30 @@ export type Database = {
           },
         ]
       }
+      app_icons: {
+        Row: {
+          app_icon: string
+          app_name: string
+          created_at: string
+          external_id: string
+          id: number
+        }
+        Insert: {
+          app_icon: string
+          app_name: string
+          created_at?: string
+          external_id?: string
+          id?: number
+        }
+        Update: {
+          app_icon?: string
+          app_name?: string
+          created_at?: string
+          external_id?: string
+          id?: number
+        }
+        Relationships: []
+      }
       conversation: {
         Row: {
           app_id: string | null
