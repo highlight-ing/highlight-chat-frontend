@@ -90,7 +90,7 @@ export default (loadPrompts?: boolean) => {
     return loadPromptsPromise
   }
 
-  const refreshPinnedPrompts = async () => {
+  const refreshPinnedPrompts = async (skipInternalCall?: boolean) => {
     const pinned = await fetchPinnedPrompts(await getAccessToken())
     // @ts-ignore
     if (Array.isArray(pinned)) {
@@ -98,6 +98,7 @@ export default (loadPrompts?: boolean) => {
     }
 
     try {
+      if (skipInternalCall) return
       //@ts-expect-error
       globalThis.highlight.internal.reloadPrompts()
     } catch (err) {
