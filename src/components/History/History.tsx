@@ -109,11 +109,15 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
 
   // Handle fetching history, and detecting new chats to fetch
   useEffect(() => {
-    if (!initialFetchDone.current) {
+    const initialChatFetch = async () => {
       // Initial fetch
       console.log('Fetching chat history')
-      refreshChatHistory()
+      await refreshChatHistory()
       initialFetchDone.current = true
+    }
+
+    if (!initialFetchDone.current) {
+      initialChatFetch()
     } else if (conversationId && !history.some((chat) => chat.id === conversationId)) {
       const fetchAndSafeRetry = async (retries: number) => {
         // New conversation found after initial fetch
@@ -286,7 +290,7 @@ interface HistoryItemProps {
 const HistoryItem = ({ chat, isSelecting, isSelected, onSelect, onOpenChat }: HistoryItemProps) => {
   const fetchRetryRef = useRef<NodeJS.Timeout>()
   const [fetchRetryCount, setFetchRetryCount] = useState(0)
-  const { refreshChatItem } = useChatHistory()
+  const { history, refreshChatItem } = useChatHistory()
   const { addOrUpdateOpenConversation, openModal, setConversationId } = useStore(
     useShallow((state) => ({
       setConversationId: state.setConversationId,
