@@ -9,4 +9,4 @@ export function getIntegrationLanguage(type: IntegrationType) {
   }
 }
 
-export const integrationFunctionNames = ['create_linear_ticket', 'create_notion_page']
+export const integrationFunctionNames = ['create_linear_ticket', 'create_notion_page', 'create_google_calendar_event']

@@ -2,10 +2,6 @@
 
 const HIGHLIGHT_BACKEND_BASE_URL = 'https://backend.highlightai.com'
 
-const ERROR_MESSAGES = {
-  INVALID_AUTH_TOKEN: 'Invalid authorization token. Try refreshing Highlight Chat.',
-}
-
 /**
  * Returns the latest Linear API token for the given user by their ID.
  */

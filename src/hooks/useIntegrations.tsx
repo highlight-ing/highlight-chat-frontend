@@ -3,9 +3,11 @@ import { CreateNotionPageComponent } from '@/components/integrations/notion'
 import { useStore } from '@/providers/store-provider'
 import { useEffect, useState } from 'react'
 import { checkLinearConnectionStatus, createMagicLinkForLinear } from '@/utils/linear-server-actions'
-import { LinearIcon, NotionIcon } from '@/icons/icons'
+import { LinearIcon, NotionIcon, GoogleIcon } from '@/icons/icons'
 import { SetupConnectionComponent } from '@/components/integrations/integration-auth'
 import { checkNotionConnectionStatus, createMagicLinkForNotion } from '@/utils/notion-server-actions'
+import { checkGoogleConnectionStatus, createMagicLinkForGoogle } from '@/utils/google-server-actions'
+import { CreateGoogleCalendarEventComponent } from '@/components/integrations/gcal'
 
 interface CreateNotionPageParams {
   title: string
@@ -13,9 +15,18 @@ interface CreateNotionPageParams {
   content: string
 }
 
+export interface CreateGoogleCalendarEventParams {
+  summary: string
+  location?: string
+  description?: string
+  start?: string
+  end?: string
+}
+
 export interface UseIntegrationsAPI {
   createLinearTicket: (conversationId: string, title: string, description: string) => Promise<void>
   createNotionPage: (conversationId: string, params: CreateNotionPageParams) => Promise<void>
+  createGoogleCalendarEvent: (conversationId: string, params: CreateGoogleCalendarEventParams) => Promise<void>
   showLoading: (conversationId: string, functionName: string) => Promise<void>
 }
 
@@ -90,6 +101,28 @@ export function useIntegrations(): UseIntegrationsAPI {
       content: (
         <MessageWithComponent content={lastMessage}>
           <CreateNotionPageComponent {...params} />
+        </MessageWithComponent>
+      ),
+      role: 'assistant',
+    })
+  }
+
+  async function createGoogleCalendarEvent(conversationId: string, params: CreateGoogleCalendarEventParams) {
+    await integrationAuthorized.get('google')
+
+    let lastMessage = previousContent.get(conversationId)
+
+    if (!lastMessage) {
+      lastMessage = getLastConversationMessage(conversationId)?.content as string
+    }
+
+    // Update the last message to show the Notion page component which will handle checking for authentication,
+    // creating the page, and showing the success message.
+    // @ts-expect-error
+    updateLastConversationMessage(conversationId!, {
+      content: (
+        <MessageWithComponent content={lastMessage}>
+          <CreateGoogleCalendarEventComponent {...params} />
         </MessageWithComponent>
       ),
       role: 'assistant',
@@ -186,6 +219,42 @@ export function useIntegrations(): UseIntegrationsAPI {
       integrationAuthorized.set('notion', Promise.resolve())
     }
 
+    if (functionName === 'create_google_calendar_event') {
+      //@ts-ignore
+      const hlToken = (await highlight.internal.getAuthorizationToken()) as string
+
+      const connected = await checkGoogleConnectionStatus(hlToken)
+
+      console.log('Google Connected', connected)
+
+      if (!connected) {
+        const promise = new Promise<void>((resolve) => {
+          // @ts-expect-error
+          updateLastConversationMessage(conversationId!, {
+            content: (
+              <MessageWithComponent content={textContents}>
+                <div className="mt-2">
+                  <SetupConnectionComponent
+                    name={'Google'}
+                    checkConnectionStatus={checkGoogleConnectionStatus}
+                    onConnect={() => resolve()}
+                    icon={<GoogleIcon size={16} />}
+                    createMagicLink={createMagicLinkForGoogle}
+                  />
+                </div>
+              </MessageWithComponent>
+            ),
+            role: 'assistant',
+          })
+        })
+
+        integrationAuthorized.set('google', promise)
+
+        return
+      }
+      integrationAuthorized.set('google', Promise.resolve())
+    }
+
     // @ts-expect-error
     updateLastConversationMessage(conversationId!, {
       content: (
@@ -197,5 +266,5 @@ export function useIntegrations(): UseIntegrationsAPI {
     })
   }
 
-  return { createLinearTicket, createNotionPage, showLoading }
+  return { createLinearTicket, createNotionPage, createGoogleCalendarEvent, showLoading }
 }

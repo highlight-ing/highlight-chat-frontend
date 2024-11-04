@@ -330,6 +330,32 @@ export type Database = {
         }
         Relationships: []
       }
+      prompt_page_trending: {
+        Row: {
+          created_at: string
+          id: number
+          prompt_id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          prompt_id: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          prompt_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompt_page_trending_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       prompt_usages: {
         Row: {
           created_at: string
@@ -365,6 +391,8 @@ export type Database = {
       prompts: {
         Row: {
           can_trend: boolean | null
+          canShowOnPromptPage: boolean
+          create_gcal_event_integration_enabled: boolean | null
           create_notion_page_integration_enabled: boolean | null
           created_at: string
           description: string | null
@@ -388,6 +416,8 @@ export type Database = {
         }
         Insert: {
           can_trend?: boolean | null
+          canShowOnPromptPage?: boolean
+          create_gcal_event_integration_enabled?: boolean | null
           create_notion_page_integration_enabled?: boolean | null
           created_at?: string
           description?: string | null
@@ -411,6 +441,8 @@ export type Database = {
         }
         Update: {
           can_trend?: boolean | null
+          canShowOnPromptPage?: boolean
+          create_gcal_event_integration_enabled?: boolean | null
           create_notion_page_integration_enabled?: boolean | null
           created_at?: string
           description?: string | null
@@ -598,12 +630,218 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      boost_marks_prompts: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       bulk_update_prompt_usages: {
         Args: {
           ids: number[]
           public_use_numbers: number[]
         }
         Returns: undefined
+      }
+      get_conversations_with_shared:
+        | {
+            Args: {
+              p_user_id: string
+            }
+            Returns: {
+              id: string
+              user_id: string
+              title: string
+              created_at: string
+              updated_at: string
+              app_id: string
+              shared_id: string
+              shared_created_at: string
+              shared_title: string
+            }[]
+          }
+        | {
+            Args: {
+              p_user_id: string
+            }
+            Returns: {
+              id: string
+              user_id: string
+              title: string
+              created_at: string
+              updated_at: string
+              app_id: string
+              shared_id: string
+              shared_created_at: string
+              shared_title: string
+            }[]
+          }
+      get_conversations_with_shared_v2:
+        | {
+            Args: {
+              p_user_id: string
+            }
+            Returns: {
+              id: string
+              user_id: string
+              title: string
+              created_at: string
+              updated_at: string
+              app_id: string
+              shared_id: string
+              shared_created_at: string
+              shared_title: string
+            }[]
+          }
+        | {
+            Args: {
+              p_user_id: string
+            }
+            Returns: {
+              id: string
+              user_id: string
+              title: string
+              created_at: string
+              updated_at: string
+              app_id: string
+              shared_id: string
+              shared_created_at: string
+              shared_title: string
+            }[]
+          }
+      get_conversations_with_shared_v3: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: {
+          id: string
+          user_id: string
+          title: string
+          created_at: string
+          updated_at: string
+          app_id: string
+          shared_id: string
+          shared_created_at: string
+          shared_title: string
+        }[]
+      }
+      get_conversations_with_shared_v4: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: {
+          id: string
+          user_id: string
+          title: string
+          created_at: string
+          updated_at: string
+          app_id: string
+          shared_id: string
+          shared_created_at: string
+          shared_title: string
+        }[]
+      }
+      get_related_prompts: {
+        Args: {
+          p_prompt_id: number
+        }
+        Returns: {
+          related_prompt_id: number
+          related_prompt_name: string
+          related_prompt_slug: string
+        }[]
+      }
+      get_top_6_prompts_by_tag: {
+        Args: {
+          tag_name: string
+        }
+        Returns: {
+          id: number
+        }[]
+      }
+      gtrgm_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gtrgm_decompress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gtrgm_in: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gtrgm_options: {
+        Args: {
+          "": unknown
+        }
+        Returns: undefined
+      }
+      gtrgm_out: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      search_prompts: {
+        Args: {
+          query: string
+          tags: string[]
+        }
+        Returns: {
+          id: number
+          name: string
+          description: string
+          tag: string
+        }[]
+      }
+      search_prompts_fuzzy: {
+        Args: {
+          query: string
+        }
+        Returns: {
+          id: number
+        }[]
+      }
+      select_top_6_tags: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: number
+          tag: string
+          tag_count: number
+        }[]
+      }
+      set_limit: {
+        Args: {
+          "": number
+        }
+        Returns: number
+      }
+      set_mark_can_trend: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      show_limit: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      show_trgm: {
+        Args: {
+          "": string
+        }
+        Returns: string[]
+      }
+      top_tags_selection: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: number
+          tag: string
+          tag_count: number
+        }[]
       }
     }
     Enums: {
