@@ -4,10 +4,11 @@ import usePromptApps from '@/hooks/usePromptApps'
 import { PinnedPrompt } from '@/types'
 import Image from 'next/image'
 import { supabaseLoader } from '@/lib/supabase'
-import { Archive, Edit2 } from 'iconsax-react'
+import { Archive, BoxAdd, Edit2 } from 'iconsax-react'
 import Tooltip from '../Tooltip/Tooltip'
 import { useStore } from '@/providers/store-provider'
 import { ScrollArea } from '../ui/scroll-area'
+import { OpenAppButton } from '../buttons/open-app-button'
 
 const actionItemVariants: Variants = {
   hidden: {
@@ -137,7 +138,14 @@ const InputPromptActions = ({ input }: { input: string }) => {
     return (
       <motion.div variants={actionItemVariants} initial="hidden" animate="show" exit="exit">
         <div className="flex w-full items-center gap-2 rounded-2xl px-6 py-2 transition-[background-color] duration-150">
-          <h3 className="text-sm text-tertiary">No pinned shortcuts.</h3>
+          <h3 className="text-sm text-tertiary">Explore more shortcuts</h3>
+          <OpenAppButton
+            appId="prompts"
+            className="flex items-center gap-1 rounded-full border border-secondary/20 px-2 py-0.5 pl-0.5 text-[10px] font-medium text-subtle transition-colors hover:text-secondary"
+          >
+            <BoxAdd size={14} variant="Bold" className="ml-1" />
+            <span>Browse Shortcuts</span>
+          </OpenAppButton>
         </div>
       </motion.div>
     )
