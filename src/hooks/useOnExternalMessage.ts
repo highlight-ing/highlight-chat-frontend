@@ -55,6 +55,9 @@ const useOnExternalMessage = () => {
         }
         setConversationId(message.conversationId)
 
+        // console.log('Fetching chat history')
+        // await refreshChatHistory()
+
         console.log(message.toolUse, message.toolUse?.type)
         // Handle toolUse if present
         if (message.toolUse && message.toolUse.type === 'tool_use') {
