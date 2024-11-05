@@ -135,20 +135,7 @@ const InputPromptActions = ({ input }: { input: string }) => {
   }
 
   if (!uniquePrompts || uniquePrompts.length === 0) {
-    return (
-      <motion.div variants={actionItemVariants} initial="hidden" animate="show" exit="exit">
-        <div className="flex w-full items-center gap-2 rounded-2xl px-6 py-2 transition-[background-color] duration-150">
-          <h3 className="text-sm text-tertiary">Explore more shortcuts</h3>
-          <OpenAppButton
-            appId="prompts"
-            className="flex items-center gap-1 rounded-full border border-secondary/20 px-2 py-0.5 pl-0.5 text-[10px] font-medium text-subtle transition-colors hover:text-secondary"
-          >
-            <BoxAdd size={14} variant="Bold" className="ml-1" />
-            <span>Browse Shortcuts</span>
-          </OpenAppButton>
-        </div>
-      </motion.div>
-    )
+    return null
   }
 
   return (
