@@ -21,7 +21,7 @@ const useOnExternalMessage = () => {
     closeAllModals: state.closeAllModals,
     isModalOpen: state.isModalOpen,
   }))
-  const { refreshChatItem, refreshChatHistory } = useChatHistory()
+  const { refreshChatItem } = useChatHistory()
   const { addToast } = useStore((state) => ({
     addToast: state.addToast,
   }))
@@ -55,8 +55,8 @@ const useOnExternalMessage = () => {
         }
         setConversationId(message.conversationId)
 
-        console.log('Fetching chat history')
-        await refreshChatHistory()
+        // console.log('Fetching chat history')
+        // await refreshChatHistory()
 
         console.log(message.toolUse, message.toolUse?.type)
         // Handle toolUse if present
