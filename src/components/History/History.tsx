@@ -55,6 +55,7 @@ function sortArrayByDate(inputArray: ChatHistoryItem[]) {
 const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: HistoryProps) => {
   const { deleteRequest } = useApi()
   const initialFetchDone = useRef(false)
+  const fetchInProgress = useRef(false)
   const conversationId = useStore((state) => state.conversationId)
   const startNewConversation = useStore((state) => state.startNewConversation)
   const removeOpenConversation = useStore((state) => state.removeOpenConversation)
@@ -110,10 +111,14 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
   // Handle fetching history, and detecting new chats to fetch
   useEffect(() => {
     const initialChatFetch = async () => {
-      // Initial fetch
-      console.log('Fetching chat history')
-      await refreshChatHistory()
-      initialFetchDone.current = true
+      if (!fetchInProgress.current) {
+        // Initial fetch
+        console.log('Fetching chat history')
+        fetchInProgress.current = true
+        await refreshChatHistory()
+        initialFetchDone.current = true
+        fetchInProgress.current = false
+      }
     }
 
     if (!initialFetchDone.current) {
