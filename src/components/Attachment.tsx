@@ -42,7 +42,6 @@ export const Attachment = ({
   version,
   ...props
 }: AttachmentProps) => {
-  const appIcon = (props as WindowAttachmentProps).appIcon
   const appName = (props as WindowContextAttachmentProps).appName
   const [isImageLoaded, setIsImageLoaded] = useState(false)
   const conversationId = version === 'v4' ? useStore((state) => state.conversationId) : undefined
@@ -146,7 +145,7 @@ export const Attachment = ({
       key="attachment-tooltip"
       tooltip={<div className="line-clamp-3 max-h-[100px] max-w-[300px]">{value}</div>}
       position="right"
-      disabled={!value || value.length === 0 || type === 'image'}
+      disabled={!value || value?.length === 0 || type === 'image'}
     >
       <div className="group relative">
         {type === 'conversation' || type === 'audio' ? (
