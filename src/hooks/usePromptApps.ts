@@ -30,6 +30,8 @@ export default (loadPrompts?: boolean) => {
     startNewConversation,
     isPromptsLoaded,
     setIsPromptsLoaded,
+    input,
+    setInput,
   } = useStore(
     useShallow((state) => ({
       userId: state.userId,
@@ -41,6 +43,8 @@ export default (loadPrompts?: boolean) => {
       startNewConversation: state.startNewConversation,
       isPromptsLoaded: state.isPromptsLoaded,
       setIsPromptsLoaded: state.setIsPromptsLoaded,
+      input: state.input,
+      setInput: state.setInput,
     })),
   )
 
@@ -156,6 +160,10 @@ export default (loadPrompts?: boolean) => {
 
     // Count the prompt view
     countPromptView(prompt.external_id, accessToken)
+
+    if (!input || input === '') {
+      setInput(prompt.name)
+    }
 
     setPrompt({
       promptApp: prompt,
