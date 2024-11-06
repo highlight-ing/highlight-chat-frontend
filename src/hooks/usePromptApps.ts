@@ -98,16 +98,16 @@ export default (loadPrompts?: boolean) => {
     return loadPromptsPromise
   }
 
-  const refreshPinnedPrompts = async () => {
-    setIsPinnedPromptsLoading(true)
-    console.log('Refreshing pinned prompts')
+  const refreshPinnedPrompts = async (fromExternalCall?: boolean) => {
+    if (!fromExternalCall) setIsPinnedPromptsLoading(true)
+    console.log('Refreshing pinned prompts', { fromExternalCall })
     const pinned = await fetchPinnedPrompts(await getAccessToken())
     // @ts-ignore
     if (Array.isArray(pinned)) {
       setPinnedPrompts(pinned ?? [])
     }
     setIsPinnedPromptsLoading(false)
-
+    if (fromExternalCall) return
     try {
       //@ts-expect-error
       globalThis.highlight.internal.reloadPrompts()
