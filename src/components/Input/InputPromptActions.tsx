@@ -35,8 +35,7 @@ const InputActionItem = ({ prompt, input }: { prompt: PinnedPrompt; input: strin
 
   function handlePromptClick() {
     setStoreInput(input)
-    console.log(input)
-    selectPrompt(prompt.external_id, false)
+    selectPrompt(prompt.external_id, false, false, input)
   }
 
   function handleEditPromptClick(e: MouseEvent) {
