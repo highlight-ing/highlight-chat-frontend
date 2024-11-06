@@ -81,6 +81,8 @@ export default (loadPrompts?: boolean) => {
 
       if (response.error) {
         setLoadingPrompts(false)
+        setIsPinnedPromptsLoading(false)
+        console.log(response.error)
         resolve([])
         loadPromptsPromise = null
         return
