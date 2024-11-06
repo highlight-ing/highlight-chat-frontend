@@ -48,6 +48,7 @@ export interface WindowContentsAttachment {
   name: string
   words: number
   created_at: Date
+  appName?: string
 }
 
 export interface WindowListAttachment {
