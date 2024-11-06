@@ -74,6 +74,7 @@ export default (loadPrompts?: boolean) => {
     loadPromptsPromise = new Promise<Prompt[]>(async (resolve) => {
       console.log('Refreshing prompts')
       setLoadingPrompts(true)
+      setIsPinnedPromptsLoading(true)
 
       const accessToken = await getAccessToken()
       const response = await fetchPrompts(accessToken)
@@ -89,6 +90,7 @@ export default (loadPrompts?: boolean) => {
 
       await refreshPinnedPrompts()
 
+      setIsPinnedPromptsLoading(false)
       setLoadingPrompts(false)
       setIsPromptsLoaded(true)
       resolve(response.prompts ?? [])
@@ -99,14 +101,12 @@ export default (loadPrompts?: boolean) => {
   }
 
   const refreshPinnedPrompts = async (fromExternalCall?: boolean) => {
-    if (!fromExternalCall) setIsPinnedPromptsLoading(true)
     console.log('Refreshing pinned prompts', { fromExternalCall })
     const pinned = await fetchPinnedPrompts(await getAccessToken())
     // @ts-ignore
     if (Array.isArray(pinned)) {
       setPinnedPrompts(pinned ?? [])
     }
-    setIsPinnedPromptsLoading(false)
     if (fromExternalCall) return
     try {
       //@ts-expect-error
