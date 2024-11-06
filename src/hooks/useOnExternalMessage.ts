@@ -21,7 +21,7 @@ const useOnExternalMessage = () => {
     closeAllModals: state.closeAllModals,
     isModalOpen: state.isModalOpen,
   }))
-  const { refreshChatItem } = useChatHistory()
+  const { refreshChatItem, refreshChatHistory } = useChatHistory()
   const { addToast } = useStore((state) => ({
     addToast: state.addToast,
   }))
@@ -31,18 +31,12 @@ const useOnExternalMessage = () => {
   const { handleSubmit } = useSubmitQuery()
   const { forkDefaultAction } = useForkDefaultAction()
   const { createAction } = useIntegration()
-  const { selectPrompt, refreshPinnedPrompts } = usePromptApps()
+  const { selectPrompt } = usePromptApps()
 
   useEffect(() => {
     const removeListener = Highlight.app.addListener('onExternalMessage', async (caller: string, message: any) => {
       console.log('Received external message from:', caller)
       console.log('Message content:', message)
-
-      if (message.type === 'refresh-pinned-prompts') {
-        await refreshPinnedPrompts(true)
-        console.log('Refreshed prompts')
-        return
-      }
 
       if (message.conversationId) {
         console.log('Opening conversation from external event:', message.conversationId)
@@ -55,8 +49,8 @@ const useOnExternalMessage = () => {
         }
         setConversationId(message.conversationId)
 
-        // console.log('Fetching chat history')
-        // await refreshChatHistory()
+        console.log('Fetching chat history')
+        await refreshChatHistory()
 
         console.log(message.toolUse, message.toolUse?.type)
         // Handle toolUse if present

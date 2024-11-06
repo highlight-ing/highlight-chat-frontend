@@ -37,7 +37,7 @@ export const useChatHistory = (): {
           addOrUpdateOpenConversation(chat)
         }
       }
-      console.log('history:', history)
+      console.log('history:', data.conversations)
       return data.conversations
     } catch (error) {
       console.error('Error fetching response:', error)
@@ -53,6 +53,13 @@ export const useChatHistory = (): {
     addOpenConversation?: boolean,
   ): Promise<ChatHistoryItem | null> => {
     try {
+      let currentHistory = history
+      if (!currentHistory || currentHistory.length === 0) {
+        console.log('FETCHING HISTORY')
+        currentHistory = await fetchResponse()
+        setHistory(currentHistory)
+      }
+
       const response = await get(`history/${conversationId}`, { version: 'v4' })
       if (!response.ok) {
         throw new Error('Network response was not ok')
@@ -61,18 +68,18 @@ export const useChatHistory = (): {
 
       if (
         equal(
-          history.find((item) => item.id === conversationId),
+          currentHistory.find((item) => item.id === conversationId),
           data.conversation,
         )
       ) {
         return data.conversation
       }
-      let newHistory = [...history]
+      let newHistory = [...currentHistory]
       const existingIndex = newHistory.findIndex((chat) => chat.id === conversationId)
       if (existingIndex !== -1) {
         newHistory[existingIndex] = data.conversation
       } else {
-        newHistory = [data.conversation, ...history]
+        newHistory = [data.conversation, ...currentHistory]
       }
       setHistory(newHistory)
       if (openConversations.some((chat) => chat.id === conversationId) || addOpenConversation) {

@@ -55,7 +55,6 @@ function sortArrayByDate(inputArray: ChatHistoryItem[]) {
 const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: HistoryProps) => {
   const { deleteRequest } = useApi()
   const initialFetchDone = useRef(false)
-  const fetchInProgress = useRef(false)
   const conversationId = useStore((state) => state.conversationId)
   const startNewConversation = useStore((state) => state.startNewConversation)
   const removeOpenConversation = useStore((state) => state.removeOpenConversation)
@@ -110,19 +109,11 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
 
   // Handle fetching history, and detecting new chats to fetch
   useEffect(() => {
-    const initialChatFetch = async () => {
-      if (!fetchInProgress.current) {
-        // Initial fetch
-        console.log('Fetching chat history')
-        fetchInProgress.current = true
-        await refreshChatHistory()
-        initialFetchDone.current = true
-        fetchInProgress.current = false
-      }
-    }
-
     if (!initialFetchDone.current) {
-      initialChatFetch()
+      // Initial fetch
+      console.log('Fetching chat history')
+      refreshChatHistory()
+      initialFetchDone.current = true
     } else if (conversationId && !history.some((chat) => chat.id === conversationId)) {
       const fetchAndSafeRetry = async (retries: number) => {
         // New conversation found after initial fetch
@@ -295,7 +286,7 @@ interface HistoryItemProps {
 const HistoryItem = ({ chat, isSelecting, isSelected, onSelect, onOpenChat }: HistoryItemProps) => {
   const fetchRetryRef = useRef<NodeJS.Timeout>()
   const [fetchRetryCount, setFetchRetryCount] = useState(0)
-  const { history, refreshChatItem } = useChatHistory()
+  const { refreshChatItem } = useChatHistory()
   const { addOrUpdateOpenConversation, openModal, setConversationId } = useStore(
     useShallow((state) => ({
       setConversationId: state.setConversationId,
@@ -334,14 +325,7 @@ const HistoryItem = ({ chat, isSelecting, isSelected, onSelect, onOpenChat }: Hi
   }
 
   useEffect(() => {
-    if (
-      history &&
-      history.length > 0 &&
-      chat.id === history[0].id &&
-      chat.title === 'New Conversation' &&
-      fetchRetryCount < MAX_RETRIES &&
-      !fetchRetryRef.current
-    ) {
+    if (chat.title === 'New Conversation' && fetchRetryCount < MAX_RETRIES && !fetchRetryRef.current) {
       console.log(`Fetching updated conversation, ${MAX_RETRIES - fetchRetryCount} tries remaining`)
 
       // Retry until title is assigned
@@ -356,7 +340,7 @@ const HistoryItem = ({ chat, isSelecting, isSelected, onSelect, onOpenChat }: Hi
         fetchRetryRef.current = undefined
       }, RETRY_INTERVAL)
     }
-  }, [chat, history, fetchRetryCount])
+  }, [chat, fetchRetryCount])
 
   return (
     <ContextMenu
