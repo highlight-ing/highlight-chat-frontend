@@ -144,12 +144,7 @@ export default (loadPrompts?: boolean) => {
     return newPrompt
   }
 
-  const selectPrompt = async (
-    promptExternalId: string,
-    isNewConversation?: boolean,
-    pinPrompt?: boolean,
-    input?: string,
-  ) => {
+  const selectPrompt = async (promptExternalId: string, isNewConversation?: boolean, pinPrompt?: boolean) => {
     const prompt = await getPromptByExternalId(promptExternalId)
 
     if (!prompt) {
@@ -172,10 +167,6 @@ export default (loadPrompts?: boolean) => {
 
     // Count the prompt view
     countPromptView(prompt.external_id, accessToken)
-
-    if ((!storeInput || storeInput === '') && (!input || input === '')) {
-      setInput(prompt.name)
-    }
 
     setPrompt({
       promptApp: prompt,
