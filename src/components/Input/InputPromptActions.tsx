@@ -112,7 +112,7 @@ const actionItemContainerVariants: Variants = {
 }
 
 const InputPromptActions = ({ input }: { input: string }) => {
-  const { isLoadingPrompts, pinnedPrompts } = usePromptApps()
+  const { isPinnedPromptsLoading, pinnedPrompts } = usePromptApps()
   const userId = useStore((state) => state.userId)
 
   const uniquePrompts = pinnedPrompts.reduce((acc: Array<PinnedPrompt>, curr) => {
@@ -123,7 +123,7 @@ const InputPromptActions = ({ input }: { input: string }) => {
     return acc
   }, [])
 
-  if (isLoadingPrompts || !userId) {
+  if (isPinnedPromptsLoading || !userId) {
     return (
       <motion.div variants={actionItemVariants} initial="hidden" animate="show" exit="exit">
         <div className="flex w-full items-center gap-2 rounded-2xl px-6 py-2 transition-[background-color] duration-150">

@@ -30,6 +30,8 @@ export default (loadPrompts?: boolean) => {
     startNewConversation,
     isPromptsLoaded,
     setIsPromptsLoaded,
+    isPinnedPromptsLoading,
+    setIsPinnedPromptsLoading,
     storeInput,
     setInput,
   } = useStore(
@@ -43,6 +45,8 @@ export default (loadPrompts?: boolean) => {
       startNewConversation: state.startNewConversation,
       isPromptsLoaded: state.isPromptsLoaded,
       setIsPromptsLoaded: state.setIsPromptsLoaded,
+      isPinnedPromptsLoading: state.isPinnedPromptsLoading,
+      setIsPinnedPromptsLoading: state.setIsPinnedPromptsLoading,
       storeInput: state.input,
       setInput: state.setInput,
     })),
@@ -95,11 +99,14 @@ export default (loadPrompts?: boolean) => {
   }
 
   const refreshPinnedPrompts = async () => {
+    setIsPinnedPromptsLoading(true)
+    console.log('Refreshing pinned prompts')
     const pinned = await fetchPinnedPrompts(await getAccessToken())
     // @ts-ignore
     if (Array.isArray(pinned)) {
       setPinnedPrompts(pinned ?? [])
     }
+    setIsPinnedPromptsLoading(false)
 
     try {
       //@ts-expect-error
@@ -165,8 +172,6 @@ export default (loadPrompts?: boolean) => {
 
     // Count the prompt view
     countPromptView(prompt.external_id, accessToken)
-
-    console.log({ storeInput })
 
     if ((!storeInput || storeInput === '') && (!input || input === '')) {
       setInput(prompt.name)
@@ -236,6 +241,7 @@ export default (loadPrompts?: boolean) => {
 
   return {
     isLoadingPrompts,
+    isPinnedPromptsLoading,
     prompts,
     communityPrompts,
     myPrompts,
