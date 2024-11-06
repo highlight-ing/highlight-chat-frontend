@@ -31,12 +31,17 @@ const useOnExternalMessage = () => {
   const { handleSubmit } = useSubmitQuery()
   const { forkDefaultAction } = useForkDefaultAction()
   const { createAction } = useIntegration()
-  const { selectPrompt } = usePromptApps()
+  const { selectPrompt, refreshPinnedPrompts } = usePromptApps()
 
   useEffect(() => {
     const removeListener = Highlight.app.addListener('onExternalMessage', async (caller: string, message: any) => {
       console.log('Received external message from:', caller)
       console.log('Message content:', message)
+
+      if (message.type === 'refresh-pinned-prompts') {
+        await refreshPinnedPrompts(true)
+        return
+      }
 
       if (message.conversationId) {
         console.log('Opening conversation from external event:', message.conversationId)
