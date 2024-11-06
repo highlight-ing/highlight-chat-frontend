@@ -30,6 +30,8 @@ export default (loadPrompts?: boolean) => {
     startNewConversation,
     isPromptsLoaded,
     setIsPromptsLoaded,
+    storeInput,
+    setInput,
   } = useStore(
     useShallow((state) => ({
       userId: state.userId,
@@ -41,6 +43,8 @@ export default (loadPrompts?: boolean) => {
       startNewConversation: state.startNewConversation,
       isPromptsLoaded: state.isPromptsLoaded,
       setIsPromptsLoaded: state.setIsPromptsLoaded,
+      storeInput: state.input,
+      setInput: state.setInput,
     })),
   )
 
@@ -133,7 +137,12 @@ export default (loadPrompts?: boolean) => {
     return newPrompt
   }
 
-  const selectPrompt = async (promptExternalId: string, isNewConversation?: boolean, pinPrompt?: boolean) => {
+  const selectPrompt = async (
+    promptExternalId: string,
+    isNewConversation?: boolean,
+    pinPrompt?: boolean,
+    input?: string,
+  ) => {
     const prompt = await getPromptByExternalId(promptExternalId)
 
     if (!prompt) {
@@ -156,6 +165,12 @@ export default (loadPrompts?: boolean) => {
 
     // Count the prompt view
     countPromptView(prompt.external_id, accessToken)
+
+    console.log({ storeInput })
+
+    if ((!storeInput || storeInput === '') && (!input || input === '')) {
+      setInput(prompt.name)
+    }
 
     setPrompt({
       promptApp: prompt,
