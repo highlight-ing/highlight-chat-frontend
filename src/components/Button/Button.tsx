@@ -13,6 +13,8 @@ export type ButtonVariantType =
   | 'success'
   | 'accent'
   | 'primary-outline'
+  | 'dark-teal' 
+  
 
 type ButtonProps = React.ComponentPropsWithoutRef<'button'> & {
   size: SizeType

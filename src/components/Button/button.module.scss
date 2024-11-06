@@ -188,7 +188,22 @@
       color: $green-80;
     }
   }
-
+  &.dark-teal {
+    background-color: #1C2B2D;
+    color: #4ECBD9;
+    border: 1px solid #4ECBD9;
+    border-radius: 6px;  // Matching the smaller border radius from the image
+  
+    &:hover {
+      background-color: #243638;
+    }
+  
+    &:active {
+      background-color: #1C2B2D;
+      opacity: 0.9;
+    }
+  }
+  
   &.accent {
     background-color: $background-accent-secondary;
     color: $text-accent;
@@ -198,3 +213,6 @@
     }
   }
 }
+
+
+

@@ -87,7 +87,7 @@ export function SetupConnectionComponent({
   return (
     <div className="flex flex-col gap-2">
       <p>You'll need to connect your {name} account first.</p>
-      <Button size="small" variant="primary-outline" onClick={_createMagicLink}>
+      <Button size="small" variant="dark-teal" onClick={_createMagicLink}>
         {icon} Connect {name}
       </Button>
 
