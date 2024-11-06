@@ -286,7 +286,7 @@ interface HistoryItemProps {
 const HistoryItem = ({ chat, isSelecting, isSelected, onSelect, onOpenChat }: HistoryItemProps) => {
   const fetchRetryRef = useRef<NodeJS.Timeout>()
   const [fetchRetryCount, setFetchRetryCount] = useState(0)
-  const { refreshChatItem } = useChatHistory()
+  const { refreshChatItem, history } = useChatHistory()
   const { addOrUpdateOpenConversation, openModal, setConversationId } = useStore(
     useShallow((state) => ({
       setConversationId: state.setConversationId,
@@ -325,7 +325,14 @@ const HistoryItem = ({ chat, isSelecting, isSelected, onSelect, onOpenChat }: Hi
   }
 
   useEffect(() => {
-    if (chat.title === 'New Conversation' && fetchRetryCount < MAX_RETRIES && !fetchRetryRef.current) {
+    if (
+      history &&
+      history.length > 0 &&
+      history[0].id === chat.id &&
+      chat.title === 'New Conversation' &&
+      fetchRetryCount < MAX_RETRIES &&
+      !fetchRetryRef.current
+    ) {
       console.log(`Fetching updated conversation, ${MAX_RETRIES - fetchRetryCount} tries remaining`)
 
       // Retry until title is assigned
@@ -340,7 +347,7 @@ const HistoryItem = ({ chat, isSelecting, isSelected, onSelect, onOpenChat }: Hi
         fetchRetryRef.current = undefined
       }, RETRY_INTERVAL)
     }
-  }, [chat, fetchRetryCount])
+  }, [chat, history, fetchRetryCount])
 
   return (
     <ContextMenu
