@@ -13,6 +13,7 @@ export interface PromptsState {
   promptUserId?: string | undefined
   prompts: Prompt[]
   isPromptsLoaded: boolean
+  isPinnedPromptsLoading: boolean
   pinnedPrompts: PinnedPrompt[]
 }
 
@@ -23,6 +24,7 @@ export type PromptsSlice = PromptsState & {
   removePrompt: (externalId: string) => void
   addPrompt: (prompt: Prompt) => void
   setIsPromptsLoaded: (isPromptsLoaded: boolean) => void
+  setIsPinnedPromptsLoading: (isPinnedPromptsLoading: boolean) => void
   setPinnedPrompts: (pinnedPrompts: PinnedPrompt[]) => void
 }
 
@@ -30,6 +32,7 @@ export const initialPromptsState: PromptsState = {
   promptUserId: undefined,
   prompts: [],
   isPromptsLoaded: false,
+  isPinnedPromptsLoading: false,
   pinnedPrompts: [],
 }
 
@@ -55,9 +58,9 @@ export const createPromptsSlice: StateCreator<Store, [], [], PromptsSlice> = (se
       prompts: get().prompts.map((p) =>
         p.external_id === prompt.external_id
           ? {
-              ...p,
-              ...prompt,
-            }
+            ...p,
+            ...prompt,
+          }
           : p,
       ),
     })
@@ -74,6 +77,9 @@ export const createPromptsSlice: StateCreator<Store, [], [], PromptsSlice> = (se
   },
   setIsPromptsLoaded: (isPromptsLoaded) => {
     set({ isPromptsLoaded })
+  },
+  setIsPinnedPromptsLoading: (isPinnedPromptsLoading) => {
+    set({ isPinnedPromptsLoading })
   },
   setPinnedPrompts: (pinnedPrompts: PinnedPrompt[]) => {
     set({
