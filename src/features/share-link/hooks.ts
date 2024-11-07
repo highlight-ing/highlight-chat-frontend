@@ -24,11 +24,16 @@ export function useNumbers() {
   })
 }
 
+// const queryClient = useQueryClient()
+
+// queryClient.setQueryData(['numbers'], (oldNumbers: Array<number>) => {
+//   return [...oldNumbers, 4]
+// })
+
 export function useGenerateShareLink() {
   const { post } = useApi()
   const addToast = useStore((state) => state.addToast)
   const setShareId = useStore((state) => state.setShareId)
-  // const queryClient = useQueryClient()
 
   return useMutation({
     mutationKey: ['generate-share-link'],
@@ -60,9 +65,6 @@ export function useGenerateShareLink() {
 
       //INFO: Updates the client side version of the conversation in zustand
       setShareId(conversationId, data)
-      // queryClient.setQueryData(['numbers'], (oldNumbers: Array<number>) => {
-      //   return [...oldNumbers, 4]
-      // })
 
       trackEvent('HL Chat Copy Link', {
         conversation_id: conversationId,
@@ -103,8 +105,7 @@ export function useDisableLink() {
       console.log('Deleting share link for: ', conversationId)
 
       //FIX: Error on the backend here
-      setShareId(conversationId, null)
-      const response = await deleteRequest(`share-link/${conversationId}`, { version: 'v3' })
+      const response = await deleteRequest(`share-link/${conversationId}`)
 
       if (!response.ok) {
         throw new Error('Failed to delete shared conversation')
