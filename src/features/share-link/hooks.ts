@@ -14,22 +14,6 @@ export function useCopyLink() {
   })
 }
 
-export function useNumbers() {
-  return useQuery({
-    queryKey: ['numbers'],
-    queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-      return [1, 2, 3]
-    },
-  })
-}
-
-// const queryClient = useQueryClient()
-
-// queryClient.setQueryData(['numbers'], (oldNumbers: Array<number>) => {
-//   return [...oldNumbers, 4]
-// })
-
 export function useGenerateShareLink() {
   const { post } = useApi()
   const addToast = useStore((state) => state.addToast)

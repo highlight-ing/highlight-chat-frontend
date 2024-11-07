@@ -3,7 +3,7 @@
 import Button from '@/components/Button/Button'
 import { ChatHistoryItem } from '@/types'
 import { ArrowDown2, EmojiHappy, Send2 } from 'iconsax-react'
-import { useCopyLink, useDisableLink, useGenerateShareLink, useNumbers } from './hooks'
+import { useCopyLink, useDisableLink, useGenerateShareLink } from './hooks'
 import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import React from 'react'
 import { cn } from '@/lib/utils'
