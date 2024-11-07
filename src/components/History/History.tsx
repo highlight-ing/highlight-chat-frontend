@@ -326,9 +326,7 @@ const HistoryItem = ({ chat, isSelecting, isSelected, onSelect, onOpenChat }: Hi
 
   useEffect(() => {
     if (
-      history &&
-      history.length > 0 &&
-      history[0].id === chat.id &&
+      history?.[0]?.id &&
       chat.title === 'New Conversation' &&
       fetchRetryCount < MAX_RETRIES &&
       !fetchRetryRef.current
@@ -347,7 +345,7 @@ const HistoryItem = ({ chat, isSelecting, isSelected, onSelect, onOpenChat }: Hi
         fetchRetryRef.current = undefined
       }, RETRY_INTERVAL)
     }
-  }, [chat, history, fetchRetryCount])
+  }, [chat, history?.[0]?.id, fetchRetryCount])
 
   return (
     <ContextMenu
