@@ -69,7 +69,7 @@ export function ShareLinkModal(props: { conversation: ChatHistoryItem }) {
           />
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-[400px] space-y-3">
+      <PopoverContent align="end" sideOffset={8} className="w-[400px] space-y-3">
         <div className="flex flex-col justify-start">
           <h3 className="text-md font-regular text-left text-white">Share Chat</h3>
         </div>

@@ -238,6 +238,7 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
           </div>
           {conversationId && (
             <div>
+              <ShareLink conversation={currentConversation || null} />
               <Button size={'small'} variant={'primary-outline'} onClick={onToggleShareModal}>
                 Share
                 <Send2 size={20} variant={'Bold'} />
@@ -246,8 +247,6 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
           )}
         </div>
       )}
-
-      <ShareLink conversation={currentConversation || null} />
 
       <ShareModal
         isVisible={isShareModalVisible}
