@@ -3,7 +3,7 @@
 import Button from '@/components/Button/Button'
 import { ChatHistoryItem } from '@/types'
 import { ArrowDown2, Send2 } from 'iconsax-react'
-import { useCopyLink, useDisableLink, useGenerateShareLink } from './hooks'
+import { useCopyLink, useDisableLink, useGenerateShareLink, useNumbers } from './hooks'
 import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import React from 'react'
 import { cn } from '@/lib/utils'
@@ -51,8 +51,6 @@ export function ShareLinkModal(props: { conversation: ChatHistoryItem }) {
   const formattedTitle = props.conversation?.title.replace(/^["']|["']$/g, '')
 
   const mostRecentShareLinkId = props.conversation?.shared_conversations?.[0]?.id
-
-  console.log({ mostRecentShareLinkId })
 
   function handleDisableLinkClick() {
     disableLink(props.conversation.id)
@@ -119,15 +117,22 @@ export function ShareLinkModal(props: { conversation: ChatHistoryItem }) {
 
 export function ShareLink(props: { conversation: ChatHistoryItem | null }) {
   const mostRecentShareLinkId = props.conversation?.shared_conversations?.[0]?.id
+  const { data: numbers, isLoading } = useNumbers()
 
   if (!props.conversation) return null
 
   if (!mostRecentShareLinkId) {
-    return <GenerateShareLinkButton conversationId={props.conversation.id} />
+    return (
+      <>
+        <div>{isLoading ? 'Loading numbers...' : numbers?.toString()}</div>
+        <GenerateShareLinkButton conversationId={props.conversation.id} />
+      </>
+    )
   }
 
   return (
     <div className="flex items-center gap-0.5">
+      <div>{isLoading ? 'Loading numbers...' : numbers?.toString()}</div>
       <CopyLinkButton shareLinkId={mostRecentShareLinkId} />
       <ShareLinkModal conversation={props.conversation} />
     </div>

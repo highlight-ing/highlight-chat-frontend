@@ -1,6 +1,6 @@
 'use client'
 
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useApi } from '@/hooks/useApi'
 import { trackEvent } from '@/utils/amplitude'
 import { useStore } from '@/providers/store-provider'
@@ -14,10 +14,21 @@ export function useCopyLink() {
   })
 }
 
+export function useNumbers() {
+  return useQuery({
+    queryKey: ['numbers'],
+    queryFn: async () => {
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+      return [1, 2, 3]
+    },
+  })
+}
+
 export function useGenerateShareLink() {
   const { post } = useApi()
   const addToast = useStore((state) => state.addToast)
   const setShareId = useStore((state) => state.setShareId)
+  // const queryClient = useQueryClient()
 
   return useMutation({
     mutationKey: ['generate-share-link'],
@@ -49,6 +60,9 @@ export function useGenerateShareLink() {
 
       //INFO: Updates the client side version of the conversation in zustand
       setShareId(conversationId, data)
+      // queryClient.setQueryData(['numbers'], (oldNumbers: Array<number>) => {
+      //   return [...oldNumbers, 4]
+      // })
 
       trackEvent('HL Chat Copy Link', {
         conversation_id: conversationId,
