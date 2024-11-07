@@ -3,20 +3,33 @@
 import Button from '@/components/Button/Button'
 import { ChatHistoryItem } from '@/types'
 import { ArrowDown2, Send2 } from 'iconsax-react'
-import { useCopyLink, useGenerateShareLink } from './hooks'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { useCopyLink, useDisableLink, useGenerateShareLink } from './hooks'
+import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import React from 'react'
 import { cn } from '@/lib/utils'
 import styles from './share-modal.module.scss'
 
-function CopyLinkButton(props: { shareLink: string }) {
-  const { mutate: copyLink, isPending } = useCopyLink(props.shareLink)
+function GenerateShareLinkButton(props: { conversationId: string }) {
+  const { mutate: generateShareLink, isPending } = useGenerateShareLink()
 
-  function handleCopyLinkClick() {
-    copyLink()
+  function handleGenerateShareLinkClick() {
+    generateShareLink(props.conversationId)
   }
 
-  console.log(isPending)
+  return (
+    <Button variant="accent" size="small" onClick={handleGenerateShareLinkClick} disabled={isPending} className="gap-2">
+      Share
+      <Send2 size={18} variant={'Bold'} />
+    </Button>
+  )
+}
+
+function CopyLinkButton(props: { shareLinkId: string }) {
+  const { mutate: copyLink, isPending } = useCopyLink()
+
+  function handleCopyLinkClick() {
+    copyLink(props.shareLinkId)
+  }
 
   return (
     <Button
@@ -33,10 +46,17 @@ function CopyLinkButton(props: { shareLink: string }) {
 
 export function ShareLinkModal(props: { conversation: ChatHistoryItem }) {
   const [open, setOpen] = React.useState(false)
+  const { mutate: disableLink, isPending: isDisableLinkPending } = useDisableLink()
 
   const formattedTitle = props.conversation?.title.replace(/^["']|["']$/g, '')
 
-  const noShareLink = props.conversation?.shared_conversations && props.conversation.shared_conversations.length > 0
+  const mostRecentShareLinkId = props.conversation?.shared_conversations?.[0]?.id
+
+  console.log({ mostRecentShareLinkId })
+
+  function handleDisableLinkClick() {
+    disableLink(props.conversation.id)
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -64,7 +84,7 @@ export function ShareLinkModal(props: { conversation: ChatHistoryItem }) {
                 <div className={styles.textContent}>
                   <p className={styles.title}>{formattedTitle}</p>
                   <p className="text-[13px] font-medium leading-[16px] text-light-40">
-                    {noShareLink ? 'Public Chat' : 'Private Chat'}
+                    {mostRecentShareLinkId ? 'Public Chat' : 'Private Chat'}
                   </p>
                 </div>
               </div>
@@ -81,53 +101,34 @@ export function ShareLinkModal(props: { conversation: ChatHistoryItem }) {
           )}
         </div>
 
-        <Button
-          size={'medium'}
-          variant={'ghost-neutral'}
-          style={{ width: '100%' }}
-          disabled={!props.conversation || noShareLink}
-        >
-          Disable All Share Links
-        </Button>
+        <PopoverClose asChild>
+          <Button
+            size={'medium'}
+            variant={'ghost-neutral'}
+            style={{ width: '100%' }}
+            disabled={!props.conversation || !mostRecentShareLinkId || isDisableLinkPending}
+            onClick={handleDisableLinkClick}
+          >
+            Disable All Share Links
+          </Button>
+        </PopoverClose>
       </PopoverContent>
     </Popover>
   )
 }
 
 export function ShareLink(props: { conversation: ChatHistoryItem | null }) {
-  const {
-    mutate: generateShareLink,
-    data: generatedShareLink,
-    isPending,
-  } = useGenerateShareLink(props.conversation?.id)
   const mostRecentShareLinkId = props.conversation?.shared_conversations?.[0]?.id
-
-  const shareLink = mostRecentShareLinkId ?? generatedShareLink
-
-  function handleGenerateShareLinkClick() {
-    generateShareLink()
-  }
 
   if (!props.conversation) return null
 
-  if (!shareLink) {
-    return (
-      <Button
-        variant="accent"
-        size="small"
-        onClick={handleGenerateShareLinkClick}
-        disabled={isPending}
-        className="gap-2"
-      >
-        Share
-        <Send2 size={18} variant={'Bold'} />
-      </Button>
-    )
+  if (!mostRecentShareLinkId) {
+    return <GenerateShareLinkButton conversationId={props.conversation.id} />
   }
 
   return (
     <div className="flex items-center gap-0.5">
-      <CopyLinkButton shareLink={shareLink} />
+      <CopyLinkButton shareLinkId={mostRecentShareLinkId} />
       <ShareLinkModal conversation={props.conversation} />
     </div>
   )
