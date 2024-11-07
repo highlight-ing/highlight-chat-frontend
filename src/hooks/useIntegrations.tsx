@@ -2,12 +2,12 @@ import { CreateLinearTicketComponent } from '@/components/integrations/linear'
 import { CreateNotionPageComponent } from '@/components/integrations/notion'
 import { useStore } from '@/providers/store-provider'
 import { useEffect, useState } from 'react'
-import { checkLinearConnectionStatus, createMagicLinkForLinear } from '@/utils/linear-server-actions'
+import { checkLinearConnectionStatus } from '@/utils/linear-server-actions'
 import { LinearIcon, NotionIcon, GoogleIcon } from '@/icons/icons'
 import { SetupConnectionComponent } from '@/components/integrations/integration-auth'
-import { checkNotionConnectionStatus, createMagicLinkForNotion } from '@/utils/notion-server-actions'
-import { checkGoogleConnectionStatus, createMagicLinkForGoogle } from '@/utils/google-server-actions'
+import { checkNotionConnectionStatus } from '@/utils/notion-server-actions'
 import { CreateGoogleCalendarEventComponent } from '@/components/integrations/gcal'
+import { checkIntegrationStatus } from '@/utils/integrations-server-actions'
 
 interface CreateNotionPageParams {
   title: string
@@ -21,6 +21,10 @@ export interface CreateGoogleCalendarEventParams {
   description?: string
   start?: string
   end?: string
+}
+
+export interface SendSlackMessageParams {
+  message: string
 }
 
 export interface UseIntegrationsAPI {
@@ -169,7 +173,6 @@ export function useIntegrations(): UseIntegrationsAPI {
                     checkConnectionStatus={checkLinearConnectionStatus}
                     onConnect={() => resolve()}
                     icon={<LinearIcon size={16} />}
-                    createMagicLink={createMagicLinkForLinear}
                   />
                 </div>
               </MessageWithComponent>
@@ -203,7 +206,6 @@ export function useIntegrations(): UseIntegrationsAPI {
                     checkConnectionStatus={checkNotionConnectionStatus}
                     onConnect={() => resolve()}
                     icon={<NotionIcon size={16} />}
-                    createMagicLink={createMagicLinkForNotion}
                   />
                 </div>
               </MessageWithComponent>
@@ -223,7 +225,7 @@ export function useIntegrations(): UseIntegrationsAPI {
       //@ts-ignore
       const hlToken = (await highlight.internal.getAuthorizationToken()) as string
 
-      const connected = await checkGoogleConnectionStatus(hlToken)
+      const connected = await checkIntegrationStatus(hlToken, 'google')
 
       console.log('Google Connected', connected)
 
@@ -236,10 +238,9 @@ export function useIntegrations(): UseIntegrationsAPI {
                 <div className="mt-2">
                   <SetupConnectionComponent
                     name={'Google'}
-                    checkConnectionStatus={checkGoogleConnectionStatus}
+                    checkConnectionStatus={(token) => checkIntegrationStatus(token, 'google')}
                     onConnect={() => resolve()}
                     icon={<GoogleIcon size={16} />}
-                    createMagicLink={createMagicLinkForGoogle}
                   />
                 </div>
               </MessageWithComponent>
@@ -253,6 +254,10 @@ export function useIntegrations(): UseIntegrationsAPI {
         return
       }
       integrationAuthorized.set('google', Promise.resolve())
+    }
+
+    if (functionName === 'send_slack_message') {
+      integrationAuthorized.set('slack', Promise.resolve())
     }
 
     // @ts-expect-error

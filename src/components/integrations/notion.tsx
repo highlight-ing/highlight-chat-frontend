@@ -127,7 +127,6 @@ function FormComponent({
   })
 
   async function onSubmit(data: NotionPageFormData) {
-    console.log('Submitting form', data)
     if (!notionToken) {
       // TODO (Julian): Add more advanced error message here
       console.warn('Token not set, please try again later.')
