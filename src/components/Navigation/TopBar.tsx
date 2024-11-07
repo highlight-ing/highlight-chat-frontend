@@ -20,6 +20,7 @@ import { useTabHotkeys } from '@/hooks/useTabHotkeys'
 import Button from '@/components/Button/Button'
 import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
 import globalStyles from '@/global.module.scss'
+import { ShareLink } from '@/features/share-link/share-link'
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const router = useRouter()
@@ -115,10 +116,10 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
             wrapperStyle={
               showHistory || !setShowHistory
                 ? {
-                    visibility: 'hidden',
-                    paddingInlineStart: `calc(${variables.chatHistoryWidth} - 36px)`,
-                    transition: 'padding 250ms ease',
-                  }
+                  visibility: 'hidden',
+                  paddingInlineStart: `calc(${variables.chatHistoryWidth} - 36px)`,
+                  transition: 'padding 250ms ease',
+                }
                 : { transition: 'padding 250ms ease' }
             }
           >
@@ -245,6 +246,8 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
           )}
         </div>
       )}
+
+      <ShareLink conversation={currentConversation || null} />
 
       <ShareModal
         isVisible={isShareModalVisible}
