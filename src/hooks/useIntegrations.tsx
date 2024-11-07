@@ -8,6 +8,7 @@ import { SetupConnectionComponent } from '@/components/integrations/integration-
 import { checkNotionConnectionStatus } from '@/utils/notion-server-actions'
 import { CreateGoogleCalendarEventComponent } from '@/components/integrations/gcal'
 import { checkIntegrationStatus } from '@/utils/integrations-server-actions'
+import { SendSlackMessageComponent } from '@/components/integrations/slack'
 
 interface CreateNotionPageParams {
   title: string
@@ -32,6 +33,7 @@ export interface UseIntegrationsAPI {
   createNotionPage: (conversationId: string, params: CreateNotionPageParams) => Promise<void>
   createGoogleCalendarEvent: (conversationId: string, params: CreateGoogleCalendarEventParams) => Promise<void>
   showLoading: (conversationId: string, functionName: string) => Promise<void>
+  sendSlackMessage: (conversationId: string, message: string) => Promise<void>
 }
 
 function MessageWithComponent({ content, children }: { content: string; children?: React.ReactNode }) {
@@ -66,6 +68,28 @@ const integrationAuthorized = new Map<string, Promise<void>>()
 export function useIntegrations(): UseIntegrationsAPI {
   const getLastConversationMessage = useStore((state) => state.getLastConversationMessage)
   const updateLastConversationMessage = useStore((state) => state.updateLastConversationMessage)
+
+  async function sendSlackMessage(conversationId: string, message: string) {
+    await integrationAuthorized.get('slack')
+
+    let lastMessage = previousContent.get(conversationId)
+
+    if (!lastMessage) {
+      lastMessage = getLastConversationMessage(conversationId)?.content as string
+    }
+
+    // Update the last message to show the Linear ticket component which will handle checking for authentication,
+    // creating the ticket, and showing the success message.
+    // @ts-expect-error
+    updateLastConversationMessage(conversationId!, {
+      content: (
+        <MessageWithComponent content={lastMessage}>
+          <SendSlackMessageComponent message={message} />
+        </MessageWithComponent>
+      ),
+      role: 'assistant',
+    })
+  }
 
   async function createLinearTicket(conversationId: string, title: string, description: string) {
     await integrationAuthorized.get('linear')
@@ -271,5 +295,5 @@ export function useIntegrations(): UseIntegrationsAPI {
     })
   }
 
-  return { createLinearTicket, createNotionPage, createGoogleCalendarEvent, showLoading }
+  return { createLinearTicket, createNotionPage, createGoogleCalendarEvent, showLoading, sendSlackMessage }
 }

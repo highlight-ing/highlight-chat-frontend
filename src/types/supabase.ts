@@ -432,6 +432,7 @@ export type Database = {
           prompt_url: string | null
           public: boolean
           public_use_number: number
+          send_slack_message_integration_enabled: boolean | null
           slug: string
           suggestion_prompt_text: string | null
           system_prompt: string | null
@@ -457,6 +458,7 @@ export type Database = {
           prompt_url?: string | null
           public?: boolean
           public_use_number?: number
+          send_slack_message_integration_enabled?: boolean | null
           slug: string
           suggestion_prompt_text?: string | null
           system_prompt?: string | null
@@ -482,6 +484,7 @@ export type Database = {
           prompt_url?: string | null
           public?: boolean
           public_use_number?: number
+          send_slack_message_integration_enabled?: boolean | null
           slug?: string
           suggestion_prompt_text?: string | null
           system_prompt?: string | null
