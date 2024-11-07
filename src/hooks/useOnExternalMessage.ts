@@ -11,6 +11,8 @@ import useForkDefaultAction from './useForkDefaultAction'
 import { useIntegration } from './useIntegration'
 import usePromptApps from './usePromptApps'
 import { useRouter } from 'next/navigation'
+import { trackEvent } from '@/utils/amplitude'
+import * as Sentry from '@sentry/nextjs'
 
 const useOnExternalMessage = () => {
   const router = useRouter()
@@ -45,16 +47,17 @@ const useOnExternalMessage = () => {
 
       if (message.conversationId) {
         console.log('Opening conversation from external event:', message.conversationId)
-
-        // Set the conversation ID
+        Sentry.captureMessage(`Update conversation ${message.conversationId} from useOnExternalMessage`)
         const conversation = await refreshChatItem(message.conversationId, true)
         if (!conversation) {
           console.error('Failed to open conversation from external event:', message.conversationId)
           return
         }
+        // Set the conversation ID
         setConversationId(message.conversationId)
 
         console.log('Refetching chat history from external message')
+        Sentry.captureMessage(`Fetch chat history from useOnExternalMessage`)
         await refreshChatHistory()
 
         console.log(message.toolUse, message.toolUse?.type)

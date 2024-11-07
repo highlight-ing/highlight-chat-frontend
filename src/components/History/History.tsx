@@ -13,6 +13,7 @@ import CircleButton from '@/components/CircleButton/CircleButton'
 import { trackEvent } from '@/utils/amplitude'
 import { useApi } from '@/hooks/useApi'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
+import * as Sentry from '@sentry/nextjs'
 
 interface HistoryProps {
   showHistory: boolean
@@ -112,12 +113,15 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
     if (!initialFetchDone.current) {
       // Initial fetch
       console.log('Fetching chat history')
+
+      Sentry.captureMessage(`Fetch chat history from History`)
       refreshChatHistory()
       initialFetchDone.current = true
     } else if (conversationId && !history.some((chat) => chat.id === conversationId)) {
       const fetchAndSafeRetry = async (retries: number) => {
         // New conversation found after initial fetch
         console.log('Fetching new conversation and adding it to history')
+        Sentry.captureMessage(`Update conversation ${conversationId} from History`)
         const newConversation = await refreshChatItem(conversationId, true)
         if (newConversation) {
           console.log('Added conversation to history')
@@ -132,7 +136,7 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
           console.error('Repeatedly failed to fetch new conversation, giving up')
         }
       }
-      fetchAndSafeRetry(5)
+      fetchAndSafeRetry(3)
     }
   }, [history, conversationId])
 
@@ -326,9 +330,7 @@ const HistoryItem = ({ chat, isSelecting, isSelected, onSelect, onOpenChat }: Hi
 
   useEffect(() => {
     if (
-      history &&
-      history.length > 0 &&
-      history[0].id === chat.id &&
+      history?.[0]?.id &&
       chat.title === 'New Conversation' &&
       fetchRetryCount < MAX_RETRIES &&
       !fetchRetryRef.current
@@ -338,6 +340,7 @@ const HistoryItem = ({ chat, isSelecting, isSelected, onSelect, onOpenChat }: Hi
       // Retry until title is assigned
       fetchRetryRef.current = setTimeout(async () => {
         const updatedConversation = await refreshChatItem(chat.id)
+        Sentry.captureMessage(`Update conversation ${chat.id} from HistoryItem`)
         if (updatedConversation && updatedConversation.title !== 'New Conversation') {
           setFetchRetryCount(0)
           console.log('Updated conversation:', updatedConversation.title)
@@ -347,7 +350,7 @@ const HistoryItem = ({ chat, isSelecting, isSelected, onSelect, onOpenChat }: Hi
         fetchRetryRef.current = undefined
       }, RETRY_INTERVAL)
     }
-  }, [chat, history, fetchRetryCount])
+  }, [chat, history?.[0]?.id, fetchRetryCount])
 
   return (
     <ContextMenu
