@@ -118,6 +118,8 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
 
   const processedTitle = conversation?.title.replace(/^["']|["']$/g, '')
 
+  console.log(conversation?.shared_conversations)
+
   return (
     <>
       <div className={`${styles.modalOverlay} ${isVisible ? styles.visible : ''}`} />
@@ -139,7 +141,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
                 <div className={styles.previewFooter}>
                   {conversation.shared_conversations && conversation.shared_conversations.length > 0
                     ? `https://highlightai.com/share/${conversation.shared_conversations[0].id}`
-                    : 'All contents currently inside the chat will be shared.'}
+                    : 'All currently inside the chat will be shared. contents'}
                 </div>
               </div>
             ) : (
