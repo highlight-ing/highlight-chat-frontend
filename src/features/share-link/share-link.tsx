@@ -5,8 +5,9 @@ import { ChatHistoryItem } from '@/types'
 import { ArrowDown2, EmojiHappy, Send2 } from 'iconsax-react'
 import { useCopyLink, useGenerateShareLink } from './hooks'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import React from 'react'
-import { cn } from '@/lib/utils'
+import React, { useEffect } from 'react'
+import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
+import { AnimatePresence, motion } from 'framer-motion'
 
 function GenerateShareLinkButton(props: { conversationId: string }) {
   const { mutate: generateShareLink, isPending } = useGenerateShareLink()
@@ -17,16 +18,40 @@ function GenerateShareLinkButton(props: { conversationId: string }) {
       size="small"
       disabled={isPending}
       onClick={() => generateShareLink(props.conversationId)}
-      className="gap-2"
+      style={{ gap: 8 }}
     >
       Share
-      <Send2 size={18} variant={'Bold'} />
+      <AnimatePresence initial={false} mode="popLayout">
+        <motion.span
+          key={isPending ? 'true' : 'false'}
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0, opacity: 0 }}
+        >
+          {isPending ? <LoadingSpinner size={'18px'} /> : <Send2 size={18} variant={'Bold'} />}
+        </motion.span>
+      </AnimatePresence>
     </Button>
   )
 }
 
 function CopyLinkButton(props: { shareLinkId: string }) {
-  const { mutate: copyLink, isPending } = useCopyLink()
+  const { mutate: copyLink, isPending, isSuccess } = useCopyLink()
+  const [showSuccessState, setShowSuccessState] = React.useState(false)
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout | null
+    if (isSuccess) {
+      setShowSuccessState(true)
+      timeout = setTimeout(() => {
+        setShowSuccessState(false)
+      }, 1200)
+    }
+    return () => {
+      if (timeout) clearTimeout(timeout)
+      setShowSuccessState(false)
+    }
+  }, [isSuccess, setShowSuccessState])
 
   return (
     <Button
@@ -34,9 +59,18 @@ function CopyLinkButton(props: { shareLinkId: string }) {
       size="small"
       disabled={isPending}
       onClick={() => copyLink(props.shareLinkId)}
-      style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+      style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0, width: 100 }}
     >
-      Copy Link
+      <AnimatePresence initial={false} mode="popLayout">
+        <motion.span
+          key={showSuccessState ? 'true' : 'false'}
+          initial={{ y: 10, opacity: 0, filter: 'blur(4px)' }}
+          animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
+          exit={{ y: -10, opacity: 0, filter: 'blur(4px)' }}
+        >
+          {showSuccessState ? 'Copied' : 'Copy Link'}
+        </motion.span>
+      </AnimatePresence>
     </Button>
   )
 }
@@ -56,11 +90,13 @@ export function ShareLinkModal(props: { conversation: ChatHistoryItem }) {
           size="small"
           style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0, paddingLeft: 8, paddingRight: 8 }}
         >
-          <ArrowDown2
-            size={20}
-            variant={'Linear'}
-            className={cn('transition-transform', { 'rotate-180 text-pink': open })}
-          />
+          <motion.span
+            initial={{ rotate: 0 }}
+            animate={open ? { rotate: 180 } : {}}
+            transition={{ type: 'spring', bounce: 0, duration: 0.15 }}
+          >
+            <ArrowDown2 size={20} variant={'Linear'} />
+          </motion.span>
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" sideOffset={8} className="w-[400px] space-y-3">

@@ -9,6 +9,9 @@ export function useCopyLink() {
   return useMutation({
     mutationKey: ['copy-share-link'],
     mutationFn: async (shareLink: string) => {
+      // await new Promise((resolve) => setTimeout(resolve, 2000))
+      // return
+
       await navigator.clipboard.writeText(`https://highlightai.com/share/${shareLink}`)
     },
   })
@@ -23,6 +26,9 @@ export function useGenerateShareLink() {
     mutationKey: ['generate-share-link'],
     mutationFn: async (conversationId: string | undefined) => {
       if (!conversationId) return
+
+      // await new Promise((resolve) => setTimeout(resolve, 2000))
+      // return
 
       console.log('Generating share link for: ', conversationId)
 
