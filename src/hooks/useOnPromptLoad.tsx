@@ -5,7 +5,7 @@ import { useCurrentChatMessages } from './useCurrentChatMessages'
 
 export function useOnPromptLoad() {
   const promptApp = useStore((state) => state.promptApp)
-  const input = useStore((state) => state.input)
+  const input = useStore((state) => state.inputOverride)
   const attachments = useStore((state) => state.attachments)
   const messages = useCurrentChatMessages()
   const { handleSubmit } = useSubmitQuery()
@@ -22,7 +22,7 @@ export function useOnPromptLoad() {
     }
 
     if (promptApp && messages.length === 0) {
-      handleSubmit(input, promptApp)
+      handleSubmit(input ?? '', promptApp)
     }
   }, [promptApp, messages])
 }
