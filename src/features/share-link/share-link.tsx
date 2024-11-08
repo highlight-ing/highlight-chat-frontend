@@ -75,7 +75,7 @@ function CopyLinkButton(props: { shareLinkId: string }) {
   )
 }
 
-export function ShareLinkModal(props: { conversation: ChatHistoryItem }) {
+function ShareLinkModal(props: { conversation: ChatHistoryItem }) {
   const [open, setOpen] = React.useState(false)
 
   const formattedTitle = props.conversation?.title.replace(/^["']|["']$/g, '')
@@ -146,7 +146,3 @@ export function ShareLink(props: { conversation: ChatHistoryItem | null }) {
     </div>
   )
 }
-
-// const { data: numbers, isLoading } = useNumbers()
-
-// <div>{isLoading ? 'Loading numbers...' : numbers?.toString()}</div>
