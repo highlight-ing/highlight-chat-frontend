@@ -3,8 +3,8 @@
 import Button from '@/components/Button/Button'
 import { ChatHistoryItem } from '@/types'
 import { ArrowDown2, EmojiHappy, Send2 } from 'iconsax-react'
-import { useCopyLink, useDisableLink, useGenerateShareLink } from './hooks'
-import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { useCopyLink, useGenerateShareLink } from './hooks'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import React from 'react'
 import { cn } from '@/lib/utils'
 
@@ -35,7 +35,6 @@ function CopyLinkButton(props: { shareLinkId: string }) {
       disabled={isPending}
       onClick={() => copyLink(props.shareLinkId)}
       style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
-      className="border-r border-r-dark"
     >
       Copy Link
     </Button>
@@ -44,15 +43,10 @@ function CopyLinkButton(props: { shareLinkId: string }) {
 
 export function ShareLinkModal(props: { conversation: ChatHistoryItem }) {
   const [open, setOpen] = React.useState(false)
-  const { mutate: disableLink, isPending: isDisableLinkPending } = useDisableLink()
 
   const formattedTitle = props.conversation?.title.replace(/^["']|["']$/g, '')
 
   const mostRecentShareLinkId = props.conversation?.shared_conversations?.[0]?.id
-
-  function handleDisableLinkClick() {
-    disableLink(props.conversation.id)
-  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -95,18 +89,6 @@ export function ShareLinkModal(props: { conversation: ChatHistoryItem }) {
             You haven&apos;t selected a props.conversation yet. Please select one and try sharing again.
           </p>
         )}
-
-        <PopoverClose asChild>
-          <Button
-            size={'medium'}
-            variant={'ghost-neutral'}
-            style={{ width: '100%' }}
-            disabled={!props.conversation || !mostRecentShareLinkId || isDisableLinkPending}
-            onClick={handleDisableLinkClick}
-          >
-            Disable All Share Links
-          </Button>
-        </PopoverClose>
       </PopoverContent>
     </Popover>
   )
@@ -122,7 +104,7 @@ export function ShareLink(props: { conversation: ChatHistoryItem | null }) {
   }
 
   return (
-    <div className="flex items-center">
+    <div className="flex items-center gap-0.5">
       <CopyLinkButton shareLinkId={mostRecentShareLinkId} />
       <ShareLinkModal conversation={props.conversation} />
     </div>
