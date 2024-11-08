@@ -1,3 +1,5 @@
+'use server'
+
 export async function listChannels(slackToken: string) {
   const response = await fetch('https://slack.com/api/conversations.list', {
     headers: {
@@ -22,6 +24,7 @@ export async function sendMessage(slackToken: string, channelId: string, message
     method: 'POST',
     headers: {
       Authorization: `Bearer ${slackToken}`,
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({
       channel: channelId,

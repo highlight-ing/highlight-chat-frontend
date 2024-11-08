@@ -17,8 +17,6 @@ const sendSlackMessageFormSchema = z.object({
 type SendSlackMessageFormData = z.infer<typeof sendSlackMessageFormSchema>
 
 function SlackMessageFormComponent({ data, onSuccess }: { data: SendSlackMessageParams; onSuccess: () => void }) {
-  const { getAccessToken } = useAuth()
-
   const {
     register,
     handleSubmit,
@@ -32,7 +30,8 @@ function SlackMessageFormComponent({ data, onSuccess }: { data: SendSlackMessage
   })
 
   const onSubmit = async (data: SendSlackMessageFormData) => {
-    const hlToken = await getAccessToken()
+    // @ts-ignore
+    const hlToken = (await highlight.internal.getAuthorizationToken()) as string
     const token = await getIntegrationTokenForUser(hlToken, 'slack')
 
     if (!token) {
@@ -54,6 +53,7 @@ function SlackMessageFormComponent({ data, onSuccess }: { data: SendSlackMessage
     <form className="flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
       <InputField size={'xxlarge'} label={'Message'} placeholder={'Message'} {...register('message')} />
       <InputField size={'xxlarge'} label={'Channel'} placeholder={'Channel'} {...register('channel')} />
+      {errors.root && <p className="text-red-500">{errors.root.message}</p>}
       <Button size={'medium'} variant={'primary'} type={'submit'} disabled={isSubmitting}>
         Send Message
       </Button>
