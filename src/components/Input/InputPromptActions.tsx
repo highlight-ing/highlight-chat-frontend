@@ -31,7 +31,7 @@ const actionItemVariants: Variants = {
 const InputActionItem = ({ prompt, input }: { prompt: PinnedPrompt; input: string }) => {
   const { selectPrompt } = usePromptApps()
   const openModal = useStore((state) => state.openModal)
-  const setStoreInput = useStore((state) => state.setInput)
+  const setStoreInput = useStore((state) => state.setInputOverride)
 
   function handlePromptClick() {
     setStoreInput(input)

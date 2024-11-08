@@ -32,8 +32,6 @@ export default (loadPrompts?: boolean) => {
     setIsPromptsLoaded,
     isPinnedPromptsLoading,
     setIsPinnedPromptsLoading,
-    storeInput,
-    setInput,
   } = useStore(
     useShallow((state) => ({
       userId: state.userId,
@@ -47,8 +45,6 @@ export default (loadPrompts?: boolean) => {
       setIsPromptsLoaded: state.setIsPromptsLoaded,
       isPinnedPromptsLoading: state.isPinnedPromptsLoading,
       setIsPinnedPromptsLoading: state.setIsPinnedPromptsLoading,
-      storeInput: state.input,
-      setInput: state.setInput,
     })),
   )
 
