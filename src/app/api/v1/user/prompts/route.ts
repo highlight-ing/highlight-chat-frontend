@@ -68,7 +68,7 @@ export async function GET(request: Request) {
   }
 
   // Check if the user has added the default prompts
-  await checkIfDefaultPromptsAdded(userId)
+  // await checkIfDefaultPromptsAdded(userId)
 
   // Select all prompts that the user has added
   const { data: selectResult, error } = await supabase

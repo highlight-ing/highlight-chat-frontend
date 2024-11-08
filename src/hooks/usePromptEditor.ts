@@ -16,8 +16,9 @@ export function usePromptEditor() {
     usePromptEditorStore()
   const { updatePrompt, addPrompt } = usePromptsStore()
   const addToast = useStore((state) => state.addToast)
+  const closeModal = useStore((state) => state.closeModal)
   const { getAccessToken } = useAuth()
-  const { refreshPinnedPrompts } = usePromptApps()
+  const { selectPrompt, refreshPinnedPrompts } = usePromptApps()
 
   // EFFECTS
   useEffect(() => {
@@ -106,9 +107,14 @@ export function usePromptEditor() {
       })
 
       addPrompt(res.prompt)
+
+      closeModal('create-prompt')
+
+      selectPrompt(res.prompt.external_id, true, false)
     } else if (res?.prompt) {
       // Update the prompts store with the updated prompt data
       updatePrompt(res.prompt)
+      closeModal('edit-prompt')
     }
 
     addToast({

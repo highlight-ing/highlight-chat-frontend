@@ -31,6 +31,7 @@ export function GcalEventFormComponent({
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<GcalEventFormData>({
     resolver: zodResolver(gcalEventFormSchema),
@@ -38,8 +39,8 @@ export function GcalEventFormComponent({
       summary: data.summary,
       location: data.location,
       description: data.description,
-      start: data.start,
-      end: data.end,
+      start: data.start ?? new Date().toISOString(),
+      end: data.end ?? new Date().toISOString(),
     },
   })
 
@@ -61,7 +62,7 @@ export function GcalEventFormComponent({
         rows={4}
         size={'xxlarge'}
         label={'Description'}
-        placeholder={'Issue Description'}
+        placeholder={'Event Description'}
         {...register('description')}
       />
       {/* <InputField size={'xxlarge'} label={'Start'} placeholder={'Event Start'} {...register('start')} /> */}

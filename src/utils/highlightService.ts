@@ -33,6 +33,9 @@ declare global {
         delete: (key: string) => void
         clear: () => void
       }
+      user: {
+        getEmail: () => Promise<string>
+      }
     }
   }
 }

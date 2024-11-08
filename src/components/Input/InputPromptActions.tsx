@@ -4,10 +4,11 @@ import usePromptApps from '@/hooks/usePromptApps'
 import { PinnedPrompt } from '@/types'
 import Image from 'next/image'
 import { supabaseLoader } from '@/lib/supabase'
-import { Archive, Edit2 } from 'iconsax-react'
+import { Archive, BoxAdd, Edit2 } from 'iconsax-react'
 import Tooltip from '../Tooltip/Tooltip'
 import { useStore } from '@/providers/store-provider'
 import { ScrollArea } from '../ui/scroll-area'
+import { OpenAppButton } from '../buttons/open-app-button'
 
 const actionItemVariants: Variants = {
   hidden: {
@@ -27,11 +28,13 @@ const actionItemVariants: Variants = {
   },
 }
 
-const InputActionItem = ({ prompt }: { prompt: PinnedPrompt }) => {
+const InputActionItem = ({ prompt, input }: { prompt: PinnedPrompt; input: string }) => {
   const { selectPrompt } = usePromptApps()
   const openModal = useStore((state) => state.openModal)
+  const setStoreInput = useStore((state) => state.setInput)
 
   function handlePromptClick() {
+    setStoreInput(input)
     selectPrompt(prompt.external_id, false)
   }
 
@@ -48,7 +51,7 @@ const InputActionItem = ({ prompt }: { prompt: PinnedPrompt }) => {
   return (
     <motion.div
       variants={actionItemVariants}
-      className="hover:bg-hover group flex h-10 w-full cursor-pointer items-center justify-between gap-2 pl-6 pr-4 transition-[background-color] duration-150"
+      className="group flex h-10 w-full cursor-pointer items-center justify-between gap-2 pl-6 pr-4 transition-[background-color] duration-150 hover:bg-hover"
       onClick={handlePromptClick}
     >
       <div className="flex items-center gap-2">
@@ -108,20 +111,21 @@ const actionItemContainerVariants: Variants = {
   },
 }
 
-const InputPromptActions = () => {
-  const { pinnedPrompts } = usePromptApps()
-  const visiblePrompts = useMemo(() => {
-    const uniquePrompts = pinnedPrompts.reduce((acc: Array<PinnedPrompt>, curr) => {
-      const externalIds = acc.map((prompt) => prompt.external_id)
-      if (!externalIds.includes(curr.external_id)) acc.push(curr)
+const InputPromptActions = ({ input }: { input: string }) => {
+  const { isPinnedPromptsLoading, pinnedPrompts } = usePromptApps()
+  const userId = useStore((state) => state.userId)
 
-      return acc
-    }, [])
+  const uniquePrompts = pinnedPrompts.reduce((acc: Array<PinnedPrompt>, curr) => {
+    const externalIds = acc.map((prompt) => prompt.external_id)
+    if (!externalIds.includes(curr.external_id)) acc.push(curr)
+    else console.log('Duplicate prompt found:', curr.external_id)
 
-    return uniquePrompts
-  }, [pinnedPrompts])
+    return acc
+  }, [])
 
-  if (!pinnedPrompts || visiblePrompts.length == 0) {
+  console.log({ pinnedPrompts, isPinnedPromptsLoading })
+
+  if (isPinnedPromptsLoading || !userId) {
     return (
       <motion.div variants={actionItemVariants} initial="hidden" animate="show" exit="exit">
         <div className="flex w-full items-center gap-2 rounded-2xl px-6 py-2 transition-[background-color] duration-150">
@@ -131,11 +135,15 @@ const InputPromptActions = () => {
     )
   }
 
+  if (!uniquePrompts || uniquePrompts.length === 0) {
+    return null
+  }
+
   return (
     <motion.div layout variants={actionItemContainerVariants} initial="hidden" animate="show" exit="exit">
       <ScrollArea type="scroll" scrollHideDelay={100} viewportClassName="max-h-52">
-        {visiblePrompts.map((prompt) => (
-          <InputActionItem key={prompt.external_id} prompt={prompt} />
+        {uniquePrompts.map((prompt) => (
+          <InputActionItem key={prompt.external_id} prompt={prompt} input={input} />
         ))}
       </ScrollArea>
     </motion.div>

@@ -119,6 +119,7 @@ export async function createGoogleCalendarEvent(accessToken: string, data: Creat
       end: {
         dateTime: endDate,
       },
+      location: data.location,
     },
   })
 

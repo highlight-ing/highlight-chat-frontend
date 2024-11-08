@@ -13,7 +13,6 @@ import { Prompt } from '@/types/supabase-helpers'
 import { useShallow } from 'zustand/react/shallow'
 import { useEffect, useMemo, useState } from 'react'
 import { trackEvent } from '@/utils/amplitude'
-import { useSubmitQuery } from './useSubmitQuery'
 
 let loadPromptsPromise: Promise<Prompt[]> | null = null
 
@@ -31,6 +30,10 @@ export default (loadPrompts?: boolean) => {
     startNewConversation,
     isPromptsLoaded,
     setIsPromptsLoaded,
+    isPinnedPromptsLoading,
+    setIsPinnedPromptsLoading,
+    storeInput,
+    setInput,
   } = useStore(
     useShallow((state) => ({
       userId: state.userId,
@@ -42,6 +45,10 @@ export default (loadPrompts?: boolean) => {
       startNewConversation: state.startNewConversation,
       isPromptsLoaded: state.isPromptsLoaded,
       setIsPromptsLoaded: state.setIsPromptsLoaded,
+      isPinnedPromptsLoading: state.isPinnedPromptsLoading,
+      setIsPinnedPromptsLoading: state.setIsPinnedPromptsLoading,
+      storeInput: state.input,
+      setInput: state.setInput,
     })),
   )
 
@@ -67,12 +74,15 @@ export default (loadPrompts?: boolean) => {
     loadPromptsPromise = new Promise<Prompt[]>(async (resolve) => {
       console.log('Refreshing prompts')
       setLoadingPrompts(true)
+      setIsPinnedPromptsLoading(true)
 
       const accessToken = await getAccessToken()
       const response = await fetchPrompts(accessToken)
 
       if (response.error) {
         setLoadingPrompts(false)
+        setIsPinnedPromptsLoading(false)
+        console.log(response.error)
         resolve([])
         loadPromptsPromise = null
         return
@@ -82,6 +92,7 @@ export default (loadPrompts?: boolean) => {
 
       await refreshPinnedPrompts()
 
+      setIsPinnedPromptsLoading(false)
       setLoadingPrompts(false)
       setIsPromptsLoaded(true)
       resolve(response.prompts ?? [])
@@ -91,13 +102,14 @@ export default (loadPrompts?: boolean) => {
     return loadPromptsPromise
   }
 
-  const refreshPinnedPrompts = async () => {
+  const refreshPinnedPrompts = async (fromExternalCall?: boolean) => {
+    console.log('Refreshing pinned prompts', { fromExternalCall })
     const pinned = await fetchPinnedPrompts(await getAccessToken())
     // @ts-ignore
     if (Array.isArray(pinned)) {
       setPinnedPrompts(pinned ?? [])
     }
-
+    if (fromExternalCall) return
     try {
       //@ts-expect-error
       globalThis.highlight.internal.reloadPrompts()
@@ -214,8 +226,15 @@ export default (loadPrompts?: boolean) => {
     refreshPrompts()
   }, [loadPrompts])
 
+  useEffect(() => {
+    if (isPromptsLoaded) {
+      setLoadingPrompts(false)
+    }
+  }, [isPromptsLoaded])
+
   return {
     isLoadingPrompts,
+    isPinnedPromptsLoading,
     prompts,
     communityPrompts,
     myPrompts,

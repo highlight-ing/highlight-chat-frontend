@@ -10,8 +10,12 @@ import { DEFAULT_PROMPT_EXTERNAL_IDS } from '@/lib/promptapps'
 import useForkDefaultAction from './useForkDefaultAction'
 import { useIntegration } from './useIntegration'
 import usePromptApps from './usePromptApps'
+import { useRouter } from 'next/navigation'
+import { trackEvent } from '@/utils/amplitude'
+import * as Sentry from '@sentry/nextjs'
 
 const useOnExternalMessage = () => {
+  const router = useRouter()
   const integrations = useIntegrations()
   const { setConversationId, openModal, closeAllModals, isModalOpen } = useStore((state) => ({
     setConversationId: state.setConversationId,
@@ -19,7 +23,7 @@ const useOnExternalMessage = () => {
     closeAllModals: state.closeAllModals,
     isModalOpen: state.isModalOpen,
   }))
-  const { refreshChatItem } = useChatHistory()
+  const { refreshChatItem, refreshChatHistory } = useChatHistory()
   const { addToast } = useStore((state) => ({
     addToast: state.addToast,
   }))
@@ -29,23 +33,32 @@ const useOnExternalMessage = () => {
   const { handleSubmit } = useSubmitQuery()
   const { forkDefaultAction } = useForkDefaultAction()
   const { createAction } = useIntegration()
-  const { selectPrompt } = usePromptApps()
+  const { selectPrompt, refreshPinnedPrompts } = usePromptApps()
 
   useEffect(() => {
     const removeListener = Highlight.app.addListener('onExternalMessage', async (caller: string, message: any) => {
       console.log('Received external message from:', caller)
       console.log('Message content:', message)
 
+      if (message.type === 'refresh-pinned-prompts') {
+        await refreshPinnedPrompts(true)
+        return
+      }
+
       if (message.conversationId) {
         console.log('Opening conversation from external event:', message.conversationId)
-
-        // Set the conversation ID
+        Sentry.captureMessage(`Update conversation ${message.conversationId} from useOnExternalMessage`)
         const conversation = await refreshChatItem(message.conversationId, true)
         if (!conversation) {
           console.error('Failed to open conversation from external event:', message.conversationId)
           return
         }
+        // Set the conversation ID
         setConversationId(message.conversationId)
+
+        console.log('Refetching chat history from external message')
+        Sentry.captureMessage(`Fetch chat history from useOnExternalMessage`)
+        await refreshChatHistory()
 
         console.log(message.toolUse, message.toolUse?.type)
         // Handle toolUse if present
@@ -105,6 +118,7 @@ const useOnExternalMessage = () => {
                 type: 'success',
                 timeout: 5000,
               })
+              router.push('/')
               addAttachment({
                 id: conversation.id,
                 type: 'conversation',
