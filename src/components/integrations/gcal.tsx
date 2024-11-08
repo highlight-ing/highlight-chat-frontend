@@ -1,3 +1,4 @@
+import * as React from 'react'
 import type { CreateGoogleCalendarEventParams } from '@/hooks/useIntegrations'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
@@ -7,9 +8,7 @@ import InputField from '../TextInput/InputField'
 import TextArea from '../TextInput/TextArea'
 import Button from '../Button/Button'
 import { createGoogleCalendarEvent } from '@/utils/google-server-actions'
-import { ConfigProvider, DatePicker } from 'antd'
-
-const { RangePicker } = DatePicker
+import { DateTimePicker } from '../date-time'
 
 const gcalEventFormSchema = z.object({
   summary: z.string(),
@@ -56,6 +55,7 @@ export function GcalEventFormComponent({
   return (
     <form className="flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
       <InputField size={'xxlarge'} label={'Summary'} placeholder={'Event Summary'} {...register('summary')} />
+      <DateTimePicker />
       <InputField size={'xxlarge'} label={'Location'} placeholder={'Event Location'} {...register('location')} />
       <TextArea
         rows={4}
@@ -64,25 +64,8 @@ export function GcalEventFormComponent({
         placeholder={'Issue Description'}
         {...register('description')}
       />
-      <ConfigProvider
-        theme={{
-          token: {},
-          components: {
-            DatePicker: {
-              colorBgContainer: 'rgba(255, 255, 255, 0.05)',
-              colorBorder: 'rgba(255, 255, 255, 0.1)',
-              borderRadius: 10,
-              colorPrimaryHover: 'rgba(255, 255, 255, 0.2)',
-              colorTextPlaceholder: 'rgba(255, 255, 255, 0.2)',
-              activeBorderColor: 'rgba(255, 255, 255, 0.4)',
-            },
-          },
-        }}
-      >
-        <RangePicker onChange={(value) => console.log(value)} showTime />
-      </ConfigProvider>
-      <InputField size={'xxlarge'} label={'Start'} placeholder={'Event Start'} {...register('start')} />
-      <InputField size={'xxlarge'} label={'End'} placeholder={'Event End'} {...register('end')} />
+      {/* <InputField size={'xxlarge'} label={'Start'} placeholder={'Event Start'} {...register('start')} /> */}
+      {/* <InputField size={'xxlarge'} label={'End'} placeholder={'Event End'} {...register('end')} /> */}
       <Button size={'medium'} variant={'primary'} type={'submit'} disabled={isSubmitting}>
         Create Event
       </Button>
