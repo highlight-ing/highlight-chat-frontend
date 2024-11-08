@@ -1,4 +1,3 @@
-import { CreateLinearTicketComponent } from '@/components/integrations/linear'
 import { CreateNotionPageComponent } from '@/components/integrations/notion'
 import { useStore } from '@/providers/store-provider'
 import { useEffect, useState } from 'react'
@@ -8,6 +7,7 @@ import { SetupConnectionComponent } from '@/components/integrations/integration-
 import { checkNotionConnectionStatus, createMagicLinkForNotion } from '@/utils/notion-server-actions'
 import { checkGoogleConnectionStatus, createMagicLinkForGoogle } from '@/utils/google-server-actions'
 import { CreateGoogleCalendarEventComponent } from '@/components/integrations/gcal'
+import { CreateLinearTicketComponent } from '@/features/integrations/linear/linear'
 
 interface CreateNotionPageParams {
   title: string
