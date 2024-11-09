@@ -18,7 +18,6 @@ export function useLinearApiToken() {
         throw new Error('No Linear token found')
       }
 
-      console.log('LINEAR TOKEN', token)
       return token
     },
     staleTime: TWO_MINUTES_IN_MILLI,

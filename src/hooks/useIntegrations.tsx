@@ -7,7 +7,7 @@ import { SetupConnectionComponent } from '@/components/integrations/integration-
 import { checkNotionConnectionStatus, createMagicLinkForNotion } from '@/utils/notion-server-actions'
 import { checkGoogleConnectionStatus, createMagicLinkForGoogle } from '@/utils/google-server-actions'
 import { CreateGoogleCalendarEventComponent } from '@/components/integrations/gcal'
-import { CreateLinearTicketComponent } from '@/features/integrations/linear/linear'
+import { CreateLinearTicket } from '@/features/integrations/linear/linear'
 
 interface CreateNotionPageParams {
   title: string
@@ -78,7 +78,7 @@ export function useIntegrations(): UseIntegrationsAPI {
     updateLastConversationMessage(conversationId!, {
       content: (
         <MessageWithComponent content={lastMessage}>
-          <CreateLinearTicketComponent title={title} description={description} />
+          <CreateLinearTicket title={title} description={description} />
         </MessageWithComponent>
       ),
       role: 'assistant',

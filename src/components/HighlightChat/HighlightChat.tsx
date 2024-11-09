@@ -20,6 +20,7 @@ import { useOnPromptChange } from '@/hooks/useOnPromptChange'
 import useOnExternalMessage from '@/hooks/useOnExternalMessage'
 import { useOnPromptLoad } from '@/hooks/useOnPromptLoad'
 import IntercomChat from '../intercom-chat'
+import { Input as FormInput } from '@/components/ui/input'
 
 /**
  * Hook that handles pasting from the clipboard.
@@ -109,6 +110,7 @@ const HighlightChat = () => {
         <ChatHeader isShowing={!isConversationLoading && !!promptApp && messages.length === 0} />
         {(isChatting || (isConversationLoading && messages.length > 0)) && <Messages />}
         {isConversationLoading && messages.length === 0 && !inputIsDisabled && <MessagesPlaceholder />}
+        <FormInput label="Test" />
         <ChatHome isShowing={!isChatting && !promptApp && !isConversationLoading} />
         {(isChatting || promptApp) && <Input isActiveChat={true} />}
         <IntercomChat />

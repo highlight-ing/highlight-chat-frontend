@@ -1,12 +1,12 @@
-import { useState } from 'react'
-import InputField from '@/components/TextInput/InputField'
-import TextArea from '@/components/TextInput/TextArea'
+import React from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import Button from '@/components/Button/Button'
 import { z } from 'zod'
-import { useCreateLinearTicket } from './hooks'
-import React from 'react'
+import { useCreateLinearTicket, useLinearClient } from './hooks'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Button } from '@/components/ui/button'
 
 const linearTicketFormSchema = z.object({
   title: z.string().min(1),
@@ -22,14 +22,10 @@ interface LinearTicketFormProps {
 }
 
 export function LinearTicketForm({ title, description, onSubmitSuccess }: LinearTicketFormProps) {
+  const { data: client } = useLinearClient()
   const { mutate: createLinearTicket } = useCreateLinearTicket(onSubmitSuccess)
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors, isSubmitting },
-  } = useForm<LinearTicketFormData>({
+  const form = useForm<z.infer<typeof linearTicketFormSchema>>({
     resolver: zodResolver(linearTicketFormSchema),
     defaultValues: {
       title,
@@ -42,19 +38,50 @@ export function LinearTicketForm({ title, description, onSubmitSuccess }: Linear
   }
 
   return (
-    <form className="flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
-      <InputField size={'xxlarge'} label={'Title'} placeholder={'Issue Title'} {...register('title')} />
-      <TextArea
-        rows={4}
-        size={'xxlarge'}
-        label={'Description'}
-        placeholder={'Issue Description'}
-        {...register('description')}
-      />
-      <Button size={'medium'} variant={'primary'} type={'submit'} disabled={isSubmitting}>
-        Create Issue
-      </Button>
-    </form>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <div className="space-y-2">
+          <label className="text-sm text-zinc-400">Title</label>
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input
+                    placeholder="Implement Shadcn Form Components"
+                    className="border-zinc-800 bg-zinc-900 text-zinc-100"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="space-y-2">
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Textarea
+                    placeholder="Update the appointment form to use Shadcn form components, integrating React Hook Form and Zod for form handling and validation. Key changes include adding a Zod schema for validation, using useForm from react-hook-form, wrapping each form field in a FormField component, and implementing an onSubmit function to handle form submission."
+                    className="min-h-[100px] border-zinc-800 bg-zinc-900 text-zinc-100"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <Button type="submit" className="bg-cyan-500 font-medium text-black hover:bg-cyan-600">
+          Create Issue
+        </Button>
+      </form>
+    </Form>
   )
 }
 
@@ -69,9 +96,9 @@ export function LinearTicketSuccessMessage({ issueUrl }: { issueUrl: string }) {
   )
 }
 
-export function CreateLinearTicketComponent({ title, description }: { title: string; description: string }) {
-  const [state, setState] = useState<'form' | 'success'>('form')
-  const [issueUrl, setIssueUrl] = useState<string>()
+export function CreateLinearTicket({ title, description }: { title: string; description: string }) {
+  const [state, setState] = React.useState<'form' | 'success'>('form')
+  const [issueUrl, setIssueUrl] = React.useState<string>()
 
   function onSubmitSuccess(issueUrl: string) {
     setIssueUrl(issueUrl)
