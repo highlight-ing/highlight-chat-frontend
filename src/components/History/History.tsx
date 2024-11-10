@@ -14,7 +14,7 @@ import { trackEvent } from '@/utils/amplitude'
 import { useApi } from '@/hooks/useApi'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 import * as Sentry from '@sentry/nextjs'
-import { NEW_CONVERSATION_TITLE, useUpdateConversationTitle } from './hooks'
+import { NEW_CONVERSATION_TITLE, useAddNewChat, useHistory, useUpdateConversationTitle } from './hooks'
 
 interface HistoryProps {
   showHistory: boolean
@@ -56,7 +56,6 @@ function sortArrayByDate(inputArray: ChatHistoryItem[]) {
 
 const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: HistoryProps) => {
   const { deleteRequest } = useApi()
-  const initialFetchDone = useRef(false)
   const conversationId = useStore((state) => state.conversationId)
   const startNewConversation = useStore((state) => state.startNewConversation)
   const removeOpenConversation = useStore((state) => state.removeOpenConversation)
@@ -65,6 +64,9 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
   const [isSelecting, setIsSelecting] = useState(false)
   const [selectedHistoryItems, setSelectedHistoryItems] = useState<string[]>([])
   const [isDeleting, setIsDeleting] = useState(false)
+
+  const { mutate: addNewChat } = useAddNewChat(conversationId)
+  useHistory()
 
   const { today, lastWeek, lastMonth, older } = useMemo(() => {
     return sortArrayByDate(history)
@@ -111,32 +113,8 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
 
   // Handle fetching history, and detecting new chats to fetch
   useEffect(() => {
-    if (!initialFetchDone.current) {
-      // Initial fetch
-      console.log('Fetching chat history')
-      Sentry.captureMessage(`Fetch chat history from History`)
-      refreshChatHistory()
-      initialFetchDone.current = true
-    } else if (conversationId && !history.some((chat) => chat.id === conversationId)) {
-      const fetchAndSafeRetry = async (retries: number) => {
-        // New conversation found after initial fetch
-        console.log('Fetching new conversation and adding it to history')
-        Sentry.captureMessage(`Update conversation ${conversationId} from History`)
-        const newConversation = await refreshChatItem(conversationId, true)
-        if (newConversation) {
-          console.log('Added conversation to history')
-          return
-        }
-        if (retries > 0) {
-          console.log('Failed to fetch new conversation, retrying in 1s')
-          setTimeout(() => {
-            fetchAndSafeRetry(--retries)
-          }, 1000)
-        } else {
-          console.error('Repeatedly failed to fetch new conversation, giving up')
-        }
-      }
-      fetchAndSafeRetry(3)
+    if (conversationId && !history.some((chat) => chat.id === conversationId)) {
+      addNewChat()
     }
   }, [history, conversationId])
 
@@ -275,10 +253,6 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
 
 export default History
 
-// Title retry logic
-const MAX_RETRIES = 3
-const RETRY_INTERVAL = 10000
-
 interface HistoryItemProps {
   chat: ChatHistoryItem
   isSelecting?: boolean
@@ -288,9 +262,6 @@ interface HistoryItemProps {
 }
 
 const HistoryItem = ({ chat, isSelecting, isSelected, onSelect, onOpenChat }: HistoryItemProps) => {
-  const fetchRetryRef = useRef<NodeJS.Timeout>()
-  const [fetchRetryCount, setFetchRetryCount] = useState(0)
-  const { refreshChatItem, history } = useChatHistory()
   const { addOrUpdateOpenConversation, openModal, setConversationId } = useStore(
     useShallow((state) => ({
       setConversationId: state.setConversationId,
@@ -298,7 +269,7 @@ const HistoryItem = ({ chat, isSelecting, isSelected, onSelect, onOpenChat }: Hi
       addOrUpdateOpenConversation: state.addOrUpdateOpenConversation,
     })),
   )
-  const { mutate: updateConversationTitle } = useUpdateConversationTitle()
+  useUpdateConversationTitle(chat)
 
   const handleOpenChat = async (chat: ChatHistoryItem) => {
     if (typeof onOpenChat === 'function') {
@@ -328,12 +299,6 @@ const HistoryItem = ({ chat, isSelecting, isSelected, onSelect, onOpenChat }: Hi
       onSelect()
     }
   }
-
-  useEffect(() => {
-    if (chat.id && chat.title === NEW_CONVERSATION_TITLE) {
-      updateConversationTitle({ chatId: chat.id })
-    }
-  }, [chat, history])
 
   return (
     <ContextMenu
