@@ -1,6 +1,7 @@
 import { useChatHistory } from '@/hooks/useChatHistory'
 import { ChatHistoryItem } from '@/types'
 import { useMutation, useQuery } from '@tanstack/react-query'
+import * as Sentry from '@sentry/nextjs'
 
 const RETRY_ATTEMPTS = 4
 export const NEW_CONVERSATION_TITLE = 'New Conversation'
@@ -10,7 +11,10 @@ export function useHistory() {
 
   return useQuery({
     queryKey: ['history'],
-    queryFn: refreshChatHistory,
+    queryFn: async () => {
+      await refreshChatHistory()
+      Sentry.captureMessage('Fetch chat history from History')
+    },
     staleTime: Infinity,
   })
 }
@@ -28,6 +32,7 @@ export function useUpdateConversationTitle(chat: ChatHistoryItem) {
         throw new Error('Conversation title not yet updated')
       }
 
+      Sentry.captureMessage(`Update conversation ${chat.id} from HistoryItem`)
       return updatedConversation
     },
     enabled: chat.id === history?.[0].id && chat.title === NEW_CONVERSATION_TITLE,
