@@ -45,7 +45,6 @@ const useOnExternalMessage = () => {
 
       if (message.conversationId) {
         console.log('Opening conversation from external event:', message.conversationId)
-        Sentry.captureMessage(`Update conversation ${message.conversationId} from useOnExternalMessage`)
         const conversation = await refreshChatItem(message.conversationId, true)
         if (!conversation) {
           console.error('Failed to open conversation from external event:', message.conversationId)
@@ -55,7 +54,6 @@ const useOnExternalMessage = () => {
         setConversationId(message.conversationId)
 
         console.log('Refetching chat history from external message')
-        Sentry.captureMessage(`Fetch chat history from useOnExternalMessage`)
         await refreshChatHistory()
 
         if (message.userInput?.length > 0) {
