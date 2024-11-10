@@ -14,6 +14,7 @@ import { trackEvent } from '@/utils/amplitude'
 import { useApi } from '@/hooks/useApi'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 import * as Sentry from '@sentry/nextjs'
+import { NEW_CONVERSATION_TITLE, useUpdateConversationTitle } from './hooks'
 
 interface HistoryProps {
   showHistory: boolean
@@ -113,7 +114,6 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
     if (!initialFetchDone.current) {
       // Initial fetch
       console.log('Fetching chat history')
-
       Sentry.captureMessage(`Fetch chat history from History`)
       refreshChatHistory()
       initialFetchDone.current = true
@@ -298,6 +298,7 @@ const HistoryItem = ({ chat, isSelecting, isSelected, onSelect, onOpenChat }: Hi
       addOrUpdateOpenConversation: state.addOrUpdateOpenConversation,
     })),
   )
+  const { mutate: updateConversationTitle } = useUpdateConversationTitle()
 
   const handleOpenChat = async (chat: ChatHistoryItem) => {
     if (typeof onOpenChat === 'function') {
@@ -329,28 +330,10 @@ const HistoryItem = ({ chat, isSelecting, isSelected, onSelect, onOpenChat }: Hi
   }
 
   useEffect(() => {
-    if (
-      history?.[0]?.id &&
-      chat.title === 'New Conversation' &&
-      fetchRetryCount < MAX_RETRIES &&
-      !fetchRetryRef.current
-    ) {
-      console.log(`Fetching updated conversation, ${MAX_RETRIES - fetchRetryCount} tries remaining`)
-
-      // Retry until title is assigned
-      fetchRetryRef.current = setTimeout(async () => {
-        const updatedConversation = await refreshChatItem(chat.id)
-        Sentry.captureMessage(`Update conversation ${chat.id} from HistoryItem`)
-        if (updatedConversation && updatedConversation.title !== 'New Conversation') {
-          setFetchRetryCount(0)
-          console.log('Updated conversation:', updatedConversation.title)
-        } else {
-          setFetchRetryCount(fetchRetryCount + 1)
-        }
-        fetchRetryRef.current = undefined
-      }, RETRY_INTERVAL)
+    if (chat.id && chat.title === NEW_CONVERSATION_TITLE) {
+      updateConversationTitle({ chatId: chat.id })
     }
-  }, [chat, history?.[0]?.id, fetchRetryCount])
+  }, [chat, history])
 
   return (
     <ContextMenu
