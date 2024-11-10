@@ -7,14 +7,13 @@ import { Clock, Trash } from 'iconsax-react'
 import { useStore } from '@/providers/store-provider'
 import { ChatHistoryItem } from '@/types'
 import ContextMenu from '@/components/ContextMenu/ContextMenu'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import CircleButton from '@/components/CircleButton/CircleButton'
 import { trackEvent } from '@/utils/amplitude'
 import { useApi } from '@/hooks/useApi'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
-import * as Sentry from '@sentry/nextjs'
-import { NEW_CONVERSATION_TITLE, useAddNewChat, useHistory, useUpdateConversationTitle } from './hooks'
+import { useAddNewChat, useHistory, useUpdateConversationTitle } from './hooks'
 
 interface HistoryProps {
   showHistory: boolean
