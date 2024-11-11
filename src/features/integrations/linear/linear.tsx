@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { useCreateLinearTicket, useLinearClient } from './hooks'
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
@@ -18,7 +18,7 @@ export type LinearTicketFormData = z.infer<typeof linearTicketFormSchema>
 interface LinearTicketFormProps {
   title: string
   description: string
-  onSubmitSuccess: (issueUrl: string) => void
+  onSubmitSuccess?: (issueUrl: string) => void
 }
 
 export function LinearTicketForm({ title, description, onSubmitSuccess }: LinearTicketFormProps) {
@@ -41,18 +41,14 @@ export function LinearTicketForm({ title, description, onSubmitSuccess }: Linear
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-2">
-          <label className="text-sm text-zinc-400">Title</label>
           <FormField
             control={form.control}
             name="title"
             render={({ field }) => (
               <FormItem>
+                <FormLabel>Test</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="Implement Shadcn Form Components"
-                    className="border-zinc-800 bg-zinc-900 text-zinc-100"
-                    {...field}
-                  />
+                  <Input placeholder="Ticket title" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -66,11 +62,7 @@ export function LinearTicketForm({ title, description, onSubmitSuccess }: Linear
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Textarea
-                    placeholder="Update the appointment form to use Shadcn form components, integrating React Hook Form and Zod for form handling and validation. Key changes include adding a Zod schema for validation, using useForm from react-hook-form, wrapping each form field in a FormField component, and implementing an onSubmit function to handle form submission."
-                    className="min-h-[100px] border-zinc-800 bg-zinc-900 text-zinc-100"
-                    {...field}
-                  />
+                  <Textarea {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

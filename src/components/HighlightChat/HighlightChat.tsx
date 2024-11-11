@@ -20,7 +20,7 @@ import useOnExternalMessage from '@/hooks/useOnExternalMessage'
 import { useOnPromptLoad } from '@/hooks/useOnPromptLoad'
 import IntercomChat from '../intercom-chat'
 import { HistorySidebar } from '@/features/history-sidebar/history-sidebar'
-import { Input as FormInput } from '@/components/ui/input'
+import { LinearTicketForm } from '@/features/integrations/linear/linear'
 
 /**
  * Hook that handles pasting from the clipboard.
@@ -110,7 +110,9 @@ const HighlightChat = () => {
         <ChatHeader isShowing={!isConversationLoading && !!promptApp && messages.length === 0} />
         {(isChatting || (isConversationLoading && messages.length > 0)) && <Messages />}
         {isConversationLoading && messages.length === 0 && !inputIsDisabled && <MessagesPlaceholder />}
-        <FormInput label="Test" />
+
+        <LinearTicketForm title="New ticket" description="A description" />
+
         <ChatHome isShowing={!isChatting && !promptApp && !isConversationLoading} />
         {(isChatting || promptApp) && <Input isActiveChat={true} />}
         <IntercomChat />
