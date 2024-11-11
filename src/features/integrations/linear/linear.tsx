@@ -61,8 +61,9 @@ export function LinearTicketForm({ title, description, onSubmitSuccess }: Linear
             name="description"
             render={({ field }) => (
               <FormItem>
+                <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea {...field} />
+                  <Textarea placeholder="Ticket description" className="max-w-lg" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
