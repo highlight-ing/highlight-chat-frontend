@@ -11,6 +11,7 @@ type DatePickerProps = {
   date?: Date
   setDate?: React.Dispatch<React.SetStateAction<Date | undefined>>
   label?: string
+  className?: string
 }
 
 export function DatePicker(props: DatePickerProps) {
@@ -21,7 +22,12 @@ export function DatePicker(props: DatePickerProps) {
 
   return (
     <Popover>
-      <PopoverTrigger className="group relative flex h-16 flex-col justify-start gap-2 rounded-[10px] border border-light-10 bg-secondary p-5 text-base font-[350] transition hover:border-light-20 data-[state=open]:border-light-40 data-[state=open]:bg-tertiary data-[state=open]:outline-none">
+      <PopoverTrigger
+        className={cn(
+          'group relative flex h-16 flex-col justify-start gap-2 rounded-[10px] border border-light-10 bg-secondary p-5 text-base font-[350] transition hover:border-light-20 data-[state=open]:border-light-40 data-[state=open]:bg-tertiary data-[state=open]:outline-none',
+          props.className,
+        )}
+      >
         <p
           className={cn(
             'pointer-events-none absolute left-5 top-2 text-[13px] font-normal text-light-20 opacity-0 transition-opacity group-data-[state=open]:opacity-100',
@@ -54,7 +60,14 @@ interface TimeSelectProps {
 }
 
 export default function TimeSelect(props: TimeSelectProps) {
-  const [time, setTime] = React.useState('')
+  const [time, setTime] = React.useState(() => {
+    if (props.date) {
+      const hours = props.date.getHours().toString().padStart(2, '0')
+      const minutes = props.date.getMinutes().toString().padStart(2, '0')
+      return `${hours}:${minutes}`
+    }
+    return '00:00'
+  })
 
   const timeOptions = React.useMemo(() => {
     const times = []
@@ -68,17 +81,15 @@ export default function TimeSelect(props: TimeSelectProps) {
     return times
   }, [])
 
-  React.useEffect(() => {
-    if (!props.date) return
+  const handleTimeChange = (newTime: string) => {
+    setTime(newTime)
 
-    const dateTime = new Date(props.date)
-    const [hours, minutes] = time.split(':')
-    dateTime.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0)
+    const [hours, minutes] = newTime.split(':')
+    const newDateTime = props.date ? new Date(props.date) : new Date()
+    newDateTime.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0)
 
-    if (typeof props.onChange === 'function') {
-      props.onChange(dateTime)
-    }
-  }, [props.date, time, props.onChange])
+    props.onChange?.(newDateTime)
+  }
 
   const formatTimeForDisplay = (time: string) => {
     const [hours, minutes] = time.split(':')
@@ -89,8 +100,10 @@ export default function TimeSelect(props: TimeSelectProps) {
     })
   }
 
+  const isCustomTimeValue = !timeOptions.includes(time)
+
   return (
-    <Select value={time} onValueChange={setTime}>
+    <Select value={time} onValueChange={(value) => handleTimeChange(value)}>
       <SelectTrigger
         className={cn(
           'group relative flex h-16 w-36 flex-col justify-start gap-2 rounded-[10px] border border-light-10 bg-secondary p-5 text-base font-[350] transition hover:border-light-20 data-[state=open]:border-light-40 data-[state=open]:bg-tertiary data-[state=open]:outline-none',
@@ -111,7 +124,7 @@ export default function TimeSelect(props: TimeSelectProps) {
             'translate-y-2': time,
           })}
         >
-          {time ? <SelectValue /> : <span>Select a time</span>}
+          {isCustomTimeValue ? time : time ? <SelectValue /> : <span>Select a time</span>}
         </span>
       </SelectTrigger>
       <SelectContent className="max-h-64 w-36" sideOffset={4}>
@@ -125,25 +138,31 @@ export default function TimeSelect(props: TimeSelectProps) {
   )
 }
 
-export function DateTimePicker({ onChange }: { onChange: (startDateTime: Date, endDateTime: Date) => void }) {
-  const [date, setDate] = React.useState<Date>()
-  const [startDateTime, setStartDateTime] = React.useState<Date>()
-  const [endDateTime, setEndDateTime] = React.useState<Date>()
+type DateTimePickerProps = {
+  dateIso: string | undefined
+  onChange: (dateTime: Date) => void
+  dateFieldLabel?: string
+  timeFieldLabel?: string
+}
+
+export function DateTimePicker(props: DateTimePickerProps) {
+  const [date, setDate] = React.useState<Date | undefined>(props.dateIso ? new Date(props.dateIso) : new Date())
+  const [dateTime, setDateTime] = React.useState<Date>()
 
   useEffect(() => {
-    if (!startDateTime || !endDateTime) return
-
-    onChange(startDateTime, endDateTime)
-  }, [startDateTime, endDateTime])
+    if (!dateTime) return
+    props.onChange(dateTime)
+  }, [dateTime])
 
   return (
-    <div className="grid grid-cols-2 gap-2">
-      <DatePicker date={date} setDate={setDate} label="Date" />
-      <div className="flex items-center gap-2">
-        <TimeSelect date={date} onChange={setStartDateTime} label="Starts" className="w-full" />
-        <span>-</span>
-        <TimeSelect date={date} onChange={setEndDateTime} label="Ends" className="w-full" />
-      </div>
+    <div className="grid grid-cols-3 gap-2">
+      <DatePicker date={date} setDate={setDate} label={props.dateFieldLabel ?? 'Date'} className="col-span-2 w-full" />
+      <TimeSelect
+        date={date}
+        onChange={setDateTime}
+        label={props.timeFieldLabel ?? 'Starts'}
+        className="col-span-1 w-full"
+      />
     </div>
   )
 }

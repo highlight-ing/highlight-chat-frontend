@@ -60,24 +60,45 @@ export function GcalEventFormComponent({
     onSuccess(link ?? '')
   }
 
-  const onDateChange = (startDateTime: Date, endDateTime: Date) => {
+  const onStartDateChange = (startDateTime: Date) => {
     try {
       if (!isNaN(startDateTime.getTime())) {
+        console.log({ startDateTime })
         setValue('start', startDateTime.toISOString())
       }
+    } catch (e) {
+      console.warn('Error setting start date value', e)
+    }
+  }
 
+  const onEndDateChange = (endDateTime: Date) => {
+    try {
       if (!isNaN(endDateTime.getTime())) {
+        console.log({ endDateTime })
         setValue('end', endDateTime.toISOString())
       }
     } catch (e) {
-      console.warn('Error setting date values', e)
+      console.warn('Error setting start date value', e)
     }
   }
 
   return (
     <form className="flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
       <InputField size={'xxlarge'} label={'Summary'} placeholder={'Event Summary'} {...register('summary')} />
-      <DateTimePicker onChange={onDateChange} />
+      <div className="grid grid-cols-2 gap-2">
+        <DateTimePicker
+          dateFieldLabel="Start Date"
+          timeFieldLabel="Start Time"
+          dateIso={new Date().toISOString()}
+          onChange={onStartDateChange}
+        />
+        <DateTimePicker
+          dateFieldLabel="End Date"
+          timeFieldLabel="End Time"
+          dateIso={new Date(new Date().setHours(15)).toISOString()}
+          onChange={onEndDateChange}
+        />
+      </div>
       <InputField size={'xxlarge'} label={'Location'} placeholder={'Event Location'} {...register('location')} />
       <TextArea
         rows={4}
