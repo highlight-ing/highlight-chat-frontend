@@ -133,7 +133,7 @@ export const Message = ({ message, isThinking }: MessageProps) => {
         return <Attachment type={attachment.type} value={attachment.name} />
       case 'window_contents':
         // case 'ocr_text':
-        return <Attachment type="window_context" value={attachment.name} />
+        return <Attachment type="window_context" value={attachment.name} appName={attachment.appName} />
       case 'conversation':
         return <Attachment type="conversation" value={attachment.text} />
       case 'selected_text':

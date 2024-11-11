@@ -4,12 +4,12 @@ import {
   getLinearTokenForUser,
 } from '@/utils/linear-server-actions'
 import { useEffect, useRef, useState } from 'react'
-import InputField from '../TextInput/InputField'
-import TextArea from '../TextInput/TextArea'
+import InputField from '@/components/TextInput/InputField'
+import TextArea from '@/components/TextInput/TextArea'
 import { LinearClient, Team } from '@linear/sdk'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import Button from '../Button/Button'
+import Button from '@/components/Button/Button'
 import { z } from 'zod'
 import { LinearIcon } from '@/icons/icons'
 import { SetupConnectionComponent } from './integration-auth'
@@ -120,7 +120,7 @@ export function LinearTicketFormComponent({
         {...register('description')}
       />
       <Button size={'medium'} variant={'primary'} type={'submit'} disabled={isSubmitting}>
-        Create Ticket
+        Create Issue
       </Button>
     </form>
   )

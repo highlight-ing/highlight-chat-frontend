@@ -20,6 +20,7 @@ import { useTabHotkeys } from '@/hooks/useTabHotkeys'
 import Button from '@/components/Button/Button'
 import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
 import globalStyles from '@/global.module.scss'
+import { ShareLink } from '@/features/share-link/share-link'
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const router = useRouter()
@@ -219,28 +220,15 @@ const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
                 currentConversation.shared_conversations.length > 0 && (
                   <span>{currentConversation.shared_conversations[0].title}</span>
                 )}
-              {promptApp ? (
-                <a href={`https://chat.hl.ing/prompts/${promptApp.slug}`} target={'_blank'}>
-                  chat.hl.ing/prompts/{promptApp.slug}
-                </a>
-              ) : currentConversation?.shared_conversations && currentConversation.shared_conversations.length > 0 ? (
-                <a
-                  href={`https://highlightai.com/share/${currentConversation.shared_conversations[0].id}`}
-                  target={'_blank'}
-                >
-                  highlightai.com/share/{currentConversation.shared_conversations[0].id}
-                </a>
-              ) : (
-                <a href={`https://chat.hl.ing`}>chat.hl.ing</a>
-              )}
             </div>
           </div>
           {conversationId && (
             <div>
-              <Button size={'small'} variant={'primary-outline'} onClick={onToggleShareModal}>
-                Share
-                <Send2 size={20} variant={'Bold'} />
-              </Button>
+              <ShareLink conversation={currentConversation || null} />
+              {/* <Button size={'small'} variant={'primary-outline'} onClick={onToggleShareModal}> */}
+              {/*   Share */}
+              {/*   <Send2 size={20} variant={'Bold'} /> */}
+              {/* </Button> */}
             </div>
           )}
         </div>

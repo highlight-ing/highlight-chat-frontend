@@ -139,7 +139,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
                 <div className={styles.previewFooter}>
                   {conversation.shared_conversations && conversation.shared_conversations.length > 0
                     ? `https://highlightai.com/share/${conversation.shared_conversations[0].id}`
-                    : 'All contents currently inside the chat will be shared.'}
+                    : 'All currently inside the chat will be shared. contents'}
                 </div>
               </div>
             ) : (

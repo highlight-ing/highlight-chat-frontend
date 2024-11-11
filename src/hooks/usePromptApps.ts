@@ -30,6 +30,8 @@ export default (loadPrompts?: boolean) => {
     startNewConversation,
     isPromptsLoaded,
     setIsPromptsLoaded,
+    isPinnedPromptsLoading,
+    setIsPinnedPromptsLoading,
   } = useStore(
     useShallow((state) => ({
       userId: state.userId,
@@ -41,6 +43,8 @@ export default (loadPrompts?: boolean) => {
       startNewConversation: state.startNewConversation,
       isPromptsLoaded: state.isPromptsLoaded,
       setIsPromptsLoaded: state.setIsPromptsLoaded,
+      isPinnedPromptsLoading: state.isPinnedPromptsLoading,
+      setIsPinnedPromptsLoading: state.setIsPinnedPromptsLoading,
     })),
   )
 
@@ -66,12 +70,15 @@ export default (loadPrompts?: boolean) => {
     loadPromptsPromise = new Promise<Prompt[]>(async (resolve) => {
       console.log('Refreshing prompts')
       setLoadingPrompts(true)
+      setIsPinnedPromptsLoading(true)
 
       const accessToken = await getAccessToken()
       const response = await fetchPrompts(accessToken)
 
       if (response.error) {
         setLoadingPrompts(false)
+        setIsPinnedPromptsLoading(false)
+        console.log(response.error)
         resolve([])
         loadPromptsPromise = null
         return
@@ -81,6 +88,7 @@ export default (loadPrompts?: boolean) => {
 
       await refreshPinnedPrompts()
 
+      setIsPinnedPromptsLoading(false)
       setLoadingPrompts(false)
       setIsPromptsLoaded(true)
       resolve(response.prompts ?? [])
@@ -90,13 +98,14 @@ export default (loadPrompts?: boolean) => {
     return loadPromptsPromise
   }
 
-  const refreshPinnedPrompts = async () => {
+  const refreshPinnedPrompts = async (fromExternalCall?: boolean) => {
+    console.log('Refreshing pinned prompts', { fromExternalCall })
     const pinned = await fetchPinnedPrompts(await getAccessToken())
     // @ts-ignore
     if (Array.isArray(pinned)) {
       setPinnedPrompts(pinned ?? [])
     }
-
+    if (fromExternalCall) return
     try {
       //@ts-expect-error
       globalThis.highlight.internal.reloadPrompts()
@@ -221,6 +230,7 @@ export default (loadPrompts?: boolean) => {
 
   return {
     isLoadingPrompts,
+    isPinnedPromptsLoading,
     prompts,
     communityPrompts,
     myPrompts,

@@ -31,6 +31,7 @@ export const useShareConversation = () => {
       }
 
       const data = await response.json()
+      console.log(`${data.shared_conversation_id}`)
       return `${data.shared_conversation_id}`
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {

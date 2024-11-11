@@ -4,10 +4,11 @@ import usePromptApps from '@/hooks/usePromptApps'
 import { PinnedPrompt } from '@/types'
 import Image from 'next/image'
 import { supabaseLoader } from '@/lib/supabase'
-import { Archive, Edit2 } from 'iconsax-react'
+import { Archive, BoxAdd, Edit2 } from 'iconsax-react'
 import Tooltip from '../Tooltip/Tooltip'
 import { useStore } from '@/providers/store-provider'
 import { ScrollArea } from '../ui/scroll-area'
+import { OpenAppButton } from '../buttons/open-app-button'
 
 const actionItemVariants: Variants = {
   hidden: {
@@ -30,11 +31,10 @@ const actionItemVariants: Variants = {
 const InputActionItem = ({ prompt, input }: { prompt: PinnedPrompt; input: string }) => {
   const { selectPrompt } = usePromptApps()
   const openModal = useStore((state) => state.openModal)
-  const setStoreInput = useStore((state) => state.setInput)
+  const setStoreInput = useStore((state) => state.setInputOverride)
 
   function handlePromptClick() {
     setStoreInput(input)
-    console.log(input)
     selectPrompt(prompt.external_id, false)
   }
 
@@ -112,7 +112,7 @@ const actionItemContainerVariants: Variants = {
 }
 
 const InputPromptActions = ({ input }: { input: string }) => {
-  const { isLoadingPrompts, pinnedPrompts } = usePromptApps()
+  const { isPinnedPromptsLoading, pinnedPrompts } = usePromptApps()
   const userId = useStore((state) => state.userId)
 
   const uniquePrompts = pinnedPrompts.reduce((acc: Array<PinnedPrompt>, curr) => {
@@ -123,7 +123,7 @@ const InputPromptActions = ({ input }: { input: string }) => {
     return acc
   }, [])
 
-  if (isLoadingPrompts || !userId) {
+  if (isPinnedPromptsLoading || !userId) {
     return (
       <motion.div variants={actionItemVariants} initial="hidden" animate="show" exit="exit">
         <div className="flex w-full items-center gap-2 rounded-2xl px-6 py-2 transition-[background-color] duration-150">
@@ -134,13 +134,7 @@ const InputPromptActions = ({ input }: { input: string }) => {
   }
 
   if (!uniquePrompts || uniquePrompts.length === 0) {
-    return (
-      <motion.div variants={actionItemVariants} initial="hidden" animate="show" exit="exit">
-        <div className="flex w-full items-center gap-2 rounded-2xl px-6 py-2 transition-[background-color] duration-150">
-          <h3 className="text-sm text-tertiary">No pinned shortcuts.</h3>
-        </div>
-      </motion.div>
-    )
+    return null
   }
 
   return (
