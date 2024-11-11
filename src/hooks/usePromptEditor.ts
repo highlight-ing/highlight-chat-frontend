@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { useStore } from '@/providers/store-provider'
 import { DEFAULT_PROMPT_EXTERNAL_IDS } from '@/lib/promptapps'
 import usePromptApps from './usePromptApps'
+import { sendExternalMessage, openApp } from '@/utils/highlightService'
 
 export function usePromptEditor() {
   // STATE
@@ -114,6 +115,15 @@ export function usePromptEditor() {
     } else if (res?.prompt) {
       // Update the prompts store with the updated prompt data
       updatePrompt(res.prompt)
+      
+      const message = {
+        type: 'prompt-edited',
+        promptId: res.prompt.id,
+      }
+      // Open the app and send message before closing modal
+      await openApp('dev2')
+      await sendExternalMessage('dev2', message)
+
       closeModal('edit-prompt')
     }
 
