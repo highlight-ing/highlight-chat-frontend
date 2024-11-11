@@ -61,9 +61,12 @@ export function GcalEventFormComponent({
   }
 
   const onDateChange = (startDateTime: Date, endDateTime: Date) => {
-    console.log({ startDateTime: startDateTime.toISOString(), endDateTime: endDateTime.toISOString() })
-    setValue('start', startDateTime.toISOString())
-    setValue('end', endDateTime.toISOString())
+    try {
+      setValue('start', startDateTime.toISOString())
+      setValue('end', endDateTime.toISOString())
+    } catch (e) {
+      console.warn('Error setting date values', e)
+    }
   }
 
   return (
