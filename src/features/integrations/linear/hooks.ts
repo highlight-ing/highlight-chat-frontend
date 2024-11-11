@@ -54,11 +54,48 @@ export function useLinearTeams() {
   })
 }
 
+export function useLinearWorkflows() {
+  const { data: client } = useLinearClient()
+
+  return useQuery({
+    queryKey: ['linearWorkflows'],
+    queryFn: async () => {
+      if (!client) {
+        throw new Error('No Linear client available')
+      }
+
+      const workflows = await client.workflowStates()
+
+      return workflows.nodes
+    },
+    enabled: !!client,
+  })
+}
+
+export function useLinearAssignees() {
+  const { data: client } = useLinearClient()
+
+  return useQuery({
+    queryKey: ['linearAssignees'],
+    queryFn: async () => {
+      if (!client) {
+        throw new Error('No Linear client available')
+      }
+
+      const assignees = await client.users()
+
+      return assignees.nodes.filter((assignee) => assignee.active)
+    },
+    enabled: !!client,
+  })
+}
+
 export function useCreateLinearTicket(onSubmitSuccess: (url: string) => void) {
   const { data: client } = useLinearClient()
   const { data: teams } = useLinearTeams()
 
   return useMutation({
+    mutationKey: ['create-linear-ticket'],
     mutationFn: async (data: LinearTicketFormData) => {
       const team = teams?.[0]
 

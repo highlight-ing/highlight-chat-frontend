@@ -9,13 +9,27 @@ const Select = SelectPrimitive.Root
 
 const SelectGroup = SelectPrimitive.Group
 
-const SelectValue = SelectPrimitive.Value
+const SelectValue = React.forwardRef<
+  React.ElementRef<typeof SelectPrimitive.Value>,
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Value>
+>(({ ...props }, ref) => <SelectPrimitive.Value ref={ref} data-slot="select-value" {...props} />)
+SelectValue.displayName = SelectPrimitive.Value.displayName
 
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
-  <SelectPrimitive.Trigger ref={ref} className={cn('', className)} {...props}>
+>(({ className, value, children, ...props }, ref) => (
+  <SelectPrimitive.Trigger
+    ref={ref}
+    data-slot="select"
+    className={cn(
+      'relative flex w-full flex-col justify-start gap-2 rounded-[10px] border border-light-10 bg-secondary px-3 py-2 text-[15px] text-primary outline-none transition-[padding] placeholder:text-subtle hover:border-light-20 focus:border-light-20 focus:bg-tertiary disabled:cursor-not-allowed disabled:opacity-50 group-has-[label]:data-[state=open]:pb-2 group-has-[label]:data-[state=open]:pt-7',
+      value && 'group-has-[label]:pb-2 group-has-[label]:pt-7',
+      className,
+    )}
+    value={value}
+    {...props}
+  >
     {children}
   </SelectPrimitive.Trigger>
 ))

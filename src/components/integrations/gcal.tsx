@@ -7,8 +7,6 @@ import { z } from 'zod'
 import InputField from '../TextInput/InputField'
 import TextArea from '../TextInput/TextArea'
 import Button from '../Button/Button'
-import { createGoogleCalendarEvent } from '@/utils/google-server-actions'
-import { DateTimePicker } from '../date-time'
 import {
   checkGoogleConnectionStatus,
   createGoogleCalendarEvent,
@@ -79,7 +77,6 @@ export function GcalEventFormComponent({
   return (
     <form className="flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
       <InputField size={'xxlarge'} label={'Summary'} placeholder={'Event Summary'} {...register('summary')} />
-      <DateTimePicker onChange={onDateChange} />
       <InputField size={'xxlarge'} label={'Location'} placeholder={'Event Location'} {...register('location')} />
       <TextArea
         rows={4}

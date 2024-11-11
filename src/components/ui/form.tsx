@@ -73,7 +73,7 @@ const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
         <div
           ref={ref}
           className={cn(
-            'group relative isolate [&>[data-slot=input]]:h-10 [&>[data-slot=label]+[data-slot=input]]:h-14',
+            'group relative isolate [&>[data-slot=input]]:h-10 [&>[data-slot=label]+[data-slot=input]]:h-14 [&>[data-slot=label]+[data-slot=select]]:h-14 [&>[data-slot=select]]:h-10',
             className,
           )}
           {...props}
@@ -95,7 +95,7 @@ const FormLabel = React.forwardRef<
       ref={ref}
       data-slot="label"
       className={cn(
-        'pointer-events-none absolute left-3 top-2 z-10 text-[13px] font-semibold text-tertiary opacity-0 transition-opacity group-focus-within:opacity-100',
+        'pointer-events-none absolute left-3 top-2 z-10 text-[13px] font-semibold text-tertiary opacity-0 transition-opacity group-focus-within:opacity-100 group-data-[state=open]:opacity-100',
         value && 'opacity-100',
         error && 'text-red-500 dark:text-red-900',
         className,
