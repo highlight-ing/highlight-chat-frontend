@@ -1,3 +1,4 @@
+import * as React from 'react'
 import type { CreateGoogleCalendarEventParams } from '@/hooks/useIntegrations'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
@@ -11,6 +12,7 @@ import { ConfigProvider, DatePicker } from 'antd'
 import dayjs from 'dayjs'
 
 const { RangePicker } = DatePicker
+import { DateTimePicker } from '../date-time'
 
 const gcalEventFormSchema = z.object({
   summary: z.string(),
@@ -58,6 +60,7 @@ export function GcalEventFormComponent({
   return (
     <form className="flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
       <InputField size={'xxlarge'} label={'Summary'} placeholder={'Event Summary'} {...register('summary')} />
+      <DateTimePicker />
       <InputField size={'xxlarge'} label={'Location'} placeholder={'Event Location'} {...register('location')} />
       <TextArea
         rows={4}
@@ -66,30 +69,8 @@ export function GcalEventFormComponent({
         placeholder={'Event Description'}
         {...register('description')}
       />
-      <ConfigProvider
-        theme={{
-          token: {},
-          components: {
-            DatePicker: {
-              colorBgContainer: 'rgba(255, 255, 255, 0.05)',
-              colorBorder: 'rgba(255, 255, 255, 0.1)',
-              borderRadius: 10,
-              colorPrimaryHover: 'rgba(255, 255, 255, 0.2)',
-              colorTextPlaceholder: 'rgba(255, 255, 255, 0.2)',
-              activeBorderColor: 'rgba(255, 255, 255, 0.4)',
-            },
-          },
-        }}
-      >
-        <RangePicker
-          value={[dayjs(watch('start')), dayjs(watch('end'))]}
-          onChange={(value) => {
-            setValue('start', value?.[0]?.toISOString())
-            setValue('end', value?.[1]?.toISOString())
-          }}
-          showTime
-        />
-      </ConfigProvider>
+      {/* <InputField size={'xxlarge'} label={'Start'} placeholder={'Event Start'} {...register('start')} /> */}
+      {/* <InputField size={'xxlarge'} label={'End'} placeholder={'Event End'} {...register('end')} /> */}
       <Button size={'medium'} variant={'primary'} type={'submit'} disabled={isSubmitting}>
         Create Event
       </Button>
