@@ -62,8 +62,13 @@ export function GcalEventFormComponent({
 
   const onDateChange = (startDateTime: Date, endDateTime: Date) => {
     try {
-      setValue('start', startDateTime.toISOString())
-      setValue('end', endDateTime.toISOString())
+      if (!isNaN(startDateTime.getTime())) {
+        setValue('start', startDateTime.toISOString())
+      }
+
+      if (!isNaN(endDateTime.getTime())) {
+        setValue('end', endDateTime.toISOString())
+      }
     } catch (e) {
       console.warn('Error setting date values', e)
     }
