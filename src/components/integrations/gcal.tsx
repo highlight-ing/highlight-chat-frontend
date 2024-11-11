@@ -15,6 +15,7 @@ import {
 import { DateTimePicker } from '../date-time'
 import { SetupConnectionComponent } from './integration-auth'
 import { GoogleIcon } from '@/icons/icons'
+import { IntegrationsLoader } from './loader'
 
 const gcalEventFormSchema = z.object({
   summary: z.string(),
@@ -112,7 +113,7 @@ export function CreateGoogleCalendarEventComponent(data: CreateGoogleCalendarEve
 
   return (
     <div className="mt-2">
-      {state === 'loading' && <div>Loading...</div>}
+      {state === 'loading' && <IntegrationsLoader />}
       {state === 'connect' && (
         <SetupConnectionComponent
           name={'Google Calendar'}
