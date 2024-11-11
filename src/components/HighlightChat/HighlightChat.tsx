@@ -20,7 +20,6 @@ import useOnExternalMessage from '@/hooks/useOnExternalMessage'
 import { useOnPromptLoad } from '@/hooks/useOnPromptLoad'
 import IntercomChat from '../intercom-chat'
 import { HistorySidebar } from '@/features/history-sidebar/history-sidebar'
-import { LinearTicketForm } from '@/features/integrations/linear/linear'
 
 /**
  * Hook that handles pasting from the clipboard.
