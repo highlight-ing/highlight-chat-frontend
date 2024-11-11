@@ -38,8 +38,8 @@ export function useUpdateConversationTitle(chat: ChatHistoryItem) {
     enabled: chat.id === history?.[0].id && chat.title === NEW_CONVERSATION_TITLE,
     retry: RETRY_ATTEMPTS,
     retryDelay: (attemptIndex) => {
-      // Exponential backoff: 1s, 2s, 4s, 8s
-      return Math.min(1000 * 2 ** attemptIndex, 16000)
+      // Exponential backoff: 5s, 10s, 20s, 20s
+      return Math.min(5000 * 2 ** attemptIndex, 20000)
     },
     staleTime: 60 * 1000,
   })
@@ -65,7 +65,7 @@ export function useAddNewChat(chatId: ChatHistoryItem['id'] | undefined) {
     retry: RETRY_ATTEMPTS,
     retryDelay: (attemptIndex) => {
       // Exponential backoff: 1s, 2s, 4s, 8s
-      return Math.min(1000 * 2 ** attemptIndex, 16000)
+      return Math.min(1000 * 2 ** attemptIndex, 8000)
     },
   })
 }
