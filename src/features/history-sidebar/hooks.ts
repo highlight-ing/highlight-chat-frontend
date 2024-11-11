@@ -19,29 +19,29 @@ export function useHistory() {
   })
 }
 
-export function useUpdateConversationTitle(chat: ChatHistoryItem) {
+export function useUpdateConversationTitle() {
   const { history, refreshChatItem } = useChatHistory()
 
-  return useQuery({
-    queryKey: ['update-conversation', chat.id],
-    queryFn: async () => {
-      const updatedConversation = await refreshChatItem(chat.id)
+  return useMutation({
+    mutationKey: ['update-conversation-title'],
+    mutationFn: async (chatId: string) => {
+      const updatedConversation = await refreshChatItem(chatId)
 
       // If the title is still "New Conversation", consider it not ready
       if (!updatedConversation || updatedConversation.title === NEW_CONVERSATION_TITLE) {
         throw new Error('Conversation title not yet updated')
       }
 
-      Sentry.captureMessage(`Update conversation ${chat.id} from HistoryItem`)
+      Sentry.captureMessage(`Update conversation ${chatId} from HistoryItem`)
       return updatedConversation
     },
-    enabled: chat.id === history?.[0].id && chat.title === NEW_CONVERSATION_TITLE,
     retry: RETRY_ATTEMPTS,
     retryDelay: (attemptIndex) => {
       // Exponential backoff: 5s, 10s, 20s, 20s
       return Math.min(5000 * 2 ** attemptIndex, 20000)
     },
-    staleTime: 60 * 1000,
+    // enabled: chat.id === history?.[0].id && chat.title === NEW_CONVERSATION_TITLE,
+    // staleTime: 60 * 1000,
   })
 }
 
@@ -60,7 +60,7 @@ export function useAddNewChat(chatId: ChatHistoryItem['id'] | undefined) {
       return newConversation
     },
     onSuccess: () => {
-      console.log('Updated conversation:', chatId)
+      console.log('Added new conversation:', chatId)
     },
     retry: RETRY_ATTEMPTS,
     retryDelay: (attemptIndex) => {
