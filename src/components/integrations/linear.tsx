@@ -88,7 +88,27 @@ export function LinearTicketFormComponent({
       setLinearTeams(teams.nodes)
     }
 
+    async function getLinearWorkflows() {
+      if (!client.current) {
+        return
+      }
+
+      const workflows = await client.current.workflowStates()
+      console.log('workflows', workflows.nodes)
+    }
+
+    async function getLinearAssignees() {
+      if (!client.current) {
+        return
+      }
+
+      const assignees = await client.current.users()
+      console.log('assignees', assignees.nodes)
+    }
+
     getLinearTeams()
+    getLinearWorkflows()
+    getLinearAssignees()
   }, [linearApiToken])
 
   useEffect(() => {
