@@ -7,14 +7,16 @@ import { Clock, Trash } from 'iconsax-react'
 import { useStore } from '@/providers/store-provider'
 import { ChatHistoryItem } from '@/types'
 import ContextMenu from '@/components/ContextMenu/ContextMenu'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import CircleButton from '@/components/CircleButton/CircleButton'
 import { trackEvent } from '@/utils/amplitude'
 import { useApi } from '@/hooks/useApi'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
-import { useAddNewChat, useHistory, useUpdateConversationTitle } from './hooks'
+import { NEW_CONVERSATION_TITLE, useAddNewChat, useHistory, useUpdateConversationTitle } from './hooks'
 import { sortArrayByDate } from './utils'
+
+const CONVERSATION_FETCH_DELAY = 2 * 1000
 
 type HistorySidebarItemProps = {
   chat: ChatHistoryItem
@@ -32,7 +34,8 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
       addOrUpdateOpenConversation: state.addOrUpdateOpenConversation,
     })),
   )
-  useUpdateConversationTitle(chat)
+  const { history } = useChatHistory()
+  const { mutate: updateConversationTitle } = useUpdateConversationTitle()
 
   const handleOpenChat = async (chat: ChatHistoryItem) => {
     if (typeof onOpenChat === 'function') {
@@ -62,6 +65,15 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
       onSelect()
     }
   }
+
+  useEffect(() => {
+    if (chat.id === history?.[0].id && chat.title === NEW_CONVERSATION_TITLE) {
+      const timeout = setTimeout(() => {
+        updateConversationTitle(chat.id)
+      }, CONVERSATION_FETCH_DELAY)
+      return () => clearTimeout(timeout)
+    }
+  }, [chat, history])
 
   return (
     <ContextMenu
@@ -171,7 +183,10 @@ export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarPr
   // Handle fetching history, and detecting new chats to fetch
   useEffect(() => {
     if (conversationId && !history.some((chat) => chat.id === conversationId)) {
-      addNewChat()
+      const timeout = setTimeout(() => {
+        addNewChat()
+      }, CONVERSATION_FETCH_DELAY)
+      return () => clearTimeout(timeout)
     }
   }, [history, conversationId])
 
