@@ -2,19 +2,21 @@ import React from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { useCreateLinearTicket, useLinearAssignees, useLinearClient, useLinearWorkflows } from './hooks'
+import { useCreateLinearTicket, useLinearAssignees, useLinearWorkflowStates } from './hooks'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import Button from '@/components/Button/Button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { cn } from '@/lib/utils'
+import { AnimatePresence, motion } from 'framer-motion'
+import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
+import { LinearIcon } from '@/icons/icons'
 
 const linearTicketFormSchema = z.object({
   title: z.string().min(1),
   description: z.string(),
-  status: z.string(),
-  assignee: z.string(),
+  status: z.string().optional(),
+  assignee: z.string().optional(),
 })
 
 export type LinearTicketFormData = z.infer<typeof linearTicketFormSchema>
@@ -22,12 +24,12 @@ export type LinearTicketFormData = z.infer<typeof linearTicketFormSchema>
 interface LinearTicketFormProps {
   title: string
   description: string
-  onSubmitSuccess?: (issueUrl: string) => void
+  onSubmitSuccess?: (url: string) => void
 }
 
 export function LinearTicketForm({ title, description, onSubmitSuccess }: LinearTicketFormProps) {
-  const { mutate: createLinearTicket } = useCreateLinearTicket(onSubmitSuccess)
-  const { data: workflows } = useLinearWorkflows()
+  const { mutate: createLinearTicket, isPending } = useCreateLinearTicket(onSubmitSuccess)
+  const { data: workflowStates } = useLinearWorkflowStates()
   const { data: assignees } = useLinearAssignees()
 
   const form = useForm<z.infer<typeof linearTicketFormSchema>>({
@@ -35,6 +37,8 @@ export function LinearTicketForm({ title, description, onSubmitSuccess }: Linear
     defaultValues: {
       title,
       description: description + '\n\nCreated with [Highlight](https://highlightai.com)',
+      status: '',
+      assignee: '',
     },
   })
 
@@ -45,7 +49,6 @@ export function LinearTicketForm({ title, description, onSubmitSuccess }: Linear
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-        <p className="text-[15px] font-normal text-primary">I will help you create a linear issue:</p>
         <FormField
           control={form.control}
           name="title"
@@ -74,34 +77,68 @@ export function LinearTicketForm({ title, description, onSubmitSuccess }: Linear
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="status"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Status</FormLabel>
-              <FormControl>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger value={field.value}>
-                    <SelectValue placeholder="Select your status" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-64" sideOffset={4}>
-                    {assignees
-                      ? assignees.map((assignee) => (
+        <div className="grid grid-cols-2 gap-3">
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Status</FormLabel>
+                <FormControl>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger value={field.value}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-64" sideOffset={4}>
+                      {workflowStates?.map((state) => (
+                        <SelectItem key={state.id} value={state.id}>
+                          {state.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="assignee"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Assignee</FormLabel>
+                <FormControl>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger value={field.value}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-64" sideOffset={4}>
+                      {assignees?.map((assignee) => (
                         <SelectItem key={assignee.id} value={assignee.id}>
                           {assignee.name}
                         </SelectItem>
-                      ))
-                      : 'No assignees found'}
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-        <Button size={'medium'} variant={'primary'} type={'submit'}>
+        <Button size={'medium'} variant={'accent'} type={'submit'} disabled={isPending} style={{ gap: 8 }}>
+          <AnimatePresence initial={false} mode="popLayout">
+            <motion.span
+              key={isPending ? 'true' : 'false'}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+            >
+              {isPending ? <LoadingSpinner size={'20px'} /> : <LinearIcon size={20} />}
+            </motion.span>
+          </AnimatePresence>
           Create Issue
         </Button>
       </form>

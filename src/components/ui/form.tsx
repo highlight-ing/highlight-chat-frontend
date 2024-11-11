@@ -60,7 +60,6 @@ const useFormField = () => {
 type FormItemContextValue = {
   id: string
 }
-//focus:[&>[data-slot=input]]:pt-7
 
 const FormItemContext = React.createContext<FormItemContextValue>({} as FormItemContextValue)
 
@@ -88,15 +87,14 @@ const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
 >(({ className, ...props }, ref) => {
-  const { error, formItemId, value } = useFormField()
+  const { error, formItemId } = useFormField()
 
   return (
     <Label
       ref={ref}
       data-slot="label"
       className={cn(
-        'pointer-events-none absolute left-3 top-2 z-10 text-[13px] font-semibold text-tertiary opacity-0 transition-opacity group-focus-within:opacity-100 group-data-[state=open]:opacity-100',
-        value && 'opacity-100',
+        'pointer-events-none absolute left-3 top-2 z-10 text-[13px] font-semibold text-tertiary',
         error && 'text-red-500 dark:text-red-900',
         className,
       )}

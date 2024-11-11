@@ -110,11 +110,6 @@ const HighlightChat = () => {
         <ChatHeader isShowing={!isConversationLoading && !!promptApp && messages.length === 0} />
         {(isChatting || (isConversationLoading && messages.length > 0)) && <Messages />}
         {isConversationLoading && messages.length === 0 && !inputIsDisabled && <MessagesPlaceholder />}
-
-        <div className="w-full">
-          <LinearTicketForm title="New ticket" description="A description" />
-        </div>
-
         <ChatHome isShowing={!isChatting && !promptApp && !isConversationLoading} />
         {(isChatting || promptApp) && <Input isActiveChat={true} />}
         <IntercomChat />

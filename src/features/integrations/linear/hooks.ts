@@ -54,19 +54,19 @@ export function useLinearTeams() {
   })
 }
 
-export function useLinearWorkflows() {
+export function useLinearWorkflowStates() {
   const { data: client } = useLinearClient()
 
   return useQuery({
-    queryKey: ['linearWorkflows'],
+    queryKey: ['linearWorkflowStates'],
     queryFn: async () => {
       if (!client) {
         throw new Error('No Linear client available')
       }
 
-      const workflows = await client.workflowStates()
+      const workflowStates = await client.workflowStates()
 
-      return workflows.nodes
+      return workflowStates.nodes
     },
     enabled: !!client,
   })
@@ -90,7 +90,7 @@ export function useLinearAssignees() {
   })
 }
 
-export function useCreateLinearTicket(onSubmitSuccess: (url: string) => void) {
+export function useCreateLinearTicket(onSubmitSuccess: ((url: string) => void) | undefined) {
   const { data: client } = useLinearClient()
   const { data: teams } = useLinearTeams()
 
@@ -103,11 +103,25 @@ export function useCreateLinearTicket(onSubmitSuccess: (url: string) => void) {
         throw new Error('No team found')
       }
 
-      const issuePayload = await client?.createIssue({
+      let payload = {
         teamId: team.id,
         title: data.title,
         description: data.description,
-      })
+      }
+
+      if (data.assignee) {
+        payload = Object.assign(payload, {
+          assigneeId: data.assignee,
+        })
+      }
+
+      if (data.status) {
+        payload = Object.assign(payload, {
+          stateId: data.status,
+        })
+      }
+
+      const issuePayload = await client?.createIssue(payload)
 
       const issueUrl = (await issuePayload?.issue)?.url
 
@@ -118,7 +132,7 @@ export function useCreateLinearTicket(onSubmitSuccess: (url: string) => void) {
       return issueUrl
     },
     onSuccess: (issueUrl) => {
-      onSubmitSuccess(issueUrl)
+      if (onSubmitSuccess) onSubmitSuccess(issueUrl)
     },
     onError: (error) => {
       console.warn(error.message)
