@@ -11,7 +11,6 @@ import useForkDefaultAction from './useForkDefaultAction'
 import { useIntegration } from './useIntegration'
 import usePromptApps from './usePromptApps'
 import { useRouter } from 'next/navigation'
-import { trackEvent } from '@/utils/amplitude'
 import * as Sentry from '@sentry/nextjs'
 
 const useOnExternalMessage = () => {
@@ -179,6 +178,18 @@ const useOnExternalMessage = () => {
         }
       } else if (message.type === 'use-prompt') {
         selectPrompt(message.prompt.external_id, true, true)
+      } else if (message.type === 'edit-prompt') {
+        console.log('Edit prompt message received for prompt:', message.prompt)
+        const openEditPromptModal = () => {
+          closeAllModals()
+          openModal('edit-prompt', { prompt: message.prompt })
+        }
+        
+        if (isModalOpen('edit-prompt')) {
+          openModal('unsaved-changes', { onContinue: openEditPromptModal })
+        } else {
+          openEditPromptModal()
+        }
       } else {
         console.log('Unknown message type received:', JSON.stringify(message, null, 2))
       }
