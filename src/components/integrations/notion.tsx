@@ -8,7 +8,7 @@ import { getNotionTokenForUser, getNotionParentItems, createNotionPage } from '@
 import { Text } from 'react-notion-x'
 import { NotionParentItem } from '@/types'
 import { ArrowDown2, ArrowUp2, Grid6, Document } from 'iconsax-react'
-import { emptyTextBlock, getDecorations, mapNotionDecorations } from '@/utils/notion'
+import { emptyTextBlock, getDecorations } from '@/utils/notion'
 import Markdown from 'react-markdown'
 import styles from '../TextInput/inputfield.module.scss'
 import NotionDropdown from '../dropdowns/notion/notion-dropdown'
