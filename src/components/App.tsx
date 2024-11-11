@@ -35,7 +35,7 @@ function useContextReceivedHandler(navigateToNewChat: () => void) {
     useShallow((state) => ({
       addAttachment: state.addAttachment,
       setHighlightContext: state.setHighlightContext,
-      setInput: state.setInput,
+      setInput: state.setInputOverride,
       promptApp: state.promptApp,
       startNewConversation: state.startNewConversation,
       setPrompt: state.setPrompt,

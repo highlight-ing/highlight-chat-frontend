@@ -188,7 +188,7 @@ export const useSubmitQuery = () => {
     })),
   )
 
-  const setInput = useStore((state) => state.setInput)
+  const setInput = useStore((state) => state.setInputOverride)
   const conversationId = useStore((state) => state.conversationId)
   const conversationIdRef = useRef(conversationId)
   const abortControllerRef = useRef<AbortController>()
@@ -269,7 +269,7 @@ export const useSubmitQuery = () => {
     conversationId: string,
     formData: FormData,
     isPromptApp: boolean,
-    promptApp?: Prompt,
+    promptApp?: Prompt | null,
     toolOverrides?: ToolOverrides,
   ) => {
     setInputIsDisabled(true)
@@ -592,7 +592,7 @@ export const useSubmitQuery = () => {
 
   const handleSubmit = async (
     input: string,
-    promptApp?: Prompt,
+    promptApp?: Prompt | null,
     context?: { image?: string; window_context?: string; conversation?: ConversationAttachment },
     toolOverrides?: ToolOverrides,
   ) => {

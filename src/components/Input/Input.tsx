@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Attachment } from '../Attachment'
 import { Attachment as AttachmentType, isFileAttachmentType } from '@/types'
-import { useSubmitQuery } from '../../hooks/useSubmitQuery'
+import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 import { useStore } from '@/providers/store-provider'
 import styles from './chatinput.module.scss'
 import { getDisplayValue } from '@/utils/attachments'
@@ -25,18 +25,29 @@ const MAX_INPUT_HEIGHT = 160
  * This is the main Highlight Chat input box, not a reusable Input component.
  */
 export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
-  const { attachments, inputIsDisabled, promptName, promptApp, removeAttachment, fileInputRef, isConversationLoading } =
-    useStore(
-      useShallow((state) => ({
-        attachments: state.attachments,
-        inputIsDisabled: state.inputIsDisabled,
-        promptName: state.promptName,
-        promptApp: state.promptApp,
-        removeAttachment: state.removeAttachment,
-        fileInputRef: state.fileInputRef,
-        isConversationLoading: state.isConversationLoading,
-      })),
-    )
+  const {
+    attachments,
+    inputOverride,
+    setInputOverride,
+    inputIsDisabled,
+    promptName,
+    promptApp,
+    removeAttachment,
+    fileInputRef,
+    isConversationLoading,
+  } = useStore(
+    useShallow((state) => ({
+      attachments: state.attachments,
+      inputIsDisabled: state.inputIsDisabled,
+      inputOverride: state.inputOverride,
+      setInputOverride: state.setInputOverride,
+      promptName: state.promptName,
+      promptApp: state.promptApp,
+      removeAttachment: state.removeAttachment,
+      fileInputRef: state.fileInputRef,
+      isConversationLoading: state.isConversationLoading,
+    })),
+  )
   const { handleSubmit } = useSubmitQuery()
   const [isInputFocused, setIsInputFocused] = useState(false)
   const [input, setInput] = useState('')
@@ -117,6 +128,13 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
       inputRef.current.style.height = newHeight + 'px'
     }
   }, [inputRef, input])
+
+  useEffect(() => {
+    if (inputOverride && inputOverride?.length > 0 && input !== inputOverride) {
+      setInput(inputOverride)
+      setInputOverride(null)
+    }
+  }, [input, inputOverride])
 
   const handleNonInputFocus = () => {
     if (inputBlurTimeoutRef.current) {
