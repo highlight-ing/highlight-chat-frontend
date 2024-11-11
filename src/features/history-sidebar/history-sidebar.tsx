@@ -1,4 +1,4 @@
-import styles from './history.module.scss'
+import styles from './history-sidebar.module.scss'
 import variables from '@/variables.module.scss'
 import * as React from 'react'
 import { useChatHistory } from '@/hooks/useChatHistory'
@@ -14,52 +14,110 @@ import { trackEvent } from '@/utils/amplitude'
 import { useApi } from '@/hooks/useApi'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 import { useAddNewChat, useHistory, useUpdateConversationTitle } from './hooks'
+import { sortArrayByDate } from './utils'
 
-interface HistoryProps {
+type HistorySidebarItemProps = {
+  chat: ChatHistoryItem
+  isSelecting?: boolean
+  isSelected?: boolean
+  onSelect?: () => void
+  onOpenChat?: () => void
+}
+
+function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenChat }: HistorySidebarItemProps) {
+  const { addOrUpdateOpenConversation, openModal, setConversationId } = useStore(
+    useShallow((state) => ({
+      setConversationId: state.setConversationId,
+      openModal: state.openModal,
+      addOrUpdateOpenConversation: state.addOrUpdateOpenConversation,
+    })),
+  )
+  useUpdateConversationTitle(chat)
+
+  const handleOpenChat = async (chat: ChatHistoryItem) => {
+    if (typeof onOpenChat === 'function') {
+      onOpenChat()
+    }
+    addOrUpdateOpenConversation(chat)
+    setConversationId(chat.id)
+
+    // @TODO move to use chat loading hook
+    trackEvent('HL Chat Opened', {
+      chatId: chat.id,
+      // messageCount: messages.length,
+      source: 'history_item',
+    })
+  }
+
+  const onDeleteChat = async (chat: ChatHistoryItem) => {
+    openModal('delete-chat', chat)
+    trackEvent('HL Chat Delete Initiated', {
+      chatId: chat.id,
+      source: 'history',
+    })
+  }
+
+  const handleSelectChat = () => {
+    if (typeof onSelect === 'function') {
+      onSelect()
+    }
+  }
+
+  return (
+    <ContextMenu
+      key={`menu-${chat.id}`}
+      items={[
+        {
+          label: 'Open Chat',
+          onClick: () => {
+            handleOpenChat(chat)
+            trackEvent('HL Chat Opened', {
+              chatId: chat.id,
+              source: 'context_menu',
+            })
+          },
+        },
+        { divider: true },
+        {
+          label: <span className="text-red-400">Delete Chat</span>,
+          onClick: () => onDeleteChat(chat),
+        },
+      ]}
+      position={'bottom'}
+      triggerId={`chat-${chat.id}`}
+      wrapperStyle={{ position: 'relative', width: '100%' }}
+    >
+      {isSelecting && (
+        <div className={`${styles.selector} ${isSelected ? styles.selected : ''}`} onClick={handleSelectChat} />
+      )}
+      <div
+        key={chat.id}
+        id={`chat-${chat.id}`}
+        className={`${styles.chat} ${isSelecting ? styles.selecting : ''}`}
+        onClick={() => (isSelecting ? handleSelectChat() : handleOpenChat(chat))}
+      >
+        <span className={styles.chatText}>
+          {chat.title.charAt(0) === '"' && chat.title.charAt(chat.title.length - 1) === '"'
+            ? chat.title.substring(1, chat.title.length - 1)
+            : chat.title}
+        </span>
+      </div>
+    </ContextMenu>
+  )
+}
+
+type HistorySidebarProps = {
   showHistory: boolean
   setShowHistory: (showHistory: boolean) => void
 }
 
-function sortArrayByDate(inputArray: ChatHistoryItem[]) {
-  const now = new Date()
-  const oneDayAgo = new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000)
-  const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-  const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
-
-  const today: ChatHistoryItem[] = []
-  const lastWeek: ChatHistoryItem[] = []
-  const lastMonth: ChatHistoryItem[] = []
-  const older: ChatHistoryItem[] = []
-
-  inputArray.forEach((item) => {
-    const createdAt = new Date(item.updated_at)
-
-    if (createdAt >= oneDayAgo) {
-      today.push(item)
-    } else if (createdAt >= oneWeekAgo) {
-      lastWeek.push(item)
-    } else if (createdAt >= oneMonthAgo) {
-      lastMonth.push(item)
-    } else {
-      older.push(item)
-    }
-  })
-
-  return {
-    today,
-    lastWeek,
-    lastMonth,
-    older,
-  }
-}
-
-const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: HistoryProps) => {
+export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarProps) {
   const { deleteRequest } = useApi()
   const conversationId = useStore((state) => state.conversationId)
   const startNewConversation = useStore((state) => state.startNewConversation)
   const removeOpenConversation = useStore((state) => state.removeOpenConversation)
   const setHistory = useStore((state) => state.setHistory)
-  const { history, refreshChatHistory, refreshChatItem } = useChatHistory()
+  const { history, refreshChatHistory } = useChatHistory()
   const [isSelecting, setIsSelecting] = useState(false)
   const [selectedHistoryItems, setSelectedHistoryItems] = useState<string[]>([])
   const [isDeleting, setIsDeleting] = useState(false)
@@ -154,7 +212,7 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
                   </div>
                 </div>
                 {today.map((chat) => (
-                  <HistoryItem
+                  <HistorySidebarItem
                     key={chat.id}
                     chat={chat}
                     onOpenChat={onOpenChat}
@@ -174,7 +232,7 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
                   </div>
                 </div>
                 {lastWeek.map((chat) => (
-                  <HistoryItem
+                  <HistorySidebarItem
                     key={chat.id}
                     chat={chat}
                     onOpenChat={onOpenChat}
@@ -194,7 +252,7 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
                   </div>
                 </div>
                 {lastMonth.map((chat) => (
-                  <HistoryItem
+                  <HistorySidebarItem
                     key={chat.id}
                     chat={chat}
                     onOpenChat={onOpenChat}
@@ -214,7 +272,7 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
                   </div>
                 </div>
                 {older.map((chat) => (
-                  <HistoryItem
+                  <HistorySidebarItem
                     key={chat.id}
                     chat={chat}
                     onOpenChat={onOpenChat}
@@ -247,97 +305,5 @@ const History: React.FC<HistoryProps> = ({ showHistory, setShowHistory }: Histor
         )}
       </div>
     </div>
-  )
-}
-
-export default History
-
-interface HistoryItemProps {
-  chat: ChatHistoryItem
-  isSelecting?: boolean
-  isSelected?: boolean
-  onSelect?: () => void
-  onOpenChat?: () => void
-}
-
-const HistoryItem = ({ chat, isSelecting, isSelected, onSelect, onOpenChat }: HistoryItemProps) => {
-  const { addOrUpdateOpenConversation, openModal, setConversationId } = useStore(
-    useShallow((state) => ({
-      setConversationId: state.setConversationId,
-      openModal: state.openModal,
-      addOrUpdateOpenConversation: state.addOrUpdateOpenConversation,
-    })),
-  )
-  useUpdateConversationTitle(chat)
-
-  const handleOpenChat = async (chat: ChatHistoryItem) => {
-    if (typeof onOpenChat === 'function') {
-      onOpenChat()
-    }
-    addOrUpdateOpenConversation(chat)
-    setConversationId(chat.id)
-
-    // @TODO move to use chat loading hook
-    trackEvent('HL Chat Opened', {
-      chatId: chat.id,
-      // messageCount: messages.length,
-      source: 'history_item',
-    })
-  }
-
-  const onDeleteChat = async (chat: ChatHistoryItem) => {
-    openModal('delete-chat', chat)
-    trackEvent('HL Chat Delete Initiated', {
-      chatId: chat.id,
-      source: 'history',
-    })
-  }
-
-  const handleSelectChat = () => {
-    if (typeof onSelect === 'function') {
-      onSelect()
-    }
-  }
-
-  return (
-    <ContextMenu
-      key={`menu-${chat.id}`}
-      items={[
-        {
-          label: 'Open Chat',
-          onClick: () => {
-            handleOpenChat(chat)
-            trackEvent('HL Chat Opened', {
-              chatId: chat.id,
-              source: 'context_menu',
-            })
-          },
-        },
-        { divider: true },
-        {
-          label: <span className="text-red-400">Delete Chat</span>,
-          onClick: () => onDeleteChat(chat),
-        },
-      ]}
-      position={'bottom'}
-      triggerId={`chat-${chat.id}`}
-      wrapperStyle={{ position: 'relative', width: '100%' }}
-    >
-      {isSelecting && (
-        <div className={`${styles.selector} ${isSelected ? styles.selected : ''}`} onClick={handleSelectChat} />
-      )}
-      <div
-        key={chat.id}
-        id={`chat-${chat.id}`}
-        className={`${styles.chat} ${isSelecting ? styles.selecting : ''}`}
-        onClick={() => (isSelecting ? handleSelectChat() : handleOpenChat(chat))}
-      >
-        <span className={styles.chatText}>
-          {chat.title.charAt(0) === '"' && chat.title.charAt(chat.title.length - 1) === '"'
-            ? chat.title.substring(1, chat.title.length - 1)
-            : chat.title}
-        </span>
-      </div>
-    </ContextMenu>
   )
 }

@@ -6,7 +6,6 @@ import { Input } from '@/components/Input/Input'
 import styles from '@/main.module.scss'
 import TopBar from '@/components/Navigation/TopBar'
 import Messages from '@/components/Messages/Messages'
-import History from '@/components/History/History'
 import { useStore } from '@/providers/store-provider'
 import { ChatHome } from '@/components/ChatHome/ChatHome'
 import ChatHeader from '@/components/ChatHeader/ChatHeader'
@@ -20,6 +19,7 @@ import { useOnPromptChange } from '@/hooks/useOnPromptChange'
 import useOnExternalMessage from '@/hooks/useOnExternalMessage'
 import { useOnPromptLoad } from '@/hooks/useOnPromptLoad'
 import IntercomChat from '../intercom-chat'
+import { HistorySidebar } from '@/features/history-sidebar/history-sidebar'
 
 /**
  * Hook that handles pasting from the clipboard.
@@ -101,7 +101,7 @@ const HighlightChat = () => {
 
   return (
     <div className={styles.page}>
-      <History showHistory={showHistory} setShowHistory={setShowHistory} />
+      <HistorySidebar showHistory={showHistory} setShowHistory={setShowHistory} />
       <TopBar showHistory={showHistory} setShowHistory={setShowHistory} />
       <div
         className={`${styles.contents} ${showHistory ? styles.partial : styles.full} ${messages.length > 0 || inputIsDisabled || !!promptApp ? styles.justifyEnd : ''}`}
