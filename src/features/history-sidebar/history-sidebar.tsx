@@ -7,13 +7,13 @@ import { Clock, Trash } from 'iconsax-react'
 import { useStore } from '@/providers/store-provider'
 import { ChatHistoryItem } from '@/types'
 import ContextMenu from '@/components/ContextMenu/ContextMenu'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import CircleButton from '@/components/CircleButton/CircleButton'
 import { trackEvent } from '@/utils/amplitude'
 import { useApi } from '@/hooks/useApi'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
-import { useAddNewChat, useHistory, useUpdateConversationTitle } from './hooks'
+import { NEW_CONVERSATION_TITLE, useAddNewChat, useHistory, useUpdateConversationTitle } from './hooks'
 import { sortArrayByDate } from './utils'
 
 type HistorySidebarItemProps = {
@@ -32,7 +32,9 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
       addOrUpdateOpenConversation: state.addOrUpdateOpenConversation,
     })),
   )
-  useUpdateConversationTitle(chat)
+  const { history } = useChatHistory()
+  const { mutate: updateConversationTitle } = useUpdateConversationTitle()
+  const initialFetchDone = useRef(false)
 
   const handleOpenChat = async (chat: ChatHistoryItem) => {
     if (typeof onOpenChat === 'function') {
@@ -62,6 +64,16 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
       onSelect()
     }
   }
+
+  useEffect(() => {
+    if (chat.id === history?.[0].id && chat.title === NEW_CONVERSATION_TITLE && !initialFetchDone.current) {
+      const timeout = setTimeout(() => {
+        updateConversationTitle(chat.id)
+        initialFetchDone.current = true
+      }, 3000)
+      return () => clearTimeout(timeout)
+    }
+  }, [chat, history])
 
   return (
     <ContextMenu
