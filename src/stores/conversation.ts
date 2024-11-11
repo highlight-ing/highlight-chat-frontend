@@ -47,7 +47,7 @@ export const createConversationSlice: StateCreator<Store, [], [], ConversationSl
   },
   startNewConversation: () => {
     get().resetConversationId()
-    get().clearInput()
+    get().clearInputOverride()
     get().clearAttachments()
   },
   getConversationId: () => get().conversationId,
@@ -83,11 +83,11 @@ export const createConversationSlice: StateCreator<Store, [], [], ConversationSl
     const updatedConversations = conversations.map((conv) =>
       conv.id === conversationId
         ? {
-          ...conv,
-          shared_conversations: shareId
-            ? [{ created_at: new Date().toISOString(), id: shareId, title: conv.title }]
-            : [],
-        }
+            ...conv,
+            shared_conversations: shareId
+              ? [{ created_at: new Date().toISOString(), id: shareId, title: conv.title }]
+              : [],
+          }
         : conv,
     )
     set({ openConversations: updatedConversations })
@@ -97,11 +97,11 @@ export const createConversationSlice: StateCreator<Store, [], [], ConversationSl
     const updatedHistory = history.map((conv) =>
       conv.id === conversationId
         ? {
-          ...conv,
-          shared_conversations: shareId
-            ? [{ created_at: new Date().toISOString(), id: shareId, title: conv.title }]
-            : [],
-        }
+            ...conv,
+            shared_conversations: shareId
+              ? [{ created_at: new Date().toISOString(), id: shareId, title: conv.title }]
+              : [],
+          }
         : conv,
     )
     set({ history: updatedHistory })

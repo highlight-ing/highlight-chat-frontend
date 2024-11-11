@@ -27,13 +27,11 @@ const useOnExternalMessage = () => {
   const { addToast } = useStore((state) => ({
     addToast: state.addToast,
   }))
-  const { addAttachment } = useStore((state) => ({
-    addAttachment: state.addAttachment,
-  }))
+  const addAttachment = useStore((state) => state.addAttachment)
   const { handleSubmit } = useSubmitQuery()
   const { forkDefaultAction } = useForkDefaultAction()
   const { createAction } = useIntegration()
-  const { selectPrompt, refreshPinnedPrompts } = usePromptApps()
+  const { selectPrompt, refreshPinnedPrompts, getPrompt } = usePromptApps()
 
   useEffect(() => {
     const removeListener = Highlight.app.addListener('onExternalMessage', async (caller: string, message: any) => {
@@ -47,7 +45,6 @@ const useOnExternalMessage = () => {
 
       if (message.conversationId) {
         console.log('Opening conversation from external event:', message.conversationId)
-        Sentry.captureMessage(`Update conversation ${message.conversationId} from useOnExternalMessage`)
         const conversation = await refreshChatItem(message.conversationId, true)
         if (!conversation) {
           console.error('Failed to open conversation from external event:', message.conversationId)
@@ -57,12 +54,14 @@ const useOnExternalMessage = () => {
         setConversationId(message.conversationId)
 
         console.log('Refetching chat history from external message')
-        Sentry.captureMessage(`Fetch chat history from useOnExternalMessage`)
         await refreshChatHistory()
 
-        console.log(message.toolUse, message.toolUse?.type)
-        // Handle toolUse if present
-        if (message.toolUse && message.toolUse.type === 'tool_use') {
+        if (message.userInput?.length > 0) {
+          // Handle user input from floaty
+          const prompt = await getPrompt(message.prompt?.external_id)
+          handleSubmit(message.userInput, prompt)
+        } else if (message.toolUse && message.toolUse.type === 'tool_use') {
+          // Handle tool use
           if (message.toolUse.name === 'get_more_context_from_window') {
             const contextGranted = await Highlight.permissions.requestWindowContextPermission()
             const screenshotGranted = await Highlight.permissions.requestScreenshotPermission()
