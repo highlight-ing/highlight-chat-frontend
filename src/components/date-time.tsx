@@ -139,7 +139,7 @@ export default function TimeSelect(props: TimeSelectProps) {
 }
 
 type DateTimePickerProps = {
-  dateIso: string | undefined
+  defaultDateIso: string | undefined
   onChange: (dateTime: Date) => void
   dateFieldLabel?: string
   timeFieldLabel?: string

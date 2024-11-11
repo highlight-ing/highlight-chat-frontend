@@ -89,13 +89,13 @@ export function GcalEventFormComponent({
         <DateTimePicker
           dateFieldLabel="Start Date"
           timeFieldLabel="Start Time"
-          dateIso={new Date().toISOString()}
+          defaultDateIso={data.start}
           onChange={onStartDateChange}
         />
         <DateTimePicker
           dateFieldLabel="End Date"
           timeFieldLabel="End Time"
-          dateIso={new Date(new Date().setHours(15)).toISOString()}
+          defaultDateIso={data.end}
           onChange={onEndDateChange}
         />
       </div>
