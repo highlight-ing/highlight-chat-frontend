@@ -16,6 +16,8 @@ import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 import { NEW_CONVERSATION_TITLE, useAddNewChat, useHistory, useUpdateConversationTitle } from './hooks'
 import { sortArrayByDate } from './utils'
 
+const CONVERSATION_FETCH_DELAY = 2 * 1000
+
 type HistorySidebarItemProps = {
   chat: ChatHistoryItem
   isSelecting?: boolean
@@ -34,7 +36,6 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
   )
   const { history } = useChatHistory()
   const { mutate: updateConversationTitle } = useUpdateConversationTitle()
-  const initialFetchDone = useRef(false)
 
   const handleOpenChat = async (chat: ChatHistoryItem) => {
     if (typeof onOpenChat === 'function') {
@@ -66,11 +67,10 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
   }
 
   useEffect(() => {
-    if (chat.id === history?.[0].id && chat.title === NEW_CONVERSATION_TITLE && !initialFetchDone.current) {
+    if (chat.id === history?.[0].id && chat.title === NEW_CONVERSATION_TITLE) {
       const timeout = setTimeout(() => {
         updateConversationTitle(chat.id)
-        initialFetchDone.current = true
-      }, 3000)
+      }, CONVERSATION_FETCH_DELAY)
       return () => clearTimeout(timeout)
     }
   }, [chat, history])
@@ -183,7 +183,10 @@ export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarPr
   // Handle fetching history, and detecting new chats to fetch
   useEffect(() => {
     if (conversationId && !history.some((chat) => chat.id === conversationId)) {
-      addNewChat()
+      const timeout = setTimeout(() => {
+        addNewChat()
+      }, CONVERSATION_FETCH_DELAY)
+      return () => clearTimeout(timeout)
     }
   }, [history, conversationId])
 
