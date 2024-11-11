@@ -66,7 +66,7 @@ export function useLinearWorkflowStates() {
 
       const workflowStates = await client.workflowStates()
 
-      return workflowStates.nodes
+      return workflowStates.nodes.sort((a, b) => a.position - b.position)
     },
     enabled: !!client,
   })
@@ -84,7 +84,7 @@ export function useLinearAssignees() {
 
       const assignees = await client.users()
 
-      return assignees.nodes.filter((assignee) => assignee.active)
+      return assignees.nodes.sort((a, b) => a.displayName.localeCompare(b.displayName))
     },
     enabled: !!client,
   })

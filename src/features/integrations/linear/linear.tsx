@@ -27,7 +27,7 @@ interface LinearTicketFormProps {
   onSubmitSuccess?: (url: string) => void
 }
 
-export function LinearTicketForm({ title, description, onSubmitSuccess }: LinearTicketFormProps) {
+function LinearTicketForm({ title, description, onSubmitSuccess }: LinearTicketFormProps) {
   const { mutate: createLinearTicket, isPending } = useCreateLinearTicket(onSubmitSuccess)
   const { data: workflowStates } = useLinearWorkflowStates()
   const { data: assignees } = useLinearAssignees()
@@ -116,7 +116,7 @@ export function LinearTicketForm({ title, description, onSubmitSuccess }: Linear
                     <SelectContent className="max-h-64" sideOffset={4}>
                       {assignees?.map((assignee) => (
                         <SelectItem key={assignee.id} value={assignee.id}>
-                          {assignee.name}
+                          {assignee.displayName}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -136,7 +136,13 @@ export function LinearTicketForm({ title, description, onSubmitSuccess }: Linear
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0, opacity: 0 }}
             >
-              {isPending ? <LoadingSpinner size={'20px'} /> : <LinearIcon size={20} />}
+              {isPending ? (
+                <LoadingSpinner size={'20px'} />
+              ) : (
+                <div className="size-5 overflow-hidden rounded-md">
+                  <LinearIcon size={20} />
+                </div>
+              )}
             </motion.span>
           </AnimatePresence>
           Create Issue
@@ -146,20 +152,40 @@ export function LinearTicketForm({ title, description, onSubmitSuccess }: Linear
   )
 }
 
-export function LinearTicketSuccessMessage({ issueUrl }: { issueUrl: string }) {
+type LinearTicketSuccessMessageProps = {
+  issueUrl: string
+  ticketTitle: string
+}
+
+function LinearTicketSuccessMessage(props: LinearTicketSuccessMessageProps) {
   return (
-    <>
-      Linear issue created:{' '}
-      <a href={issueUrl} target="_blank">
-        View Issue
+    <div className="flex flex-col gap-3">
+      <p>Linear issue created:</p>
+      <a href={props.issueUrl} target="_blank" style={{ textDecoration: 'none', cursor: 'pointer' }}>
+        <div className="flex h-[48px] w-fit items-center gap-2.5 text-nowrap rounded-[16px] border border-light-10 bg-secondary p-[5px] pr-2 text-base leading-none">
+          <div className="grid size-9 shrink-0 place-items-center rounded-[12px] bg-light-5 text-primary">
+            <div className="size-5 overflow-hidden rounded-md">
+              <LinearIcon size={20} />
+            </div>
+          </div>
+          <div className="">
+            <p className="truncate text-sm font-medium text-secondary">{props.ticketTitle}</p>
+            <p className="text-xs text-tertiary">Linear issue</p>
+          </div>
+        </div>
       </a>
-    </>
+    </div>
   )
 }
 
-export function CreateLinearTicket({ title, description }: { title: string; description: string }) {
+type CreateLinearTicketProps = {
+  title: string
+  description: string
+}
+
+export function CreateLinearTicket(props: CreateLinearTicketProps) {
   const [state, setState] = React.useState<'form' | 'success'>('form')
-  const [issueUrl, setIssueUrl] = React.useState<string>()
+  const [issueUrl, setIssueUrl] = React.useState('')
 
   function onSubmitSuccess(issueUrl: string) {
     setIssueUrl(issueUrl)
@@ -169,9 +195,9 @@ export function CreateLinearTicket({ title, description }: { title: string; desc
   return (
     <div className="mt-2">
       {state === 'form' && (
-        <LinearTicketForm title={title} description={description} onSubmitSuccess={onSubmitSuccess} />
+        <LinearTicketForm title={props.title} description={props.description} onSubmitSuccess={onSubmitSuccess} />
       )}
-      {state === 'success' && issueUrl && <LinearTicketSuccessMessage issueUrl={issueUrl} />}
+      {state === 'success' && issueUrl && <LinearTicketSuccessMessage issueUrl={issueUrl} ticketTitle={props.title} />}
     </div>
   )
 }
