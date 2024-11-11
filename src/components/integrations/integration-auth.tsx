@@ -40,10 +40,10 @@ export function SetupConnectionComponent({
 
   useEffect(() => {
     if (connectClicked) {
-      // Create an interval that checks the connection status every 5 seconds
+      // Create an interval that checks the connection status every 2 seconds
       const interval = setInterval(() => {
         _checkConnectionStatus()
-      }, 5000)
+      }, 2000)
 
       return () => clearInterval(interval)
     }

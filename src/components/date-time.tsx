@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { format } from 'date-fns'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -125,12 +125,16 @@ export default function TimeSelect(props: TimeSelectProps) {
   )
 }
 
-export function DateTimePicker() {
+export function DateTimePicker({ onChange }: { onChange: (startDateTime: Date, endDateTime: Date) => void }) {
   const [date, setDate] = React.useState<Date>()
   const [startDateTime, setStartDateTime] = React.useState<Date>()
   const [endDateTime, setEndDateTime] = React.useState<Date>()
 
-  console.log({ startDateTime, endDateTime })
+  useEffect(() => {
+    if (!startDateTime || !endDateTime) return
+
+    onChange(startDateTime, endDateTime)
+  }, [startDateTime, endDateTime])
 
   return (
     <div className="grid grid-cols-2 gap-2">

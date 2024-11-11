@@ -4,14 +4,23 @@ import { z } from 'zod'
 import InputField from '@/components/TextInput/InputField'
 import Button from '@/components/Button/Button'
 import { useEffect, useId, useState } from 'react'
-import { getNotionTokenForUser, getNotionParentItems, createNotionPage } from '@/utils/notion-server-actions'
+import {
+  getNotionTokenForUser,
+  getNotionParentItems,
+  createNotionPage,
+  checkNotionConnectionStatus,
+  createMagicLinkForNotion,
+} from '@/utils/notion-server-actions'
 import { Text } from 'react-notion-x'
 import { NotionParentItem } from '@/types'
 import { ArrowDown2, ArrowUp2, Grid6, Document } from 'iconsax-react'
 import { emptyTextBlock, getDecorations, mapNotionDecorations } from '@/utils/notion'
 import Markdown from 'react-markdown'
 import styles from '../TextInput/inputfield.module.scss'
+import { NotionIcon } from '@/icons/icons'
 import NotionDropdown from '../dropdowns/notion/notion-dropdown'
+import { SetupConnectionComponent } from './integration-auth'
+import { IntegrationsLoader } from './loader'
 
 interface CreateNotionPageComponentProps {
   title: string
@@ -185,7 +194,7 @@ function FormComponent({
 }
 
 export function CreateNotionPageComponent({ title, content }: CreateNotionPageComponentProps) {
-  const [state, setState] = useState<'form' | 'success'>('form')
+  const [state, setState] = useState<'loading' | 'connect' | 'form' | 'success'>('loading')
   const [url, setUrl] = useState<string | undefined>(undefined)
 
   function onSuccess(url?: string) {
@@ -193,8 +202,34 @@ export function CreateNotionPageComponent({ title, content }: CreateNotionPageCo
     setUrl(url)
   }
 
+  useEffect(() => {
+    async function checkConnection() {
+      //@ts-ignore
+      const hlToken = (await highlight.internal.getAuthorizationToken()) as string
+
+      const connected = await checkNotionConnectionStatus(hlToken)
+      if (connected) {
+        setState('form')
+      } else {
+        setState('connect')
+      }
+    }
+
+    checkConnection()
+  }, [])
+
   return (
     <div className="mt-2">
+      {state === 'loading' && <IntegrationsLoader />}
+      {state === 'connect' && (
+        <SetupConnectionComponent
+          name={'Notion'}
+          checkConnectionStatus={checkNotionConnectionStatus}
+          onConnect={() => setState('form')}
+          icon={<NotionIcon size={16} />}
+          createMagicLink={createMagicLinkForNotion}
+        />
+      )}
       {state === 'form' && <FormComponent title={title} content={content} onSuccess={onSuccess} />}
       {state === 'success' && url && (
         <span>
