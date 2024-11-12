@@ -3,7 +3,7 @@
 import Button from '@/components/Button/Button'
 import { ChatHistoryItem } from '@/types'
 import { ArrowDown2, EmojiHappy, Send2 } from 'iconsax-react'
-import { useCopyLink, useGenerateShareLink } from './hooks'
+import { useCopyLink, useDisableLink, useGenerateShareLink } from './hooks'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import React, { useEffect } from 'react'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
@@ -75,6 +75,27 @@ function CopyLinkButton(props: { shareLinkId: string }) {
   )
 }
 
+type DisableShareLinkButtonProps = {
+  conversationId: string
+}
+
+function DisableShareLinkButton(props: DisableShareLinkButtonProps) {
+  const { mutate: disableShareLink, isPending } = useDisableLink()
+
+  return (
+    <Button
+      size={'medium'}
+      variant={'tertiary'}
+      style={{ width: '100%' }}
+      disabled={isPending}
+      onClick={() => disableShareLink(props.conversationId)}
+    >
+      {isPending && <LoadingSpinner size={'20px'} />}
+      <span className="pl-2">{isPending ? 'Disabling links...' : 'Disable All Share Links'}</span>
+    </Button>
+  )
+}
+
 function ShareLinkModal(props: { conversation: ChatHistoryItem }) {
   const [open, setOpen] = React.useState(false)
 
@@ -122,9 +143,11 @@ function ShareLinkModal(props: { conversation: ChatHistoryItem }) {
           </div>
         ) : (
           <p className="text-sm font-medium text-subtle">
-            You haven&apos;t selected a props.conversation yet. Please select one and try sharing again.
+            You haven&apos;t selected a conversation yet. Please select one and try sharing again.
           </p>
         )}
+
+        {mostRecentShareLinkId && <DisableShareLinkButton conversationId={props.conversation.id} />}
       </PopoverContent>
     </Popover>
   )
