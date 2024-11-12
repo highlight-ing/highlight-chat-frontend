@@ -146,7 +146,9 @@ type DateTimePickerProps = {
 }
 
 export function DateTimePicker(props: DateTimePickerProps) {
-  const [date, setDate] = React.useState<Date | undefined>(props.dateIso ? new Date(props.dateIso) : new Date())
+  const [date, setDate] = React.useState<Date | undefined>(
+    props.defaultDateIso ? new Date(props.defaultDateIso) : new Date(),
+  )
   const [dateTime, setDateTime] = React.useState<Date>()
 
   useEffect(() => {
