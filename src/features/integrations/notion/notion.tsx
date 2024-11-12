@@ -84,7 +84,7 @@ function NotionPageForm(props: NotionFormProps) {
                               <div className="grid size-5 place-items-center">
                                 <Grid6 variant="Bold" size={20} />
                               </div>
-                              <div className="text-ellipsis text-[13px] font-medium leading-none text-primary/60">
+                              <div className="line-clamp-1 text-[13px] font-medium leading-none text-primary/60">
                                 <Text value={getDecorations(database.title)} block={emptyTextBlock} />
                               </div>
                             </div>
@@ -101,7 +101,7 @@ function NotionPageForm(props: NotionFormProps) {
                               <div className="grid size-5 place-items-center">
                                 <Document variant="Bold" size={20} />
                               </div>
-                              <div className="text-ellipsis text-[13px] font-medium leading-none text-primary/60">
+                              <div className="line-clamp-1 text-[13px] font-medium leading-none text-primary/60">
                                 <Text value={getDecorations(page.title)} block={emptyTextBlock} />
                               </div>
                             </div>

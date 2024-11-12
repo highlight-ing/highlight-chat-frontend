@@ -2,7 +2,7 @@ import React from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { useCreateLinearTicket, useLinearAssignees, useLinearWorkflowStates } from './hooks'
+import { useCheckLinearConnection, useCreateLinearTicket, useLinearAssignees, useLinearWorkflowStates } from './hooks'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -11,6 +11,10 @@ import { LinearIcon } from '@/icons/icons'
 import { IntegrationSubmitButton } from '../components/submit-button'
 import { IntegrationSuccessMessage } from '../components/success-message'
 import { IntegrationWrapper } from '../components/integration-wrapper'
+import { IntegrationsLoader } from '../components/loader'
+import { SetupConnection } from '../components/setup-connection'
+import { checkLinearConnectionStatus, createMagicLinkForLinear } from './actions'
+import { useQueryClient } from '@tanstack/react-query'
 
 const linearTicketFormSchema = z.object({
   title: z.string().min(1),
@@ -140,12 +144,39 @@ type CreateLinearTicketProps = {
 }
 
 export function CreateLinearTicket(props: CreateLinearTicketProps) {
+  const { data: connectedToLinear, isLoading: connectionIsLoading } = useCheckLinearConnection()
   const [state, setState] = React.useState<'form' | 'success'>('form')
   const [issueUrl, setIssueUrl] = React.useState('')
+  const queryClient = useQueryClient()
 
   function onSubmitSuccess(issueUrl: string) {
     setIssueUrl(issueUrl)
     setState('success')
+  }
+
+  if (connectionIsLoading) {
+    return (
+      <IntegrationWrapper>
+        <IntegrationsLoader />
+      </IntegrationWrapper>
+    )
+  }
+
+  if (!connectedToLinear) {
+    return (
+      <IntegrationWrapper>
+        <SetupConnection
+          name={'Linear'}
+          checkConnectionStatus={checkLinearConnectionStatus}
+          onConnect={() => {
+            queryClient.invalidateQueries({ queryKey: ['linear-api-token'] })
+            setState('form')
+          }}
+          icon={<LinearIcon size={16} />}
+          createMagicLink={createMagicLinkForLinear}
+        />
+      </IntegrationWrapper>
+    )
   }
 
   if (state === 'form') {

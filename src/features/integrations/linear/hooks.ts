@@ -1,6 +1,6 @@
 import { LinearClient } from '@linear/sdk'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { getLinearTokenForUser } from './actions'
+import { checkLinearConnectionStatus, getLinearTokenForUser } from './actions'
 import { LinearTicketFormData } from './linear'
 
 export function useLinearApiToken() {
@@ -16,18 +16,19 @@ export function useLinearApiToken() {
         throw new Error('No Linear token found')
       }
 
-      return token
+      return { linearToken: token, hlToken }
     },
   })
 }
 
 export function useLinearClient() {
-  const { data: linearApiToken } = useLinearApiToken()
+  const { data: tokenData } = useLinearApiToken()
+  const linearToken = tokenData?.linearToken
 
   return useQuery({
-    queryKey: ['linear-client', linearApiToken],
-    queryFn: () => new LinearClient({ accessToken: linearApiToken }),
-    enabled: !!linearApiToken,
+    queryKey: ['linear-client', linearToken],
+    queryFn: () => new LinearClient({ accessToken: linearToken }),
+    enabled: !!linearToken,
     staleTime: Infinity,
   })
 }
@@ -48,6 +49,25 @@ export function useLinearTeams() {
       return teams.nodes
     },
     enabled: !!client,
+  })
+}
+
+export function useCheckLinearConnection() {
+  const { data: tokenData } = useLinearApiToken()
+  const hlToken = tokenData?.hlToken
+
+  return useQuery({
+    queryKey: ['linear-check-connection'],
+    queryFn: async () => {
+      if (!hlToken) {
+        throw new Error('No Linear token available')
+      }
+
+      const connected = await checkLinearConnectionStatus(hlToken)
+
+      return connected as boolean
+    },
+    enabled: !!hlToken,
   })
 }
 
