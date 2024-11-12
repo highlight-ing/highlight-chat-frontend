@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { LinearIcon } from '@/icons/icons'
 import { IntegrationSubmitButton } from '../components/submit-button'
 import { IntegrationSuccessMessage } from '../components/success-message'
-import { IntegrationWrapper } from '../components/integration-wrapper'
 import { IntegrationsLoader } from '../components/loader'
 import { SetupConnection } from '../components/setup-connection'
 import { checkLinearConnectionStatus, createMagicLinkForLinear } from './actions'
@@ -155,49 +154,37 @@ export function CreateLinearTicket(props: CreateLinearTicketProps) {
   }
 
   if (connectionIsLoading) {
-    return (
-      <IntegrationWrapper>
-        <IntegrationsLoader />
-      </IntegrationWrapper>
-    )
+    return <IntegrationsLoader />
   }
 
   if (!connectedToLinear) {
     return (
-      <IntegrationWrapper>
-        <SetupConnection
-          name={'Linear'}
-          checkConnectionStatus={checkLinearConnectionStatus}
-          onConnect={() => {
-            queryClient.invalidateQueries({ queryKey: ['linear-api-token'] })
-            setState('form')
-          }}
-          icon={<LinearIcon size={16} />}
-          createMagicLink={createMagicLinkForLinear}
-        />
-      </IntegrationWrapper>
+      <SetupConnection
+        name={'Linear'}
+        checkConnectionStatus={checkLinearConnectionStatus}
+        onConnect={() => {
+          queryClient.invalidateQueries({ queryKey: ['linear-api-token'] })
+          setState('form')
+        }}
+        icon={<LinearIcon size={16} />}
+        createMagicLink={createMagicLinkForLinear}
+      />
     )
   }
 
   if (state === 'form') {
-    return (
-      <IntegrationWrapper>
-        <LinearTicketForm title={props.title} description={props.description} onSubmitSuccess={onSubmitSuccess} />
-      </IntegrationWrapper>
-    )
+    return <LinearTicketForm title={props.title} description={props.description} onSubmitSuccess={onSubmitSuccess} />
   }
 
   if (state === 'success' && issueUrl) {
     return (
-      <IntegrationWrapper>
-        <IntegrationSuccessMessage
-          heading="Linear issue created:"
-          url={issueUrl}
-          title={props.title}
-          subTitle="Linear issue"
-          icon={<LinearIcon size={20} />}
-        />
-      </IntegrationWrapper>
+      <IntegrationSuccessMessage
+        heading="Linear issue created:"
+        url={issueUrl}
+        title={props.title}
+        subTitle="Linear issue"
+        icon={<LinearIcon size={20} />}
+      />
     )
   }
 }

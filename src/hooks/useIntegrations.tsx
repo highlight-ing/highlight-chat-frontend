@@ -66,7 +66,9 @@ export function useIntegrations(): UseIntegrationsAPI {
     updateLastConversationMessage(conversationId!, {
       content: (
         <MessageWithComponent content={lastMessage}>
-          <CreateLinearTicket title={title} description={description} />
+          <div className="mt-2">
+            <CreateLinearTicket title={title} description={description} />
+          </div>
         </MessageWithComponent>
       ),
       role: 'assistant',
@@ -88,7 +90,9 @@ export function useIntegrations(): UseIntegrationsAPI {
     updateLastConversationMessage(conversationId!, {
       content: (
         <MessageWithComponent content={lastMessage}>
-          <CreateNotionPage {...params} />
+          <div className="mt-2">
+            <CreateNotionPage {...params} />
+          </div>
         </MessageWithComponent>
       ),
       role: 'assistant',

@@ -153,14 +153,6 @@ function NotionPageForm(props: NotionFormProps) {
   )
 }
 
-type CreateNotionPageWrapperProps = {
-  children: React.ReactNode
-}
-
-function CreateNotionPageWrapper(props: CreateNotionPageWrapperProps) {
-  return <div className="mt-2">{props.children}</div>
-}
-
 type CreateNotionPageProps = {
   title: string
   content: string
@@ -178,49 +170,37 @@ export function CreateNotionPage(props: CreateNotionPageProps) {
   }
 
   if (connectionIsLoading) {
-    return (
-      <CreateNotionPageWrapper>
-        <IntegrationsLoader />
-      </CreateNotionPageWrapper>
-    )
+    return <IntegrationsLoader />
   }
 
   if (!connectedToNotion) {
     return (
-      <CreateNotionPageWrapper>
-        <SetupConnection
-          name={'Notion'}
-          checkConnectionStatus={checkNotionConnectionStatus}
-          onConnect={() => {
-            queryClient.invalidateQueries({ queryKey: ['notion-api-token'] })
-            setState('form')
-          }}
-          icon={<NotionIcon size={16} />}
-          createMagicLink={createMagicLinkForNotion}
-        />
-      </CreateNotionPageWrapper>
+      <SetupConnection
+        name={'Notion'}
+        checkConnectionStatus={checkNotionConnectionStatus}
+        onConnect={() => {
+          queryClient.invalidateQueries({ queryKey: ['notion-api-token'] })
+          setState('form')
+        }}
+        icon={<NotionIcon size={16} />}
+        createMagicLink={createMagicLinkForNotion}
+      />
     )
   }
 
   if (state === 'form') {
-    return (
-      <CreateNotionPageWrapper>
-        <NotionPageForm title={props.title} content={props.content} onSuccess={onSuccess} />
-      </CreateNotionPageWrapper>
-    )
+    return <NotionPageForm title={props.title} content={props.content} onSuccess={onSuccess} />
   }
 
   if (state === 'success' && url) {
     return (
-      <CreateNotionPageWrapper>
-        <IntegrationSuccessMessage
-          heading="Notion page created:"
-          url={url}
-          title={props.title}
-          subTitle="Notion page"
-          icon={<NotionIcon size={20} />}
-        />
-      </CreateNotionPageWrapper>
+      <IntegrationSuccessMessage
+        heading="Notion page created:"
+        url={url}
+        title={props.title}
+        subTitle="Notion page"
+        icon={<NotionIcon size={20} />}
+      />
     )
   }
 }
