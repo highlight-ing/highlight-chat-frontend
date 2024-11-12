@@ -13,7 +13,7 @@ export function useHistory() {
     queryKey: ['history'],
     queryFn: async () => {
       await refreshChatHistory()
-      Sentry.captureMessage('Fetch chat history from History')
+      // Sentry.captureMessage('Fetch chat history from History')
     },
     staleTime: Infinity,
   })
@@ -32,7 +32,7 @@ export function useUpdateConversationTitle() {
         throw new Error('Conversation title not yet updated')
       }
 
-      Sentry.captureMessage(`Update conversation ${chatId} from HistoryItem`)
+      // Sentry.captureMessage(`Update conversation ${chatId} from HistoryItem`)
       return updatedConversation
     },
     retry: RETRY_ATTEMPTS,
