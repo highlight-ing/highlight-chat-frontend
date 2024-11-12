@@ -1,6 +1,6 @@
 import React from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { ControllerRenderProps, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { checkNotionConnectionStatus, createMagicLinkForNotion } from './actions'
 import { Text } from 'react-notion-x'
@@ -33,6 +33,58 @@ const notionPageFormSchema = z.object({
 
 export type NotionPageFormSchema = z.infer<typeof notionPageFormSchema>
 
+type NotionFormDropdownProps = {
+  field: ControllerRenderProps<NotionPageFormSchema>
+}
+
+function ParentDropdown(props: NotionFormDropdownProps) {
+  const { data: parentItems } = useNotionParentItems()
+
+  return (
+    <Select value={props.field.value} onValueChange={props.field.onChange}>
+      <SelectTrigger value={props.field.value}>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent sideOffset={4}>
+        <SelectGroup>
+          <SelectLabel>Databases</SelectLabel>
+          {parentItems
+            ?.filter((item) => item.type === 'database')
+            .map((database) => (
+              <SelectItem key={database.id} value={database.id}>
+                <div className="flex items-center gap-2">
+                  <div className="grid size-5 place-items-center">
+                    <Grid6 variant="Bold" size={20} />
+                  </div>
+                  <div className="line-clamp-1 text-[13px] font-medium leading-none text-primary/60">
+                    <Text value={getDecorations(database.title)} block={emptyTextBlock} />
+                  </div>
+                </div>
+              </SelectItem>
+            ))}
+        </SelectGroup>
+        <SelectGroup>
+          <SelectLabel>Pages</SelectLabel>
+          {parentItems
+            ?.filter((item) => item.type === 'page')
+            .map((page) => (
+              <SelectItem key={page.id} value={page.id}>
+                <div className="flex items-center gap-2">
+                  <div className="grid size-5 place-items-center">
+                    <Document variant="Bold" size={20} />
+                  </div>
+                  <div className="line-clamp-1 text-[13px] font-medium leading-none text-primary/60">
+                    <Text value={getDecorations(page.title)} block={emptyTextBlock} />
+                  </div>
+                </div>
+              </SelectItem>
+            ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  )
+}
+
 type NotionFormProps = {
   title: string
   content: string
@@ -40,7 +92,6 @@ type NotionFormProps = {
 }
 
 function NotionPageForm(props: NotionFormProps) {
-  const { data: parentItems } = useNotionParentItems()
   const { mutate: createNotionPage, isPending } = useCreateNotionPage(props.onSuccess)
 
   const contentWithFooter =
@@ -69,47 +120,7 @@ function NotionPageForm(props: NotionFormProps) {
             <FormItem>
               <FormLabel>Parent</FormLabel>
               <FormControl>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger value={field.value}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent sideOffset={4}>
-                    <SelectGroup>
-                      <SelectLabel>Databases</SelectLabel>
-                      {parentItems
-                        ?.filter((item) => item.type === 'database')
-                        .map((database) => (
-                          <SelectItem key={database.id} value={database.id}>
-                            <div className="flex items-center gap-2">
-                              <div className="grid size-5 place-items-center">
-                                <Grid6 variant="Bold" size={20} />
-                              </div>
-                              <div className="line-clamp-1 text-[13px] font-medium leading-none text-primary/60">
-                                <Text value={getDecorations(database.title)} block={emptyTextBlock} />
-                              </div>
-                            </div>
-                          </SelectItem>
-                        ))}
-                    </SelectGroup>
-                    <SelectGroup>
-                      <SelectLabel>Pages</SelectLabel>
-                      {parentItems
-                        ?.filter((item) => item.type === 'page')
-                        .map((page) => (
-                          <SelectItem key={page.id} value={page.id}>
-                            <div className="flex items-center gap-2">
-                              <div className="grid size-5 place-items-center">
-                                <Document variant="Bold" size={20} />
-                              </div>
-                              <div className="line-clamp-1 text-[13px] font-medium leading-none text-primary/60">
-                                <Text value={getDecorations(page.title)} block={emptyTextBlock} />
-                              </div>
-                            </div>
-                          </SelectItem>
-                        ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                <ParentDropdown field={field} />
               </FormControl>
               <FormMessage />
             </FormItem>

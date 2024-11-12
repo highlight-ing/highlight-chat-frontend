@@ -1,6 +1,6 @@
 import React from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { ControllerRenderProps, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { useCheckLinearConnection, useCreateLinearTicket, useLinearAssignees, useLinearWorkflowStates } from './hooks'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -22,7 +22,49 @@ const linearTicketFormSchema = z.object({
   assignee: z.string().optional(),
 })
 
-export type LinearTicketFormData = z.infer<typeof linearTicketFormSchema>
+export type LinearTicketFormSchema = z.infer<typeof linearTicketFormSchema>
+
+type LinearFormDropdownProps = {
+  field: ControllerRenderProps<LinearTicketFormSchema>
+}
+
+function WorkflowStatesDropdown(props: LinearFormDropdownProps) {
+  const { data: workflowStates } = useLinearWorkflowStates()
+
+  return (
+    <Select value={props.field.value} onValueChange={props.field.onChange}>
+      <SelectTrigger value={props.field.value}>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent className="max-h-64" sideOffset={4}>
+        {workflowStates?.map((state) => (
+          <SelectItem key={state.id} value={state.id}>
+            {state.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  )
+}
+
+function AssigneesDropdown(props: LinearFormDropdownProps) {
+  const { data: assignees } = useLinearAssignees()
+
+  return (
+    <Select value={props.field.value} onValueChange={props.field.onChange}>
+      <SelectTrigger value={props.field.value}>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent className="max-h-64" sideOffset={4}>
+        {assignees?.map((assignee) => (
+          <SelectItem key={assignee.id} value={assignee.id}>
+            {assignee.displayName}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  )
+}
 
 interface LinearTicketFormProps {
   title: string
@@ -32,8 +74,6 @@ interface LinearTicketFormProps {
 
 function LinearTicketForm({ title, description, onSubmitSuccess }: LinearTicketFormProps) {
   const { mutate: createLinearTicket, isPending } = useCreateLinearTicket(onSubmitSuccess)
-  const { data: workflowStates } = useLinearWorkflowStates()
-  const { data: assignees } = useLinearAssignees()
 
   const form = useForm<z.infer<typeof linearTicketFormSchema>>({
     resolver: zodResolver(linearTicketFormSchema),
@@ -45,7 +85,7 @@ function LinearTicketForm({ title, description, onSubmitSuccess }: LinearTicketF
     },
   })
 
-  async function onSubmit(data: LinearTicketFormData) {
+  async function onSubmit(data: LinearTicketFormSchema) {
     createLinearTicket(data)
   }
 
@@ -88,23 +128,13 @@ function LinearTicketForm({ title, description, onSubmitSuccess }: LinearTicketF
               <FormItem>
                 <FormLabel>Status</FormLabel>
                 <FormControl>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger value={field.value}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-64" sideOffset={4}>
-                      {workflowStates?.map((state) => (
-                        <SelectItem key={state.id} value={state.id}>
-                          {state.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <WorkflowStatesDropdown field={field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="assignee"
@@ -112,18 +142,7 @@ function LinearTicketForm({ title, description, onSubmitSuccess }: LinearTicketF
               <FormItem>
                 <FormLabel>Assignee</FormLabel>
                 <FormControl>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger value={field.value}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-64" sideOffset={4}>
-                      {assignees?.map((assignee) => (
-                        <SelectItem key={assignee.id} value={assignee.id}>
-                          {assignee.displayName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <AssigneesDropdown field={field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

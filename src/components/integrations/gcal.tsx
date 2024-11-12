@@ -85,6 +85,20 @@ export function GcalEventFormComponent({
   return (
     <form className="flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
       <InputField size={'xxlarge'} label={'Summary'} placeholder={'Event Summary'} {...register('summary')} />
+      <div className="grid grid-cols-2 gap-2">
+        <DateTimePicker
+          dateFieldLabel="Start Date"
+          timeFieldLabel="Start Time"
+          defaultDateIso={data.start}
+          onChange={onStartDateChange}
+        />
+        <DateTimePicker
+          dateFieldLabel="End Date"
+          timeFieldLabel="End Time"
+          defaultDateIso={data.end}
+          onChange={onEndDateChange}
+        />
+      </div>
       <InputField size={'xxlarge'} label={'Location'} placeholder={'Event Location'} {...register('location')} />
       <TextArea
         rows={4}
@@ -93,8 +107,6 @@ export function GcalEventFormComponent({
         placeholder={'Event Description'}
         {...register('description')}
       />
-      {/* <InputField size={'xxlarge'} label={'Start'} placeholder={'Event Start'} {...register('start')} /> */}
-      {/* <InputField size={'xxlarge'} label={'End'} placeholder={'Event End'} {...register('end')} /> */}
       <Button size={'medium'} variant={'primary'} type={'submit'} disabled={isSubmitting}>
         Create Event
       </Button>

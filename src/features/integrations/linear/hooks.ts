@@ -1,7 +1,7 @@
 import { LinearClient } from '@linear/sdk'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { checkLinearConnectionStatus, getLinearTokenForUser } from './actions'
-import { LinearTicketFormData } from './linear'
+import { LinearTicketFormSchema } from './linear'
 
 export function useLinearApiToken() {
   return useQuery({
@@ -113,7 +113,7 @@ export function useCreateLinearTicket(onSubmitSuccess: ((url: string) => void) |
 
   return useMutation({
     mutationKey: ['create-linear-ticket'],
-    mutationFn: async (data: LinearTicketFormData) => {
+    mutationFn: async (data: LinearTicketFormSchema) => {
       const team = teams?.[0]
 
       if (!team?.id) {
