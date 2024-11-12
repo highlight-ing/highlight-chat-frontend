@@ -1,24 +1,17 @@
+import React from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { useEffect, useState } from 'react'
-import {
-  getNotionTokenForUser,
-  getNotionParentItems,
-  createNotionPage,
-  checkNotionConnectionStatus,
-  createMagicLinkForNotion,
-} from '@/utils/notion-server-actions'
+import { checkNotionConnectionStatus, createMagicLinkForNotion } from './actions'
 import { Text } from 'react-notion-x'
 import { Grid6, Document } from 'iconsax-react'
-import { emptyTextBlock, getDecorations, mapNotionDecorations } from '@/utils/notion'
+import { emptyTextBlock, getDecorations } from './utils'
 import Markdown from 'react-markdown'
-import styles from '@/components/TextInput/inputfield.module.scss'
 import { NotionIcon } from '@/icons/icons'
-import { useCreateNotionPage, useNotionParentItems } from './hooks'
+import { useCheckNotionConnection, useCreateNotionPage, useNotionParentItems } from './hooks'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { IntegrationSubmitButton } from '../submit-button'
+import { IntegrationSubmitButton } from '../components/submit-button'
 import {
   Select,
   SelectContent,
@@ -28,9 +21,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { SetupConnectionComponent } from '@/components/integrations/integration-auth'
-import { IntegrationsLoader } from '@/components/integrations/loader'
-import { Textarea } from '@/components/ui/textarea'
+import { IntegrationsLoader } from '../components/loader'
+import { SetupConnection } from '../components/setup-connection'
+import { IntegrationSuccessMessage } from '../components/success-message'
+import { useQueryClient } from '@tanstack/react-query'
 
 const notionPageFormSchema = z.object({
   title: z.string().min(1),
@@ -45,7 +39,7 @@ type NotionFormProps = {
   onSuccess: (url?: string) => void
 }
 
-function NotionForm(props: NotionFormProps) {
+function NotionPageForm(props: NotionFormProps) {
   const { data: parentItems } = useNotionParentItems()
   const { mutate: createNotionPage, isPending } = useCreateNotionPage(props.onSuccess)
 
@@ -138,7 +132,7 @@ function NotionForm(props: NotionFormProps) {
 
         <FormItem>
           <FormLabel>Page Contents</FormLabel>
-          <div className="relative flex !h-fit min-h-36 w-full resize-none flex-col justify-start gap-2 rounded-[10px] border border-light-10 bg-secondary bg-transparent px-3 pb-2 pt-7 text-[15px] text-base text-primary shadow-sm outline-none transition-[padding] placeholder:text-subtle hover:border-light-20 focus:border-light-20 focus:bg-tertiary disabled:cursor-not-allowed disabled:opacity-50 md:text-sm">
+          <div className="relative flex !h-fit min-h-36 w-full resize-none flex-col justify-start gap-2 rounded-2xl border border-light-10 bg-secondary bg-transparent px-3 pb-2 pt-7 text-[15px] text-base text-primary shadow-sm outline-none transition-[padding] placeholder:text-subtle hover:border-light-20 focus:border-light-20 focus:bg-tertiary disabled:cursor-not-allowed disabled:opacity-50 md:text-sm">
             <Markdown
               components={{
                 a: ({ href, children }) => (
@@ -159,57 +153,74 @@ function NotionForm(props: NotionFormProps) {
   )
 }
 
+type CreateNotionPageWrapperProps = {
+  children: React.ReactNode
+}
+
+function CreateNotionPageWrapper(props: CreateNotionPageWrapperProps) {
+  return <div className="mt-2">{props.children}</div>
+}
+
 type CreateNotionPageProps = {
   title: string
   content: string
 }
 
 export function CreateNotionPage(props: CreateNotionPageProps) {
-  const [state, setState] = useState<'loading' | 'connect' | 'form' | 'success'>('loading')
-  const [url, setUrl] = useState<string | undefined>(undefined)
+  const { data: connected, isLoading: connectionIsLoading } = useCheckNotionConnection()
+  const [state, setState] = React.useState<'form' | 'success'>('form')
+  const [url, setUrl] = React.useState<string | undefined>(undefined)
+  const queryClient = useQueryClient()
 
   function onSuccess(url?: string) {
     setState('success')
     setUrl(url)
   }
 
-  useEffect(() => {
-    async function checkConnection() {
-      //@ts-ignore
-      const hlToken = (await highlight.internal.getAuthorizationToken()) as string
+  if (connectionIsLoading) {
+    return (
+      <CreateNotionPageWrapper>
+        <IntegrationsLoader />
+      </CreateNotionPageWrapper>
+    )
+  }
 
-      const connected = await checkNotionConnectionStatus(hlToken)
-      if (connected) {
-        setState('form')
-      } else {
-        setState('connect')
-      }
-    }
-
-    checkConnection()
-  }, [])
-
-  return (
-    <div className="mt-2">
-      {state === 'loading' && <IntegrationsLoader />}
-      {state === 'connect' && (
-        <SetupConnectionComponent
+  if (!connected) {
+    return (
+      <CreateNotionPageWrapper>
+        <SetupConnection
           name={'Notion'}
           checkConnectionStatus={checkNotionConnectionStatus}
-          onConnect={() => setState('form')}
+          onConnect={async () => {
+            await queryClient.invalidateQueries({ queryKey: ['notion-check-connection'] })
+            setState('form')
+          }}
           icon={<NotionIcon size={16} />}
           createMagicLink={createMagicLinkForNotion}
         />
-      )}
-      {state === 'form' && <NotionForm title={props.title} content={props.content} onSuccess={onSuccess} />}
-      {state === 'success' && url && (
-        <span>
-          Page created successfully:{' '}
-          <a href={url} target="_blank">
-            {url}
-          </a>
-        </span>
-      )}
-    </div>
-  )
+      </CreateNotionPageWrapper>
+    )
+  }
+
+  if (state === 'form') {
+    return (
+      <CreateNotionPageWrapper>
+        <NotionPageForm title={props.title} content={props.content} onSuccess={onSuccess} />
+      </CreateNotionPageWrapper>
+    )
+  }
+
+  if (state === 'success' && url) {
+    return (
+      <CreateNotionPageWrapper>
+        <IntegrationSuccessMessage
+          heading="Notion page created:"
+          url={url}
+          title={props.title}
+          subTitle="Notion page"
+          icon={<NotionIcon size={20} />}
+        />
+      </CreateNotionPageWrapper>
+    )
+  }
 }

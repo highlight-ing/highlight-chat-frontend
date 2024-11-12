@@ -6,12 +6,10 @@ import { useCreateLinearTicket, useLinearAssignees, useLinearWorkflowStates } fr
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import Button from '@/components/Button/Button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { AnimatePresence, motion } from 'framer-motion'
-import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 import { LinearIcon } from '@/icons/icons'
-import { IntegrationSubmitButton } from '../submit-button'
+import { IntegrationSubmitButton } from '../components/submit-button'
+import { IntegrationSuccessMessage } from '../components/success-message'
 
 const linearTicketFormSchema = z.object({
   title: z.string().min(1),
@@ -135,32 +133,6 @@ function LinearTicketForm({ title, description, onSubmitSuccess }: LinearTicketF
   )
 }
 
-type LinearTicketSuccessMessageProps = {
-  issueUrl: string
-  ticketTitle: string
-}
-
-function LinearTicketSuccessMessage(props: LinearTicketSuccessMessageProps) {
-  return (
-    <div className="flex flex-col gap-3">
-      <p>Linear issue created:</p>
-      <a href={props.issueUrl} target="_blank" style={{ textDecoration: 'none', cursor: 'pointer' }}>
-        <div className="flex h-[48px] w-fit items-center gap-2.5 text-nowrap rounded-[16px] border border-light-10 bg-secondary p-[5px] pr-2 text-base leading-none">
-          <div className="grid size-9 shrink-0 place-items-center rounded-[12px] bg-light-5 text-primary">
-            <div className="size-5 overflow-hidden rounded-md">
-              <LinearIcon size={20} />
-            </div>
-          </div>
-          <div className="">
-            <p className="truncate text-sm font-medium text-secondary">{props.ticketTitle}</p>
-            <p className="text-xs text-tertiary">Linear issue</p>
-          </div>
-        </div>
-      </a>
-    </div>
-  )
-}
-
 type CreateLinearTicketProps = {
   title: string
   description: string
@@ -180,7 +152,15 @@ export function CreateLinearTicket(props: CreateLinearTicketProps) {
       {state === 'form' && (
         <LinearTicketForm title={props.title} description={props.description} onSubmitSuccess={onSubmitSuccess} />
       )}
-      {state === 'success' && issueUrl && <LinearTicketSuccessMessage issueUrl={issueUrl} ticketTitle={props.title} />}
+      {state === 'success' && issueUrl && (
+        <IntegrationSuccessMessage
+          heading="Linear issue created:"
+          url={issueUrl}
+          title={props.title}
+          subTitle="Linear issue"
+          icon={<LinearIcon size={20} />}
+        />
+      )}
     </div>
   )
 }

@@ -1,11 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import {
-  getNotionTokenForUser,
-  getNotionParentItems,
-  createNotionPage,
-  checkNotionConnectionStatus,
-  createMagicLinkForNotion,
-} from './actions'
+import { getNotionTokenForUser, getNotionParentItems, createNotionPage, checkNotionConnectionStatus } from './actions'
 import { NotionPageFormSchema } from './notion'
 
 const TWO_MINUTES_IN_MILLI = 120000
@@ -47,24 +41,46 @@ export function useNotionParentItems() {
   })
 }
 
-export function useCreateNotionPage(onSubmitSuccess: (url: string | undefined) => void) {
+export function useCheckNotionConnection() {
   const { data: token } = useNotionApiToken()
 
+  return useQuery({
+    queryKey: ['notion-check-connection'],
+    queryFn: async () => {
+      if (!token) {
+        throw new Error('No Notion token available')
+      }
+
+      const connected = await checkNotionConnectionStatus(token)
+
+      return connected as boolean
+    },
+    enabled: !!token,
+    staleTime: TWO_MINUTES_IN_MILLI,
+  })
+}
+
+export function useCreateNotionPage(onSubmitSuccess: (url: string | undefined) => void) {
+  const { data: token } = useNotionApiToken()
+  const { data: parentItems } = useNotionParentItems()
+
   return useMutation({
-    mutationKey: ['create-linear-ticket'],
+    mutationKey: ['create-notion-page'],
     mutationFn: async (input: { formData: NotionPageFormSchema; contentWithFooter: string }) => {
       if (!token) {
         console.warn('Notion token not set, please try again later.')
         throw new Error('No Notion token available')
       }
 
-      if (!input.formData?.parent) {
-        throw new Error('Parent item not selected')
+      const parentItem = parentItems?.find((item) => item.id === input.formData.parentId)
+
+      if (!parentItem) {
+        throw new Error('Parent item not found')
       }
 
       const response = await createNotionPage({
         accessToken: token,
-        parent: input.formData.parent,
+        parent: parentItem,
         title: input.formData.title,
         content: input.contentWithFooter,
       })

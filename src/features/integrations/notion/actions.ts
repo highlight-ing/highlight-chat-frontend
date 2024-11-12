@@ -74,6 +74,8 @@ export async function checkNotionConnectionStatus(accessToken: string) {
     },
   })
 
+  console.log('CONNECTED TO NOTION', response.ok)
+
   if (!response.ok) {
     console.warn('Failed to check if Notion is connected', response.status, await response.text())
     throw new Error('Failed to check if Notion is connected')
