@@ -167,7 +167,7 @@ type CreateNotionPageProps = {
 }
 
 export function CreateNotionPage(props: CreateNotionPageProps) {
-  const { data: connected, isLoading: connectionIsLoading } = useCheckNotionConnection()
+  const { data: connectedToNotion, isLoading: connectionIsLoading } = useCheckNotionConnection()
   const [state, setState] = React.useState<'form' | 'success'>('form')
   const [url, setUrl] = React.useState<string | undefined>(undefined)
   const queryClient = useQueryClient()
@@ -185,14 +185,14 @@ export function CreateNotionPage(props: CreateNotionPageProps) {
     )
   }
 
-  if (!connected) {
+  if (!connectedToNotion) {
     return (
       <CreateNotionPageWrapper>
         <SetupConnection
           name={'Notion'}
           checkConnectionStatus={checkNotionConnectionStatus}
-          onConnect={async () => {
-            await queryClient.invalidateQueries({ queryKey: ['notion-check-connection'] })
+          onConnect={() => {
+            queryClient.invalidateQueries({ queryKey: ['notion-api-token'] })
             setState('form')
           }}
           icon={<NotionIcon size={16} />}

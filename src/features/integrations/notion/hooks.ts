@@ -2,8 +2,6 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { getNotionTokenForUser, getNotionParentItems, createNotionPage, checkNotionConnectionStatus } from './actions'
 import { NotionPageFormSchema } from './notion'
 
-const TWO_MINUTES_IN_MILLI = 120000
-
 export function useNotionApiToken() {
   return useQuery({
     queryKey: ['notion-api-token'],
@@ -17,57 +15,58 @@ export function useNotionApiToken() {
         throw new Error('No Notion token found')
       }
 
-      return token
+      return { notionToken: token, hlToken }
     },
-    staleTime: TWO_MINUTES_IN_MILLI,
   })
 }
 
 export function useNotionParentItems() {
-  const { data: token } = useNotionApiToken()
+  const { data: tokenData } = useNotionApiToken()
+  const notionToken = tokenData?.notionToken
 
   return useQuery({
-    queryKey: ['notion-parent-items', token],
+    queryKey: ['notion-parent-items', notionToken],
     queryFn: async () => {
-      if (!token) {
+      if (!notionToken) {
         throw new Error('No Notion token available')
       }
 
-      const items = await getNotionParentItems(token)
+      const items = await getNotionParentItems(notionToken)
 
       return items
     },
-    enabled: !!token,
+    enabled: !!notionToken,
   })
 }
 
 export function useCheckNotionConnection() {
-  const { data: token } = useNotionApiToken()
+  const { data: tokenData } = useNotionApiToken()
+  const hlToken = tokenData?.hlToken
 
   return useQuery({
     queryKey: ['notion-check-connection'],
     queryFn: async () => {
-      if (!token) {
+      if (!hlToken) {
         throw new Error('No Notion token available')
       }
 
-      const connected = await checkNotionConnectionStatus(token)
+      const connected = await checkNotionConnectionStatus(hlToken)
 
       return connected as boolean
     },
-    enabled: !!token,
-    staleTime: TWO_MINUTES_IN_MILLI,
+    enabled: !!hlToken,
   })
 }
 
 export function useCreateNotionPage(onSubmitSuccess: (url: string | undefined) => void) {
-  const { data: token } = useNotionApiToken()
+  const { data: tokenData } = useNotionApiToken()
   const { data: parentItems } = useNotionParentItems()
+  const notionToken = tokenData?.notionToken
 
   return useMutation({
     mutationKey: ['create-notion-page'],
     mutationFn: async (input: { formData: NotionPageFormSchema; contentWithFooter: string }) => {
-      if (!token) {
+      if (!notionToken) {
         console.warn('Notion token not set, please try again later.')
         throw new Error('No Notion token available')
       }
@@ -79,7 +78,7 @@ export function useCreateNotionPage(onSubmitSuccess: (url: string | undefined) =
       }
 
       const response = await createNotionPage({
-        accessToken: token,
+        accessToken: notionToken,
         parent: parentItem,
         title: input.formData.title,
         content: input.contentWithFooter,

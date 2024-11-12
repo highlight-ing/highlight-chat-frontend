@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { LinearIcon } from '@/icons/icons'
 import { IntegrationSubmitButton } from '../components/submit-button'
 import { IntegrationSuccessMessage } from '../components/success-message'
+import { IntegrationWrapper } from '../components/integration-wrapper'
 
 const linearTicketFormSchema = z.object({
   title: z.string().min(1),
@@ -147,12 +148,17 @@ export function CreateLinearTicket(props: CreateLinearTicketProps) {
     setState('success')
   }
 
-  return (
-    <div className="mt-2">
-      {state === 'form' && (
+  if (state === 'form') {
+    return (
+      <IntegrationWrapper>
         <LinearTicketForm title={props.title} description={props.description} onSubmitSuccess={onSubmitSuccess} />
-      )}
-      {state === 'success' && issueUrl && (
+      </IntegrationWrapper>
+    )
+  }
+
+  if (state === 'success' && issueUrl) {
+    return (
+      <IntegrationWrapper>
         <IntegrationSuccessMessage
           heading="Linear issue created:"
           url={issueUrl}
@@ -160,7 +166,7 @@ export function CreateLinearTicket(props: CreateLinearTicketProps) {
           subTitle="Linear issue"
           icon={<LinearIcon size={20} />}
         />
-      )}
-    </div>
-  )
+      </IntegrationWrapper>
+    )
+  }
 }

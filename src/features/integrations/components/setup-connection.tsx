@@ -4,6 +4,7 @@
 
 import { useEffect, useState } from 'react'
 import Button from '@/components/Button/Button'
+import { useQueryClient } from '@tanstack/react-query'
 
 /**
  * @param name - The name of the integration

@@ -3,8 +3,6 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { getLinearTokenForUser } from './actions'
 import { LinearTicketFormData } from './linear'
 
-const TWO_MINUTES_IN_MILLI = 120000
-
 export function useLinearApiToken() {
   return useQuery({
     queryKey: ['linear-api-token'],
@@ -20,7 +18,6 @@ export function useLinearApiToken() {
 
       return token
     },
-    staleTime: TWO_MINUTES_IN_MILLI,
   })
 }
 
