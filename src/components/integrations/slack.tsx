@@ -5,10 +5,10 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import InputField from '@/components/TextInput/InputField'
 import Button from '@/components/Button/Button'
-import { sendMessage, listChannels } from '@/utils/slack-server-actions'
+import { sendMessage, listConversations } from '@/utils/slack-server-actions'
 import { getIntegrationTokenForUser } from '@/utils/integrations-server-actions'
 import BaseDropdown, { DropdownItem } from '@/components/dropdowns/base-dropdown'
-import { ArrowDown2, ArrowUp2, Hashtag } from 'iconsax-react'
+import { ArrowDown2, ArrowUp2, Hashtag, User } from 'iconsax-react'
 
 const sendSlackMessageFormSchema = z.object({
   message: z.string(),
@@ -29,13 +29,14 @@ function SlackMessageFormComponent({ data, onSuccess }: { data: SendSlackMessage
       const hlToken = (await highlight.internal.getAuthorizationToken()) as string
       const token = await getIntegrationTokenForUser(hlToken, 'slack')
 
-      console.log('Slack token', token)
-
       if (!token) return
 
       slackToken.current = token
 
-      const channels = await listChannels(token)
+      const channels = await listConversations(hlToken)
+
+      console.log('channels', channels)
+
       setItems([
         {
           id: 'channel-label',
@@ -43,12 +44,26 @@ function SlackMessageFormComponent({ data, onSuccess }: { data: SendSlackMessage
           component: 'Channels',
         },
         ...channels
-          .filter((channel: any) => channel.is_channel)
+          .filter((channel: any) => channel.type === 'public_channel')
           .map((channel: any) => ({
             id: channel.id,
             type: 'item',
             component: channel.name,
             icon: <Hashtag size={20} />,
+          })),
+        {
+          id: 'dm-label',
+          type: 'label',
+          component: 'Direct Messages',
+        },
+        ...channels
+          .filter((channel: any) => channel.type === 'im')
+          .filter((channel: any) => channel.user !== '')
+          .map((channel: any) => ({
+            id: channel.id,
+            type: 'item',
+            component: channel.user,
+            icon: <User size={20} />,
           })),
       ])
 

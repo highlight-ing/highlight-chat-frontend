@@ -1,22 +1,20 @@
 'use server'
 
-export async function listChannels(slackToken: string) {
-  const response = await fetch('https://slack.com/api/conversations.list', {
+export async function listConversations(accessToken: string) {
+  const response = await fetch('https://backend.highlightai.com/v1/slack/conversations', {
     headers: {
-      Authorization: `Bearer ${slackToken}`,
+      Authorization: `Bearer ${accessToken}`,
     },
   })
 
   if (!response.ok) {
-    console.warn('Failed to list Slack channels', response.status, await response.text())
-    throw new Error('Failed to list Slack channels')
+    console.warn('Failed to list Slack conversations', response.status, await response.text())
+    throw new Error('Failed to list Slack conversations')
   }
 
   const data = await response.json()
 
-  // TODO: Handle pagination
-
-  return data.channels
+  return data.conversations
 }
 
 export async function sendMessage(slackToken: string, channelId: string, message: string) {
