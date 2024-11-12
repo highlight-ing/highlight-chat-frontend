@@ -72,7 +72,7 @@ const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
         <div
           ref={ref}
           className={cn(
-            'group relative isolate [&>[data-slot=input]]:h-10 [&>[data-slot=label]+[data-slot=input]]:h-14 [&>[data-slot=label]+[data-slot=select]]:h-14 [&>[data-slot=select]]:h-10',
+            'group relative isolate space-y-1.5 [&>[data-slot=input]]:h-10 [&>[data-slot=label]+[data-slot=input]]:h-14 [&>[data-slot=label]+[data-slot=select]]:h-14 [&>[data-slot=select]]:h-10',
             className,
           )}
           {...props}
@@ -95,7 +95,7 @@ const FormLabel = React.forwardRef<
       data-slot="label"
       className={cn(
         'pointer-events-none absolute left-3 top-2 z-10 text-[13px] font-semibold text-tertiary',
-        error && 'text-red-500 dark:text-red-900',
+        error && 'text-red/70',
         className,
       )}
       htmlFor={formItemId}
@@ -151,7 +151,7 @@ const FormMessage = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<
       <p
         ref={ref}
         id={formMessageId}
-        className={cn('text-red-500 dark:text-red-900 text-[0.8rem] font-medium', className)}
+        className={cn('pl-3 text-[0.8rem] font-medium text-red/80', className)}
         {...props}
       >
         {body}

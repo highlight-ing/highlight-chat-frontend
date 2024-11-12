@@ -28,7 +28,7 @@ import { useQueryClient } from '@tanstack/react-query'
 
 const notionPageFormSchema = z.object({
   title: z.string().min(1),
-  parentId: z.string(),
+  parentId: z.string().min(1, 'You must select a parent'),
 })
 
 export type NotionPageFormSchema = z.infer<typeof notionPageFormSchema>
@@ -99,7 +99,6 @@ function NotionPageForm(props: NotionFormProps) {
 
   const form = useForm<z.infer<typeof notionPageFormSchema>>({
     resolver: zodResolver(notionPageFormSchema),
-
     defaultValues: {
       title: props.title,
       parentId: '',
