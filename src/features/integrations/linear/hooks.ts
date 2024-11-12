@@ -7,7 +7,7 @@ const TWO_MINUTES_IN_MILLI = 120000
 
 export function useLinearApiToken() {
   return useQuery({
-    queryKey: ['linearApiToken'],
+    queryKey: ['linear-api-token'],
     queryFn: async () => {
       // @ts-expect-error: highlight is mounted on window
       const hlToken = (await highlight.internal.getAuthorizationToken()) as string
@@ -28,7 +28,7 @@ export function useLinearClient() {
   const { data: linearApiToken } = useLinearApiToken()
 
   return useQuery({
-    queryKey: ['linearClient', linearApiToken],
+    queryKey: ['linear-client', linearApiToken],
     queryFn: () => new LinearClient({ accessToken: linearApiToken }),
     enabled: !!linearApiToken,
     staleTime: Infinity,
@@ -39,7 +39,7 @@ export function useLinearTeams() {
   const { data: client } = useLinearClient()
 
   return useQuery({
-    queryKey: ['linearTeams'],
+    queryKey: ['linear-teams'],
     queryFn: async () => {
       if (!client) {
         throw new Error('No Linear client available')
@@ -58,7 +58,7 @@ export function useLinearWorkflowStates() {
   const { data: client } = useLinearClient()
 
   return useQuery({
-    queryKey: ['linearWorkflowStates'],
+    queryKey: ['linear-workflow-states'],
     queryFn: async () => {
       if (!client) {
         throw new Error('No Linear client available')
@@ -76,7 +76,7 @@ export function useLinearAssignees() {
   const { data: client } = useLinearClient()
 
   return useQuery({
-    queryKey: ['linearAssignees'],
+    queryKey: ['linear-assignees'],
     queryFn: async () => {
       if (!client) {
         throw new Error('No Linear client available')

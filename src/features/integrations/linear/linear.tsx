@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { AnimatePresence, motion } from 'framer-motion'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 import { LinearIcon } from '@/icons/icons'
+import { IntegrationSubmitButton } from '../submit-button'
 
 const linearTicketFormSchema = z.object({
   title: z.string().min(1),
@@ -128,25 +129,7 @@ function LinearTicketForm({ title, description, onSubmitSuccess }: LinearTicketF
           />
         </div>
 
-        <Button size={'medium'} variant={'accent'} type={'submit'} disabled={isPending} style={{ gap: 8 }}>
-          <AnimatePresence initial={false} mode="popLayout">
-            <motion.span
-              key={isPending ? 'true' : 'false'}
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0, opacity: 0 }}
-            >
-              {isPending ? (
-                <LoadingSpinner size={'20px'} />
-              ) : (
-                <div className="size-5 overflow-hidden rounded-md">
-                  <LinearIcon size={20} />
-                </div>
-              )}
-            </motion.span>
-          </AnimatePresence>
-          Create Issue
-        </Button>
+        <IntegrationSubmitButton isPending={isPending} label="Create ticket" icon={<LinearIcon size={20} />} />
       </form>
     </Form>
   )
