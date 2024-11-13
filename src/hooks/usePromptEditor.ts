@@ -8,7 +8,7 @@ import { DEFAULT_PROMPT_EXTERNAL_IDS } from '@/lib/promptapps'
 import usePromptApps from './usePromptApps'
 import { sendExternalMessage, openApp } from '@/utils/highlightService'
 
-export const PROMPT_SLUG = 'dev2'
+export const PROMPT_SLUG = 'prompts'
 
 export function usePromptEditor() {
   // STATE
