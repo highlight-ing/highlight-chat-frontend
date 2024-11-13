@@ -1,5 +1,4 @@
 import React from 'react'
-import type { CreateGoogleCalendarEventParams } from '@/hooks/useIntegrations'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControllerRenderProps, useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -19,6 +18,8 @@ import { format } from 'date-fns'
 import { extractDateAndTime } from './utils'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useQueryClient } from '@tanstack/react-query'
+import { CreateGoogleCalendarEventParams } from '../_hooks/use-integrations'
+import { ChevronDownIcon } from '@radix-ui/react-icons'
 
 const googleCalEventFormSchema = z.object({
   summary: z.string().min(1),
@@ -51,8 +52,9 @@ function DatePickerDropdown(props: GoogleCalEventDropdownProps) {
 
   return (
     <Popover>
-      <PopoverTrigger className="relative flex w-full justify-between gap-2 rounded-2xl border border-light-10 bg-secondary px-3 pb-2 pt-7 text-[15px] text-primary outline-none transition-[padding] placeholder:text-subtle hover:border-light-20 disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:border-light-20 data-[state=open]:bg-tertiary [&>span]:line-clamp-1">
+      <PopoverTrigger className="relative flex w-full gap-2 rounded-2xl border border-light-10 bg-secondary px-3 pb-2 pt-7 text-[15px] leading-snug text-primary outline-none transition-[padding] placeholder:text-subtle hover:border-light-20 disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:border-light-20 data-[state=open]:bg-tertiary [&>span]:line-clamp-1">
         {formattedDate}
+        <ChevronDownIcon className="absolute right-3 top-1/2 size-4 -translate-y-1/2 text-subtle" />
       </PopoverTrigger>
       <PopoverContent align="start" className="w-auto rounded-lg bg-secondary p-0">
         <Calendar mode="single" selected={dateValue} onSelect={(date) => handleChange(date, timeValue)} initialFocus />
@@ -102,7 +104,7 @@ function TimeSelectDropdown(props: GoogleCalEventDropdownProps) {
       <SelectTrigger value={timeValue} className="w-full">
         {isCustomTimeValue ? timeValue : timeValue ? <SelectValue /> : <span>Select a time</span>}
       </SelectTrigger>
-      <SelectContent className="max-h-64 w-36" sideOffset={4}>
+      <SelectContent className="w-36" sideOffset={4}>
         {timeOptions.map((time) => (
           <SelectItem key={time} value={time}>
             {formatTimeForDisplay(time)}
@@ -153,74 +155,63 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
           )}
         />
 
-        <div className="grid w-full grid-cols-2 gap-2">
-          <div className="grid w-full grid-cols-3 gap-2">
-            <div className="col-span-2">
-              <FormField
-                control={form.control}
-                name="start"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Start date</FormLabel>
-                    <FormControl>
-                      <DatePickerDropdown field={field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+        <div className="flex w-full items-center gap-3">
+          <FormField
+            control={form.control}
+            name="start"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Start date</FormLabel>
+                <FormControl>
+                  <DatePickerDropdown field={field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <div className="col-span-1">
-              <FormField
-                control={form.control}
-                name="start"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Start time</FormLabel>
-                    <FormControl>
-                      <TimeSelectDropdown field={field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </div>
+          <FormField
+            control={form.control}
+            name="start"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Start time</FormLabel>
+                <FormControl>
+                  <TimeSelectDropdown field={field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-          <div className="grid w-full grid-cols-3 gap-2">
-            <div className="col-span-2">
-              <FormField
-                control={form.control}
-                name="end"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>End date</FormLabel>
-                    <FormControl>
-                      <DatePickerDropdown field={field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="col-span-1">
-              <FormField
-                control={form.control}
-                name="end"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>End time</FormLabel>
-                    <FormControl>
-                      <TimeSelectDropdown field={field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </div>
+        <div className="flex w-full items-center gap-3">
+          <FormField
+            control={form.control}
+            name="end"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>End date</FormLabel>
+                <FormControl>
+                  <DatePickerDropdown field={field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="end"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>End time</FormLabel>
+                <FormControl>
+                  <TimeSelectDropdown field={field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         <FormField

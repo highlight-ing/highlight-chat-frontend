@@ -27,7 +27,6 @@ import { FileAttachment, ImageAttachment, PdfAttachment } from '@/types'
 import { useUploadFile } from './useUploadFile'
 import { v4 as uuidv4 } from 'uuid'
 import { Attachment } from '@/types'
-import { useIntegrations } from './useIntegrations'
 import { formatDateForConversation } from '@/utils/string'
 
 // Create a type guard for FileAttachment
@@ -44,6 +43,7 @@ import {
   SpreadsheetAttachment,
 } from '@/utils/formDataUtils'
 import { getWordCount } from '@/utils/string'
+import { useIntegrations } from '@/features/integrations/_hooks/use-integrations'
 
 async function createAttachmentMetadata(
   attachment: FileAttachment | Attachment,

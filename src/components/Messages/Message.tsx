@@ -16,16 +16,13 @@ import rehypeKatex from 'rehype-katex'
 import 'katex/dist/katex.min.css'
 import Button from '@/components/Button/Button'
 
-// @ts-ignore
-import { BlockMath, InlineMath } from 'react-katex'
 import { getDisplayValue } from '@/utils/attachments'
 import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
 import { MessageText } from 'iconsax-react'
 import { useStore } from '@/providers/store-provider'
 import { AttachedContextContextTypes } from '@/utils/formDataUtils'
 import AssistantMessageButton from './AssistantMessageButton'
-import { useIntegrations } from '@/hooks/useIntegrations'
-import { useIntegration } from '@/hooks/useIntegration'
+import { useIntegration } from '@/features/integrations/_hooks/use-integration'
 
 const hasAttachment = (message: UserMessage) => {
   return (

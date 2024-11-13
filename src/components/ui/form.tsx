@@ -72,7 +72,7 @@ const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
         <div
           ref={ref}
           className={cn(
-            'group relative isolate space-y-1.5 [&>[data-slot=input]]:h-10 [&>[data-slot=label]+[data-slot=input]]:h-14 [&>[data-slot=label]+[data-slot=select]]:h-14 [&>[data-slot=select]]:h-10',
+            'group relative isolate w-full [&>[data-slot=input]]:h-10 [&>[data-slot=label]+[data-slot=input]]:h-14 [&>[data-slot=label]+[data-slot=popover]]:h-14 [&>[data-slot=label]+[data-slot=select]]:h-14 [&>[data-slot=popover]]:h-10 [&>[data-slot=select]]:h-10',
             className,
           )}
           {...props}

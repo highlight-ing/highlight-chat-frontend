@@ -5,14 +5,12 @@ import { useEffect } from 'react'
 import { useStore } from '@/providers/store-provider'
 import { useChatHistory } from '@/hooks/useChatHistory'
 import { useSubmitQuery } from '@/hooks/useSubmitQuery'
-import { useIntegrations } from './useIntegrations'
+import { useIntegrations } from '@/features/integrations/_hooks/use-integrations'
+import { useIntegration } from '@/features/integrations/_hooks/use-integration'
 import { DEFAULT_PROMPT_EXTERNAL_IDS } from '@/lib/promptapps'
 import useForkDefaultAction from './useForkDefaultAction'
-import { useIntegration } from './useIntegration'
 import usePromptApps from './usePromptApps'
 import { useRouter } from 'next/navigation'
-import { trackEvent } from '@/utils/amplitude'
-import * as Sentry from '@sentry/nextjs'
 
 const useOnExternalMessage = () => {
   const router = useRouter()

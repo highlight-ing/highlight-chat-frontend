@@ -1,13 +1,13 @@
 import { useStore } from '@/providers/store-provider'
 import { LinearIcon, NotionIcon, GoogleIcon } from '@/icons/icons'
-import { IntegrationsLoader } from '@/features/integrations/_components/loader'
-import { CreateLinearTicket } from '@/features/integrations/linear/linear'
-import { CreateNotionPage } from '@/features/integrations/notion/notion'
-import { CreateGoogleCalEvent } from '@/features/integrations/google-cal/google-cal'
-import { SetupConnection } from '@/features/integrations/_components/setup-connection'
-import { checkLinearConnectionStatus, createMagicLinkForLinear } from '@/features/integrations/linear/actions'
-import { checkNotionConnectionStatus, createMagicLinkForNotion } from '@/features/integrations/notion/actions'
-import { checkGoogleConnectionStatus, createMagicLinkForGoogle } from '@/features/integrations/google-cal/actions'
+import { IntegrationsLoader } from '../_components/loader'
+import { CreateLinearTicket } from '../linear/linear'
+import { CreateNotionPage } from '../notion/notion'
+import { CreateGoogleCalEvent } from '../google-cal/google-cal'
+import { SetupConnection } from '../_components/setup-connection'
+import { checkLinearConnectionStatus, createMagicLinkForLinear } from '../linear/actions'
+import { checkNotionConnectionStatus, createMagicLinkForNotion } from '../notion/actions'
+import { checkGoogleConnectionStatus, createMagicLinkForGoogle } from '../google-cal/actions'
 
 interface CreateNotionPageParams {
   title: string
@@ -33,7 +33,7 @@ export interface UseIntegrationsAPI {
 function MessageWithComponent({ content, children }: { content: string; children?: React.ReactNode }) {
   return (
     <div>
-      <p>{content}</p>
+      {content && <p>{content} </p>}
       {children}
     </div>
   )

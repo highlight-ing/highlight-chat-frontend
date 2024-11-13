@@ -20,7 +20,6 @@ export function useLinearApiToken() {
       return linearToken
     },
     enabled: !!hlToken,
-    refetchInterval: 7 * 1000,
   })
 }
 
@@ -69,6 +68,7 @@ export function useCheckLinearConnection() {
       return connected as boolean
     },
     enabled: !!hlToken,
+    refetchInterval: 7 * 1000,
   })
 }
 

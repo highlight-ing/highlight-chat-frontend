@@ -1,4 +1,4 @@
-import { IntegrationType } from '@/types'
+import { IntegrationType } from './types'
 
 export function getIntegrationLanguage(type: IntegrationType) {
   switch (type) {

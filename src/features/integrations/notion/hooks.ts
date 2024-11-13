@@ -19,7 +19,6 @@ export function useNotionApiToken() {
       return notionToken
     },
     enabled: !!hlToken,
-    refetchInterval: 7 * 1000,
   })
 }
 
@@ -56,6 +55,7 @@ export function useCheckNotionConnection() {
       return connected as boolean
     },
     enabled: !!hlToken,
+    refetchInterval: 7 * 1000,
   })
 }
 
