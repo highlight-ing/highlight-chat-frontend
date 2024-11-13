@@ -14,7 +14,6 @@ async function getNewTokens(): Promise<TokensResponse> {
   const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await Highlight.auth.signIn()
   console.log('[useAuth] Got new tokens from Highlight.')
   updateUserInfo(newAccessToken)
-  console.log(newAccessToken, newRefreshToken, 'new tokens')
   const payload = decodeJwt(newAccessToken)
 
   const exp = payload.exp ?? 0

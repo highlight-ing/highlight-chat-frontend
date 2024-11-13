@@ -37,7 +37,6 @@ export const useChatHistory = (): {
           addOrUpdateOpenConversation(chat)
         }
       }
-      console.log('history:', data.conversations)
       return data.conversations
     } catch (error) {
       console.error('Error fetching response:', error)

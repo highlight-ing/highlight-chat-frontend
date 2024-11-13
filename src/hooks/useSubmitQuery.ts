@@ -235,12 +235,21 @@ export const useSubmitQuery = () => {
     })
   }
 
+  const TWO_SECONDS_IN_MILLISECONDS = 2000
+
   // Validates conversation ID's that are generated in HL Chat
   const createAndValidateConversationId = async () => {
-    const newConversationId = uuidv4()
     try {
-      const response = await get(`conversation/${newConversationId}/exists`, { version: 'v4' })
-      if (!response.ok) throw new Error('Could not validate conversation ID. Generating a new one...')
+      const newConversationId = uuidv4()
+      const response = (await Promise.race([
+        get(`conversation/${newConversationId}/exists`, { version: 'v4' }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Validation timeout. Generated a new one')), TWO_SECONDS_IN_MILLISECONDS),
+        ),
+      ])) as Response
+
+      if (typeof response === 'object' && !response?.ok)
+        throw new Error('Could not validate conversation ID. Generated a new one')
 
       const data = (await response.json()) as { id: string }
       const idIsTheSame = newConversationId === data.id
@@ -349,7 +358,7 @@ export const useSubmitQuery = () => {
               value: conversation_data.transcript,
               duration: Math.floor(
                 (new Date(conversation_data.endedAt).getTime() - new Date(conversation_data.startedAt).getTime()) /
-                60000,
+                  60000,
               ),
             })
           } else {
