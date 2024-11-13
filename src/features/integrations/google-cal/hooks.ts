@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { useHighlightToken } from '../hooks/use-hl-token'
+import { useHighlightToken } from '../_hooks/use-hl-token'
 import { GoogleCalEventFormSchema } from './google-cal'
 import { checkGoogleConnectionStatus, createGoogleCalendarEvent } from './actions'
 
@@ -18,18 +18,19 @@ export function useCheckGoogleCalConnection() {
       return connected as boolean
     },
     enabled: !!hlToken,
+    refetchInterval: 7 * 1000,
   })
 }
 
-export function useCreateGoogleCalEvent(onSubmitSuccess: (url: string | undefined) => void) {
+export function useCreateGoogleCalEvent(onSuccess: ((url: string) => void) | undefined) {
   const { data: hlToken } = useHighlightToken()
 
   return useMutation({
-    mutationKey: ['create-notion-page'],
+    mutationKey: ['create-google-cal-event'],
     mutationFn: async (data: GoogleCalEventFormSchema) => {
       if (!hlToken) {
-        console.warn('Notion token not set, please try again later.')
-        throw new Error('No Notion token available')
+        console.warn('Highlight token not set, please try again later.')
+        throw new Error('No Highligh token available')
       }
 
       const link = await createGoogleCalendarEvent(hlToken, data)
@@ -41,7 +42,7 @@ export function useCreateGoogleCalEvent(onSubmitSuccess: (url: string | undefine
       return link
     },
     onSuccess: (link) => {
-      if (onSubmitSuccess) onSubmitSuccess(link)
+      if (onSuccess) onSuccess(link)
     },
     onError: (error) => {
       console.warn(error.message)

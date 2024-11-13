@@ -1,15 +1,13 @@
-import { CreateNotionPageComponent } from '@/components/integrations/notion'
 import { useStore } from '@/providers/store-provider'
-import { useEffect, useState } from 'react'
-import { checkLinearConnectionStatus, createMagicLinkForLinear } from '@/utils/linear-server-actions'
 import { LinearIcon, NotionIcon, GoogleIcon } from '@/icons/icons'
-import { SetupConnectionComponent } from '@/components/integrations/integration-auth'
-import { checkNotionConnectionStatus, createMagicLinkForNotion } from '@/utils/notion-server-actions'
-import { checkGoogleConnectionStatus, createMagicLinkForGoogle } from '@/utils/google-server-actions'
-import { CreateGoogleCalendarEventComponent } from '@/components/integrations/gcal'
+import { IntegrationsLoader } from '@/features/integrations/_components/loader'
 import { CreateLinearTicket } from '@/features/integrations/linear/linear'
-import { IntegrationsLoader } from '@/components/integrations/loader'
 import { CreateNotionPage } from '@/features/integrations/notion/notion'
+import { CreateGoogleCalEvent } from '@/features/integrations/google-cal/google-cal'
+import { SetupConnection } from '@/features/integrations/_components/setup-connection'
+import { checkLinearConnectionStatus, createMagicLinkForLinear } from '@/features/integrations/linear/actions'
+import { checkNotionConnectionStatus, createMagicLinkForNotion } from '@/features/integrations/notion/actions'
+import { checkGoogleConnectionStatus, createMagicLinkForGoogle } from '@/features/integrations/google-cal/actions'
 
 interface CreateNotionPageParams {
   title: string
@@ -114,7 +112,7 @@ export function useIntegrations(): UseIntegrationsAPI {
     updateLastConversationMessage(conversationId!, {
       content: (
         <MessageWithComponent content={lastMessage}>
-          <CreateGoogleCalendarEventComponent {...params} />
+          <CreateGoogleCalEvent {...params} />
         </MessageWithComponent>
       ),
       role: 'assistant',
@@ -156,7 +154,7 @@ export function useIntegrations(): UseIntegrationsAPI {
             content: (
               <MessageWithComponent content={textContents}>
                 <div className="mt-2">
-                  <SetupConnectionComponent
+                  <SetupConnection
                     name={'Linear'}
                     checkConnectionStatus={checkLinearConnectionStatus}
                     onConnect={() => resolve()}
@@ -190,7 +188,7 @@ export function useIntegrations(): UseIntegrationsAPI {
             content: (
               <MessageWithComponent content={textContents}>
                 <div className="mt-2">
-                  <SetupConnectionComponent
+                  <SetupConnection
                     name={'Notion'}
                     checkConnectionStatus={checkNotionConnectionStatus}
                     onConnect={() => resolve()}
@@ -226,7 +224,7 @@ export function useIntegrations(): UseIntegrationsAPI {
             content: (
               <MessageWithComponent content={textContents}>
                 <div className="mt-2">
-                  <SetupConnectionComponent
+                  <SetupConnection
                     name={'Google'}
                     checkConnectionStatus={checkGoogleConnectionStatus}
                     onConnect={() => resolve()}

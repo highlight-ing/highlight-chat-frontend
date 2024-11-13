@@ -12,7 +12,6 @@ import {
   createGoogleCalendarEvent,
   createMagicLinkForGoogle,
 } from '@/utils/google-server-actions'
-import { DateTimePicker } from '../date-time'
 import { SetupConnectionComponent } from './integration-auth'
 import { GoogleIcon } from '@/icons/icons'
 import { IntegrationsLoader } from './loader'
@@ -83,20 +82,7 @@ export function GcalEventFormComponent({
   return (
     <form className="flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
       <InputField size={'xxlarge'} label={'Summary'} placeholder={'Event Summary'} {...register('summary')} />
-      <div className="grid grid-cols-2 gap-2">
-        <DateTimePicker
-          dateFieldLabel="Start Date"
-          timeFieldLabel="Start Time"
-          defaultDateIso={data.start}
-          onChange={onStartDateChange}
-        />
-        <DateTimePicker
-          dateFieldLabel="End Date"
-          timeFieldLabel="End Time"
-          defaultDateIso={data.end}
-          onChange={onEndDateChange}
-        />
-      </div>
+      <div className="grid grid-cols-2 gap-2"></div>
       <InputField size={'xxlarge'} label={'Location'} placeholder={'Event Location'} {...register('location')} />
       <TextArea
         rows={4}

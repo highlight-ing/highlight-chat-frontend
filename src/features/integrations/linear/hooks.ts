@@ -2,7 +2,7 @@ import { LinearClient } from '@linear/sdk'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { checkLinearConnectionStatus, getLinearTokenForUser } from './actions'
 import { LinearTicketFormSchema } from './linear'
-import { useHighlightToken } from '../hooks/use-hl-token'
+import { useHighlightToken } from '../_hooks/use-hl-token'
 
 export function useLinearApiToken() {
   const { data: hlToken } = useHighlightToken()
@@ -20,6 +20,7 @@ export function useLinearApiToken() {
       return linearToken
     },
     enabled: !!hlToken,
+    refetchInterval: 7 * 1000,
   })
 }
 

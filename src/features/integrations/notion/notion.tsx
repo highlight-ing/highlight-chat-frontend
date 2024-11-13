@@ -11,7 +11,6 @@ import { NotionIcon } from '@/icons/icons'
 import { useCheckNotionConnection, useCreateNotionPage, useNotionParentItems } from './hooks'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { IntegrationSubmitButton } from '../components/submit-button'
 import {
   Select,
   SelectContent,
@@ -21,9 +20,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { IntegrationsLoader } from '../components/loader'
-import { SetupConnection } from '../components/setup-connection'
-import { IntegrationSuccessMessage } from '../components/success-message'
+import { IntegrationSubmitButton } from '../_components/submit-button'
+import { IntegrationsLoader } from '../_components/loader'
+import { SetupConnection } from '../_components/setup-connection'
+import { IntegrationSuccessMessage } from '../_components/success-message'
 import { useQueryClient } from '@tanstack/react-query'
 
 const notionPageFormSchema = z.object({

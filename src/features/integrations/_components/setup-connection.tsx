@@ -4,7 +4,6 @@
 
 import { useEffect, useState } from 'react'
 import Button from '@/components/Button/Button'
-import { useQueryClient } from '@tanstack/react-query'
 
 /**
  * @param name - The name of the integration
@@ -86,15 +85,11 @@ export function SetupConnection({
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3">
       <p>You'll need to connect your {name} account first.</p>
       <Button size="small" variant="primary-outline" onClick={_createMagicLink}>
         {icon} Connect {name}
       </Button>
-
-      {/* <small onClick={_checkConnectionStatus} className="cursor-pointer underline">
-        Check connection status
-      </small> */}
     </div>
   )
 }
