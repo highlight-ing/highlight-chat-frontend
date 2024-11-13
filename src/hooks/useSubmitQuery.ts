@@ -349,7 +349,7 @@ export const useSubmitQuery = () => {
               value: conversation_data.transcript,
               duration: Math.floor(
                 (new Date(conversation_data.endedAt).getTime() - new Date(conversation_data.startedAt).getTime()) /
-                  60000,
+                60000,
               ),
             })
           } else {
@@ -534,11 +534,18 @@ export const useSubmitQuery = () => {
         }
       })
 
+      const currentDate = new Date()
+      const twentyFourHoursAgo = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000)
+      const isMoreRecentThan24Hours = (dateToCompare: Date): boolean => {
+        return dateToCompare.getTime() > twentyFourHoursAgo.getTime()
+      }
+
       const conversationData = await Highlight.conversations.getAllConversations()
       const conversationAttachments: Array<ConversationAttachmentMetadata> = conversationData
         .filter((conversation) => {
           return Object.entries(conversation).every(([key, value]) => key !== undefined && value !== undefined)
         })
+        .filter((conversation) => isMoreRecentThan24Hours(new Date(conversation.endedAt)))
         .map((conversation) => ({
           id: conversation.id,
           type: 'conversation',

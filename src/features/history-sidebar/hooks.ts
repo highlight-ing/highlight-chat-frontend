@@ -1,7 +1,6 @@
 import { useChatHistory } from '@/hooks/useChatHistory'
 import { ChatHistoryItem } from '@/types'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import * as Sentry from '@sentry/nextjs'
 
 const RETRY_ATTEMPTS = 4
 export const NEW_CONVERSATION_TITLE = 'New Conversation'
@@ -13,14 +12,13 @@ export function useHistory() {
     queryKey: ['history'],
     queryFn: async () => {
       await refreshChatHistory()
-      // Sentry.captureMessage('Fetch chat history from History')
     },
     staleTime: Infinity,
   })
 }
 
 export function useUpdateConversationTitle() {
-  const { history, refreshChatItem } = useChatHistory()
+  const { refreshChatItem } = useChatHistory()
 
   return useMutation({
     mutationKey: ['update-conversation-title'],
@@ -32,7 +30,6 @@ export function useUpdateConversationTitle() {
         throw new Error('Conversation title not yet updated')
       }
 
-      // Sentry.captureMessage(`Update conversation ${chatId} from HistoryItem`)
       return updatedConversation
     },
     retry: RETRY_ATTEMPTS,
@@ -40,8 +37,6 @@ export function useUpdateConversationTitle() {
       // Exponential backoff: 5s, 10s, 20s, 20s
       return Math.min(5000 * 2 ** attemptIndex, 20000)
     },
-    // enabled: chat.id === history?.[0].id && chat.title === NEW_CONVERSATION_TITLE,
-    // staleTime: 60 * 1000,
   })
 }
 
