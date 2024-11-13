@@ -22,6 +22,7 @@ declare global {
         openApp: (appId: string) => void
         sendConversationAsAttachment: (targetAppId: string, attachment: string) => Promise<void>
         requestAudioPermissionEvents: () => Promise<void>
+        sendExternalMessage: (appSlug: string, message: any) => Promise<void>
       }
       appStorage: {
         isHydrated: () => boolean
@@ -37,6 +38,25 @@ declare global {
         getEmail: () => Promise<string>
       }
     }
+  }
+}
+
+export const sendExternalMessage = async (appSlug: string, message: any) => {
+  try {
+    // pretty print message here
+    console.log('Sending external message:', JSON.stringify(message, null, 2))
+    await window.highlight.internal.sendExternalMessage(appSlug, message)
+    console.log('Message sent successfully')
+  } catch (error) {
+    console.error('Error sending external message:', error)
+  }
+}
+
+export const openApp = async (appId: string) => {
+  try {
+    await Highlight.app.openApp(appId)
+  } catch (error) {
+    console.error('Error opening app:', error)
   }
 }
 
