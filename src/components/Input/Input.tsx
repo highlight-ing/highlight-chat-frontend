@@ -61,10 +61,12 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
     let windowFocusTimeout: NodeJS.Timeout | null
 
     const onWindowFocus = () => {
-      windowFocusTimeout = setTimeout(() => {
-        inputRef.current?.focus()
-        setIsInputFocused(true)
-      }, 100)
+      if (!isActiveChat) {
+        windowFocusTimeout = setTimeout(() => {
+          inputRef.current?.focus()
+          setIsInputFocused(true)
+        }, 100)
+      }
     }
 
     const onInputFocus = () => {
