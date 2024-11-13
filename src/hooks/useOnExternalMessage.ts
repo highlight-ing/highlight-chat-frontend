@@ -81,6 +81,8 @@ const useOnExternalMessage = () => {
                 window_context: ocrScreenContents,
               })
             }
+          } else if (message.toolUse.name === 'create_google_calendar_event') {
+            integrations.createGoogleCalendarEvent(message.conversationId, message.toolUse.input)
           } else if (message.toolUse.name === 'create_linear_ticket') {
             console.log('Creating linear ticket', message.conversationId)
             integrations.createLinearTicket(
