@@ -63,7 +63,6 @@ export function GcalEventFormComponent({
   const onStartDateChange = (startDateTime: Date) => {
     try {
       if (!isNaN(startDateTime.getTime())) {
-        console.log({ startDateTime })
         setValue('start', startDateTime.toISOString())
       }
     } catch (e) {
@@ -74,7 +73,6 @@ export function GcalEventFormComponent({
   const onEndDateChange = (endDateTime: Date) => {
     try {
       if (!isNaN(endDateTime.getTime())) {
-        console.log({ endDateTime })
         setValue('end', endDateTime.toISOString())
       }
     } catch (e) {
