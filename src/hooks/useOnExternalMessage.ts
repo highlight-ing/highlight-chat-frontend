@@ -35,9 +35,6 @@ const useOnExternalMessage = () => {
 
   useEffect(() => {
     const removeListener = Highlight.app.addListener('onExternalMessage', async (caller: string, message: any) => {
-      console.log('Received external message from:', caller)
-      console.log('Message content:', message)
-
       if (message.type === 'refresh-pinned-prompts') {
         await refreshPinnedPrompts(true)
         return
