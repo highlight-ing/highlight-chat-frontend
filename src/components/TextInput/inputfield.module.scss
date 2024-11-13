@@ -48,7 +48,7 @@
 }
 
 .inputField {
-  background-color: $light-5;
+  background-color: $background-secondary;
   border: 1px solid $light-10;
   border-radius: 10px;
   font-weight: 350;
@@ -64,6 +64,7 @@
   &:focus {
     outline: none;
     border-color: $light-40;
+    background-color: $background-tertiary
   }
 
   &.small {
@@ -71,28 +72,33 @@
     font-size: 12px;
     height: 32px;
   }
+
   &.medium {
     padding: 12px;
     font-size: 14px;
     height: 36px;
   }
+
   &.large {
     padding: 16px;
     font-size: 14px;
     height: 42px;
   }
+
   &.xlarge {
     padding: 16px;
     font-size: 16px;
     height: 48px;
   }
+
   &.xxlarge {
     padding: 20px;
     font-size: 16px;
     height: 64px;
     transition: padding 200ms ease-in-out;
 
-    &:focus, &.label {
+    &:focus,
+    &.label {
       padding-top: 40px;
     }
   }
@@ -102,7 +108,11 @@
   @extend .inputField;
   resize: none;
 
-  &.small, &.medium, &.large, &.xlarge, &.xxlarge {
+  &.small,
+  &.medium,
+  &.large,
+  &.xlarge,
+  &.xxlarge {
     height: fit-content !important;
   }
 
@@ -112,7 +122,8 @@
     height: 64px;
     transition: padding 200ms ease-in-out;
 
-    &:focus, &.label {
+    &:focus,
+    &.label {
       padding-top: 32px;
       padding-bottom: 8px;
     }

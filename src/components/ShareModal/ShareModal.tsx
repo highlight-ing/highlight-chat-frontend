@@ -118,8 +118,6 @@ const ShareModal: React.FC<ShareModalProps> = ({ isVisible, conversation, onClos
 
   const processedTitle = conversation?.title.replace(/^["']|["']$/g, '')
 
-  console.log(conversation?.shared_conversations)
-
   return (
     <>
       <div className={`${styles.modalOverlay} ${isVisible ? styles.visible : ''}`} />

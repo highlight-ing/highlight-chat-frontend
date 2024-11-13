@@ -1,4 +1,8 @@
-import { getLinearTokenForUser } from '@/utils/linear-server-actions'
+import {
+  checkLinearConnectionStatus,
+  createMagicLinkForLinear,
+  getLinearTokenForUser,
+} from '@/utils/linear-server-actions'
 import { useEffect, useRef, useState } from 'react'
 import InputField from '@/components/TextInput/InputField'
 import TextArea from '@/components/TextInput/TextArea'
@@ -7,6 +11,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import Button from '@/components/Button/Button'
 import { z } from 'zod'
+import { LinearIcon } from '@/icons/icons'
+import { SetupConnectionComponent } from './integration-auth'
+import { IntegrationsLoader } from './loader'
 
 const linearTicketFormSchema = z.object({
   title: z.string().min(1),
@@ -131,7 +138,7 @@ export function LinearTicketSuccessComponent({ issueUrl }: { issueUrl: string })
 }
 
 export function CreateLinearTicketComponent({ title, description }: { title: string; description: string }) {
-  const [state, setState] = useState<'form' | 'success'>('form')
+  const [state, setState] = useState<'loading' | 'connect' | 'form' | 'success'>('loading')
   const [issueUrl, setIssueUrl] = useState<string>()
 
   function onSubmitSuccess(issueUrl: string) {
@@ -139,8 +146,34 @@ export function CreateLinearTicketComponent({ title, description }: { title: str
     setState('success')
   }
 
+  useEffect(() => {
+    async function checkConnection() {
+      //@ts-ignore
+      const hlToken = (await highlight.internal.getAuthorizationToken()) as string
+
+      const connected = await checkLinearConnectionStatus(hlToken)
+      if (connected) {
+        setState('form')
+      } else {
+        setState('connect')
+      }
+    }
+
+    checkConnection()
+  }, [])
+
   return (
     <div className="mt-2">
+      {state === 'loading' && <IntegrationsLoader />}
+      {state === 'connect' && (
+        <SetupConnectionComponent
+          name={'Linear'}
+          checkConnectionStatus={checkLinearConnectionStatus}
+          onConnect={() => setState('form')}
+          icon={<LinearIcon size={16} />}
+          createMagicLink={createMagicLinkForLinear}
+        />
+      )}
       {state === 'form' && (
         <LinearTicketFormComponent title={title} description={description} onSubmitSuccess={onSubmitSuccess} />
       )}

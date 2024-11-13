@@ -9,9 +9,6 @@ export function useCopyLink() {
   return useMutation({
     mutationKey: ['copy-share-link'],
     mutationFn: async (shareLink: string) => {
-      // INFO: For mocking/testing the UI
-      // await new Promise((resolve) => setTimeout(resolve, 2000))
-
       await navigator.clipboard.writeText(`https://highlightai.com/share/${shareLink}`)
     },
   })
@@ -26,10 +23,6 @@ export function useGenerateShareLink() {
     mutationKey: ['generate-share-link'],
     mutationFn: async (conversationId: string | undefined) => {
       if (!conversationId) return
-
-      // INFO: For mocking/testing the UI
-      // await new Promise((resolve) => setTimeout(resolve, 2000))
-      // return
 
       console.log('Generating share link for: ', conversationId)
 
@@ -95,7 +88,6 @@ export function useDisableLink() {
 
       console.log('Deleting share link for: ', conversationId)
 
-      //FIX: Error on the backend here
       const response = await deleteRequest(`share-link/${conversationId}`)
 
       if (!response.ok) {

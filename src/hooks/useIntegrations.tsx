@@ -9,6 +9,7 @@ import { checkNotionConnectionStatus } from '@/utils/notion-server-actions'
 import { CreateGoogleCalendarEventComponent } from '@/components/integrations/gcal'
 import { checkIntegrationStatus } from '@/utils/integrations-server-actions'
 import { SendSlackMessageComponent } from '@/components/integrations/slack'
+import { IntegrationsLoader } from '@/components/integrations/loader'
 
 interface CreateNotionPageParams {
   title: string
@@ -43,20 +44,6 @@ function MessageWithComponent({ content, children }: { content: string; children
       {children}
     </div>
   )
-}
-
-function LoadingComponent() {
-  const [text, setText] = useState('Loading...')
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setText('Still loading...')
-    }, 5000)
-
-    return () => clearTimeout(timeout)
-  }, [])
-
-  return <p className="mt-2 text-sm text-gray-500">{text}</p>
 }
 
 // Holds the previous content of the conversation to be able to append to it
@@ -169,7 +156,7 @@ export function useIntegrations(): UseIntegrationsAPI {
         content: (
           <MessageWithComponent content={textContents}>
             <div className="mt-2">
-              <LoadingComponent />
+              <IntegrationsLoader />
             </div>
           </MessageWithComponent>
         ),
@@ -288,7 +275,7 @@ export function useIntegrations(): UseIntegrationsAPI {
     updateLastConversationMessage(conversationId!, {
       content: (
         <MessageWithComponent content={textContents}>
-          <LoadingComponent />
+          <IntegrationsLoader />
         </MessageWithComponent>
       ),
       role: 'assistant',
