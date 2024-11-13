@@ -1,16 +1,21 @@
+import * as React from 'react'
 import type { CreateGoogleCalendarEventParams } from '@/hooks/useIntegrations'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import InputField from '../TextInput/InputField'
 import TextArea from '../TextInput/TextArea'
 import Button from '../Button/Button'
-import { createGoogleCalendarEvent } from '@/utils/google-server-actions'
-import { ConfigProvider, DatePicker } from 'antd'
-import dayjs from 'dayjs'
-
-const { RangePicker } = DatePicker
+import {
+  checkGoogleConnectionStatus,
+  createGoogleCalendarEvent,
+  createMagicLinkForGoogle,
+} from '@/utils/google-server-actions'
+import { DateTimePicker } from '../date-time'
+import { SetupConnectionComponent } from './integration-auth'
+import { GoogleIcon } from '@/icons/icons'
+import { IntegrationsLoader } from './loader'
 
 const gcalEventFormSchema = z.object({
   summary: z.string(),
@@ -55,9 +60,43 @@ export function GcalEventFormComponent({
     onSuccess(link ?? '')
   }
 
+  const onStartDateChange = (startDateTime: Date) => {
+    try {
+      if (!isNaN(startDateTime.getTime())) {
+        setValue('start', startDateTime.toISOString())
+      }
+    } catch (e) {
+      console.warn('Error setting start date value', e)
+    }
+  }
+
+  const onEndDateChange = (endDateTime: Date) => {
+    try {
+      if (!isNaN(endDateTime.getTime())) {
+        setValue('end', endDateTime.toISOString())
+      }
+    } catch (e) {
+      console.warn('Error setting start date value', e)
+    }
+  }
+
   return (
     <form className="flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
       <InputField size={'xxlarge'} label={'Summary'} placeholder={'Event Summary'} {...register('summary')} />
+      <div className="grid grid-cols-2 gap-2">
+        <DateTimePicker
+          dateFieldLabel="Start Date"
+          timeFieldLabel="Start Time"
+          defaultDateIso={data.start}
+          onChange={onStartDateChange}
+        />
+        <DateTimePicker
+          dateFieldLabel="End Date"
+          timeFieldLabel="End Time"
+          defaultDateIso={data.end}
+          onChange={onEndDateChange}
+        />
+      </div>
       <InputField size={'xxlarge'} label={'Location'} placeholder={'Event Location'} {...register('location')} />
       <TextArea
         rows={4}
@@ -66,30 +105,6 @@ export function GcalEventFormComponent({
         placeholder={'Event Description'}
         {...register('description')}
       />
-      <ConfigProvider
-        theme={{
-          token: {},
-          components: {
-            DatePicker: {
-              colorBgContainer: 'rgba(255, 255, 255, 0.05)',
-              colorBorder: 'rgba(255, 255, 255, 0.1)',
-              borderRadius: 10,
-              colorPrimaryHover: 'rgba(255, 255, 255, 0.2)',
-              colorTextPlaceholder: 'rgba(255, 255, 255, 0.2)',
-              activeBorderColor: 'rgba(255, 255, 255, 0.4)',
-            },
-          },
-        }}
-      >
-        <RangePicker
-          value={[dayjs(watch('start')), dayjs(watch('end'))]}
-          onChange={(value) => {
-            setValue('start', value?.[0]?.toISOString())
-            setValue('end', value?.[1]?.toISOString())
-          }}
-          showTime
-        />
-      </ConfigProvider>
       <Button size={'medium'} variant={'primary'} type={'submit'} disabled={isSubmitting}>
         Create Event
       </Button>
@@ -98,7 +113,7 @@ export function GcalEventFormComponent({
 }
 
 export function CreateGoogleCalendarEventComponent(data: CreateGoogleCalendarEventParams) {
-  const [state, setState] = useState<'form' | 'success'>('form')
+  const [state, setState] = useState<'loading' | 'connect' | 'form' | 'success'>('loading')
   const [url, setUrl] = useState<string | undefined>(undefined)
 
   function onSuccess(url?: string) {
@@ -106,8 +121,35 @@ export function CreateGoogleCalendarEventComponent(data: CreateGoogleCalendarEve
     setUrl(url)
   }
 
+  useEffect(() => {
+    async function checkConnection() {
+      //@ts-ignore
+      const hlToken = (await highlight.internal.getAuthorizationToken()) as string
+
+      const connected = await checkGoogleConnectionStatus(hlToken)
+
+      if (connected) {
+        setState('form')
+      } else {
+        setState('connect')
+      }
+    }
+
+    checkConnection()
+  }, [])
+
   return (
     <div className="mt-2">
+      {state === 'loading' && <IntegrationsLoader />}
+      {state === 'connect' && (
+        <SetupConnectionComponent
+          name={'Google Calendar'}
+          checkConnectionStatus={checkGoogleConnectionStatus}
+          onConnect={() => setState('form')}
+          icon={<GoogleIcon size={16} />}
+          createMagicLink={createMagicLinkForGoogle}
+        />
+      )}
       {state === 'form' && <GcalEventFormComponent data={data} onSuccess={onSuccess} />}
       {state === 'success' && url && (
         <span>
