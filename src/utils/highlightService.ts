@@ -13,6 +13,7 @@ const getAppStorage = () => (isBrowser ? window.highlight.appStorage : null)
 declare global {
   interface Window {
     highlight: {
+      version: string
       internal: {
         getConversations: () => Promise<ConversationData[]>
         createConversationsStorageListener: (callback: () => void) => () => void
