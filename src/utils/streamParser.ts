@@ -1,6 +1,6 @@
 import { Toast } from '@/types'
-import { UseIntegrationsAPI } from '@/hooks/useIntegrations'
-import { integrationFunctionNames } from './integrations'
+import { UseIntegrationsAPI } from '@/features/integrations/_hooks/use-integrations'
+import { integrationFunctionNames } from '@/features/integrations/utils'
 
 type StreamParserProps = {
   showConfirmationModal: (message: string) => Promise<boolean>

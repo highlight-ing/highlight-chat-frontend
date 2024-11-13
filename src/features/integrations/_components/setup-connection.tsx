@@ -12,7 +12,7 @@ import Button from '@/components/Button/Button'
  * @param icon - The icon of the integration
  * @param createMagicLink - A function that creates a magic link to redirect the user to the integration's auth page
  */
-export function SetupConnectionComponent({
+export function SetupConnection({
   name,
   checkConnectionStatus,
   onConnect,
@@ -85,15 +85,11 @@ export function SetupConnectionComponent({
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3">
       <p>You'll need to connect your {name} account first.</p>
       <Button size="small" variant="primary-outline" onClick={_createMagicLink}>
         {icon} Connect {name}
       </Button>
-
-      {/* <small onClick={_checkConnectionStatus} className="cursor-pointer underline">
-        Check connection status
-      </small> */}
     </div>
   )
 }

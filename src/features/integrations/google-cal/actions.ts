@@ -1,6 +1,6 @@
 'use server'
 
-import type { CreateGoogleCalendarEventParams } from '@/hooks/useIntegrations'
+import type { CreateGoogleCalendarEventParams } from '../_hooks/use-integrations'
 import { google } from 'googleapis'
 
 const HIGHLIGHT_BACKEND_BASE_URL = 'https://backend.highlightai.com'

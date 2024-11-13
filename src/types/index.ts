@@ -272,11 +272,6 @@ export interface LLMMessage {
 
 export type CopyState = 'idle' | 'copying' | 'copied' | 'hiding'
 
-/**
- * All the types of integrations that we support.
- */
-export type IntegrationType = 'linear' | 'notion'
-
 export interface NotionParentItem {
   type: 'database' | 'page'
   id: string

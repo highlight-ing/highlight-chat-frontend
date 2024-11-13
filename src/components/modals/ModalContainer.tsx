@@ -18,9 +18,9 @@ import PromptAddedModal from '@/presentations/modals/PromptAddedModal'
 import CustomizePromptModal from '@/presentations/modals/CustomizePromptModal'
 import CreatePromptFromTemplateModal from '@/presentations/modals/CreatePromptFromTemplate'
 import UnsavedChangesModal from '@/presentations/modals/UnsavedChangesModal'
-import ConnectIntegrationModal from '@/presentations/modals/ConnectIntegrationModal'
 import SendFeedbackModal, { SendFeedbackModalProps } from '@/presentations/modals/SendFeedbackModal'
 import UpdateFeedbackModal, { UpdateFeedbackModalProps } from '@/presentations/modals/UpdateFeedbackModal'
+import { ConnectIntegrationModal } from '@/features/integrations/_components/connect-integration-modal'
 
 type FunctionalComponent = (props: ModalObjectProps) => JSX.Element
 

@@ -1,4 +1,4 @@
-import { useSubmitQuery } from './useSubmitQuery'
+import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 
 export function useIntegration() {
   const { handleSubmit } = useSubmitQuery()

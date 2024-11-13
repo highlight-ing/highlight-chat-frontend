@@ -1,15 +1,13 @@
-import { IntegrationType, ModalObjectProps } from '@/types'
-
-import { useStore } from '@/providers/store-provider'
-import ConfirmationModal from '@/components/modals/ConfirmationModal'
-import { getIntegrationLanguage } from '@/utils/integrations'
+import { IntegrationType } from '../types'
+import { getIntegrationLanguage } from '../utils'
 import Modal from '@/components/modals/Modal'
+import { ModalObjectProps } from '@/types'
 
 export interface ConnectIntegrationModalContext {
   type: IntegrationType
 }
 
-export default function ConnectIntegrationModal({ id, context }: ModalObjectProps) {
+export function ConnectIntegrationModal({ id, context }: ModalObjectProps) {
   const { type } = context as ConnectIntegrationModalContext
 
   return (

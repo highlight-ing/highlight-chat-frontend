@@ -1,14 +1,13 @@
-import { CreateLinearTicketComponent } from '@/components/integrations/linear'
-import { CreateNotionPageComponent } from '@/components/integrations/notion'
 import { useStore } from '@/providers/store-provider'
-import { useEffect, useState } from 'react'
-import { checkLinearConnectionStatus, createMagicLinkForLinear } from '@/utils/linear-server-actions'
 import { LinearIcon, NotionIcon, GoogleIcon } from '@/icons/icons'
-import { SetupConnectionComponent } from '@/components/integrations/integration-auth'
-import { checkNotionConnectionStatus, createMagicLinkForNotion } from '@/utils/notion-server-actions'
-import { checkGoogleConnectionStatus, createMagicLinkForGoogle } from '@/utils/google-server-actions'
-import { CreateGoogleCalendarEventComponent } from '@/components/integrations/gcal'
-import { IntegrationsLoader } from '@/components/integrations/loader'
+import { IntegrationsLoader } from '../_components/loader'
+import { CreateLinearTicket } from '../linear/linear'
+import { CreateNotionPage } from '../notion/notion'
+import { CreateGoogleCalEvent } from '../google-cal/google-cal'
+import { SetupConnection } from '../_components/setup-connection'
+import { checkLinearConnectionStatus, createMagicLinkForLinear } from '../linear/actions'
+import { checkNotionConnectionStatus, createMagicLinkForNotion } from '../notion/actions'
+import { checkGoogleConnectionStatus, createMagicLinkForGoogle } from '../google-cal/actions'
 
 interface CreateNotionPageParams {
   title: string
@@ -34,7 +33,7 @@ export interface UseIntegrationsAPI {
 function MessageWithComponent({ content, children }: { content: string; children?: React.ReactNode }) {
   return (
     <div>
-      <p>{content}</p>
+      {content && <p>{content} </p>}
       {children}
     </div>
   )
@@ -65,7 +64,9 @@ export function useIntegrations(): UseIntegrationsAPI {
     updateLastConversationMessage(conversationId!, {
       content: (
         <MessageWithComponent content={lastMessage}>
-          <CreateLinearTicketComponent title={title} description={description} />
+          <div className="mt-2">
+            <CreateLinearTicket title={title} description={description} />
+          </div>
         </MessageWithComponent>
       ),
       role: 'assistant',
@@ -87,7 +88,9 @@ export function useIntegrations(): UseIntegrationsAPI {
     updateLastConversationMessage(conversationId!, {
       content: (
         <MessageWithComponent content={lastMessage}>
-          <CreateNotionPageComponent {...params} />
+          <div className="mt-2">
+            <CreateNotionPage {...params} />
+          </div>
         </MessageWithComponent>
       ),
       role: 'assistant',
@@ -109,7 +112,7 @@ export function useIntegrations(): UseIntegrationsAPI {
     updateLastConversationMessage(conversationId!, {
       content: (
         <MessageWithComponent content={lastMessage}>
-          <CreateGoogleCalendarEventComponent {...params} />
+          <CreateGoogleCalEvent {...params} />
         </MessageWithComponent>
       ),
       role: 'assistant',
@@ -151,7 +154,7 @@ export function useIntegrations(): UseIntegrationsAPI {
             content: (
               <MessageWithComponent content={textContents}>
                 <div className="mt-2">
-                  <SetupConnectionComponent
+                  <SetupConnection
                     name={'Linear'}
                     checkConnectionStatus={checkLinearConnectionStatus}
                     onConnect={() => resolve()}
@@ -185,7 +188,7 @@ export function useIntegrations(): UseIntegrationsAPI {
             content: (
               <MessageWithComponent content={textContents}>
                 <div className="mt-2">
-                  <SetupConnectionComponent
+                  <SetupConnection
                     name={'Notion'}
                     checkConnectionStatus={checkNotionConnectionStatus}
                     onConnect={() => resolve()}
@@ -221,7 +224,7 @@ export function useIntegrations(): UseIntegrationsAPI {
             content: (
               <MessageWithComponent content={textContents}>
                 <div className="mt-2">
-                  <SetupConnectionComponent
+                  <SetupConnection
                     name={'Google'}
                     checkConnectionStatus={checkGoogleConnectionStatus}
                     onConnect={() => resolve()}
