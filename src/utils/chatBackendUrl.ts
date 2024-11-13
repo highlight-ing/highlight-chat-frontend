@@ -1,4 +1,4 @@
-const appVersion = window.highlight?.version
+const appVersion = window?.highlight?.version
 const isAlpha = appVersion?.endsWith('alpha')
 
 export const backendUrl =
