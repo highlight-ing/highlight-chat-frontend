@@ -104,9 +104,6 @@ export async function createGoogleCalendarEvent(accessToken: string, data: Creat
 
   const calendar = google.calendar({ version: 'v3', auth: oauth2Client })
 
-  const startDate = data.start ? new Date(data.start).toISOString() : new Date().toISOString()
-  const endDate = data.end ? new Date(data.end).toISOString() : new Date(startDate).toISOString()
-
   const event = await calendar.events.insert({
     auth: oauth2Client,
     calendarId: 'primary',
@@ -114,10 +111,10 @@ export async function createGoogleCalendarEvent(accessToken: string, data: Creat
       summary: data.summary,
       description: data.description,
       start: {
-        dateTime: startDate,
+        dateTime: data.start,
       },
       end: {
-        dateTime: endDate,
+        dateTime: data.end,
       },
       location: data.location,
     },
