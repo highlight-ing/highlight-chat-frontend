@@ -1,24 +1,18 @@
 import React from 'react'
 import type { CreateGoogleCalendarEventParams } from '@/hooks/useIntegrations'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import InputField from '../TextInput/InputField'
-import Button from '../Button/Button'
-import {
-  checkGoogleConnectionStatus,
-  createGoogleCalendarEvent,
-  createMagicLinkForGoogle,
-} from '@/utils/google-server-actions'
-import { DateTimePicker } from '../date-time'
-import { SetupConnectionComponent } from './integration-auth'
 import { GoogleIcon } from '@/icons/icons'
-import { IntegrationsLoader } from './loader'
+import { IntegrationsLoader } from '../components/loader'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { IntegrationSubmitButton } from '../components/submit-button'
+import { useCheckGoogleCalConnection, useCreateGoogleCalEvent } from './hooks'
+import { checkGoogleConnectionStatus, createMagicLinkForGoogle } from './actions'
+import { IntegrationSuccessMessage } from '../components/success-message'
+import { SetupConnection } from '../components/setup-connection'
 
 const googleCalEventFormSchema = z.object({
   summary: z.string().min(1),
@@ -28,14 +22,14 @@ const googleCalEventFormSchema = z.object({
   end: z.string().optional(),
 })
 
-type GoogleCalEventFormSchema = z.infer<typeof googleCalEventFormSchema>
+export type GoogleCalEventFormSchema = z.infer<typeof googleCalEventFormSchema>
 
 type GoogleCalEventFormProps = {
   data: CreateGoogleCalendarEventParams
   onSuccess: (url: string) => void
 }
 
-export function GcalEventFormComponent(props: GoogleCalEventFormProps) {
+export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
   const { mutate: createGoogleCalEvent, isPending } = useCreateGoogleCalEvent(props.onSuccess)
 
   const form = useForm<z.infer<typeof googleCalEventFormSchema>>({
@@ -141,53 +135,45 @@ export function GcalEventFormComponent(props: GoogleCalEventFormProps) {
   )
 }
 
-export function CreateGoogleCalendarEventComponent(data: CreateGoogleCalendarEventParams) {
-  const [state, setState] = useState<'loading' | 'connect' | 'form' | 'success'>('loading')
-  const [url, setUrl] = useState<string | undefined>(undefined)
+export function CreateGoogleCalEvent(data: CreateGoogleCalendarEventParams) {
+  const { data: connectedToGoogleCal, isLoading: connectionIsLoading } = useCheckGoogleCalConnection()
+  const [state, setState] = React.useState<'form' | 'success'>('form')
+  const [url, setUrl] = React.useState<string | undefined>(undefined)
 
   function onSuccess(url?: string) {
     setState('success')
     setUrl(url)
   }
 
-  useEffect(() => {
-    async function checkConnection() {
-      //@ts-ignore
-      const hlToken = (await highlight.internal.getAuthorizationToken()) as string
+  if (connectionIsLoading) {
+    return <IntegrationsLoader />
+  }
 
-      const connected = await checkGoogleConnectionStatus(hlToken)
+  if (!connectedToGoogleCal) {
+    return (
+      <SetupConnection
+        name={'Google Calendar'}
+        checkConnectionStatus={checkGoogleConnectionStatus}
+        onConnect={() => setState('form')}
+        icon={<GoogleIcon size={16} />}
+        createMagicLink={createMagicLinkForGoogle}
+      />
+    )
+  }
 
-      if (connected) {
-        setState('form')
-      } else {
-        setState('connect')
-      }
-    }
+  if (state === 'form') {
+    return <GoogleCalEventForm data={data} onSuccess={onSuccess} />
+  }
 
-    checkConnection()
-  }, [])
-
-  return (
-    <div className="mt-2">
-      {state === 'loading' && <IntegrationsLoader />}
-      {state === 'connect' && (
-        <SetupConnectionComponent
-          name={'Google Calendar'}
-          checkConnectionStatus={checkGoogleConnectionStatus}
-          onConnect={() => setState('form')}
-          icon={<GoogleIcon size={16} />}
-          createMagicLink={createMagicLinkForGoogle}
-        />
-      )}
-      {state === 'form' && <GcalEventFormComponent data={data} onSuccess={onSuccess} />}
-      {state === 'success' && url && (
-        <span>
-          Google Calendar event created successfully:{' '}
-          <a href={url} target="_blank">
-            {url}
-          </a>
-        </span>
-      )}
-    </div>
-  )
+  if (state === 'success' && url) {
+    return (
+      <IntegrationSuccessMessage
+        heading="Google Calendar event created:"
+        url={url}
+        title={data.summary}
+        subTitle="Google Calendar event"
+        icon={<GoogleIcon size={20} />}
+      />
+    )
+  }
 }

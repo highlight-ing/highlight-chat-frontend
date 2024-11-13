@@ -2,28 +2,29 @@ import { LinearClient } from '@linear/sdk'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { checkLinearConnectionStatus, getLinearTokenForUser } from './actions'
 import { LinearTicketFormSchema } from './linear'
+import { useHighlightToken } from '../hooks/use-hl-token'
 
 export function useLinearApiToken() {
+  const { data: hlToken } = useHighlightToken()
+
   return useQuery({
     queryKey: ['linear-api-token'],
     queryFn: async () => {
-      // @ts-expect-error: highlight is mounted on window
-      const hlToken = (await highlight.internal.getAuthorizationToken()) as string
-      const token = await getLinearTokenForUser(hlToken as string)
+      const linearToken = await getLinearTokenForUser(hlToken as string)
 
-      if (!token) {
+      if (!linearToken) {
         console.warn('Something is wrong, no Linear token found for user but we are in the Linear form')
         throw new Error('No Linear token found')
       }
 
-      return { linearToken: token, hlToken }
+      return linearToken
     },
+    enabled: !!hlToken,
   })
 }
 
 export function useLinearClient() {
-  const { data: tokenData } = useLinearApiToken()
-  const linearToken = tokenData?.linearToken
+  const { data: linearToken } = useLinearApiToken()
 
   return useQuery({
     queryKey: ['linear-client', linearToken],
@@ -53,8 +54,7 @@ export function useLinearTeams() {
 }
 
 export function useCheckLinearConnection() {
-  const { data: tokenData } = useLinearApiToken()
-  const hlToken = tokenData?.hlToken
+  const { data: hlToken } = useHighlightToken()
 
   return useQuery({
     queryKey: ['linear-check-connection'],

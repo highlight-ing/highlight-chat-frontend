@@ -1,28 +1,29 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { getNotionTokenForUser, getNotionParentItems, createNotionPage, checkNotionConnectionStatus } from './actions'
 import { NotionPageFormSchema } from './notion'
+import { useHighlightToken } from '../hooks/use-hl-token'
 
 export function useNotionApiToken() {
+  const { data: hlToken } = useHighlightToken()
+
   return useQuery({
     queryKey: ['notion-api-token'],
     queryFn: async () => {
-      // @ts-expect-error: highlight is mounted on window
-      const hlToken = (await highlight.internal.getAuthorizationToken()) as string
-      const token = await getNotionTokenForUser(hlToken as string)
+      const notionToken = await getNotionTokenForUser(hlToken as string)
 
-      if (!token) {
+      if (!notionToken) {
         console.warn('Something is wrong, no Notion token found for user but we are in the Notion form')
         throw new Error('No Notion token found')
       }
 
-      return { notionToken: token, hlToken }
+      return notionToken
     },
+    enabled: !!hlToken,
   })
 }
 
 export function useNotionParentItems() {
-  const { data: tokenData } = useNotionApiToken()
-  const notionToken = tokenData?.notionToken
+  const { data: notionToken } = useNotionApiToken()
 
   return useQuery({
     queryKey: ['notion-parent-items', notionToken],
@@ -40,8 +41,7 @@ export function useNotionParentItems() {
 }
 
 export function useCheckNotionConnection() {
-  const { data: tokenData } = useNotionApiToken()
-  const hlToken = tokenData?.hlToken
+  const { data: hlToken } = useHighlightToken()
 
   return useQuery({
     queryKey: ['notion-check-connection'],
@@ -59,9 +59,8 @@ export function useCheckNotionConnection() {
 }
 
 export function useCreateNotionPage(onSubmitSuccess: (url: string | undefined) => void) {
-  const { data: tokenData } = useNotionApiToken()
+  const { data: notionToken } = useNotionApiToken()
   const { data: parentItems } = useNotionParentItems()
-  const notionToken = tokenData?.notionToken
 
   return useMutation({
     mutationKey: ['create-notion-page'],
