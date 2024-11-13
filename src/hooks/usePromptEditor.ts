@@ -8,6 +8,8 @@ import { DEFAULT_PROMPT_EXTERNAL_IDS } from '@/lib/promptapps'
 import usePromptApps from './usePromptApps'
 import { sendExternalMessage, openApp } from '@/utils/highlightService'
 
+export const PROMPT_SLUG = 'dev2'
+
 export function usePromptEditor() {
   // STATE
   const [saveDisabled, setSaveDisabled] = useState(false)
@@ -109,6 +111,11 @@ export function usePromptEditor() {
 
       addPrompt(res.prompt)
 
+      const message = {
+        type: 'prompt-created',
+        promptId: res.prompt.id,
+      }
+      await sendExternalMessage(PROMPT_SLUG, message)
       closeModal('create-prompt')
 
       selectPrompt(res.prompt.external_id, true, false)
@@ -121,8 +128,8 @@ export function usePromptEditor() {
         promptId: res.prompt.id,
       }
       // Open the app and send message before closing modal
-      await openApp('dev2')
-      await sendExternalMessage('dev2', message)
+      await openApp(PROMPT_SLUG)
+      await sendExternalMessage(PROMPT_SLUG, message)
 
       closeModal('edit-prompt')
     }
