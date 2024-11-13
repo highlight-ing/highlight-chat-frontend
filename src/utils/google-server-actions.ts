@@ -38,5 +38,7 @@ export async function createGoogleCalendarEvent(accessToken: string, data: Creat
     },
   })
 
+  console.log({ event })
+
   return event.data.htmlLink
 }

@@ -9,6 +9,7 @@ import { sendMessage, listConversations } from '@/utils/slack-server-actions'
 import { getIntegrationTokenForUser } from '@/utils/integrations-server-actions'
 import BaseDropdown, { DropdownItem } from '@/components/dropdowns/base-dropdown'
 import { ArrowDown2, ArrowUp2, Hashtag, User } from 'iconsax-react'
+import TextArea from '../TextInput/TextArea'
 
 const sendSlackMessageFormSchema = z.object({
   message: z.string(),
@@ -46,13 +47,13 @@ function SlackMessageFormComponent({ data, onSuccess }: { data: SendSlackMessage
         ...channels
           .filter((channel: any) => channel.type === 'public_channel')
           .map((channel: any) => ({
-            id: channel.id,
+            id: `channel-${channel.id}`,
             type: 'item',
             component: channel.name,
             icon: <Hashtag size={20} />,
           })),
         {
-          id: 'dm-label',
+          id: 'im-label',
           type: 'label',
           component: 'Direct Messages',
         },
@@ -60,7 +61,7 @@ function SlackMessageFormComponent({ data, onSuccess }: { data: SendSlackMessage
           .filter((channel: any) => channel.type === 'im')
           .filter((channel: any) => channel.user !== '')
           .map((channel: any) => ({
-            id: channel.id,
+            id: `im-${channel.id}`,
             type: 'item',
             component: channel.user,
             icon: <User size={20} />,
@@ -105,6 +106,7 @@ function SlackMessageFormComponent({ data, onSuccess }: { data: SendSlackMessage
 
   return (
     <>
+      <span className="text-sm font-medium">Send to</span>
       <BaseDropdown
         items={items}
         onItemSelect={(item) => {
@@ -118,7 +120,7 @@ function SlackMessageFormComponent({ data, onSuccess }: { data: SendSlackMessage
           // @ts-ignore
           ({ isOpen }) => (
             <Button id={triggerId} size={'medium'} variant={'tertiary'}>
-              <Hashtag size={16} />
+              {selectedItem?.id.startsWith('channel-') ? <Hashtag size={16} /> : <User size={16} />}
               {selectedItem?.component}
               {isOpen && <ArrowDown2 size={16} />}
               {!isOpen && <ArrowUp2 size={16} />}
@@ -126,10 +128,9 @@ function SlackMessageFormComponent({ data, onSuccess }: { data: SendSlackMessage
           )
         }
       </BaseDropdown>
-      <form className="flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
-        <InputField size={'xxlarge'} label={'Message'} placeholder={'Message'} {...register('message')} />
-        <InputField size={'xxlarge'} label={'Channel'} placeholder={'Channel'} {...register('channel')} />
-
+      <form className="mt-2 flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
+        {/* <InputField size={'xxlarge'} label={'Message'} placeholder={'Message'} {...register('message')} /> */}
+        <TextArea rows={4} size={'xxlarge'} label={'Message'} placeholder={''} {...register('message')} />
         {errors.root && <p className="text-red-500">{errors.root.message}</p>}
         <Button size={'medium'} variant={'primary'} type={'submit'} disabled={isSubmitting}>
           Send Message
