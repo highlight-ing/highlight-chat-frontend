@@ -177,7 +177,6 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
           animate={{ height: bounds.height }}
           transition={{ ...inputTransition, duration: isInputFocused ? 0.2 : 0.25, delay: isInputFocused ? 0 : 0.15 }}
           className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''} min-h-[68px]`}
-          onFocus={handleNonInputFocus}
           onClick={focusInput}
         >
           <div ref={ref} className={`${styles.inputWrapper} flex-col justify-between`}>
@@ -201,7 +200,9 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
                   className="h-6 max-h-[120px] w-full resize-none overflow-y-auto leading-6"
                 />
               </div>
-              <AttachmentDropdowns isInputFocused={isInputFocused} inputRef={inputRef} />
+              <div onFocus={handleNonInputFocus}>
+                <AttachmentDropdowns isInputFocused={isInputFocused} inputRef={inputRef} />
+              </div>
             </div>
 
             <AnimatePresence mode="popLayout">

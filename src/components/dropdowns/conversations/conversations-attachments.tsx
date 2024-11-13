@@ -102,13 +102,17 @@ export const ConversationAttachments = () => {
   return (
     <ScrollArea className="flex h-60 w-full flex-col gap-1 space-y-1">
       {attachmentOptions.map((option, index) => (
-        <DropdownMenuItem key={index} onClick={option.onClick}>
+        <div
+          key={index}
+          onClick={option.onClick}
+          className="relative mt-1 flex cursor-pointer select-none items-center gap-2 rounded-[16px] border border-tertiary p-1 text-sm outline-none transition-colors first:mt-0 hover:bg-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0"
+        >
           {option.imageComponent}
           <div className="flex flex-col">
             <span className="text-sm font-medium text-secondary">{option.title}</span>
             {option.description && <span className="text-xs text-tertiary">{option.description}</span>}
           </div>
-        </DropdownMenuItem>
+        </div>
       ))}
     </ScrollArea>
   )

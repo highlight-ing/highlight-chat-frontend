@@ -6,16 +6,11 @@ import { MAX_NUMBER_OF_ATTACHMENTS } from '@/stores/chat-attachments'
 import { useConversations } from '@/context/ConversationContext'
 import AnimatedVoiceSquare from '@/components/Conversations/AnimatedVoiceSquare'
 import ConversationToggle from './conversations-toggle'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { ConversationAttachments } from './conversations-attachments'
-import { useContext, useEffect, useState } from 'react'
-import { AttachmentDropdownsContext } from '../attachment-dropdowns'
+import { useState } from 'react'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
-interface ConversationsDropdownProps {
-  onCloseAutoFocus: (e: Event) => void
-}
-
-export const ConversationsDropdown = ({ onCloseAutoFocus }: ConversationsDropdownProps) => {
+export const ConversationsDropdown = () => {
   const { isAudioTranscripEnabled, micActivity } = useConversations()
   const { attachments } = useStore(
     useShallow((state) => ({
@@ -24,30 +19,17 @@ export const ConversationsDropdown = ({ onCloseAutoFocus }: ConversationsDropdow
       setFileInputRef: state.setFileInputRef,
     })),
   )
-  const { activeDropdown, setActiveDropdown } = useContext(AttachmentDropdownsContext)
   const [isOpen, setIsOpen] = useState(false)
-  const dropdownId = 'conversations'
-
-  useEffect(() => {
-    if (isOpen) setActiveDropdown(dropdownId)
-  }, [isOpen])
-
-  useEffect(() => {
-    if (activeDropdown !== dropdownId) setIsOpen(false)
-  }, [activeDropdown, setIsOpen])
 
   const isDisabled = attachments.length >= MAX_NUMBER_OF_ATTACHMENTS
 
   return (
-    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
       <Tooltip
         tooltip={isDisabled ? 'Max number of attahments added' : isOpen ? '' : 'Attach a conversation'}
         position={'top'}
       >
-        <DropdownMenuTrigger
-          disabled={isDisabled}
-          className={`${styles.button} ${isDisabled ? styles.disabledButton : ''}`}
-        >
+        <PopoverTrigger disabled={isDisabled} className={`${styles.button} ${isDisabled ? styles.disabledButton : ''}`}>
           {isAudioTranscripEnabled ? (
             <AnimatedVoiceSquare
               width={24}
@@ -67,18 +49,12 @@ export const ConversationsDropdown = ({ onCloseAutoFocus }: ConversationsDropdow
               transitionDuration={0}
             />
           )}
-        </DropdownMenuTrigger>
+        </PopoverTrigger>
       </Tooltip>
-      <DropdownMenuContent
-        onCloseAutoFocus={onCloseAutoFocus}
-        sideOffset={18}
-        align="end"
-        alignOffset={-10}
-        className="w-64 space-y-2"
-      >
+      <PopoverContent sideOffset={18} align="end" alignOffset={-10} className="w-64 space-y-2 p-2 pt-3">
         <ConversationToggle />
         <ConversationAttachments />
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </PopoverContent>
+    </Popover>
   )
 }
