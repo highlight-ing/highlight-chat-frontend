@@ -113,7 +113,9 @@ export function useIntegrations(): UseIntegrationsAPI {
     updateLastConversationMessage(conversationId!, {
       content: (
         <MessageWithComponent content={lastMessage}>
-          <CreateGoogleCalEvent {...params} />
+          <div className="mt-2">
+            <CreateGoogleCalEvent {...params} />
+          </div>
         </MessageWithComponent>
       ),
       role: 'assistant',
