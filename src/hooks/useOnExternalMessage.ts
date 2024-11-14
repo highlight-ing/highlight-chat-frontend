@@ -91,16 +91,17 @@ const useOnExternalMessage = () => {
             // integrations.createGoogleCalendarEvent(message.conversationId, message.toolUse.input)
           } else if (message.toolUse.name === 'create_linear_ticket') {
             console.log('Creating linear ticket', message.conversationId)
-            integrations.createLinearTicket(
-              message.conversationId,
-              message.toolUse.input.title ?? '',
-              message.toolUse.input.description ?? '',
-            )
+
+            addPendingIntegration({
+              integrationName: 'create_linear_ticket',
+              conversationId: message.conversationId,
+              input: message.toolUse.input,
+            })
           } else if (message.toolUse.name === 'create_notion_page') {
-            integrations.createNotionPage(message.conversationId, {
-              title: message.toolUse.input.title,
-              description: message.toolUse.input.description ?? '',
-              content: message.toolUse.input.content ?? '',
+            addPendingIntegration({
+              integrationName: 'create_notion_page',
+              conversationId: message.conversationId,
+              input: message.toolUse.input,
             })
           } else if (message.toolUse.name === 'get_more_context_from_conversation') {
             const conversation = await Highlight.conversations.getConversationById(message.toolUse.input.conversation)
