@@ -113,7 +113,7 @@ function LinearTicketForm({ title, description, onSubmitSuccess }: LinearTicketF
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea placeholder="Ticket description" className="max-w-lg" {...field} />
+                <Textarea placeholder="Ticket description" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
