@@ -45,7 +45,7 @@ function ParentDropdown(props: NotionFormDropdownProps) {
       <SelectTrigger value={props.field.value}>
         <SelectValue placeholder="Select a parent" />
       </SelectTrigger>
-      <SelectContent sideOffset={4}>
+      <SelectContent sideOffset={4} className="max-h-[270px]">
         <SelectGroup>
           <SelectLabel>Databases</SelectLabel>
           {parentItems

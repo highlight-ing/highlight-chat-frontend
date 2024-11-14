@@ -55,7 +55,7 @@ function AssigneesDropdown(props: LinearFormDropdownProps) {
       <SelectTrigger value={props.field.value}>
         <SelectValue placeholder="Select an assignee" />
       </SelectTrigger>
-      <SelectContent className="" sideOffset={4}>
+      <SelectContent className="max-h-[270px]" sideOffset={4}>
         {assignees?.map((assignee) => (
           <SelectItem key={assignee.id} value={assignee.id}>
             {assignee.displayName}
