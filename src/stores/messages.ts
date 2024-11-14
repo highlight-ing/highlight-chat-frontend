@@ -34,6 +34,7 @@ export const createMessagesSlice: StateCreator<MessagesSlice> = (set, get) => ({
   updateLastConversationMessage: (conversationId, message, personalization) => {
     const openConversationMessages = { ...get().conversationMessages }
     if (!openConversationMessages[conversationId]?.length) {
+      console.log('no messages in conversation', conversationId, get().conversationMessages)
       return
     }
     const lastMessageIndex = openConversationMessages[conversationId].findLastIndex((msg) => msg.role === message.role)

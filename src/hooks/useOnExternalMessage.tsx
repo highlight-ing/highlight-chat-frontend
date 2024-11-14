@@ -11,16 +11,20 @@ import { DEFAULT_PROMPT_EXTERNAL_IDS } from '@/lib/promptapps'
 import useForkDefaultAction from './useForkDefaultAction'
 import usePromptApps from './usePromptApps'
 import { useRouter } from 'next/navigation'
+import { CreateGoogleCalEvent } from '@/features/integrations/google-cal/google-cal'
 
 const useOnExternalMessage = () => {
   const router = useRouter()
   const integrations = useIntegrations()
-  const { setConversationId, openModal, closeAllModals, isModalOpen } = useStore((state) => ({
-    setConversationId: state.setConversationId,
-    openModal: state.openModal,
-    closeAllModals: state.closeAllModals,
-    isModalOpen: state.isModalOpen,
-  }))
+  const { setConversationId, openModal, closeAllModals, isModalOpen, updateLastConversationMessage } = useStore(
+    (state) => ({
+      setConversationId: state.setConversationId,
+      openModal: state.openModal,
+      closeAllModals: state.closeAllModals,
+      isModalOpen: state.isModalOpen,
+      updateLastConversationMessage: state.updateLastConversationMessage,
+    }),
+  )
   const { refreshChatItem, refreshChatHistory } = useChatHistory()
   const { addToast } = useStore((state) => ({
     addToast: state.addToast,
@@ -56,6 +60,7 @@ const useOnExternalMessage = () => {
           const prompt = await getPrompt(message.prompt?.external_id)
           handleSubmit(message.userInput, prompt)
         } else if (message.toolUse && message.toolUse.type === 'tool_use') {
+          console.log('Tool use received:', message.toolUse)
           // Handle tool use
           if (message.toolUse.name === 'get_more_context_from_window') {
             const contextGranted = await Highlight.permissions.requestWindowContextPermission()
@@ -82,7 +87,11 @@ const useOnExternalMessage = () => {
               })
             }
           } else if (message.toolUse.name === 'create_google_calendar_event') {
-            integrations.createGoogleCalendarEvent(message.conversationId, message.toolUse.input)
+            // @ts-expect-error
+            updateLastConversationMessage(message.conversationId!, {
+              content: <CreateGoogleCalEvent {...message.toolUse.input} />,
+              role: 'assistant',
+            })
           } else if (message.toolUse.name === 'create_linear_ticket') {
             console.log('Creating linear ticket', message.conversationId)
             integrations.createLinearTicket(
@@ -184,7 +193,7 @@ const useOnExternalMessage = () => {
     return () => {
       removeListener()
     }
-  }, [setConversationId, openModal])
+  }, [setConversationId, openModal, updateLastConversationMessage])
 }
 
 export default useOnExternalMessage

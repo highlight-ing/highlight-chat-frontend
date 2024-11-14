@@ -30,7 +30,7 @@ export interface UseIntegrationsAPI {
   showLoading: (conversationId: string, functionName: string) => Promise<void>
 }
 
-function MessageWithComponent({ content, children }: { content: string; children?: React.ReactNode }) {
+export function MessageWithComponent({ content, children }: { content: string; children?: React.ReactNode }) {
   return (
     <div>
       {content && <p>{content} </p>}
@@ -48,10 +48,10 @@ const integrationAuthorized = new Map<string, Promise<void>>()
 export function useIntegrations(): UseIntegrationsAPI {
   const getLastConversationMessage = useStore((state) => state.getLastConversationMessage)
   const updateLastConversationMessage = useStore((state) => state.updateLastConversationMessage)
+  const getConversationMessages = useStore((state) => state.getConversationMessages)
+  const allMessages = useStore((state) => state.conversationMessages)
 
   async function createLinearTicket(conversationId: string, title: string, description: string) {
-    await integrationAuthorized.get('linear')
-
     let lastMessage = previousContent.get(conversationId)
 
     if (!lastMessage) {
@@ -74,8 +74,6 @@ export function useIntegrations(): UseIntegrationsAPI {
   }
 
   async function createNotionPage(conversationId: string, params: CreateNotionPageParams) {
-    await integrationAuthorized.get('notion')
-
     let lastMessage = previousContent.get(conversationId)
 
     if (!lastMessage) {
@@ -98,12 +96,12 @@ export function useIntegrations(): UseIntegrationsAPI {
   }
 
   async function createGoogleCalendarEvent(conversationId: string, params: CreateGoogleCalendarEventParams) {
-    await integrationAuthorized.get('google')
-
+    console.log('conversation messages', getConversationMessages(conversationId))
     let lastMessage = previousContent.get(conversationId)
-
+    console.log('allMessages', allMessages)
     if (!lastMessage) {
       lastMessage = getLastConversationMessage(conversationId)?.content as string
+      console.log('last message', lastMessage, conversationId)
     }
 
     // Update the last message to show the Notion page component which will handle checking for authentication,
