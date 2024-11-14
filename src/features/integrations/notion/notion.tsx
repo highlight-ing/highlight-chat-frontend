@@ -39,6 +39,7 @@ type NotionFormDropdownProps = {
 
 function ParentDropdown(props: NotionFormDropdownProps) {
   const { data: parentItems } = useNotionParentItems()
+  const firstParent = parentItems?.[0]
 
   return (
     <Select value={props.field.value} onValueChange={props.field.onChange}>
@@ -93,6 +94,8 @@ type NotionFormProps = {
 
 function NotionPageForm(props: NotionFormProps) {
   const { mutate: createNotionPage, isPending } = useCreateNotionPage(props.onSuccess)
+  const { data: parentItems } = useNotionParentItems()
+  const firstParent = parentItems?.[0]
 
   const contentWithFooter =
     props.content.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1') + '\n\nCreated with [Highlight](https://highlightai.com)'
@@ -101,7 +104,7 @@ function NotionPageForm(props: NotionFormProps) {
     resolver: zodResolver(notionPageFormSchema),
     defaultValues: {
       title: props.title,
-      parentId: '',
+      parentId: firstParent?.id ?? '',
     },
   })
 
