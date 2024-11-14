@@ -39,12 +39,11 @@ type NotionFormDropdownProps = {
 
 function ParentDropdown(props: NotionFormDropdownProps) {
   const { data: parentItems } = useNotionParentItems()
-  const firstParent = parentItems?.[0]
 
   return (
     <Select value={props.field.value} onValueChange={props.field.onChange}>
       <SelectTrigger value={props.field.value}>
-        <SelectValue />
+        <SelectValue placeholder="Select a parent" />
       </SelectTrigger>
       <SelectContent sideOffset={4}>
         <SelectGroup>
@@ -94,8 +93,6 @@ type NotionFormProps = {
 
 function NotionPageForm(props: NotionFormProps) {
   const { mutate: createNotionPage, isPending } = useCreateNotionPage(props.onSuccess)
-  const { data: parentItems } = useNotionParentItems()
-  const firstParent = parentItems?.[0]
 
   const contentWithFooter =
     props.content.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1') + '\n\nCreated with [Highlight](https://highlightai.com)'
@@ -104,7 +101,7 @@ function NotionPageForm(props: NotionFormProps) {
     resolver: zodResolver(notionPageFormSchema),
     defaultValues: {
       title: props.title,
-      parentId: firstParent?.id ?? '',
+      parentId: '',
     },
   })
 
@@ -172,7 +169,11 @@ type CreateNotionPageProps = {
 }
 
 export function CreateNotionPage(props: CreateNotionPageProps) {
-  const { data: connectedToNotion, isLoading: connectionIsLoading } = useCheckNotionConnection()
+  const {
+    data: connectedToNotion,
+    isLoading: connectionIsLoading,
+    isSuccess: connectionCheckSuccess,
+  } = useCheckNotionConnection()
   const [state, setState] = React.useState<'form' | 'success'>('form')
   const [url, setUrl] = React.useState<string | undefined>(undefined)
   const queryClient = useQueryClient()
@@ -186,7 +187,7 @@ export function CreateNotionPage(props: CreateNotionPageProps) {
     return <IntegrationsLoader />
   }
 
-  if (!connectedToNotion) {
+  if (connectionCheckSuccess && !connectedToNotion) {
     return (
       <SetupConnection
         name={'Notion'}
@@ -201,7 +202,7 @@ export function CreateNotionPage(props: CreateNotionPageProps) {
     )
   }
 
-  if (state === 'form') {
+  if (connectedToNotion && state === 'form') {
     return <NotionPageForm title={props.title} content={props.content} onSuccess={onSuccess} />
   }
 

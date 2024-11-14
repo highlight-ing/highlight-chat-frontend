@@ -48,7 +48,7 @@ function DatePickerDropdown(props: GoogleCalEventDropdownProps) {
     props.field.onChange(combinedDateTime.toISOString())
   }
 
-  const formattedDate = dateValue ? format(dateValue, 'PPP') : 'Pick a date'
+  const formattedDate = dateValue ? format(dateValue, 'PPPP') : 'Pick a date'
 
   return (
     <Popover>
@@ -101,7 +101,7 @@ function TimeSelectDropdown(props: GoogleCalEventDropdownProps) {
 
   return (
     <Select value={timeValue} onValueChange={(time) => handleChange(dateValue, time)}>
-      <SelectTrigger value={timeValue} className="w-full">
+      <SelectTrigger value={timeValue} className="">
         {isCustomTimeValue ? timeValue : timeValue ? <SelectValue /> : <span>Select a time</span>}
       </SelectTrigger>
       <SelectContent className="w-36" sideOffset={4}>
@@ -159,12 +159,12 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
           )}
         />
 
-        <div className="flex w-full items-center gap-3">
+        <div className="grid w-full grid-cols-3 gap-3">
           <FormField
             control={form.control}
             name="start"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="col-span-2">
                 <FormLabel>Start date</FormLabel>
                 <FormControl>
                   <DatePickerDropdown field={field} />
@@ -173,12 +173,11 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
             name="start"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="col-span-1">
                 <FormLabel>Start time</FormLabel>
                 <FormControl>
                   <TimeSelectDropdown field={field} />
@@ -189,12 +188,12 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
           />
         </div>
 
-        <div className="flex w-full items-center gap-3">
+        <div className="grid w-full grid-cols-3 gap-3">
           <FormField
             control={form.control}
             name="end"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="col-span-2">
                 <FormLabel>End date</FormLabel>
                 <FormControl>
                   <DatePickerDropdown field={field} />
@@ -207,7 +206,7 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
             control={form.control}
             name="end"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="col-span-1">
                 <FormLabel>End time</FormLabel>
                 <FormControl>
                   <TimeSelectDropdown field={field} />
@@ -253,7 +252,11 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
 }
 
 export function CreateGoogleCalEvent(data: CreateGoogleCalendarEventParams) {
-  const { data: connectedToGoogleCal, isLoading: connectionIsLoading } = useCheckGoogleCalConnection()
+  const {
+    data: connectedToGoogleCal,
+    isLoading: connectionIsLoading,
+    isSuccess: connectionCheckSuccess,
+  } = useCheckGoogleCalConnection()
   const [state, setState] = React.useState<'form' | 'success'>('form')
   const [url, setUrl] = React.useState<string | undefined>(undefined)
   const queryClient = useQueryClient()
@@ -267,7 +270,7 @@ export function CreateGoogleCalEvent(data: CreateGoogleCalendarEventParams) {
     return <IntegrationsLoader />
   }
 
-  if (!connectedToGoogleCal) {
+  if (connectionCheckSuccess && !connectedToGoogleCal) {
     return (
       <SetupConnection
         name={'Google Calendar'}

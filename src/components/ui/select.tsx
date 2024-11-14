@@ -25,7 +25,8 @@ const SelectTrigger = React.forwardRef<
     ref={ref}
     data-slot="select"
     className={cn(
-      'relative flex w-full rounded-2xl border border-light-10 bg-secondary px-3 pb-2 pt-7 text-[15px] leading-snug text-primary outline-none transition-[padding] placeholder:text-subtle hover:border-light-20 disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:border-light-20 data-[state=open]:bg-tertiary [&>span]:line-clamp-1',
+      'relative flex w-full rounded-2xl border border-light-10 bg-secondary px-3 pb-2 pt-7 text-[15px] leading-snug text-primary outline-none transition-[padding] hover:border-light-20 disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:border-light-20 data-[state=open]:bg-tertiary [&>span]:line-clamp-1',
+      !value && 'text-subtle',
       className,
     )}
     value={value}
