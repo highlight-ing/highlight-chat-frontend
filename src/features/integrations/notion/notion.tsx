@@ -169,7 +169,11 @@ type CreateNotionPageProps = {
 }
 
 export function CreateNotionPage(props: CreateNotionPageProps) {
-  const { data: connectedToNotion, isLoading: connectionIsLoading } = useCheckNotionConnection()
+  const {
+    data: connectedToNotion,
+    isLoading: connectionIsLoading,
+    isSuccess: connectionCheckSuccess,
+  } = useCheckNotionConnection()
   const [state, setState] = React.useState<'form' | 'success'>('form')
   const [url, setUrl] = React.useState<string | undefined>(undefined)
   const queryClient = useQueryClient()
@@ -183,7 +187,7 @@ export function CreateNotionPage(props: CreateNotionPageProps) {
     return <IntegrationsLoader />
   }
 
-  if (!connectedToNotion) {
+  if (connectionCheckSuccess && !connectedToNotion) {
     return (
       <SetupConnection
         name={'Notion'}
@@ -198,7 +202,7 @@ export function CreateNotionPage(props: CreateNotionPageProps) {
     )
   }
 
-  if (state === 'form') {
+  if (connectedToNotion && state === 'form') {
     return <NotionPageForm title={props.title} content={props.content} onSuccess={onSuccess} />
   }
 

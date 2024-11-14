@@ -252,7 +252,11 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
 }
 
 export function CreateGoogleCalEvent(data: CreateGoogleCalendarEventParams) {
-  const { data: connectedToGoogleCal, isLoading: connectionIsLoading } = useCheckGoogleCalConnection()
+  const {
+    data: connectedToGoogleCal,
+    isLoading: connectionIsLoading,
+    isSuccess: connectionCheckSuccess,
+  } = useCheckGoogleCalConnection()
   const [state, setState] = React.useState<'form' | 'success'>('form')
   const [url, setUrl] = React.useState<string | undefined>(undefined)
   const queryClient = useQueryClient()
@@ -266,7 +270,7 @@ export function CreateGoogleCalEvent(data: CreateGoogleCalendarEventParams) {
     return <IntegrationsLoader />
   }
 
-  if (!connectedToGoogleCal) {
+  if (connectionCheckSuccess && !connectedToGoogleCal) {
     return (
       <SetupConnection
         name={'Google Calendar'}

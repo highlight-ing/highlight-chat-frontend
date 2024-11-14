@@ -162,7 +162,11 @@ type CreateLinearTicketProps = {
 }
 
 export function CreateLinearTicket(props: CreateLinearTicketProps) {
-  const { data: connectedToLinear, isLoading: connectionIsLoading } = useCheckLinearConnection()
+  const {
+    data: connectedToLinear,
+    isLoading: connectionIsLoading,
+    isSuccess: connectionCheckSuccess,
+  } = useCheckLinearConnection()
   const [state, setState] = React.useState<'form' | 'success'>('form')
   const [issueUrl, setIssueUrl] = React.useState('')
   const queryClient = useQueryClient()
@@ -176,7 +180,7 @@ export function CreateLinearTicket(props: CreateLinearTicketProps) {
     return <IntegrationsLoader />
   }
 
-  if (!connectedToLinear) {
+  if (connectionCheckSuccess && !connectedToLinear) {
     return (
       <SetupConnection
         name={'Linear'}
