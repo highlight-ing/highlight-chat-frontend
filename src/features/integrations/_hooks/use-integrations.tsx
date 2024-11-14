@@ -33,7 +33,7 @@ export interface UseIntegrationsAPI {
 function MessageWithComponent({ content, children }: { content: string; children?: React.ReactNode }) {
   return (
     <div>
-      {content && <p>{content} </p>}
+      {content && <p className="pb-2">{content} </p>}
       {children}
     </div>
   )
