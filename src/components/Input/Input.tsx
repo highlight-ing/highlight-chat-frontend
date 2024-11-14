@@ -203,7 +203,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
                 />
               </div>
               <div onFocus={handleNonInputFocus}>
-                <AttachmentDropdowns isInputFocused={isInputFocused} inputRef={inputRef} />
+                <AttachmentDropdowns />
               </div>
             </div>
 
