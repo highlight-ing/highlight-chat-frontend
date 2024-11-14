@@ -31,6 +31,7 @@ export async function parseAndHandleStreamChunk(
     try {
       // Try to parse as JSON
       const jsonChunk = JSON.parse(jsonStr)
+      console.log('got a chunk', jsonChunk)
 
       switch (jsonChunk.type) {
         case 'text':

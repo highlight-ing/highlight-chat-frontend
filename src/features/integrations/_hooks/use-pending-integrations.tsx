@@ -27,6 +27,16 @@ export function usePendingIntegrations() {
         case 'create_google_calendar_event':
           integrations.createGoogleCalendarEvent(integration.conversationId, integration.input)
           break
+        case 'create_linear_ticket':
+          integrations.createLinearTicket(
+            integration.conversationId,
+            integration.input.title ?? '',
+            integration.input.description ?? '',
+          )
+          break
+        case 'create_notion_page':
+          integrations.createNotionPage(integration.conversationId, integration.input)
+          break
       }
     })
   }, [pendingIntegrations, conversationMessages])
