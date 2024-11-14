@@ -8,6 +8,7 @@ import { SetupConnection } from '../_components/setup-connection'
 import { checkLinearConnectionStatus, createMagicLinkForLinear } from '../linear/actions'
 import { checkNotionConnectionStatus, createMagicLinkForNotion } from '../notion/actions'
 import { checkGoogleConnectionStatus, createMagicLinkForGoogle } from '../google-cal/actions'
+import { useEffect } from 'react'
 
 interface CreateNotionPageParams {
   title: string
@@ -112,7 +113,9 @@ export function useIntegrations(): UseIntegrationsAPI {
     updateLastConversationMessage(conversationId!, {
       content: (
         <MessageWithComponent content={lastMessage}>
-          <CreateGoogleCalEvent {...params} />
+          <div className="mt-2">
+            <CreateGoogleCalEvent {...params} />
+          </div>
         </MessageWithComponent>
       ),
       role: 'assistant',

@@ -29,6 +29,7 @@ import {
   PromptEditorSlice,
   PromptEditorState,
 } from './prompt-editor'
+import { createIntegrationsSlice, initialIntegrationsState, IntegrationsSlice, IntegrationsState } from './integrations'
 
 /**
  * To add a new store, create a new file and reference messages.ts
@@ -48,7 +49,8 @@ export type StoreState = MessagesState &
   ModalsState &
   HistoryState &
   PromptEditorState &
-  ToastState
+  ToastState &
+  IntegrationsState
 
 export type Store = MessagesSlice &
   AuthSlice &
@@ -62,7 +64,8 @@ export type Store = MessagesSlice &
   ModalsSlice &
   HistorySlice &
   PromptEditorSlice &
-  ToastSlice
+  ToastSlice &
+  IntegrationsSlice
 
 const defaultState: StoreState = {
   ...initialMessagesState,
@@ -78,6 +81,7 @@ const defaultState: StoreState = {
   ...initialHistoryState,
   ...initialPromptEditorState,
   ...initialToastState,
+  ...initialIntegrationsState,
 }
 
 export const initStore: () => StoreState = () => {
@@ -102,6 +106,7 @@ export const createStore = (initState: StoreState = defaultState) => {
         ...createModalsSlice(...a),
         ...createPromptEditorSlice(...a),
         ...createToastSlice(...a),
+        ...createIntegrationsSlice(...a),
       }),
       {
         name: 'highlight-store',

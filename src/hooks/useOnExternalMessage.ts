@@ -25,6 +25,7 @@ const useOnExternalMessage = () => {
   const { addToast } = useStore((state) => ({
     addToast: state.addToast,
   }))
+  const addPendingIntegration = useStore((state) => state.addPendingIntegration)
   const addAttachment = useStore((state) => state.addAttachment)
   const { handleSubmit } = useSubmitQuery()
   const { forkDefaultAction } = useForkDefaultAction()
@@ -82,7 +83,12 @@ const useOnExternalMessage = () => {
               })
             }
           } else if (message.toolUse.name === 'create_google_calendar_event') {
-            integrations.createGoogleCalendarEvent(message.conversationId, message.toolUse.input)
+            addPendingIntegration({
+              integrationName: 'create_google_calendar_event',
+              conversationId: message.conversationId,
+              input: message.toolUse.input,
+            })
+            // integrations.createGoogleCalendarEvent(message.conversationId, message.toolUse.input)
           } else if (message.toolUse.name === 'create_linear_ticket') {
             console.log('Creating linear ticket', message.conversationId)
             integrations.createLinearTicket(

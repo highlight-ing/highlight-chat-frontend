@@ -20,6 +20,8 @@ import { Prompt } from '@/types/supabase-helpers'
 import { processAttachments } from '@/utils/contextprocessor'
 import * as Sentry from '@sentry/react'
 import { checkForFollowUpFeedback, markFollowUpFeedbackAsShown } from '@/app/(app)/actions'
+import { useIntegrations } from '@/features/integrations/_hooks/use-integrations'
+import { usePendingIntegrations } from '@/features/integrations/_hooks/use-pending-integrations'
 
 function useContextReceivedHandler(navigateToNewChat: () => void) {
   const {
@@ -291,6 +293,7 @@ export default function App({ children }: { children: React.ReactNode }) {
   useAboutMeRegister()
   useAuthChangeHandler()
   useShowFollowUpFeedbackToast()
+  usePendingIntegrations()
 
   return (
     <>
