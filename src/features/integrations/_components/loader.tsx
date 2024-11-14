@@ -1,3 +1,4 @@
+import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 import { useEffect, useState } from 'react'
 
 export function IntegrationsLoader() {
@@ -5,11 +6,16 @@ export function IntegrationsLoader() {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setText('Still loading...')
+      setText('Almost there...')
     }, 5000)
 
     return () => clearTimeout(timeout)
   }, [])
 
-  return <p className="mt-2 text-sm text-gray-500">{text}</p>
+  return (
+    <div className="flex items-center gap-2">
+      <LoadingSpinner size="16px" />
+      <p className="text-primary">{text}</p>
+    </div>
+  )
 }
