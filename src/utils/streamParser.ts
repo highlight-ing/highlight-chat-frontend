@@ -41,10 +41,10 @@ export async function parseAndHandleStreamChunk(
         case 'loading':
           if (jsonChunk.name === 'highlight_search') {
             integrations.showLoading(conversationId, jsonChunk.name)
-          } else if (integrationFunctionNames.includes(jsonChunk.name) && jsonChunk.loaded === false) {
-            console.log('Showing loading', conversationId)
-            integrations.showLoading(conversationId, jsonChunk.name)
           }
+          // } else if (integrationFunctionNames.includes(jsonChunk.name) && jsonChunk.loaded === false) {
+          //   integrations.showLoading(conversationId, jsonChunk.name)
+          // }
           break
 
         // We can define each tool use with different names
