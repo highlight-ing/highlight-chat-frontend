@@ -195,7 +195,7 @@ export function CreateLinearTicket(props: CreateLinearTicketProps) {
     )
   }
 
-  if (state === 'form') {
+  if (connectedToLinear && state === 'form') {
     return <LinearTicketForm title={props.title} description={props.description} onSubmitSuccess={onSubmitSuccess} />
   }
 
