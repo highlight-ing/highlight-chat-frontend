@@ -27,7 +27,7 @@ export interface UseIntegrationsAPI {
   createLinearTicket: (conversationId: string, title: string, description: string) => Promise<void>
   createNotionPage: (conversationId: string, params: CreateNotionPageParams) => Promise<void>
   createGoogleCalendarEvent: (conversationId: string, params: CreateGoogleCalendarEventParams) => Promise<void>
-  showLoading: (conversationId: string, functionName: string) => Promise<void>
+  showLoading: (conversationId: string, functionName: string, loaded: boolean) => Promise<void>
 }
 
 function MessageWithComponent({ content, children }: { content: string; children?: React.ReactNode }) {
@@ -115,13 +115,13 @@ export function useIntegrations(): UseIntegrationsAPI {
     })
   }
 
-  async function showLoading(conversationId: string, functionName: string) {
+  async function showLoading(conversationId: string, functionName: string, loaded: boolean) {
     const lastMessage = getLastConversationMessage(conversationId)
     const textContents = lastMessage?.content as string
 
     previousContent.set(conversationId, textContents)
 
-    if (functionName === 'highlight_search') {
+    if (functionName === 'highlight_search' && !loaded) {
       // @ts-expect-error
       updateLastConversationMessage(conversationId!, {
         content: (
@@ -135,7 +135,7 @@ export function useIntegrations(): UseIntegrationsAPI {
 
     // The two if blocks below handle the case where the user needs to connect their integration
     // We have a map that stores a Promise for each integration that is pending.
-    if (functionName === 'create_linear_ticket') {
+    if (functionName === 'create_linear_ticket' && !loaded) {
       //@ts-ignore
       const hlToken = (await highlight.internal.getAuthorizationToken()) as string
 
@@ -167,7 +167,7 @@ export function useIntegrations(): UseIntegrationsAPI {
       integrationAuthorized.set('linear', Promise.resolve())
     }
 
-    if (functionName === 'create_notion_page') {
+    if (functionName === 'create_notion_page' && !loaded) {
       //@ts-ignore
       const hlToken = (await highlight.internal.getAuthorizationToken()) as string
 
@@ -199,7 +199,7 @@ export function useIntegrations(): UseIntegrationsAPI {
       integrationAuthorized.set('notion', Promise.resolve())
     }
 
-    if (functionName === 'create_google_calendar_event') {
+    if (functionName === 'create_google_calendar_event' && !loaded) {
       //@ts-ignore
       const hlToken = (await highlight.internal.getAuthorizationToken()) as string
 

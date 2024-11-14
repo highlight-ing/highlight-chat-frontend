@@ -40,7 +40,7 @@ export async function parseAndHandleStreamChunk(
 
         case 'loading':
           if (jsonChunk.name === 'highlight_search') {
-            integrations.showLoading(conversationId, jsonChunk.name)
+            integrations.showLoading(conversationId, jsonChunk.name, jsonChunk.loaded)
           }
           // } else if (integrationFunctionNames.includes(jsonChunk.name) && jsonChunk.loaded === false) {
           //   integrations.showLoading(conversationId, jsonChunk.name)
