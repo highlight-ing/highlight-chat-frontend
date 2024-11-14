@@ -184,10 +184,12 @@ export function CreateNotionPage(props: CreateNotionPageProps) {
   }
 
   if (connectionIsLoading) {
+    console.log('Notion connection is loading')
     return <IntegrationsLoader />
   }
 
   if (connectionCheckSuccess && !connectedToNotion) {
+    console.log('Notion setup connection')
     return (
       <SetupConnection
         name={'Notion'}
@@ -203,10 +205,12 @@ export function CreateNotionPage(props: CreateNotionPageProps) {
   }
 
   if (connectedToNotion && state === 'form') {
+    console.log('Notion connect and form')
     return <NotionPageForm title={props.title} content={props.content} onSuccess={onSuccess} />
   }
 
   if (state === 'success' && url) {
+    console.log('Notion success')
     return (
       <IntegrationSuccessMessage
         heading="Notion page created:"
@@ -217,4 +221,6 @@ export function CreateNotionPage(props: CreateNotionPageProps) {
       />
     )
   }
+
+  console.log('Notion fallback return', { connectionIsLoading, connectionCheckSuccess, connectedToNotion, state })
 }

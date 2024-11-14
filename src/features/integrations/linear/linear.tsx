@@ -177,10 +177,12 @@ export function CreateLinearTicket(props: CreateLinearTicketProps) {
   }
 
   if (connectionIsLoading) {
+    console.log('Linear connection is loading')
     return <IntegrationsLoader />
   }
 
   if (connectionCheckSuccess && !connectedToLinear) {
+    console.log('Linear setup connection')
     return (
       <SetupConnection
         name={'Linear'}
@@ -196,10 +198,12 @@ export function CreateLinearTicket(props: CreateLinearTicketProps) {
   }
 
   if (state === 'form') {
+    console.log('Linear form')
     return <LinearTicketForm title={props.title} description={props.description} onSubmitSuccess={onSubmitSuccess} />
   }
 
   if (state === 'success' && issueUrl) {
+    console.log('Linear success')
     return (
       <IntegrationSuccessMessage
         heading="Linear issue created:"
@@ -210,4 +214,6 @@ export function CreateLinearTicket(props: CreateLinearTicketProps) {
       />
     )
   }
+
+  console.log('Linear fallback return', { connectionIsLoading, connectionCheckSuccess, connectedToLinear, state })
 }

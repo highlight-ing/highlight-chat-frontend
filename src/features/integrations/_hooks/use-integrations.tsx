@@ -72,6 +72,7 @@ export function useIntegrations(): UseIntegrationsAPI {
   }
 
   async function createNotionPage(conversationId: string, params: CreateNotionPageParams) {
+    console.log('checking for notion connection')
     await integrationAuthorized.get('notion')
 
     let lastMessage = previousContent.get(conversationId)
@@ -80,6 +81,7 @@ export function useIntegrations(): UseIntegrationsAPI {
       lastMessage = getLastConversationMessage(conversationId)?.content as string
     }
 
+    console.log('updating last message with notion params')
     // Update the last message to show the Notion page component which will handle checking for authentication,
     // creating the page, and showing the success message.
     // @ts-expect-error
