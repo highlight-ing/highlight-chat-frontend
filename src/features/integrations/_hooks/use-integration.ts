@@ -8,10 +8,10 @@ export function useIntegration() {
 
     switch (action) {
       case 'notion':
-        prompt = 'Create a new Notion page inferring the title and content from the conversation.'
+        prompt = 'Create a new Notion page inferring the title and content from the messages above.'
         break
       case 'linear':
-        prompt = 'Create a new Linear ticket inferring the title and description from the conversation.'
+        prompt = 'Create a new Linear ticket inferring the title and description from the messages above.'
         break
       default:
         return
