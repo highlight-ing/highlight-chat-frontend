@@ -87,14 +87,15 @@ const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
 >(({ className, ...props }, ref) => {
-  const { error, formItemId } = useFormField()
+  const { error, formItemId, value } = useFormField()
 
   return (
     <Label
       ref={ref}
       data-slot="label"
       className={cn(
-        'pointer-events-none absolute left-3 top-2 z-10 text-[13px] font-semibold text-tertiary',
+        'pointer-events-none absolute left-3 top-2 z-10 text-[13px] font-semibold text-tertiary opacity-100 transition-opacity',
+        value && 'opacity-100',
         error && 'text-red/70',
         className,
       )}
