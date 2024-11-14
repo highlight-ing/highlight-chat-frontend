@@ -1,4 +1,3 @@
-import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { useStore } from '@/providers/store-provider'
 import Highlight from '@highlight-ai/app-runtime'
 import styles from './screenshot.module.scss'
@@ -66,18 +65,18 @@ export const ScreenshotAttachments = () => {
   if (attachmentOptions && attachmentOptions?.length === 0) {
     return (
       <>
-        <DropdownMenuItem>
+        <div className="relative mt-1 flex cursor-pointer select-none items-center gap-2 rounded-[16px] border border-tertiary p-1 text-sm outline-none transition-colors first:mt-0 hover:bg-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0">
           <Skeleton className={`${styles.image} ${styles.displayImage}`} />
-          <Skeleton className="bg-hover h-3.5 w-1/3 rounded-sm" />
-        </DropdownMenuItem>
-        <DropdownMenuItem>
+          <Skeleton className="h-3.5 w-1/3 rounded-sm bg-hover" />
+        </div>
+        <div className="relative mt-1 flex cursor-pointer select-none items-center gap-2 rounded-[16px] border border-tertiary p-1 text-sm outline-none transition-colors first:mt-0 hover:bg-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0">
           <Skeleton className={`${styles.image} ${styles.displayImage}`} />
-          <Skeleton className="bg-hover h-3.5 w-1/3 rounded-sm" />
-        </DropdownMenuItem>
-        <DropdownMenuItem>
+          <Skeleton className="h-3.5 w-1/3 rounded-sm bg-hover" />
+        </div>
+        <div className="relative mt-1 flex cursor-pointer select-none items-center gap-2 rounded-[16px] border border-tertiary p-1 text-sm outline-none transition-colors first:mt-0 hover:bg-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0">
           <Skeleton className={`${styles.image} ${styles.displayImage}`} />
-          <Skeleton className="bg-hover h-3.5 w-1/3 rounded-sm" />
-        </DropdownMenuItem>
+          <Skeleton className="h-3.5 w-1/3 rounded-sm bg-hover" />
+        </div>
       </>
     )
   }
@@ -85,12 +84,16 @@ export const ScreenshotAttachments = () => {
   return (
     <ScrollArea className="h-[276px] w-full">
       {attachmentOptions.map((option, index) => (
-        <DropdownMenuItem key={index} onClick={option.onClick}>
+        <div
+          key={index}
+          onClick={option.onClick}
+          className="relative mt-1 flex cursor-pointer select-none items-center gap-2 rounded-[16px] border border-tertiary p-1 text-sm outline-none transition-colors first:mt-0 hover:bg-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0"
+        >
           {option.imageComponent}
           <div className="flex flex-col">
             <span className="text-sm font-medium text-secondary">{option.title}</span>
           </div>
-        </DropdownMenuItem>
+        </div>
       ))}
     </ScrollArea>
   )
