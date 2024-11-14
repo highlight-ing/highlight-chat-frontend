@@ -65,9 +65,7 @@ export function useIntegrations(): UseIntegrationsAPI {
     updateLastConversationMessage(conversationId!, {
       content: (
         <MessageWithComponent content={lastMessage}>
-          <div className="mt-2">
-            <CreateLinearTicket title={title} description={description} />
-          </div>
+          <CreateLinearTicket title={title} description={description} />
         </MessageWithComponent>
       ),
       role: 'assistant',
@@ -89,9 +87,7 @@ export function useIntegrations(): UseIntegrationsAPI {
     updateLastConversationMessage(conversationId!, {
       content: (
         <MessageWithComponent content={lastMessage}>
-          <div className="mt-2">
-            <CreateNotionPage {...params} />
-          </div>
+          <CreateNotionPage {...params} />
         </MessageWithComponent>
       ),
       role: 'assistant',
@@ -113,9 +109,7 @@ export function useIntegrations(): UseIntegrationsAPI {
     updateLastConversationMessage(conversationId!, {
       content: (
         <MessageWithComponent content={lastMessage}>
-          <div className="mt-2">
-            <CreateGoogleCalEvent {...params} />
-          </div>
+          <CreateGoogleCalEvent {...params} />
         </MessageWithComponent>
       ),
       role: 'assistant',
@@ -133,9 +127,7 @@ export function useIntegrations(): UseIntegrationsAPI {
       updateLastConversationMessage(conversationId!, {
         content: (
           <MessageWithComponent content={textContents}>
-            <div className="mt-2">
-              <IntegrationsLoader />
-            </div>
+            <IntegrationsLoader />
           </MessageWithComponent>
         ),
         role: 'assistant',
@@ -156,15 +148,13 @@ export function useIntegrations(): UseIntegrationsAPI {
           updateLastConversationMessage(conversationId!, {
             content: (
               <MessageWithComponent content={textContents}>
-                <div className="mt-2">
-                  <SetupConnection
-                    name={'Linear'}
-                    checkConnectionStatus={checkLinearConnectionStatus}
-                    onConnect={() => resolve()}
-                    icon={<LinearIcon size={16} />}
-                    createMagicLink={createMagicLinkForLinear}
-                  />
-                </div>
+                <SetupConnection
+                  name={'Linear'}
+                  checkConnectionStatus={checkLinearConnectionStatus}
+                  onConnect={() => resolve()}
+                  icon={<LinearIcon size={16} />}
+                  createMagicLink={createMagicLinkForLinear}
+                />
               </MessageWithComponent>
             ),
             role: 'assistant',
@@ -190,15 +180,13 @@ export function useIntegrations(): UseIntegrationsAPI {
           updateLastConversationMessage(conversationId!, {
             content: (
               <MessageWithComponent content={textContents}>
-                <div className="mt-2">
-                  <SetupConnection
-                    name={'Notion'}
-                    checkConnectionStatus={checkNotionConnectionStatus}
-                    onConnect={() => resolve()}
-                    icon={<NotionIcon size={16} />}
-                    createMagicLink={createMagicLinkForNotion}
-                  />
-                </div>
+                <SetupConnection
+                  name={'Notion'}
+                  checkConnectionStatus={checkNotionConnectionStatus}
+                  onConnect={() => resolve()}
+                  icon={<NotionIcon size={16} />}
+                  createMagicLink={createMagicLinkForNotion}
+                />
               </MessageWithComponent>
             ),
             role: 'assistant',
@@ -226,15 +214,13 @@ export function useIntegrations(): UseIntegrationsAPI {
           updateLastConversationMessage(conversationId!, {
             content: (
               <MessageWithComponent content={textContents}>
-                <div className="mt-2">
-                  <SetupConnection
-                    name={'Google'}
-                    checkConnectionStatus={checkGoogleConnectionStatus}
-                    onConnect={() => resolve()}
-                    icon={<GoogleIcon size={16} />}
-                    createMagicLink={createMagicLinkForGoogle}
-                  />
-                </div>
+                <SetupConnection
+                  name={'Google'}
+                  checkConnectionStatus={checkGoogleConnectionStatus}
+                  onConnect={() => resolve()}
+                  icon={<GoogleIcon size={16} />}
+                  createMagicLink={createMagicLinkForGoogle}
+                />
               </MessageWithComponent>
             ),
             role: 'assistant',
