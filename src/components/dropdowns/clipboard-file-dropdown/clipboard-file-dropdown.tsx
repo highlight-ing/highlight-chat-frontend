@@ -1,16 +1,18 @@
-import { useStore } from '@/components/providers/store-provider'
-import { useShallow } from 'zustand/react/shallow'
-import styles from './clipboard-file-dropdown.module.scss'
-import Tooltip from '@/components/Tooltip/Tooltip'
-import { MAX_NUMBER_OF_ATTACHMENTS } from '@/stores/chat-attachments'
 import { useEffect, useRef, useState } from 'react'
+import { MAX_NUMBER_OF_ATTACHMENTS } from '@/stores/chat-attachments'
 import { trackEvent } from '@/utils/amplitude'
+import Highlight from '@highlight-ai/app-runtime'
 import { ClipboardText, DocumentUpload } from 'iconsax-react'
 import mammoth from 'mammoth'
 import * as pptxtojson from 'pptxtojson'
-import Highlight from '@highlight-ai/app-runtime'
+import { useShallow } from 'zustand/react/shallow'
+
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { PaperclipIcon } from '@/components/icons'
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
+import { useStore } from '@/components/providers/store-provider'
+import Tooltip from '@/components/Tooltip/Tooltip'
+
+import styles from './clipboard-file-dropdown.module.scss'
 
 export const ClipboardFileDropdown = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)

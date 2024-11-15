@@ -1,6 +1,7 @@
-import { supabaseAdmin } from '@/lib/supabase'
 import { corsHeaders } from '@/utils/cors'
 import Handlebars from 'handlebars'
+
+import { supabaseAdmin } from '@/lib/supabase'
 
 /**
  * API route that returns a single prompt by its slug

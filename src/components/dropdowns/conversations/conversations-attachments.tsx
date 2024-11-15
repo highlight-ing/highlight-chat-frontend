@@ -1,12 +1,13 @@
 import { useConversations } from '@/context/ConversationContext'
-import { getWordCountFormatted } from '@/utils/string'
 import { getConversationDisplayTitle, getConversationWordCount } from '@/utils/conversations'
+import { getWordCountFormatted } from '@/utils/string'
 import { Setting2, VoiceSquare } from 'iconsax-react'
-import { useStore } from '@/components/providers/store-provider'
 import { useShallow } from 'zustand/react/shallow'
+
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
-import AnimatedVoiceSquare from '@/components/Conversations/AnimatedVoiceSquare'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import AnimatedVoiceSquare from '@/components/Conversations/AnimatedVoiceSquare'
+import { useStore } from '@/components/providers/store-provider'
 
 const MAX_NUM_CONVERSATION = 20
 

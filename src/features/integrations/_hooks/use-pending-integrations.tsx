@@ -1,5 +1,7 @@
-import { useStore } from '@/components/providers/store-provider'
 import { useEffect } from 'react'
+
+import { useStore } from '@/components/providers/store-provider'
+
 import { useIntegrations } from './use-integrations'
 
 /**

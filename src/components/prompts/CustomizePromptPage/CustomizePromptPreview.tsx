@@ -1,15 +1,17 @@
-import { Prompt } from '@/types/supabase-helpers'
-import styles from './customize-prompt.module.scss'
+import Image from 'next/image'
+import { PromptTag } from '@/types'
 import variables from '@/variables.module.scss'
 import { Setting } from 'iconsax-react'
+
+import { Prompt } from '@/types/supabase-helpers'
+import { supabaseLoader } from '@/lib/supabase'
+import usePromptApps from '@/hooks/usePromptApps'
 import { Badge } from '@/components/Badge/Badge'
 import Button from '@/components/Button/Button'
-import Tooltip from '@/components/Tooltip/Tooltip'
-import { supabaseLoader } from '@/lib/supabase'
-import Image from 'next/image'
-import usePromptApps from '@/hooks/usePromptApps'
 import { useStore } from '@/components/providers/store-provider'
-import { PromptTag } from '@/types'
+import Tooltip from '@/components/Tooltip/Tooltip'
+
+import styles from './customize-prompt.module.scss'
 
 export const CustomizePromptPreview = ({ prompt }: { prompt: Prompt }) => {
   const { selectPrompt } = usePromptApps()

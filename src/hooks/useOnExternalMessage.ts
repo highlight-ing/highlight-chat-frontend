@@ -1,16 +1,19 @@
 'use client'
 
-import Highlight from '@highlight-ai/app-runtime'
 import { useEffect } from 'react'
-import { useStore } from '@/components/providers/store-provider'
+import { useRouter } from 'next/navigation'
+import Highlight from '@highlight-ai/app-runtime'
+
+import { DEFAULT_PROMPT_EXTERNAL_IDS } from '@/lib/promptapps'
 import { useChatHistory } from '@/hooks/useChatHistory'
 import { useSubmitQuery } from '@/hooks/useSubmitQuery'
-import { useIntegrations } from '@/features/integrations/_hooks/use-integrations'
+import { useStore } from '@/components/providers/store-provider'
+
 import { useIntegration } from '@/features/integrations/_hooks/use-integration'
-import { DEFAULT_PROMPT_EXTERNAL_IDS } from '@/lib/promptapps'
+import { useIntegrations } from '@/features/integrations/_hooks/use-integrations'
+
 import useForkDefaultAction from './useForkDefaultAction'
 import usePromptApps from './usePromptApps'
-import { useRouter } from 'next/navigation'
 
 const useOnExternalMessage = () => {
   const router = useRouter()

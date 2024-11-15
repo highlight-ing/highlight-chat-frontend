@@ -1,7 +1,8 @@
 'use client'
 
-import * as Headless from '@headlessui/react'
 import React, { useState } from 'react'
+import * as Headless from '@headlessui/react'
+
 import { NavbarItem } from './navbar'
 
 function OpenMenuIcon() {

@@ -1,6 +1,6 @@
-import { useStore } from '@/components/providers/store-provider'
-import { Alert, AlertTitle, AlertDescription, AlertActions } from '@/components/catalyst/alert'
+import { Alert, AlertActions, AlertDescription, AlertTitle } from '@/components/catalyst/alert'
 import { Button } from '@/components/catalyst/button'
+import { useStore } from '@/components/providers/store-provider'
 
 export default function ErrorModal() {
   const { errorModalOpen, errorModalMessage, setErrorModalOpen } = useStore((state) => ({

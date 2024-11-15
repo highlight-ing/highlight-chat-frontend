@@ -1,4 +1,5 @@
 import variables from '@/variables.module.scss'
+
 type ColorScheme = {
   icon: {
     color: string

@@ -1,5 +1,5 @@
-import imageCompression from 'browser-image-compression'
 import Highlight from '@highlight-ai/app-runtime'
+import imageCompression from 'browser-image-compression'
 
 export const compressImageIfNeeded = async (file: File): Promise<File> => {
   const ONE_MB = 1 * 1024 * 1024 // 1MB in bytes

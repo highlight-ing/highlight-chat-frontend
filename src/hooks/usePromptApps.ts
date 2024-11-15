@@ -1,18 +1,19 @@
-import { useStore } from '@/components/providers/store-provider'
+import { useEffect, useMemo, useState } from 'react'
+import { trackEvent } from '@/utils/amplitude'
 import {
   addPromptToUser,
   countPromptView,
-  fetchPrompts,
   fetchPinnedPrompts,
-  serverGetPromptByExternalId,
-  serverGetPromptAppById,
+  fetchPrompts,
   getPromptAppBySlug,
+  serverGetPromptAppById,
+  serverGetPromptByExternalId,
 } from '@/utils/prompts'
-import useAuth from '@/hooks/useAuth'
-import { Prompt } from '@/types/supabase-helpers'
 import { useShallow } from 'zustand/react/shallow'
-import { useEffect, useMemo, useState } from 'react'
-import { trackEvent } from '@/utils/amplitude'
+
+import { Prompt } from '@/types/supabase-helpers'
+import useAuth from '@/hooks/useAuth'
+import { useStore } from '@/components/providers/store-provider'
 
 let loadPromptsPromise: Promise<Prompt[]> | null = null
 

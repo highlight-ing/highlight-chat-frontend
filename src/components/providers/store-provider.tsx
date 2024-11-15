@@ -1,6 +1,4 @@
-import { createContext, type ReactNode, useContext, useRef } from 'react'
-import { type StoreApi, useStore as useZustandStore } from 'zustand'
-
+import { createContext, useContext, useRef, type ReactNode } from 'react'
 /**
  * This is setup to support Next.JS and our Zustand store
  * This is all boilerplate
@@ -8,6 +6,7 @@ import { type StoreApi, useStore as useZustandStore } from 'zustand'
  */
 
 import { createStore, initStore, Store } from '@/stores'
+import { useStore as useZustandStore, type StoreApi } from 'zustand'
 
 export const StoreContext = createContext<StoreApi<Store> | null>(null)
 

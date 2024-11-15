@@ -1,4 +1,5 @@
 import { ComponentProps } from 'react'
+
 import { useStore } from '@/components/providers/store-provider'
 
 export function CreateShortcutButton(props: ComponentProps<'button'>) {

@@ -1,6 +1,8 @@
 'use client'
+
 import React from 'react'
 import { trackEvent } from '@/utils/amplitude'
+
 const shareButtonClass =
   'px-4 py-[6px] inline-flex items-center border border-tertiary rounded-[10px] text-[9px] md:text-sm font-medium text-secondary hover:text-primary hover:border-primary transition-colors transition-border duration-300 ease-in-out'
 

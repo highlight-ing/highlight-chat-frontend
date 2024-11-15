@@ -1,10 +1,12 @@
-import { usePromptEditorStore } from '@/stores/prompt-editor'
-import IntelliPrompt from '../IntelliPrompt'
-import styles from '../prompteditor.module.scss'
 import { useEffect } from 'react'
-import OnboardingBox from '../OnboardingBox'
+import { usePromptEditorStore } from '@/stores/prompt-editor'
+
 import { Switch } from '@/components/catalyst/switch'
 import { LinearIcon, NotionIcon } from '@/components/icons'
+
+import IntelliPrompt from '../IntelliPrompt'
+import OnboardingBox from '../OnboardingBox'
+import styles from '../prompteditor.module.scss'
 
 function OnboardingIndex0() {
   const { setOnboarding } = usePromptEditorStore()

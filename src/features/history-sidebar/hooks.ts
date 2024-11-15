@@ -1,6 +1,7 @@
-import { useChatHistory } from '@/hooks/useChatHistory'
 import { ChatHistoryItem } from '@/types'
 import { useMutation, useQuery } from '@tanstack/react-query'
+
+import { useChatHistory } from '@/hooks/useChatHistory'
 
 const RETRY_ATTEMPTS = 4
 export const NEW_CONVERSATION_TITLE = 'New Conversation'

@@ -1,7 +1,8 @@
-import { useStore } from '@/components/providers/store-provider'
 import { useEffect } from 'react'
-import usePromptApps from '@/hooks/usePromptApps'
 import Highlight from '@highlight-ai/app-runtime'
+
+import usePromptApps from '@/hooks/usePromptApps'
+import { useStore } from '@/components/providers/store-provider'
 
 export const useOnPromptChange = () => {
   const { pinnedPrompts } = usePromptApps()

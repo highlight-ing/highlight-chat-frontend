@@ -1,7 +1,9 @@
+import { ModalObjectProps } from '@/types'
+
+import Modal from '@/components/modals/Modal'
+
 import { IntegrationType } from '../types'
 import { getIntegrationLanguage } from '../utils'
-import Modal from '@/components/modals/Modal'
-import { ModalObjectProps } from '@/types'
 
 export interface ConnectIntegrationModalContext {
   type: IntegrationType

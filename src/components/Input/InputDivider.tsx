@@ -1,5 +1,6 @@
-import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
+
+import { cn } from '@/lib/utils'
 
 export function InputDivider({ className }: { className?: string }) {
   return (

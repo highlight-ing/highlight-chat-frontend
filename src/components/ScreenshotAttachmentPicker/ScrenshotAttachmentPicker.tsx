@@ -1,10 +1,11 @@
-import { useStore } from '@/components/providers/store-provider'
-import Highlight from '@highlight-ai/app-runtime'
-
-import styles from './screenshot-attachment-picker.module.scss'
 import { useEffect, useState } from 'react'
 import { trackEvent } from '@/utils/amplitude'
+import Highlight from '@highlight-ai/app-runtime'
+
+import { useStore } from '@/components/providers/store-provider'
+
 import { AttachmentPicker } from '../AttachmentPicker/AttachmentPicker'
+import styles from './screenshot-attachment-picker.module.scss'
 
 interface ScreenshotAttachmentPickerProps {
   isVisible: boolean

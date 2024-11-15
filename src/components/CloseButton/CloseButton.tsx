@@ -1,5 +1,6 @@
-import styles from './closebutton.module.scss'
 import React from 'react'
+
+import styles from './closebutton.module.scss'
 
 interface CloseButtonProps {
   className?: string

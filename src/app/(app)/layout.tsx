@@ -1,11 +1,12 @@
 'use client'
 
 import React from 'react'
-import App from '@/components/App'
-import { StoreProvider } from '@/components/providers/store-provider'
-import { ReactQueryProvider } from '@/components/providers/react-query-provider'
 import { ConversationProvider } from '@/context/ConversationContext'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+
+import App from '@/components/App'
+import { ReactQueryProvider } from '@/components/providers/react-query-provider'
+import { StoreProvider } from '@/components/providers/store-provider'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (

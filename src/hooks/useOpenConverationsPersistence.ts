@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react'
-import equal from 'fast-deep-equal'
-import Highlight from '@highlight-ai/app-runtime'
 import { ChatHistoryItem } from '@/types'
+import Highlight from '@highlight-ai/app-runtime'
+import equal from 'fast-deep-equal'
+
 import { useStore } from '@/components/providers/store-provider'
 
 export const useOpenConverationsPersistence = () => {

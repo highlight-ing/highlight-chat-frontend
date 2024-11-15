@@ -1,5 +1,5 @@
-import { StateCreator } from 'zustand'
 import { ChatHistoryItem, Toast } from '@/types'
+import { StateCreator } from 'zustand'
 
 export interface ToastState {
   toasts: Toast[]

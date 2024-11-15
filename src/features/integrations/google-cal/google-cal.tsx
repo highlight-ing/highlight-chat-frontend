@@ -1,7 +1,11 @@
 import React from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
+import { format } from 'date-fns'
 import { ControllerRenderProps, useForm } from 'react-hook-form'
 import { z } from 'zod'
+
+import { Calendar } from '@/components/ui/calendar'
 import {
   Form,
   FormControl,
@@ -13,24 +17,19 @@ import {
   FormPopoverTrigger,
   FormSelectTrigger,
   FormTextarea,
-  useFormField,
 } from '@/components/ui/form'
-import { GoogleIcon } from '@/components/icons'
-import { IntegrationsLoader } from '../_components/loader'
-import { IntegrationSubmitButton } from '../_components/submit-button'
-import { useCheckGoogleCalConnection, useCreateGoogleCalEvent } from './hooks'
-import { checkGoogleConnectionStatus, createMagicLinkForGoogle } from './actions'
-import { IntegrationSuccessMessage } from '../_components/success-message'
-import { SetupConnection } from '../_components/setup-connection'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Calendar } from '@/components/ui/calendar'
-import { format } from 'date-fns'
-import { extractDateAndTime } from './utils'
+import { Popover, PopoverContent } from '@/components/ui/popover'
 import { Select, SelectContent, SelectItem, SelectValue } from '@/components/ui/select'
-import { useQueryClient } from '@tanstack/react-query'
+import { GoogleIcon } from '@/components/icons'
+
 import { CreateGoogleCalendarEventParams } from '../_hooks/use-integrations'
-import { ChevronDownIcon } from '@radix-ui/react-icons'
-import { cn } from '@/lib/utils'
+import { IntegrationsLoader } from '../_components/loader'
+import { SetupConnection } from '../_components/setup-connection'
+import { IntegrationSubmitButton } from '../_components/submit-button'
+import { IntegrationSuccessMessage } from '../_components/success-message'
+import { checkGoogleConnectionStatus, createMagicLinkForGoogle } from './actions'
+import { useCheckGoogleCalConnection, useCreateGoogleCalEvent } from './hooks'
+import { extractDateAndTime } from './utils'
 
 const googleCalEventFormSchema = z
   .object({

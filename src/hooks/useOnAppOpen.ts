@@ -1,14 +1,15 @@
 'use client'
 
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Highlight, {
   type AppOpenEventOptions,
   type NavigateOptions,
   type OpenModalOptions,
 } from '@highlight-ai/app-runtime'
-import { useEffect } from 'react'
-import { useStore } from '@/components/providers/store-provider'
-import { useRouter } from 'next/navigation'
+
 import usePromptApps from '@/hooks/usePromptApps'
+import { useStore } from '@/components/providers/store-provider'
 
 export const useOnAppOpen = () => {
   const router = useRouter()

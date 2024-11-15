@@ -1,8 +1,9 @@
 import React from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { ControllerRenderProps, useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { useCheckLinearConnection, useCreateLinearTicket, useLinearAssignees, useLinearWorkflowStates } from './hooks'
+
 import {
   Form,
   FormControl,
@@ -16,12 +17,13 @@ import {
 } from '@/components/ui/form'
 import { Select, SelectContent, SelectItem, SelectValue } from '@/components/ui/select'
 import { LinearIcon } from '@/components/icons'
-import { IntegrationSubmitButton } from '../_components/submit-button'
-import { IntegrationSuccessMessage } from '../_components/success-message'
+
 import { IntegrationsLoader } from '../_components/loader'
 import { SetupConnection } from '../_components/setup-connection'
+import { IntegrationSubmitButton } from '../_components/submit-button'
+import { IntegrationSuccessMessage } from '../_components/success-message'
 import { checkLinearConnectionStatus, createMagicLinkForLinear } from './actions'
-import { useQueryClient } from '@tanstack/react-query'
+import { useCheckLinearConnection, useCreateLinearTicket, useLinearAssignees, useLinearWorkflowStates } from './hooks'
 
 const linearTicketFormSchema = z.object({
   title: z.string().min(1),

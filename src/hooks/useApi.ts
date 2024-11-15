@@ -1,5 +1,6 @@
-import useAuth from '@/hooks/useAuth'
 import { backendUrl } from '@/utils/chatBackendUrl'
+
+import useAuth from '@/hooks/useAuth'
 
 type ApiVersion = 'v3' | 'v4'
 

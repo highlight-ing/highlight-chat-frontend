@@ -1,13 +1,15 @@
-import React, { useRef, useEffect, useState } from 'react'
-import { EmojiHappy } from 'iconsax-react'
-import styles from './share-modal.module.scss'
-import variables from '@/variables.module.scss'
+import React, { useEffect, useRef, useState } from 'react'
 import { ChatHistoryItem } from '@/types'
-import { useShareConversation, useDeleteConversation } from '@/hooks/useShareConversation'
-import { useStore } from '@/components/providers/store-provider'
+import { trackEvent } from '@/utils/amplitude'
+import variables from '@/variables.module.scss'
+import { EmojiHappy } from 'iconsax-react'
+
+import { useDeleteConversation, useShareConversation } from '@/hooks/useShareConversation'
 import Button from '@/components/Button/Button'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
-import { trackEvent } from '@/utils/amplitude'
+import { useStore } from '@/components/providers/store-provider'
+
+import styles from './share-modal.module.scss'
 
 interface ShareModalProps {
   isVisible: boolean

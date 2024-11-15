@@ -1,7 +1,8 @@
 import { StateCreator } from 'zustand'
+import { useShallow } from 'zustand/react/shallow'
+
 import { Prompt } from '@/types/supabase-helpers'
 import { useStore } from '@/components/providers/store-provider'
-import { useShallow } from 'zustand/react/shallow'
 
 /**
  * The state of the current prompt being used in the editor.

@@ -1,4 +1,5 @@
 import React from 'react'
+
 import styles from './loadingspinner.module.scss'
 
 interface LoadingSpinnerProps {

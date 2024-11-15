@@ -1,4 +1,5 @@
-import { ReactElement, PropsWithChildren } from 'react'
+import { PropsWithChildren, ReactElement } from 'react'
+
 import styles from './settingoption.module.scss'
 
 const SettingOption = ({

@@ -1,13 +1,13 @@
 import { ModalObjectProps } from '@/types'
+import { trackEvent } from '@/utils/amplitude'
+import { removePromptFromUser } from '@/utils/prompts'
+import Highlight from '@highlight-ai/app-runtime'
 
-import { useStore } from '@/components/providers/store-provider'
-import ConfirmationModal from '@/components/modals/ConfirmationModal'
 import { Prompt } from '@/types/supabase-helpers'
 import useAuth from '@/hooks/useAuth'
-import { removePromptFromUser } from '@/utils/prompts'
 import usePromptApps from '@/hooks/usePromptApps'
-import { trackEvent } from '@/utils/amplitude'
-import Highlight from '@highlight-ai/app-runtime'
+import ConfirmationModal from '@/components/modals/ConfirmationModal'
+import { useStore } from '@/components/providers/store-provider'
 
 export interface UnpinPromptModalContext {
   prompt: Prompt

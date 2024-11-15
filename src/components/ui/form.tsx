@@ -1,19 +1,20 @@
 'use client'
 
 import * as React from 'react'
+import { ChevronDownIcon } from '@radix-ui/react-icons'
 import * as LabelPrimitive from '@radix-ui/react-label'
-import type { SelectTrigger as SelectTriggerPrimitive } from '@radix-ui/react-select'
 import type { PopoverTrigger as PopoverTriggerPrimitive } from '@radix-ui/react-popover'
+import type { SelectTrigger as SelectTriggerPrimitive } from '@radix-ui/react-select'
 import { Slot } from '@radix-ui/react-slot'
 import { Controller, ControllerProps, FieldPath, FieldValues, FormProvider, useFormContext } from 'react-hook-form'
 
 import { cn } from '@/lib/utils'
 import { Label } from '@/components/ui/label'
-import { SelectTrigger } from './select'
-import { Textarea } from './textarea'
+
 import { Input } from './input'
 import { PopoverTrigger } from './popover'
-import { ChevronDownIcon } from '@radix-ui/react-icons'
+import { SelectTrigger } from './select'
+import { Textarea } from './textarea'
 
 const Form = FormProvider
 

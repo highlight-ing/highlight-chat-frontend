@@ -1,13 +1,15 @@
-import { ClipboardText, GallerySlash, DocumentText1, Smallcaps } from 'iconsax-react'
-import { useState, useEffect } from 'react'
-import { CloseIcon } from '../icons/icons'
-import Tooltip from './Tooltip/Tooltip'
+import { useEffect, useState } from 'react'
 import { AttachmentType } from '@/types'
-import { useImageDownload } from '@/hooks/useImageDownload'
-import { VoiceSquare } from 'iconsax-react'
 import { getWordCountFormatted } from '@/utils/string'
+import { ClipboardText, DocumentText1, GallerySlash, Smallcaps, VoiceSquare } from 'iconsax-react'
+
+import { useImageDownload } from '@/hooks/useImageDownload'
+import { CloseIcon } from '@/components/icons'
 import { useStore } from '@/components/providers/store-provider'
 import { fetchAppIcon } from '@/app/(app)/actions'
+
+import Tooltip from './Tooltip/Tooltip'
+
 interface BaseAttachmentProps {
   onRemove?: () => void
   value: string
@@ -69,7 +71,7 @@ export const Attachment = ({
         if (isSharedImage && sharedImageUrl) {
           return (
             <img
-              className="transition-padding pointer-events-none flex h-12 w-auto max-w-20 items-center overflow-hidden rounded-sm object-cover transition-opacity duration-150 ease-in-out"
+              className="transition-padding max-w-20 pointer-events-none flex h-12 w-auto items-center overflow-hidden rounded-sm object-cover transition-opacity duration-150 ease-in-out"
               src={sharedImageUrl}
               alt="Shared Attachment"
             />
@@ -81,7 +83,7 @@ export const Attachment = ({
           // Local image (base64)
           return (
             <img
-              className="transition-padding pointer-events-none flex h-12 w-auto max-w-20 items-center overflow-hidden rounded-sm object-cover transition-opacity duration-150 ease-in-out"
+              className="transition-padding max-w-20 pointer-events-none flex h-12 w-auto items-center overflow-hidden rounded-sm object-cover transition-opacity duration-150 ease-in-out"
               src={value}
               alt="Attachment"
             />
@@ -99,7 +101,7 @@ export const Attachment = ({
           if (error) return <GallerySlash color="#FF8A65" size={size} />
           return (
             <img
-              className="transition-padding pointer-events-none flex h-12 w-auto max-w-20 items-center overflow-hidden rounded-sm object-cover opacity-50 transition-opacity duration-150 ease-in-out"
+              className="transition-padding max-w-20 pointer-events-none flex h-12 w-auto items-center overflow-hidden rounded-sm object-cover opacity-50 transition-opacity duration-150 ease-in-out"
               style={{ opacity: isImageLoaded ? 1 : 0 }}
               src={imageUrl || value}
               onLoad={() => setIsImageLoaded(true)}
@@ -109,7 +111,7 @@ export const Attachment = ({
         }
       case 'clipboard':
         return (
-          <div className="flex h-[48px] items-center gap-2.5 text-nowrap rounded-[16px] border border-light-10 bg-secondary px-2.5 text-base">
+          <div className="text-nowrap flex h-[48px] items-center gap-2.5 rounded-[16px] border border-light-10 bg-secondary px-2.5 text-base">
             <ClipboardText className="min-w-5 text-secondary" variant="Bold" size={size} />
             <span className="inline-block align-middle text-sm text-secondary">Clipboard</span>
           </div>
@@ -119,7 +121,7 @@ export const Attachment = ({
         return (
           <div className="align-center flex w-full justify-center gap-2 p-2 pl-2.5">
             <DocumentText1 className="min-w-5 text-secondary" variant="Bold" size={size} />
-            <span className="inline-block max-w-40 truncate align-middle text-sm text-secondary">{value}</span>
+            <span className="max-w-40 inline-block truncate align-middle text-sm text-secondary">{value}</span>
           </div>
         )
       case 'window':
@@ -149,8 +151,8 @@ export const Attachment = ({
     >
       <div className="group relative">
         {type === 'conversation' || type === 'audio' ? (
-          <div className="flex h-[48px] w-40 items-center gap-2.5 text-nowrap rounded-[16px] border border-light-10 bg-secondary p-[5px] text-base leading-none">
-            <div className="grid size-9 grow-0 place-items-center rounded-[12px] bg-green-20 text-green">
+          <div className="text-nowrap flex h-[48px] w-40 items-center gap-2.5 rounded-[16px] border border-light-10 bg-secondary p-[5px] text-base leading-none">
+            <div className="size-9 grid grow-0 place-items-center rounded-[12px] bg-green-20 text-green">
               <VoiceSquare size={16} variant="Bold" />
             </div>
             <div className="flex flex-col">

@@ -1,26 +1,29 @@
 'use client'
 
 import * as React from 'react'
-import { ChatHistoryItem, TopBarProps } from '@/types'
-import { Add, Clock, MessageText, Send2 } from 'iconsax-react'
-import CircleButton from '@/components/CircleButton/CircleButton'
-import Tooltip from '@/components/Tooltip/Tooltip'
-import { useStore } from '@/components/providers/store-provider'
-import { useRouter } from 'next/navigation'
-import { useShallow } from 'zustand/react/shallow'
-import TopTab from '@/components/Navigation/TopTab'
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
-import styles from './top-bar.module.scss'
-import variables from '@/variables.module.scss'
-import { useOpenConverationsPersistence } from '@/hooks/useOpenConverationsPersistence'
 import { useMemo, useState } from 'react'
-import ShareModal from '@/components/ShareModal/ShareModal'
+import { useRouter } from 'next/navigation'
+import globalStyles from '@/global.module.scss'
+import { ChatHistoryItem, TopBarProps } from '@/types'
 import { trackEvent } from '@/utils/amplitude'
+import variables from '@/variables.module.scss'
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
+import { Add, Clock, MessageText, Send2 } from 'iconsax-react'
+import { useShallow } from 'zustand/react/shallow'
+
+import { useOpenConverationsPersistence } from '@/hooks/useOpenConverationsPersistence'
 import { useTabHotkeys } from '@/hooks/useTabHotkeys'
 import Button from '@/components/Button/Button'
+import CircleButton from '@/components/CircleButton/CircleButton'
+import TopTab from '@/components/Navigation/TopTab'
 import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
-import globalStyles from '@/global.module.scss'
+import { useStore } from '@/components/providers/store-provider'
+import ShareModal from '@/components/ShareModal/ShareModal'
+import Tooltip from '@/components/Tooltip/Tooltip'
+
 import { ShareLink } from '@/features/share-link/share-link'
+
+import styles from './top-bar.module.scss'
 
 const TopBar: React.FC<TopBarProps> = ({ showHistory, setShowHistory }) => {
   const router = useRouter()

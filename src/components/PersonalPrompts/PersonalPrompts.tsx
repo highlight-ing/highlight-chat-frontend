@@ -1,26 +1,26 @@
-import styles from './personal-prompts.module.scss'
-import variables from '@/variables.module.scss'
 import { useState } from 'react'
-import { PersonalPromptsProps, PersonalPromptsItemProps } from '@/types'
+import Image from 'next/image'
+import { usePromptEditorStore } from '@/stores/prompt-editor'
+import { PersonalPromptsItemProps, PersonalPromptsProps } from '@/types'
+import variables from '@/variables.module.scss'
+import { ArchiveMinus, Edit2, ElementPlus, Lock, Setting, Trash } from 'iconsax-react'
 
+import { Prompt } from '@/types/supabase-helpers'
+import { DEFAULT_PROMPT_EXTERNAL_IDS } from '@/lib/promptapps'
+import { supabaseLoader } from '@/lib/supabase'
+import useForkDefaultAction from '@/hooks/useForkDefaultAction'
+import usePromptApps from '@/hooks/usePromptApps'
 // Components
 import { Badge } from '@/components/Badge/Badge'
 import Button from '@/components/Button/Button'
-import { Setting, Trash, Lock, Edit2, ElementPlus, ArchiveMinus } from 'iconsax-react'
 import EmptyPrompts from '@/components/EmptyPrompts/EmptyPrompts'
-import { Prompt } from '@/types/supabase-helpers'
-import Image from 'next/image'
-import { supabaseLoader } from '@/lib/supabase'
+import { useStore } from '@/components/providers/store-provider'
+import Tooltip from '@/components/Tooltip/Tooltip'
 
+import { PreferredAttachment } from '../prompts/PreferredAttachment/PreferredAttachment'
 // Custom Variables for styling
 import CSS_VARIABLES, { ColorScheme } from './customVariables'
-import Tooltip from '@/components/Tooltip/Tooltip'
-import usePromptApps from '@/hooks/usePromptApps'
-import { useStore } from '@/components/providers/store-provider'
-import { PreferredAttachment } from '../prompts/PreferredAttachment/PreferredAttachment'
-import { usePromptEditorStore } from '@/stores/prompt-editor'
-import { DEFAULT_PROMPT_EXTERNAL_IDS } from '@/lib/promptapps'
-import useForkDefaultAction from '@/hooks/useForkDefaultAction'
+import styles from './personal-prompts.module.scss'
 
 type PromptWithPin = Prompt & { isPinned?: boolean }
 

@@ -1,13 +1,15 @@
-import { useConversations } from '@/context/ConversationContext'
-import { AttachmentPicker } from '../AttachmentPicker/AttachmentPicker'
-import { getTimeAgo, getWordCountFormatted } from '@/utils/string'
-import { getConversationDisplayTitle, getConversationSubtitle } from '@/utils/conversations'
-import styles from './conversation-attachment-picker.module.scss'
-import { Setting2, VoiceSquare } from 'iconsax-react'
-import { useStore } from '@/components/providers/store-provider'
-import { useShallow } from 'zustand/react/shallow'
 import { useEffect } from 'react'
+import { useConversations } from '@/context/ConversationContext'
 import { trackEvent } from '@/utils/amplitude'
+import { getConversationDisplayTitle, getConversationSubtitle } from '@/utils/conversations'
+import { getTimeAgo, getWordCountFormatted } from '@/utils/string'
+import { Setting2, VoiceSquare } from 'iconsax-react'
+import { useShallow } from 'zustand/react/shallow'
+
+import { useStore } from '@/components/providers/store-provider'
+
+import { AttachmentPicker } from '../AttachmentPicker/AttachmentPicker'
+import styles from './conversation-attachment-picker.module.scss'
 
 interface ConversationAttachmentPickerProps {
   isVisible: boolean

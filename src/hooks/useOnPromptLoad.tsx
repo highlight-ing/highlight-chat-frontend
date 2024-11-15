@@ -1,7 +1,9 @@
-import { useStore } from '@/components/providers/store-provider'
 import { useEffect } from 'react'
-import { useSubmitQuery } from './useSubmitQuery'
+
+import { useStore } from '@/components/providers/store-provider'
+
 import { useCurrentChatMessages } from './useCurrentChatMessages'
+import { useSubmitQuery } from './useSubmitQuery'
 
 export function useOnPromptLoad() {
   const promptApp = useStore((state) => state.promptApp)

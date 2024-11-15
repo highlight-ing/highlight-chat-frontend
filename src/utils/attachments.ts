@@ -1,4 +1,5 @@
 import { Attachment, AudioAttachment } from '@/types'
+
 import { getDurationUnit } from './string'
 
 export const getAudioAttachmentPreview = (attachment: AudioAttachment): string => {

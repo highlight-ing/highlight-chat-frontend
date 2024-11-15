@@ -1,9 +1,10 @@
-import { Note, Screenmirroring, Shapes, VoiceSquare } from 'iconsax-react'
 import sassVariables from '@/variables.module.scss'
-import ContextMenu from '@/components/ContextMenu/ContextMenu'
+import { Note, Screenmirroring, Shapes, VoiceSquare } from 'iconsax-react'
+
 import Button from '@/components/Button/Button'
-import Tooltip from '@/components/Tooltip/Tooltip'
+import ContextMenu from '@/components/ContextMenu/ContextMenu'
 import { useStore } from '@/components/providers/store-provider'
+import Tooltip from '@/components/Tooltip/Tooltip'
 
 export const TemplatesTool = ({ hidden }: { hidden: boolean }) => {
   const openModal = useStore((state) => state.openModal)

@@ -1,8 +1,9 @@
 'use client'
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useApi } from '@/hooks/useApi'
 import { trackEvent } from '@/utils/amplitude'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+
+import { useApi } from '@/hooks/useApi'
 import { useStore } from '@/components/providers/store-provider'
 
 export function useCopyLink() {

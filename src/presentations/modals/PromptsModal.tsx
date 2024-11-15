@@ -1,15 +1,17 @@
-import { ModalObjectProps } from '@/types'
-import { Prompt } from '@/types/supabase-helpers'
-import Modal from '@/components/modals/Modal'
-import { useStore } from '@/components/providers/store-provider'
 import React, { useMemo } from 'react'
-import PromptListRow from '@/components/prompts/PromptListRow'
-import styles from './modals.module.scss'
-import { Divider } from '@/components/catalyst/divider'
-import { AddCircle } from 'iconsax-react'
+import { ModalObjectProps } from '@/types'
 import variables from '@/variables.module.scss'
-import usePromptApps from '@/hooks/usePromptApps'
+import { AddCircle } from 'iconsax-react'
 import { useShallow } from 'zustand/react/shallow'
+
+import { Prompt } from '@/types/supabase-helpers'
+import usePromptApps from '@/hooks/usePromptApps'
+import { Divider } from '@/components/catalyst/divider'
+import Modal from '@/components/modals/Modal'
+import PromptListRow from '@/components/prompts/PromptListRow'
+import { useStore } from '@/components/providers/store-provider'
+
+import styles from './modals.module.scss'
 
 const HighlightChatPrompt = {
   slug: 'hlchat',

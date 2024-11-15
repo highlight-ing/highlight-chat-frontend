@@ -1,14 +1,12 @@
 import React from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
+import { Document, Grid6 } from 'iconsax-react'
 import { ControllerRenderProps, useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { checkNotionConnectionStatus, createMagicLinkForNotion } from './actions'
-import { Text } from 'react-notion-x'
-import { Grid6, Document } from 'iconsax-react'
-import { emptyTextBlock, getDecorations } from './utils'
 import Markdown from 'react-markdown'
-import { NotionIcon } from '@/components/icons'
-import { useCheckNotionConnection, useCreateNotionPage, useNotionParentItems } from './hooks'
+import { Text } from 'react-notion-x'
+import { z } from 'zod'
+
 import {
   Form,
   FormControl,
@@ -20,11 +18,15 @@ import {
   FormSelectTrigger,
 } from '@/components/ui/form'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectValue } from '@/components/ui/select'
-import { IntegrationSubmitButton } from '../_components/submit-button'
+import { NotionIcon } from '@/components/icons'
+
 import { IntegrationsLoader } from '../_components/loader'
 import { SetupConnection } from '../_components/setup-connection'
+import { IntegrationSubmitButton } from '../_components/submit-button'
 import { IntegrationSuccessMessage } from '../_components/success-message'
-import { useQueryClient } from '@tanstack/react-query'
+import { checkNotionConnectionStatus, createMagicLinkForNotion } from './actions'
+import { useCheckNotionConnection, useCreateNotionPage, useNotionParentItems } from './hooks'
+import { emptyTextBlock, getDecorations } from './utils'
 
 const notionPageFormSchema = z.object({
   title: z.string().min(1),
@@ -53,7 +55,7 @@ function ParentDropdown(props: NotionFormDropdownProps) {
             .map((database) => (
               <SelectItem key={database.id} value={database.id}>
                 <div className="flex items-center gap-2">
-                  <div className="grid size-5 place-items-center">
+                  <div className="size-5 grid place-items-center">
                     <Grid6 variant="Bold" size={20} />
                   </div>
                   <div className="line-clamp-1 text-[13px] font-medium leading-none text-primary/60">
@@ -70,7 +72,7 @@ function ParentDropdown(props: NotionFormDropdownProps) {
             .map((page) => (
               <SelectItem key={page.id} value={page.id}>
                 <div className="flex items-center gap-2">
-                  <div className="grid size-5 place-items-center">
+                  <div className="size-5 grid place-items-center">
                     <Document variant="Bold" size={20} />
                   </div>
                   <div className="line-clamp-1 text-[13px] font-medium leading-none text-primary/60">
@@ -142,7 +144,7 @@ function NotionPageForm(props: NotionFormProps) {
 
         <FormItem>
           <FormLabel>Page Contents</FormLabel>
-          <div className="relative flex !h-fit min-h-36 w-full resize-none flex-col justify-start gap-2 rounded-2xl border border-light-10 bg-secondary bg-transparent px-3 pb-2 pt-7 text-[15px] text-base text-primary shadow-sm outline-none transition-[padding] placeholder:text-subtle hover:border-light-20 focus:border-light-20 focus:bg-tertiary disabled:cursor-not-allowed disabled:opacity-50 md:text-sm">
+          <div className="min-h-36 relative flex !h-fit w-full resize-none flex-col justify-start gap-2 rounded-2xl border border-light-10 bg-secondary bg-transparent px-3 pb-2 pt-7 text-[15px] text-base text-primary shadow-sm outline-none transition-[padding] placeholder:text-subtle hover:border-light-20 focus:border-light-20 focus:bg-tertiary disabled:cursor-not-allowed disabled:opacity-50 md:text-sm">
             <Markdown
               components={{
                 a: ({ href, children }) => (

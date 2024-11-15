@@ -1,8 +1,10 @@
-import { StateCreator } from 'zustand'
-import { Prompt } from '@/types/supabase-helpers'
 import { PinnedPrompt } from '@/types'
-import { useStore } from '@/components/providers/store-provider'
+import { StateCreator } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
+
+import { Prompt } from '@/types/supabase-helpers'
+import { useStore } from '@/components/providers/store-provider'
+
 import { Store } from '.'
 
 /**

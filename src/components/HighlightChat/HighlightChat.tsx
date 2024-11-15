@@ -86,7 +86,7 @@ const HighlightChat = () => {
       inputIsDisabled: state.inputIsDisabled,
       promptApp: state.promptApp,
       isConversationLoading: state.isConversationLoading,
-    }))
+    })),
   )
   const messages = useCurrentChatMessages()
 

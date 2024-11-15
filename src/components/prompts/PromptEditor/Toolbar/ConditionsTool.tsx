@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react'
-import { Category2, Hierarchy, MessageProgramming, MessageSearch, Text } from 'iconsax-react'
 import sassVariables from '@/variables.module.scss'
-import ContextMenu from '@/components/ContextMenu/ContextMenu'
+import { Category2, Hierarchy, MessageProgramming, MessageSearch, Text } from 'iconsax-react'
+
 import Button from '@/components/Button/Button'
+import ContextMenu from '@/components/ContextMenu/ContextMenu'
 import Tooltip from '@/components/Tooltip/Tooltip'
 
 export const ConditionsTool = ({ disabled }: { disabled?: boolean }) => {

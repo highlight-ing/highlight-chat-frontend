@@ -1,7 +1,8 @@
 import { SharedChat } from '@/types'
-import { extractBearerToken, validateHighlightJWT } from './auth'
-import { z } from 'zod'
 import { backendUrl } from '@/utils/chatBackendUrl'
+import { z } from 'zod'
+
+import { extractBearerToken, validateHighlightJWT } from './auth'
 
 interface RequestOptions {
   version?: 'v1' | 'v3'

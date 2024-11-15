@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+
 import { useStore } from '@/components/providers/store-provider'
 
 export const useTabHotkeys = () => {

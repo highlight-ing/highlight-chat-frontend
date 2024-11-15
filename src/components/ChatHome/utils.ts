@@ -1,4 +1,4 @@
-import { format, isToday, isThisHour, differenceInMinutes, intervalToDuration, formatDuration } from 'date-fns'
+import { differenceInMinutes, format, formatDuration, intervalToDuration, isThisHour, isToday } from 'date-fns'
 
 export function formatConversationEndDate(date: Date) {
   if (isThisHour(date)) {

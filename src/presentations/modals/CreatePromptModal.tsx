@@ -1,12 +1,14 @@
-import { ModalObjectProps } from '@/types'
-import Modal from '@/components/modals/Modal'
-import PromptEditor from '@/components/prompts/PromptEditor/PromptEditor'
 import { useEffect } from 'react'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
-import styles from './modals.module.scss'
+import { ModalObjectProps } from '@/types'
+
 import CloseButton from '@/components/CloseButton/CloseButton'
-import { useStore } from '@/components/providers/store-provider'
+import Modal from '@/components/modals/Modal'
+import PromptEditor from '@/components/prompts/PromptEditor/PromptEditor'
 import PromptSaveButton from '@/components/prompts/PromptEditor/PromptSaveButton'
+import { useStore } from '@/components/providers/store-provider'
+
+import styles from './modals.module.scss'
 
 const CreatePromptModal = ({ id, context }: ModalObjectProps) => {
   const { onboarding, promptEditorData, clearPromptEditorData, startTutorial, setSelectedScreen } =

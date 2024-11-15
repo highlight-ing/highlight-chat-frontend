@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Highlight from '@highlight-ai/app-runtime'
 
 export const addAudioPermissionListener = (listener: (event: 'locked' | 'detect' | 'attach') => void): (() => void) => {

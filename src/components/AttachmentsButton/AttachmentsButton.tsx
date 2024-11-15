@@ -1,19 +1,21 @@
 import { useEffect, useRef, useState } from 'react'
-import { ClipboardText, DocumentUpload, GalleryAdd, VoiceSquare } from 'iconsax-react'
+import { MAX_NUMBER_OF_ATTACHMENTS } from '@/stores/chat-attachments'
+import { trackEvent } from '@/utils/amplitude'
 import Highlight from '@highlight-ai/app-runtime'
-import { PaperclipIcon } from '@/components/icons'
-import ContextMenu, { MenuItemType } from '../ContextMenu/ContextMenu'
-import { useStore } from '@/components/providers/store-provider'
-import { ScreenshotAttachmentPicker } from '../ScreenshotAttachmentPicker/ScrenshotAttachmentPicker'
-import { useShallow } from 'zustand/react/shallow'
-import styles from './attachments-button.module.scss'
-import Tooltip from '@/components/Tooltip/Tooltip'
+import { ClipboardText, DocumentUpload, GalleryAdd, VoiceSquare } from 'iconsax-react'
 import mammoth from 'mammoth'
 import * as pptxtojson from 'pptxtojson'
-import { trackEvent } from '@/utils/amplitude'
-import { ConversationAttachmentPicker } from '../ConversationAttachmentPicker.tsx/ConversationAttachmentPicker'
+import { useShallow } from 'zustand/react/shallow'
+
 import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
-import { MAX_NUMBER_OF_ATTACHMENTS } from '@/stores/chat-attachments'
+import { PaperclipIcon } from '@/components/icons'
+import { useStore } from '@/components/providers/store-provider'
+import Tooltip from '@/components/Tooltip/Tooltip'
+
+import ContextMenu, { MenuItemType } from '../ContextMenu/ContextMenu'
+import { ConversationAttachmentPicker } from '../ConversationAttachmentPicker.tsx/ConversationAttachmentPicker'
+import { ScreenshotAttachmentPicker } from '../ScreenshotAttachmentPicker/ScrenshotAttachmentPicker'
+import styles from './attachments-button.module.scss'
 
 export const AttachmentsButton = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)

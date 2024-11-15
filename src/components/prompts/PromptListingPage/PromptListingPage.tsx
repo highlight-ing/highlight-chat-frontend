@@ -1,6 +1,7 @@
-import RelatedApp, { RelatedAppProps } from './RelatedApp'
 import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
+
 import Buttons from './Buttons'
+import RelatedApp, { RelatedAppProps } from './RelatedApp'
 import Video from './Video'
 
 function IconPlaceholder() {

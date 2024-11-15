@@ -1,4 +1,5 @@
 import React, { ReactElement, useEffect, useRef, useState } from 'react'
+
 import styles from './animatedlabel.module.scss'
 
 const AnimatedLabel = ({ label, transitionMs }: { label: string | ReactElement; transitionMs: number }) => {

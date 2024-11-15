@@ -1,49 +1,45 @@
 // src/hooks/useSubmitQuery.ts
 import { useEffect, useRef } from 'react'
-import { useStore } from '@/components/providers/store-provider'
-import { useApi } from '@/hooks/useApi'
-import { Prompt } from '@/types/supabase-helpers'
-import { useShallow } from 'zustand/react/shallow'
-import { HighlightContext } from '@highlight-ai/app-runtime'
-import Highlight from '@highlight-ai/app-runtime'
-import * as Sentry from '@sentry/react'
-
+import { Attachment, FileAttachment, ImageAttachment, PdfAttachment } from '@/types'
+import { trackEvent } from '@/utils/amplitude'
 import { fetchWindows } from '@/utils/attachmentUtils'
-import { parseAndHandleStreamChunk } from '@/utils/streamParser'
+import { processAttachments } from '@/utils/contextprocessor'
+// Import necessary types from formDataUtils
 import {
-  buildFormData,
-  OCRTextAttachment,
-  WindowListAttachment,
-  ClipboardTextAttachment,
   AboutMeAttachment,
-  ConversationAttachment,
   AttachedContexts,
   AvailableContexts,
+  buildFormData,
+  ClipboardTextAttachment,
+  ConversationAttachment,
   ConversationAttachmentMetadata,
+  ImageAttachmentMetadata,
+  OCRTextAttachment,
+  PDFAttachment,
+  SpreadsheetAttachment,
+  TextFileAttachmentMetadata,
+  WindowContentsAttachment,
+  WindowListAttachment,
 } from '@/utils/formDataUtils'
-import { trackEvent } from '@/utils/amplitude'
-import { processAttachments } from '@/utils/contextprocessor'
-import { FileAttachment, ImageAttachment, PdfAttachment } from '@/types'
-import { useUploadFile } from './useUploadFile'
+import { parseAndHandleStreamChunk } from '@/utils/streamParser'
+import { formatDateForConversation, getWordCount } from '@/utils/string'
+import Highlight, { HighlightContext } from '@highlight-ai/app-runtime'
+import * as Sentry from '@sentry/react'
 import { v4 as uuidv4 } from 'uuid'
-import { Attachment } from '@/types'
-import { formatDateForConversation } from '@/utils/string'
+import { useShallow } from 'zustand/react/shallow'
+
+import { Prompt } from '@/types/supabase-helpers'
+import { useApi } from '@/hooks/useApi'
+import { useStore } from '@/components/providers/store-provider'
+
+import { useIntegrations } from '@/features/integrations/_hooks/use-integrations'
+
+import { useUploadFile } from './useUploadFile'
 
 // Create a type guard for FileAttachment
 function isUploadableAttachment(attachment: Attachment): attachment is PdfAttachment | ImageAttachment {
   return ['pdf', 'image'].includes(attachment.type)
 }
-
-// Import necessary types from formDataUtils
-import {
-  TextFileAttachmentMetadata,
-  ImageAttachmentMetadata,
-  PDFAttachment,
-  WindowContentsAttachment,
-  SpreadsheetAttachment,
-} from '@/utils/formDataUtils'
-import { getWordCount } from '@/utils/string'
-import { useIntegrations } from '@/features/integrations/_hooks/use-integrations'
 
 async function createAttachmentMetadata(
   attachment: FileAttachment | Attachment,

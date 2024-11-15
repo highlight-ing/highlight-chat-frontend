@@ -1,13 +1,14 @@
-import { useStore } from '@/components/providers/store-provider'
-
-import styles from './chatheader.module.scss'
-import { Link, MessageText, ArrowLeft } from 'iconsax-react'
-import { getPromptAppType } from '@/lib/promptapps'
-import { useShallow } from 'zustand/react/shallow'
-import PromptAppIcon from '../PromptAppIcon/PromptAppIcon'
-import Button from '../Button/Button'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { ArrowLeft, Link, MessageText } from 'iconsax-react'
+import { useShallow } from 'zustand/react/shallow'
+
+import { getPromptAppType } from '@/lib/promptapps'
+import { useStore } from '@/components/providers/store-provider'
+
+import Button from '../Button/Button'
+import PromptAppIcon from '../PromptAppIcon/PromptAppIcon'
+import styles from './chatheader.module.scss'
 
 const ChatHeader = ({ isShowing }: { isShowing: boolean }) => {
   const router = useRouter()

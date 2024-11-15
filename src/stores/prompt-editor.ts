@@ -1,8 +1,9 @@
-import { StateCreator } from 'zustand'
-import { useStore } from '@/components/providers/store-provider'
-import { useShallow } from 'zustand/react/shallow'
 import { PromptTag } from '@/types'
+import { StateCreator } from 'zustand'
+import { useShallow } from 'zustand/react/shallow'
+
 import { PreferredAttachment } from '@/lib/zod'
+import { useStore } from '@/components/providers/store-provider'
 
 /**
  * Holds the state for the prompt editor,

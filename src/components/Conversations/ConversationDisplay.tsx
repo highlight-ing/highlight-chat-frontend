@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { ConversationEntry } from './ConversationEntry'
-import { SectionHeader } from './SectionHeader'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useConversations } from '@/context/ConversationContext'
 import { getWordCount } from '@/utils/string'
+
+import { ConversationEntry } from './ConversationEntry'
+import { SectionHeader } from './SectionHeader'
 
 type TimeFrame = 'today' | 'week' | 'two-weeks' | 'month'
 

@@ -1,9 +1,10 @@
 import { ChatHistoryItem, ModalObjectProps } from '@/types'
+import { useShallow } from 'zustand/react/shallow'
+
 import { useApi } from '@/hooks/useApi'
 import { useChatHistory } from '@/hooks/useChatHistory'
-import { useStore } from '@/components/providers/store-provider'
 import ConfirmationModal from '@/components/modals/ConfirmationModal'
-import { useShallow } from 'zustand/react/shallow'
+import { useStore } from '@/components/providers/store-provider'
 
 const DeleteChatModal = ({ id, context }: ModalObjectProps) => {
   const chat = context as ChatHistoryItem

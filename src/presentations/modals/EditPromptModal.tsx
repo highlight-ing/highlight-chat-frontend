@@ -1,15 +1,17 @@
+import { useEffect, useRef, useState } from 'react'
+import { DEFAULT_SYSTEM_PROMPT, usePromptEditorStore } from '@/stores/prompt-editor'
 import { ModalObjectProps, PromptTag } from '@/types'
+
+import { Prompt } from '@/types/supabase-helpers'
+import { PreferredAttachmentSchema } from '@/lib/zod'
+import Button from '@/components/Button/Button'
+import CloseButton from '@/components/CloseButton/CloseButton'
 import Modal from '@/components/modals/Modal'
 import PromptEditor from '@/components/prompts/PromptEditor/PromptEditor'
-import { DEFAULT_SYSTEM_PROMPT, usePromptEditorStore } from '@/stores/prompt-editor'
-import { useEffect, useRef, useState } from 'react'
-import styles from './modals.module.scss'
-import { Prompt } from '@/types/supabase-helpers'
-import CloseButton from '@/components/CloseButton/CloseButton'
-import { useStore } from '@/components/providers/store-provider'
 import PromptSaveButton from '@/components/prompts/PromptEditor/PromptSaveButton'
-import Button from '@/components/Button/Button'
-import { PreferredAttachmentSchema } from '@/lib/zod'
+import { useStore } from '@/components/providers/store-provider'
+
+import styles from './modals.module.scss'
 
 const EditPromptModal = ({ id, context }: ModalObjectProps) => {
   const prompt = context?.prompt as Prompt

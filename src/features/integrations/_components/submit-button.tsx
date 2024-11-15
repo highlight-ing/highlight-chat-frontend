@@ -1,7 +1,8 @@
+import React from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+
 import Button from '@/components/Button/Button'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
-import { AnimatePresence, motion } from 'framer-motion'
-import React from 'react'
 
 type IntegrationSubmitButtonProps = {
   icon: React.ReactNode

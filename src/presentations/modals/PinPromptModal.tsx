@@ -1,12 +1,12 @@
 import { ModalObjectProps } from '@/types'
+import { trackEvent } from '@/utils/amplitude'
+import { addPromptToUser } from '@/utils/prompts'
 
-import { useStore } from '@/components/providers/store-provider'
-import ConfirmationModal from '@/components/modals/ConfirmationModal'
 import { Prompt } from '@/types/supabase-helpers'
 import useAuth from '@/hooks/useAuth'
-import { addPromptToUser } from '@/utils/prompts'
 import usePromptApps from '@/hooks/usePromptApps'
-import { trackEvent } from '@/utils/amplitude'
+import ConfirmationModal from '@/components/modals/ConfirmationModal'
+import { useStore } from '@/components/providers/store-provider'
 
 export interface PinPromptModalContext {
   prompt: Prompt

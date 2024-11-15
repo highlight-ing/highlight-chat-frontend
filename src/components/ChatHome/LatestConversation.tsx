@@ -1,13 +1,14 @@
-import { VoiceSquare } from 'iconsax-react'
-import { OpenAppButton } from '../buttons/open-app-button'
-import { useConversations } from '@/context/ConversationContext'
 import { useMemo } from 'react'
-import { formatConversationDuration, formatConversationEndDate } from './utils'
-import Tooltip from '../Tooltip/Tooltip'
-import { useStore } from '@/components/providers/store-provider'
-import { ConversationData } from '@highlight-ai/app-runtime'
+import { useConversations } from '@/context/ConversationContext'
+import Highlight, { ConversationData } from '@highlight-ai/app-runtime'
+import { VoiceSquare } from 'iconsax-react'
 import { useShallow } from 'zustand/react/shallow'
-import Highlight from '@highlight-ai/app-runtime'
+
+import { useStore } from '@/components/providers/store-provider'
+
+import { OpenAppButton } from '../buttons/open-app-button'
+import Tooltip from '../Tooltip/Tooltip'
+import { formatConversationDuration, formatConversationEndDate } from './utils'
 
 function NoAudioNote() {
   return (

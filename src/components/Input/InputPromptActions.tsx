@@ -1,14 +1,16 @@
-import { motion, Variants } from 'framer-motion'
-import { useMemo, MouseEvent } from 'react'
-import usePromptApps from '@/hooks/usePromptApps'
-import { PinnedPrompt } from '@/types'
+import { MouseEvent, useMemo } from 'react'
 import Image from 'next/image'
-import { supabaseLoader } from '@/lib/supabase'
+import { PinnedPrompt } from '@/types'
+import { motion, Variants } from 'framer-motion'
 import { Archive, BoxAdd, Edit2 } from 'iconsax-react'
-import Tooltip from '../Tooltip/Tooltip'
+
+import { supabaseLoader } from '@/lib/supabase'
+import usePromptApps from '@/hooks/usePromptApps'
 import { useStore } from '@/components/providers/store-provider'
-import { ScrollArea } from '../ui/scroll-area'
+
 import { OpenAppButton } from '../buttons/open-app-button'
+import Tooltip from '../Tooltip/Tooltip'
+import { ScrollArea } from '../ui/scroll-area'
 
 const actionItemVariants: Variants = {
   hidden: {
