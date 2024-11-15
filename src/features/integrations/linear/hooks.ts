@@ -69,6 +69,7 @@ export function useCheckLinearConnection() {
     },
     enabled: !!hlToken,
     refetchInterval: 7 * 1000,
+    retry: false,
   })
 }
 
