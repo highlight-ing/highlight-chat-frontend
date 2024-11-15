@@ -9,17 +9,17 @@ import { emptyTextBlock, getDecorations } from './utils'
 import Markdown from 'react-markdown'
 import { NotionIcon } from '@/icons/icons'
 import { useCheckNotionConnection, useCreateNotionPage, useNotionParentItems } from './hooks'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+  Form,
+  FormControl,
+  FormField,
+  FormInput,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormSelectTrigger,
+} from '@/components/ui/form'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectValue } from '@/components/ui/select'
 import { IntegrationSubmitButton } from '../_components/submit-button'
 import { IntegrationsLoader } from '../_components/loader'
 import { SetupConnection } from '../_components/setup-connection'
@@ -42,9 +42,9 @@ function ParentDropdown(props: NotionFormDropdownProps) {
 
   return (
     <Select value={props.field.value} onValueChange={props.field.onChange}>
-      <SelectTrigger value={props.field.value}>
+      <FormSelectTrigger value={props.field.value}>
         <SelectValue placeholder="Select a parent" />
-      </SelectTrigger>
+      </FormSelectTrigger>
       <SelectContent sideOffset={4} className="max-h-[270px]">
         <SelectGroup>
           <SelectLabel>Databases</SelectLabel>
@@ -133,7 +133,7 @@ function NotionPageForm(props: NotionFormProps) {
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder="Page title" {...field} />
+                <FormInput placeholder="Page title" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
