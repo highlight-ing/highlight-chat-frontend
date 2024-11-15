@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import styles from './modals.module.scss'
 import CloseButton from '@/components/CloseButton/CloseButton'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import PromptSaveButton from '@/components/prompts/PromptEditor/PromptSaveButton'
 
 const CreatePromptFromTemplateModal = ({ id, context }: ModalObjectProps) => {

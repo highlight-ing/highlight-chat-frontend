@@ -3,7 +3,7 @@ import Modal from '@/components/modals/Modal'
 import styles from './modals.module.scss'
 import { Prompt } from '@/types/supabase-helpers'
 import CloseButton from '@/components/CloseButton/CloseButton'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import { CustomizePromptButton } from '@/components/prompts/CustomizePromptPage/CustomizePromptButton'
 import { CustomizePromptDetails } from '@/components/prompts/CustomizePromptPage/CustomizePromptDetails'
 

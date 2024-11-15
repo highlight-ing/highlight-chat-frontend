@@ -1,7 +1,7 @@
 import React from 'react'
 import { VoiceSquare } from 'iconsax-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import { useInputFocus } from '@/components/Input/Input'
 import { ConversationData } from '@highlight-ai/app-runtime'
 import { getWordCount } from '@/utils/string'

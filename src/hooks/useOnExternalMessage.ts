@@ -2,7 +2,7 @@
 
 import Highlight from '@highlight-ai/app-runtime'
 import { useEffect } from 'react'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import { useChatHistory } from '@/hooks/useChatHistory'
 import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 import { useIntegrations } from '@/features/integrations/_hooks/use-integrations'

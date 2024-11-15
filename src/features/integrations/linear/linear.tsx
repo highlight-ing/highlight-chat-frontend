@@ -15,7 +15,7 @@ import {
   FormTextarea,
 } from '@/components/ui/form'
 import { Select, SelectContent, SelectItem, SelectValue } from '@/components/ui/select'
-import { LinearIcon } from '@/icons/icons'
+import { LinearIcon } from '@/components/icons'
 import { IntegrationSubmitButton } from '../_components/submit-button'
 import { IntegrationSuccessMessage } from '../_components/success-message'
 import { IntegrationsLoader } from '../_components/loader'

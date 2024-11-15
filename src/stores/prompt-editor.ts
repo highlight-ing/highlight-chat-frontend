@@ -1,5 +1,5 @@
 import { StateCreator } from 'zustand'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import { useShallow } from 'zustand/react/shallow'
 import { PromptTag } from '@/types'
 import { PreferredAttachment } from '@/lib/zod'

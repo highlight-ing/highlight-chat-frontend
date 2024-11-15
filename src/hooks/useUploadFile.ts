@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import useAuth from './useAuth'
 import { useApi } from '@/hooks/useApi'
 import { useShallow } from 'zustand/react/shallow'

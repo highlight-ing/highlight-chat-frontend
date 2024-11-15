@@ -1,7 +1,7 @@
 import React, { type PropsWithChildren } from 'react'
 import { trackEvent } from '@/utils/amplitude'
 import { Message } from '@/types'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import { useState, useEffect } from 'react'
 import { z } from 'zod'
 import client from '@/utils/api-client'

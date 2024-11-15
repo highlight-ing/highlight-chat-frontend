@@ -6,7 +6,7 @@ import { AttachmentType } from '@/types'
 import { useImageDownload } from '@/hooks/useImageDownload'
 import { VoiceSquare } from 'iconsax-react'
 import { getWordCountFormatted } from '@/utils/string'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import { fetchAppIcon } from '@/app/(app)/actions'
 interface BaseAttachmentProps {
   onRemove?: () => void

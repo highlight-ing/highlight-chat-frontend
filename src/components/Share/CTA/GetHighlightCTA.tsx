@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { HighlightIcon } from '@/icons/icons'
+import { HighlightIcon } from '@/components/icons'
 import { usePlatform } from '@/hooks/usePlatform'
 import { buildDownloadURL } from '@/utils/downloadUrl'
 import {

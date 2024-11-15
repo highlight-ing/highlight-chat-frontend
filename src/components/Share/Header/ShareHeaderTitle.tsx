@@ -1,5 +1,5 @@
 import React from 'react'
-import { HighlightIcon } from '@/icons/icons'
+import { HighlightIcon } from '@/components/icons'
 
 interface ShareHeaderTitleProps {
   title: string

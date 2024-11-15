@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/DropdownMenu/dropdown-menu'
 import { useDownloadOrRedirect } from '@/hooks/useDownloadOrRedirect'
-import { HighlightIcon } from '@/icons/icons'
+import { HighlightIcon } from '@/components/icons'
 import { Prompt } from '@/types/supabase-helpers'
 import { ArrowDown, Code, LinkCircle, Tag } from 'iconsax-react'
 import { useState } from 'react'

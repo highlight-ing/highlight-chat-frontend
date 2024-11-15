@@ -1,6 +1,6 @@
 import { StateCreator } from 'zustand'
 import { Prompt } from '@/types/supabase-helpers'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import { useShallow } from 'zustand/react/shallow'
 
 /**

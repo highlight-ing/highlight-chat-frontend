@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { type Toast } from '@/types'
 import styles from './toast.module.scss'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import CloseButton from '@/components/CloseButton/CloseButton'
 import Button from '../Button/Button'
 

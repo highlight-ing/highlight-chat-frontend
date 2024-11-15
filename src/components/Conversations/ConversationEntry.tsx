@@ -1,7 +1,7 @@
 import React from 'react'
 import Highlight, { ConversationData } from '@highlight-ai/app-runtime'
 import { EntryAttachment } from './EntryAttachment'
-import { ConversationsIcon } from '@/icons/icons' // Import the new icon
+import { ConversationsIcon } from '@/components/icons' // Import the new icon
 
 interface ConversationEntryProps {
   conversation?: ConversationData

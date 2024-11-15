@@ -1,4 +1,4 @@
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import { Alert, AlertTitle, AlertDescription, AlertActions } from '@/components/catalyst/alert'
 import { Button } from '@/components/catalyst/button'
 

@@ -1,5 +1,5 @@
-import { useStore } from '@/providers/store-provider'
-import { LinearIcon, NotionIcon, GoogleIcon } from '@/icons/icons'
+import { useStore } from '@/components/providers/store-provider'
+import { LinearIcon, NotionIcon, GoogleIcon } from '@/components/icons'
 import { IntegrationsLoader } from '../_components/loader'
 import { CreateLinearTicket } from '../linear/linear'
 import { CreateNotionPage } from '../notion/notion'

@@ -1,4 +1,4 @@
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import Highlight from '@highlight-ai/app-runtime'
 
 import styles from './screenshot-attachment-picker.module.scss'

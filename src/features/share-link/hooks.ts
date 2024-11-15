@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useApi } from '@/hooks/useApi'
 import { trackEvent } from '@/utils/amplitude'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 
 export function useCopyLink() {
   return useMutation({

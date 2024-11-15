@@ -1,4 +1,4 @@
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import { useEffect } from 'react'
 import { useIntegrations } from './use-integrations'
 

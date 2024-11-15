@@ -3,7 +3,7 @@ import CloseButton from '@/components/CloseButton/CloseButton'
 import LoadingModal from '@/components/modals/LoadingModal'
 
 import styles from './modals.module.scss'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 
 type SizeType = 'xsmall' | 'small' | 'medium' | 'large' | 'xlarge' | 'fullscreen' | string
 

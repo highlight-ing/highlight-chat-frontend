@@ -1,4 +1,4 @@
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import { useShallow } from 'zustand/react/shallow'
 import styles from './clipboard-file-dropdown.module.scss'
 import Tooltip from '@/components/Tooltip/Tooltip'
@@ -9,7 +9,7 @@ import { ClipboardText, DocumentUpload } from 'iconsax-react'
 import mammoth from 'mammoth'
 import * as pptxtojson from 'pptxtojson'
 import Highlight from '@highlight-ai/app-runtime'
-import { PaperclipIcon } from '@/icons/icons'
+import { PaperclipIcon } from '@/components/icons'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 
 export const ClipboardFileDropdown = () => {

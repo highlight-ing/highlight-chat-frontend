@@ -2,7 +2,7 @@ import React from 'react'
 import styles from './message.module.scss'
 import { Copy, Send2, ExportCircle, LikeDislike, Like1, Dislike } from 'iconsax-react'
 import { AssistantMessageButtonType, AssistantMessageButtonStatus } from '@/types'
-import { LinearIcon, NotionIcon } from '@/icons/icons'
+import { LinearIcon, NotionIcon } from '@/components/icons'
 
 interface AssistantMessageButtonProps {
   type: AssistantMessageButtonType

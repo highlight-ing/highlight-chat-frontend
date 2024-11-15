@@ -1,5 +1,5 @@
 import { supabaseLoader } from '@/lib/supabase'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { Prompt } from '@/types/supabase-helpers'
 

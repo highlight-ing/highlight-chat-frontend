@@ -1,4 +1,4 @@
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import { useEffect } from 'react'
 import usePromptApps from '@/hooks/usePromptApps'
 import Highlight from '@highlight-ai/app-runtime'

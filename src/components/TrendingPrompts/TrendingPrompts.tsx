@@ -12,7 +12,7 @@ import Button from '@/components/Button/Button'
 import { Badge } from '@/components/Badge/Badge'
 import Tooltip from '@/components/Tooltip/Tooltip'
 import usePromptApps from '@/hooks/usePromptApps'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import { PreferredAttachment } from '../prompts/PreferredAttachment/PreferredAttachment'
 
 const TrendingPrompts = ({

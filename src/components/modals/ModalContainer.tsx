@@ -2,7 +2,7 @@
 
 import React, { Fragment, useEffect } from 'react'
 import DeleteChatModal from '@/presentations/modals/DeleteChatModal'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import { ModalObjectProps } from '@/types'
 import PromptsModal from '@/presentations/modals/PromptsModal'
 import CreatePromptModal from '@/presentations/modals/CreatePromptModal'

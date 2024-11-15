@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import { Input } from '@/components/Input/Input'
-import { HighlightIcon } from '@/icons/icons'
+import { HighlightIcon } from '@/components/icons'
 
 import { useShallow } from 'zustand/react/shallow'
 import { trackEvent } from '@/utils/amplitude'

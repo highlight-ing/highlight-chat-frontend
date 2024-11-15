@@ -1,6 +1,6 @@
 // src/hooks/useSubmitQuery.ts
 import { useEffect, useRef } from 'react'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import { useApi } from '@/hooks/useApi'
 import { Prompt } from '@/types/supabase-helpers'
 import { useShallow } from 'zustand/react/shallow'

@@ -6,7 +6,7 @@ import Highlight, {
   type OpenModalOptions,
 } from '@highlight-ai/app-runtime'
 import { useEffect } from 'react'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import { useRouter } from 'next/navigation'
 import usePromptApps from '@/hooks/usePromptApps'
 

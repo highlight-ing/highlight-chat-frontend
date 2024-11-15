@@ -1,4 +1,4 @@
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import Toast from '@/components/Toast/Toast'
 import styles from './toast.module.scss'
 

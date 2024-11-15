@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { supabaseLoader } from '@/lib/supabase'
 import { Archive, BoxAdd, Edit2 } from 'iconsax-react'
 import Tooltip from '../Tooltip/Tooltip'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import { ScrollArea } from '../ui/scroll-area'
 import { OpenAppButton } from '../buttons/open-app-button'
 

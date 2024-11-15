@@ -1,6 +1,6 @@
 import React from 'react'
 import { AssistantMessage } from '@/types'
-import { HighlightIcon } from '@/icons/icons'
+import { HighlightIcon } from '@/components/icons'
 import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'

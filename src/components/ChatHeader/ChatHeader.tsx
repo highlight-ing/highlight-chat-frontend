@@ -1,4 +1,4 @@
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 
 import styles from './chatheader.module.scss'
 import { Link, MessageText, ArrowLeft } from 'iconsax-react'

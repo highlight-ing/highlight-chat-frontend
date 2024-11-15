@@ -3,7 +3,7 @@ import sassVariables from '@/variables.module.scss'
 import ContextMenu from '@/components/ContextMenu/ContextMenu'
 import Button from '@/components/Button/Button'
 import Tooltip from '@/components/Tooltip/Tooltip'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 
 export const TemplatesTool = ({ hidden }: { hidden: boolean }) => {
   const openModal = useStore((state) => state.openModal)

@@ -5,7 +5,7 @@ import Highlight, { Attachment as RuntimeAttachmentType, type HighlightContext }
 import { usePathname, useRouter } from 'next/navigation'
 import { debounce } from 'throttle-debounce'
 import { useSubmitQuery } from '@/hooks/useSubmitQuery'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import Modals from './modals/Modals'
 import { ModalContainer } from '@/components/modals/ModalContainer'
 import { useShallow } from 'zustand/react/shallow'

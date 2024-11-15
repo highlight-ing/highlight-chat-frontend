@@ -1,7 +1,7 @@
 import { StateCreator } from 'zustand'
 import { Prompt } from '@/types/supabase-helpers'
 import { PinnedPrompt } from '@/types'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import { useShallow } from 'zustand/react/shallow'
 import { Store } from '.'
 
@@ -58,9 +58,9 @@ export const createPromptsSlice: StateCreator<Store, [], [], PromptsSlice> = (se
       prompts: get().prompts.map((p) =>
         p.external_id === prompt.external_id
           ? {
-            ...p,
-            ...prompt,
-          }
+              ...p,
+              ...prompt,
+            }
           : p,
       ),
     })

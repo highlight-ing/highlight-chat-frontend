@@ -7,7 +7,7 @@ import { Text } from 'react-notion-x'
 import { Grid6, Document } from 'iconsax-react'
 import { emptyTextBlock, getDecorations } from './utils'
 import Markdown from 'react-markdown'
-import { NotionIcon } from '@/icons/icons'
+import { NotionIcon } from '@/components/icons'
 import { useCheckNotionConnection, useCreateNotionPage, useNotionParentItems } from './hooks'
 import {
   Form,

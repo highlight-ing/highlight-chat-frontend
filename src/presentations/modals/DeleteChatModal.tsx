@@ -1,7 +1,7 @@
 import { ChatHistoryItem, ModalObjectProps } from '@/types'
 import { useApi } from '@/hooks/useApi'
 import { useChatHistory } from '@/hooks/useChatHistory'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import ConfirmationModal from '@/components/modals/ConfirmationModal'
 import { useShallow } from 'zustand/react/shallow'
 

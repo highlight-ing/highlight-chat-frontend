@@ -1,4 +1,4 @@
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import { useShallow } from 'zustand/react/shallow'
 import styles from './conversations-dropdown.module.scss'
 import Tooltip from '@/components/Tooltip/Tooltip'

@@ -2,7 +2,7 @@ import Button from '@/components/Button/Button'
 import { Prompt } from '@/types/supabase-helpers'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { APP_PROMPT_COMMENT } from '@/types'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 
 export function CustomizePromptButton({ prompt }: Readonly<{ prompt: Prompt }>) {
   const { setSelectedScreen, setPromptEditorData, clearPromptEditorData, setOnboarding } = usePromptEditorStore()

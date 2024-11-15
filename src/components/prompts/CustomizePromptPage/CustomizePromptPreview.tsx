@@ -8,7 +8,7 @@ import Tooltip from '@/components/Tooltip/Tooltip'
 import { supabaseLoader } from '@/lib/supabase'
 import Image from 'next/image'
 import usePromptApps from '@/hooks/usePromptApps'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import { PromptTag } from '@/types'
 
 export const CustomizePromptPreview = ({ prompt }: { prompt: Prompt }) => {

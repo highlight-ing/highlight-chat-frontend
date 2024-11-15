@@ -4,7 +4,7 @@ import styles from '../prompteditor.module.scss'
 import { useEffect } from 'react'
 import OnboardingBox from '../OnboardingBox'
 import { Switch } from '@/components/catalyst/switch'
-import { LinearIcon, NotionIcon } from '@/icons/icons'
+import { LinearIcon, NotionIcon } from '@/components/icons'
 
 function OnboardingIndex0() {
   const { setOnboarding } = usePromptEditorStore()

@@ -1,7 +1,7 @@
 import { ModalObjectProps } from '@/types'
 import { Prompt } from '@/types/supabase-helpers'
 import Modal from '@/components/modals/Modal'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
 import React, { useMemo } from 'react'
 import PromptListRow from '@/components/prompts/PromptListRow'
 import styles from './modals.module.scss'

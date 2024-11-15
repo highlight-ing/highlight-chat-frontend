@@ -15,7 +15,7 @@ import {
   FormTextarea,
   useFormField,
 } from '@/components/ui/form'
-import { GoogleIcon } from '@/icons/icons'
+import { GoogleIcon } from '@/components/icons'
 import { IntegrationsLoader } from '../_components/loader'
 import { IntegrationSubmitButton } from '../_components/submit-button'
 import { useCheckGoogleCalConnection, useCreateGoogleCalEvent } from './hooks'
