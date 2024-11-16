@@ -1,16 +1,16 @@
-import { useEffect } from 'react'
+import React from 'react'
 import Highlight from '@highlight-ai/app-runtime'
 
 import usePromptApps from '@/hooks/usePromptApps'
 import { useStore } from '@/components/providers/store-provider'
 
-export const useOnPromptChange = () => {
+export function useOnPromptChange() {
   const { pinnedPrompts } = usePromptApps()
   const promptApp = useStore((state) => state.promptApp)
   const openModal = useStore((state) => state.openModal)
   const closeModal = useStore((state) => state.closeModal)
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!promptApp) {
       closeModal('prompt-added')
       return

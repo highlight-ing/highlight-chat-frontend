@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useConversations } from '@/context/ConversationContext'
-import Highlight, { ConversationData } from '@highlight-ai/app-runtime'
+import { ConversationData } from '@highlight-ai/app-runtime'
 import { VoiceSquare } from 'iconsax-react'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -24,26 +24,6 @@ function NoAudioNote() {
         Open Highlight Audio
       </OpenAppButton>
     </div>
-  )
-}
-
-function OpenConversationButton(props: { conversation: ConversationData }) {
-  async function handleClick() {
-    await Highlight.app.openApp('conversations')
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    // TODO: Trigger conversations to open this conversation
-  }
-
-  return (
-    <button
-      type="button"
-      aria-label="Open Conversation"
-      onClick={handleClick}
-      className="rounded-[6px] bg-white/[8%] px-6 py-1 text-xs text-secondary transition-colors hover:bg-white/15"
-    >
-      Open
-    </button>
   )
 }
 
@@ -74,7 +54,7 @@ function ChatWithConversationButton(props: { conversation: ConversationData }) {
       type="button"
       aria-label="Chat"
       onClick={handleClick}
-      className="rounded-[6px] bg-white/[8%] px-6 py-1 text-xs text-secondary transition-colors hover:bg-white/15"
+      className="hover:bg-white/15 rounded-[6px] bg-white/[8%] px-6 py-1 text-xs text-secondary transition-colors"
     >
       Chat
     </button>
@@ -90,7 +70,7 @@ export function LatestConversation(props: { focusInput: () => void }) {
 
       const formattedConversationTitle =
         mostRecentConversation?.title.startsWith('Conversation ended') ||
-        mostRecentConversation?.title.startsWith('Audio Notes from')
+          mostRecentConversation?.title.startsWith('Audio Notes from')
           ? 'Audio Note'
           : (mostRecentConversation?.title ?? 'Audio Note')
 
@@ -137,7 +117,6 @@ export function LatestConversation(props: { focusInput: () => void }) {
         onClick={props.focusInput}
         className="flex items-center gap-3 opacity-0 transition-opacity group-hover:opacity-100"
       >
-        {/* <OpenConversationButton conversation={mostRecentConversation.conversation} /> */}
         <ChatWithConversationButton conversation={mostRecentConversation.conversation} />
       </div>
     </div>

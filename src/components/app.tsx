@@ -21,7 +21,6 @@ import { useStore } from '@/components/providers/store-provider'
 import ToastContainer from '@/components/Toast/ToastContainer'
 import { checkForFollowUpFeedback, markFollowUpFeedbackAsShown } from '@/app/(app)/actions'
 
-import { useIntegrations } from '@/features/integrations/_hooks/use-integrations'
 import { usePendingIntegrations } from '@/features/integrations/_hooks/use-pending-integrations'
 
 import Modals from './modals/Modals'
@@ -210,7 +209,7 @@ function useShowFollowUpFeedbackToast() {
  *
  * This should hold all the providers.
  */
-export default function App({ children }: { children: React.ReactNode }) {
+export function App({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const { getAccessToken } = useAuth()

@@ -122,7 +122,7 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
 
 type HistorySidebarProps = {
   showHistory: boolean
-  setShowHistory: (showHistory: boolean) => void
+  setShowHistory: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarProps) {

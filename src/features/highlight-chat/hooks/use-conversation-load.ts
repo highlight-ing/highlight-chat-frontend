@@ -5,7 +5,7 @@ import { useApi } from '@/hooks/useApi'
 import usePromptApps from '@/hooks/usePromptApps'
 import { useStore } from '@/components/providers/store-provider'
 
-export default function useHandleConversationLoad() {
+export function useConversationLoad() {
   const { get } = useApi()
   const history = useStore((state) => state.history)
   const promptApp = useStore((state) => state.promptApp)

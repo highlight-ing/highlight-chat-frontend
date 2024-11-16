@@ -7,8 +7,6 @@ import { HighlightIcon } from '@/components/icons'
 import { Input } from '@/components/Input/Input'
 import { useStore } from '@/components/providers/store-provider'
 
-import { LatestConversation } from './LatestConversation'
-
 function InputHeading() {
   const { promptName, promptDescription } = useStore(
     useShallow((state) => ({

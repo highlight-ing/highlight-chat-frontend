@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import React from 'react'
 import { useRouter } from 'next/navigation'
 import Highlight, {
   type AppOpenEventOptions,
@@ -11,14 +11,14 @@ import Highlight, {
 import usePromptApps from '@/hooks/usePromptApps'
 import { useStore } from '@/components/providers/store-provider'
 
-export const useOnAppOpen = () => {
+export function useOnAppOpen() {
   const router = useRouter()
   const openModal = useStore((state) => state.openModal)
   const startNewConversation = useStore((state) => state.startNewConversation)
   const clearPrompt = useStore((state) => state.clearPrompt)
   const { selectPrompt, getPromptBySlug } = usePromptApps()
 
-  useEffect(() => {
+  React.useEffect(() => {
     const onOpen = async (eventOpts: boolean | AppOpenEventOptions) => {
       let isActiveApp
       if (typeof eventOpts === 'boolean') {

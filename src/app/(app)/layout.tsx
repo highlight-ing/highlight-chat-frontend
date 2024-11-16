@@ -4,7 +4,7 @@ import React from 'react'
 import { ConversationProvider } from '@/context/ConversationContext'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
-import App from '@/components/App'
+import { App } from '@/components/app'
 import { ReactQueryProvider } from '@/components/providers/react-query-provider'
 import { StoreProvider } from '@/components/providers/store-provider'
 

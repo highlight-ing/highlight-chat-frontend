@@ -6,16 +6,15 @@ import Highlight from '@highlight-ai/app-runtime'
 
 import { DEFAULT_PROMPT_EXTERNAL_IDS } from '@/lib/promptapps'
 import { useChatHistory } from '@/hooks/useChatHistory'
+import useForkDefaultAction from '@/hooks/useForkDefaultAction'
+import usePromptApps from '@/hooks/usePromptApps'
 import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 import { useStore } from '@/components/providers/store-provider'
 
 import { useIntegration } from '@/features/integrations/_hooks/use-integration'
 import { useIntegrations } from '@/features/integrations/_hooks/use-integrations'
 
-import useForkDefaultAction from './useForkDefaultAction'
-import usePromptApps from './usePromptApps'
-
-const useOnExternalMessage = () => {
+export function useOnExternalMessage() {
   const router = useRouter()
   const integrations = useIntegrations()
   const { setConversationId, openModal, closeAllModals, isModalOpen } = useStore((state) => ({
@@ -196,5 +195,3 @@ const useOnExternalMessage = () => {
     }
   }, [setConversationId, openModal])
 }
-
-export default useOnExternalMessage

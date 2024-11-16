@@ -55,11 +55,6 @@ export type CompareResult = {
   claude: string[]
 }
 
-export interface TopBarProps {
-  showHistory: boolean
-  setShowHistory: (show: boolean) => void
-}
-
 export interface ImageAttachment {
   type: 'image'
   value: string

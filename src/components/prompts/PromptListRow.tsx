@@ -2,11 +2,11 @@ import React from 'react'
 import { ArrowRight, Edit2, MessageText } from 'iconsax-react'
 
 import { Prompt } from '@/types/supabase-helpers'
-import styles from '@/components/ChatHome/chathome.module.scss'
 import CircleButton from '@/components/CircleButton/CircleButton'
 import Tooltip from '@/components/Tooltip/Tooltip'
 
 import PromptAppIcon from '../PromptAppIcon/PromptAppIcon'
+import styles from './prompt-list-row.module.scss'
 
 interface PromptListRowProps {
   prompt: Prompt

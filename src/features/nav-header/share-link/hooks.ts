@@ -1,7 +1,7 @@
 'use client'
 
 import { trackEvent } from '@/utils/amplitude'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 
 import { useApi } from '@/hooks/useApi'
 import { useStore } from '@/components/providers/store-provider'

@@ -4,13 +4,17 @@ import { ArrowLeft, Link, MessageText } from 'iconsax-react'
 import { useShallow } from 'zustand/react/shallow'
 
 import { getPromptAppType } from '@/lib/promptapps'
+import Button from '@/components/Button/Button'
+import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
 import { useStore } from '@/components/providers/store-provider'
 
-import Button from '../Button/Button'
-import PromptAppIcon from '../PromptAppIcon/PromptAppIcon'
-import styles from './chatheader.module.scss'
+import styles from './chat-header.module.scss'
 
-const ChatHeader = ({ isShowing }: { isShowing: boolean }) => {
+type ChatHeaderProps = {
+  isShowing: boolean
+}
+
+export function ChatHeader({ isShowing }: ChatHeaderProps) {
   const router = useRouter()
 
   const { startNewConversation, promptApp, promptName, promptDescription, userId, clearPrompt } = useStore(
@@ -92,5 +96,3 @@ const ChatHeader = ({ isShowing }: { isShowing: boolean }) => {
     </div>
   )
 }
-
-export default ChatHeader

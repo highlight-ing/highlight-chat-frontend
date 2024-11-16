@@ -14,12 +14,12 @@ import { useStore } from '@/components/providers/store-provider'
 import { Attachment } from '../Attachment'
 import { CreateShortcutButton } from '../buttons/create-shortcut-button'
 import { OpenAppButton } from '../buttons/open-app-button'
-import { LatestConversation } from '../ChatHome/LatestConversation'
 import { AttachmentDropdowns } from '../dropdowns/attachment-dropdowns'
 import styles from './chatinput.module.scss'
 import { InputDivider } from './InputDivider'
 import InputFooter from './InputFooter'
 import InputPromptActions from './InputPromptActions'
+import { LatestConversation } from './latest-conversation'
 
 const MAX_INPUT_HEIGHT = 160
 
