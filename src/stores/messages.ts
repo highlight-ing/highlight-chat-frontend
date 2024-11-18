@@ -1,5 +1,5 @@
-import { StateCreator } from 'zustand'
 import { Message } from '@/types'
+import { StateCreator } from 'zustand'
 
 export interface MessagesState {
   conversationMessages: Record<string, Message[]>

@@ -1,7 +1,8 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
+
 import { useHighlightToken } from '../_hooks/use-hl-token'
-import { GoogleCalEventFormSchema } from './google-cal'
 import { checkGoogleConnectionStatus, createGoogleCalendarEvent } from './actions'
+import { GoogleCalEventFormSchema } from './google-cal'
 
 export function useCheckGoogleCalConnection() {
   const { data: hlToken } = useHighlightToken()
@@ -19,6 +20,7 @@ export function useCheckGoogleCalConnection() {
     },
     enabled: !!hlToken,
     refetchInterval: 7 * 1000,
+    retry: false,
   })
 }
 

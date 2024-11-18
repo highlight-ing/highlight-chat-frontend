@@ -1,35 +1,35 @@
-import { createStore as create } from 'zustand/vanilla'
+import { createHistorySlice, HistorySlice, HistoryState, initialHistoryState } from '@/stores/history'
+import { createToastSlice, initialToastState, ToastSlice, ToastState } from '@/stores/toasts'
 import { persist } from 'zustand/middleware'
+import { createStore as create } from 'zustand/vanilla'
 
-import { MessagesSlice, MessagesState, createMessagesSlice, initialMessagesState } from './messages'
+import { AboutMeSlice, AboutMeState, createAboutMeSlice, initialAboutMeState } from './about-me'
 import { AuthSlice, AuthState, createAuthSlice, initialAuthState } from './auth'
-import { ChatInputSlice, ChatInputState, createChatInputSlice, initialChatInputState } from './chat-input'
 import {
   ChatAttachmentsSlice,
   ChatAttachmentsState,
   createChatAttachmentsSlice,
   initialChatAttachmentsState,
 } from './chat-attachments'
+import { ChatInputSlice, ChatInputState, createChatInputSlice, initialChatInputState } from './chat-input'
 import { ConversationSlice, ConversationState, createConversationSlice, initialConversationState } from './conversation'
-import { PromptSlice, PromptState, createPromptSlice, initialPromptState } from './prompt'
-import { PromptsSlice, createPromptsSlice, initialPromptsState } from './prompts'
-import { AboutMeSlice, AboutMeState, createAboutMeSlice, initialAboutMeState } from './about-me'
 import {
+  createHighlightContextSlice,
   HighlightContextSlice,
   HighlightContextState,
-  createHighlightContextSlice,
   initialHighlightContextState,
 } from './highlight-context'
-import { ModalsSlice, ModalsState, createModalsSlice, initialModalsState } from './modals'
-import { createHistorySlice, HistorySlice, HistoryState, initialHistoryState } from '@/stores/history'
-import { createToastSlice, ToastSlice, ToastState, initialToastState } from '@/stores/toasts'
+import { createIntegrationsSlice, initialIntegrationsState, IntegrationsSlice, IntegrationsState } from './integrations'
+import { createMessagesSlice, initialMessagesState, MessagesSlice, MessagesState } from './messages'
+import { createModalsSlice, initialModalsState, ModalsSlice, ModalsState } from './modals'
+import { createPromptSlice, initialPromptState, PromptSlice, PromptState } from './prompt'
 import {
   createPromptEditorSlice,
   initialPromptEditorState,
   PromptEditorSlice,
   PromptEditorState,
 } from './prompt-editor'
-import { createIntegrationsSlice, initialIntegrationsState, IntegrationsSlice, IntegrationsState } from './integrations'
+import { createPromptsSlice, initialPromptsState, PromptsSlice } from './prompts'
 
 /**
  * To add a new store, create a new file and reference messages.ts

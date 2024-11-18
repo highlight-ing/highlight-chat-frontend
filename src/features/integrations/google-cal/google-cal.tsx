@@ -1,26 +1,35 @@
 import React from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
+import { format } from 'date-fns'
 import { ControllerRenderProps, useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, useFormField } from '@/components/ui/form'
-import { GoogleIcon } from '@/icons/icons'
-import { IntegrationsLoader } from '../_components/loader'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { IntegrationSubmitButton } from '../_components/submit-button'
-import { useCheckGoogleCalConnection, useCreateGoogleCalEvent } from './hooks'
-import { checkGoogleConnectionStatus, createMagicLinkForGoogle } from './actions'
-import { IntegrationSuccessMessage } from '../_components/success-message'
-import { SetupConnection } from '../_components/setup-connection'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+
 import { Calendar } from '@/components/ui/calendar'
-import { format } from 'date-fns'
-import { extractDateAndTime } from './utils'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useQueryClient } from '@tanstack/react-query'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormInput,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormPopoverTrigger,
+  FormSelectTrigger,
+  FormTextarea,
+} from '@/components/ui/form'
+import { Popover, PopoverContent } from '@/components/ui/popover'
+import { Select, SelectContent, SelectItem, SelectValue } from '@/components/ui/select'
+import { GoogleIcon } from '@/components/icons'
+
 import { CreateGoogleCalendarEventParams } from '../_hooks/use-integrations'
-import { ChevronDownIcon } from '@radix-ui/react-icons'
-import { cn } from '@/lib/utils'
+import { IntegrationsLoader } from '../_components/loader'
+import { SetupConnection } from '../_components/setup-connection'
+import { IntegrationSubmitButton } from '../_components/submit-button'
+import { IntegrationSuccessMessage } from '../_components/success-message'
+import { checkGoogleConnectionStatus, createMagicLinkForGoogle } from './actions'
+import { useCheckGoogleCalConnection, useCreateGoogleCalEvent } from './hooks'
+import { extractDateAndTime } from './utils'
 
 const googleCalEventFormSchema = z
   .object({
@@ -51,7 +60,6 @@ type GoogleCalEventDropdownProps = {
 
 function DatePickerDropdown(props: GoogleCalEventDropdownProps) {
   const { date: dateValue, time: timeValue } = extractDateAndTime(props.field.value)
-  const { error } = useFormField()
 
   function handleChange(date: Date | undefined, time: string) {
     if (!date) return
@@ -67,15 +75,7 @@ function DatePickerDropdown(props: GoogleCalEventDropdownProps) {
 
   return (
     <Popover>
-      <PopoverTrigger
-        className={cn(
-          'relative flex w-full gap-2 rounded-2xl border border-light-10 bg-secondary px-3 py-2 text-[15px] text-primary outline-none transition-[padding] placeholder:text-subtle hover:border-light-20 disabled:cursor-not-allowed disabled:opacity-50 group-has-[label]:pb-2 group-has-[label]:pt-7 group-has-[label]:leading-snug data-[state=open]:border-light-20 data-[state=open]:bg-tertiary [&>span]:line-clamp-1',
-          error && 'border-red/70 hover:border-red data-[state=open]:border-red',
-        )}
-      >
-        {formattedDate}
-        <ChevronDownIcon className="absolute right-3 top-1/2 size-4 -translate-y-1/2 text-subtle" />
-      </PopoverTrigger>
+      <FormPopoverTrigger>{formattedDate}</FormPopoverTrigger>
       <PopoverContent align="start" className="w-auto rounded-lg bg-secondary p-0">
         <Calendar mode="single" selected={dateValue} onSelect={(date) => handleChange(date, timeValue)} initialFocus />
       </PopoverContent>
@@ -121,9 +121,9 @@ function TimeSelectDropdown(props: GoogleCalEventDropdownProps) {
 
   return (
     <Select value={timeValue} onValueChange={(time) => handleChange(dateValue, time)}>
-      <SelectTrigger value={timeValue} className="">
+      <FormSelectTrigger value={timeValue} className="">
         {isCustomTimeValue ? timeValue : timeValue ? <SelectValue /> : <span>Select a time</span>}
-      </SelectTrigger>
+      </FormSelectTrigger>
       <SelectContent className="w-36" sideOffset={4}>
         {timeOptions.map((time) => (
           <SelectItem key={time} value={time}>
@@ -172,7 +172,7 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
             <FormItem>
               <FormLabel>Summary</FormLabel>
               <FormControl>
-                <Input placeholder="Event summary" {...field} />
+                <FormInput placeholder="Event summary" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -183,15 +183,18 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
           <FormField
             control={form.control}
             name="start"
-            render={({ field }) => (
-              <FormItem className="col-span-2">
-                <FormLabel>Start date</FormLabel>
-                <FormControl>
-                  <DatePickerDropdown field={field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            render={({ field, fieldState }) => {
+              console.log({ fieldState })
+              return (
+                <FormItem className="col-span-2">
+                  <FormLabel>Start date</FormLabel>
+                  <FormControl>
+                    <DatePickerDropdown field={field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )
+            }}
           />
           <FormField
             control={form.control}
@@ -244,7 +247,7 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
             <FormItem>
               <FormLabel>Location</FormLabel>
               <FormControl>
-                <Input placeholder="Event location" {...field} />
+                <FormInput placeholder="Event location" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -258,7 +261,7 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea placeholder="Event description" {...field} />
+                <FormTextarea placeholder="Event description" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

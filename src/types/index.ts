@@ -1,9 +1,10 @@
-import { Prompt } from '@/types/supabase-helpers'
-import { ColorScheme } from '@/components/PersonalPrompts/customVariables'
-import { ButtonVariantType } from '@/components/Button/Button'
-import { AttachedContextContextTypes } from '@/utils/formDataUtils'
 import { ReactNode } from 'react'
+import { AttachedContextContextTypes } from '@/utils/formDataUtils'
 import { RichTextItemResponse } from '@notionhq/client/build/src/api-endpoints'
+
+import { Prompt } from '@/types/supabase-helpers'
+import { ButtonVariantType } from '@/components/Button/Button'
+import { ColorScheme } from '@/components/PersonalPrompts/customVariables'
 
 type WindowAttachment = {
   type: 'window'
@@ -52,11 +53,6 @@ export type CompareResult = {
   overview: string[]
   grok: string[]
   claude: string[]
-}
-
-export interface TopBarProps {
-  showHistory: boolean
-  setShowHistory: (show: boolean) => void
 }
 
 export interface ImageAttachment {

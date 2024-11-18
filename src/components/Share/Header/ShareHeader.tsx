@@ -1,6 +1,7 @@
 import React from 'react'
-import ShareHeaderTitle from './ShareHeaderTitle'
+
 import ShareHeaderButtonLinks from './ShareHeaderButtonLinks'
+import ShareHeaderTitle from './ShareHeaderTitle'
 
 interface ShareHeaderProps {
   title: string

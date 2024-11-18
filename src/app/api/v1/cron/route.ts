@@ -1,5 +1,6 @@
+import { NextRequest, NextResponse } from 'next/server'
+
 import { supabaseAdmin } from '@/lib/supabase'
-import { NextResponse, NextRequest } from 'next/server'
 
 const DISABLE_CRON_AUTHENTICATION_CHECK = false
 

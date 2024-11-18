@@ -1,13 +1,14 @@
-import { useStore } from '@/providers/store-provider'
-import { LinearIcon, NotionIcon, GoogleIcon } from '@/icons/icons'
+import { GoogleIcon, LinearIcon, NotionIcon } from '@/components/icons'
+import { useStore } from '@/components/providers/store-provider'
+
 import { IntegrationsLoader } from '../_components/loader'
-import { CreateLinearTicket } from '../linear/linear'
-import { CreateNotionPage } from '../notion/notion'
-import { CreateGoogleCalEvent } from '../google-cal/google-cal'
 import { SetupConnection } from '../_components/setup-connection'
-import { checkLinearConnectionStatus, createMagicLinkForLinear } from '../linear/actions'
-import { checkNotionConnectionStatus, createMagicLinkForNotion } from '../notion/actions'
 import { checkGoogleConnectionStatus, createMagicLinkForGoogle } from '../google-cal/actions'
+import { CreateGoogleCalEvent } from '../google-cal/google-cal'
+import { checkLinearConnectionStatus, createMagicLinkForLinear } from '../linear/actions'
+import { CreateLinearTicket } from '../linear/linear'
+import { checkNotionConnectionStatus, createMagicLinkForNotion } from '../notion/actions'
+import { CreateNotionPage } from '../notion/notion'
 
 interface CreateNotionPageParams {
   title: string

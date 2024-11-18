@@ -1,7 +1,8 @@
-import { refreshTokens, updateUserInfo } from '@/app/(app)/actions'
-import { useStore } from '@/providers/store-provider'
 import Highlight from '@highlight-ai/app-runtime'
 import { decodeJwt } from 'jose'
+
+import { useStore } from '@/components/providers/store-provider'
+import { refreshTokens, updateUserInfo } from '@/app/(app)/actions'
 
 interface TokensResponse {
   accessToken: string

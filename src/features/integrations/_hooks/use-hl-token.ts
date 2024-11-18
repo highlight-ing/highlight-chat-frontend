@@ -8,5 +8,6 @@ export function useHighlightToken() {
       const hlToken = (await highlight.internal.getAuthorizationToken()) as string
       return hlToken
     },
+    staleTime: 0,
   })
 }

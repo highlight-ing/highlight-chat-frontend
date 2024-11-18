@@ -1,7 +1,8 @@
-import { StateCreator } from 'zustand'
-import { v4 as uuidv4 } from 'uuid'
-import { Store } from '.'
 import { ChatHistoryItem, Message } from '@/types'
+import { v4 as uuidv4 } from 'uuid'
+import { StateCreator } from 'zustand'
+
+import { Store } from '.'
 
 /**
  * Store that deals with the current conversation.

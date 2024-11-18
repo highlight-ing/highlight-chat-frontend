@@ -1,14 +1,16 @@
 import { useState } from 'react'
-import { useStore } from '@/providers/store-provider'
-import { useShallow } from 'zustand/react/shallow'
-import styles from './screenshot.module.scss'
-import Tooltip from '@/components/Tooltip/Tooltip'
 import { MAX_NUMBER_OF_ATTACHMENTS } from '@/stores/chat-attachments'
-import { Gallery } from 'iconsax-react'
-import { ScreenshotAttachments } from './screenshot-attachments'
 import { trackEvent } from '@/utils/amplitude'
 import Highlight from '@highlight-ai/app-runtime'
+import { Gallery } from 'iconsax-react'
+import { useShallow } from 'zustand/react/shallow'
+
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { useStore } from '@/components/providers/store-provider'
+import Tooltip from '@/components/Tooltip/Tooltip'
+
+import { ScreenshotAttachments } from './screenshot-attachments'
+import styles from './screenshot.module.scss'
 
 export const ScreenshotDropdown = () => {
   const { attachments } = useStore(

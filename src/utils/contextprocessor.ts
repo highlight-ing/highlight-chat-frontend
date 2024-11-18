@@ -1,5 +1,5 @@
-import { dataURItoFile } from '@/utils/attachments'
 import { Attachment, ImageAttachment, PdfAttachment, SpreadsheetAttachment, TextFileAttachment } from '@/types'
+import { dataURItoFile } from '@/utils/attachments'
 
 export function processAttachments(attachments: any[]): Attachment[] {
   return attachments.map((attachment) => {

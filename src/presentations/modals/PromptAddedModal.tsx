@@ -1,12 +1,14 @@
-import Modal from '@/components/modals/Modal'
-import { type ModalObjectProps } from '@/types'
 import React, { useEffect, useState } from 'react'
-import { Prompt } from '@/types/supabase-helpers'
-import styles from './modals.module.scss'
+import { type ModalObjectProps } from '@/types'
 import Highlight from '@highlight-ai/app-runtime'
-import Hotkey from '@/components/Hotkey/Hotkey'
 import { ArchiveAdd, MessageText } from 'iconsax-react'
+
+import { Prompt } from '@/types/supabase-helpers'
+import Hotkey from '@/components/Hotkey/Hotkey'
+import Modal from '@/components/modals/Modal'
 import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
+
+import styles from './modals.module.scss'
 
 const PromptAddedModal = ({ id, context }: ModalObjectProps) => {
   const prompt = context?.prompt as Prompt

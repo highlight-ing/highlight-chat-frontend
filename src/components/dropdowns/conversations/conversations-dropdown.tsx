@@ -1,14 +1,16 @@
-import { useStore } from '@/providers/store-provider'
-import { useShallow } from 'zustand/react/shallow'
-import styles from './conversations-dropdown.module.scss'
-import Tooltip from '@/components/Tooltip/Tooltip'
-import { MAX_NUMBER_OF_ATTACHMENTS } from '@/stores/chat-attachments'
-import { useConversations } from '@/context/ConversationContext'
-import AnimatedVoiceSquare from '@/components/Conversations/AnimatedVoiceSquare'
-import ConversationToggle from './conversations-toggle'
-import { ConversationAttachments } from './conversations-attachments'
 import { useState } from 'react'
+import { useConversations } from '@/context/ConversationContext'
+import { MAX_NUMBER_OF_ATTACHMENTS } from '@/stores/chat-attachments'
+import { useShallow } from 'zustand/react/shallow'
+
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import AnimatedVoiceSquare from '@/components/Conversations/AnimatedVoiceSquare'
+import { useStore } from '@/components/providers/store-provider'
+import Tooltip from '@/components/Tooltip/Tooltip'
+
+import { ConversationAttachments } from './conversations-attachments'
+import styles from './conversations-dropdown.module.scss'
+import ConversationToggle from './conversations-toggle'
 
 export const ConversationsDropdown = () => {
   const { isAudioTranscripEnabled, micActivity } = useConversations()

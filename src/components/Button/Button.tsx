@@ -1,4 +1,5 @@
 import React, { forwardRef, PropsWithChildren } from 'react'
+
 import styles from './button.module.scss'
 
 type SizeType = 'xlarge' | 'large' | 'medium' | 'small' | 'xsmall' | 'icon'

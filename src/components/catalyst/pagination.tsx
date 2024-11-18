@@ -1,5 +1,6 @@
-import clsx from 'clsx'
 import type React from 'react'
+import clsx from 'clsx'
+
 import { Button } from './button'
 
 export function Pagination({

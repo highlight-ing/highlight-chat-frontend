@@ -1,7 +1,8 @@
 import { CSSProperties, PropsWithChildren, ReactElement, useEffect, useRef, useState } from 'react'
-import { Portal } from 'react-portal'
-import styles from './tooltip.module.scss'
 import { calculatePositionedStyle } from '@/utils/components'
+import { Portal } from 'react-portal'
+
+import styles from './tooltip.module.scss'
 
 // space between tooltip and whatever it's wrapping
 const emptyObj = {}

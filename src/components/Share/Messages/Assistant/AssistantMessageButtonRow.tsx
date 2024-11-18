@@ -1,6 +1,7 @@
 import React from 'react'
-import AssistantMessageButton from './AssistantMessageButton'
 import { AssistantMessageButtonConfig } from '@/types'
+
+import AssistantMessageButton from './AssistantMessageButton'
 
 interface AssistantMessageButtonRowProps {
   buttons: AssistantMessageButtonConfig[]

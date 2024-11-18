@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { PlatformType } from '@/types'
-import { isWindows, isMacOs, isIOS, isAndroid, isMobile, isDesktop } from 'react-device-detect'
+import { isAndroid, isDesktop, isIOS, isMacOs, isMobile, isWindows } from 'react-device-detect'
 
 export function usePlatform() {
   const [platform, setPlatform] = useState<PlatformType>('unknown')

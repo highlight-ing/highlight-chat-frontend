@@ -1,7 +1,7 @@
 import { ModalObjectProps } from '@/types'
 
-import { useStore } from '@/providers/store-provider'
 import ConfirmationModal from '@/components/modals/ConfirmationModal'
+import { useStore } from '@/components/providers/store-provider'
 
 export interface UnsavedChangesModalContext {
   onContinue: () => void

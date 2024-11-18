@@ -1,28 +1,33 @@
-import Markdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
 import React, { Fragment, useState } from 'react'
+import globalStyles from '@/global.module.scss'
 import variables from '@/variables.module.scss'
-import { AssistantIcon, PersonalizeIcon } from '@/icons/icons'
+import Highlight from '@highlight-ai/app-runtime'
+import Markdown from 'react-markdown'
+import rehypeKatex from 'rehype-katex'
+import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
+
+import { AssistantIcon, PersonalizeIcon } from '@/components/icons'
+import CodeBlock from '@/components/Messages/CodeBlock'
+import TypedText from '@/components/TypedText/TypedText'
+
 import { Message as MessageType, UserMessage } from '../../types'
 import { Attachment } from '../Attachment'
-import Highlight from '@highlight-ai/app-runtime'
-
-import globalStyles from '@/global.module.scss'
 import styles from './message.module.scss'
-import TypedText from '@/components/TypedText/TypedText'
-import CodeBlock from '@/components/Messages/CodeBlock'
-import remarkMath from 'remark-math'
-import rehypeKatex from 'rehype-katex'
+
 import 'katex/dist/katex.min.css'
-import Button from '@/components/Button/Button'
 
 import { getDisplayValue } from '@/utils/attachments'
-import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
-import { MessageText } from 'iconsax-react'
-import { useStore } from '@/providers/store-provider'
 import { AttachedContextContextTypes } from '@/utils/formDataUtils'
-import AssistantMessageButton from './AssistantMessageButton'
+import { MessageText } from 'iconsax-react'
+
+import Button from '@/components/Button/Button'
+import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
+import { useStore } from '@/components/providers/store-provider'
+
 import { useIntegration } from '@/features/integrations/_hooks/use-integration'
+
+import AssistantMessageButton from './AssistantMessageButton'
 
 const hasAttachment = (message: UserMessage) => {
   return (

@@ -1,5 +1,6 @@
 'use client'
 
+import { useDownloadOrRedirect } from '@/hooks/useDownloadOrRedirect'
 import Button from '@/components/Button/Button'
 import {
   DropdownMenu,
@@ -7,7 +8,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/DropdownMenu/dropdown-menu'
-import { useDownloadOrRedirect } from '@/hooks/useDownloadOrRedirect'
 
 function PlatformDownloadButton({ externalId }: { externalId: string }) {
   const { platform, handleDownload } = useDownloadOrRedirect()

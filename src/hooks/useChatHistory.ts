@@ -1,8 +1,9 @@
-import { useApi } from '@/hooks/useApi'
-import { useStore } from '@/providers/store-provider'
 import { ChatHistoryItem } from '@/types'
-import { useShallow } from 'zustand/react/shallow'
 import equal from 'fast-deep-equal'
+import { useShallow } from 'zustand/react/shallow'
+
+import { useApi } from '@/hooks/useApi'
+import { useStore } from '@/components/providers/store-provider'
 
 interface ChatHistoryResponse {
   conversations: ChatHistoryItem[]

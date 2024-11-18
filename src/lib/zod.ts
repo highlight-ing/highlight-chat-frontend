@@ -1,5 +1,5 @@
-import { z } from 'zod'
 import videoUrlParser from 'js-video-url-parser'
+import { z } from 'zod'
 
 // Schema that uses js-video-url-parser to validate the video URL is YouTube or Vimeo
 export const videoUrlSchema = z

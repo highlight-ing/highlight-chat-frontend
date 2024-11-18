@@ -1,5 +1,5 @@
-import Intercom from '@intercom/messenger-js-sdk'
 import { useEffect } from 'react'
+import Intercom from '@intercom/messenger-js-sdk'
 
 export default function IntercomChat() {
   useEffect(() => {

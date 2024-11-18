@@ -1,13 +1,14 @@
 'use server'
 
+import { PinnedPrompt } from '@/types'
+import mime from 'mime-types'
+import { nanoid } from 'nanoid'
+import slugify from 'slugify'
+import { z } from 'zod'
+
+import { validateUserAuth } from '@/lib/auth'
 import { PROMPTS_TABLE_SELECT_FIELDS, promptSelectMapper, supabaseAdmin } from '@/lib/supabase'
 import { PreferredAttachmentSchema, videoUrlSchema } from '@/lib/zod'
-import { z } from 'zod'
-import mime from 'mime-types'
-import slugify from 'slugify'
-import { nanoid } from 'nanoid'
-import { PinnedPrompt } from '@/types'
-import { validateUserAuth } from '@/lib/auth'
 
 /**
  * This file contains all the server actions for interacting with prompts.

@@ -1,5 +1,5 @@
-import { StateCreator } from 'zustand'
 import type { HighlightContext } from '@highlight-ai/app-runtime'
+import { StateCreator } from 'zustand'
 
 /**
  * Store that holds the incoming HighlightContext from when the app is activated within Highlight.

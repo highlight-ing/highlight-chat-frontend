@@ -1,6 +1,5 @@
-import Highlight from '@highlight-ai/app-runtime'
 import { LLMMessage } from '@/types'
-import { ConversationData } from '@highlight-ai/app-runtime'
+import Highlight, { ConversationData } from '@highlight-ai/app-runtime'
 
 export const CONVERSATIONS_STORAGE_KEY = 'conversations'
 export const AUTO_CLEAR_VALUE_KEY = 'autoClearValue'

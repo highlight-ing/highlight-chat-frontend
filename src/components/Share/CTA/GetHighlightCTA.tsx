@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react'
-import { HighlightIcon } from '@/icons/icons'
-import { usePlatform } from '@/hooks/usePlatform'
+import React, { useEffect, useState } from 'react'
+import { DownloadPlatformType, PlatformType } from '@/types'
+import { trackEvent } from '@/utils/amplitude'
 import { buildDownloadURL } from '@/utils/downloadUrl'
+
+import { usePlatform } from '@/hooks/usePlatform'
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from '@/components/DropdownMenu/dropdown-menu'
-import { trackEvent } from '@/utils/amplitude'
-import { PlatformType, DownloadPlatformType } from '@/types'
+import { HighlightIcon } from '@/components/icons'
 
 export default function GetHighlightCTA() {
   const platform = usePlatform()

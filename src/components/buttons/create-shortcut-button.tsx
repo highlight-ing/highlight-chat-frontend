@@ -1,5 +1,6 @@
 import { ComponentProps } from 'react'
-import { useStore } from '@/providers/store-provider'
+
+import { useStore } from '@/components/providers/store-provider'
 
 export function CreateShortcutButton(props: ComponentProps<'button'>) {
   const openModal = useStore((state) => state.openModal)

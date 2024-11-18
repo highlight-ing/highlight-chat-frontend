@@ -1,6 +1,5 @@
-import { StateCreator } from 'zustand'
-
 import { ModalObjectProps } from '@/types'
+import { StateCreator } from 'zustand'
 
 export interface ModalsState {
   modals: ModalObjectProps[]

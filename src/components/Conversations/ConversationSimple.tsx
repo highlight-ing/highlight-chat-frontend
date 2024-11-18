@@ -1,11 +1,14 @@
 'use client'
+
 import React from 'react'
-import AnimatedVoiceSquare from './AnimatedVoiceSquare'
-import { Switch } from '@/components/ui/switch'
+import { useConversations } from '@/context/ConversationContext'
+import Highlight from '@highlight-ai/app-runtime'
+
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import Highlight from '@highlight-ai/app-runtime'
-import { useConversations } from '@/context/ConversationContext'
+import { Switch } from '@/components/ui/switch'
+
+import AnimatedVoiceSquare from './AnimatedVoiceSquare'
 
 export default function ConversationSimple() {
   const { isAudioTranscripEnabled, setIsAudioTranscriptEnabled } = useConversations()

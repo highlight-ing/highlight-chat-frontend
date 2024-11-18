@@ -1,8 +1,10 @@
 import React, { CSSProperties, ReactElement, useEffect, useRef, useState } from 'react'
-import { ExportSquare, VideoCircle } from 'iconsax-react'
-import styles from './expandablevideo.module.scss'
 import variables from '@/variables.module.scss'
+import { ExportSquare, VideoCircle } from 'iconsax-react'
+
 import CloseButton from '@/components/CloseButton/CloseButton'
+
+import styles from './expandablevideo.module.scss'
 
 interface ExampleVideoProps {
   src: string

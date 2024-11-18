@@ -1,19 +1,29 @@
 import React from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { ControllerRenderProps, useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { useCheckLinearConnection, useCreateLinearTicket, useLinearAssignees, useLinearWorkflowStates } from './hooks'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { LinearIcon } from '@/icons/icons'
-import { IntegrationSubmitButton } from '../_components/submit-button'
-import { IntegrationSuccessMessage } from '../_components/success-message'
+
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormInput,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormSelectTrigger,
+  FormTextarea,
+} from '@/components/ui/form'
+import { Select, SelectContent, SelectItem, SelectValue } from '@/components/ui/select'
+import { LinearIcon } from '@/components/icons'
+
 import { IntegrationsLoader } from '../_components/loader'
 import { SetupConnection } from '../_components/setup-connection'
+import { IntegrationSubmitButton } from '../_components/submit-button'
+import { IntegrationSuccessMessage } from '../_components/success-message'
 import { checkLinearConnectionStatus, createMagicLinkForLinear } from './actions'
-import { useQueryClient } from '@tanstack/react-query'
+import { useCheckLinearConnection, useCreateLinearTicket, useLinearAssignees, useLinearWorkflowStates } from './hooks'
 
 const linearTicketFormSchema = z.object({
   title: z.string().min(1),
@@ -33,9 +43,9 @@ function WorkflowStatesDropdown(props: LinearFormDropdownProps) {
 
   return (
     <Select value={props.field.value} onValueChange={props.field.onChange}>
-      <SelectTrigger value={props.field.value}>
+      <FormSelectTrigger value={props.field.value}>
         <SelectValue placeholder="Select a status" />
-      </SelectTrigger>
+      </FormSelectTrigger>
       <SelectContent sideOffset={4}>
         {workflowStates?.map((state) => (
           <SelectItem key={state.id} value={state.id}>
@@ -52,9 +62,9 @@ function AssigneesDropdown(props: LinearFormDropdownProps) {
 
   return (
     <Select value={props.field.value} onValueChange={props.field.onChange}>
-      <SelectTrigger value={props.field.value}>
+      <FormSelectTrigger value={props.field.value}>
         <SelectValue placeholder="Select an assignee" />
-      </SelectTrigger>
+      </FormSelectTrigger>
       <SelectContent className="max-h-[270px]" sideOffset={4}>
         {assignees?.map((assignee) => (
           <SelectItem key={assignee.id} value={assignee.id}>
@@ -99,7 +109,7 @@ function LinearTicketForm({ title, description, onSubmitSuccess }: LinearTicketF
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder="Ticket title" {...field} />
+                <FormInput placeholder="Ticket title" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -113,7 +123,7 @@ function LinearTicketForm({ title, description, onSubmitSuccess }: LinearTicketF
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea placeholder="Ticket description" {...field} />
+                <FormTextarea placeholder="Ticket description" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

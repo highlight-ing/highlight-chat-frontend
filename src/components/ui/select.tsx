@@ -1,10 +1,10 @@
 'use client'
 
 import * as React from 'react'
-import * as SelectPrimitive from '@radix-ui/react-select'
-import { cn } from '@/lib/utils'
 import { ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons'
-import { useFormField } from './form'
+import * as SelectPrimitive from '@radix-ui/react-select'
+
+import { cn } from '@/lib/utils'
 
 const Select = SelectPrimitive.Root
 
@@ -21,19 +21,15 @@ SelectValue.displayName = SelectPrimitive.Value.displayName
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
->(({ className, value, children, ...props }, ref) => {
-  const { error } = useFormField()
-
+>(({ className, children, ...props }, ref) => {
   return (
     <SelectPrimitive.Trigger
       ref={ref}
       data-slot="select"
       className={cn(
         'relative flex w-full rounded-2xl border border-light-10 bg-secondary px-3 py-2 text-[15px] text-primary outline-none transition-[padding] hover:border-light-20 disabled:cursor-not-allowed disabled:opacity-50 group-has-[label]:pb-2 group-has-[label]:pt-7 group-has-[label]:leading-snug data-[state=open]:border-light-20 data-[state=open]:bg-tertiary data-[placeholder]:text-subtle [&>span]:line-clamp-1',
-        error && 'border-red/70 hover:border-red data-[state=open]:border-red',
         className,
       )}
-      value={value}
       {...props}
     >
       {children}

@@ -1,6 +1,8 @@
 import { usePromptEditorStore } from '@/stores/prompt-editor'
-import styles from './prompteditor.module.scss'
+
 import Button from '@/components/Button/Button'
+
+import styles from './prompteditor.module.scss'
 
 export default function OnboardingBox({
   title,

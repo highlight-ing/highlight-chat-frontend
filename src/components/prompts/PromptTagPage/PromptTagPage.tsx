@@ -1,6 +1,10 @@
 'use client'
 
-import { PromptWithTags } from '@/app/(web)/tag/[slug]/page'
+import { useState } from 'react'
+import { ArrowDown, Code, LinkCircle, Tag } from 'iconsax-react'
+
+import { Prompt } from '@/types/supabase-helpers'
+import { useDownloadOrRedirect } from '@/hooks/useDownloadOrRedirect'
 import Button from '@/components/Button/Button'
 import {
   DropdownMenu,
@@ -8,11 +12,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/DropdownMenu/dropdown-menu'
-import { useDownloadOrRedirect } from '@/hooks/useDownloadOrRedirect'
-import { HighlightIcon } from '@/icons/icons'
-import { Prompt } from '@/types/supabase-helpers'
-import { ArrowDown, Code, LinkCircle, Tag } from 'iconsax-react'
-import { useState } from 'react'
+import { HighlightIcon } from '@/components/icons'
+import { PromptWithTags } from '@/app/(web)/tag/[slug]/page'
 
 function MiddleDownloadButton() {
   const { platform, handleDownload } = useDownloadOrRedirect()

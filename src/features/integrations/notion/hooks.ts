@@ -1,7 +1,8 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { getNotionTokenForUser, getNotionParentItems, createNotionPage, checkNotionConnectionStatus } from './actions'
-import { NotionPageFormSchema } from './notion'
+
 import { useHighlightToken } from '../_hooks/use-hl-token'
+import { checkNotionConnectionStatus, createNotionPage, getNotionParentItems, getNotionTokenForUser } from './actions'
+import { NotionPageFormSchema } from './notion'
 
 export function useNotionApiToken() {
   const { data: hlToken } = useHighlightToken()
@@ -56,6 +57,7 @@ export function useCheckNotionConnection() {
     },
     enabled: !!hlToken,
     refetchInterval: 7 * 1000,
+    retry: false,
   })
 }
 

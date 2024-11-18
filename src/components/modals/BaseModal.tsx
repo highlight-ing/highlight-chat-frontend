@@ -1,9 +1,10 @@
 import React, { PropsWithChildren, ReactElement, ReactNode, useEffect } from 'react'
+
 import CloseButton from '@/components/CloseButton/CloseButton'
 import LoadingModal from '@/components/modals/LoadingModal'
+import { useStore } from '@/components/providers/store-provider'
 
 import styles from './modals.module.scss'
-import { useStore } from '@/providers/store-provider'
 
 type SizeType = 'xsmall' | 'small' | 'medium' | 'large' | 'xlarge' | 'fullscreen' | string
 

@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+
 import usePromptApps from '@/hooks/usePromptApps'
 
 // It can take a string or number because the db has both :')

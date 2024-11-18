@@ -1,19 +1,20 @@
-import styles from './trending-prompts.module.scss'
-import variables from '@/variables.module.scss'
-import { Prompt } from '@/types/supabase-helpers'
-import { Setting, ArchiveSlash, ArchiveAdd, Messages2 } from 'iconsax-react'
-import { useState, useEffect, useMemo } from 'react'
-import { PromptTag, PinnedPrompt } from '@/types'
-import { supabaseLoader } from '@/lib/supabase'
+import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
+import { PinnedPrompt, PromptTag } from '@/types'
+import variables from '@/variables.module.scss'
+import { ArchiveAdd, ArchiveSlash, Messages2, Setting } from 'iconsax-react'
 
+import { Prompt } from '@/types/supabase-helpers'
+import { supabaseLoader } from '@/lib/supabase'
+import usePromptApps from '@/hooks/usePromptApps'
+import { Badge } from '@/components/Badge/Badge'
 // Components
 import Button from '@/components/Button/Button'
-import { Badge } from '@/components/Badge/Badge'
+import { useStore } from '@/components/providers/store-provider'
 import Tooltip from '@/components/Tooltip/Tooltip'
-import usePromptApps from '@/hooks/usePromptApps'
-import { useStore } from '@/providers/store-provider'
+
 import { PreferredAttachment } from '../prompts/PreferredAttachment/PreferredAttachment'
+import styles from './trending-prompts.module.scss'
 
 const TrendingPrompts = ({
   userId,

@@ -1,16 +1,21 @@
 import React from 'react'
 import { AssistantMessage } from '@/types'
-import { HighlightIcon } from '@/icons/icons'
 import Markdown from 'react-markdown'
+import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
-import rehypeKatex from 'rehype-katex'
+
+import { HighlightIcon } from '@/components/icons'
+
 import 'katex/dist/katex.min.css'
+
+import { AssistantMessageButtonStatus, AssistantMessageButtonType } from '@/types'
+
 import CodeBlock from '@/components/Messages/CodeBlock'
+
 import AssistantMessageButtonRow from './AssistantMessageButtonRow'
-import { useAssistantMessageButtons } from './useAssistantMessageButtons'
-import { AssistantMessageButtonType, AssistantMessageButtonStatus } from '@/types'
 import styles from './share-assistant-message.module.scss'
+import { useAssistantMessageButtons } from './useAssistantMessageButtons'
 
 interface ShareAssistantMessageProps {
   message: AssistantMessage

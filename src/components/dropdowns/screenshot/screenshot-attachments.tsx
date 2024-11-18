@@ -1,10 +1,12 @@
-import { useStore } from '@/providers/store-provider'
-import Highlight from '@highlight-ai/app-runtime'
-import styles from './screenshot.module.scss'
 import { useEffect, useState } from 'react'
 import { trackEvent } from '@/utils/amplitude'
+import Highlight from '@highlight-ai/app-runtime'
+
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useStore } from '@/components/providers/store-provider'
+
+import styles from './screenshot.module.scss'
 
 export const ScreenshotAttachments = () => {
   const [windows, setWindows] = useState<{ windowTitle: string; appIcon?: string }[]>([])

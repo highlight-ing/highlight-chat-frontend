@@ -1,8 +1,8 @@
 'use client'
 
+import { Fragment } from 'react'
 import * as Headless from '@headlessui/react'
 import clsx from 'clsx'
-import { Fragment } from 'react'
 
 export function Listbox<T>({
   className,

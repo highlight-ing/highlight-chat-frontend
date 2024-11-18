@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+
 import styles from './typed-text.module.scss'
 
 interface TypedTextProps {

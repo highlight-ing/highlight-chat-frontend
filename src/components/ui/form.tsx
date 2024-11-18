@@ -1,12 +1,20 @@
 'use client'
 
 import * as React from 'react'
+import { ChevronDownIcon } from '@radix-ui/react-icons'
 import * as LabelPrimitive from '@radix-ui/react-label'
+import type { PopoverTrigger as PopoverTriggerPrimitive } from '@radix-ui/react-popover'
+import type { SelectTrigger as SelectTriggerPrimitive } from '@radix-ui/react-select'
 import { Slot } from '@radix-ui/react-slot'
 import { Controller, ControllerProps, FieldPath, FieldValues, FormProvider, useFormContext } from 'react-hook-form'
 
 import { cn } from '@/lib/utils'
 import { Label } from '@/components/ui/label'
+
+import { Input } from './input'
+import { PopoverTrigger } from './popover'
+import { SelectTrigger } from './select'
+import { Textarea } from './textarea'
 
 const Form = FormProvider
 
@@ -93,11 +101,7 @@ const FormLabel = React.forwardRef<
     <Label
       ref={ref}
       data-slot="label"
-      className={cn(
-        'pointer-events-none absolute left-3 top-2 z-10 text-[13px] font-semibold text-tertiary opacity-100 transition-opacity group-has-[data-state=open]:bg-pink',
-        value && 'opacity-100',
-        className,
-      )}
+      className={cn(value && 'opacity-100', className)}
       htmlFor={formItemId}
       {...props}
     />
@@ -162,4 +166,90 @@ const FormMessage = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<
 )
 FormMessage.displayName = 'FormMessage'
 
-export { useFormField, Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage, FormField }
+const FormSelectTrigger = React.forwardRef<
+  React.ElementRef<typeof SelectTriggerPrimitive>,
+  React.ComponentPropsWithoutRef<typeof SelectTriggerPrimitive>
+>(({ className, children, ...props }, ref) => {
+  const { error } = useFormField()
+
+  return (
+    <SelectTrigger
+      ref={ref}
+      data-slot="select"
+      className={cn(error && 'border-red/70 hover:border-red data-[state=open]:border-red', className)}
+      {...props}
+    >
+      {children}
+    </SelectTrigger>
+  )
+})
+FormSelectTrigger.displayName = SelectTrigger.displayName
+
+const FormPopoverTrigger = React.forwardRef<
+  React.ElementRef<typeof PopoverTriggerPrimitive>,
+  React.ComponentPropsWithoutRef<typeof PopoverTriggerPrimitive>
+>(({ className, children, ...props }, ref) => {
+  const { error } = useFormField()
+
+  return (
+    <PopoverTrigger
+      ref={ref}
+      className={cn(
+        'relative flex w-full gap-2 rounded-2xl border border-light-10 bg-secondary px-3 py-2 text-[15px] text-primary outline-none transition-[padding] placeholder:text-subtle hover:border-light-20 disabled:cursor-not-allowed disabled:opacity-50 group-has-[label]:pb-2 group-has-[label]:pt-7 group-has-[label]:leading-snug data-[state=open]:border-light-20 data-[state=open]:bg-tertiary [&>span]:line-clamp-1',
+        error && 'border-red/70 hover:border-red data-[state=open]:border-red',
+        className,
+      )}
+      {...props}
+    >
+      {children}
+      <ChevronDownIcon className="absolute right-3 top-1/2 size-4 -translate-y-1/2 text-subtle" />
+    </PopoverTrigger>
+  )
+})
+FormPopoverTrigger.displayName = PopoverTrigger.displayName
+
+const FormTextarea = React.forwardRef<HTMLTextAreaElement, React.ComponentProps<'textarea'>>(
+  ({ className, rows = 4, ...props }, ref) => {
+    const { error } = useFormField()
+
+    return (
+      <Textarea
+        className={cn(error && 'border-red/70 hover:border-red focus:border-red', className)}
+        ref={ref}
+        {...props}
+      />
+    )
+  },
+)
+FormTextarea.displayName = 'Textarea'
+
+const FormInput = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
+  ({ className, type, ...props }, ref) => {
+    const { error } = useFormField()
+
+    return (
+      <Input
+        type={type}
+        className={cn(error && 'border-red/70 hover:border-red focus:border-red', className)}
+        ref={ref}
+        {...props}
+      />
+    )
+  },
+)
+FormInput.displayName = 'Input'
+
+export {
+  useFormField,
+  Form,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormDescription,
+  FormMessage,
+  FormField,
+  FormSelectTrigger,
+  FormTextarea,
+  FormInput,
+  FormPopoverTrigger,
+}

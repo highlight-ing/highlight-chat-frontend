@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
-import { useStore } from '@/providers/store-provider'
+
+import { useStore } from '@/components/providers/store-provider'
 
 export const useTabHotkeys = () => {
   const conversationId = useStore((state) => state.conversationId)

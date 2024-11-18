@@ -1,5 +1,5 @@
-import Highlight from '@highlight-ai/app-runtime'
 import { ComponentProps } from 'react'
+import Highlight from '@highlight-ai/app-runtime'
 
 type OpenAppButtonProps = ComponentProps<'button'> & { appId: 'conversations' | 'prompts' }
 

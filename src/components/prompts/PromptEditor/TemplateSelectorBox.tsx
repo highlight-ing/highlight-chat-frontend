@@ -1,8 +1,9 @@
-import { Squircle } from '@squircle-js/react'
-import styles from './prompteditor.module.scss'
-import { EmojiHappy, Personalcard, Setting, User } from 'iconsax-react'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { APP_PROMPT_COMMENT } from '@/types'
+import { Squircle } from '@squircle-js/react'
+import { EmojiHappy, Personalcard, Setting, User } from 'iconsax-react'
+
+import styles from './prompteditor.module.scss'
 
 function TemplateCard({
   title,

@@ -1,4 +1,4 @@
-import { jwtVerify, JWTPayload, JWTVerifyResult } from 'jose'
+import { JWTPayload, jwtVerify, JWTVerifyResult } from 'jose'
 
 /**
  * Validates a JWT from the Highlight auth service.

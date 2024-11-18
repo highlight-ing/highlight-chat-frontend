@@ -10,7 +10,7 @@ export const Popover = PopoverPrimitive.Root
 export const PopoverTrigger = React.forwardRef<
   React.ElementRef<typeof PopoverPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Trigger>
->(({ className, value, children, ...props }, ref) => (
+>(({ className, children, ...props }, ref) => (
   <PopoverPrimitive.Trigger ref={ref} data-slot="popover" className={cn('', className)} {...props}>
     {children}
   </PopoverPrimitive.Trigger>

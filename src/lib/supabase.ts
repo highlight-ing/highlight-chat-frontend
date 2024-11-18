@@ -1,5 +1,6 @@
-import { Database } from '@/types/supabase'
 import { createClient } from '@supabase/supabase-js'
+
+import { Database } from '@/types/supabase'
 
 export const PROMPTS_TABLE_SELECT_FIELDS =
   'external_id, name, description, prompt_text, created_at, slug, user_id, image, user_images(file_extension), public_use_number, preferred_attachment, added_prompt_tags(tags(external_id, tag, slug)), linear_integration_enabled, create_notion_page_integration_enabled'

@@ -1,8 +1,9 @@
-import PromptTagPage from '@/components/prompts/PromptTagPage/PromptTagPage'
-import { supabaseAdmin } from '@/lib/supabase'
-import { Prompt } from '@/types/supabase-helpers'
 import { Metadata, ResolvingMetadata } from 'next'
 import { notFound } from 'next/navigation'
+
+import { Prompt } from '@/types/supabase-helpers'
+import { supabaseAdmin } from '@/lib/supabase'
+import PromptTagPage from '@/components/prompts/PromptTagPage/PromptTagPage'
 
 interface TagPageProps {
   params: { slug: string }

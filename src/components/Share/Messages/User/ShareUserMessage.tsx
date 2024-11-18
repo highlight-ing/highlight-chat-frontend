@@ -1,14 +1,17 @@
 import React, { useEffect, useMemo } from 'react'
 import Markdown from 'react-markdown'
+import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
-import rehypeKatex from 'rehype-katex'
+
 import 'katex/dist/katex.min.css'
+
 import { UserMessage } from '@/types'
-import { Attachment } from '@/components/Attachment'
-import CodeBlock from '@/components/Messages/CodeBlock'
 import { getDisplayValue } from '@/utils/attachments'
 import { ProfileCircle } from 'iconsax-react'
+
+import { Attachment } from '@/components/Attachment'
+import CodeBlock from '@/components/Messages/CodeBlock'
 import Spinner from '@/components/Spinner'
 
 interface ShareUserMessageProps {

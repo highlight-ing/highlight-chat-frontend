@@ -1,5 +1,6 @@
-import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 import { useEffect, useState } from 'react'
+
+import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 
 export function IntegrationsLoader() {
   const [text, setText] = useState('Loading...')

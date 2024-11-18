@@ -1,7 +1,8 @@
 'use client'
 
-import Button from '@/components/Button/Button'
 import { useRouter } from 'next/navigation'
+
+import Button from '@/components/Button/Button'
 import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
 
 function AppIcon() {
