@@ -90,10 +90,6 @@ function SlackMessageFormComponent({ data, onSuccess }: { data: SendSlackMessage
     })()
   }, [])
 
-
-
-
-
   const onSubmit = async (data: SendSlackMessageFormData) => {
     console.log('form submitted', data)
     const token = slackToken.current
@@ -144,7 +140,7 @@ function SlackMessageFormComponent({ data, onSuccess }: { data: SendSlackMessage
         {/* <InputField size={'xxlarge'} label={'Message'} placeholder={'Message'} {...register('message')} /> */}
         <TextArea rows={4} size={'xxlarge'} label={'Message'} placeholder={''} {...register('message')} />
         {errors.root && <p className="text-red-500">{errors.root.message}</p>}
-        <Button size={'medium'} variant={'primary'} type={'submit'} disabled={isSubmitting}>
+        <Button size={'medium'} variant={'primary'} type={'submit'} disabled={isSubmitting || loading}>
           Send Message
         </Button>
       </form>
