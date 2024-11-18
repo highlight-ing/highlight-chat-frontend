@@ -14,6 +14,7 @@ export function useShowChangelog() {
 
   React.useEffect(() => {
     const highlightVersion = window.highlight.version
+    window.highlight.appStorage.set('changelog-version-dismissed', undefined)
     if (highlightVersion.includes(newestChangelogVersion) === false) return
 
     const latestChangelogVersionDismissed = window.highlight.appStorage.get('changelog-version-dismissed') as string
