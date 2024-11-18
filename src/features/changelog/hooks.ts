@@ -14,20 +14,21 @@ export function useShowChangelog() {
 
   React.useEffect(() => {
     const highlightVersion = window.highlight.version
+    window.highlight.appStorage.set('changelog-version-dismissed', undefined)
     if (highlightVersion.includes(newestChangelogVersion) === false) return
 
     const latestChangelogVersionDismissed = window.highlight.appStorage.get('changelog-version-dismissed') as string
     if (latestChangelogVersionDismissed?.includes(newestChangelogVersion)) return
 
     setShowChangelog(true)
-  }, [setShowChangelog])
+  }, [])
 
   return { showChangelog, setShowChangelog }
 }
 
-export function useMostRecentChangelog() {
+export function useChangelogs() {
   const notes: Changelog = changelogData
   const mostRecentChangelogNote = notes[0]
 
-  return mostRecentChangelogNote
+  return { allChangelogNotes: notes, mostRecentChangelogNote }
 }

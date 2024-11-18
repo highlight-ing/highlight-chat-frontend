@@ -10,8 +10,9 @@ import Messages from '@/components/Messages/Messages'
 import MessagesPlaceholder from '@/components/Messages/MessagesPlaceholder'
 import { useStore } from '@/components/providers/store-provider'
 
-import { ChatHeader } from '@/features/chat-header/chat-header'
-import { ChatHome } from '@/features/chat-home/chat-home'
+import { ChatHeader } from '@/features/highlight-chat/components/chat-header/chat-header'
+import { ChatHome } from '@/features/highlight-chat/components/chat-home'
+import { IntercomChat } from '@/features/highlight-chat/components/intercom-chat'
 import { useClipboardPaste } from '@/features/highlight-chat/hooks/use-clipboard-paste'
 import { useConversationLoad } from '@/features/highlight-chat/hooks/use-conversation-load'
 import { useOnAppOpen } from '@/features/highlight-chat/hooks/use-on-app-open'
@@ -19,7 +20,6 @@ import { useOnExternalMessage } from '@/features/highlight-chat/hooks/use-on-ext
 import { useOnPromptChange } from '@/features/highlight-chat/hooks/use-on-prompt-change'
 import { useOnPromptLoad } from '@/features/highlight-chat/hooks/use-on-prompt-load'
 import { HistorySidebar } from '@/features/history-sidebar/history-sidebar'
-import { IntercomChat } from '@/features/intercom-chat/intercom-chat'
 import { NavigationTopBar } from '@/features/nav-header/top-bar/top-bar'
 
 export default function Home() {
@@ -37,7 +37,6 @@ export default function Home() {
     return inputIsDisabled || messages.length > 0
   }, [inputIsDisabled, messages])
 
-  // HOOKS
   useClipboardPaste()
   useConversationLoad()
   useOnAppOpen()
