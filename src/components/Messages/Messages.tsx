@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styles from '@/main.module.scss'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -20,6 +20,9 @@ const Messages = () => {
   const messages = useCurrentChatMessages()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const isUserScrolledRef = useRef<boolean>(false)
+  const [lastUserMessageIndex, setLastUserMessageIndex] = useState<number | null>(null)
+  const [isThinking, setIsThinking] = useState(false)
+  const prevInputDisabledRef = useRef(inputIsDisabled)
 
   const handleScroll = () => {
     if (!scrollContainerRef.current) {
@@ -57,6 +60,23 @@ const Messages = () => {
     return () => observer.disconnect()
   }, [])
 
+  useEffect(() => {
+    // When input becomes enabled again (response is complete), stop thinking
+    if (prevInputDisabledRef.current && !inputIsDisabled) {
+      setIsThinking(false)
+    }
+    prevInputDisabledRef.current = inputIsDisabled
+
+    // Start thinking when input becomes disabled
+    if (inputIsDisabled) {
+      const lastIndex = messages.findLastIndex(m => m.role === 'user')
+      if (lastIndex !== -1) {
+        setLastUserMessageIndex(lastIndex)
+        setIsThinking(true)
+      }
+    }
+  }, [inputIsDisabled, messages])
+
   return (
     <Scrollable className={styles.messagesContainer} ref={scrollContainerRef} onScroll={handleScroll}>
       <div className={styles.messages}>
@@ -70,15 +90,14 @@ const Messages = () => {
               return ''
             }
 
-            // Show thinking message after the last user message
+            // Show thinking message after the specific user message it appeared with
             const showThinkingAfterMessage = 
-              message.role === 'user' && 
-              (!messages[index + 1] || messages[index + 1].role === 'assistant')
+              lastUserMessageIndex === index
 
             return (
               <React.Fragment key={index}>
                 <Message message={message} />
-                {showThinkingAfterMessage && <ThinkingMessage />}
+                {showThinkingAfterMessage && <ThinkingMessage isAnimating={isThinking} />}
               </React.Fragment>
             )
           })}
