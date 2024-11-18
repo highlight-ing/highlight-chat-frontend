@@ -72,7 +72,7 @@ const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
         <div
           ref={ref}
           className={cn(
-            'group relative isolate w-full [&>[data-slot=input]]:h-10 [&>[data-slot=label]+[data-slot=input]]:h-14 [&>[data-slot=label]+[data-slot=popover]]:h-14 [&>[data-slot=label]+[data-slot=select]]:h-14 [&>[data-slot=popover]]:h-10 [&>[data-slot=select]]:h-10',
+            'group relative isolate w-full [&>[data-slot=input]]:h-10 [&>[data-slot=label]+[data-slot=input]]:h-14 [&>[data-slot=label]+[data-slot=popover]]:h-14 [&>[data-slot=label]+[data-slot=select]]:h-14 [&>[data-slot=message]]:pt-1.5 [&>[data-slot=popover]]:h-10 [&>[data-slot=select]]:h-10',
             className,
           )}
           {...props}
@@ -87,15 +87,15 @@ const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
 >(({ className, ...props }, ref) => {
-  const { error, formItemId } = useFormField()
+  const { formItemId, value } = useFormField()
 
   return (
     <Label
       ref={ref}
       data-slot="label"
       className={cn(
-        'pointer-events-none absolute left-3 top-2 z-10 text-[13px] font-semibold text-tertiary',
-        error && 'text-red/70',
+        'pointer-events-none absolute left-3 top-2 z-10 text-[13px] font-semibold text-tertiary opacity-100 transition-opacity group-has-[data-state=open]:bg-pink',
+        value && 'opacity-100',
         className,
       )}
       htmlFor={formItemId}
@@ -150,6 +150,7 @@ const FormMessage = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<
     return (
       <p
         ref={ref}
+        data-slot="message"
         id={formMessageId}
         className={cn('pl-3 text-[0.8rem] font-medium text-red/80', className)}
         {...props}

@@ -115,8 +115,6 @@ export async function getNotionParentItems(accessToken: string) {
       return
     }
 
-    console.log(result)
-
     for (const property of Object.values(result.properties)) {
       if (property.type === 'title' && Array.isArray(property.title)) {
         parentItems.push({
@@ -159,13 +157,13 @@ export async function createNotionPage({ accessToken, parent, title, content }: 
   type IdRequest = string | string
   const apiParent:
     | {
-      page_id: IdRequest
-      type?: 'page_id'
-    }
+        page_id: IdRequest
+        type?: 'page_id'
+      }
     | {
-      database_id: IdRequest
-      type?: 'database_id'
-    } =
+        database_id: IdRequest
+        type?: 'database_id'
+      } =
     parent.type === 'page' ? { type: 'page_id', page_id: parent.id } : { type: 'database_id', database_id: parent.id }
 
   const response = await notion.pages.create({

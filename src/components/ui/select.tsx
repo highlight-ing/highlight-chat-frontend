@@ -4,6 +4,7 @@ import * as React from 'react'
 import * as SelectPrimitive from '@radix-ui/react-select'
 import { cn } from '@/lib/utils'
 import { ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons'
+import { useFormField } from './form'
 
 const Select = SelectPrimitive.Root
 
@@ -20,24 +21,28 @@ SelectValue.displayName = SelectPrimitive.Value.displayName
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
->(({ className, value, children, ...props }, ref) => (
-  <SelectPrimitive.Trigger
-    ref={ref}
-    data-slot="select"
-    className={cn(
-      'relative flex w-full rounded-2xl border border-light-10 bg-secondary px-3 pb-2 pt-7 text-[15px] leading-snug text-primary outline-none transition-[padding] hover:border-light-20 disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:border-light-20 data-[state=open]:bg-tertiary [&>span]:line-clamp-1',
-      !value && 'text-subtle',
-      className,
-    )}
-    value={value}
-    {...props}
-  >
-    {children}
-    <SelectPrimitive.Icon asChild>
-      <ChevronDownIcon className="absolute right-3 top-1/2 size-4 -translate-y-1/2 text-subtle" />
-    </SelectPrimitive.Icon>
-  </SelectPrimitive.Trigger>
-))
+>(({ className, value, children, ...props }, ref) => {
+  const { error } = useFormField()
+
+  return (
+    <SelectPrimitive.Trigger
+      ref={ref}
+      data-slot="select"
+      className={cn(
+        'relative flex w-full rounded-2xl border border-light-10 bg-secondary px-3 py-2 text-[15px] text-primary outline-none transition-[padding] hover:border-light-20 disabled:cursor-not-allowed disabled:opacity-50 group-has-[label]:pb-2 group-has-[label]:pt-7 group-has-[label]:leading-snug data-[state=open]:border-light-20 data-[state=open]:bg-tertiary data-[placeholder]:text-subtle [&>span]:line-clamp-1',
+        error && 'border-red/70 hover:border-red data-[state=open]:border-red',
+        className,
+      )}
+      value={value}
+      {...props}
+    >
+      {children}
+      <SelectPrimitive.Icon asChild>
+        <ChevronDownIcon className="absolute right-3 top-1/2 size-4 -translate-y-1/2 text-subtle" />
+      </SelectPrimitive.Icon>
+    </SelectPrimitive.Trigger>
+  )
+})
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName
 
 const SelectScrollUpButton = React.forwardRef<

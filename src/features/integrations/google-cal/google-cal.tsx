@@ -2,7 +2,7 @@ import React from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ControllerRenderProps, useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, useFormField } from '@/components/ui/form'
 import { GoogleIcon } from '@/icons/icons'
 import { IntegrationsLoader } from '../_components/loader'
 import { Input } from '@/components/ui/input'
@@ -20,14 +20,28 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useQueryClient } from '@tanstack/react-query'
 import { CreateGoogleCalendarEventParams } from '../_hooks/use-integrations'
 import { ChevronDownIcon } from '@radix-ui/react-icons'
+import { cn } from '@/lib/utils'
 
-const googleCalEventFormSchema = z.object({
-  summary: z.string().min(1),
-  location: z.string().optional(),
-  description: z.string().optional(),
-  start: z.string().optional(),
-  end: z.string().optional(),
-})
+const googleCalEventFormSchema = z
+  .object({
+    summary: z.string().min(1),
+    location: z.string().optional(),
+    description: z.string().optional(),
+    start: z.string().optional(),
+    end: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.start && data.end) {
+        return new Date(data.start) < new Date(data.end)
+      }
+      return true
+    },
+    {
+      message: 'Start date must be before end date',
+      path: ['end'],
+    },
+  )
 
 export type GoogleCalEventFormSchema = z.infer<typeof googleCalEventFormSchema>
 
@@ -37,6 +51,7 @@ type GoogleCalEventDropdownProps = {
 
 function DatePickerDropdown(props: GoogleCalEventDropdownProps) {
   const { date: dateValue, time: timeValue } = extractDateAndTime(props.field.value)
+  const { error } = useFormField()
 
   function handleChange(date: Date | undefined, time: string) {
     if (!date) return
@@ -52,7 +67,12 @@ function DatePickerDropdown(props: GoogleCalEventDropdownProps) {
 
   return (
     <Popover>
-      <PopoverTrigger className="relative flex w-full gap-2 rounded-2xl border border-light-10 bg-secondary px-3 pb-2 pt-7 text-[15px] leading-snug text-primary outline-none transition-[padding] placeholder:text-subtle hover:border-light-20 disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:border-light-20 data-[state=open]:bg-tertiary [&>span]:line-clamp-1">
+      <PopoverTrigger
+        className={cn(
+          'relative flex w-full gap-2 rounded-2xl border border-light-10 bg-secondary px-3 py-2 text-[15px] text-primary outline-none transition-[padding] placeholder:text-subtle hover:border-light-20 disabled:cursor-not-allowed disabled:opacity-50 group-has-[label]:pb-2 group-has-[label]:pt-7 group-has-[label]:leading-snug data-[state=open]:border-light-20 data-[state=open]:bg-tertiary [&>span]:line-clamp-1',
+          error && 'border-red/70 hover:border-red data-[state=open]:border-red',
+        )}
+      >
         {formattedDate}
         <ChevronDownIcon className="absolute right-3 top-1/2 size-4 -translate-y-1/2 text-subtle" />
       </PopoverTrigger>
@@ -285,7 +305,7 @@ export function CreateGoogleCalEvent(data: CreateGoogleCalendarEventParams) {
     )
   }
 
-  if (state === 'form') {
+  if (connectedToGoogleCal && state === 'form') {
     return <GoogleCalEventForm data={data} onSuccess={onSuccess} />
   }
 

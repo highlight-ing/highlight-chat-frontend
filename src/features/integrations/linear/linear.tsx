@@ -34,9 +34,9 @@ function WorkflowStatesDropdown(props: LinearFormDropdownProps) {
   return (
     <Select value={props.field.value} onValueChange={props.field.onChange}>
       <SelectTrigger value={props.field.value}>
-        <SelectValue />
+        <SelectValue placeholder="Select a status" />
       </SelectTrigger>
-      <SelectContent className="max-h-64" sideOffset={4}>
+      <SelectContent sideOffset={4}>
         {workflowStates?.map((state) => (
           <SelectItem key={state.id} value={state.id}>
             {state.name}
@@ -53,7 +53,7 @@ function AssigneesDropdown(props: LinearFormDropdownProps) {
   return (
     <Select value={props.field.value} onValueChange={props.field.onChange}>
       <SelectTrigger value={props.field.value}>
-        <SelectValue />
+        <SelectValue placeholder="Select an assignee" />
       </SelectTrigger>
       <SelectContent className="max-h-[270px]" sideOffset={4}>
         {assignees?.map((assignee) => (
@@ -195,7 +195,7 @@ export function CreateLinearTicket(props: CreateLinearTicketProps) {
     )
   }
 
-  if (state === 'form') {
+  if (connectedToLinear && state === 'form') {
     return <LinearTicketForm title={props.title} description={props.description} onSubmitSuccess={onSubmitSuccess} />
   }
 
