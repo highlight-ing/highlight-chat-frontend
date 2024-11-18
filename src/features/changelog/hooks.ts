@@ -1,3 +1,5 @@
+import React from 'react'
+
 import changelogData from './changelog.json'
 
 type Changelog = Array<{
@@ -6,20 +8,21 @@ type Changelog = Array<{
 }>
 
 export function useShowChangelog() {
+  const [showChangelog, setShowChangelog] = React.useState(false)
   const notes: Changelog = changelogData
   const newestChangelogVersion = notes[0].version
-  const highlightVersion = window.highlight.version
 
-  console.log(highlightVersion)
+  React.useEffect(() => {
+    const highlightVersion = window.highlight.version
+    if (highlightVersion.includes(newestChangelogVersion) === false) return
 
-  if (highlightVersion.includes(newestChangelogVersion) === false) return false
+    const latestChangelogVersionDismissed = window.highlight.appStorage.get('changelog-version-dismissed') as string
+    if (latestChangelogVersionDismissed?.includes(newestChangelogVersion)) return
 
-  const latestChangelogVersionDismissed = window.highlight.appStorage.get('changelog-version-dismissed') as string
-  // window.highlight.appStorage.set('changelog-version-dismissed', undefined)
+    setShowChangelog(true)
+  }, [setShowChangelog])
 
-  if (latestChangelogVersionDismissed?.includes(newestChangelogVersion)) return false
-
-  return true
+  return { showChangelog, setShowChangelog }
 }
 
 export function useMostRecentChangelog() {

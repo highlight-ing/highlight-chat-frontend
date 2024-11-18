@@ -7,19 +7,27 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { useMostRecentChangelog, useShowChangelog } from './hooks'
 
 export function ChangelogModal() {
-  const showChangelog = useShowChangelog()
+  const { showChangelog, setShowChangelog } = useShowChangelog()
   const { releaseNotes, version } = useMostRecentChangelog()
   const [open, setOpen] = React.useState(showChangelog)
 
   React.useEffect(() => {
-    if (showChangelog && !open) {
-      // window.highlight.appStorage.set('changelog-version-dismissed', version)
+    if (showChangelog) {
+      setOpen(true)
     }
-  }, [showChangelog, open])
+  }, [setOpen, showChangelog])
+
+  function handleOpenChange(value: boolean) {
+    if (value === false && showChangelog) {
+      window.highlight.appStorage.set('changelog-version-dismissed', version)
+      setShowChangelog(false)
+    }
+    setOpen(value)
+  }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent onOpenAutoFocus={(e) => e.preventDefault()} className="max-w-lg">
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent onOpenAutoFocus={(e) => e.preventDefault()} className="max-w-xl">
         <DialogHeader>
           <DialogTitle>
             Highlight <span className="text-teal">{version}</span> Release Notes
