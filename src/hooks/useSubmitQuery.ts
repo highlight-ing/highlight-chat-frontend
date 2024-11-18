@@ -288,6 +288,7 @@ export const useSubmitQuery = () => {
         create_notion_page:
           (promptApp?.create_notion_page_integration_enabled ?? false) || (toolOverrides?.create_notion_page ?? false),
         create_google_calendar_event: promptApp?.create_gcal_event_integration_enabled ?? false,
+        send_slack_message: promptApp?.send_slack_message_integration_enabled ?? false,
       }
 
       formData.append('conversation_id', conversationId)

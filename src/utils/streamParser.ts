@@ -84,7 +84,13 @@ export async function parseAndHandleStreamChunk(
             integrations.createNotionPage(conversationId, { title, description, content })
           }
 
-          if (jsonChunk.name === 'create_google_calendar_event') {
+          if (jsonChunk.name === 'send_slack_message') {
+            integrations.sendSlackMessage(conversationId, {
+              message: jsonChunk.input.message ?? '',
+            })
+          }
+
+          if (jsonChunk.name === 'create_google_calendar_event') {  
             const summary = jsonChunk.input.summary ?? ''
             const location = jsonChunk.input.location ?? undefined
             const description = jsonChunk.input.description ?? undefined
