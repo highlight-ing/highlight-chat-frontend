@@ -1,5 +1,5 @@
-import { StateCreator } from 'zustand'
 import { ChatHistoryItem } from '@/types'
+import { StateCreator } from 'zustand'
 
 export interface HistoryState {
   history: ChatHistoryItem[]

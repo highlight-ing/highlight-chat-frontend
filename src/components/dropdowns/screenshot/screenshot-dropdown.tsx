@@ -1,21 +1,18 @@
-import { useContext, useEffect, useState } from 'react'
-import { useStore } from '@/providers/store-provider'
-import { useShallow } from 'zustand/react/shallow'
-import styles from './screenshot.module.scss'
-import Tooltip from '@/components/Tooltip/Tooltip'
+import { useState } from 'react'
 import { MAX_NUMBER_OF_ATTACHMENTS } from '@/stores/chat-attachments'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Gallery } from 'iconsax-react'
-import { ScreenshotAttachments } from './screenshot-attachments'
-import { AttachmentDropdownsContext } from '../attachment-dropdowns'
 import { trackEvent } from '@/utils/amplitude'
 import Highlight from '@highlight-ai/app-runtime'
+import { Gallery } from 'iconsax-react'
+import { useShallow } from 'zustand/react/shallow'
 
-interface ScreenshotDropdownProps {
-  onCloseAutoFocus: (e: Event) => void
-}
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { useStore } from '@/components/providers/store-provider'
+import Tooltip from '@/components/Tooltip/Tooltip'
 
-export const ScreenshotDropdown = ({ onCloseAutoFocus }: ScreenshotDropdownProps) => {
+import { ScreenshotAttachments } from './screenshot-attachments'
+import styles from './screenshot.module.scss'
+
+export const ScreenshotDropdown = () => {
   const { attachments } = useStore(
     useShallow((state) => ({
       attachments: state.attachments,
@@ -23,17 +20,8 @@ export const ScreenshotDropdown = ({ onCloseAutoFocus }: ScreenshotDropdownProps
       setFileInputRef: state.setFileInputRef,
     })),
   )
-  const { activeDropdown, setActiveDropdown } = useContext(AttachmentDropdownsContext)
   const [isOpen, setIsOpen] = useState(false)
   const dropdownId = 'screenshot'
-
-  useEffect(() => {
-    if (isOpen) setActiveDropdown(dropdownId)
-  }, [isOpen])
-
-  useEffect(() => {
-    if (activeDropdown !== dropdownId) setIsOpen(false)
-  }, [activeDropdown, setIsOpen])
 
   const onClickScreenshot = async () => {
     const hasScreenshotPermission = await Highlight.permissions.requestScreenshotPermission()
@@ -50,28 +38,22 @@ export const ScreenshotDropdown = ({ onCloseAutoFocus }: ScreenshotDropdownProps
   const isDisabled = attachments.length >= MAX_NUMBER_OF_ATTACHMENTS
 
   return (
-    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
       <Tooltip
         tooltip={isDisabled ? 'Max number of attahments added' : isOpen ? '' : 'Attach a screenshot'}
         position={'top'}
       >
-        <DropdownMenuTrigger
+        <PopoverTrigger
           disabled={isDisabled}
           onClick={onClickScreenshot}
           className={`${styles.button} ${isDisabled ? styles.disabledButton : ''}`}
         >
           <Gallery variant="Bold" size={24} className="text-tertiary" />
-        </DropdownMenuTrigger>
+        </PopoverTrigger>
       </Tooltip>
-      <DropdownMenuContent
-        onCloseAutoFocus={onCloseAutoFocus}
-        sideOffset={18}
-        align="end"
-        alignOffset={-54}
-        className="space-y-2"
-      >
+      <PopoverContent sideOffset={18} align="end" alignOffset={-54} className="w-64 space-y-2 p-2 pt-3">
         <ScreenshotAttachments />
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </PopoverContent>
+    </Popover>
   )
 }

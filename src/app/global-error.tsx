@@ -1,9 +1,10 @@
 'use client'
 
-import * as Sentry from '@sentry/nextjs'
+import { useEffect } from 'react'
 import NextError from 'next/error'
 import Link from 'next/link'
-import { useEffect } from 'react'
+import * as Sentry from '@sentry/nextjs'
+
 import Button from '@/components/Button/Button'
 
 export default function GlobalError({ error }: { error: Error & { digest?: string } }) {

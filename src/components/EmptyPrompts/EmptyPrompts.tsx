@@ -1,8 +1,10 @@
-import styles from './empty-prompts.module.scss'
 import variables from '@/variables.module.scss'
 import { Setting } from 'iconsax-react'
+
 import Button from '@/components/Button/Button'
-import { useStore } from '@/providers/store-provider'
+import { useStore } from '@/components/providers/store-provider'
+
+import styles from './empty-prompts.module.scss'
 
 export default function EmptyPrompts() {
   const openModal = useStore((state) => state.openModal)

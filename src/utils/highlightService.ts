@@ -1,6 +1,5 @@
-import Highlight from '@highlight-ai/app-runtime'
 import { LLMMessage } from '@/types'
-import { ConversationData } from '@highlight-ai/app-runtime'
+import Highlight, { ConversationData } from '@highlight-ai/app-runtime'
 
 export const CONVERSATIONS_STORAGE_KEY = 'conversations'
 export const AUTO_CLEAR_VALUE_KEY = 'autoClearValue'
@@ -13,6 +12,7 @@ const getAppStorage = () => (isBrowser ? window.highlight.appStorage : null)
 declare global {
   interface Window {
     highlight: {
+      version: string
       internal: {
         getConversations: () => Promise<ConversationData[]>
         createConversationsStorageListener: (callback: () => void) => () => void

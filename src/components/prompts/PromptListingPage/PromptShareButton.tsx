@@ -1,8 +1,9 @@
 'use client'
 
-import Button from '@/components/Button/Button'
-import { trackEvent } from '@/utils/amplitude'
 import { useRef, useState } from 'react'
+import { trackEvent } from '@/utils/amplitude'
+
+import Button from '@/components/Button/Button'
 
 export default function PromptShareButton() {
   const timeout = useRef<NodeJS.Timeout | null>(null)

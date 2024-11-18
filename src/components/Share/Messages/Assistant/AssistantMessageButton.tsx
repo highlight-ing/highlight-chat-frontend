@@ -1,6 +1,6 @@
 import React from 'react'
-import { Copy, Send2, ExportCircle, Flag2 } from 'iconsax-react'
-import { AssistantMessageButtonType, AssistantMessageButtonStatus } from '@/types'
+import { AssistantMessageButtonStatus, AssistantMessageButtonType } from '@/types'
+import { Copy, ExportCircle, Flag2, Send2 } from 'iconsax-react'
 
 interface AssistantMessageButtonProps {
   type: AssistantMessageButtonType

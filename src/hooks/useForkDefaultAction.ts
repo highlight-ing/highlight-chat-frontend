@@ -1,7 +1,8 @@
-import { supabaseLoader } from '@/lib/supabase'
-import { useStore } from '@/providers/store-provider'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
+
 import { Prompt } from '@/types/supabase-helpers'
+import { supabaseLoader } from '@/lib/supabase'
+import { useStore } from '@/components/providers/store-provider'
 
 export default function useForkDefaultAction() {
   const { setSelectedScreen, setPromptEditorData, clearPromptEditorData, setOnboarding } = usePromptEditorStore()

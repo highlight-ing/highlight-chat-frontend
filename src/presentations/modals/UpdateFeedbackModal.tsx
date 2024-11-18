@@ -1,19 +1,18 @@
-import React, { type PropsWithChildren } from 'react'
-import { trackEvent } from '@/utils/amplitude'
+import React, { useEffect, useState, type PropsWithChildren } from 'react'
 import { Message } from '@/types'
-import { useStore } from '@/providers/store-provider'
-import { useState, useEffect } from 'react'
-import { z } from 'zod'
+import { trackEvent } from '@/utils/amplitude'
 import client from '@/utils/api-client'
-import useAuth from '@/hooks/useAuth'
+import { z } from 'zod'
 
+import useAuth from '@/hooks/useAuth'
 // Components
 import Button from '@/components/Button/Button'
-import Modal from '@/components/modals/Modal'
-import FeedbackRatingButtons from '@/components/Feedback/FeedbackRatingButtons'
-import FeedbackTypeSelect from '@/components/Feedback/FeedbackTypeSelect'
-import FeedbackTextarea from '@/components/Feedback/FeedbackTextarea'
 import FeedbackDisclosure from '@/components/Feedback/FeedbackDisclosure'
+import FeedbackRatingButtons from '@/components/Feedback/FeedbackRatingButtons'
+import FeedbackTextarea from '@/components/Feedback/FeedbackTextarea'
+import FeedbackTypeSelect from '@/components/Feedback/FeedbackTypeSelect'
+import Modal from '@/components/modals/Modal'
+import { useStore } from '@/components/providers/store-provider'
 
 export interface UpdateFeedbackModalProps {
   id: string

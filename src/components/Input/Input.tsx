@@ -1,23 +1,28 @@
 import { useEffect, useRef, useState } from 'react'
-import { Attachment } from '../Attachment'
 import { Attachment as AttachmentType, isFileAttachmentType } from '@/types'
-import { useSubmitQuery } from '@/hooks/useSubmitQuery'
-import { useStore } from '@/providers/store-provider'
-import styles from './chatinput.module.scss'
-import { getDisplayValue } from '@/utils/attachments'
-import { useShallow } from 'zustand/react/shallow'
 import { trackEvent } from '@/utils/amplitude'
+import { getDisplayValue } from '@/utils/attachments'
 import { AnimatePresence, motion, MotionConfig, Transition } from 'framer-motion'
-import useMeasure from 'react-use-measure'
-import InputPromptActions from './InputPromptActions'
-import { AttachmentDropdowns } from '../dropdowns/attachment-dropdowns'
-import InputFooter from './InputFooter'
 import { AddCircle, BoxAdd } from 'iconsax-react'
-import { InputDivider } from './InputDivider'
+import useMeasure from 'react-use-measure'
+import { useShallow } from 'zustand/react/shallow'
+
 import { cn } from '@/lib/utils'
-import { OpenAppButton } from '../buttons/open-app-button'
+import { useSubmitQuery } from '@/hooks/useSubmitQuery'
+import { useStore } from '@/components/providers/store-provider'
+
+import { ViewChangelogBanner } from '@/features/changelog/view-changelog-banner'
+
+import { Attachment } from '../Attachment'
 import { CreateShortcutButton } from '../buttons/create-shortcut-button'
-import { LatestConversation } from '../ChatHome/LatestConversation'
+import { OpenAppButton } from '../buttons/open-app-button'
+import { AttachmentDropdowns } from '../dropdowns/attachment-dropdowns'
+import { Stacker, StackerItem } from '../stacker'
+import styles from './chatinput.module.scss'
+import { InputDivider } from './InputDivider'
+import InputFooter from './InputFooter'
+import InputPromptActions from './InputPromptActions'
+import { LatestConversation } from './latest-conversation'
 
 const MAX_INPUT_HEIGHT = 160
 
@@ -61,10 +66,12 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
     let windowFocusTimeout: NodeJS.Timeout | null
 
     const onWindowFocus = () => {
-      windowFocusTimeout = setTimeout(() => {
-        inputRef.current?.focus()
-        setIsInputFocused(true)
-      }, 100)
+      if (!isActiveChat) {
+        windowFocusTimeout = setTimeout(() => {
+          inputRef.current?.focus()
+          setIsInputFocused(true)
+        }, 100)
+      }
     }
 
     const onInputFocus = () => {
@@ -177,7 +184,6 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
           animate={{ height: bounds.height }}
           transition={{ ...inputTransition, duration: isInputFocused ? 0.2 : 0.25, delay: isInputFocused ? 0 : 0.15 }}
           className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''} min-h-[68px]`}
-          onFocus={handleNonInputFocus}
           onClick={focusInput}
         >
           <div ref={ref} className={`${styles.inputWrapper} flex-col justify-between`}>
@@ -201,7 +207,9 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
                   className="h-6 max-h-[120px] w-full resize-none overflow-y-auto leading-6"
                 />
               </div>
-              <AttachmentDropdowns isInputFocused={isInputFocused} inputRef={inputRef} />
+              <div onFocus={handleNonInputFocus}>
+                <AttachmentDropdowns />
+              </div>
             </div>
 
             <AnimatePresence mode="popLayout">
@@ -273,9 +281,14 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
               </CreateShortcutButton>
             </div>
 
-            <div className={cn('w-full transition-transform', { '-translate-y-16': isInputFocused })}>
-              <LatestConversation focusInput={focusInput} />
-            </div>
+            <Stacker className={cn('w-full transition-transform', isInputFocused && '-translate-y-16')}>
+              <StackerItem index={0}>
+                <LatestConversation focusInput={focusInput} />
+              </StackerItem>
+              <StackerItem index={1}>
+                <ViewChangelogBanner />
+              </StackerItem>
+            </Stacker>
           </div>
         )}
       </div>

@@ -1,9 +1,10 @@
+import { Metadata, ResolvingMetadata } from 'next'
+import { notFound } from 'next/navigation'
+
+import { supabaseAdmin } from '@/lib/supabase'
 import PromptListingPage from '@/components/prompts/PromptListingPage/PromptListingPage'
 import PromptShareButton from '@/components/prompts/PromptListingPage/PromptShareButton'
 import { RelatedAppProps } from '@/components/prompts/PromptListingPage/RelatedApp'
-import { supabaseAdmin } from '@/lib/supabase'
-import { Metadata, ResolvingMetadata } from 'next'
-import { notFound } from 'next/navigation'
 
 interface PromptPageProps {
   params: { slug: string }

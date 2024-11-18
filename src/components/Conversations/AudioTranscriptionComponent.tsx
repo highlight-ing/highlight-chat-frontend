@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { Switch } from '@/components/ui/switch'
-import EnableConversationsButton from './EnableConversationsButton'
-import AnimatedVoiceSquare from './AnimatedVoiceSquare'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useConversations } from '@/context/ConversationContext'
 import { useDebouncedCallback } from 'use-debounce'
+
 import { Button } from '@/components/ui/button' // Make sure to import the Button component
+import { Switch } from '@/components/ui/switch'
+
+import AnimatedVoiceSquare from './AnimatedVoiceSquare'
+import EnableConversationsButton from './EnableConversationsButton'
 
 type AudioState = 'active' | 'inactive' | 'off' | 'noPermissions' | 'saving'
 

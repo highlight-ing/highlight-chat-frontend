@@ -1,8 +1,9 @@
 'use client'
 
 import Image from 'next/image'
-import { supabaseLoader } from '@/lib/supabase'
 import globalStyles from '@/global.module.scss'
+
+import { supabaseLoader } from '@/lib/supabase'
 
 /**
  * Loads an image from Supabase.

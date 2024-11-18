@@ -1,5 +1,6 @@
 import { motion, Variants } from 'framer-motion'
-import { BoxAdd, AddCircle } from 'iconsax-react'
+import { AddCircle, BoxAdd } from 'iconsax-react'
+
 import { CreateShortcutButton } from '../buttons/create-shortcut-button'
 import { OpenAppButton } from '../buttons/open-app-button'
 

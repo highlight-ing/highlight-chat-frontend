@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { type Toast } from '@/types'
-import styles from './toast.module.scss'
-import { useStore } from '@/providers/store-provider'
+
 import CloseButton from '@/components/CloseButton/CloseButton'
+import { useStore } from '@/components/providers/store-provider'
+
 import Button from '../Button/Button'
+import styles from './toast.module.scss'
 
 const Toast: React.FC<React.PropsWithChildren<Toast>> = ({ children, onClose, ...toast }) => {
   const removeToast = useStore((state) => state.removeToast)

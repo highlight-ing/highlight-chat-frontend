@@ -1,5 +1,5 @@
-import { languages, editor, Position } from 'monaco-editor'
 import { Monaco } from '@monaco-editor/react'
+import { editor, languages, Position } from 'monaco-editor'
 
 /**
  * @author athena-chen-chen

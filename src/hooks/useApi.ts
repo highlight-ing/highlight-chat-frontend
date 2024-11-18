@@ -1,6 +1,6 @@
-import useAuth from '@/hooks/useAuth'
+import { backendUrl } from '@/utils/chatBackendUrl'
 
-const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080'
+import useAuth from '@/hooks/useAuth'
 
 type ApiVersion = 'v3' | 'v4'
 

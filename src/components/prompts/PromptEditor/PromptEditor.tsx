@@ -1,11 +1,13 @@
+import React from 'react'
+import { PromptEditorScreen, usePromptEditorStore } from '@/stores/prompt-editor'
+
+import Tooltip from '@/components/Tooltip/Tooltip'
+
+import styles from './prompteditor.module.scss'
 import AppScreen from './screens/AppScreen'
 import SettingsScreen from './screens/SettingsScreen'
 import StartWithTemplateScreen from './screens/StartWithTemplateScreen'
-import { PromptEditorScreen, usePromptEditorStore } from '@/stores/prompt-editor'
-import styles from './prompteditor.module.scss'
 import VariablesScreen from './screens/VariablesScreen'
-import React from 'react'
-import Tooltip from '@/components/Tooltip/Tooltip'
 
 function ScreenSelector({
   active,

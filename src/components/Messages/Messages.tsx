@@ -1,10 +1,11 @@
 import React, { useEffect, useRef } from 'react'
-import { Message } from '@/components/Messages/Message'
 import styles from '@/main.module.scss'
-import ThinkingMessage from '@/components/Messages/ThinkingMessage'
-import { useStore } from '@/providers/store-provider'
 import { useShallow } from 'zustand/react/shallow'
+
 import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
+import { Message } from '@/components/Messages/Message'
+import ThinkingMessage from '@/components/Messages/ThinkingMessage'
+import { useStore } from '@/components/providers/store-provider'
 import Scrollable from '@/components/Scrollable/Scrollable'
 
 // The threshold in pixels to consider chat "scrolled up" by the user.

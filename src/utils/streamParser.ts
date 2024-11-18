@@ -1,6 +1,7 @@
 import { Toast } from '@/types'
-import { UseIntegrationsAPI } from '@/hooks/useIntegrations'
-import { integrationFunctionNames } from './integrations'
+
+import { UseIntegrationsAPI } from '@/features/integrations/_hooks/use-integrations'
+import { integrationFunctionNames } from '@/features/integrations/utils'
 
 type StreamParserProps = {
   showConfirmationModal: (message: string) => Promise<boolean>
@@ -31,6 +32,7 @@ export async function parseAndHandleStreamChunk(
     try {
       // Try to parse as JSON
       const jsonChunk = JSON.parse(jsonStr)
+      console.log('got a chunk', jsonChunk)
 
       switch (jsonChunk.type) {
         case 'text':
@@ -40,10 +42,9 @@ export async function parseAndHandleStreamChunk(
 
         case 'loading':
           if (jsonChunk.name === 'highlight_search') {
-            integrations.showLoading(conversationId, jsonChunk.name)
+            integrations.showLoading(conversationId, jsonChunk.name, jsonChunk.loaded)
           } else if (integrationFunctionNames.includes(jsonChunk.name) && jsonChunk.loaded === false) {
-            console.log('Showing loading', conversationId)
-            integrations.showLoading(conversationId, jsonChunk.name)
+            integrations.showLoading(conversationId, jsonChunk.name, jsonChunk.loaded)
           }
           break
 

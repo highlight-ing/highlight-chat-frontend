@@ -1,18 +1,20 @@
 'use client'
-import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react'
-import { Message, UserMessage } from '@/types/index'
-import { ShareUserMessage } from '@/components/Share/Messages/User/ShareUserMessage'
-import { ShareAssistantMessage } from '@/components/Share/Messages/Assistant/ShareAssistantMessage'
-import GetHighlightCTA from '@/components/Share/CTA/GetHighlightCTA'
-import { useApi } from '@/hooks/useApi'
+
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { initAmplitudeAnonymous, trackEvent } from '@/utils/amplitude'
+
+import { Message, UserMessage } from '@/types/index'
+import { useApi } from '@/hooks/useApi'
 import { useDownloadOrRedirect } from '@/hooks/useDownloadOrRedirect'
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from '@/components/DropdownMenu/dropdown-menu'
+import GetHighlightCTA from '@/components/Share/CTA/GetHighlightCTA'
+import { ShareAssistantMessage } from '@/components/Share/Messages/Assistant/ShareAssistantMessage'
+import { ShareUserMessage } from '@/components/Share/Messages/User/ShareUserMessage'
 
 interface SharePageComponentProps {
   messages: Message[]

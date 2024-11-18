@@ -1,12 +1,14 @@
-import { usePromptEditorStore } from '@/stores/prompt-editor'
-import { removePromptFromUser, savePrompt } from '@/utils/prompts'
-import useAuth from './useAuth'
-import { usePromptsStore } from '@/stores/prompts'
 import { useEffect, useState } from 'react'
-import { useStore } from '@/providers/store-provider'
+import { usePromptEditorStore } from '@/stores/prompt-editor'
+import { usePromptsStore } from '@/stores/prompts'
+import { openApp, sendExternalMessage } from '@/utils/highlightService'
+import { removePromptFromUser, savePrompt } from '@/utils/prompts'
+
 import { DEFAULT_PROMPT_EXTERNAL_IDS } from '@/lib/promptapps'
+import { useStore } from '@/components/providers/store-provider'
+
+import useAuth from './useAuth'
 import usePromptApps from './usePromptApps'
-import { sendExternalMessage, openApp } from '@/utils/highlightService'
 
 export const PROMPT_SLUG = 'prompts'
 
@@ -122,7 +124,7 @@ export function usePromptEditor() {
     } else if (res?.prompt) {
       // Update the prompts store with the updated prompt data
       updatePrompt(res.prompt)
-      
+
       const message = {
         type: 'prompt-edited',
         promptId: res.prompt.id,

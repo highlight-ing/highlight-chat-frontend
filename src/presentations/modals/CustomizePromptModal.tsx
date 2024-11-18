@@ -1,11 +1,13 @@
 import { ModalObjectProps } from '@/types'
-import Modal from '@/components/modals/Modal'
-import styles from './modals.module.scss'
+
 import { Prompt } from '@/types/supabase-helpers'
 import CloseButton from '@/components/CloseButton/CloseButton'
-import { useStore } from '@/providers/store-provider'
+import Modal from '@/components/modals/Modal'
 import { CustomizePromptButton } from '@/components/prompts/CustomizePromptPage/CustomizePromptButton'
 import { CustomizePromptDetails } from '@/components/prompts/CustomizePromptPage/CustomizePromptDetails'
+import { useStore } from '@/components/providers/store-provider'
+
+import styles from './modals.module.scss'
 
 const CustomizePromptModal = ({ id, context }: ModalObjectProps) => {
   const prompt = context?.prompt as Prompt

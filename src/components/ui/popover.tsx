@@ -7,7 +7,15 @@ import { cn } from '@/lib/utils'
 
 export const Popover = PopoverPrimitive.Root
 
-export const PopoverTrigger = PopoverPrimitive.Trigger
+export const PopoverTrigger = React.forwardRef<
+  React.ElementRef<typeof PopoverPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Trigger>
+>(({ className, children, ...props }, ref) => (
+  <PopoverPrimitive.Trigger ref={ref} data-slot="popover" className={cn('', className)} {...props}>
+    {children}
+  </PopoverPrimitive.Trigger>
+))
+PopoverTrigger.displayName = PopoverPrimitive.Trigger.displayName
 
 export const PopoverAnchor = PopoverPrimitive.Anchor
 

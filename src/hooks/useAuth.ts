@@ -1,7 +1,8 @@
-import { refreshTokens, updateUserInfo } from '@/app/(app)/actions'
-import { useStore } from '@/providers/store-provider'
 import Highlight from '@highlight-ai/app-runtime'
 import { decodeJwt } from 'jose'
+
+import { useStore } from '@/components/providers/store-provider'
+import { refreshTokens, updateUserInfo } from '@/app/(app)/actions'
 
 interface TokensResponse {
   accessToken: string
@@ -14,7 +15,6 @@ async function getNewTokens(): Promise<TokensResponse> {
   const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await Highlight.auth.signIn()
   console.log('[useAuth] Got new tokens from Highlight.')
   updateUserInfo(newAccessToken)
-  console.log(newAccessToken, newRefreshToken, 'new tokens')
   const payload = decodeJwt(newAccessToken)
 
   const exp = payload.exp ?? 0

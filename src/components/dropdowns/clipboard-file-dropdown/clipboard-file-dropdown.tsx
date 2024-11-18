@@ -1,23 +1,20 @@
-import { useStore } from '@/providers/store-provider'
-import { useShallow } from 'zustand/react/shallow'
-import styles from './clipboard-file-dropdown.module.scss'
-import Tooltip from '@/components/Tooltip/Tooltip'
+import { useEffect, useRef, useState } from 'react'
 import { MAX_NUMBER_OF_ATTACHMENTS } from '@/stores/chat-attachments'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { useContext, useEffect, useRef, useState } from 'react'
-import { AttachmentDropdownsContext } from '../attachment-dropdowns'
 import { trackEvent } from '@/utils/amplitude'
+import Highlight from '@highlight-ai/app-runtime'
 import { ClipboardText, DocumentUpload } from 'iconsax-react'
 import mammoth from 'mammoth'
 import * as pptxtojson from 'pptxtojson'
-import Highlight from '@highlight-ai/app-runtime'
-import { PaperclipIcon } from '@/icons/icons'
+import { useShallow } from 'zustand/react/shallow'
 
-interface ClipboardFileDropdownProps {
-  onCloseAutoFocus: (e: Event) => void
-}
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { PaperclipIcon } from '@/components/icons'
+import { useStore } from '@/components/providers/store-provider'
+import Tooltip from '@/components/Tooltip/Tooltip'
 
-export const ClipboardFileDropdown = ({ onCloseAutoFocus }: ClipboardFileDropdownProps) => {
+import styles from './clipboard-file-dropdown.module.scss'
+
+export const ClipboardFileDropdown = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { attachments, setFileInputRef, addAttachment } = useStore(
     useShallow((state) => ({
@@ -26,17 +23,7 @@ export const ClipboardFileDropdown = ({ onCloseAutoFocus }: ClipboardFileDropdow
       setFileInputRef: state.setFileInputRef,
     })),
   )
-  const { activeDropdown, setActiveDropdown } = useContext(AttachmentDropdownsContext)
   const [isOpen, setIsOpen] = useState(false)
-  const dropdownId = 'clipboard-file'
-
-  useEffect(() => {
-    if (isOpen) setActiveDropdown(dropdownId)
-  }, [isOpen])
-
-  useEffect(() => {
-    if (activeDropdown !== dropdownId) setIsOpen(false)
-  }, [activeDropdown, setIsOpen])
 
   useEffect(() => {
     setFileInputRef(fileInputRef)
@@ -204,28 +191,22 @@ export const ClipboardFileDropdown = ({ onCloseAutoFocus }: ClipboardFileDropdow
 
   return (
     <>
-      <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
         <Tooltip
           tooltip={isDisabled ? 'Max number of attahments added' : isOpen ? '' : 'Attach clipboard & files'}
           position={'top'}
         >
-          <DropdownMenuTrigger
+          <PopoverTrigger
             disabled={isDisabled}
             className={`${styles.button} ${isDisabled ? styles.disabledButton : ''}`}
           >
             <PaperclipIcon />
-          </DropdownMenuTrigger>
+          </PopoverTrigger>
         </Tooltip>
-        <DropdownMenuContent
-          onCloseAutoFocus={onCloseAutoFocus}
-          sideOffset={18}
-          align="end"
-          alignOffset={-98}
-          className="w-44 p-0"
-        >
-          <DropdownMenuItem
+        <PopoverContent sideOffset={18} align="end" alignOffset={-98} className="w-44 p-0">
+          <div
             onClick={handleAttachmentClick}
-            className="mt-0 h-12 border-none p-0 first:rounded-b-none last:rounded-t-none"
+            className="relative mt-0 flex h-12 cursor-pointer select-none items-center gap-2 rounded-[16px] border border-none border-tertiary p-0 text-sm outline-none transition-colors first:mt-0 first:rounded-b-none last:rounded-t-none hover:bg-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0"
           >
             <div className="grid place-items-center pl-2.5 text-secondary">
               <DocumentUpload size={20} variant={'Bold'} />
@@ -233,10 +214,10 @@ export const ClipboardFileDropdown = ({ onCloseAutoFocus }: ClipboardFileDropdow
             <div className="flex flex-col">
               <span className="text-sm font-medium text-secondary">Upload File</span>
             </div>
-          </DropdownMenuItem>
-          <DropdownMenuItem
+          </div>
+          <div
             onClick={onAddClipboard}
-            className="h-12 border-none p-0 first:rounded-b-none last:rounded-t-none"
+            className="relative mt-0 flex h-12 cursor-pointer select-none items-center gap-2 rounded-[16px] border border-none border-tertiary p-0 text-sm outline-none transition-colors first:mt-0 first:rounded-b-none last:rounded-t-none hover:bg-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0"
           >
             <div className="grid place-items-center pl-2.5 text-secondary">
               <ClipboardText size={20} variant={'Bold'} />
@@ -244,9 +225,9 @@ export const ClipboardFileDropdown = ({ onCloseAutoFocus }: ClipboardFileDropdow
             <div className="flex flex-col">
               <span className="text-sm font-medium text-secondary">Clipboard</span>
             </div>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+          </div>
+        </PopoverContent>
+      </Popover>
 
       <input
         type="file"

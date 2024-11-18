@@ -1,5 +1,6 @@
-import { Message } from '@/components/Messages/Message'
 import React, { useMemo } from 'react'
+
+import { Message } from '@/components/Messages/Message'
 
 const THINKING_MESSAGES = ['Hmm.. Let me think...', 'Working on it...', 'Just a moment...', 'Hang on a second...']
 

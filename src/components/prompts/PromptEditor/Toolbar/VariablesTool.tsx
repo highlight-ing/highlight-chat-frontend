@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react'
+import sassVariables from '@/variables.module.scss'
 import {
   Category2,
   ClipboardText,
@@ -10,9 +11,9 @@ import {
   Sound,
   TextalignLeft,
 } from 'iconsax-react'
-import sassVariables from '@/variables.module.scss'
-import ContextMenu, { MenuItemType } from '@/components/ContextMenu/ContextMenu'
+
 import Button from '@/components/Button/Button'
+import ContextMenu, { MenuItemType } from '@/components/ContextMenu/ContextMenu'
 import Tooltip from '@/components/Tooltip/Tooltip'
 
 interface VariablesToolProps {

@@ -1,8 +1,8 @@
 import { PropsWithChildren, ReactElement, ReactHTMLElement, useCallback, useEffect, useRef, useState } from 'react'
+import { calculatePositionedStyle } from '@/utils/components'
 import { Portal } from 'react-portal'
 
 import styles from './contextmenu.module.scss'
-import { calculatePositionedStyle } from '@/utils/components'
 
 type Position = 'top' | 'bottom' | 'left' | 'right'
 

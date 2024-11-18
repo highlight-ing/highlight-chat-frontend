@@ -1,18 +1,20 @@
-import styles from './history-sidebar.module.scss'
-import variables from '@/variables.module.scss'
 import * as React from 'react'
-import { useChatHistory } from '@/hooks/useChatHistory'
-import Tooltip from '@/components/Tooltip/Tooltip'
-import { Clock, Trash } from 'iconsax-react'
-import { useStore } from '@/providers/store-provider'
-import { ChatHistoryItem } from '@/types'
-import ContextMenu from '@/components/ContextMenu/ContextMenu'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useShallow } from 'zustand/react/shallow'
-import CircleButton from '@/components/CircleButton/CircleButton'
+import { ChatHistoryItem } from '@/types'
 import { trackEvent } from '@/utils/amplitude'
+import variables from '@/variables.module.scss'
+import { Clock, Trash } from 'iconsax-react'
+import { useShallow } from 'zustand/react/shallow'
+
 import { useApi } from '@/hooks/useApi'
+import { useChatHistory } from '@/hooks/useChatHistory'
+import CircleButton from '@/components/CircleButton/CircleButton'
+import ContextMenu from '@/components/ContextMenu/ContextMenu'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
+import { useStore } from '@/components/providers/store-provider'
+import Tooltip from '@/components/Tooltip/Tooltip'
+
+import styles from './history-sidebar.module.scss'
 import { NEW_CONVERSATION_TITLE, useAddNewChat, useHistory, useUpdateConversationTitle } from './hooks'
 import { sortArrayByDate } from './utils'
 
@@ -120,7 +122,7 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
 
 type HistorySidebarProps = {
   showHistory: boolean
-  setShowHistory: (showHistory: boolean) => void
+  setShowHistory: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarProps) {

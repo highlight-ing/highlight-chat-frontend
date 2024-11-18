@@ -1,8 +1,9 @@
+import React, { type PropsWithChildren, type ReactElement } from 'react'
 import styles from '@/presentations/modals/modals.module.scss'
+import { trackEvent } from '@/utils/amplitude'
+
 import Button, { ButtonVariantType } from '@/components/Button/Button'
 import Modal from '@/components/modals/Modal'
-import React, { type PropsWithChildren, type ReactElement } from 'react'
-import { trackEvent } from '@/utils/amplitude'
 
 export interface ConfirmationModalProps {
   header?: string

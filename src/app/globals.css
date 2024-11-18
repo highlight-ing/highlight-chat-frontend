@@ -12,22 +12,24 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
+  background: linear-gradient(to bottom,
       transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+      rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
 }
 
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.markdown>* {
+  all: revert;
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0
   }
+
   to {
     opacity: 1
   }
@@ -93,8 +95,15 @@ body {
 }
 
 @keyframes gentleScale {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 .animate-gentle-scale {
@@ -102,9 +111,12 @@ body {
 }
 
 @keyframes voiceWave {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scaleY(1);
   }
+
   50% {
     transform: scaleY(1.5);
   }

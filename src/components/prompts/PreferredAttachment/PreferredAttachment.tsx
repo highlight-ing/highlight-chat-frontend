@@ -1,4 +1,4 @@
-import { ClipboardText, Monitor, DocumentText, Microphone } from 'iconsax-react'
+import { ClipboardText, DocumentText, Microphone, Monitor } from 'iconsax-react'
 
 export function PreferredAttachment({ type }: { type: string }) {
   let title = ''

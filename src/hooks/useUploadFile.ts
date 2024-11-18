@@ -1,10 +1,12 @@
 import { useRef } from 'react'
-import { useStore } from '@/providers/store-provider'
-import useAuth from './useAuth'
-import { useApi } from '@/hooks/useApi'
-import { useShallow } from 'zustand/react/shallow'
-import * as Sentry from '@sentry/react'
 import { trackEvent } from '@/utils/amplitude'
+import * as Sentry from '@sentry/react'
+import { useShallow } from 'zustand/react/shallow'
+
+import { useApi } from '@/hooks/useApi'
+import { useStore } from '@/components/providers/store-provider'
+
+import useAuth from './useAuth'
 
 export const useUploadFile = () => {
   const { post } = useApi()

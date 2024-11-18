@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
-import { usePlatform } from './usePlatform'
-import { buildDownloadURL } from '@/utils/downloadUrl'
-import { trackEvent } from '@/utils/amplitude'
+import { useEffect, useState } from 'react'
 import { DownloadPlatformType } from '@/types'
+import { trackEvent } from '@/utils/amplitude'
+import { buildDownloadURL } from '@/utils/downloadUrl'
+
+import { usePlatform } from './usePlatform'
 
 export function useDownloadOrRedirect() {
   const platform = usePlatform()

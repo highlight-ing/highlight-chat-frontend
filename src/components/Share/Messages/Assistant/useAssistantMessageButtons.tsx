@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AssistantMessageButtonType, AssistantMessageButtonConfig, AssistantMessageButtonStatus } from '@/types'
+import { AssistantMessageButtonConfig, AssistantMessageButtonStatus, AssistantMessageButtonType } from '@/types'
 import { trackEvent } from '@/utils/amplitude'
 
 type UseAssistantMessageButtonsOptions = {

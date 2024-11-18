@@ -1,8 +1,8 @@
 import { SharedChat } from '@/types'
-import { extractBearerToken, validateHighlightJWT } from './auth'
+import { backendUrl } from '@/utils/chatBackendUrl'
 import { z } from 'zod'
 
-const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080/'
+import { extractBearerToken, validateHighlightJWT } from './auth'
 
 interface RequestOptions {
   version?: 'v1' | 'v3'

@@ -1,8 +1,9 @@
-import { notFound } from 'next/navigation'
-import SharePageComponent from '@/components/Share/SharePageComponent'
-import Header from '@/components/Share/Header/ShareHeader'
 import { Metadata } from 'next'
+import { notFound } from 'next/navigation'
+
 import { getSharedConversation } from '@/lib/api'
+import Header from '@/components/Share/Header/ShareHeader'
+import SharePageComponent from '@/components/Share/SharePageComponent'
 
 interface SharePageProps {
   params: {
