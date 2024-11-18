@@ -1,4 +1,4 @@
-import { GoogleIcon, LinearIcon, NotionIcon } from '@/components/icons'
+import { GoogleIcon, LinearIcon, NotionIcon, SlackIcon } from '@/components/icons'
 import { useStore } from '@/components/providers/store-provider'
 import { IntegrationsLoader } from '../_components/loader'
 import { SetupConnection } from '../_components/setup-connection'
@@ -10,6 +10,7 @@ import { checkNotionConnectionStatus, createMagicLinkForNotion } from '../notion
 import { CreateNotionPage } from '../notion/notion'
 import { SendSlackMessageParams } from '../types'
 import { SendSlackMessageComponent } from '../_components/slack'
+import { checkIntegrationStatus, createMagicLinkForIntegration } from '@/utils/integrations-server-actions'
 
 interface CreateNotionPageParams {
   title: string
@@ -208,6 +209,38 @@ export function useIntegrations(): UseIntegrationsAPI {
                   onConnect={() => resolve()}
                   icon={<NotionIcon size={16} />}
                   createMagicLink={createMagicLinkForNotion}
+                />
+              </MessageWithComponent>
+            ),
+            role: 'assistant',
+          })
+        })
+
+        integrationAuthorized.set('notion', promise)
+
+        return
+      }
+      integrationAuthorized.set('notion', Promise.resolve())
+    }
+
+    if (functionName === 'send_slack_message' && !loaded) {
+      //@ts-ignore
+      const hlToken = (await highlight.internal.getAuthorizationToken()) as string
+
+      const connected = await checkIntegrationStatus(hlToken, 'slack')
+
+      if (!connected) {
+        const promise = new Promise<void>((resolve) => {
+          // @ts-expect-error
+          updateLastConversationMessage(conversationId!, {
+            content: (
+              <MessageWithComponent content={textContents}>
+                <SetupConnection
+                  name={'Slack'}
+                  checkConnectionStatus={(token) => checkIntegrationStatus(token, 'slack')}
+                  onConnect={() => resolve()}
+                  icon={<SlackIcon size={16} />}
+                  createMagicLink={(token) => createMagicLinkForIntegration(token, 'slack')}
                 />
               </MessageWithComponent>
             ),
