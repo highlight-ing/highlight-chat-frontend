@@ -5,7 +5,6 @@
 import { useEffect, useState } from 'react'
 
 import Button from '@/components/Button/Button'
-import { createMagicLinkForIntegration } from '@/utils/integrations-server-actions'
 
 /**
  * @param name - The name of the integration
@@ -19,9 +18,11 @@ export function SetupConnection({
   checkConnectionStatus,
   onConnect,
   icon,
+  createMagicLink,
 }: {
   name: string
   checkConnectionStatus: (token: string) => Promise<boolean>
+  createMagicLink: (token: string) => Promise<string>
   onConnect: () => void
   icon: React.ReactNode
 }) {
@@ -75,7 +76,7 @@ export function SetupConnection({
       // @ts-ignore
       const token = (await highlight.internal.getAuthorizationToken()) as string
 
-      const connectLink = await createMagicLinkForIntegration(token, name)
+      const connectLink = await createMagicLink(token)
       setConnectClicked(true)
       window.open(connectLink, '_blank')
     } catch (e) {

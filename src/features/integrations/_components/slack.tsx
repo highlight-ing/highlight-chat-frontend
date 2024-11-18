@@ -1,15 +1,14 @@
-import { SendSlackMessageParams } from '@/hooks/useIntegrations'
+import { SendSlackMessageParams } from '@/features/integrations/types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useId, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import InputField from '@/components/TextInput/InputField'
 import Button from '@/components/Button/Button'
 import { sendMessage, listConversations } from '@/utils/slack-server-actions'
 import { getIntegrationTokenForUser } from '@/utils/integrations-server-actions'
 import BaseDropdown, { DropdownItem } from '@/components/dropdowns/base-dropdown'
 import { ArrowDown2, ArrowUp2, Hashtag, User } from 'iconsax-react'
-import TextArea from '../TextInput/TextArea'
+import TextArea from '@/components/TextInput/TextArea'
 
 const sendSlackMessageFormSchema = z.object({
   message: z.string(),
@@ -24,6 +23,19 @@ function SlackMessageFormComponent({ data, onSuccess }: { data: SendSlackMessage
   const [items, setItems] = useState<DropdownItem[]>([])
   const [selectedItem, setSelectedItem] = useState<DropdownItem | null>(null)
 
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+    setValue,
+  } = useForm<SendSlackMessageFormData>({
+    resolver: zodResolver(sendSlackMessageFormSchema),
+    defaultValues: {
+      message: data.message,
+    },
+  })
+
   useEffect(() => {
     ;(async () => {
       // @ts-ignore
@@ -35,8 +47,6 @@ function SlackMessageFormComponent({ data, onSuccess }: { data: SendSlackMessage
       slackToken.current = token
 
       const channels = await listConversations(hlToken)
-
-      console.log('channels', channels)
 
       setItems([
         {
@@ -68,23 +78,24 @@ function SlackMessageFormComponent({ data, onSuccess }: { data: SendSlackMessage
           })),
       ])
 
+      setValue('channel', channels[0].id)
+      setSelectedItem({
+        id: `channel-${channels[0].id}`,
+        type: 'item',
+        component: channels[0].name,
+        icon: <Hashtag size={20} />,
+      })
+
       setLoading(false)
     })()
   }, [])
 
-  const {
-    register,
-    handleSubmit,
-    setError,
-    formState: { errors, isSubmitting },
-  } = useForm<SendSlackMessageFormData>({
-    resolver: zodResolver(sendSlackMessageFormSchema),
-    defaultValues: {
-      message: data.message,
-    },
-  })
+
+
+
 
   const onSubmit = async (data: SendSlackMessageFormData) => {
+    console.log('form submitted', data)
     const token = slackToken.current
 
     if (!token) {
@@ -111,6 +122,7 @@ function SlackMessageFormComponent({ data, onSuccess }: { data: SendSlackMessage
         items={items}
         onItemSelect={(item) => {
           setSelectedItem(item)
+          setValue('channel', item.id.split('-')[1])
         }}
         triggerId={triggerId}
         position="bottom"
@@ -140,10 +152,10 @@ function SlackMessageFormComponent({ data, onSuccess }: { data: SendSlackMessage
   )
 }
 
-export function SendSlackMessageComponent(data: SendSlackMessageParams) {
+export function SendSlackMessageComponent({ data }: { data: SendSlackMessageParams }) {
   const [state, setState] = useState<'form' | 'success'>('form')
 
-  function onSuccess(url?: string) {
+  function onSuccess() {
     setState('success')
   }
 
