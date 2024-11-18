@@ -27,7 +27,12 @@ const stackerItemVariants: Variants = {
 
 export function StackerItem(props: StackerItemProps) {
   return (
-    <motion.div variants={stackerItemVariants} custom={props.index} className={cn(props.className)}>
+    <motion.div
+      variants={stackerItemVariants}
+      custom={props.index}
+      transition={{ type: 'spring', duration: 0.35, bounce: 0.3 }}
+      className={cn(props.className)}
+    >
       {props.children}
     </motion.div>
   )
