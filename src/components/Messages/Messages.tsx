@@ -70,11 +70,10 @@ const Messages = () => {
               return ''
             }
 
-            // Show the thinking message after a user message if input is disabled
+            // Show thinking message after the last user message
             const showThinkingAfterMessage = 
-              inputIsDisabled && 
               message.role === 'user' && 
-              (!messages[index + 1] || messages[index + 1].role !== 'assistant')
+              (!messages[index + 1] || messages[index + 1].role === 'assistant')
 
             return (
               <React.Fragment key={index}>
@@ -83,12 +82,6 @@ const Messages = () => {
               </React.Fragment>
             )
           })}
-        {inputIsDisabled &&
-          (!messages.length ||
-            messages[messages.length - 1]?.role !== 'assistant' ||
-            (typeof messages[messages.length - 1]?.content === 'string' &&
-              //@ts-ignore
-              !messages[messages.length - 1]?.content?.trim()?.length)) && <ThinkingMessage />}
       </div>
     </Scrollable>
   )

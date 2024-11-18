@@ -69,14 +69,22 @@ export function Messages() {
             ) {
               return ''
             }
-            return <Message key={index} message={message} />
+
+            // Show thinking message only if it's the last message and input is disabled
+            const showThinkingMessage = 
+              inputIsDisabled && 
+              index === messages.length - 1 && 
+              message.role === 'user';
+
+            return (
+              <React.Fragment key={index}>
+                <Message key={index} message={message} />
+                {showThinkingMessage && <ThinkingMessage />}
+              </React.Fragment>
+            )
           })}
-        {inputIsDisabled &&
-          (!messages.length ||
-            messages[messages.length - 1]?.role !== 'assistant' ||
-            (typeof messages[messages.length - 1]?.content === 'string' &&
-              //@ts-ignore
-              !messages[messages.length - 1]?.content?.trim()?.length)) && <ThinkingMessage />}
+        {/* Show thinking message if there are no messages and input is disabled */}
+        {inputIsDisabled && messages.length === 0 && <ThinkingMessage />}
       </div>
     </Scrollable>
   )
