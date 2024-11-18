@@ -17,13 +17,13 @@ import { useChatHistory } from '@/hooks/useChatHistory'
 import usePromptApps from '@/hooks/usePromptApps'
 import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 import { ModalContainer } from '@/components/modals/ModalContainer'
+import Modals from '@/components/modals/Modals'
 import { useStore } from '@/components/providers/store-provider'
 import ToastContainer from '@/components/Toast/ToastContainer'
 import { checkForFollowUpFeedback, markFollowUpFeedbackAsShown } from '@/app/(app)/actions'
 
+import { ChangelogModal } from '@/features/changelog/changelog-modal'
 import { usePendingIntegrations } from '@/features/integrations/_hooks/use-pending-integrations'
-
-import Modals from './modals/Modals'
 
 function useContextReceivedHandler(navigateToNewChat: () => void) {
   const {
@@ -303,6 +303,7 @@ export function App({ children }: { children: React.ReactNode }) {
       <ModalContainer />
       <ToastContainer />
       <Modals />
+      <ChangelogModal />
     </>
   )
 }
