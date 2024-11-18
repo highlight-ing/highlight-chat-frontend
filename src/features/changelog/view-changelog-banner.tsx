@@ -39,7 +39,7 @@ export function ViewChangelogBanner() {
   const { mostRecentChangelogNote } = useChangelogs()
 
   return (
-    <div className=" flex h-16 w-full items-center justify-between rounded-2xl border border-[#191919] bg-primary px-3 shadow-md hover:bg-secondary">
+    <div className=" flex h-16 w-full items-center justify-between rounded-2xl border border-[#191919] bg-secondary/70 px-3 shadow-md hover:bg-secondary">
       <div className="flex items-center gap-3 font-medium text-subtle">
         <HighlightIcon size={24} />
         <p>

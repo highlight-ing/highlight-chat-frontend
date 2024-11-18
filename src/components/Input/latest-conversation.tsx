@@ -95,7 +95,7 @@ export function LatestConversation(props: { focusInput: () => void }) {
   if (!mostRecentConversation) return <NoAudioNote />
 
   return (
-    <div className="group flex w-full items-start justify-between rounded-2xl border border-[#191919] bg-primary p-4 shadow-md transition-colors ease-out hover:bg-secondary">
+    <div className="group flex w-full items-start justify-between rounded-2xl border border-[#191919] bg-secondary p-4 shadow-md transition-colors ease-out hover:bg-secondary">
       <div className="space-y-1.5">
         <div className="flex items-center gap-3 font-medium text-primary">
           <VoiceSquare size={24} variant="Bold" className="text-green" />

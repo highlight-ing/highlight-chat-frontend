@@ -13,13 +13,15 @@ type StackerItemProps = {
 
 const stackerItemVariants: Variants = {
   idle: (index: number) => ({
-    scale: 1 - 0.04 * index,
-    y: -(index ** 1.2 * 20),
+    scale: 1 - index ** 1.4 * 0.04,
+    y: -1 * (index ** 1.4 * 20),
     zIndex: 1 - index,
+    opacity: 1 - index * 0.3,
   }),
   hover: {
     scale: 1,
     y: 0,
+    opacity: 1,
   },
 }
 
