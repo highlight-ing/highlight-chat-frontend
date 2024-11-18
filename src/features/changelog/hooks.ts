@@ -20,14 +20,14 @@ export function useShowChangelog() {
     if (latestChangelogVersionDismissed?.includes(newestChangelogVersion)) return
 
     setShowChangelog(true)
-  }, [setShowChangelog])
+  }, [])
 
   return { showChangelog, setShowChangelog }
 }
 
-export function useMostRecentChangelog() {
+export function useChangelogs() {
   const notes: Changelog = changelogData
   const mostRecentChangelogNote = notes[0]
 
-  return mostRecentChangelogNote
+  return { allChangelogNotes: notes, mostRecentChangelogNote }
 }

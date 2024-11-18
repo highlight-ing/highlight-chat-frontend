@@ -37,7 +37,6 @@ export default function Home() {
     return inputIsDisabled || messages.length > 0
   }, [inputIsDisabled, messages])
 
-  // HOOKS
   useClipboardPaste()
   useConversationLoad()
   useOnAppOpen()

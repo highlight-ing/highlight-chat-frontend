@@ -7,6 +7,8 @@ import Highlight from '@highlight-ai/app-runtime'
 import { ReactQueryProvider } from '@/components/providers/react-query-provider'
 import { StoreProvider } from '@/components/providers/store-provider'
 
+import { App } from './app'
+
 export default function Layout({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     if (typeof window !== 'undefined' && !Highlight.isRunningInHighlight()) {
@@ -17,7 +19,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <StoreProvider>
       <ConversationProvider>
-        <ReactQueryProvider>{children}</ReactQueryProvider>
+        <ReactQueryProvider>
+          <App>{children}</App>
+        </ReactQueryProvider>
       </ConversationProvider>
     </StoreProvider>
   )

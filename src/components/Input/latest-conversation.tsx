@@ -12,7 +12,7 @@ import { formatConversationDuration, formatConversationEndDate } from './utils'
 
 function NoAudioNote() {
   return (
-    <div className="flex h-14 w-full items-center justify-between rounded-2xl border border-[#191919] px-3">
+    <div className="flex h-14 w-full items-center justify-between rounded-2xl border border-[#191919] bg-primary px-3">
       <div className="flex items-center gap-3 font-medium text-subtle">
         <VoiceSquare size={24} variant="Bold" />
         <p>Your most recent audio note will show here</p>
@@ -70,7 +70,7 @@ export function LatestConversation(props: { focusInput: () => void }) {
 
       const formattedConversationTitle =
         mostRecentConversation?.title.startsWith('Conversation ended') ||
-          mostRecentConversation?.title.startsWith('Audio Notes from')
+        mostRecentConversation?.title.startsWith('Audio Notes from')
           ? 'Audio Note'
           : (mostRecentConversation?.title ?? 'Audio Note')
 
@@ -95,7 +95,7 @@ export function LatestConversation(props: { focusInput: () => void }) {
   if (!mostRecentConversation) return <NoAudioNote />
 
   return (
-    <div className="group flex w-full items-start justify-between rounded-2xl border border-[#191919] p-4 transition-colors ease-out hover:bg-white/[4%]">
+    <div className="group flex w-full items-start justify-between rounded-2xl border border-[#191919] bg-primary p-4 shadow-md transition-colors ease-out hover:bg-secondary">
       <div className="space-y-1.5">
         <div className="flex items-center gap-3 font-medium text-primary">
           <VoiceSquare size={24} variant="Bold" className="text-green" />

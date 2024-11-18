@@ -11,10 +11,13 @@ import { cn } from '@/lib/utils'
 import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 import { useStore } from '@/components/providers/store-provider'
 
+import { ViewChangelogBanner } from '@/features/changelog/view-changelog-banner'
+
 import { Attachment } from '../Attachment'
 import { CreateShortcutButton } from '../buttons/create-shortcut-button'
 import { OpenAppButton } from '../buttons/open-app-button'
 import { AttachmentDropdowns } from '../dropdowns/attachment-dropdowns'
+import { Stacker, StackerItem } from '../stacker'
 import styles from './chatinput.module.scss'
 import { InputDivider } from './InputDivider'
 import InputFooter from './InputFooter'
@@ -278,9 +281,14 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
               </CreateShortcutButton>
             </div>
 
-            <div className={cn('w-full transition-transform', { '-translate-y-16': isInputFocused })}>
-              <LatestConversation focusInput={focusInput} />
-            </div>
+            <Stacker className={cn('w-full transition-transform', isInputFocused && '-translate-y-16')}>
+              <StackerItem index={0}>
+                <LatestConversation focusInput={focusInput} />
+              </StackerItem>
+              <StackerItem index={1}>
+                <ViewChangelogBanner />
+              </StackerItem>
+            </Stacker>
           </div>
         )}
       </div>
