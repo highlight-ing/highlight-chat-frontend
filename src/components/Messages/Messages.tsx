@@ -69,7 +69,19 @@ const Messages = () => {
             ) {
               return ''
             }
-            return <Message key={index} message={message} />
+
+            // Show the thinking message after a user message if input is disabled
+            const showThinkingAfterMessage = 
+              inputIsDisabled && 
+              message.role === 'user' && 
+              (!messages[index + 1] || messages[index + 1].role !== 'assistant')
+
+            return (
+              <React.Fragment key={index}>
+                <Message message={message} />
+                {showThinkingAfterMessage && <ThinkingMessage />}
+              </React.Fragment>
+            )
           })}
         {inputIsDisabled &&
           (!messages.length ||

@@ -317,115 +317,123 @@ export const useSubmitQuery = () => {
 
       let accumulatedMessage = ''
 
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
+      // Add empty assistant message to trigger thinking message removal
+      addConversationMessage(conversationId, {
+        role: 'assistant',
+        content: '',
+        id: 'streaming-' + Date.now(),
+        conversation_id: conversationId,
+        version: 'v4',
+        given_feedback: null
+      })
 
-        checkAbortSignal()
+      try {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) {
+            setInputIsDisabled(false) // Reset input state when streaming is done
+            break
+          }
 
-        const chunk = new TextDecoder().decode(value)
+          checkAbortSignal()
 
-        const { content, windowName, conversation, factIndex, fact, messageId } = await parseAndHandleStreamChunk(
-          chunk,
-          {
-            showConfirmationModal,
-            addToast,
-            integrations,
-            conversationId,
-          },
-        )
+          const chunk = new TextDecoder().decode(value)
 
-        if (content) {
-          accumulatedMessage += content
-          updateLastConversationMessage(conversationId, {
-            role: 'assistant',
-            content: accumulatedMessage,
-            conversation_id: conversationId,
-            id: messageId,
-            given_feedback: null,
-          })
-        }
+          const { content, windowName, conversation, factIndex, fact, messageId } = await parseAndHandleStreamChunk(
+            chunk,
+            {
+              showConfirmationModal,
+              addToast,
+              integrations,
+              conversationId,
+            },
+          )
 
-        if (conversation) {
-          const conversation_data = await Highlight.conversations.getConversationById(conversation)
-          if (conversation_data) {
-            addAttachment({
-              type: 'audio',
-              value: conversation_data.transcript,
-              duration: Math.floor(
-                (new Date(conversation_data.endedAt).getTime() - new Date(conversation_data.startedAt).getTime()) /
-                  60000,
-              ),
-            })
-          } else {
-            addToast({
-              title: 'Failed to request Conversation',
-              description: 'We were unable to request conversation with this ID',
+          if (content) {
+            accumulatedMessage += content
+            updateLastConversationMessage(conversationId, {
+              role: 'assistant',
+              content: accumulatedMessage,
+              conversation_id: conversationId,
+              id: messageId,
+              given_feedback: null,
             })
           }
-        }
 
-        if (typeof factIndex === 'number' && fact) {
-          updateLastConversationMessage(conversationId, {
-            role: 'assistant',
-            content: accumulatedMessage,
-            conversation_id: conversationId,
-            factIndex: factIndex,
-            fact: fact,
-            id: messageId,
-            given_feedback: null,
-          })
-        } else if (fact) {
-          updateLastConversationMessage(conversationId, {
-            role: 'assistant',
-            content: accumulatedMessage,
-            conversation_id: conversationId,
-            fact: fact,
-            id: messageId,
-            given_feedback: null,
-          })
-        }
+          if (conversation) {
+            const conversation_data = await Highlight.conversations.getConversationById(conversation)
+            if (conversation_data) {
+              addAttachment({
+                type: 'audio',
+                value: conversation_data.transcript,
+                duration: Math.floor(
+                  (new Date(conversation_data.endedAt).getTime() - new Date(conversation_data.startedAt).getTime()) /
+                    60000,
+                ),
+              })
+            } else {
+              addToast({
+                title: 'Failed to request Conversation',
+                description: 'We were unable to request conversation with this ID',
+              })
+            }
+          }
 
-        if (windowName) {
-          const contextGranted = await Highlight.permissions.requestWindowContextPermission()
-          const screenshotGranted = await Highlight.permissions.requestScreenshotPermission()
-          if (contextGranted && screenshotGranted) {
-            addToast({
-              title: 'Context Granted',
-              description: `Context granted for ${windowName}`,
-              type: 'success',
-              timeout: 5000,
+          if (typeof factIndex === 'number' && fact) {
+            updateLastConversationMessage(conversationId, {
+              role: 'assistant',
+              content: accumulatedMessage,
+              conversation_id: conversationId,
+              factIndex: factIndex,
+              fact: fact,
+              id: messageId,
+              given_feedback: null,
             })
-            const screenshot = await Highlight.user.getWindowScreenshot(windowName)
-            addAttachment({ type: 'image', value: screenshot })
-
-            const windowContext = await Highlight.user.getWindowContext(windowName)
-            const ocrScreenContents = windowContext.application.focusedWindow.rawContents
-              ? windowContext.application.focusedWindow.rawContents
-              : windowContext.environment.ocrScreenContents || ''
-            addAttachment({ type: 'window_context', value: ocrScreenContents })
-
-            await handleSubmit("Here's the context you requested.", promptApp, {
-              image: screenshot,
-              window_context: ocrScreenContents,
+          } else if (fact) {
+            updateLastConversationMessage(conversationId, {
+              role: 'assistant',
+              content: accumulatedMessage,
+              conversation_id: conversationId,
+              fact: fact,
+              id: messageId,
+              given_feedback: null,
             })
           }
+
+          if (windowName) {
+            const contextGranted = await Highlight.permissions.requestWindowContextPermission()
+            const screenshotGranted = await Highlight.permissions.requestScreenshotPermission()
+            if (contextGranted && screenshotGranted) {
+              addToast({
+                title: 'Context Granted',
+                description: `Context granted for ${windowName}`,
+                type: 'success',
+                timeout: 5000,
+              })
+              const screenshot = await Highlight.user.getWindowScreenshot(windowName)
+              addAttachment({ type: 'image', value: screenshot })
+
+              const windowContext = await Highlight.user.getWindowContext(windowName)
+              const ocrScreenContents = windowContext.application.focusedWindow.rawContents
+                ? windowContext.application.focusedWindow.rawContents
+                : windowContext.environment.ocrScreenContents || ''
+              addAttachment({ type: 'window_context', value: ocrScreenContents })
+
+              await handleSubmit("Here's the context you requested.", promptApp, {
+                image: screenshot,
+                window_context: ocrScreenContents,
+              })
+            }
+          }
         }
+      } catch (error: any) {
+        setInputIsDisabled(false) // Reset input state on error
+        throw error
       }
     } catch (error: any) {
-      const endTime = Date.now()
-      const duration = (endTime - startTime) / 1000
-
-      if (error.message.includes('aborted')) {
-        console.log('Skipping message request, aborted')
-      } else {
-        handleError(error, {
-          conversationId,
-          isPromptApp,
-          duration,
-          endpoint: 'chat/',
-        })
-      }
+      setInputIsDisabled(false) // Reset input state on outer error
+      handleError(error, { method: 'fetchResponse' })
+      throw error
     } finally {
       const endTime = Date.now()
       const duration = endTime - startTime
@@ -436,7 +444,6 @@ export const useSubmitQuery = () => {
         success: !abortControllerRef.current?.signal.aborted,
       })
 
-      setInputIsDisabled(false)
       abortControllerRef.current = undefined
     }
   }
@@ -739,8 +746,6 @@ export const useSubmitQuery = () => {
       await fetchResponse(conversationId, formData, !!promptApp, promptApp, toolOverrides)
     } catch (error: any) {
       handleError(error, { method: 'handleSubmit' })
-    } finally {
-      setInputIsDisabled(false)
     }
   }
 
