@@ -1,5 +1,6 @@
 const appVersion = typeof window !== 'undefined' ? window.highlight?.version : undefined
-const isAlpha = appVersion?.endsWith('alpha')
+const isDevelopment = process.env.NODE_ENV === 'development'
+const isAlpha = !isDevelopment && appVersion?.endsWith('alpha')
 
 export const backendUrl = isAlpha
   ? 'https://chat-backend-staging.highlight.ing'
