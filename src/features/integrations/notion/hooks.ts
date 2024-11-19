@@ -56,7 +56,7 @@ export function useCheckNotionConnection() {
       return connected as boolean
     },
     enabled: !!hlToken,
-    refetchInterval: 7 * 1000,
+    refetchInterval: 10 * 1000,
     retry: false,
   })
 }

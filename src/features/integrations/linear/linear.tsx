@@ -197,6 +197,7 @@ export function CreateLinearTicket(props: CreateLinearTicketProps) {
         checkConnectionStatus={checkLinearConnectionStatus}
         onConnect={() => {
           queryClient.invalidateQueries({ queryKey: ['linear-api-token'] })
+          queryClient.invalidateQueries({ queryKey: ['linear-check-connection'] })
           setState('form')
         }}
         icon={<LinearIcon size={16} />}
