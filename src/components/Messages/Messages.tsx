@@ -22,6 +22,8 @@ const Messages = () => {
   const isUserScrolledRef = useRef<boolean>(false)
   const [thinkingMessageIndices, setThinkingMessageIndices] = useState<number[]>([])
   const prevMessagesRef = useRef<typeof messages>([])
+  const [completedMessageIndices, setCompletedMessageIndices] = useState<number[]>([])
+  const streamingTimeoutRef = useRef<NodeJS.Timeout>()
 
   const handleScroll = () => {
     if (!scrollContainerRef.current) {
@@ -59,7 +61,29 @@ const Messages = () => {
     return () => observer.disconnect()
   }, [])
 
-  // Track both messages and input state
+  useEffect(() => {
+    // When input becomes enabled (streaming ends)
+    if (!inputIsDisabled) {
+      // Clear any existing timeout
+      if (streamingTimeoutRef.current) {
+        clearTimeout(streamingTimeoutRef.current);
+      }
+      // Set a new timeout to ensure we don't have any race conditions
+      streamingTimeoutRef.current = setTimeout(() => {
+        const lastUserIndex = messages.findLastIndex(m => m.role === 'user')
+        if (lastUserIndex !== -1) {
+          setCompletedMessageIndices(prev => [...prev, lastUserIndex])
+        }
+      }, 100);
+    }
+
+    return () => {
+      if (streamingTimeoutRef.current) {
+        clearTimeout(streamingTimeoutRef.current);
+      }
+    };
+  }, [inputIsDisabled, messages]);
+
   useEffect(() => {
     const prevMessages = prevMessagesRef.current
     const currentMessages = messages
@@ -70,6 +94,8 @@ const Messages = () => {
       if (lastMessage?.role === 'user') {
         const newIndex = currentMessages.length - 1
         setThinkingMessageIndices(prev => [...prev, newIndex])
+        // Reset completed state for new message
+        setCompletedMessageIndices(prev => prev.filter(i => i !== newIndex))
       }
     }
 
@@ -78,6 +104,8 @@ const Messages = () => {
       const lastUserIndex = messages.findLastIndex(m => m.role === 'user')
       if (lastUserIndex !== -1 && !thinkingMessageIndices.includes(lastUserIndex)) {
         setThinkingMessageIndices(prev => [...prev, lastUserIndex])
+        // Reset completed state when streaming starts
+        setCompletedMessageIndices(prev => prev.filter(i => i !== lastUserIndex))
       }
     }
 
@@ -107,7 +135,11 @@ const Messages = () => {
             return (
               <React.Fragment key={index}>
                 <Message message={message} />
-                {showThinkingAfterMessage && <ThinkingMessage isAnimating={false} />}
+                {showThinkingAfterMessage && (
+                  <ThinkingMessage 
+                    isAnimating={!completedMessageIndices.includes(index)} 
+                  />
+                )}
               </React.Fragment>
             )
           })}

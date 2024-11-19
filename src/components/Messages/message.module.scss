@@ -159,13 +159,22 @@
     color: $light-60;
     position: relative;
     opacity: 0.6;
-    transition: opacity 0.3s ease;
-    animation: shimmerWave 2s ease-in-out infinite;
+    transition: all 0.3s ease;
     
-    @for $i from 1 through 30 {
-      &:nth-child(#{$i}) {
-        animation-delay: #{$i * 0.05}s;
+    &.animating {
+      animation: shimmerWave 2s ease-in-out infinite;
+      
+      @for $i from 1 through 30 {
+        &:nth-child(#{$i}) {
+          animation-delay: #{$i * 0.05}s;
+        }
       }
+    }
+    
+    &.static {
+      animation: none;
+      opacity: 0.8;
+      color: $light-80;
     }
   }
 }
