@@ -31,12 +31,12 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({ isAnimating = true })
     }
 
     if (!isAnimating) {
-      // Add a 0.5 second delay before stopping the animation
+      // Add a delay before stopping the animation to match streaming completion
       timerRef.current = setTimeout(() => {
         setIsLocalAnimating(false);
-      }, 500);
+      }, 2000);
     } else {
-      // Immediately start animating when isAnimating becomes true
+      // Start animating immediately when isAnimating becomes true
       setIsLocalAnimating(true);
     }
     
