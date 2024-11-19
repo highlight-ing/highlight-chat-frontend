@@ -10,6 +10,42 @@
   }
 }
 
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes placeholderFade {
+  0% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+
+  100% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes smoothFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(1px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .inputContainer {
   background-color: #1f1f1f;
   cursor: text;
@@ -17,6 +53,16 @@
   width: 100%;
   animation: fadeIn 400ms forwards;
   overflow: visible;
+  border: 1px solid transparent;
+
+  &.disabled,
+  &.loading,
+  &.sending {
+    border-color: transparent;
+    box-shadow: none;
+    animation: none;
+    background-color: #1f1f1f;
+  }
 
   &.active {
     margin-bottom: 20px;
@@ -37,6 +83,7 @@
     font-size: 15px;
     resize: none;
     outline: none;
+    transition: all 0.2s ease;
 
     &:focus {
       outline: none;
@@ -45,6 +92,15 @@
     &::placeholder {
       color: $light-40;
       user-select: none;
+      transition: color 0.3s ease, opacity 0.3s ease;
+
+      .loading & {
+        animation: fadeIn 0.3s ease forwards;
+      }
+
+      .fadeOut & {
+        animation: fadeOut 0.6s ease forwards;
+      }
     }
   }
 
