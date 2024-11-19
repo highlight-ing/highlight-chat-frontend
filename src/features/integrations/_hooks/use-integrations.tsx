@@ -9,8 +9,8 @@ import { CreateLinearTicket } from '../linear/linear'
 import { checkNotionConnectionStatus, createMagicLinkForNotion } from '../notion/actions'
 import { CreateNotionPage } from '../notion/notion'
 import { SendSlackMessageParams } from '../types'
-import { SendSlackMessageComponent } from '../_components/slack'
 import { checkIntegrationStatus, createMagicLinkForIntegration } from '@/utils/integrations-server-actions'
+import { SendSlackMessageComponent } from '../slack/slack'
 
 interface CreateNotionPageParams {
   title: string
