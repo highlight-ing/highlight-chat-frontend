@@ -23,6 +23,7 @@ const Messages = () => {
   const [thinkingMessageIndices, setThinkingMessageIndices] = useState<number[]>([])
   const prevMessagesRef = useRef<typeof messages>([])
   const [completedMessageIndices, setCompletedMessageIndices] = useState<number[]>([])
+  const [activeThinkingIndices, setActiveThinkingIndices] = useState<number[]>([])
   const streamingTimeoutRef = useRef<NodeJS.Timeout>()
 
   const handleScroll = () => {
@@ -73,6 +74,8 @@ const Messages = () => {
         const lastUserIndex = messages.findLastIndex(m => m.role === 'user')
         if (lastUserIndex !== -1) {
           setCompletedMessageIndices(prev => [...prev, lastUserIndex])
+          // Remove from active indices when completed
+          setActiveThinkingIndices(prev => prev.filter(i => i !== lastUserIndex))
         }
       }, 100);
     }
@@ -91,27 +94,45 @@ const Messages = () => {
     // If we have a new message
     if (currentMessages.length > prevMessages.length) {
       const lastMessage = currentMessages[currentMessages.length - 1]
+      
+      // If it's a user message, immediately show blue thinking message
       if (lastMessage?.role === 'user') {
         const newIndex = currentMessages.length - 1
         setThinkingMessageIndices(prev => [...prev, newIndex])
-        // Reset completed state for new message
         setCompletedMessageIndices(prev => prev.filter(i => i !== newIndex))
+        // Set this as the only active thinking message
+        setActiveThinkingIndices([newIndex])
       }
-    }
-
-    // Also handle input disabled state
-    if (inputIsDisabled) {
-      const lastUserIndex = messages.findLastIndex(m => m.role === 'user')
-      if (lastUserIndex !== -1 && !thinkingMessageIndices.includes(lastUserIndex)) {
-        setThinkingMessageIndices(prev => [...prev, lastUserIndex])
-        // Reset completed state when streaming starts
-        setCompletedMessageIndices(prev => prev.filter(i => i !== lastUserIndex))
+      
+      // If it's an assistant message
+      if (lastMessage?.role === 'assistant') {
+        // Find the last user message before this assistant message
+        const lastUserIndex = currentMessages.slice(0, -1).findLastIndex(m => m.role === 'user')
+        if (lastUserIndex !== -1) {
+          // Mark that thinking message as completed
+          setCompletedMessageIndices(prev => [...prev, lastUserIndex])
+          // Remove from active indices when completed
+          setActiveThinkingIndices(prev => prev.filter(i => i !== lastUserIndex))
+        }
       }
     }
 
     // Update our reference
     prevMessagesRef.current = messages
-  }, [messages, inputIsDisabled, thinkingMessageIndices])
+  }, [messages])
+
+  // Separate effect for handling input state
+  useEffect(() => {
+    if (inputIsDisabled) {
+      const lastUserIndex = messages.findLastIndex(m => m.role === 'user')
+      if (lastUserIndex !== -1 && !thinkingMessageIndices.includes(lastUserIndex)) {
+        setThinkingMessageIndices(prev => [...prev, lastUserIndex])
+        setCompletedMessageIndices(prev => prev.filter(i => i !== lastUserIndex))
+        // Ensure this is the only active thinking message
+        setActiveThinkingIndices([lastUserIndex])
+      }
+    }
+  }, [inputIsDisabled, messages, thinkingMessageIndices])
 
   return (
     <Scrollable className={styles.messagesContainer} ref={scrollContainerRef} onScroll={handleScroll}>
@@ -137,7 +158,8 @@ const Messages = () => {
                 <Message message={message} />
                 {showThinkingAfterMessage && (
                   <ThinkingMessage 
-                    isAnimating={!completedMessageIndices.includes(index)} 
+                    isAnimating={!completedMessageIndices.includes(index)}
+                    isLatest={activeThinkingIndices.includes(index)} 
                   />
                 )}
               </React.Fragment>

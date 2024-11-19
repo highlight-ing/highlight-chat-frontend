@@ -10,9 +10,13 @@ const THINKING_MESSAGES = ['Hmm.. Let me think...', 'Working on it...', 'Just a 
 
 interface ThinkingMessageProps {
   isAnimating?: boolean
+  isLatest?: boolean
 }
 
-const ThinkingMessage: React.FC<ThinkingMessageProps> = ({ isAnimating = true }) => {
+const ThinkingMessage: React.FC<ThinkingMessageProps> = ({ 
+  isAnimating = true,
+  isLatest = false 
+}) => {
   const [thinkingText] = useState(() => 
     THINKING_MESSAGES[Math.floor(Math.random() * THINKING_MESSAGES.length)]
   )
@@ -29,17 +33,10 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({ isAnimating = true })
       timerRef.current = undefined;
     }
 
-    if (!isAnimating) {
-      // Add a delay before stopping the animation to match streaming completion
-      timerRef.current = setTimeout(() => {
-        setIsLocalAnimating(false);
-      }, 500);
-    } else {
-      // Start animating immediately when isAnimating becomes true
-      setIsLocalAnimating(true);
-    }
+    // Update animation state immediately
+    setIsLocalAnimating(isAnimating);
     
-    // Cleanup on unmount or when effect reruns
+    // Cleanup on unmount
     return () => {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
@@ -61,7 +58,7 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({ isAnimating = true })
 
   return (
     <div className={styles.messageContainer}>
-      <div className={styles.thinkingAvatar}>
+      <div className={`${styles.thinkingAvatar} ${!isLatest && !isAnimating ? styles.inactive : ''}`}>
         <div
           className={`${globalStyles.promptIcon} ${globalStyles.self}`}
           style={{ '--size': '32px' } as React.CSSProperties}

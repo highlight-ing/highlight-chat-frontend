@@ -277,7 +277,6 @@ export const useSubmitQuery = () => {
     promptApp?: Prompt | null,
     toolOverrides?: ToolOverrides,
   ) => {
-    setInputIsDisabled(true)
     const startTime = Date.now()
 
     console.log('promptApp: ', promptApp)
@@ -331,7 +330,6 @@ export const useSubmitQuery = () => {
         while (true) {
           const { done, value } = await reader.read()
           if (done) {
-            setInputIsDisabled(false) // Reset input state when streaming is done
             break
           }
 
@@ -427,11 +425,9 @@ export const useSubmitQuery = () => {
           }
         }
       } catch (error: any) {
-        setInputIsDisabled(false) // Reset input state on error
         throw error
       }
     } catch (error: any) {
-      setInputIsDisabled(false) // Reset input state on outer error
       handleError(error, { method: 'fetchResponse' })
       throw error
     } finally {
@@ -746,6 +742,8 @@ export const useSubmitQuery = () => {
       await fetchResponse(conversationId, formData, !!promptApp, promptApp, toolOverrides)
     } catch (error: any) {
       handleError(error, { method: 'handleSubmit' })
+    } finally {
+      setInputIsDisabled(false) // Always reset input state after completion or error
     }
   }
 
