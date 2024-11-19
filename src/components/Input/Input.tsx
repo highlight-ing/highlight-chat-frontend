@@ -56,6 +56,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   const { handleSubmit } = useSubmitQuery()
   const [isInputFocused, setIsInputFocused] = useState(false)
   const [input, setInput] = useState('')
+  const [isSending, setIsSending] = useState(false)
 
   let inputRef = useRef<HTMLTextAreaElement>(null)
   let inputBlurTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -152,8 +153,10 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (!inputIsDisabled && e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      handleSubmit(input, promptApp)
+      setIsSending(true)
+      await handleSubmit(input, promptApp)
       setInput('')
+      setIsSending(false)
     }
   }
 
@@ -183,7 +186,16 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
           initial={{ height: 68 }}
           animate={{ height: bounds.height }}
           transition={{ ...inputTransition, duration: isInputFocused ? 0.2 : 0.25, delay: isInputFocused ? 0 : 0.15 }}
-          className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''} min-h-[68px]`}
+          className={cn(
+            styles.inputContainer,
+            isActiveChat && styles.active,
+            'min-h-[68px]',
+            {
+              [styles.disabled]: inputIsDisabled,
+              [styles.loading]: isConversationLoading,
+              [styles.sending]: isSending
+            }
+          )}
           onClick={focusInput}
         >
           <div ref={ref} className={`${styles.inputWrapper} flex-col justify-between`}>
