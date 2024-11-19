@@ -148,10 +148,36 @@
 }
 
 .thinking {
-  color: $light-40;
-  font-size: 15px;
-  font-weight: 300;
-  padding: 5px 0;
+  color: $light-60;
+  margin-left: 12px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  
+  .waveChar {
+    display: inline-block;
+    color: $light-60;
+    position: relative;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+    animation: shimmerWave 2s ease-in-out infinite;
+    
+    @for $i from 1 through 30 {
+      &:nth-child(#{$i}) {
+        animation-delay: #{$i * 0.05}s;
+      }
+    }
+  }
+}
+
+@keyframes shimmerWave {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+    color: $light-100;
+  }
 }
 
 .codeBlock {

@@ -20,6 +20,17 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({ isAnimating = true })
   
   const promptApp = useStore((state: StoreState) => state.promptApp)
 
+  const renderAnimatedText = (text: string) => {
+    return text.split('').map((char, index) => (
+      <span 
+        key={index} 
+        className={styles.waveChar}
+      >
+        {char}
+      </span>
+    ));
+  };
+
   return (
     <div className={styles.messageContainer}>
       <div className={styles.avatar}>
@@ -42,7 +53,7 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({ isAnimating = true })
         </div>
       </div>
       <span className={styles.thinking}>
-        {thinkingText}...
+        {renderAnimatedText(thinkingText + '...')}
       </span>
     </div>
   )
