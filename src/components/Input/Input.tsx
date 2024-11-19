@@ -181,14 +181,14 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
 
   // Placeholder suggestions for the input
   const PLACEHOLDER_SUGGESTIONS = [
-    'create a notion doc about ...',
-    'schedule a calendar event at ...',
-    'create a linear ticket for ...',
-    'summarize this for me ...',
+    'create a notion doc about...',
+    'schedule a calendar event at...',
+    'create a linear ticket for...',
+    'summarize this for me...',
     'catch me up on the news...',
-    'help me brainstorm ideas for ...',
-    'draft an email about ...',
-    'explain this concept to me ...',
+    'help me brainstorm ideas for...',
+    'draft an email about...',
+    'explain this concept to me...',
   ] as const
 
   const TYPING_SPEED = 10 // Base time between each character being typed
