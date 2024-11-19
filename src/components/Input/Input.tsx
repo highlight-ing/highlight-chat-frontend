@@ -194,7 +194,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   const TYPING_SPEED = 10;       // Base time between each character being typed
   const TYPING_VARIANCE = 30;    // Random variance in typing speed for natural feel
   const SUGGESTION_PAUSE = 1500; // Time to wait before moving to next suggestion
-  const INITIAL_DELAY = 1000;    // Time to wait before starting the animation
+  const INITIAL_DELAY = 500;    // Time to wait before starting the animation
   const CLEAR_SPEED = 30;       // Speed for clearing text
 
   const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
