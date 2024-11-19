@@ -190,39 +190,54 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
     'explain this concept to me ...',
   ] as const;
 
-  const TYPING_SPEED = 300;      // Time between each character being typed
+  const TYPING_SPEED = 10;       // Base time between each character being typed
+  const TYPING_VARIANCE = 50;    // Random variance in typing speed for natural feel
   const SUGGESTION_PAUSE = 3000; // Time to wait before moving to next suggestion
   const INITIAL_DELAY = 500;    // Time to wait before starting the animation
+  const CLEAR_SPEED = 30;       // Speed for clearing text
 
   const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
   const [displayedPlaceholder, setDisplayedPlaceholder] = useState('');
+  const typingTimeoutRef = useRef<NodeJS.Timeout>();
+  const currentIndexRef = useRef(0);
 
   // Effect for typing animation and cycling through suggestions
   useEffect(() => {
     if (isConversationLoading || inputIsDisabled) return;
 
     const currentText = PLACEHOLDER_SUGGESTIONS[currentPlaceholderIndex];
-    let typingTimeout: NodeJS.Timeout;
+    currentIndexRef.current = 0;
+    
+    const getRandomTypingDelay = () => TYPING_SPEED + Math.random() * TYPING_VARIANCE;
+
+    const clearText = () => {
+      if (currentIndexRef.current > 0) {
+        currentIndexRef.current--;
+        setDisplayedPlaceholder(currentText.slice(0, currentIndexRef.current));
+        typingTimeoutRef.current = setTimeout(clearText, CLEAR_SPEED);
+      } else {
+        typingTimeoutRef.current = setTimeout(() => {
+          setCurrentPlaceholderIndex(prev => (prev + 1) % PLACEHOLDER_SUGGESTIONS.length);
+        }, INITIAL_DELAY);
+      }
+    };
     
     const typeNextChar = () => {
-      setDisplayedPlaceholder(prev => {
-        if (prev.length < currentText.length) {
-          typingTimeout = setTimeout(typeNextChar, TYPING_SPEED);
-          return currentText.slice(0, prev.length + 1);
-        }
-        // When typing is complete, schedule the next suggestion
-        typingTimeout = setTimeout(() => {
-          setDisplayedPlaceholder('');
-          setCurrentPlaceholderIndex(prev => (prev + 1) % PLACEHOLDER_SUGGESTIONS.length);
-        }, SUGGESTION_PAUSE);
-        return prev;
-      });
+      if (currentIndexRef.current < currentText.length) {
+        currentIndexRef.current++;
+        setDisplayedPlaceholder(currentText.slice(0, currentIndexRef.current));
+        typingTimeoutRef.current = setTimeout(typeNextChar, getRandomTypingDelay());
+      } else {
+        typingTimeoutRef.current = setTimeout(clearText, SUGGESTION_PAUSE);
+      }
     };
 
-    typingTimeout = setTimeout(typeNextChar, INITIAL_DELAY);
+    typingTimeoutRef.current = setTimeout(typeNextChar, INITIAL_DELAY);
 
     return () => {
-      clearTimeout(typingTimeout);
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
     };
   }, [currentPlaceholderIndex, isConversationLoading, inputIsDisabled]);
 
