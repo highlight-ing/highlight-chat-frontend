@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 import Highlight from '@highlight-ai/app-runtime'
 
