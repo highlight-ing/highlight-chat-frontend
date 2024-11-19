@@ -3,9 +3,8 @@ import { useStore } from '@/components/providers/store-provider'
 import { StoreState } from '@/stores'
 import styles from './message.module.scss'
 import globalStyles from '@/global.module.scss'
-import { AssistantIcon } from '@/components/icons'
+import { SpinningGear, CompletedCheckbox } from '@/components/icons/ThinkingIcons'
 import { MessageText } from 'iconsax-react'
-import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
 
 const THINKING_MESSAGES = ['Hmm.. Let me think...', 'Working on it...', 'Just a moment...', 'Hang on a second...']
 
@@ -63,21 +62,10 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({ isAnimating = true })
     <div className={styles.messageContainer}>
       <div className={styles.avatar}>
         <div
-          className={`${globalStyles.promptIcon} ${promptApp && promptApp.image && promptApp.user_images?.file_extension ? globalStyles.none : globalStyles.self}`}
+          className={`${globalStyles.promptIcon} ${globalStyles.self}`}
           style={{ '--size': '32px' } as React.CSSProperties}
         >
-          {promptApp && promptApp.image && promptApp.user_images?.file_extension ? (
-            <PromptAppIcon
-              width={32}
-              height={32}
-              imageId={promptApp.image}
-              imageExtension={promptApp.user_images?.file_extension ?? ''}
-            />
-          ) : promptApp ? (
-            <MessageText variant={'Bold'} size={16} />
-          ) : (
-            <AssistantIcon />
-          )}
+          {isLocalAnimating ? <SpinningGear /> : <CompletedCheckbox />}
         </div>
       </div>
       <span className={styles.thinking}>
