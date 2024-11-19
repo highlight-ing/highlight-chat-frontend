@@ -20,23 +20,6 @@
   }
 }
 
-// @keyframes shimmer {
-//   0% {
-//     border-color: rgba(255, 255, 255, 0.06);
-//     box-shadow: 0 0 15px rgba(255, 255, 255, 0.02);
-//   }
-//
-//   50% {
-//     border-color: rgba(255, 255, 255, 0.15);
-//     box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
-//   }
-//
-//   100% {
-//     border-color: rgba(255, 255, 255, 0.06);
-//     box-shadow: 0 0 15px rgba(255, 255, 255, 0.02);
-//   }
-// }
-
 @keyframes placeholderFade {
   0% {
     opacity: 0.4;
@@ -71,12 +54,6 @@
   animation: fadeIn 400ms forwards;
   overflow: visible;
   border: 1px solid transparent;
-  transition: all 0.3s ease;
-
-  // &:not(.disabled):not(.loading):not(.sending) {
-  //   animation: shimmer 2.5s ease-in-out infinite;
-  //   background-color: rgba(31, 31, 31, 0.95);
-  // }
 
   &.disabled,
   &.loading,
@@ -110,7 +87,6 @@
 
     &:focus {
       outline: none;
-      border-color: rgba(255, 255, 255, 0.06);
     }
 
     &::placeholder {
