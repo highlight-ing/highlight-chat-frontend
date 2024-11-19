@@ -35,7 +35,6 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
     inputOverride,
     setInputOverride,
     inputIsDisabled,
-    promptName,
     promptApp,
     removeAttachment,
     fileInputRef,
@@ -46,7 +45,6 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
       inputIsDisabled: state.inputIsDisabled,
       inputOverride: state.inputOverride,
       setInputOverride: state.setInputOverride,
-      promptName: state.promptName,
       promptApp: state.promptApp,
       removeAttachment: state.removeAttachment,
       fileInputRef: state.fileInputRef,
@@ -56,10 +54,84 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   const { handleSubmit } = useSubmitQuery()
   const [isInputFocused, setIsInputFocused] = useState(false)
   const [input, setInput] = useState('')
-  const [isSending, setIsSending] = useState(false)
 
   let inputRef = useRef<HTMLTextAreaElement>(null)
   let inputBlurTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Placeholder suggestions for the input
+  const PLACEHOLDER_SUGGESTIONS = [
+    'create a notion doc about ...',
+    'schedule a calendar event at ...',
+    'create a linear ticket for ...',
+    'summarize this for me ...',
+    'catch me up on the news...',
+    'help me brainstorm ideas for ...',
+    'draft an email about ...',
+    'explain this concept to me ...',
+  ] as const
+
+  const TYPING_SPEED = 10 // Base time between each character being typed
+  const TYPING_VARIANCE = 30 // Random variance in typing speed for natural feel
+  const SUGGESTION_PAUSE = 2000 // Time to wait before moving to next suggestion
+  const INITIAL_DELAY = 800 // Time to wait before starting the animation
+  const CLEAR_SPEED = 30 // Speed for clearing text
+
+  const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0)
+  const [displayedPlaceholder, setDisplayedPlaceholder] = useState('')
+  const typingTimeoutRef = useRef<NodeJS.Timeout>()
+  const currentIndexRef = useRef(0)
+
+  // Reset animation state when loading state changes
+  useEffect(() => {
+    if (isConversationLoading || inputIsDisabled) {
+      // Clear any ongoing animation
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current)
+      }
+      setDisplayedPlaceholder('')
+      currentIndexRef.current = 0
+    }
+  }, [isConversationLoading, inputIsDisabled])
+
+  // Effect for typing animation and cycling through suggestions
+  useEffect(() => {
+    if (isConversationLoading || inputIsDisabled) return
+
+    const currentText = PLACEHOLDER_SUGGESTIONS[currentPlaceholderIndex]
+    currentIndexRef.current = 0
+
+    const getRandomTypingDelay = () => TYPING_SPEED + Math.random() * TYPING_VARIANCE
+
+    const clearText = () => {
+      if (currentIndexRef.current > 0) {
+        currentIndexRef.current--
+        setDisplayedPlaceholder(currentText.slice(0, currentIndexRef.current))
+        typingTimeoutRef.current = setTimeout(clearText, CLEAR_SPEED)
+      } else {
+        typingTimeoutRef.current = setTimeout(() => {
+          setCurrentPlaceholderIndex((prev) => (prev + 1) % PLACEHOLDER_SUGGESTIONS.length)
+        }, INITIAL_DELAY)
+      }
+    }
+
+    const typeNextChar = () => {
+      if (currentIndexRef.current < currentText.length) {
+        currentIndexRef.current++
+        setDisplayedPlaceholder(currentText.slice(0, currentIndexRef.current))
+        typingTimeoutRef.current = setTimeout(typeNextChar, getRandomTypingDelay())
+      } else {
+        typingTimeoutRef.current = setTimeout(clearText, SUGGESTION_PAUSE)
+      }
+    }
+
+    typingTimeoutRef.current = setTimeout(typeNextChar, INITIAL_DELAY)
+
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current)
+      }
+    }
+  }, [currentPlaceholderIndex, isConversationLoading, inputIsDisabled])
 
   // Use to handle the auto closing when the window is focused
   // and to prevent toggling the input focus when pressing a dropdown
@@ -153,11 +225,8 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (!inputIsDisabled && e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      const currentInput = input
-      setInput('') // Clear input immediately
-      setIsSending(true)
-      await handleSubmit(currentInput, promptApp)
-      setIsSending(false)
+      handleSubmit(input, promptApp)
+      setInput('')
     }
   }
 
@@ -179,90 +248,6 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
 
   const inputTransition: Transition = { type: 'spring', duration: 0.25, bounce: 0.3 }
 
-  // Placeholder suggestions for the input
-  const PLACEHOLDER_SUGGESTIONS = [
-    'create a notion doc about...',
-    'schedule a calendar event at...',
-    'create a linear ticket for...',
-    'summarize this for me...',
-    'catch me up on the news...',
-    'help me brainstorm ideas for...',
-    'draft an email about...',
-    'explain this concept to me...',
-  ] as const
-
-  const TYPING_SPEED = 10 // Base time between each character being typed
-  const TYPING_VARIANCE = 30 // Random variance in typing speed for natural feel
-  const SUGGESTION_PAUSE = 2000 // Time to wait before moving to next suggestion
-  const INITIAL_DELAY = 1000 // Time to wait before starting the animation
-  const CLEAR_SPEED = 30 // Speed for clearing text
-
-  const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0)
-  const [displayedPlaceholder, setDisplayedPlaceholder] = useState('')
-  const [isFadingOut, setIsFadingOut] = useState(false)
-  const typingTimeoutRef = useRef<NodeJS.Timeout>()
-  const currentIndexRef = useRef(0)
-
-  // Reset animation state when loading state changes
-  useEffect(() => {
-    if (isConversationLoading || inputIsDisabled) {
-      // Clear any ongoing animation
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current)
-      }
-      setDisplayedPlaceholder('')
-      currentIndexRef.current = 0
-      setIsFadingOut(false)
-    } else {
-      // Add fade out when loading ends
-      setIsFadingOut(true)
-      const fadeTimeout = setTimeout(() => {
-        setIsFadingOut(false)
-      }, 600) // Match the CSS animation duration (0.6s)
-      return () => clearTimeout(fadeTimeout)
-    }
-  }, [isConversationLoading, inputIsDisabled])
-
-  // Effect for typing animation and cycling through suggestions
-  useEffect(() => {
-    if (isConversationLoading || inputIsDisabled) return
-
-    const currentText = PLACEHOLDER_SUGGESTIONS[currentPlaceholderIndex]
-    currentIndexRef.current = 0
-
-    const getRandomTypingDelay = () => TYPING_SPEED + Math.random() * TYPING_VARIANCE
-
-    const clearText = () => {
-      if (currentIndexRef.current > 0) {
-        currentIndexRef.current--
-        setDisplayedPlaceholder(currentText.slice(0, currentIndexRef.current))
-        typingTimeoutRef.current = setTimeout(clearText, CLEAR_SPEED)
-      } else {
-        typingTimeoutRef.current = setTimeout(() => {
-          setCurrentPlaceholderIndex((prev) => (prev + 1) % PLACEHOLDER_SUGGESTIONS.length)
-        }, INITIAL_DELAY)
-      }
-    }
-
-    const typeNextChar = () => {
-      if (currentIndexRef.current < currentText.length) {
-        currentIndexRef.current++
-        setDisplayedPlaceholder(currentText.slice(0, currentIndexRef.current))
-        typingTimeoutRef.current = setTimeout(typeNextChar, getRandomTypingDelay())
-      } else {
-        typingTimeoutRef.current = setTimeout(clearText, SUGGESTION_PAUSE)
-      }
-    }
-
-    typingTimeoutRef.current = setTimeout(typeNextChar, INITIAL_DELAY)
-
-    return () => {
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current)
-      }
-    }
-  }, [currentPlaceholderIndex, isConversationLoading, inputIsDisabled])
-
   return (
     <MotionConfig transition={inputTransition}>
       <div className="flex w-full flex-col items-center gap-8">
@@ -271,12 +256,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
           initial={{ height: 68 }}
           animate={{ height: bounds.height }}
           transition={{ ...inputTransition, duration: isInputFocused ? 0.2 : 0.25, delay: isInputFocused ? 0 : 0.15 }}
-          className={cn(styles.inputContainer, isActiveChat && styles.active, 'min-h-[68px]', {
-            [styles.disabled]: inputIsDisabled,
-            [styles.loading]: isConversationLoading && !isFadingOut,
-            [styles.fadeOut]: isFadingOut,
-            [styles.sending]: isSending,
-          })}
+          className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''} min-h-[68px]`}
           onClick={focusInput}
         >
           <div ref={ref} className={`${styles.inputWrapper} flex-col justify-between`}>
@@ -289,9 +269,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
                   id="textarea-input"
                   ref={inputRef}
                   disabled={isConversationLoading || inputIsDisabled}
-                  placeholder={
-                    isConversationLoading || inputIsDisabled ? 'Loading new chat...' : input ? '' : displayedPlaceholder
-                  }
+                  placeholder={isConversationLoading || inputIsDisabled ? 'Loading new chat...' : displayedPlaceholder}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
@@ -302,7 +280,6 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
                 <AttachmentDropdowns />
               </div>
             </div>
-
             <AnimatePresence mode="popLayout">
               {attachments.length > 0 && (
                 <div className={`${styles.attachmentsRow} mt-1.5`}>
