@@ -463,7 +463,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
       {onboarding.isOnboarding && onboarding.index === 4 && (
         <OnboardingBox
           title="Save, publish, and share"
-          line2="There’s no limit to the number of actions you can create and share, so have fun!"
+          line2="There’s no limit to the number of shortcuts you can create and share, so have fun!"
           buttonText="Continue"
           bottomComponent={
             <div>

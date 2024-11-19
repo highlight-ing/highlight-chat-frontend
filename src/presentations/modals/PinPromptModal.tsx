@@ -39,8 +39,8 @@ export default function PinPromptModal({ id, context }: ModalObjectProps) {
     closeModal(id)
 
     addToast({
-      title: 'Action pinned',
-      description: 'Your action has been pinned.',
+      title: 'Shortcut pinned',
+      description: 'Your shortcut has been pinned.',
       type: 'success',
       timeout: 1500,
     })
@@ -49,7 +49,7 @@ export default function PinPromptModal({ id, context }: ModalObjectProps) {
   return (
     <ConfirmationModal
       id={id}
-      header="Pin action"
+      header="Pin shortcut"
       primaryAction={{
         label: 'Pin',
         onClick: onUpdate,
@@ -61,7 +61,7 @@ export default function PinPromptModal({ id, context }: ModalObjectProps) {
       }}
     >
       <div>
-        By pinning this action, you'll have quick access to it whenever you summon Highlight. Pinned actions appear
+        By pinning this shortcut, you'll have quick access to it whenever you summon Highlight. Pinned shortcuts appear
         prominently in your assistant, making them easily accessible for frequent use.
       </div>
     </ConfirmationModal>

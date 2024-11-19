@@ -12,9 +12,9 @@ export default function EmptyPrompts() {
   return (
     <div className={styles.emptyPersonalPrompts}>
       <Setting color={variables.light20} variant="Bold" />
-      <p>Actions you create and favorite will be added here.</p>
+      <p>Shortcuts you create and favorite will be added here.</p>
       <Button size="small" variant="tertiary" onClick={() => openModal('create-prompt')}>
-        Create Action
+        Create Shortcut
       </Button>
     </div>
   )
