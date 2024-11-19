@@ -33,7 +33,7 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({ isAnimating = true })
       // Add a delay before stopping the animation to match streaming completion
       timerRef.current = setTimeout(() => {
         setIsLocalAnimating(false);
-      }, 2000);
+      }, 500);
     } else {
       // Start animating immediately when isAnimating becomes true
       setIsLocalAnimating(true);
@@ -52,6 +52,7 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({ isAnimating = true })
       <span 
         key={index} 
         className={`${styles.waveChar} ${isLocalAnimating ? styles.animating : styles.static}`}
+        style={{ whiteSpace: 'pre' }}
       >
         {char}
       </span>
