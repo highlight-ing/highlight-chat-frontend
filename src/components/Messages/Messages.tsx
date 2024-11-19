@@ -20,9 +20,8 @@ const Messages = () => {
   const messages = useCurrentChatMessages()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const isUserScrolledRef = useRef<boolean>(false)
-  const [lastUserMessageIndex, setLastUserMessageIndex] = useState<number | null>(null)
-  const [isThinking, setIsThinking] = useState(false)
-  const prevInputDisabledRef = useRef(inputIsDisabled)
+  const [thinkingMessageIndices, setThinkingMessageIndices] = useState<number[]>([])
+  const prevMessagesRef = useRef<typeof messages>([])
 
   const handleScroll = () => {
     if (!scrollContainerRef.current) {
@@ -60,22 +59,31 @@ const Messages = () => {
     return () => observer.disconnect()
   }, [])
 
+  // Track both messages and input state
   useEffect(() => {
-    // When input becomes enabled again (response is complete), stop thinking
-    if (prevInputDisabledRef.current && !inputIsDisabled) {
-      setIsThinking(false)
-    }
-    prevInputDisabledRef.current = inputIsDisabled
+    const prevMessages = prevMessagesRef.current
+    const currentMessages = messages
 
-    // Start thinking when input becomes disabled
-    if (inputIsDisabled) {
-      const lastIndex = messages.findLastIndex(m => m.role === 'user')
-      if (lastIndex !== -1) {
-        setLastUserMessageIndex(lastIndex)
-        setIsThinking(true)
+    // If we have a new message
+    if (currentMessages.length > prevMessages.length) {
+      const lastMessage = currentMessages[currentMessages.length - 1]
+      if (lastMessage?.role === 'user') {
+        const newIndex = currentMessages.length - 1
+        setThinkingMessageIndices(prev => [...prev, newIndex])
       }
     }
-  }, [inputIsDisabled, messages])
+
+    // Also handle input disabled state
+    if (inputIsDisabled) {
+      const lastUserIndex = messages.findLastIndex(m => m.role === 'user')
+      if (lastUserIndex !== -1 && !thinkingMessageIndices.includes(lastUserIndex)) {
+        setThinkingMessageIndices(prev => [...prev, lastUserIndex])
+      }
+    }
+
+    // Update our reference
+    prevMessagesRef.current = messages
+  }, [messages, inputIsDisabled, thinkingMessageIndices])
 
   return (
     <Scrollable className={styles.messagesContainer} ref={scrollContainerRef} onScroll={handleScroll}>
@@ -90,14 +98,16 @@ const Messages = () => {
               return ''
             }
 
-            // Show thinking message after the specific user message it appeared with
             const showThinkingAfterMessage = 
-              lastUserMessageIndex === index
+              message.role === 'user' && (
+                inputIsDisabled || 
+                thinkingMessageIndices.includes(index)
+              )
 
             return (
               <React.Fragment key={index}>
                 <Message message={message} />
-                {showThinkingAfterMessage && <ThinkingMessage isAnimating={isThinking} />}
+                {showThinkingAfterMessage && <ThinkingMessage isAnimating={false} />}
               </React.Fragment>
             )
           })}
