@@ -60,7 +60,7 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({ isAnimating = true })
 
   return (
     <div className={styles.messageContainer}>
-      <div className={styles.avatar}>
+      <div className={styles.thinkingAvatar}>
         <div
           className={`${globalStyles.promptIcon} ${globalStyles.self}`}
           style={{ '--size': '32px' } as React.CSSProperties}

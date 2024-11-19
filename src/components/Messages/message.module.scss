@@ -60,6 +60,16 @@
   }
 }
 
+.thinkingAvatar {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: -40px;
+  svg {
+    color: rgba($text-accent, 0.8);
+  }
+}
+
 .messageBody {
   font-size: 15px;
   color: $light-80;
