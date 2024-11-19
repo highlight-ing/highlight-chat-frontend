@@ -153,9 +153,10 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (!inputIsDisabled && e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
+      const currentInput = input;
+      setInput('');  // Clear input immediately
       setIsSending(true)
-      await handleSubmit(input, promptApp)
-      setInput('')
+      await handleSubmit(currentInput, promptApp)
       setIsSending(false)
     }
   }
@@ -193,13 +194,25 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   const TYPING_SPEED = 10;       // Base time between each character being typed
   const TYPING_VARIANCE = 30;    // Random variance in typing speed for natural feel
   const SUGGESTION_PAUSE = 1500; // Time to wait before moving to next suggestion
-  const INITIAL_DELAY = 500;    // Time to wait before starting the animation
+  const INITIAL_DELAY = 1000;    // Time to wait before starting the animation
   const CLEAR_SPEED = 30;       // Speed for clearing text
 
   const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
   const [displayedPlaceholder, setDisplayedPlaceholder] = useState('');
   const typingTimeoutRef = useRef<NodeJS.Timeout>();
   const currentIndexRef = useRef(0);
+
+  // Reset animation state when loading state changes
+  useEffect(() => {
+    if (isConversationLoading || inputIsDisabled) {
+      // Clear any ongoing animation
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      setDisplayedPlaceholder('');
+      currentIndexRef.current = 0;
+    }
+  }, [isConversationLoading, inputIsDisabled]);
 
   // Effect for typing animation and cycling through suggestions
   useEffect(() => {
