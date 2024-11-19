@@ -178,6 +178,54 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
 
   const inputTransition: Transition = { type: 'spring', duration: 0.25, bounce: 0.3 }
 
+  // Placeholder suggestions for the input
+  const PLACEHOLDER_SUGGESTIONS = [
+    'create a notion doc about ...',
+    'schedule a calendar event at ...',
+    'create a linear ticket for ...',
+    'summarize this for me ...',
+    'catch me up on the news...',
+    'help me brainstorm ideas for ...',
+    'draft an email about ...',
+    'explain this concept to me ...',
+  ] as const;
+
+  const TYPING_SPEED = 300;      // Time between each character being typed
+  const SUGGESTION_PAUSE = 3000; // Time to wait before moving to next suggestion
+  const INITIAL_DELAY = 500;    // Time to wait before starting the animation
+
+  const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
+  const [displayedPlaceholder, setDisplayedPlaceholder] = useState('');
+
+  // Effect for typing animation and cycling through suggestions
+  useEffect(() => {
+    if (isConversationLoading || inputIsDisabled) return;
+
+    const currentText = PLACEHOLDER_SUGGESTIONS[currentPlaceholderIndex];
+    let typingTimeout: NodeJS.Timeout;
+    
+    const typeNextChar = () => {
+      setDisplayedPlaceholder(prev => {
+        if (prev.length < currentText.length) {
+          typingTimeout = setTimeout(typeNextChar, TYPING_SPEED);
+          return currentText.slice(0, prev.length + 1);
+        }
+        // When typing is complete, schedule the next suggestion
+        typingTimeout = setTimeout(() => {
+          setDisplayedPlaceholder('');
+          setCurrentPlaceholderIndex(prev => (prev + 1) % PLACEHOLDER_SUGGESTIONS.length);
+        }, SUGGESTION_PAUSE);
+        return prev;
+      });
+    };
+
+    typingTimeout = setTimeout(typeNextChar, INITIAL_DELAY);
+
+    return () => {
+      clearTimeout(typingTimeout);
+    };
+  }, [currentPlaceholderIndex, isConversationLoading, inputIsDisabled]);
+
   return (
     <MotionConfig transition={inputTransition}>
       <div className="flex w-full flex-col items-center gap-8">
@@ -211,7 +259,9 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
                   placeholder={
                     isConversationLoading || inputIsDisabled
                       ? 'Loading new chat...'
-                      : `Ask ${promptName ? promptName : 'Highlight AI'} anything...`
+                      : input
+                      ? ''
+                      : displayedPlaceholder
                   }
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
