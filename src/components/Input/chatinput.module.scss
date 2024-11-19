@@ -10,6 +10,16 @@
   }
 }
 
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
 @keyframes shimmer {
   0% {
     border-color: rgba(255, 255, 255, 0.06);
@@ -98,9 +108,15 @@
     &::placeholder {
       color: $light-40;
       user-select: none;
-      animation: placeholderFade 3s ease-in-out infinite;
-      transition: all 0.15s ease-out;
-      letter-spacing: 0.2px;
+      transition: color 0.3s ease, opacity 0.3s ease;
+      
+      .loading & {
+        animation: fadeIn 0.3s ease forwards;
+      }
+      
+      .fadeOut & {
+        animation: fadeOut 0.6s ease forwards;
+      }
     }
   }
 

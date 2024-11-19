@@ -199,6 +199,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
 
   const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
   const [displayedPlaceholder, setDisplayedPlaceholder] = useState('');
+  const [isFadingOut, setIsFadingOut] = useState(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout>();
   const currentIndexRef = useRef(0);
 
@@ -211,6 +212,14 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
       }
       setDisplayedPlaceholder('');
       currentIndexRef.current = 0;
+      setIsFadingOut(false);
+    } else {
+      // Add fade out when loading ends
+      setIsFadingOut(true);
+      const fadeTimeout = setTimeout(() => {
+        setIsFadingOut(false);
+      }, 600); // Match the CSS animation duration (0.6s)
+      return () => clearTimeout(fadeTimeout);
     }
   }, [isConversationLoading, inputIsDisabled]);
 
@@ -268,7 +277,8 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
             'min-h-[68px]',
             {
               [styles.disabled]: inputIsDisabled,
-              [styles.loading]: isConversationLoading,
+              [styles.loading]: isConversationLoading && !isFadingOut,
+              [styles.fadeOut]: isFadingOut,
               [styles.sending]: isSending
             }
           )}
