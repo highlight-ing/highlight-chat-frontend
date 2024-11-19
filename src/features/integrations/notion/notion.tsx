@@ -17,6 +17,7 @@ import {
   FormMessage,
   FormSelectTrigger,
 } from '@/components/ui/form'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectValue } from '@/components/ui/select'
 import { NotionIcon } from '@/components/icons'
 
@@ -54,11 +55,11 @@ function ParentDropdown(props: NotionFormDropdownProps) {
             ?.filter((item) => item.type === 'database')
             .map((database) => (
               <SelectItem key={database.id} value={database.id}>
-                <div className="flex items-center gap-2">
+                <div className="flex w-full items-center gap-2">
                   <div className="size-5 grid place-items-center">
                     <Grid6 variant="Bold" size={20} />
                   </div>
-                  <div className="line-clamp-1 text-[13px] font-medium leading-none text-primary/60">
+                  <div className="truncate text-[13px] font-medium leading-none text-primary/60">
                     <Text value={getDecorations(database.title)} block={emptyTextBlock} />
                   </div>
                 </div>
@@ -71,11 +72,11 @@ function ParentDropdown(props: NotionFormDropdownProps) {
             ?.filter((item) => item.type === 'page')
             .map((page) => (
               <SelectItem key={page.id} value={page.id}>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-shrink items-center gap-2">
                   <div className="size-5 grid place-items-center">
                     <Document variant="Bold" size={20} />
                   </div>
-                  <div className="line-clamp-1 text-[13px] font-medium leading-none text-primary/60">
+                  <div className="truncate text-[13px] font-medium leading-none text-primary/60">
                     <Text value={getDecorations(page.title)} block={emptyTextBlock} />
                   </div>
                 </div>
