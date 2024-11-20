@@ -14,9 +14,10 @@ import CodeBlock from '@/components/Messages/CodeBlock'
 import Spinner from '@/components/Spinner'
 
 import { useFileMetadata } from './hooks'
+import { hasAttachment, preprocessLaTeX } from './utils'
 
 type UserFileProps = {
-  fileId: UserMessage['file_ids'][0]
+  fileId: string
 }
 
 function UserFile(props: UserFileProps) {
@@ -29,39 +30,33 @@ function UserFile(props: UserFileProps) {
   return <div>{data?.type}</div>
 }
 
+type MessageContent = {
+  content?: string
+  attached_context: Array<{
+    file_id: string
+    type: string
+  }>
+  file_ids: Array<string>
+}
+
 interface ShareUserMessageProps {
   message: UserMessage & { fetchedImage?: string; isImageLoading?: boolean }
 }
 
-const hasAttachment = (message: UserMessage) => {
-  return (
-    message.screenshot ||
-    message.clipboard_text ||
-    message.window_context ||
-    message.window ||
-    message.file_title ||
-    message.audio ||
-    message.image_url ||
-    (message.file_attachments && message.file_attachments.length > 0)
-  )
-}
-
-const preprocessLaTeX = (content: string) => {
-  const blockProcessedContent = content.replace(/\\\[(.*?)\\\]/g, (_, equation) => `$$${equation}$$`)
-  return blockProcessedContent.replace(/\\\((.*?)\\\)/g, (_, equation) => `$${equation}$`)
-}
-
 export const ShareUserMessage: React.FC<ShareUserMessageProps> = React.memo(({ message }) => {
+  const content = typeof message.content === 'string' ? (JSON.parse(message.content) as MessageContent) : undefined
   const hasAttachments = React.useMemo(() => hasAttachment(message), [message])
-  const hasContent = typeof message.content === 'string' && message.content.trim() !== ''
-  const hasFiles = message?.file_ids && message.file_ids.length > 0
+  const hasContent = content?.content?.trim() !== ''
+  const hasFiles = content?.file_ids && content.file_ids.length > 0
 
   return (
     <div className="mx-auto my-4 w-full max-w-[712px] px-6 md:px-4">
       <div className="rounded-[16px] border border-tertiary bg-primary p-4">
         {hasFiles && (
           <div className="flex items-center gap-2">
-            {message?.file_ids.map((fileId) => <UserFile fileId={fileId} />)}
+            {content.file_ids.map((fileId) => (
+              <UserFile fileId={fileId} />
+            ))}
           </div>
         )}
         {hasContent && (
@@ -98,7 +93,7 @@ export const ShareUserMessage: React.FC<ShareUserMessageProps> = React.memo(({ m
                 },
               }}
             >
-              {typeof message.content === 'string' ? preprocessLaTeX(message.content) : ''}
+              {typeof content?.content === 'string' ? preprocessLaTeX(content.content) : ''}
             </Markdown>
           </div>
         )}

@@ -131,9 +131,9 @@ const SharePageComponent: React.FC<SharePageComponentProps> = ({ messages }) => 
           {processedMessages.map((message, index) => (
             <React.Fragment key={index}>
               {message.role === 'user' ? (
-                <ShareUserMessage message={message as UserMessage} />
+                <ShareUserMessage key={message.id} message={message as UserMessage} />
               ) : (
-                <ShareAssistantMessage message={message} buttonTypes={['Copy', 'Share', 'Save']} />
+                <ShareAssistantMessage key={message.id} message={message} buttonTypes={['Copy', 'Share', 'Save']} />
               )}
             </React.Fragment>
           ))}

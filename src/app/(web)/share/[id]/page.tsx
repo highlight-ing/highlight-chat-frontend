@@ -31,8 +31,6 @@ export default async function SharePage({ params }: SharePageProps) {
     notFound()
   }
 
-  console.log(sharedData)
-
   return (
     <div className="flex h-screen flex-col">
       <Header title={sharedData.title} sharedBy={sharedData.user_id} />
