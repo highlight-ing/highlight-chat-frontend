@@ -14,22 +14,17 @@ export default function ConversationToggle() {
   }
 
   return (
-<div className="flex items-center justify-between">
-  <p className="text-base font-medium text-tertiary">Audio Notes</p>
-  <div className="relative inline-flex items-center">
-    <Switch
-      id="audio-switch"
-      checked={isAudioTranscripEnabled}
-      onCheckedChange={handleToggle}
-      className="h-[15px] w-[26px] data-[state=checked]:bg-conv-green"
-    />
-    <Label
-      className="text-xs font-normal text-tertiary absolute left-[-20px] top-1/2 transform -translate-y-1/2"
-    >
-      {isAudioTranscripEnabled ? 'On' : 'Off'}
-    </Label>
-  </div>
-</div>
-
+    <div className="flex items-center justify-between">
+      <p className="text-base font-medium text-tertiary">Audio Notes</p>
+      <div className="relative inline-flex items-center gap-2">
+        <Label className="text-xs font-normal text-tertiary">{isAudioTranscripEnabled ? 'On' : 'Off'}</Label>
+        <Switch
+          id="audio-switch"
+          checked={isAudioTranscripEnabled}
+          onCheckedChange={handleToggle}
+          className="h-[15px] w-[26px] data-[state=checked]:bg-conv-green"
+        />
+      </div>
+    </div>
   )
 }
