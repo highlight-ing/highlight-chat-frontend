@@ -358,7 +358,6 @@ export const useSubmitQuery = () => {
                   llm_provider: metadata.llm_provider,
                   has_live_data: metadata.has_live_data || false,
                   requires_live_data: metadata.requires_live_data || 'none',
-                  metadata: metadata.metadata || {}
                 };
 
                 console.log('Emitting metadata event:', metadataEvent);
