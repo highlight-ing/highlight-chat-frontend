@@ -31,7 +31,7 @@ export function useGenerateShareLink() {
       formData.append('conversation_id', conversationId)
 
       const response = await post('share-link/create', formData, {
-        version: 'v3',
+        version: 'v4',
       })
 
       if (!response.ok) {
