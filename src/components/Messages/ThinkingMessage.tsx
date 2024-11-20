@@ -69,39 +69,26 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
         const newLogs: LogEntry[] = [];
         const metadata = event.detail;
         
-        // Add model information
-        if (metadata.model) {
-          newLogs.push({
-            timestamp: Date.now(),
-            type: 'Model',
-            value: metadata.model
-          });
-        }
+        // Add model information (always show)
+        newLogs.push({
+          timestamp: Date.now(),
+          type: 'Model',
+          value: metadata.model || 'Unknown'
+        });
 
-        // Add LLM provider
-        if (metadata.llm_provider) {
-          newLogs.push({
-            timestamp: Date.now(),
-            type: 'Provider',
-            value: metadata.llm_provider
-          });
-        }
+        // Add LLM provider (always show)
+        newLogs.push({
+          timestamp: Date.now(),
+          type: 'Provider',
+          value: metadata.llm_provider || 'Unknown'
+        });
 
-        // Add live data information
-        if (metadata.has_live_data !== undefined) {
+        // Add Search status only if live data is enabled
+        if (metadata.has_live_data) {
           newLogs.push({
             timestamp: Date.now(),
-            type: 'Live Data',
-            value: metadata.has_live_data ? 'Enabled' : 'Disabled'
-          });
-        }
-
-        // Add live data requirement
-        if (metadata.requires_live_data) {
-          newLogs.push({
-            timestamp: Date.now(),
-            type: 'Requires',
-            value: metadata.requires_live_data
+            type: 'Search',
+            value: 'Enabled'
           });
         }
 

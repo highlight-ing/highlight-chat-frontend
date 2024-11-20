@@ -68,11 +68,13 @@
   left: -40px;
   svg {
     color: $text-accent;
+    animation: spinGear 8s linear infinite;
   }
 
   &.inactive {
     svg {
       color: rgba($light-60, 0.8);
+      animation: none;
     }
   }
 }
@@ -221,6 +223,15 @@
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+@keyframes spinGear {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(30deg);
+  }
 }
 
 @keyframes shimmerWave {
