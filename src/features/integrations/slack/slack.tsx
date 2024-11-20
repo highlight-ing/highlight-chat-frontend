@@ -5,10 +5,14 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import Button from '@/components/Button/Button'
 import { sendMessage, listConversations } from '@/utils/slack-server-actions'
-import { getIntegrationTokenForUser } from '@/utils/integrations-server-actions'
+import { checkIntegrationStatus, createMagicLinkForIntegration, getIntegrationTokenForUser } from '@/utils/integrations-server-actions'
 import BaseDropdown, { DropdownItem } from '@/components/dropdowns/base-dropdown'
 import { ArrowDown2, ArrowUp2, Hashtag, User } from 'iconsax-react'
 import TextArea from '@/components/TextInput/TextArea'
+import { useCheckSlackConnection } from './hooks'
+import { IntegrationsLoader } from '../_components/loader'
+import { SetupConnection } from '../_components/setup-connection'
+import { SlackIcon } from '@/components/icons'
 
 const sendSlackMessageFormSchema = z.object({
   message: z.string(),
@@ -149,16 +153,42 @@ function SlackMessageFormComponent({ data, onSuccess }: { data: SendSlackMessage
 }
 
 export function SendSlackMessageComponent({ data }: { data: SendSlackMessageParams }) {
+  const {
+    data: connectedToSlack,
+    isLoading: connectionIsLoading,
+    isSuccess: connectionCheckSuccess,
+  } = useCheckSlackConnection()
+
   const [state, setState] = useState<'form' | 'success'>('form')
+
+  if (connectionIsLoading) {
+    return <IntegrationsLoader />
+  }
 
   function onSuccess() {
     setState('success')
   }
 
+  if (connectionCheckSuccess && !connectedToSlack) {
+    return (
+      <SetupConnection
+        name={'Slack'}
+        checkConnectionStatus={(token) => checkIntegrationStatus(token, 'slack')}
+        onConnect={() => {
+          setState('form')
+        }}
+        icon={<SlackIcon size={16} />}
+        createMagicLink={(token) => createMagicLinkForIntegration(token, 'slack')}
+      />
+    )
+  }
+
+  if (connectionCheckSuccess && connectedToSlack) {
   return (
     <div className="mt-2">
       {state === 'form' && <SlackMessageFormComponent data={data} onSuccess={onSuccess} />}
       {state === 'success' && <span>Slack message sent successfully</span>}
     </div>
-  )
+    )
+  }
 }

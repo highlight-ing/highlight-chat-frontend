@@ -25,8 +25,7 @@ export async function checkIntegrationStatus(hlAccessToken: string, integration:
     throw e
   }
 
-  if (!data[integration]) {
-    console.warn('Integration not found', integration)
+  if (data[integration] === null || data[integration] === undefined) {
     throw new Error('Integration not found')
   }
 

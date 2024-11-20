@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons'
+import { ChevronDownIcon } from '@radix-ui/react-icons'
 import * as SelectPrimitive from '@radix-ui/react-select'
 
 import { cn } from '@/lib/utils'
@@ -27,47 +27,19 @@ const SelectTrigger = React.forwardRef<
       ref={ref}
       data-slot="select"
       className={cn(
-        'relative flex w-full rounded-2xl border border-light-10 bg-secondary px-3 py-2 text-[15px] text-primary outline-none transition-[padding] hover:border-light-20 disabled:cursor-not-allowed disabled:opacity-50 group-has-[label]:pb-2 group-has-[label]:pt-7 group-has-[label]:leading-snug data-[state=open]:border-light-20 data-[state=open]:bg-tertiary data-[placeholder]:text-subtle [&>span]:line-clamp-1',
+        'group-has-[label]:pb-2 group-has-[label]:pt-7 group-has-[label]:leading-snug relative flex w-full rounded-2xl border border-light-10 bg-secondary px-3 py-2 text-[15px] text-primary outline-none transition-[padding] hover:border-light-20 disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:border-light-20 data-[state=open]:bg-tertiary data-[placeholder]:text-subtle [&>span]:line-clamp-1',
         className,
       )}
       {...props}
     >
       {children}
       <SelectPrimitive.Icon asChild>
-        <ChevronDownIcon className="absolute right-3 top-1/2 size-4 -translate-y-1/2 text-subtle" />
+        <ChevronDownIcon className="size-4 absolute right-3 top-1/2 -translate-y-1/2 text-subtle" />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   )
 })
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName
-
-const SelectScrollUpButton = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.ScrollUpButton>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollUpButton>
->(({ className, ...props }, ref) => (
-  <SelectPrimitive.ScrollUpButton
-    ref={ref}
-    className={cn('flex cursor-default items-center justify-center py-1', className)}
-    {...props}
-  >
-    <ChevronUpIcon className="h-4 w-4" />
-  </SelectPrimitive.ScrollUpButton>
-))
-SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName
-
-const SelectScrollDownButton = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.ScrollDownButton>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollDownButton>
->(({ className, ...props }, ref) => (
-  <SelectPrimitive.ScrollDownButton
-    ref={ref}
-    className={cn('flex cursor-default items-center justify-center py-1', className)}
-    {...props}
-  >
-    <ChevronDownIcon className="h-4 w-4" />
-  </SelectPrimitive.ScrollDownButton>
-))
-SelectScrollDownButton.displayName = SelectPrimitive.ScrollDownButton.displayName
 
 const SelectContent = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Content>,
@@ -88,10 +60,11 @@ const SelectContent = React.forwardRef<
       <SelectPrimitive.Viewport
         className={cn(
           position === 'popper' &&
-            'h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]',
+            'h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)] max-w-2xl',
         )}
       >
         {children}
+        <div className="absolute right-0 top-0 h-full w-8 bg-gradient-to-r" />
       </SelectPrimitive.Viewport>
     </SelectPrimitive.Content>
   </SelectPrimitive.Portal>
@@ -117,7 +90,7 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      'relative flex min-h-8 w-full cursor-default select-none items-center rounded-md py-1.5 pl-2 pr-8 text-sm text-primary outline-none focus:bg-neutral-100 focus:bg-tertiary data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      'min-h-8 relative flex w-full cursor-default select-none items-center rounded-md py-1.5 pl-2 pr-8 text-sm text-primary outline-none focus:bg-neutral-100 focus:bg-tertiary data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       className,
     )}
     {...props}
@@ -136,7 +109,7 @@ const SelectSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SelectPrimitive.Separator
     ref={ref}
-    className={cn('-mx-1 my-1 h-px bg-neutral-100 dark:bg-neutral-800', className)}
+    className={cn('dark:bg-neutral-800 -mx-1 my-1 h-px bg-neutral-100', className)}
     {...props}
   />
 ))
@@ -162,15 +135,4 @@ function CheckMark({ className }: { className?: string }) {
   )
 }
 
-export {
-  Select,
-  SelectGroup,
-  SelectValue,
-  SelectTrigger,
-  SelectContent,
-  SelectLabel,
-  SelectItem,
-  SelectSeparator,
-  SelectScrollUpButton,
-  SelectScrollDownButton,
-}
+export { Select, SelectGroup, SelectValue, SelectTrigger, SelectContent, SelectLabel, SelectItem, SelectSeparator }
