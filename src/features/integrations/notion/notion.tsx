@@ -17,7 +17,6 @@ import {
   FormMessage,
   FormSelectTrigger,
 } from '@/components/ui/form'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectValue } from '@/components/ui/select'
 import { NotionIcon } from '@/components/icons'
 
@@ -172,14 +171,15 @@ type CreateNotionPageProps = {
 }
 
 export function CreateNotionPage(props: CreateNotionPageProps) {
+  const [state, setState] = React.useState<'form' | 'success'>('form')
+  const [url, setUrl] = React.useState<string | undefined>(undefined)
+  const queryClient = useQueryClient()
+
   const {
     data: connectedToNotion,
     isLoading: connectionIsLoading,
     isSuccess: connectionCheckSuccess,
   } = useCheckNotionConnection()
-  const [state, setState] = React.useState<'form' | 'success'>('form')
-  const [url, setUrl] = React.useState<string | undefined>(undefined)
-  const queryClient = useQueryClient()
 
   function onSuccess(url?: string) {
     setState('success')
@@ -197,6 +197,7 @@ export function CreateNotionPage(props: CreateNotionPageProps) {
         checkConnectionStatus={checkNotionConnectionStatus}
         onConnect={() => {
           queryClient.invalidateQueries({ queryKey: ['notion-api-token'] })
+          queryClient.invalidateQueries({ queryKey: ['notion-check-connection'] })
           setState('form')
         }}
         icon={<NotionIcon size={16} />}

@@ -55,9 +55,9 @@ export async function parseAndHandleStreamChunk(
 
         case 'loading':
           if (jsonChunk.name === 'highlight_search') {
-            integrations.showLoading(conversationId, jsonChunk.name, jsonChunk.loaded)
+            integrations.showLoading(conversationId, jsonChunk.loaded)
           } else if (integrationFunctionNames.includes(jsonChunk.name) && jsonChunk.loaded === false) {
-            integrations.showLoading(conversationId, jsonChunk.name, jsonChunk.loaded)
+            integrations.showLoading(conversationId, jsonChunk.loaded)
           }
           break
 
@@ -103,7 +103,7 @@ export async function parseAndHandleStreamChunk(
             })
           }
 
-          if (jsonChunk.name === 'create_google_calendar_event') {  
+          if (jsonChunk.name === 'create_google_calendar_event') {
             const summary = jsonChunk.input.summary ?? ''
             const location = jsonChunk.input.location ?? undefined
             const description = jsonChunk.input.description ?? undefined
