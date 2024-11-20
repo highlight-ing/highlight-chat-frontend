@@ -4,7 +4,6 @@ import { getWordCountFormatted } from '@/utils/string'
 import { Setting2, VoiceSquare } from 'iconsax-react'
 import { useShallow } from 'zustand/react/shallow'
 
-import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import AnimatedVoiceSquare from '@/components/Conversations/AnimatedVoiceSquare'
 import { useStore } from '@/components/providers/store-provider'
@@ -25,7 +24,7 @@ export const ConversationAttachments = () => {
 
   const currentConversationOptions = {
     imageComponent: (
-      <div className="grid size-9 shrink-0 place-items-center rounded-[12px] bg-green-20 text-green">
+      <div className="size-9 grid shrink-0 place-items-center rounded-[12px] bg-green-20 text-green">
         <AnimatedVoiceSquare
           width={16}
           height={16}
@@ -56,7 +55,7 @@ export const ConversationAttachments = () => {
     .slice(0, MAX_NUM_CONVERSATION)
     .map((conversation) => ({
       imageComponent: (
-        <div className="grid size-9 shrink-0 place-items-center rounded-[12px] bg-green-20 text-green">
+        <div className="size-10 grid shrink-0 place-items-center rounded-[12px] bg-green-20 text-green">
           <VoiceSquare size={16} variant="Bold" />
         </div>
       ),
@@ -76,7 +75,7 @@ export const ConversationAttachments = () => {
 
   const enableAudioTranscriptOption = {
     imageComponent: (
-      <div className="grid size-9 shrink-0 place-items-center rounded-[12px] bg-green-20 text-green">
+      <div className="size-12 grid shrink-0 place-items-center rounded-[12px] bg-green-20 text-green">
         <Setting2 size={16} variant="Bold" />
       </div>
     ),
@@ -101,20 +100,22 @@ export const ConversationAttachments = () => {
         : [noConversationsOption]
 
   return (
-    <ScrollArea className="flex h-60 w-full flex-col gap-1 space-y-1">
-      {attachmentOptions.map((option, index) => (
-        <div
-          key={index}
-          onClick={option.onClick}
-          className="relative mt-1 flex cursor-pointer select-none items-center gap-2 rounded-[16px] border border-tertiary p-1 text-sm outline-none transition-colors first:mt-0 hover:bg-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0"
-        >
-          {option.imageComponent}
-          <div className="flex flex-col">
-            <span className="text-sm font-medium text-secondary">{option.title}</span>
-            {option.description && <span className="text-xs text-tertiary">{option.description}</span>}
+    <ScrollArea className="h-60 w-full">
+      <div className="space-y-2">
+        {attachmentOptions.map((option, index) => (
+          <div
+            key={index}
+            onClick={option.onClick}
+            className="relative flex cursor-pointer items-center gap-2 rounded-2xl border border-tertiary p-1.5 hover:bg-hover"
+          >
+            {option.imageComponent}
+            <div className="flex flex-col">
+              <span className="line-clamp-1 text-xs font-medium text-secondary">{option.title}</span>
+              {option.description && <span className="text-[10px] text-tertiary">{option.description}</span>}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </ScrollArea>
   )
 }

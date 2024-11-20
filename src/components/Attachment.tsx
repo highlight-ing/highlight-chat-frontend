@@ -156,7 +156,7 @@ export const Attachment = ({
               <VoiceSquare size={16} variant="Bold" />
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-secondary">Conversation</span>
+              <span className="text-sm font-medium text-secondary">Audio Notes</span>
               {value && <span className="text-xs text-tertiary">{`${getWordCountFormatted(value)} words`}</span>}
             </div>
           </div>

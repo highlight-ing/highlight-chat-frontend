@@ -21,7 +21,6 @@ export const ScreenshotDropdown = () => {
     })),
   )
   const [isOpen, setIsOpen] = useState(false)
-  const dropdownId = 'screenshot'
 
   const onClickScreenshot = async () => {
     const hasScreenshotPermission = await Highlight.permissions.requestScreenshotPermission()

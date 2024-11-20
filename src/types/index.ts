@@ -275,3 +275,20 @@ export interface NotionParentItem {
 }
 
 export type PreferredAttachment = 'audio' | 'default' | 'screen' | 'page-text' | 'clipboard'
+
+export type MetadataEvent = {
+  type: 'metadata'
+  conversation_id: string
+  message_id: string
+  model?: string
+  llm_provider?: string
+  has_live_data?: boolean
+  requires_live_data?: string
+  tool_activated?: boolean
+  tool_name?: string
+  tool_id?: string
+  provider_switch?: boolean
+  switch_reason?: string
+  from_provider?: string
+  to_provider?: string
+}

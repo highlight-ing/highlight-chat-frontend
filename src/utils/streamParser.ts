@@ -1,4 +1,4 @@
-import { Toast } from '@/types'
+import { Toast, MetadataEvent } from '@/types'
 
 import { UseIntegrationsAPI } from '@/features/integrations/_hooks/use-integrations'
 import { integrationFunctionNames } from '@/features/integrations/utils'
@@ -8,11 +8,12 @@ type StreamParserProps = {
   addToast: (toast: Partial<Toast>) => void
   integrations: UseIntegrationsAPI
   conversationId: string
+  onMetadata?: (metadata: MetadataEvent) => void
 }
 
 export async function parseAndHandleStreamChunk(
   chunk: string,
-  { showConfirmationModal, addToast, integrations, conversationId }: StreamParserProps,
+  { showConfirmationModal, addToast, integrations, conversationId, onMetadata }: StreamParserProps,
 ) {
   let contextConfirmed: boolean | null = null
   let accumulatedContent = ''
@@ -35,6 +36,18 @@ export async function parseAndHandleStreamChunk(
       console.log('got a chunk', jsonChunk)
 
       switch (jsonChunk.type) {
+        case 'metadata':
+          if (jsonChunk.conversation_id && jsonChunk.message_id) {
+            console.log('Received metadata event:', jsonChunk)
+            if (onMetadata) {
+              console.log('Calling onMetadata callback with:', jsonChunk)
+              onMetadata(jsonChunk as MetadataEvent)
+            }
+          } else {
+            console.warn('Received metadata event with missing required fields:', jsonChunk)
+          }
+          break
+
         case 'text':
           accumulatedContent += jsonChunk.content
           messageId = jsonChunk.message_id
