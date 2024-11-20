@@ -14,9 +14,9 @@ export default function ConversationToggle() {
   }
 
   return (
-    <div className="flex justify-between">
+    <div className="flex items-center justify-between">
       <p className="text-base font-medium text-tertiary">Audio Notes</p>
-      <div className="flex items-center gap-1">
+      <div className="relative inline-flex items-center gap-2">
         <Label className="text-xs font-normal text-tertiary">{isAudioTranscripEnabled ? 'On' : 'Off'}</Label>
         <Switch
           id="audio-switch"

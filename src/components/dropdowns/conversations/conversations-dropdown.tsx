@@ -53,7 +53,7 @@ export const ConversationsDropdown = () => {
           )}
         </PopoverTrigger>
       </Tooltip>
-      <PopoverContent sideOffset={18} align="end" alignOffset={-10} className="w-64 space-y-2 p-2 pt-3">
+      <PopoverContent sideOffset={18} align="end" alignOffset={-10} className="w-64 space-y-3 p-2 pt-3">
         <ConversationToggle />
         <ConversationAttachments />
       </PopoverContent>
