@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import React from 'react'
 import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
@@ -8,11 +8,26 @@ import 'katex/dist/katex.min.css'
 
 import { UserMessage } from '@/types'
 import { getDisplayValue } from '@/utils/attachments'
-import { ProfileCircle } from 'iconsax-react'
 
 import { Attachment } from '@/components/Attachment'
 import CodeBlock from '@/components/Messages/CodeBlock'
 import Spinner from '@/components/Spinner'
+
+import { useFileMetadata } from './hooks'
+
+type UserFileProps = {
+  fileId: UserMessage['file_ids'][0]
+}
+
+function UserFile(props: UserFileProps) {
+  const { data, isLoading, isError } = useFileMetadata(props.fileId)
+
+  if (isLoading) return <div>Loading...</div>
+
+  if (isError) return <div>Error</div>
+
+  return <div>{data?.type}</div>
+}
 
 interface ShareUserMessageProps {
   message: UserMessage & { fetchedImage?: string; isImageLoading?: boolean }
@@ -37,12 +52,18 @@ const preprocessLaTeX = (content: string) => {
 }
 
 export const ShareUserMessage: React.FC<ShareUserMessageProps> = React.memo(({ message }) => {
-  const hasAttachments = useMemo(() => hasAttachment(message), [message])
+  const hasAttachments = React.useMemo(() => hasAttachment(message), [message])
   const hasContent = typeof message.content === 'string' && message.content.trim() !== ''
+  const hasFiles = message?.file_ids && message.file_ids.length > 0
 
   return (
     <div className="mx-auto my-4 w-full max-w-[712px] px-6 md:px-4">
       <div className="rounded-[16px] border border-tertiary bg-primary p-4">
+        {hasFiles && (
+          <div className="flex items-center gap-2">
+            {message?.file_ids.map((fileId) => <UserFile fileId={fileId} />)}
+          </div>
+        )}
         {hasContent && (
           <div className={`text-sm font-light leading-[1.6] text-primary/90 ${hasAttachments ? 'mb-4' : ''}`}>
             <Markdown

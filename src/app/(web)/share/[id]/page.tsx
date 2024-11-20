@@ -12,7 +12,7 @@ interface SharePageProps {
 }
 
 export async function generateMetadata({ params }: SharePageProps): Promise<Metadata> {
-  const sharedData = await getSharedConversation(params.id, { version: 'v3' })
+  const sharedData = await getSharedConversation(params.id, { version: 'v4' })
 
   if (!sharedData) {
     notFound()
@@ -25,11 +25,13 @@ export async function generateMetadata({ params }: SharePageProps): Promise<Meta
 }
 
 export default async function SharePage({ params }: SharePageProps) {
-  const sharedData = await getSharedConversation(params.id, { version: 'v3' })
+  const sharedData = await getSharedConversation(params.id, { version: 'v4' })
 
   if (!sharedData) {
     notFound()
   }
+
+  console.log(sharedData)
 
   return (
     <div className="flex h-screen flex-col">

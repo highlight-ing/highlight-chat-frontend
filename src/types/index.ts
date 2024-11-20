@@ -38,6 +38,7 @@ export type UserMessage = BaseMessage & {
   fact?: string
   attached_context?: AttachedContextContextTypes[]
   given_feedback?: string | null
+  file_ids: Array<string>
 }
 
 export type AssistantMessage = BaseMessage & {
