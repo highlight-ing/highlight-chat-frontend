@@ -1,6 +1,5 @@
-import { GoogleIcon, LinearIcon, NotionIcon } from '@/components/icons'
+import { GoogleIcon, LinearIcon, NotionIcon, SlackIcon } from '@/components/icons'
 import { useStore } from '@/components/providers/store-provider'
-
 import { IntegrationsLoader } from '../_components/loader'
 import { SetupConnection } from '../_components/setup-connection'
 import { checkGoogleConnectionStatus, createMagicLinkForGoogle } from '../google-cal/actions'
@@ -9,6 +8,9 @@ import { checkLinearConnectionStatus, createMagicLinkForLinear } from '../linear
 import { CreateLinearTicket } from '../linear/linear'
 import { checkNotionConnectionStatus, createMagicLinkForNotion } from '../notion/actions'
 import { CreateNotionPage } from '../notion/notion'
+import { SendSlackMessageParams } from '../types'
+import { checkIntegrationStatus, createMagicLinkForIntegration } from '@/utils/integrations-server-actions'
+import { SendSlackMessageComponent } from '../slack/slack'
 
 interface CreateNotionPageParams {
   title: string
@@ -28,6 +30,7 @@ export interface UseIntegrationsAPI {
   createLinearTicket: (conversationId: string, title: string, description: string) => Promise<void>
   createNotionPage: (conversationId: string, params: CreateNotionPageParams) => Promise<void>
   createGoogleCalendarEvent: (conversationId: string, params: CreateGoogleCalendarEventParams) => Promise<void>
+  sendSlackMessage: (conversationId: string, params: SendSlackMessageParams) => Promise<void>
   showLoading: (conversationId: string, functionName: string, loaded: boolean) => Promise<void>
 }
 
@@ -110,6 +113,26 @@ export function useIntegrations(): UseIntegrationsAPI {
       content: (
         <MessageWithComponent content={lastMessage}>
           <CreateGoogleCalEvent {...params} />
+        </MessageWithComponent>
+      ),
+      role: 'assistant',
+    })
+  }
+
+  async function sendSlackMessage(conversationId: string, params: SendSlackMessageParams) {
+    await integrationAuthorized.get('slack')
+
+    let lastMessage = previousContent.get(conversationId)
+
+    if (!lastMessage) {
+      lastMessage = getLastConversationMessage(conversationId)?.content as string
+    }
+
+    // @ts-expect-error
+    updateLastConversationMessage(conversationId!, {
+      content: (
+        <MessageWithComponent content={lastMessage}>
+          <SendSlackMessageComponent data={params} />
         </MessageWithComponent>
       ),
       role: 'assistant',
@@ -200,6 +223,38 @@ export function useIntegrations(): UseIntegrationsAPI {
       integrationAuthorized.set('notion', Promise.resolve())
     }
 
+    if (functionName === 'send_slack_message' && !loaded) {
+      //@ts-ignore
+      const hlToken = (await highlight.internal.getAuthorizationToken()) as string
+
+      const connected = await checkIntegrationStatus(hlToken, 'slack')
+
+      if (!connected) {
+        const promise = new Promise<void>((resolve) => {
+          // @ts-expect-error
+          updateLastConversationMessage(conversationId!, {
+            content: (
+              <MessageWithComponent content={textContents}>
+                <SetupConnection
+                  name={'Slack'}
+                  checkConnectionStatus={(token) => checkIntegrationStatus(token, 'slack')}
+                  onConnect={() => resolve()}
+                  icon={<SlackIcon size={16} />}
+                  createMagicLink={(token) => createMagicLinkForIntegration(token, 'slack')}
+                />
+              </MessageWithComponent>
+            ),
+            role: 'assistant',
+          })
+        })
+
+        integrationAuthorized.set('notion', promise)
+
+        return
+      }
+      integrationAuthorized.set('notion', Promise.resolve())
+    }
+
     if (functionName === 'create_google_calendar_event' && !loaded) {
       //@ts-ignore
       const hlToken = (await highlight.internal.getAuthorizationToken()) as string
@@ -245,5 +300,5 @@ export function useIntegrations(): UseIntegrationsAPI {
     })
   }
 
-  return { createLinearTicket, createNotionPage, createGoogleCalendarEvent, showLoading }
+  return { createLinearTicket, createNotionPage, createGoogleCalendarEvent, showLoading, sendSlackMessage }
 }

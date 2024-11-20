@@ -287,6 +287,7 @@ export const useSubmitQuery = () => {
         create_notion_page:
           (promptApp?.create_notion_page_integration_enabled ?? false) || (toolOverrides?.create_notion_page ?? false),
         create_google_calendar_event: promptApp?.create_gcal_event_integration_enabled ?? false,
+        send_slack_message: promptApp?.send_slack_message_integration_enabled ?? false,
       }
 
       formData.append('conversation_id', conversationId)
@@ -337,15 +338,40 @@ export const useSubmitQuery = () => {
 
           const chunk = new TextDecoder().decode(value)
 
-          const { content, windowName, conversation, factIndex, fact, messageId } = await parseAndHandleStreamChunk(
-            chunk,
-            {
-              showConfirmationModal,
-              addToast,
-              integrations,
-              conversationId,
+        const { content, windowName, conversation, factIndex, fact, messageId } = await parseAndHandleStreamChunk(
+          chunk,
+          {
+            showConfirmationModal,
+            addToast,
+            integrations,
+            conversationId,
+            onMetadata: (metadata) => {
+              if (metadata.provider_switch) {
+                console.log('[Provider Switch Event]:', {
+                  from: metadata.from_provider,
+                  to: metadata.to_provider,
+                  reason: metadata.switch_reason,
+                  model: metadata.model,
+                  llm_provider: metadata.llm_provider,
+                  has_live_data: metadata.has_live_data,
+                  requires_live_data: metadata.requires_live_data,
+                })
+              } else if (metadata.tool_activated) {
+                console.log('[Tool Activation Event]:', {
+                  tool_name: metadata.tool_name,
+                  tool_id: metadata.tool_id,
+                })
+              } else if (metadata.model && metadata.llm_provider) {
+                console.log('[Initial Chat Event]:', {
+                  model: metadata.model,
+                  llm_provider: metadata.llm_provider,
+                  has_live_data: metadata.has_live_data,
+                  requires_live_data: metadata.requires_live_data,
+                })
+              }
             },
-          )
+          },
+        )
 
           if (content) {
             accumulatedMessage += content

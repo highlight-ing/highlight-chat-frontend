@@ -1,3 +1,5 @@
+'use client'
+
 import { useStore } from '@/components/providers/store-provider'
 import Toast from '@/components/Toast/Toast'
 
