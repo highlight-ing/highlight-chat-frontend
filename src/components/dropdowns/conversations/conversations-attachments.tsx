@@ -106,7 +106,7 @@ export const ConversationAttachments = () => {
           <div
             key={index}
             onClick={option.onClick}
-            className="relative flex cursor-pointer items-center gap-3 rounded-2xl border border-tertiary p-1.5 hover:bg-hover"
+            className="relative flex cursor-pointer items-center gap-2 rounded-2xl border border-tertiary p-1.5 hover:bg-hover"
           >
             {option.imageComponent}
             <div className="flex flex-col">
