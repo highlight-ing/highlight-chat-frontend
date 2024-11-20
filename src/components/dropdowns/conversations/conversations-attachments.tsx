@@ -101,20 +101,20 @@ export const ConversationAttachments = () => {
         : [noConversationsOption]
 
   return (
-    <ScrollArea className="flex h-60 w-full flex-col gap-1 space-y-1">
-      {attachmentOptions.map((option, index) => (
-        <div
-          key={index}
-          onClick={option.onClick}
-          className="relative mt-1 flex cursor-pointer select-none items-center gap-2 rounded-[16px] border border-tertiary p-1 text-sm outline-none transition-colors first:mt-0 hover:bg-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0"
-        >
-          {option.imageComponent}
-          <div className="flex flex-col">
-            <span className="text-xs font-medium text-secondary">{option.title}</span>
-            {option.description && <span className="text-[10px] text-tertiary">{option.description}</span>}
-          </div>
+  <ScrollArea className="flex h-60 w-full flex-col space-y-2"> {/* Adjusted space-y */}
+    {attachmentOptions.map((option, index) => (
+      <div
+        key={index}
+        onClick={option.onClick}
+        className="relative flex cursor-pointer items-center gap-3 rounded-lg border border-tertiary p-2 hover:bg-hover"
+      >
+        {option.imageComponent}
+        <div className="flex flex-col">
+          <span className="text-xs font-medium text-secondary">{option.title}</span>
+          {option.description && <span className="text-[10px] text-tertiary">{option.description}</span>}
         </div>
-      ))}
-    </ScrollArea>
+      </div>
+    ))}
+  </ScrollArea>
   )
 }
