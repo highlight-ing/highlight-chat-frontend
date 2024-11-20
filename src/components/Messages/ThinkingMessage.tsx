@@ -53,6 +53,11 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
 
   useEffect(() => {
     const handleMetadata = (event: CustomEvent) => {
+      if (!isLocalAnimating) {
+        console.log('Stream ended, ignoring metadata event');
+        return;
+      }
+
       console.log('Received metadata event:', event.detail);
       
       if (!event.detail || typeof event.detail !== 'object') {
@@ -118,16 +123,6 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
       });
     };
 
-    window.addEventListener('highlight:metadata', handleMetadata as EventListener);
-    console.log('Added metadata event listener');
-
-    return () => {
-      window.removeEventListener('highlight:metadata', handleMetadata as EventListener);
-      console.log('Removed metadata event listener');
-    };
-  }, []);
-
-  useEffect(() => {
     // Clear any existing timer first
     if (timerRef.current) {
       clearTimeout(timerRef.current);
@@ -137,11 +132,19 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
     // Update animation state immediately
     setIsLocalAnimating(isAnimating);
     
-    // Cleanup on unmount
+    // Set up metadata listener only when animating
+    if (isAnimating) {
+      window.addEventListener('highlight:metadata', handleMetadata as EventListener);
+      console.log('Added metadata event listener');
+    }
+
+    // Cleanup on unmount or when animation stops
     return () => {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
       }
+      window.removeEventListener('highlight:metadata', handleMetadata as EventListener);
+      console.log('Removed metadata event listener');
     };
   }, [isAnimating]);
 
