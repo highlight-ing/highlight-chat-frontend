@@ -345,3 +345,39 @@
     color: $light-40;
   }
 }
+
+.logContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.logEntry {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  padding: 6px 8px;
+  background: $light-10;
+  border-radius: 4px;
+  
+  .logType {
+    color: $light-60;
+    font-weight: 500;
+    min-width: 80px;
+  }
+  
+  .logValue {
+    color: $light-80;
+    word-break: break-word;
+  }
+}
+
+.emptyLog {
+  color: $light-40;
+  font-size: 12px;
+  text-align: center;
+  padding: 12px;
+}

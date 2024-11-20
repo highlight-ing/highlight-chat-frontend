@@ -346,28 +346,27 @@ export const useSubmitQuery = () => {
             integrations,
             conversationId,
             onMetadata: (metadata) => {
-              if (metadata.provider_switch) {
-                console.log('[Provider Switch Event]:', {
-                  from: metadata.from_provider,
-                  to: metadata.to_provider,
-                  reason: metadata.switch_reason,
-                  model: metadata.model,
-                  llm_provider: metadata.llm_provider,
-                  has_live_data: metadata.has_live_data,
-                  requires_live_data: metadata.requires_live_data,
-                })
-              } else if (metadata.tool_activated) {
-                console.log('[Tool Activation Event]:', {
+              if (metadata.tool_name) {
+                trackEvent('HL_CHAT_TOOL_USED', {
                   tool_name: metadata.tool_name,
                   tool_id: metadata.tool_id,
                 })
               } else if (metadata.model && metadata.llm_provider) {
-                console.log('[Initial Chat Event]:', {
+                const metadataEvent = {
+                  type: 'metadata',
                   model: metadata.model,
                   llm_provider: metadata.llm_provider,
-                  has_live_data: metadata.has_live_data,
-                  requires_live_data: metadata.requires_live_data,
-                })
+                  has_live_data: metadata.has_live_data || false,
+                  requires_live_data: metadata.requires_live_data || 'none',
+                  metadata: metadata.metadata || {}
+                };
+
+                console.log('Emitting metadata event:', metadataEvent);
+                if (promptApp) {
+                  promptApp.emit('metadata', metadataEvent);
+                }
+                // Also emit the event directly to ThinkingMessage
+                window.dispatchEvent(new CustomEvent('highlight:metadata', { detail: metadataEvent }));
               }
             },
           },

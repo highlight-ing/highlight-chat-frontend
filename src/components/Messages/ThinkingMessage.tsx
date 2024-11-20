@@ -1,16 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useStore } from '@/components/providers/store-provider'
+import { useShallow } from 'zustand/react/shallow'
 import { StoreState } from '@/stores'
 import styles from './message.module.scss'
 import globalStyles from '@/global.module.scss'
 import { SpinningGear, CompletedCheckbox } from '@/components/icons/ThinkingIcons'
 import ThinkingDrawer from './ThinkingDrawer'
+import { MetadataEvent } from '@/types'
 
 const THINKING_MESSAGES = ['Hmm.. Let me think...', 'Working on it...', 'Just a moment...', 'Hang on a second...']
 
 interface ThinkingMessageProps {
   isAnimating?: boolean
   isLatest?: boolean
+}
+
+interface LogEntry {
+  timestamp: number;
+  type: string;
+  value: string;
 }
 
 const ThinkingMessage: React.FC<ThinkingMessageProps> = ({ 
@@ -23,9 +31,106 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
   
   const [isLocalAnimating, setIsLocalAnimating] = useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
   const timerRef = useRef<NodeJS.Timeout>();
-  
-  const promptApp = useStore((state: StoreState) => state.promptApp)
+
+  const { promptApp } = useStore(
+    useShallow((state: any) => ({
+      promptApp: state.promptApp
+    }))
+  );
+
+  // Log initial render
+  useEffect(() => {
+    console.log('ThinkingMessage rendered:', {
+      isDrawerOpen,
+      logsLength: logs.length,
+      logs,
+      promptApp: !!promptApp,
+      promptAppDetails: promptApp
+    });
+  });
+
+  useEffect(() => {
+    const handleMetadata = (event: CustomEvent) => {
+      console.log('Received metadata event:', event.detail);
+      
+      if (!event.detail || typeof event.detail !== 'object') {
+        console.error('Invalid metadata event received:', event.detail);
+        return;
+      }
+
+      setLogs(prevLogs => {
+        const newLogs: LogEntry[] = [];
+        const metadata = event.detail;
+        
+        // Add model information
+        if (metadata.model) {
+          newLogs.push({
+            timestamp: Date.now(),
+            type: 'Model',
+            value: metadata.model
+          });
+        }
+
+        // Add LLM provider
+        if (metadata.llm_provider) {
+          newLogs.push({
+            timestamp: Date.now(),
+            type: 'Provider',
+            value: metadata.llm_provider.toUpperCase()
+          });
+        }
+
+        // Add live data information
+        if (metadata.has_live_data !== undefined) {
+          newLogs.push({
+            timestamp: Date.now(),
+            type: 'Live Data',
+            value: metadata.has_live_data ? 'Enabled' : 'Disabled'
+          });
+        }
+
+        // Add live data requirement
+        if (metadata.requires_live_data) {
+          newLogs.push({
+            timestamp: Date.now(),
+            type: 'Requires',
+            value: metadata.requires_live_data
+          });
+        }
+
+        // Add any other metadata fields
+        if (metadata.metadata && typeof metadata.metadata === 'object') {
+          Object.entries(metadata.metadata).forEach(([key, value]) => {
+            newLogs.push({
+              timestamp: Date.now(),
+              type: key,
+              value: typeof value === 'string' ? value : JSON.stringify(value)
+            });
+          });
+        }
+
+        const updatedLogs = [...prevLogs, ...newLogs];
+        console.log('Updated logs:', updatedLogs);
+        
+        if (newLogs.length > 0) {
+          setIsDrawerOpen(true);
+          console.log('Opening drawer with new logs');
+        }
+        
+        return updatedLogs;
+      });
+    };
+
+    window.addEventListener('highlight:metadata', handleMetadata as EventListener);
+    console.log('Added metadata event listener');
+
+    return () => {
+      window.removeEventListener('highlight:metadata', handleMetadata as EventListener);
+      console.log('Removed metadata event listener');
+    };
+  }, []);
 
   useEffect(() => {
     // Clear any existing timer first
@@ -74,7 +179,11 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
           </span>
           <ThinkingDrawer 
             isOpen={isDrawerOpen}
-            onToggle={() => setIsDrawerOpen(!isDrawerOpen)}
+            onToggle={() => {
+              console.log('Drawer toggled, current logs:', logs);
+              setIsDrawerOpen(!isDrawerOpen);
+            }}
+            logs={logs}
           />
         </div>
       </div>

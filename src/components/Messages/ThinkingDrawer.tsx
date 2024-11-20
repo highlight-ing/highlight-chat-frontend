@@ -1,13 +1,21 @@
 import React from 'react';
 import { ArrowDown2 } from 'iconsax-react';
 import styles from './message.module.scss';
+import { MetadataEvent } from '@/types';
+
+interface LogEntry {
+  timestamp: number;
+  type: string;
+  value: string;
+}
 
 interface ThinkingDrawerProps {
   isOpen: boolean;
   onToggle: () => void;
+  logs: LogEntry[];
 }
 
-const ThinkingDrawer: React.FC<ThinkingDrawerProps> = ({ isOpen, onToggle }) => {
+const ThinkingDrawer: React.FC<ThinkingDrawerProps> = ({ isOpen, onToggle, logs }) => {
   return (
     <>
       <button 
@@ -21,7 +29,17 @@ const ThinkingDrawer: React.FC<ThinkingDrawerProps> = ({ isOpen, onToggle }) => 
         <div className={styles.drawer}>
           <div className={styles.drawerContent}>
             <h3>Thinking Process</h3>
-            <p>Watch the AI's thought process in real-time...</p>
+            <div className={styles.logContainer}>
+              {logs.map((log, index) => (
+                <div key={index} className={styles.logEntry}>
+                  <span className={styles.logType}>{log.type}</span>
+                  <span className={styles.logValue}>{log.value}</span>
+                </div>
+              ))}
+              {logs.length === 0 && (
+                <div className={styles.emptyLog}>Waiting for process details...</div>
+              )}
+            </div>
           </div>
         </div>
       )}
