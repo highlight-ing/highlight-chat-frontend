@@ -1,21 +1,39 @@
+import { trackEvent } from '@/utils/amplitude'
+import { ArrowRight } from 'iconsax-react'
 import Markdown from 'react-markdown'
 
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
-import Button from '@/components/Button/Button'
 import { HighlightIcon } from '@/components/icons'
 
 import { useChangelogs } from './hooks'
 
-function ChangelogSheet() {
+export function ViewChangelogBanner() {
   const { allChangelogNotes } = useChangelogs()
+  const { mostRecentChangelogNote } = useChangelogs()
+
+  function handleClick() {
+    trackEvent('HL Chat Changelog Open', {
+      version: mostRecentChangelogNote.version,
+    })
+  }
 
   return (
     <Sheet>
-      <SheetTrigger asChild className="opacity-0 transition-opacity group-hover:opacity-100">
-        <Button size="xsmall" variant="accent">
-          View Changelog
-        </Button>
+      <SheetTrigger
+        onClick={handleClick}
+        className="group flex h-16 w-full items-center justify-between rounded-2xl border border-[#191919] bg-secondary/70 px-3 shadow-md hover:bg-secondary"
+      >
+        <div className="flex items-center gap-3 font-medium text-subtle">
+          <HighlightIcon size={24} />
+          <p>
+            Highlight <span className="text-teal">{mostRecentChangelogNote.version}</span> has been released!
+          </p>
+        </div>
+        <div className="flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary opacity-0 transition hover:bg-hover group-hover:opacity-100">
+          <span>View changelog</span>
+          <ArrowRight size={20} variant="Bold" className="opacity-80" />
+        </div>
       </SheetTrigger>
       <SheetContent onOpenAutoFocus={(e) => e.preventDefault()} className="pl-3 pr-2">
         <SheetHeader className="pb-2">
@@ -32,21 +50,5 @@ function ChangelogSheet() {
         </ScrollArea>
       </SheetContent>
     </Sheet>
-  )
-}
-
-export function ViewChangelogBanner() {
-  const { mostRecentChangelogNote } = useChangelogs()
-
-  return (
-    <div className=" flex h-16 w-full items-center justify-between rounded-2xl border border-[#191919] bg-secondary/70 px-3 shadow-md hover:bg-secondary">
-      <div className="flex items-center gap-3 font-medium text-subtle">
-        <HighlightIcon size={24} />
-        <p>
-          Highlight <span className="text-teal">{mostRecentChangelogNote.version}</span> has been released!
-        </p>
-      </div>
-      <ChangelogSheet />
-    </div>
   )
 }
