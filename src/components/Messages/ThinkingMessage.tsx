@@ -164,16 +164,16 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
     <div className={styles.messageContainer}>
       <div className={`${styles.thinkingAvatar} ${!isLatest && !isAnimating ? styles.inactive : ''}`}>
         <div
-          className={`${globalStyles.promptIcon} ${globalStyles.self}`}
+          className={`${globalStyles.promptIcon} ${globalStyles.none}`}
           style={{ '--size': '32px' } as React.CSSProperties}
         >
-          {isLocalAnimating ? <SpinningGear /> : <CompletedCheckbox />}
+          {isLocalAnimating && <SpinningGear />}
         </div>
       </div>
       <div className={styles.thinkingContent}>
         <div className={styles.thinkingHeader}>
-          <span className={styles.thinking}>
-            {renderAnimatedText(thinkingText + '...')}
+          <span className={`${styles.thinking} ${!isLocalAnimating ? styles.completed : ''}`}>
+            {isLocalAnimating ? renderAnimatedText(thinkingText + '...') : '...'}
           </span>
           <ThinkingDrawer 
             isOpen={isDrawerOpen}

@@ -173,6 +173,14 @@
   font-size: 14px;
   display: flex;
   align-items: center;
+  transition: all 0.3s ease-out;
+  
+  &.completed {
+    opacity: 0.5;
+    font-size: 16px;
+    letter-spacing: 2px;
+    margin-left: 16px;
+  }
   
   .waveChar {
     display: inline-block;
