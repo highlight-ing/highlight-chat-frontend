@@ -56,7 +56,7 @@ const ThinkingDrawer: React.FC<ThinkingDrawerProps> = ({ isOpen, onToggle, logs 
               </div>
             ))}
             {logs.length === 0 && (
-              <div className={styles.emptyLog}>Waiting for process details...</div>
+              <div className={styles.emptyLog}>Highlight is thinking...</div>
             )}
           </div>
         </div>

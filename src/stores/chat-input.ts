@@ -15,7 +15,7 @@ export type ChatInputSlice = ChatInputState & {
   setFileInputRef: (ref: React.RefObject<HTMLInputElement>) => void
   setInput: (input: string) => void
   setInputIsDisabled: (isDisabled: boolean) => void
-  setInputOverride: (input: string) => void
+  setInputOverride: (input: string | null) => void
   clearInputOverride: () => void
 }
 
@@ -29,7 +29,7 @@ export const initialChatInputState: ChatInputState = {
 export const createChatInputSlice: StateCreator<ChatInputSlice> = (set) => ({
   ...initialChatInputState,
   setInput: (input: string) => set({ input }),
-  setInputOverride: (inputOverride: string) => set({ inputOverride }),
+  setInputOverride: (inputOverride: string | null) => set({ inputOverride }),
   clearInputOverride: () => set({ inputOverride: null }),
   setInputIsDisabled: (isDisabled: boolean) => set({ inputIsDisabled: isDisabled }),
   setFileInputRef: (ref: React.RefObject<HTMLInputElement>) => {
