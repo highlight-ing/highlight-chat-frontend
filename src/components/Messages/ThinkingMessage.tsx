@@ -78,7 +78,7 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
           newLogs.push({
             timestamp: Date.now(),
             type: 'Provider',
-            value: metadata.llm_provider.toUpperCase()
+            value: metadata.llm_provider
           });
         }
 
