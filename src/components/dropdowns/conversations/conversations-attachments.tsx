@@ -110,8 +110,8 @@ export const ConversationAttachments = () => {
         >
           {option.imageComponent}
           <div className="flex flex-col">
-            <span className="text-sm font-medium text-secondary">{option.title}</span>
-            {option.description && <span className="text-xs text-tertiary">{option.description}</span>}
+            <span className="text-xs font-medium text-secondary">{option.title}</span>
+            {option.description && <span className="text-[10px] text-tertiary">{option.description}</span>}
           </div>
         </div>
       ))}
