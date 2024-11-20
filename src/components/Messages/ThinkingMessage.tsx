@@ -4,7 +4,7 @@ import { StoreState } from '@/stores'
 import styles from './message.module.scss'
 import globalStyles from '@/global.module.scss'
 import { SpinningGear, CompletedCheckbox } from '@/components/icons/ThinkingIcons'
-import { MessageText } from 'iconsax-react'
+import ThinkingDrawer from './ThinkingDrawer'
 
 const THINKING_MESSAGES = ['Hmm.. Let me think...', 'Working on it...', 'Just a moment...', 'Hang on a second...']
 
@@ -22,6 +22,7 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
   )
   
   const [isLocalAnimating, setIsLocalAnimating] = useState(true);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const timerRef = useRef<NodeJS.Timeout>();
   
   const promptApp = useStore((state: StoreState) => state.promptApp)
@@ -66,9 +67,17 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
           {isLocalAnimating ? <SpinningGear /> : <CompletedCheckbox />}
         </div>
       </div>
-      <span className={styles.thinking}>
-        {renderAnimatedText(thinkingText + '...')}
-      </span>
+      <div className={styles.thinkingContent}>
+        <div className={styles.thinkingHeader}>
+          <span className={styles.thinking}>
+            {renderAnimatedText(thinkingText + '...')}
+          </span>
+          <ThinkingDrawer 
+            isOpen={isDrawerOpen}
+            onToggle={() => setIsDrawerOpen(!isDrawerOpen)}
+          />
+        </div>
+      </div>
     </div>
   )
 }
