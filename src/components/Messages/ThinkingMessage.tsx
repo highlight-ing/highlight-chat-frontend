@@ -114,11 +114,6 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
         const updatedLogs = [...prevLogs, ...newLogs];
         console.log('Updated logs:', updatedLogs);
         
-        if (newLogs.length > 0) {
-          setIsDrawerOpen(true);
-          console.log('Opening drawer with new logs');
-        }
-        
         return updatedLogs;
       });
     };

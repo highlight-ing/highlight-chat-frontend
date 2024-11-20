@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { ArrowDown2 } from 'iconsax-react';
 import styles from './message.module.scss';
 import { MetadataEvent } from '@/types';
@@ -16,33 +16,51 @@ interface ThinkingDrawerProps {
 }
 
 const ThinkingDrawer: React.FC<ThinkingDrawerProps> = ({ isOpen, onToggle, logs }) => {
+  const [hasInteracted, setHasInteracted] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    if (!hasInteracted && isOpen) {
+      setHasInteracted(true);
+    }
+  }, [isOpen, hasInteracted]);
+
+  const handleToggle = useCallback(() => {
+    if (!isAnimating) {
+      if (!hasInteracted) {
+        setHasInteracted(true);
+      }
+      setIsAnimating(true);
+      setTimeout(() => setIsAnimating(false), 400); // Match animation duration
+      onToggle();
+    }
+  }, [hasInteracted, isAnimating, onToggle]);
+
   return (
     <>
       <button 
-        className={`${styles.drawerToggle} ${isOpen ? styles.open : ''}`}
-        onClick={onToggle}
+        className={`${styles.drawerToggle} ${hasInteracted ? styles.animated : ''} ${isOpen ? styles.open : ''}`}
+        onClick={handleToggle}
         aria-label="Toggle details"
+        disabled={isAnimating}
       >
         <ArrowDown2 size={16} />
       </button>
-      {isOpen && (
-        <div className={styles.drawer}>
-          <div className={styles.drawerContent}>
-            <h3>Thinking Process</h3>
-            <div className={styles.logContainer}>
-              {logs.map((log, index) => (
-                <div key={index} className={styles.logEntry}>
-                  <span className={styles.logType}>{log.type}</span>
-                  <span className={styles.logValue}>{log.value}</span>
-                </div>
-              ))}
-              {logs.length === 0 && (
-                <div className={styles.emptyLog}>Waiting for process details...</div>
-              )}
-            </div>
+      <div className={`${styles.drawer} ${hasInteracted ? styles.animated : ''} ${isOpen ? styles.open : ''}`}>
+        <div className={styles.drawerContent}>
+          <div className={styles.verticalLine} />
+          <div className={styles.logContainer}>
+            {logs.map((log, index) => (
+              <div key={index} className={styles.logEntry}>
+                <span>{log.type}: {log.value}</span>
+              </div>
+            ))}
+            {logs.length === 0 && (
+              <div className={styles.emptyLog}>Waiting for process details...</div>
+            )}
           </div>
         </div>
-      )}
+      </div>
     </>
   );
 };

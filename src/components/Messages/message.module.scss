@@ -16,6 +16,7 @@
   max-width: $chat-body-width;
   position: relative;
   animation: fadeIn 200ms forwards;
+  transition: transform 0.4s ease-out;
 
   &.placeholder {
     @extend .loadingGradient;
@@ -295,6 +296,72 @@
   100% { transform: scale(1); }
 }
 
+@keyframes lineAppear {
+  0% {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes lineDisappear {
+  0% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+}
+
+@keyframes drawerOpen {
+  0% {
+    max-height: 0;
+    opacity: 0;
+  }
+  100% {
+    max-height: 500px;
+    opacity: 1;
+  }
+}
+
+@keyframes drawerClose {
+  0% {
+    max-height: 500px;
+    opacity: 1;
+  }
+  100% {
+    max-height: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes lineOpen {
+  0% {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes lineClose {
+  0% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+}
+
 .drawerContainer {
   position: relative;
   display: flex;
@@ -306,78 +373,109 @@
   border: none;
   padding: 4px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.3s ease;
-  color: $light-40;
-  
-  &.open {
-    transform: rotate(180deg);
+  color: $light-60;
+  transform: rotate(0deg);
+
+  &:disabled {
+    pointer-events: none;
   }
 
-  &:hover {
-    color: $light-60;
+  &.animated {
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  &.open {
+    transform: rotate(-90deg);
+  }
+  
+  &:hover:not(:disabled) {
+    color: $light-80;
   }
 }
 
 .drawer {
   margin-top: 8px;
-  background-color: $light-5;
-  border-radius: 8px;
-  border: 1px solid $light-10;
   overflow: hidden;
-  width: 100%;
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+
+  &.animated {
+    visibility: visible;
+    
+    &:not(.open) {
+      animation: drawerClose 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    
+    &.open {
+      pointer-events: auto;
+      animation: drawerOpen 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+  }
+
+  &:not(.animated) {
+    &.open {
+      max-height: 500px;
+      opacity: 1;
+      pointer-events: auto;
+      visibility: visible;
+    }
+  }
 }
 
 .drawerContent {
-  padding: 12px;
-  
-  h3 {
-    margin: 0 0 8px 0;
-    font-size: 14px;
-    color: $light-80;
+  position: relative;
+  padding: 8px 0 8px 24px;
+}
+
+.verticalLine {
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: $text-accent;
+  transform-origin: center;
+  opacity: 0;
+  transform: scaleY(0);
+
+  .drawer.animated:not(.open) & {
+    animation: lineClose 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
-  
-  p {
-    margin: 0;
-    font-size: 12px;
-    color: $light-40;
+
+  .drawer.animated.open & {
+    animation: lineOpen 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .drawer:not(.animated).open & {
+    opacity: 1;
+    transform: scaleY(1);
   }
 }
 
 .logContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 8px;
+  opacity: 0;
+  transform: translateY(-5px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  .open & {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .logEntry {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  font-size: 12px;
-  line-height: 1.4;
-  padding: 6px 8px;
-  background: $light-10;
-  border-radius: 4px;
+  color: $light-80;
+  font-size: 14px;
   
-  .logType {
-    color: $light-60;
-    font-weight: 500;
-    min-width: 80px;
-  }
-  
-  .logValue {
-    color: $light-80;
-    word-break: break-word;
+  span {
+    margin-right: 8px;
   }
 }
 
 .emptyLog {
-  color: $light-40;
-  font-size: 12px;
-  text-align: center;
-  padding: 12px;
+  color: $light-60;
+  font-style: italic;
+  font-size: 14px;
 }
