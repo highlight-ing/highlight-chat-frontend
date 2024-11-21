@@ -361,10 +361,6 @@ export const useSubmitQuery = () => {
                 };
 
                 console.log('Emitting metadata event:', metadataEvent);
-                if (promptApp) {
-                  promptApp.emit('metadata', metadataEvent);
-                }
-                // Also emit the event directly to ThinkingMessage
                 window.dispatchEvent(new CustomEvent('highlight:metadata', { detail: metadataEvent }));
               }
             },
