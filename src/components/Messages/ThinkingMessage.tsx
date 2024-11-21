@@ -8,7 +8,30 @@ import { SpinningGear, CompletedCheckbox } from '@/components/icons/ThinkingIcon
 import ThinkingDrawer from './ThinkingDrawer'
 import { MetadataEvent } from '@/types'
 
-const THINKING_MESSAGES = ['Hmm.. Let me think...', 'Working on it...', 'Just a moment...', 'Hang on a second...']
+const INITIAL_THINKING_MESSAGES = [
+  'Hmm...',
+  'Firing up...',
+  'Thinking...'
+]
+
+const MODEL_MESSAGES = [
+  'Using {model}...',
+  'Picking {model}...',
+  'Chose {model}...',
+]
+
+const PROVIDER_MESSAGES = [
+  'Plugging into {provider}...',
+  'Tapping into {provider}...',
+  'Working through {provider}...'
+]
+
+const GENERATING_MESSAGES = [
+  'Generating...',
+  'Crafting...',
+  'Putting it all together...',
+  'Almost there...'
+]
 
 interface ThinkingMessageProps {
   isAnimating?: boolean
@@ -25,14 +48,20 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
   isAnimating = true,
   isLatest = false 
 }) => {
-  const [thinkingText] = useState(() => 
-    THINKING_MESSAGES[Math.floor(Math.random() * THINKING_MESSAGES.length)]
+  const [thinkingText, setThinkingText] = useState(() => 
+    INITIAL_THINKING_MESSAGES[Math.floor(Math.random() * INITIAL_THINKING_MESSAGES.length)]
   )
   
   const [isLocalAnimating, setIsLocalAnimating] = useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const timerRef = useRef<NodeJS.Timeout>();
+  const messageTimer = useRef<NodeJS.Timeout>();
+  const stateTimer = useRef<NodeJS.Timeout>();
+
+  const [messageState, setMessageState] = useState<'thinking' | 'model' | 'provider' | 'generating'>('thinking');
+  const [currentModel, setCurrentModel] = useState<string>('');
+  const [currentProvider, setCurrentProvider] = useState<string>('');
 
   const { promptApp } = useStore(
     useShallow((state: any) => ({
@@ -63,6 +92,23 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
       if (!event.detail || typeof event.detail !== 'object') {
         console.error('Invalid metadata event received:', event.detail);
         return;
+      }
+
+      const metadata = event.detail;
+      
+      // Update model and provider state
+      if (metadata.model) {
+        setCurrentModel(metadata.model);
+        setMessageState('model');
+      }
+      if (metadata.llm_provider) {
+        setCurrentProvider(metadata.llm_provider);
+        setMessageState('provider');
+      }
+      
+      // If streaming starts, update to generating state
+      if (metadata.status === 'streaming') {
+        setMessageState('generating');
       }
 
       setLogs(prevLogs => {
@@ -135,16 +181,153 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
     };
   }, [isAnimating]);
 
+  // For demo purposes when no real metadata is available
+  const demoStates = {
+    model: 'GPT-4o',
+    provider: 'OpenAI'
+  };
+
+  // Set up state rotation
+  useEffect(() => {
+    let stateIndex = 0;
+    const states = ['thinking', 'model', 'provider', 'generating'] as const;
+    
+    const rotateState = () => {
+      const nextState = states[stateIndex];
+      setMessageState(nextState);
+      
+      // Set demo values when transitioning to respective states
+      if (nextState === 'model' && !currentModel) {
+        setCurrentModel(demoStates.model);
+      }
+      if (nextState === 'provider' && !currentProvider) {
+        setCurrentProvider(demoStates.provider);
+      }
+      
+      // Only increment if not at the last state
+      if (stateIndex < states.length - 1) {
+        stateIndex++;
+        
+        // If we've reached the last state, clear the interval
+        if (stateIndex === states.length - 1) {
+          if (stateTimer.current) {
+            clearInterval(stateTimer.current);
+          }
+        }
+      }
+    };
+
+    // Clear any existing state timer
+    if (stateTimer.current) {
+      clearInterval(stateTimer.current);
+    }
+
+    // Start the state rotation if animating
+    if (isLocalAnimating) {
+      rotateState(); // Initial state
+      stateTimer.current = setInterval(rotateState, 8000); // Change state every 8 seconds
+    }
+
+    return () => {
+      if (stateTimer.current) {
+        clearInterval(stateTimer.current);
+      }
+    };
+  }, [isLocalAnimating]);
+
+  const getRandomMessage = () => {
+    const messages = (() => {
+      switch (messageState) {
+        case 'model':
+          return MODEL_MESSAGES.map(msg => 
+            msg.replace('{model}', currentModel || demoStates.model)
+          );
+        case 'provider':
+          return PROVIDER_MESSAGES.map(msg => 
+            msg.replace('{provider}', currentProvider || demoStates.provider)
+          );
+        case 'generating':
+          return GENERATING_MESSAGES;
+        default:
+          return INITIAL_THINKING_MESSAGES;
+      }
+    })();
+    
+    // Get a random message different from the current one
+    const currentIndex = messages.indexOf(thinkingText);
+    let newIndex;
+    do {
+      newIndex = Math.floor(Math.random() * messages.length);
+    } while (newIndex === currentIndex && messages.length > 1);
+    
+    return messages[newIndex];
+  };
+
+  // Set up message rotation timer
+  useEffect(() => {
+    const rotateMessage = () => {
+      const newMessage = getRandomMessage();
+      setThinkingText(newMessage);
+    };
+
+    // Clear any existing timer
+    if (messageTimer.current) {
+      clearInterval(messageTimer.current);
+    }
+
+    // Start the rotation if animating
+    if (isLocalAnimating) {
+      rotateMessage(); // Initial rotation
+      messageTimer.current = setInterval(rotateMessage, 2000);
+    }
+
+    return () => {
+      if (messageTimer.current) {
+        clearInterval(messageTimer.current);
+      }
+    };
+  }, [isLocalAnimating, messageState, currentModel, currentProvider]);
+
+  // Clean up all timers on unmount
+  useEffect(() => {
+    return () => {
+      if (messageTimer.current) {
+        clearInterval(messageTimer.current);
+      }
+      if (stateTimer.current) {
+        clearInterval(stateTimer.current);
+      }
+    };
+  }, []);
+
   const renderAnimatedText = (text: string) => {
-    return text.split('').map((char, index) => (
-      <span 
-        key={index} 
-        className={`${styles.waveChar} ${isLocalAnimating ? styles.animating : styles.static}`}
-        style={{ whiteSpace: 'pre' }}
-      >
-        {char}
-      </span>
-    ));
+    return text.split('').map((char, index) => {
+      // Skip animation for spaces to prevent jumpiness
+      if (char === ' ') {
+        return (
+          <span 
+            key={index} 
+            style={{ whiteSpace: 'pre' }}
+          >
+            {char}
+          </span>
+        );
+      }
+      
+      return (
+        <span 
+          key={`${index}-${char}`}
+          className={`${styles.waveChar} ${isLocalAnimating ? styles.animating : styles.static}`}
+          style={{ 
+            whiteSpace: 'pre',
+            display: 'inline-block'
+          }}
+          aria-hidden="true"
+        >
+          {char}
+        </span>
+      );
+    });
   };
 
   return (
@@ -160,7 +343,7 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
       <div className={styles.thinkingContent}>
         <div className={styles.thinkingHeader}>
           <span className={`${styles.thinking} ${!isLocalAnimating ? styles.completed : ''}`}>
-            {isLocalAnimating ? renderAnimatedText(thinkingText + '...') : '...'}
+            {isLocalAnimating ? renderAnimatedText(thinkingText) : '...'}
           </span>
           <ThinkingDrawer 
             isOpen={isDrawerOpen}
