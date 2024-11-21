@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, forwardRef } from 'react';
 import { ArrowDown2 } from 'iconsax-react';
 import styles from './message.module.scss';
 import { MetadataEvent } from '@/types';
@@ -15,7 +15,7 @@ interface ThinkingDrawerProps {
   logs: LogEntry[];
 }
 
-const ThinkingDrawer: React.FC<ThinkingDrawerProps> = ({ isOpen, onToggle, logs }) => {
+const ThinkingDrawer = forwardRef<HTMLDivElement, ThinkingDrawerProps>(({ isOpen, onToggle, logs }, ref) => {
   const [hasInteracted, setHasInteracted] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -47,7 +47,7 @@ const ThinkingDrawer: React.FC<ThinkingDrawerProps> = ({ isOpen, onToggle, logs 
         <ArrowDown2 size={16} />
       </button>
       <div className={`${styles.drawer} ${hasInteracted ? styles.animated : ''} ${isOpen ? styles.open : ''}`}>
-        <div className={styles.drawerContent}>
+        <div ref={ref} className={styles.drawerContent}>
           <div className={styles.verticalLine} />
           <div className={styles.logContainer}>
             {logs.map((log, index) => (
@@ -63,6 +63,6 @@ const ThinkingDrawer: React.FC<ThinkingDrawerProps> = ({ isOpen, onToggle, logs 
       </div>
     </>
   );
-};
+});
 
 export default ThinkingDrawer;

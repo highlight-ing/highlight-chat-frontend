@@ -58,6 +58,7 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
   const timerRef = useRef<NodeJS.Timeout>();
   const messageTimer = useRef<NodeJS.Timeout>();
   const stateTimer = useRef<NodeJS.Timeout>();
+  const drawerRef = useRef<HTMLDivElement>(null);
 
   const [messageState, setMessageState] = useState<'thinking' | 'model' | 'provider' | 'generating'>('thinking');
   const [currentModel, setCurrentModel] = useState<string>('');
@@ -79,6 +80,13 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
       promptAppDetails: promptApp
     });
   });
+
+  useEffect(() => {
+    if (drawerRef.current && isDrawerOpen) {
+      const height = drawerRef.current.scrollHeight;
+      document.documentElement.style.setProperty('--drawer-height', `${height}px`);
+    }
+  }, [isDrawerOpen, logs]);
 
   useEffect(() => {
     const handleMetadata = (event: CustomEvent) => {
@@ -331,7 +339,7 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
   };
 
   return (
-    <div className={styles.messageContainer}>
+    <div className={`${styles.messageContainer} ${isDrawerOpen ? styles['drawer-open'] : ''}`}>
       <div className={`${styles.thinkingAvatar} ${!isLatest && !isAnimating ? styles.inactive : ''}`}>
         <div
           className={`${globalStyles.promptIcon} ${globalStyles.none}`}
@@ -352,6 +360,7 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
               setIsDrawerOpen(!isDrawerOpen);
             }}
             logs={logs}
+            ref={drawerRef}
           />
         </div>
       </div>

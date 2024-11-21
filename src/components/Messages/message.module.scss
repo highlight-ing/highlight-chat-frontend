@@ -16,7 +16,13 @@
   max-width: $chat-body-width;
   position: relative;
   animation: fadeIn 200ms forwards;
-  transition: transform 0.4s ease-out;
+  transition: margin-bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 0;
+
+  &.drawer-open {
+    margin-bottom: calc(var(--drawer-height, 0px) + 16px);
+    transition: margin-bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 
   &.placeholder {
     @extend .loadingGradient;
@@ -404,7 +410,7 @@
   }
   
   &.open {
-    transform: rotate(-90deg);
+    transform: rotate(180deg);
   }
   
   &:hover:not(:disabled) {
@@ -413,12 +419,17 @@
 }
 
 .drawer {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
   margin-top: 8px;
   overflow: hidden;
   max-height: 0;
   opacity: 0;
   pointer-events: none;
   visibility: hidden;
+  z-index: 10;
 
   &.animated {
     visibility: visible;
