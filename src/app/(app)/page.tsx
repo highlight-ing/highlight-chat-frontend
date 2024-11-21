@@ -10,6 +10,7 @@ import Messages from '@/components/Messages/Messages'
 import MessagesPlaceholder from '@/components/Messages/MessagesPlaceholder'
 import { useStore } from '@/components/providers/store-provider'
 
+import { ConversationsFeed } from '@/features/conversations/conversations-feed'
 import { ChatHeader } from '@/features/highlight-chat/components/chat-header/chat-header'
 import { ChatHome } from '@/features/highlight-chat/components/chat-home'
 import { IntercomChat } from '@/features/highlight-chat/components/intercom-chat'
@@ -55,6 +56,7 @@ export default function Home() {
         {(isChatting || (isConversationLoading && messages.length > 0)) && <Messages />}
         {isConversationLoading && messages.length === 0 && !inputIsDisabled && <MessagesPlaceholder />}
         <ChatHome isShowing={!isChatting && !promptApp && !isConversationLoading} />
+        <ConversationsFeed />
         {(isChatting || promptApp) && <Input isActiveChat={true} />}
         <IntercomChat />
       </div>
