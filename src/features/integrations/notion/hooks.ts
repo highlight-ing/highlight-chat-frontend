@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { useHighlightToken } from '../_hooks/use-hl-token'
 import { checkNotionConnectionStatus, createNotionPage, getNotionParentItems, getNotionTokenForUser } from './actions'
@@ -38,6 +38,7 @@ export function useNotionParentItems() {
       return items
     },
     enabled: !!notionToken,
+    staleTime: 2 * 60 * 1000,
   })
 }
 
@@ -56,18 +57,28 @@ export function useCheckNotionConnection() {
       return connected as boolean
     },
     enabled: !!hlToken,
-    refetchInterval: 10 * 1000,
-    retry: false,
   })
 }
 
 export function useCreateNotionPage(onSubmitSuccess: (url: string | undefined) => void) {
   const { data: notionToken } = useNotionApiToken()
   const { data: parentItems } = useNotionParentItems()
+  const { data: hlToken } = useHighlightToken()
+  const queryClient = useQueryClient()
 
   return useMutation({
     mutationKey: ['create-notion-page'],
     mutationFn: async (input: { formData: NotionPageFormSchema; contentWithFooter: string }) => {
+      if (!hlToken) {
+        throw new Error('No Highligh token available')
+      }
+
+      const connected = await checkNotionConnectionStatus(hlToken)
+
+      if (!connected) {
+        throw new Error('Not connected to Notion')
+      }
+
       if (!notionToken) {
         console.warn('Notion token not set, please try again later.')
         throw new Error('No Notion token available')
@@ -92,6 +103,9 @@ export function useCreateNotionPage(onSubmitSuccess: (url: string | undefined) =
       if (onSubmitSuccess) onSubmitSuccess(response)
     },
     onError: (error) => {
+      if (error.message.includes('Not connected')) {
+        queryClient.invalidateQueries({ queryKey: ['notion-check-connection'] })
+      }
       console.warn(error.message)
     },
   })
