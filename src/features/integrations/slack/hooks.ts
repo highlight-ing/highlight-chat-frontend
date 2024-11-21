@@ -18,7 +18,7 @@ export function useCheckSlackConnection() {
       return connected as boolean
     },
     enabled: !!hlToken,
-    refetchInterval: 8 * 1000,
+    refetchInterval: 15000,
     retry: false,
   })
 }

@@ -49,7 +49,7 @@ function SlackMessageFormComponent({ data, onSuccess }: { data: SendSlackMessage
   })
 
   useEffect(() => {
-    ;(async () => {
+    ; (async () => {
       // @ts-ignore
       const hlToken = (await highlight.internal.getAuthorizationToken()) as string
       const token = await getIntegrationTokenForUser(hlToken, 'slack')
@@ -166,9 +166,8 @@ export function SendSlackMessageComponent({ data }: { data: SendSlackMessagePara
     isLoading: connectionIsLoading,
     isSuccess: connectionCheckSuccess,
   } = useCheckSlackConnection()
-  const queryClient = useQueryClient()
-
   const [state, setState] = useState<'form' | 'success'>('form')
+  const queryClient = useQueryClient()
 
   if (connectionIsLoading) {
     return <IntegrationsLoader />
