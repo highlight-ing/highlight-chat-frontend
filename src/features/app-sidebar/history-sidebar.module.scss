@@ -46,7 +46,6 @@
 .chats {
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
   padding: 8px;
   gap: 1px;
   user-select: none;
@@ -65,7 +64,8 @@
   font-weight: 500;
   padding: 8px 8px 2px;
 
-  &:hover, &.selecting {
+  &:hover,
+  &.selecting {
     .edit {
       opacity: 1;
       pointer-events: initial;
@@ -90,6 +90,7 @@
     transform: translateX(-8px);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -97,6 +98,7 @@
 }
 
 $selector-size: 17px;
+
 .selector {
   position: absolute;
   top: 8px;
@@ -154,14 +156,14 @@ $selector-size: 17px;
   }
 }
 
-.chatText {
-}
+.chatText {}
 
 @keyframes fadeInBottom {
   from {
     transform: translateY(100%);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;

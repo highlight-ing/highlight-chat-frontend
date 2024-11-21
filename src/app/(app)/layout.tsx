@@ -4,6 +4,7 @@ import React from 'react'
 import { ConversationProvider } from '@/context/ConversationContext'
 import Highlight from '@highlight-ai/app-runtime'
 
+import { SidebarProvider } from '@/components/ui/sidebar'
 import { ReactQueryProvider } from '@/components/providers/react-query-provider'
 import { StoreProvider } from '@/components/providers/store-provider'
 
@@ -20,7 +21,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <StoreProvider>
       <ConversationProvider>
         <ReactQueryProvider>
-          <App>{children}</App>
+          <SidebarProvider id="history-sidebar">
+            <App>{children}</App>
+          </SidebarProvider>
         </ReactQueryProvider>
       </ConversationProvider>
     </StoreProvider>

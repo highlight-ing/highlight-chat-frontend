@@ -9,9 +9,11 @@ import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
 import { Add, Clock, MessageText } from 'iconsax-react'
 import { useShallow } from 'zustand/react/shallow'
 
+import { cn } from '@/lib/utils'
 import { useOpenConverationsPersistence } from '@/hooks/useOpenConverationsPersistence'
 import { usePromptApp } from '@/hooks/usePromptApp'
 import { useTabHotkeys } from '@/hooks/useTabHotkeys'
+import { useSidebar } from '@/components/ui/sidebar'
 import CircleButton from '@/components/CircleButton/CircleButton'
 import ContextMenu, { MenuItemType } from '@/components/ContextMenu/ContextMenu'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
@@ -224,13 +226,9 @@ export const NavigationTopBarTab = React.forwardRef<HTMLDivElement, TopTabProps>
   },
 )
 
-type TopBarProps = {
-  showHistory: boolean
-  setShowHistory: React.Dispatch<React.SetStateAction<boolean>>
-}
-
-export function NavigationTopBar({ showHistory, setShowHistory }: TopBarProps) {
+export function NavigationTopBar() {
   const router = useRouter()
+  const { showHistory, setShowHistory } = useSidebar()
 
   const {
     startNewConversation,
@@ -303,22 +301,16 @@ export function NavigationTopBar({ showHistory, setShowHistory }: TopBarProps) {
   }, [conversationId, history])
 
   return (
-    <div className={styles.topBar}>
-      <div className="flex w-full items-center justify-between">
-        <div className="flex items-center gap-1">
-          <Tooltip
-            tooltip="View chat history"
-            position="bottom"
-            wrapperStyle={
-              showHistory || !setShowHistory
-                ? {
-                  visibility: 'hidden',
-                  paddingInlineStart: `calc(${variables.chatHistoryWidth} - 36px)`,
-                  transition: 'padding 250ms ease',
-                }
-                : { transition: 'padding 250ms ease' }
-            }
-          >
+    <div
+      className={cn(
+        styles.topBar,
+        'left-[--sidebar-width] transition-[left] duration-200',
+        showHistory && 'left-[calc(var(--sidebar-width)-42px)]',
+      )}
+    >
+      <div className="flex items-center justify-between">
+        <div className={cn('flex items-center gap-1')}>
+          <Tooltip tooltip="View chat history" position="bottom">
             <CircleButton onClick={onShowHistoryClick}>
               <Clock size={20} variant={'Bold'} />
             </CircleButton>
@@ -373,7 +365,7 @@ export function NavigationTopBar({ showHistory, setShowHistory }: TopBarProps) {
       </div>
 
       {conversationId && (
-        <div className={`${styles.topHeader} ${showHistory ? styles.offset : ''}`}>
+        <div className={`${styles.topHeader}`}>
           <div className={'flex gap-3'}>
             {promptApp ? (
               <>

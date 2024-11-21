@@ -1,13 +1,16 @@
-import * as React from 'react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { ChatHistoryItem } from '@/types'
 import { trackEvent } from '@/utils/amplitude'
 import variables from '@/variables.module.scss'
 import { Clock, Trash } from 'iconsax-react'
 import { useShallow } from 'zustand/react/shallow'
 
+import { cn } from '@/lib/utils'
 import { useApi } from '@/hooks/useApi'
 import { useChatHistory } from '@/hooks/useChatHistory'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Sidebar, SidebarContent, useSidebar } from '@/components/ui/sidebar'
+import Button from '@/components/Button/Button'
 import CircleButton from '@/components/CircleButton/CircleButton'
 import ContextMenu from '@/components/ContextMenu/ContextMenu'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
@@ -120,12 +123,8 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
   )
 }
 
-type HistorySidebarProps = {
-  showHistory: boolean
-  setShowHistory: React.Dispatch<React.SetStateAction<boolean>>
-}
-
-export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarProps) {
+function HistorySidebar() {
+  const { showHistory, setShowHistory } = useSidebar()
   const { deleteRequest } = useApi()
   const conversationId = useStore((state) => state.conversationId)
   const startNewConversation = useStore((state) => state.startNewConversation)
@@ -215,7 +214,7 @@ export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarPr
           </CircleButton>
         </Tooltip>
       </div>
-      <div className={styles.chats}>
+      <ScrollArea className={styles.chats}>
         {!history?.length ? (
           <div className={styles.baseHistoryItem}>No chat history available</div>
         ) : (
@@ -320,7 +319,47 @@ export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarPr
             )}
           </div>
         )}
-      </div>
+      </ScrollArea>
     </div>
+  )
+}
+
+function AttachmentSidebar() {
+  const { showAttachments, showHistory } = useSidebar()
+
+  return (
+    <div
+      className={cn(
+        'w-[32rem] transition-transform duration-200',
+        showAttachments ? 'translate-x-0' : '-translate-x-[32rem]',
+        showAttachments && showHistory && 'translate-x-[16rem]',
+      )}
+    >
+      Despite its modest size, the park offers a tranquil escape from the urban chaos that surrounds it. Tall, ancient
+      trees stand like guardians along the winding paths, their leaves rustling gently in the breeze. The air is filled
+      with the sweet scent of blooming flowers, a natural perfume that changes with the seasons. Visitors to the park
+      often find themselves drawn to the serene pond at its center. On its surface, ducks glide effortlessly, leaving
+      ripples in their wake. Occasionally, the stillness of the water is broken by the playful splash of a fish or the
+      gentle plop of a frog leaping from a lily pad. Benches are strategically placed around the pond, inviting
+      passersby to sit and reflect, read a book, or simply watch the world go by. For those seeking more active
+      pursuits, the park offers a variety of options. A jogging trail circles the perimeter, frequented by runners of
+      all ages and abilities. In the mornings, the sound of rhythmic footsteps and measured breathing creates a unique
+      symphony of movement. Nearby, a small playground echoes with the joyful laughter of children, their imaginations
+      transforming slides and swings into castles and rocket ships. The park is not just a haven for people; it is a
+      sanctuary for wildlife as well. Birds of all kinds make their homes in the trees, their songs providing a constant
+      soundtrack to the park's activities. Squirrels dart playfully across the grass, stopping occasionally to nibble on
+      a found treasure. I
+    </div>
+  )
+}
+
+export function AppSidebar() {
+  return (
+    <Sidebar>
+      <SidebarContent>
+        <HistorySidebar />
+        <AttachmentSidebar />
+      </SidebarContent>
+    </Sidebar>
   )
 }
