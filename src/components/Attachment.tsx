@@ -163,6 +163,7 @@ export const Attachment = ({
 
     if (id) {
       setSelectedTranscriptId(id)
+      setManualTranscriptText(value)
     } else if (value) {
       setSelectedTranscriptId('')
       setManualTranscriptText(value)

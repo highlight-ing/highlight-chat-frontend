@@ -99,7 +99,7 @@ function TranscriptViewerHeader() {
     setHeaderHeight(bounds.height)
   }, [bounds, setHeaderHeight])
 
-  if (!data) return null
+  if (!data?.transcript) return null
 
   const formattedTitle = formatTranscriptTitle(data.title)
 
@@ -160,8 +160,7 @@ function TranscriptMessageItem(props: TranscriptMessageItemProps) {
 }
 
 export function TranscriptViewer() {
-  const { data, isLoading, isError, isSuccess } = useTranscript()
-  const setTranscriptOpen = useSetAtom(transcriptOpenAtom)
+  const { data, isLoading, isError } = useTranscript()
   const headerHeight = useAtomValue(headerHeightAtom)
   const manualTranscriptText = useAtomValue(manualTranscriptTextAtom)
   const transcriptMessages = parseTranscript(data?.transcript ?? manualTranscriptText)
@@ -174,9 +173,17 @@ export function TranscriptViewer() {
     )
   }
 
-  if (isError || (isSuccess && !data)) {
-    setTranscriptOpen(false)
-    return null
+  if (isError) {
+    return (
+      <TranscriptViewerLayout>
+        <ScrollArea style={{ height: `calc(100% - ${headerHeight}px` }}>
+          <div className="w-full space-y-6 p-4 pt-6">
+            <CopyTranscript />
+            {transcriptMessages?.map((message, index) => <TranscriptMessageItem key={index} message={message} />)}
+          </div>
+        </ScrollArea>
+      </TranscriptViewerLayout>
+    )
   }
 
   return (
