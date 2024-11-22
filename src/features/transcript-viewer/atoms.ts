@@ -8,4 +8,4 @@ export const isOnHomeAtom = atom(false)
 
 export const selectedTranscriptIdAtom = atom('')
 
-export const externalTranscriptContentAtom = atom('')
+export const manualTranscriptTextAtom = atom('')

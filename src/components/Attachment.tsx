@@ -9,7 +9,11 @@ import { CloseIcon } from '@/components/icons'
 import { useStore } from '@/components/providers/store-provider'
 import { fetchAppIcon } from '@/app/(app)/actions'
 
-import { selectedTranscriptIdAtom, transcriptOpenAtom } from '@/features/transcript-viewer/atoms'
+import {
+  manualTranscriptTextAtom,
+  selectedTranscriptIdAtom,
+  transcriptOpenAtom,
+} from '@/features/transcript-viewer/atoms'
 
 import Tooltip from './Tooltip/Tooltip'
 
@@ -151,11 +155,19 @@ export const Attachment = ({
   }
 
   const setSelectedTranscriptId = useSetAtom(selectedTranscriptIdAtom)
+  const setManualTranscriptText = useSetAtom(manualTranscriptTextAtom)
   const setTranscriptOpen = useSetAtom(transcriptOpenAtom)
 
   function handleAudioClick() {
-    if (!id) return
-    setSelectedTranscriptId(id)
+    if (!id && !value) return
+
+    if (id) {
+      setSelectedTranscriptId(id)
+    } else if (value) {
+      setSelectedTranscriptId('')
+      setManualTranscriptText(value)
+    }
+
     setTranscriptOpen(true)
   }
 
@@ -182,9 +194,8 @@ export const Attachment = ({
           </button>
         ) : (
           <div
-            className={`flex h-[48px] items-center justify-center rounded-[16px] border border-light-10 bg-secondary ${
-              type === 'pdf' || type === 'text_file' ? 'max-w-40' : ''
-            } ${type !== 'image' ? 'min-w-12' : 'min-w-[52px]'} w-fit overflow-hidden`}
+            className={`flex h-[48px] items-center justify-center rounded-[16px] border border-light-10 bg-secondary ${type === 'pdf' || type === 'text_file' ? 'max-w-40' : ''
+              } ${type !== 'image' ? 'min-w-12' : 'min-w-[52px]'} w-fit overflow-hidden`}
           >
             {renderAttachmentContent()}
           </div>

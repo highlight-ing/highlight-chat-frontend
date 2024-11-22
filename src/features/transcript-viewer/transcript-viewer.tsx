@@ -9,7 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 import Tooltip from '@/components/Tooltip/Tooltip'
 
-import { externalTranscriptContentAtom, isOnHomeAtom, transcriptOpenAtom } from './atoms'
+import { isOnHomeAtom, manualTranscriptTextAtom, transcriptOpenAtom } from './atoms'
 import { useTranscript } from './queries'
 import { TranscriptMessage } from './types'
 import { formatHeaderTimestamp, formatTranscriptTitle, parseTranscript } from './utils'
@@ -118,11 +118,11 @@ function TranscriptViewerHeader() {
 
 function CopyTranscript() {
   const { data } = useTranscript()
-  const externalTranscriptContent = useAtomValue(externalTranscriptContentAtom)
+  const manualTranscriptText = useAtomValue(manualTranscriptTextAtom)
 
   async function handleCopyClick() {
-    if (!data?.transcript && !externalTranscriptContent) return
-    await window.navigator.clipboard.writeText(data?.transcript ?? externalTranscriptContent)
+    if (!data?.transcript && !manualTranscriptText) return
+    await window.navigator.clipboard.writeText(data?.transcript ?? manualTranscriptText)
   }
 
   return (
@@ -162,8 +162,8 @@ function TranscriptMessageItem(props: TranscriptMessageItemProps) {
 export function TranscriptViewer() {
   const { data, isLoading } = useTranscript()
   const headerHeight = useAtomValue(headerHeightAtom)
-  const externalTranscriptContent = useAtomValue(externalTranscriptContentAtom)
-  const transcriptMessages = parseTranscript(data?.transcript ?? externalTranscriptContent)
+  const manualTranscriptText = useAtomValue(manualTranscriptTextAtom)
+  const transcriptMessages = parseTranscript(data?.transcript ?? manualTranscriptText)
 
   if (isLoading) {
     return (

@@ -16,7 +16,7 @@ import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 import { useStore } from '@/components/providers/store-provider'
 
 import {
-  externalTranscriptContentAtom,
+  manualTranscriptTextAtom,
   selectedTranscriptIdAtom,
   transcriptOpenAtom,
 } from '@/features/transcript-viewer/atoms'
@@ -51,7 +51,7 @@ export function useContextReceivedHandler() {
   const router = useRouter()
 
   const setTranscriptOpen = useSetAtom(transcriptOpenAtom)
-  const setExternalTranscriptContent = useSetAtom(externalTranscriptContentAtom)
+  const setManualTranscriptText = useSetAtom(manualTranscriptTextAtom)
   const setSelectedTranscriptId = useSetAtom(selectedTranscriptIdAtom)
 
   React.useEffect(() => {
@@ -115,7 +115,7 @@ export function useContextReceivedHandler() {
 
       setTranscriptOpen(true)
       setSelectedTranscriptId('')
-      setExternalTranscriptContent(attachment)
+      setManualTranscriptText(attachment)
     })
 
     return () => {
