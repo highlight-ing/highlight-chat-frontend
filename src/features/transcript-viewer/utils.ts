@@ -5,7 +5,6 @@ import { TranscriptMessage } from './types'
 
 export function parseTranscript(transcript: string | undefined) {
   if (typeof transcript !== 'string') {
-    console.error('Invalid transcript provided to parseTranscript:', transcript)
     return []
   }
 

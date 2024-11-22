@@ -14,5 +14,6 @@ export function useTranscript() {
 
       return transcript
     },
+    enabled: !!transcriptId && transcriptId !== '',
   })
 }
