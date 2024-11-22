@@ -1,7 +1,7 @@
 import React from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowLeft, ClipboardText, VoiceSquare } from 'iconsax-react'
-import { useAtomValue, useSetAtom } from 'jotai'
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai'
 import useMeasure from 'react-use-measure'
 
 import { cn } from '@/lib/utils'
@@ -9,26 +9,48 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 import Tooltip from '@/components/Tooltip/Tooltip'
 
-import { headerHeightAtom, isOnHomeAtom, transcriptOpenAtom } from './atoms'
+import { isOnHomeAtom, transcriptOpenAtom } from './atoms'
 import { useTranscript } from './queries'
 import { TranscriptMessage } from './types'
 import { formatHeaderTimestamp, formatTranscriptTitle, parseTranscript } from './utils'
 
+const headerHeightAtom = atom(0)
+const hoveringCloseAtom = atom(false)
+
 function CloseTranscriptViewerButton() {
+  const [hoveringClose, setHoveringClose] = useAtom(hoveringCloseAtom)
   const setTranscriptOpen = useSetAtom(transcriptOpenAtom)
 
   function handleClick() {
     setTranscriptOpen(false)
+    setHoveringClose(false)
   }
 
   return (
-    <button
-      aria-label="Close Transcript Viewer"
-      onClick={handleClick}
-      className="size-8 group absolute -right-8 top-0 grid place-items-center border border-t-0 border-tertiary bg-bg-layer-1 transition-colors hover:bg-secondary"
-    >
-      <ArrowLeft size={18} className="text-tertiary transition-colors group-hover:text-primary" />
-    </button>
+    <div className="absolute -right-8 top-0">
+      <motion.button
+        onHoverStart={() => setHoveringClose(true)}
+        onHoverEnd={() => setHoveringClose(false)}
+        aria-label="Close Transcript Viewer"
+        onClick={handleClick}
+        className="size-8 group relative grid place-items-center border border-t-0 border-tertiary bg-bg-layer-1 transition-colors hover:bg-secondary"
+      >
+        <ArrowLeft size={18} className="text-tertiary transition-colors group-hover:text-primary" />
+        <AnimatePresence>
+          {hoveringClose && (
+            <motion.div
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 10 }}
+              transition={{ type: 'spring', duration: 0.2, bounce: 0 }}
+              className="absolute -left-16 rounded-lg bg-hover px-2.5 py-1 text-sm"
+            >
+              Close
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.button>
+    </div>
   )
 }
 
@@ -39,6 +61,7 @@ type TranscriptViewerLayoutProps = {
 function TranscriptViewerLayout(props: TranscriptViewerLayoutProps) {
   const transcriptOpen = useAtomValue(transcriptOpenAtom)
   const isOnHome = useAtomValue(isOnHomeAtom)
+  const hoveringClose = useAtomValue(hoveringCloseAtom)
 
   return (
     <AnimatePresence mode="popLayout">
@@ -54,7 +77,13 @@ function TranscriptViewerLayout(props: TranscriptViewerLayoutProps) {
           )}
         >
           <CloseTranscriptViewerButton />
-          {props.children}
+          <motion.div
+            initial={{ x: 0, opacity: 1, filter: 'blur(0px)' }}
+            animate={hoveringClose ? { x: -12, opacity: 0.6, filter: 'blur(1px)' } : {}}
+            className="h-full"
+          >
+            {props.children}
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
@@ -146,8 +175,8 @@ export function TranscriptViewer() {
     <TranscriptViewerLayout>
       <div className="h-full">
         <TranscriptViewerHeader />
-        <ScrollArea style={{ height: `calc(100% - ${headerHeight}px` }} className="w-full p-4 pt-6">
-          <div className="space-y-6">
+        <ScrollArea style={{ height: `calc(100% - ${headerHeight}px` }}>
+          <div className="w-full space-y-6 p-4 pt-6">
             <CopyTranscript />
             {transcriptMessages?.map((message, index) => <TranscriptMessageItem key={index} message={message} />)}
           </div>
