@@ -2,7 +2,7 @@
 
 import React from 'react'
 import styles from '@/main.module.scss'
-import { useAtom, useAtomValue } from 'jotai'
+import { useAtom } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
 import { cn } from '@/lib/utils'
@@ -28,6 +28,7 @@ import { TranscriptViewer } from '@/features/transcript-viewer/transcript-viewer
 
 export default function Home() {
   const [showHistory, setShowHistory] = React.useState(false)
+  const [transcriptOpen, setTransactionOpen] = useAtom(transcriptOpenAtom)
   const { inputIsDisabled, promptApp, isConversationLoading } = useStore(
     useShallow((state) => ({
       inputIsDisabled: state.inputIsDisabled,
@@ -36,11 +37,15 @@ export default function Home() {
     })),
   )
   const messages = useCurrentChatMessages()
-  const transcriptOpen = useAtomValue(transcriptOpenAtom)
   const isChatting = React.useMemo(() => {
     return inputIsDisabled || messages.length > 0
   }, [inputIsDisabled, messages])
-  const showTranscriptViewer = isChatting && transcriptOpen
+
+  React.useEffect(() => {
+    if (!isChatting) {
+      setTransactionOpen(false)
+    }
+  }, [isChatting, setTransactionOpen])
 
   useClipboardPaste()
   useConversationLoad()
@@ -59,8 +64,8 @@ export default function Home() {
           'grid grid-cols-3',
         )}
       >
-        {showTranscriptViewer && <TranscriptViewer />}
-        <div className={cn('col-span-3 flex w-full flex-col items-center', showTranscriptViewer && 'col-span-2')}>
+        {transcriptOpen && <TranscriptViewer />}
+        <div className={cn('col-span-3 flex w-full flex-col items-center', transcriptOpen && 'col-span-2')}>
           <ChatHeader isShowing={!isConversationLoading && !!promptApp && messages.length === 0} />
           {(isChatting || (isConversationLoading && messages.length > 0)) && <Messages />}
           {isConversationLoading && messages.length === 0 && !inputIsDisabled && <MessagesPlaceholder />}

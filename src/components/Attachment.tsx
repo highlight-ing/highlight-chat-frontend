@@ -154,6 +154,7 @@ export const Attachment = ({
   const setTranscriptOpen = useSetAtom(transcriptOpenAtom)
 
   function handleAudioClick() {
+    if (!id) return
     setSelectedTranscriptId(id)
     setTranscriptOpen(true)
   }
@@ -174,7 +175,7 @@ export const Attachment = ({
             <div className="size-9 grid grow-0 place-items-center rounded-[12px] bg-green-20 text-green">
               <VoiceSquare size={16} variant="Bold" />
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col items-start">
               <span className="text-sm font-medium text-secondary">Audio Notes</span>
               {value && <span className="text-xs text-tertiary">{`${getWordCountFormatted(value)} words`}</span>}
             </div>
