@@ -2,9 +2,12 @@ import { useMemo } from 'react'
 import { useConversations } from '@/context/ConversationContext'
 import { ConversationData } from '@highlight-ai/app-runtime'
 import { VoiceSquare } from 'iconsax-react'
+import { useSetAtom } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
 import { useStore } from '@/components/providers/store-provider'
+
+import { selectedTranscriptIdAtom, transcriptOpenAtom } from '@/features/transcript-viewer/atoms'
 
 import { OpenAppButton } from '../buttons/open-app-button'
 import Tooltip from '../Tooltip/Tooltip'
@@ -63,6 +66,8 @@ function ChatWithConversationButton(props: { conversation: ConversationData }) {
 
 export function LatestConversation(props: { focusInput: () => void }) {
   const { conversations } = useConversations()
+  const setTranscriptOpen = useSetAtom(transcriptOpenAtom)
+  const setSelectedTranscriptId = useSetAtom(selectedTranscriptIdAtom)
 
   const mostRecentConversation = useMemo(() => {
     if (conversations.length > 0) {
@@ -83,6 +88,7 @@ export function LatestConversation(props: { focusInput: () => void }) {
       const formattedConversationEndDate = formatConversationEndDate(mostRecentConversation.endedAt)
 
       return {
+        id: mostRecentConversation.id,
         title: formattedConversationTitle,
         wordCount: conversationWordCount,
         duration: formattedConversationDuration,
@@ -94,13 +100,26 @@ export function LatestConversation(props: { focusInput: () => void }) {
 
   if (!mostRecentConversation) return <NoAudioNote />
 
+  function handleTitleClick() {
+    if (!mostRecentConversation?.id) return
+
+    setSelectedTranscriptId(mostRecentConversation.id)
+    setTranscriptOpen(true)
+  }
+
   return (
     <div className="group flex w-full items-start justify-between rounded-2xl border border-[#191919] bg-secondary p-4 shadow-md transition-colors ease-out hover:bg-secondary">
       <div className="space-y-1.5">
-        <div className="flex items-center gap-3 font-medium text-primary">
-          <VoiceSquare size={24} variant="Bold" className="text-green" />
-          <p>{mostRecentConversation.title}</p>
-        </div>
+        <Tooltip position="left" tooltip="View audio note">
+          <button
+            aria-label="View Audio Note"
+            onClick={handleTitleClick}
+            className="flex items-center gap-3 font-medium text-primary"
+          >
+            <VoiceSquare size={24} variant="Bold" className="text-green" />
+            <p>{mostRecentConversation.title}</p>
+          </button>
+        </Tooltip>
         <div className="flex items-center gap-3 text-sm capitalize text-subtle">
           <Tooltip position="top" tooltip="Ended">
             <p>{mostRecentConversation.endedAt}</p>

@@ -2,7 +2,7 @@
 
 import React from 'react'
 import styles from '@/main.module.scss'
-import { useAtom } from 'jotai'
+import { useAtom, useSetAtom } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
 import { cn } from '@/lib/utils'
@@ -23,12 +23,13 @@ import { useOnPromptChange } from '@/features/highlight-chat/hooks/use-on-prompt
 import { useOnPromptLoad } from '@/features/highlight-chat/hooks/use-on-prompt-load'
 import { HistorySidebar } from '@/features/history-sidebar/history-sidebar'
 import { NavigationTopBar } from '@/features/nav-header/top-bar/top-bar'
-import { transcriptOpenAtom } from '@/features/transcript-viewer/atoms'
+import { isOnHomeAtom, transcriptOpenAtom } from '@/features/transcript-viewer/atoms'
 import { TranscriptViewer } from '@/features/transcript-viewer/transcript-viewer'
 
 export default function Home() {
   const [showHistory, setShowHistory] = React.useState(false)
   const [transcriptOpen, setTransactionOpen] = useAtom(transcriptOpenAtom)
+  const setIsOnHome = useSetAtom(isOnHomeAtom)
   const { inputIsDisabled, promptApp, isConversationLoading } = useStore(
     useShallow((state) => ({
       inputIsDisabled: state.inputIsDisabled,
@@ -42,10 +43,12 @@ export default function Home() {
   }, [inputIsDisabled, messages])
 
   React.useEffect(() => {
+    setIsOnHome(!isChatting)
+
     if (!isChatting) {
       setTransactionOpen(false)
     }
-  }, [isChatting, setTransactionOpen])
+  }, [isChatting, setIsOnHome, setTransactionOpen])
 
   useClipboardPaste()
   useConversationLoad()
