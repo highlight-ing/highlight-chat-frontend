@@ -44,10 +44,7 @@ export default function Home() {
 
   React.useEffect(() => {
     setIsOnHome(!isChatting)
-
-    if (!isChatting) {
-      setTransactionOpen(false)
-    }
+    setTransactionOpen(false)
   }, [isChatting, setIsOnHome, setTransactionOpen])
 
   useClipboardPaste()
