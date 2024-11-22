@@ -1,5 +1,5 @@
 import React from 'react'
-import { ClipboardText, VoiceSquare } from 'iconsax-react'
+import { ArrowLeft, ClipboardText, VoiceSquare } from 'iconsax-react'
 import { useAtomValue, useSetAtom } from 'jotai'
 import useMeasure from 'react-use-measure'
 
@@ -11,6 +11,24 @@ import Tooltip from '@/components/Tooltip/Tooltip'
 import { headerHeightAtom, isOnHomeAtom, transcriptOpenAtom } from './atoms'
 import { useTranscript } from './queries'
 import { formatHeaderTimestamp, formatTranscriptTitle, parseTranscript } from './utils'
+
+function CloseTranscriptViewerButton() {
+  const setTranscriptOpen = useSetAtom(transcriptOpenAtom)
+
+  function handleClick() {
+    setTranscriptOpen(false)
+  }
+
+  return (
+    <button
+      aria-label="Close Transcript Viewer"
+      onClick={handleClick}
+      className="size-8 group absolute -right-8 top-0 grid place-items-center border border-t-0 border-tertiary bg-bg-layer-1 transition-colors hover:bg-secondary"
+    >
+      <ArrowLeft size={18} className="text-tertiary transition-colors group-hover:text-primary" />
+    </button>
+  )
+}
 
 type TranscriptViewerLayoutProps = {
   children: React.ReactNode
@@ -28,6 +46,7 @@ function TranscriptViewerLayout(props: TranscriptViewerLayoutProps) {
         isOnHome && 'top-0 h-[calc(100vh-48px)]',
       )}
     >
+      <CloseTranscriptViewerButton />
       {props.children}
     </div>
   )

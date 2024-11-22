@@ -76,8 +76,8 @@ export function LatestConversation(props: { focusInput: () => void }) {
       const formattedConversationTitle =
         mostRecentConversation?.title.startsWith('Conversation ended') ||
         mostRecentConversation?.title.startsWith('Audio Notes from')
-          ? 'Audio Note'
-          : (mostRecentConversation?.title ?? 'Audio Note')
+          ? 'Most Recent Audio Note'
+          : (mostRecentConversation?.title ?? 'Most Recent Audio Note')
 
       const conversationWordCount = mostRecentConversation?.transcript.split(' ').length
 
