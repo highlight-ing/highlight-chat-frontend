@@ -65,7 +65,13 @@ export default function Home() {
         )}
       >
         {transcriptOpen && <TranscriptViewer />}
-        <div className={cn('col-span-3 flex w-full flex-col items-center', transcriptOpen && 'col-span-2')}>
+        <div
+          className={cn(
+            'col-span-3 flex w-full flex-col items-center',
+            styles.contents,
+            transcriptOpen && 'col-span-2',
+          )}
+        >
           <ChatHeader isShowing={!isConversationLoading && !!promptApp && messages.length === 0} />
           {(isChatting || (isConversationLoading && messages.length > 0)) && <Messages />}
           {isConversationLoading && messages.length === 0 && !inputIsDisabled && <MessagesPlaceholder />}

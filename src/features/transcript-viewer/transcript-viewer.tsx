@@ -41,9 +41,9 @@ function TranscriptViewerLayout(props: TranscriptViewerLayoutProps) {
   return (
     <div
       className={cn(
-        'sticky top-[56px] col-span-1 h-[calc(100vh-104px)] items-end border-r border-tertiary text-primary',
+        'sticky top-[104px] z-10 col-span-1 h-[calc(100vh-104px)] items-end border-r border-tertiary text-primary',
         !transcriptOpen && 'hidden',
-        isOnHome && 'top-0 h-[calc(100vh-48px)]',
+        isOnHome && 'top-[48px] h-[calc(100vh-48px)]',
       )}
     >
       <CloseTranscriptViewerButton />

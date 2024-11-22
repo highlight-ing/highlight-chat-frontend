@@ -99,6 +99,7 @@ export interface SpreadsheetAttachment {
 
 export interface ConversationAttachment {
   id: string
+  type: 'conversation'
   value: string
   title: string
   startedAt: Date
