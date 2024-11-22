@@ -2,11 +2,14 @@ import { useEffect, useState } from 'react'
 import { AttachmentType } from '@/types'
 import { getWordCountFormatted } from '@/utils/string'
 import { ClipboardText, DocumentText1, GallerySlash, Smallcaps, VoiceSquare } from 'iconsax-react'
+import { useSetAtom } from 'jotai'
 
 import { useImageDownload } from '@/hooks/useImageDownload'
 import { CloseIcon } from '@/components/icons'
 import { useStore } from '@/components/providers/store-provider'
 import { fetchAppIcon } from '@/app/(app)/actions'
+
+import { selectedTranscriptIdAtom, transcriptOpenAtom } from '@/features/transcript-viewer/atoms'
 
 import Tooltip from './Tooltip/Tooltip'
 
@@ -33,9 +36,14 @@ interface OtherAttachmentProps extends BaseAttachmentProps {
   isFile?: boolean
 }
 
-type AttachmentProps = WindowAttachmentProps | WindowContextAttachmentProps | OtherAttachmentProps
+type AttachmentProps = (WindowAttachmentProps | WindowContextAttachmentProps | OtherAttachmentProps) & {
+  title?: string
+  id?: string
+}
 
 export const Attachment = ({
+  title,
+  id,
   type,
   value,
   onRemove,
@@ -142,6 +150,14 @@ export const Attachment = ({
     }
   }
 
+  const setSelectedTranscriptId = useSetAtom(selectedTranscriptIdAtom)
+  const setTranscriptOpen = useSetAtom(transcriptOpenAtom)
+
+  function handleAudioClick() {
+    setSelectedTranscriptId(id)
+    setTranscriptOpen(true)
+  }
+
   return (
     <Tooltip
       key="attachment-tooltip"
@@ -151,7 +167,10 @@ export const Attachment = ({
     >
       <div className="group relative">
         {type === 'conversation' || type === 'audio' ? (
-          <div className="text-nowrap flex h-[48px] w-40 items-center gap-2.5 rounded-[16px] border border-light-10 bg-secondary p-[5px] text-base leading-none">
+          <button
+            onClick={handleAudioClick}
+            className="text-nowrap flex h-[48px] w-40 items-center gap-2.5 rounded-[16px] border border-light-10 bg-secondary p-[5px] text-base leading-none"
+          >
             <div className="size-9 grid grow-0 place-items-center rounded-[12px] bg-green-20 text-green">
               <VoiceSquare size={16} variant="Bold" />
             </div>
@@ -159,7 +178,7 @@ export const Attachment = ({
               <span className="text-sm font-medium text-secondary">Audio Notes</span>
               {value && <span className="text-xs text-tertiary">{`${getWordCountFormatted(value)} words`}</span>}
             </div>
-          </div>
+          </button>
         ) : (
           <div
             className={`flex h-[48px] items-center justify-center rounded-[16px] border border-light-10 bg-secondary ${
