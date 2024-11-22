@@ -42,6 +42,7 @@ function ChatWithConversationButton(props: { conversation: ConversationData }) {
   function handleClick() {
     clearPrompt()
     startNewConversation()
+
     addAttachment({
       id: props.conversation.id,
       type: 'conversation',
@@ -100,7 +101,7 @@ export function LatestConversation(props: { focusInput: () => void }) {
 
   if (!mostRecentConversation) return <NoAudioNote />
 
-  function handleTitleClick() {
+  function handleClick() {
     if (!mostRecentConversation?.id) return
 
     setSelectedTranscriptId(mostRecentConversation.id)
@@ -108,17 +109,17 @@ export function LatestConversation(props: { focusInput: () => void }) {
   }
 
   return (
-    <div className="group flex w-full items-start justify-between rounded-2xl border border-[#191919] bg-secondary p-4 shadow-md transition-colors ease-out hover:bg-secondary">
+    <button
+      aria-label="View Audio Note"
+      onClick={handleClick}
+      className="group flex w-full items-start justify-between rounded-2xl border border-[#191919] bg-secondary p-4 shadow-md transition-colors ease-out hover:bg-secondary"
+    >
       <div className="space-y-1.5">
         <Tooltip position="top" tooltip="View audio note">
-          <button
-            aria-label="View Audio Note"
-            onClick={handleTitleClick}
-            className="flex items-center gap-3 font-medium text-primary"
-          >
+          <div className="flex items-center gap-3 font-medium text-primary">
             <VoiceSquare size={24} variant="Bold" className="text-green" />
             <p>{mostRecentConversation.title}</p>
-          </button>
+          </div>
         </Tooltip>
         <div className="flex items-center gap-3 text-sm capitalize text-subtle">
           <Tooltip position="top" tooltip="Ended">
@@ -138,6 +139,6 @@ export function LatestConversation(props: { focusInput: () => void }) {
       >
         <ChatWithConversationButton conversation={mostRecentConversation.conversation} />
       </div>
-    </div>
+    </button>
   )
 }
