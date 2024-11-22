@@ -160,7 +160,8 @@ function TranscriptMessageItem(props: TranscriptMessageItemProps) {
 }
 
 export function TranscriptViewer() {
-  const { data, isLoading } = useTranscript()
+  const { data, isLoading, isError, isSuccess } = useTranscript()
+  const setTranscriptOpen = useSetAtom(transcriptOpenAtom)
   const headerHeight = useAtomValue(headerHeightAtom)
   const manualTranscriptText = useAtomValue(manualTranscriptTextAtom)
   const transcriptMessages = parseTranscript(data?.transcript ?? manualTranscriptText)
@@ -171,6 +172,11 @@ export function TranscriptViewer() {
         <LoadingSpinner size="20px" />
       </TranscriptViewerLayout>
     )
+  }
+
+  if (isError || (isSuccess && !data)) {
+    setTranscriptOpen(false)
+    return null
   }
 
   return (

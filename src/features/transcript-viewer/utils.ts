@@ -35,8 +35,7 @@ export function formatHeaderTimestamp(startDate: Date | string | number, endDate
 
   // check if dates are valid
   if (isNaN(startDateObj.getTime()) || isNaN(endDateObj.getTime())) {
-    console.error('Invalid date input:', { startDate, endDate })
-    return 'Invalid date range'
+    return null
   }
 
   // get the user's time zone

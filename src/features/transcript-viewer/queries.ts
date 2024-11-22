@@ -12,7 +12,7 @@ export function useTranscript() {
     queryFn: async () => {
       const transcript = await Highlight.conversations.getConversationById(transcriptId)
 
-      return transcript
+      return transcript ?? { transcript: undefined }
     },
     enabled: !!transcriptId && transcriptId !== '',
   })
