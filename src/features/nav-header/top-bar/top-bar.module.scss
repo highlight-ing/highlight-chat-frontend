@@ -196,7 +196,7 @@
 .topHeader {
   position: fixed;
   top: $topbar-height;
-  left: var(--sidebar-width);
+  left: 0;
   right: 0;
   display: flex;
   align-items: center;
@@ -211,6 +211,9 @@
   transition: left 250ms ease;
   animation: fadeInTop 250ms forwards;
 
+  &.offset {
+    left: var(--sidebar-width);
+  }
 }
 
 .topHeaderLeft {

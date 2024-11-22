@@ -5,7 +5,7 @@
   top: 0;
   left: 0;
   bottom: 0;
-  width: $chat-history-width;
+  width: var(--sidebar-width);
   display: flex;
   flex-direction: column;
   background-color: #121212;
@@ -22,7 +22,7 @@
 
   &.hide {
     pointer-events: none;
-    transform: translateX(-$chat-history-width);
+    transform: translateX(var(--sidebar-width));
     opacity: 0;
   }
 }
@@ -31,7 +31,7 @@
   height: $topbar-height;
   display: flex;
   align-items: center;
-  padding: 6px;
+  padding: 4px;
   border-bottom: 1px solid $dark-40;
   gap: 8px;
   color: $light-60;
@@ -46,7 +46,7 @@
 .chats {
   display: flex;
   flex-direction: column;
-  padding: 8px;
+  padding: 6px;
   gap: 1px;
   user-select: none;
 

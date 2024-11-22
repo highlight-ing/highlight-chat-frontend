@@ -9,7 +9,6 @@ import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
 import { Add, Clock, MessageText } from 'iconsax-react'
 import { useShallow } from 'zustand/react/shallow'
 
-import { cn } from '@/lib/utils'
 import { useOpenConverationsPersistence } from '@/hooks/useOpenConverationsPersistence'
 import { usePromptApp } from '@/hooks/usePromptApp'
 import { useTabHotkeys } from '@/hooks/useTabHotkeys'
@@ -77,22 +76,22 @@ export const NavigationTopBarTab = React.forwardRef<HTMLDivElement, TopTabProps>
       return [
         ...(conversationId !== conversation.id
           ? [
-            {
-              label: 'Open',
-              onClick: () => onOpen(conversation),
-            },
-          ]
+              {
+                label: 'Open',
+                onClick: () => onOpen(conversation),
+              },
+            ]
           : []),
         ...(openConversationMessages[conversation.id]?.length > 0
           ? [
-            {
-              label: 'Reload',
-              onClick: () => {
-                clearConversationMessages(conversation.id)
-                trackEvent('HL Chat Tab', { action: 'Reload' })
+              {
+                label: 'Reload',
+                onClick: () => {
+                  clearConversationMessages(conversation.id)
+                  trackEvent('HL Chat Tab', { action: 'Reload' })
+                },
               },
-            },
-          ]
+            ]
           : []),
         {
           divider: true,
@@ -103,29 +102,29 @@ export const NavigationTopBarTab = React.forwardRef<HTMLDivElement, TopTabProps>
         },
         ...(openConversations.length > 1
           ? [
-            {
-              label: 'Close all others',
-              onClick: () => {
-                if (conversationId !== conversation.id) {
-                  setConversationId(conversation.id)
-                }
-                setOpenConversations([conversation])
-                clearAllOtherConversationMessages(conversation.id)
-                trackEvent('HL Chat Tab', { action: 'Close all others' })
+              {
+                label: 'Close all others',
+                onClick: () => {
+                  if (conversationId !== conversation.id) {
+                    setConversationId(conversation.id)
+                  }
+                  setOpenConversations([conversation])
+                  clearAllOtherConversationMessages(conversation.id)
+                  trackEvent('HL Chat Tab', { action: 'Close all others' })
+                },
               },
-            },
-            {
-              label: 'Close all',
-              onClick: () => {
-                setOpenConversations([])
-                clearAllConversationMessages()
-                if (conversationId) {
-                  startNewConversation()
-                }
-                trackEvent('HL Chat Tab', { action: 'Close all' })
+              {
+                label: 'Close all',
+                onClick: () => {
+                  setOpenConversations([])
+                  clearAllConversationMessages()
+                  if (conversationId) {
+                    startNewConversation()
+                  }
+                  trackEvent('HL Chat Tab', { action: 'Close all' })
+                },
               },
-            },
-          ]
+            ]
           : []),
         {
           divider: true,
@@ -228,7 +227,7 @@ export const NavigationTopBarTab = React.forwardRef<HTMLDivElement, TopTabProps>
 
 export function NavigationTopBar() {
   const router = useRouter()
-  const { showHistory, setShowHistory } = useSidebar()
+  const { open: showHistory, setOpen: setShowHistory } = useSidebar()
 
   const {
     startNewConversation,
@@ -301,16 +300,22 @@ export function NavigationTopBar() {
   }, [conversationId, history])
 
   return (
-    <div
-      className={cn(
-        styles.topBar,
-        'left-[--sidebar-width] transition-[left] duration-200',
-        showHistory && 'left-[calc(var(--sidebar-width)-42px)]',
-      )}
-    >
-      <div className="flex items-center justify-between">
-        <div className={cn('flex items-center gap-1')}>
-          <Tooltip tooltip="View chat history" position="bottom">
+    <div className={styles.topBar}>
+      <div className="flex w-full items-center justify-between">
+        <div className="flex items-center gap-1">
+          <Tooltip
+            tooltip="View chat history"
+            position="bottom"
+            wrapperStyle={
+              showHistory || !setShowHistory
+                ? {
+                    visibility: 'hidden',
+                    paddingInlineStart: `calc(var(--sidebar-width) - 36px)`,
+                    transition: 'padding 250ms ease',
+                  }
+                : { transition: 'padding 250ms ease' }
+            }
+          >
             <CircleButton onClick={onShowHistoryClick}>
               <Clock size={20} variant={'Bold'} />
             </CircleButton>
@@ -365,7 +370,7 @@ export function NavigationTopBar() {
       </div>
 
       {conversationId && (
-        <div className={`${styles.topHeader}`}>
+        <div className={`${styles.topHeader} ${showHistory ? styles.offset : ''}`}>
           <div className={'flex gap-3'}>
             {promptApp ? (
               <>
