@@ -1,11 +1,7 @@
 import { format } from 'date-fns'
 import { formatInTimeZone } from 'date-fns-tz'
 
-type TranscriptMessage = {
-  time: string
-  sender: string
-  text: string
-}
+import { TranscriptMessage } from './types'
 
 export function parseTranscript(transcript: string | undefined) {
   if (typeof transcript !== 'string') {

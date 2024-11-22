@@ -11,6 +11,7 @@ import Tooltip from '@/components/Tooltip/Tooltip'
 
 import { headerHeightAtom, isOnHomeAtom, transcriptOpenAtom } from './atoms'
 import { useTranscript } from './queries'
+import { TranscriptMessage } from './types'
 import { formatHeaderTimestamp, formatTranscriptTitle, parseTranscript } from './utils'
 
 function CloseTranscriptViewerButton() {
@@ -106,6 +107,28 @@ function CopyTranscript() {
   )
 }
 
+type TranscriptMessageItemProps = {
+  message: TranscriptMessage
+}
+
+function TranscriptMessageItem(props: TranscriptMessageItemProps) {
+  return (
+    <div className="space-y-1.5">
+      <div
+        className={cn(
+          'select-text text-[13px] font-medium leading-tight',
+          props.message.sender === 'Me' || props.message.sender.toLowerCase().includes('self')
+            ? 'text-[#4ceda0]/40'
+            : 'text-white opacity-20',
+        )}
+      >
+        {props.message.time} - {props.message.sender}
+      </div>
+      <p>{props.message.text}</p>
+    </div>
+  )
+}
+
 export function TranscriptViewer() {
   const { data, isLoading } = useTranscript()
   const headerHeight = useAtomValue(headerHeightAtom)
@@ -126,22 +149,7 @@ export function TranscriptViewer() {
         <ScrollArea style={{ height: `calc(100% - ${headerHeight}px` }} className="w-full p-4 pt-6">
           <div className="space-y-6">
             <CopyTranscript />
-
-            {transcriptMessages?.map((message, index) => (
-              <div key={index} className="space-y-1.5">
-                <div
-                  className={cn(
-                    'select-text text-[13px] font-medium leading-tight',
-                    message.sender === 'Me' || message.sender.toLowerCase().includes('self')
-                      ? 'text-[#4ceda0]/40'
-                      : 'text-white opacity-20',
-                  )}
-                >
-                  {message.time} - {message.sender}
-                </div>
-                <p>{message.text}</p>
-              </div>
-            ))}
+            {transcriptMessages?.map((message, index) => <TranscriptMessageItem key={index} message={message} />)}
           </div>
         </ScrollArea>
       </div>
