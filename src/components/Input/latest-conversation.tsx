@@ -75,7 +75,7 @@ export function LatestConversation(props: { focusInput: () => void }) {
 
       const formattedConversationTitle =
         mostRecentConversation?.title.startsWith('Conversation ended') ||
-        mostRecentConversation?.title.startsWith('Audio Notes from')
+          mostRecentConversation?.title.startsWith('Audio Notes from')
           ? 'Most Recent Audio Note'
           : (mostRecentConversation?.title ?? 'Most Recent Audio Note')
 
@@ -110,7 +110,7 @@ export function LatestConversation(props: { focusInput: () => void }) {
   return (
     <div className="group flex w-full items-start justify-between rounded-2xl border border-[#191919] bg-secondary p-4 shadow-md transition-colors ease-out hover:bg-secondary">
       <div className="space-y-1.5">
-        <Tooltip position="left" tooltip="View audio note">
+        <Tooltip position="top" tooltip="View audio note">
           <button
             aria-label="View Audio Note"
             onClick={handleTitleClick}
