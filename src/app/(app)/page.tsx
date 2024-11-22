@@ -2,6 +2,7 @@
 
 import React from 'react'
 import styles from '@/main.module.scss'
+import { motion } from 'framer-motion'
 import { useAtom, useSetAtom } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -61,13 +62,13 @@ export default function Home() {
       <div
         className={cn(
           `${styles.contents} ${showHistory ? styles.partial : styles.full} ${messages.length > 0 || inputIsDisabled || !!promptApp ? styles.justifyEnd : ''}`,
-          'grid grid-cols-3',
+          'grid grid-cols-3 transition duration-700',
         )}
       >
-        {transcriptOpen && <TranscriptViewer />}
+        <TranscriptViewer />
         <div
           className={cn(
-            'col-span-3 flex w-full flex-col items-center',
+            'col-span-3 flex w-full flex-col items-center transition delay-100',
             styles.contents,
             transcriptOpen && 'col-span-2',
           )}

@@ -1,4 +1,5 @@
 import React from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowLeft, ClipboardText, VoiceSquare } from 'iconsax-react'
 import { useAtomValue, useSetAtom } from 'jotai'
 import useMeasure from 'react-use-measure'
@@ -39,16 +40,23 @@ function TranscriptViewerLayout(props: TranscriptViewerLayoutProps) {
   const isOnHome = useAtomValue(isOnHomeAtom)
 
   return (
-    <div
-      className={cn(
-        'sticky top-[104px] z-10 col-span-1 h-[calc(100vh-104px)] items-end border-r border-tertiary text-primary',
-        !transcriptOpen && 'hidden',
-        isOnHome && 'top-[48px] h-[calc(100vh-48px)]',
+    <AnimatePresence mode="popLayout">
+      {transcriptOpen && (
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -50, transition: { duration: 0.09 } }}
+          className={cn(
+            'sticky top-[104px] z-10 col-span-1 h-[calc(100vh-104px)] items-end border-r border-tertiary text-primary',
+            !transcriptOpen && 'hidden',
+            isOnHome && 'top-[48px] h-[calc(100vh-48px)]',
+          )}
+        >
+          <CloseTranscriptViewerButton />
+          {props.children}
+        </motion.div>
       )}
-    >
-      <CloseTranscriptViewerButton />
-      {props.children}
-    </div>
+    </AnimatePresence>
   )
 }
 

@@ -4,6 +4,7 @@ import { trackEvent } from '@/utils/amplitude'
 import { getDisplayValue } from '@/utils/attachments'
 import { AnimatePresence, motion, MotionConfig, Transition } from 'framer-motion'
 import { AddCircle, BoxAdd } from 'iconsax-react'
+import { useAtomValue } from 'jotai'
 import useMeasure from 'react-use-measure'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -12,6 +13,7 @@ import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 import { useStore } from '@/components/providers/store-provider'
 
 import { ViewChangelogBanner } from '@/features/changelog/view-changelog-banner'
+import { transcriptOpenAtom } from '@/features/transcript-viewer/atoms'
 
 import { Attachment } from '../Attachment'
 import { CreateShortcutButton } from '../buttons/create-shortcut-button'
@@ -54,6 +56,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   const { handleSubmit } = useSubmitQuery()
   const [isInputFocused, setIsInputFocused] = useState(false)
   const [input, setInput] = useState('')
+  const transcriptOpen = useAtomValue(transcriptOpenAtom)
 
   let inputRef = useRef<HTMLTextAreaElement>(null)
   let inputBlurTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -255,7 +258,14 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
           layout
           initial={{ height: 68 }}
           animate={{ height: bounds.height }}
-          transition={{ ...inputTransition, duration: isInputFocused ? 0.2 : 0.25, delay: isInputFocused ? 0 : 0.15 }}
+          transition={{
+            duration: 0,
+            height: {
+              ...inputTransition,
+              duration: isInputFocused ? 0.2 : 0.25,
+              delay: transcriptOpen ? 0 : isInputFocused ? 0 : 0.15,
+            },
+          }}
           className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''} min-h-[68px]`}
           onClick={focusInput}
         >
