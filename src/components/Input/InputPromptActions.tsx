@@ -1,14 +1,13 @@
-import { MouseEvent, useMemo } from 'react'
+import { MouseEvent } from 'react'
 import Image from 'next/image'
 import { PinnedPrompt } from '@/types'
 import { motion, Variants } from 'framer-motion'
-import { Archive, BoxAdd, Edit2 } from 'iconsax-react'
+import { Archive, Edit2 } from 'iconsax-react'
 
 import { supabaseLoader } from '@/lib/supabase'
 import usePromptApps from '@/hooks/usePromptApps'
 import { useStore } from '@/components/providers/store-provider'
 
-import { OpenAppButton } from '../buttons/open-app-button'
 import Tooltip from '../Tooltip/Tooltip'
 import { ScrollArea } from '../ui/scroll-area'
 
@@ -68,7 +67,6 @@ const InputActionItem = ({ prompt, input }: { prompt: PinnedPrompt; input: strin
           />
         )}
         <h3>{`${prompt.name}`}</h3>
-        {/* <p className="text-white/40">{prompt.description}</p> */}
       </div>
       <div className="flex items-center opacity-0 transition-opacity group-hover:opacity-100">
         <Tooltip position="top" tooltip="Edit prompt">
@@ -76,7 +74,7 @@ const InputActionItem = ({ prompt, input }: { prompt: PinnedPrompt; input: strin
             type="button"
             aria-label="Edit prompt"
             onClick={(e) => handleEditPromptClick(e)}
-            className="grid size-8 place-items-center"
+            className="size-8 grid place-items-center"
           >
             <Edit2 variant="Bold" size={16} />
             <span className="sr-only">Edit prompt</span>
@@ -87,7 +85,7 @@ const InputActionItem = ({ prompt, input }: { prompt: PinnedPrompt; input: strin
             type="button"
             aria-label="Unpin prompt"
             onClick={handleUnpinPromptClick}
-            className="grid size-8 place-items-center"
+            className="size-8 grid place-items-center"
           >
             <Archive variant="Bold" size={16} />
             <span className="sr-only">Unpin prompt</span>
@@ -142,8 +140,8 @@ const InputPromptActions = ({ input }: { input: string }) => {
   return (
     <motion.div layout variants={actionItemContainerVariants} initial="hidden" animate="show" exit="exit">
       <ScrollArea type="scroll" scrollHideDelay={100} viewportClassName="max-h-52">
-        {uniquePrompts.map((prompt) => (
-          <InputActionItem key={prompt.external_id} prompt={prompt} input={input} />
+        {uniquePrompts.map((prompt, index) => (
+          <InputActionItem key={`${prompt.external_id}-${index}`} prompt={prompt} input={input} />
         ))}
       </ScrollArea>
     </motion.div>

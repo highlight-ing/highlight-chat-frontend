@@ -6,6 +6,7 @@ import { trackEvent } from '@/utils/amplitude'
 import { processAttachments } from '@/utils/contextprocessor'
 import { countPromptView, getPromptAppBySlug } from '@/utils/prompts'
 import Highlight, { Attachment as RuntimeAttachmentType, type HighlightContext } from '@highlight-ai/app-runtime'
+import { useSetAtom } from 'jotai'
 import { debounce } from 'throttle-debounce'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -13,6 +14,12 @@ import { Prompt } from '@/types/supabase-helpers'
 import useAuth from '@/hooks/useAuth'
 import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 import { useStore } from '@/components/providers/store-provider'
+
+import {
+  manualTranscriptTextAtom,
+  selectedTranscriptIdAtom,
+  transcriptOpenAtom,
+} from '@/features/transcript-viewer/atoms'
 
 export function useContextReceivedHandler() {
   const {
@@ -42,6 +49,10 @@ export function useContextReceivedHandler() {
   const { handleIncomingContext } = useSubmitQuery()
 
   const router = useRouter()
+
+  const setTranscriptOpen = useSetAtom(transcriptOpenAtom)
+  const setManualTranscriptText = useSetAtom(manualTranscriptTextAtom)
+  const setSelectedTranscriptId = useSetAtom(selectedTranscriptIdAtom)
 
   React.useEffect(() => {
     const debouncedHandleSubmit = debounce(300, async (context: HighlightContext, promptApp?: Prompt) => {
@@ -101,6 +112,10 @@ export function useContextReceivedHandler() {
         value: attachment,
         duration: 0,
       })
+
+      setTranscriptOpen(true)
+      setSelectedTranscriptId('')
+      setManualTranscriptText(attachment)
     })
 
     return () => {

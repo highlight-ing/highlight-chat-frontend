@@ -12,7 +12,9 @@ export function useHistory() {
   return useQuery({
     queryKey: ['history'],
     queryFn: async () => {
-      await refreshChatHistory()
+      const history = await refreshChatHistory()
+
+      return history ?? []
     },
     staleTime: Infinity,
   })
