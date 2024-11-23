@@ -161,8 +161,6 @@ export const useSubmitQuery = () => {
     updateLastConversationMessage,
     addToast,
     updateLastMessageSentTimestamp,
-    setModelClassification,
-    setSearchClassification,
   } = useStore(
     useShallow((state) => ({
       addAttachment: state.addAttachment,
@@ -176,8 +174,6 @@ export const useSubmitQuery = () => {
       updateLastConversationMessage: state.updateLastConversationMessage,
       addToast: state.addToast,
       updateLastMessageSentTimestamp: state.updateLastMessageSentTimestamp,
-      setModelClassification: state.setModelClassification,
-      setSearchClassification: state.setSearchClassification,
     })),
   )
 
@@ -667,7 +663,7 @@ export const useSubmitQuery = () => {
 
           // If it's a string, assume it's a URL (could be a local URL)
           if (typeof attachment.value === 'string') {
-            fileOrUrl = attachment.value // Pass the URL directly
+            fileOrUrl = attachment.value
           } else {
             const fileName = `${uuidv4()}.${attachment.type}`
             const mimeType = getFileType(attachment)
@@ -688,10 +684,26 @@ export const useSubmitQuery = () => {
               search = uploadedFile.search
             }
           }
-        }),
+        })
       )
 
       await Promise.all(uploadFilePromises)
+
+      // Build form data
+      const formData = await buildFormData({
+        prompt: query,
+        conversationId,
+        attachedContext,
+        availableContexts,
+      })
+
+      // Add model and search if available
+      if (model) {
+        formData.append('model', model)
+      }
+      if (search !== undefined) {
+        formData.append('search', String(search))
+      }
 
       // Add non-uploadable attachments to attachedContext
       attachments
@@ -755,23 +767,6 @@ export const useSubmitQuery = () => {
         titles: windows,
       }
       availableContexts.context.push(windowListAttachment)
-
-      // Build FormData using the updated builder
-      const formData = await buildFormData({
-        prompt: query,
-        conversationId,
-        llmProvider: 'anthropic',
-        attachedContext,
-        availableContexts,
-      })
-
-      // Add model and search if available
-      if (model) {
-        formData.append('model', model)
-      }
-      if (search !== undefined) {
-        formData.append('search', String(search))
-      }
 
       // @ts-expect-error
       addConversationMessage(conversationId, {
