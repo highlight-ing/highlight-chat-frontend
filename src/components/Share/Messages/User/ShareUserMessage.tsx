@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import React from 'react'
 import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
@@ -8,41 +8,106 @@ import 'katex/dist/katex.min.css'
 
 import { UserMessage } from '@/types'
 import { getDisplayValue } from '@/utils/attachments'
-import { ProfileCircle } from 'iconsax-react'
+import { DocumentText1, GallerySlash } from 'iconsax-react'
 
+import { Skeleton } from '@/components/ui/skeleton'
+import { Tooltip } from '@/components/ui/tooltip'
 import { Attachment } from '@/components/Attachment'
 import CodeBlock from '@/components/Messages/CodeBlock'
 import Spinner from '@/components/Spinner'
+
+import { useFileMetadata } from './hooks'
+import { hasAttachment, preprocessLaTeX } from './utils'
+
+type UserFileLayoutProps = {
+  children: React.ReactNode
+  tooltipContent?: string
+}
+
+function UserFileLayout(props: UserFileLayoutProps) {
+  return (
+    <Tooltip content={props.tooltipContent ?? 'File'}>
+      <div className="grid h-10 w-16 place-items-center rounded-xl border border-secondary/60">{props.children}</div>
+    </Tooltip>
+  )
+}
+
+type UserFileProps = {
+  fileId: string
+}
+
+const ATTACHMENT_SIZE = 20
+
+function UserFile(props: UserFileProps) {
+  const { data, isLoading, isError } = useFileMetadata(props.fileId)
+
+  if (isLoading) {
+    return (
+      <UserFileLayout tooltipContent="Getting file type">
+        <Skeleton className="size-full bg-secondary" />
+      </UserFileLayout>
+    )
+  }
+
+  if (isError)
+    return (
+      <UserFileLayout tooltipContent="Error retreving file type">
+        <DocumentText1 variant="Bold" size={ATTACHMENT_SIZE} color="#FF8A65" />
+      </UserFileLayout>
+    )
+
+  if (data?.file_type.includes('image')) {
+    return (
+      <UserFileLayout tooltipContent="Image">
+        <GallerySlash variant="Bold" size={ATTACHMENT_SIZE} color="#00FAFF" />
+      </UserFileLayout>
+    )
+  }
+
+  if (data?.file_type.includes('pdf')) {
+    return (
+      <UserFileLayout tooltipContent="PDF">
+        <DocumentText1 variant="Bold" size={ATTACHMENT_SIZE} />
+      </UserFileLayout>
+    )
+  }
+
+  return (
+    <UserFileLayout>
+      <DocumentText1 size={ATTACHMENT_SIZE} className="text-secondary" />
+    </UserFileLayout>
+  )
+}
+
+type MessageContent = {
+  content?: string
+  attached_context: Array<{
+    file_id: string
+    type: string
+  }>
+  file_ids: Array<string>
+}
 
 interface ShareUserMessageProps {
   message: UserMessage & { fetchedImage?: string; isImageLoading?: boolean }
 }
 
-const hasAttachment = (message: UserMessage) => {
-  return (
-    message.screenshot ||
-    message.clipboard_text ||
-    message.window_context ||
-    message.window ||
-    message.file_title ||
-    message.audio ||
-    message.image_url ||
-    (message.file_attachments && message.file_attachments.length > 0)
-  )
-}
-
-const preprocessLaTeX = (content: string) => {
-  const blockProcessedContent = content.replace(/\\\[(.*?)\\\]/g, (_, equation) => `$$${equation}$$`)
-  return blockProcessedContent.replace(/\\\((.*?)\\\)/g, (_, equation) => `$${equation}$`)
-}
-
 export const ShareUserMessage: React.FC<ShareUserMessageProps> = React.memo(({ message }) => {
-  const hasAttachments = useMemo(() => hasAttachment(message), [message])
-  const hasContent = typeof message.content === 'string' && message.content.trim() !== ''
+  const content = typeof message.content === 'string' ? (JSON.parse(message.content) as MessageContent) : undefined
+  const hasAttachments = React.useMemo(() => hasAttachment(message), [message])
+  const hasContent = content?.content?.trim() !== ''
+  const hasFiles = content?.file_ids && content.file_ids.length > 0
 
   return (
     <div className="mx-auto my-4 w-full max-w-[712px] px-6 md:px-4">
-      <div className="rounded-[16px] border border-tertiary bg-primary p-4">
+      <div className="space-y-2 rounded-[16px] border border-tertiary bg-primary p-4">
+        {hasFiles && (
+          <div className="flex items-center gap-2">
+            {content.file_ids.map((fileId) => (
+              <UserFile key={fileId} fileId={fileId} />
+            ))}
+          </div>
+        )}
         {hasContent && (
           <div className={`text-sm font-light leading-[1.6] text-primary/90 ${hasAttachments ? 'mb-4' : ''}`}>
             <Markdown
@@ -77,7 +142,7 @@ export const ShareUserMessage: React.FC<ShareUserMessageProps> = React.memo(({ m
                 },
               }}
             >
-              {typeof message.content === 'string' ? preprocessLaTeX(message.content) : ''}
+              {typeof content?.content === 'string' ? preprocessLaTeX(content.content) : ''}
             </Markdown>
           </div>
         )}

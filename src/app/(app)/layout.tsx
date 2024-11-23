@@ -4,6 +4,7 @@ import React from 'react'
 import { ConversationProvider } from '@/context/ConversationContext'
 import Highlight from '@highlight-ai/app-runtime'
 
+import { TooltipProvider } from '@/components/ui/tooltip'
 import { JotaiProvider } from '@/components/providers/jotai-provider'
 import { ReactQueryProvider } from '@/components/providers/react-query-provider'
 import { StoreProvider } from '@/components/providers/store-provider'
@@ -22,7 +23,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <ConversationProvider>
         <ReactQueryProvider>
           <JotaiProvider>
-            <App>{children}</App>
+            <TooltipProvider>
+              <App>{children}</App>
+            </TooltipProvider>
           </JotaiProvider>
         </ReactQueryProvider>
       </ConversationProvider>

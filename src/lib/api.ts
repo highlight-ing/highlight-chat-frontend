@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { extractBearerToken, validateHighlightJWT } from './auth'
 
 interface RequestOptions {
-  version?: 'v1' | 'v3'
+  version?: 'v1' | 'v3' | 'v4'
   signal?: AbortSignal
 }
 
