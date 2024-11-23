@@ -3,7 +3,7 @@ import { getWordCount } from '@/utils/string'
 import { ConversationData } from '@highlight-ai/app-runtime'
 import { VoiceSquare } from 'iconsax-react'
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { Tooltip } from '@/components/ui/tooltip'
 import { useInputFocus } from '@/components/Input/Input'
 import { useStore } from '@/components/providers/store-provider'
 
@@ -34,24 +34,17 @@ export function EntryAttachment({ conversation }: EntryAttachmentProps) {
   }
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <button
-            onClick={handleAttachConversation}
-            className="flex w-[280px] max-w-[280px] items-start rounded-[14px] border border-tertiary p-2 text-[14px] text-subtle hover:bg-tertiary"
-          >
-            <VoiceSquare variant="Linear" size={42} color="#4CEDA0" className="mr-3" />
-            <div className="flex flex-col items-start justify-center">
-              <span className="font-medium text-secondary">Conversation</span>
-              <span className="text-[12px] text-tertiary">{getWordCount(conversation.transcript)} Words</span>
-            </div>
-          </button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p className="max-w-[300px]">{tooltipContent}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip content={tooltipContent} className="max-w-[300px]">
+      <button
+        onClick={handleAttachConversation}
+        className="flex w-[280px] max-w-[280px] items-start rounded-[14px] border border-tertiary p-2 text-[14px] text-subtle hover:bg-tertiary"
+      >
+        <VoiceSquare variant="Linear" size={42} color="#4CEDA0" className="mr-3" />
+        <div className="flex flex-col items-start justify-center">
+          <span className="font-medium text-secondary">Conversation</span>
+          <span className="text-[12px] text-tertiary">{getWordCount(conversation.transcript)} Words</span>
+        </div>
+      </button>
+    </Tooltip>
   )
 }
