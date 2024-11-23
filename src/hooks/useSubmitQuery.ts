@@ -161,6 +161,8 @@ export const useSubmitQuery = () => {
     updateLastConversationMessage,
     addToast,
     updateLastMessageSentTimestamp,
+    setModelClassification,
+    setSearchClassification,
   } = useStore(
     useShallow((state) => ({
       addAttachment: state.addAttachment,
@@ -174,6 +176,8 @@ export const useSubmitQuery = () => {
       updateLastConversationMessage: state.updateLastConversationMessage,
       addToast: state.addToast,
       updateLastMessageSentTimestamp: state.updateLastMessageSentTimestamp,
+      setModelClassification: state.setModelClassification,
+      setSearchClassification: state.setSearchClassification,
     })),
   )
 
@@ -543,6 +547,7 @@ export const useSubmitQuery = () => {
           const uploadedFile = await uploadFile(
             new File([attachment.value], fileName, { type: mimeType }),
             conversationId,
+            { prompt: query },
           )
           return {
             originalAttachment: attachment,
@@ -636,6 +641,9 @@ export const useSubmitQuery = () => {
     try {
       setInputIsDisabled(true)
 
+      let model: string | undefined
+      let search: boolean | undefined
+
       let conversationId = getConversationId()
       if (!conversationId) {
         conversationId = await createAndValidateConversationId()
@@ -651,8 +659,10 @@ export const useSubmitQuery = () => {
       }
 
       // Upload files first
+      const fileAttachments = attachments.filter(isUploadableAttachment)
+
       const uploadFilePromises = await Promise.all(
-        attachments.filter(isUploadableAttachment).map(async (attachment) => {
+        fileAttachments.map(async (attachment) => {
           let fileOrUrl: File | string = attachment.value
 
           // If it's a string, assume it's a URL (could be a local URL)
@@ -664,11 +674,19 @@ export const useSubmitQuery = () => {
             fileOrUrl = new File([attachment.value], fileName, { type: mimeType })
           }
 
-          const uploadedFile = await uploadFile(fileOrUrl, conversationId)
+          const uploadedFile = await uploadFile(fileOrUrl, conversationId, { prompt: query })
 
           if (uploadedFile && uploadedFile.file_id) {
             const metadata = await createAttachmentMetadata(attachment, uploadedFile.file_id)
             if (metadata) attachedContext.context.push(metadata)
+
+            // Get model and search from first file that has them
+            if (!model && uploadedFile?.model) {
+              model = uploadedFile.model
+            }
+            if (search === undefined && uploadedFile?.search !== undefined) {
+              search = uploadedFile.search
+            }
           }
         }),
       )
@@ -746,6 +764,14 @@ export const useSubmitQuery = () => {
         attachedContext,
         availableContexts,
       })
+
+      // Add model and search if available
+      if (model) {
+        formData.append('model', model)
+      }
+      if (search !== undefined) {
+        formData.append('search', String(search))
+      }
 
       // @ts-expect-error
       addConversationMessage(conversationId, {
