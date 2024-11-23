@@ -22,11 +22,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <StoreProvider>
       <ConversationProvider>
         <ReactQueryProvider>
-          <App>
-            <TooltipProvider>{children}</TooltipProvider>
-          </App>
           <JotaiProvider>
-            <App>{children}</App>
+            <TooltipProvider>
+              <App>{children}</App>
+            </TooltipProvider>
           </JotaiProvider>
         </ReactQueryProvider>
       </ConversationProvider>
