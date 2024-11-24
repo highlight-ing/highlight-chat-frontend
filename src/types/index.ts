@@ -114,7 +114,7 @@ export type FileAttachment =
   | TextFileAttachment
   | WindowContextAttachment
 
-export type Attachment =
+export type Attachment = (
   | AudioAttachment
   | ClipboardAttachment
   | SelectedTextAttachment
@@ -122,6 +122,12 @@ export type Attachment =
   | FileAttachment
   | WindowContextAttachment
   | ConversationAttachment
+) & {
+  id?: string
+  title?: string
+  startedAt?: Date
+  endedAt?: Date
+}
 
 export type FileAttachmentType = 'image' | 'pdf' | 'spreadsheet' | 'text_file'
 export type AttachmentType =

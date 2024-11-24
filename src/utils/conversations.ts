@@ -52,3 +52,17 @@ export const getConversationWordCount = (conversation?: ConversationData): strin
   }
   return `${wordCount} Words`
 }
+
+export function formatTitle(originalTitle: string | undefined) {
+  if (!originalTitle) return 'Audio Note'
+
+  if (originalTitle.startsWith('Audio Notes from')) {
+    return 'Audio Note'
+  }
+
+  if (originalTitle.startsWith('Google Meet')) {
+    return 'Google Meet'
+  }
+
+  return originalTitle
+}
