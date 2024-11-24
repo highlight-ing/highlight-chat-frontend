@@ -12,7 +12,7 @@
   border-right: 1px solid $dark-40;
   overflow-x: hidden;
   transition: transform 250ms, opacity 250ms;
-  z-index: 2;
+  z-index: 30;
 
   &.show {
     pointer-events: initial;
@@ -188,7 +188,7 @@ $selector-size: 17px;
   font-size: 13px;
   color: $light-40;
   pointer-events: all;
-  z-index: 1;
+  z-index: 20;
   transition: background-color 200ms, border 100ms;
   animation: fadeInBottom 200ms forwards;
 
