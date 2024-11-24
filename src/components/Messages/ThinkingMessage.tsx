@@ -4,7 +4,7 @@ import { useShallow } from 'zustand/react/shallow'
 import { StoreState } from '@/stores'
 import styles from './message.module.scss'
 import globalStyles from '@/global.module.scss'
-import { SpinningGear, CompletedCheckbox } from '@/components/icons/ThinkingIcons'
+import { SpinningGear, CompletedCheckbox } from '@/components/Icons/ThinkingIcons'
 import ThinkingDrawer from './ThinkingDrawer'
 import { MetadataEvent } from '@/types'
 
