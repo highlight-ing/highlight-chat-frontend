@@ -210,7 +210,7 @@ const FormPopoverTrigger = React.forwardRef<
 FormPopoverTrigger.displayName = PopoverTrigger.displayName
 
 const FormTextarea = React.forwardRef<HTMLTextAreaElement, React.ComponentProps<'textarea'>>(
-  ({ className, rows = 4, ...props }, ref) => {
+  ({ className, ...props }, ref) => {
     const { error } = useFormField()
 
     return (
@@ -243,12 +243,12 @@ FormInput.displayName = 'Input'
 export {
   useFormField,
   Form,
+  FormField,
   FormItem,
   FormLabel,
   FormControl,
   FormDescription,
   FormMessage,
-  FormField,
   FormSelectTrigger,
   FormTextarea,
   FormInput,

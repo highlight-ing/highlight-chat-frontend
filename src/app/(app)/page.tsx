@@ -68,7 +68,7 @@ export default function Home() {
         <TranscriptViewer />
         <div
           className={cn(
-            'col-span-3 flex w-full flex-col items-center transition delay-100',
+            'col-span-3 flex w-full flex-col items-center justify-end transition delay-100',
             styles.contents,
             transcriptOpen && 'col-span-2',
           )}

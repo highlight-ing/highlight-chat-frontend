@@ -145,6 +145,7 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
 
   const form = useForm<z.infer<typeof googleCalEventFormSchema>>({
     resolver: zodResolver(googleCalEventFormSchema),
+    shouldFocusError: true,
     defaultValues: {
       summary: props.data.summary,
       location: props.data.location,

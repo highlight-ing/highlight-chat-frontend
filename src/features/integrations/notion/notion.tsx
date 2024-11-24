@@ -101,6 +101,7 @@ function NotionPageForm(props: NotionFormProps) {
 
   const form = useForm<z.infer<typeof notionPageFormSchema>>({
     resolver: zodResolver(notionPageFormSchema),
+    shouldFocusError: true,
     defaultValues: {
       title: props.title,
       parentId: '',
@@ -114,6 +115,23 @@ function NotionPageForm(props: NotionFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+        <FormItem>
+          <FormLabel>Page Contents</FormLabel>
+          <div className="min-h-44 relative flex !h-fit w-full resize-none flex-col justify-start gap-2 rounded-2xl border border-light-10 bg-secondary bg-transparent px-3 pb-2 pt-7 text-[15px] text-base text-primary shadow-sm outline-none transition-[padding] placeholder:text-subtle hover:border-light-20 focus:border-light-20 focus:bg-tertiary disabled:cursor-not-allowed disabled:opacity-50 md:text-sm">
+            <Markdown
+              components={{
+                a: ({ href, children }) => (
+                  <a href={href} target="_blank">
+                    {children}
+                  </a>
+                ),
+              }}
+            >
+              {contentWithFooter}
+            </Markdown>
+          </div>
+        </FormItem>
+
         <FormField
           control={form.control}
           name="parentId"
@@ -141,23 +159,6 @@ function NotionPageForm(props: NotionFormProps) {
             </FormItem>
           )}
         />
-
-        <FormItem>
-          <FormLabel>Page Contents</FormLabel>
-          <div className="min-h-36 relative flex !h-fit w-full resize-none flex-col justify-start gap-2 rounded-2xl border border-light-10 bg-secondary bg-transparent px-3 pb-2 pt-7 text-[15px] text-base text-primary shadow-sm outline-none transition-[padding] placeholder:text-subtle hover:border-light-20 focus:border-light-20 focus:bg-tertiary disabled:cursor-not-allowed disabled:opacity-50 md:text-sm">
-            <Markdown
-              components={{
-                a: ({ href, children }) => (
-                  <a href={href} target="_blank">
-                    {children}
-                  </a>
-                ),
-              }}
-            >
-              {contentWithFooter}
-            </Markdown>
-          </div>
-        </FormItem>
 
         <IntegrationSubmitButton isPending={isPending} label="Create page" icon={<NotionIcon size={20} />} />
       </form>
