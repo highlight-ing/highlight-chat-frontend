@@ -2,15 +2,15 @@
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
-import { trackEvent } from '@/utils/amplitude'
-import { processAttachments } from '@/utils/contextprocessor'
-import { countPromptView, getPromptAppBySlug } from '@/utils/prompts'
 import Highlight, { Attachment as RuntimeAttachmentType, type HighlightContext } from '@highlight-ai/app-runtime'
 import { useSetAtom } from 'jotai'
 import { debounce } from 'throttle-debounce'
 import { useShallow } from 'zustand/react/shallow'
 
 import { Prompt } from '@/types/supabase-helpers'
+import { trackEvent } from '@/utils/amplitude'
+import { processAttachments } from '@/utils/contextprocessor'
+import { countPromptView, getPromptAppBySlug } from '@/utils/prompts'
 import { selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import useAuth from '@/hooks/useAuth'
 import { useSubmitQuery } from '@/hooks/useSubmitQuery'
@@ -108,6 +108,7 @@ export function useContextReceivedHandler() {
       })
 
       setSelectedAudioNote({
+        title: 'Audio Note',
         transcript: attachment,
       })
       setTranscriptOpen(true)

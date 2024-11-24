@@ -51,13 +51,3 @@ export function formatHeaderTimestamp(startDate: Date | string | number, endDate
 
   return `${datePart} ${startTimePart} - ${endTimePart} ${timeZoneAbbr}`
 }
-
-export function formatTranscriptTitle(originalTitle: string | undefined) {
-  if (!originalTitle) return 'Audio Note'
-
-  if (originalTitle.startsWith('Audio Notes from')) {
-    return 'Audio Note'
-  }
-
-  return originalTitle
-}
