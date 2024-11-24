@@ -11,7 +11,7 @@ import { debounce } from 'throttle-debounce'
 import { useShallow } from 'zustand/react/shallow'
 
 import { Prompt } from '@/types/supabase-helpers'
-import { manualTranscriptTextAtom, selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
+import { selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import useAuth from '@/hooks/useAuth'
 import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 import { useStore } from '@/components/providers/store-provider'
@@ -46,8 +46,7 @@ export function useContextReceivedHandler() {
   const router = useRouter()
 
   const setTranscriptOpen = useSetAtom(transcriptOpenAtom)
-  const setManualTranscriptText = useSetAtom(manualTranscriptTextAtom)
-  const selectedAudioNote = useSetAtom(selectedAudioNoteAtom)
+  const setSelectedAudioNote = useSetAtom(selectedAudioNoteAtom)
 
   React.useEffect(() => {
     const debouncedHandleSubmit = debounce(300, async (context: HighlightContext, promptApp?: Prompt) => {
@@ -108,10 +107,10 @@ export function useContextReceivedHandler() {
         duration: 0,
       })
 
-      setTranscriptOpen(true)
-      selectedAudioNote({
+      setSelectedAudioNote({
         transcript: attachment,
       })
+      setTranscriptOpen(true)
     })
 
     return () => {
