@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import { Attachment as AttachmentType, isFileAttachmentType } from '@/types'
 import { trackEvent } from '@/utils/amplitude'
 import { getDisplayValue } from '@/utils/attachments'
@@ -13,7 +14,6 @@ import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 import { useStore } from '@/components/providers/store-provider'
 
 import { ViewChangelogBanner } from '@/features/changelog/view-changelog-banner'
-import { transcriptOpenAtom } from '@/features/transcript-viewer/atoms'
 
 import { Attachment } from '../Attachment'
 import { CreateShortcutButton } from '../buttons/create-shortcut-button'
@@ -293,26 +293,29 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
             <AnimatePresence mode="popLayout">
               {attachments.length > 0 && (
                 <div className={`${styles.attachmentsRow} mt-1.5`}>
-                  {attachments.map((attachment: AttachmentType, index: number) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, filter: 'blur(4px)', y: -5 }}
-                      animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
-                      transition={{ ...inputTransition, delay: 0.15 }}
-                    >
-                      <Attachment
-                        type={attachment.type}
-                        value={getDisplayValue(attachment)}
-                        isFile={
-                          attachment.type === 'pdf' ||
-                          (attachment.type === 'image' && !!attachment.file) ||
-                          attachment.type === 'spreadsheet'
-                        }
-                        onRemove={() => onRemoveAttachment(attachment)}
+                  {attachments.map((attachment: AttachmentType, index: number) => {
+                    console.log(attachment)
+                    return (
+                      <motion.div
                         key={index}
-                      />
-                    </motion.div>
-                  ))}
+                        initial={{ opacity: 0, filter: 'blur(4px)', y: -5 }}
+                        animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
+                        transition={{ ...inputTransition, delay: 0.15 }}
+                      >
+                        <Attachment
+                          type={attachment.type}
+                          value={getDisplayValue(attachment)}
+                          isFile={
+                            attachment.type === 'pdf' ||
+                            (attachment.type === 'image' && !!attachment.file) ||
+                            attachment.type === 'spreadsheet'
+                          }
+                          onRemove={() => onRemoveAttachment(attachment)}
+                          key={index}
+                        />
+                      </motion.div>
+                    )
+                  })}
                 </div>
               )}
             </AnimatePresence>

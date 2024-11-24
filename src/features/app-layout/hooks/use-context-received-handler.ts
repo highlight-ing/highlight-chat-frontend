@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
+import { manualTranscriptTextAtom, selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import { trackEvent } from '@/utils/amplitude'
 import { processAttachments } from '@/utils/contextprocessor'
 import { countPromptView, getPromptAppBySlug } from '@/utils/prompts'
@@ -14,12 +15,6 @@ import { Prompt } from '@/types/supabase-helpers'
 import useAuth from '@/hooks/useAuth'
 import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 import { useStore } from '@/components/providers/store-provider'
-
-import {
-  manualTranscriptTextAtom,
-  selectedTranscriptIdAtom,
-  transcriptOpenAtom,
-} from '@/features/transcript-viewer/atoms'
 
 export function useContextReceivedHandler() {
   const {
@@ -52,7 +47,7 @@ export function useContextReceivedHandler() {
 
   const setTranscriptOpen = useSetAtom(transcriptOpenAtom)
   const setManualTranscriptText = useSetAtom(manualTranscriptTextAtom)
-  const setSelectedTranscriptId = useSetAtom(selectedTranscriptIdAtom)
+  const selectedAudioNote = useSetAtom(selectedAudioNoteAtom)
 
   React.useEffect(() => {
     const debouncedHandleSubmit = debounce(300, async (context: HighlightContext, promptApp?: Prompt) => {
@@ -114,8 +109,9 @@ export function useContextReceivedHandler() {
       })
 
       setTranscriptOpen(true)
-      setSelectedTranscriptId('')
-      setManualTranscriptText(attachment)
+      selectedAudioNote({
+        transcript: attachment,
+      })
     })
 
     return () => {

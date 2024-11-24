@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import { AttachmentType } from '@/types'
 import { getWordCountFormatted } from '@/utils/string'
 import { ClipboardText, DocumentText1, GallerySlash, Smallcaps, VoiceSquare } from 'iconsax-react'
@@ -8,12 +9,6 @@ import { useImageDownload } from '@/hooks/useImageDownload'
 import { CloseIcon } from '@/components/icons'
 import { useStore } from '@/components/providers/store-provider'
 import { fetchAppIcon } from '@/app/(app)/actions'
-
-import {
-  manualTranscriptTextAtom,
-  selectedTranscriptIdAtom,
-  transcriptOpenAtom,
-} from '@/features/transcript-viewer/atoms'
 
 import Tooltip from './Tooltip/Tooltip'
 
@@ -43,6 +38,8 @@ interface OtherAttachmentProps extends BaseAttachmentProps {
 type AttachmentProps = (WindowAttachmentProps | WindowContextAttachmentProps | OtherAttachmentProps) & {
   title?: string
   id?: string
+  startedAt?: Date
+  endedAt?: Date
 }
 
 export const Attachment = ({
@@ -154,21 +151,18 @@ export const Attachment = ({
     }
   }
 
-  const setSelectedTranscriptId = useSetAtom(selectedTranscriptIdAtom)
-  const setManualTranscriptText = useSetAtom(manualTranscriptTextAtom)
+  const setSelectedAudioNote = useSetAtom(selectedAudioNoteAtom)
   const setTranscriptOpen = useSetAtom(transcriptOpenAtom)
 
   function handleAudioClick() {
-    if (!id && !value) return
+    if (!value) return
 
-    if (id) {
-      setSelectedTranscriptId(id)
-      setManualTranscriptText(value)
-    } else if (value) {
-      setSelectedTranscriptId('')
-      setManualTranscriptText(value)
-    }
-
+    setSelectedAudioNote({
+      id,
+      transcript: value,
+      startedAt: props.startedAt,
+      endedAt: props.endedAt,
+    })
     setTranscriptOpen(true)
   }
 

@@ -1,24 +1,27 @@
 import React from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { isOnHomeAtom, selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
+import { AnimatePresence, motion, Variants } from 'framer-motion'
 import { ArrowLeft, ClipboardText, VoiceSquare } from 'iconsax-react'
-import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai'
+import { atom, useAtomValue, useSetAtom } from 'jotai'
 import useMeasure from 'react-use-measure'
 
 import { cn } from '@/lib/utils'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
-import Tooltip from '@/components/Tooltip/Tooltip'
+import { Tooltip } from '@/components/ui/tooltip'
 
-import { isOnHomeAtom, manualTranscriptTextAtom, transcriptOpenAtom } from './atoms'
-import { useTranscript } from './queries'
 import { TranscriptMessage } from './types'
 import { formatHeaderTimestamp, formatTranscriptTitle, parseTranscript } from './utils'
 
 const headerHeightAtom = atom(0)
 const hoveringCloseAtom = atom(false)
 
+const hoveringCloseVariants: Variants = {
+  idle: { x: 0, opacity: 1 },
+  hover: (hoveringClose: boolean) => (hoveringClose ? { x: -12, opacity: 0.5 } : {}),
+}
+
 function CloseTranscriptViewerButton() {
-  const [hoveringClose, setHoveringClose] = useAtom(hoveringCloseAtom)
+  const setHoveringClose = useSetAtom(hoveringCloseAtom)
   const setTranscriptOpen = useSetAtom(transcriptOpenAtom)
 
   function handleClick() {
@@ -27,30 +30,19 @@ function CloseTranscriptViewerButton() {
   }
 
   return (
-    <div className="absolute -right-8 top-0">
-      <motion.button
-        onHoverStart={() => setHoveringClose(true)}
-        onHoverEnd={() => setHoveringClose(false)}
-        aria-label="Close Transcript Viewer"
-        onClick={handleClick}
-        className="size-8 group relative grid place-items-center border border-t-0 border-tertiary bg-bg-layer-1 transition-colors hover:bg-secondary"
-      >
-        <ArrowLeft size={18} className="text-tertiary transition-colors group-hover:text-primary" />
-        <AnimatePresence>
-          {hoveringClose && (
-            <motion.div
-              initial={{ opacity: 0, x: 10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 10 }}
-              transition={{ type: 'spring', duration: 0.2, bounce: 0 }}
-              className="absolute -left-16 rounded-lg bg-hover px-2.5 py-1 text-sm"
-            >
-              Close
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.button>
-    </div>
+    <Tooltip content="Close" side="left">
+      <div className="absolute -right-8 top-0">
+        <motion.button
+          onHoverStart={() => setHoveringClose(true)}
+          onHoverEnd={() => setHoveringClose(false)}
+          aria-label="Close Transcript Viewer"
+          onClick={handleClick}
+          className="size-8 group relative grid place-items-center border border-t-0 border-tertiary bg-bg-layer-1 transition-colors hover:bg-secondary"
+        >
+          <ArrowLeft size={18} className="text-tertiary transition-colors group-hover:text-primary" />
+        </motion.button>
+      </div>
+    </Tooltip>
   )
 }
 
@@ -58,77 +50,109 @@ type TranscriptViewerLayoutProps = {
   children: React.ReactNode
 }
 
+const transcriptViewerVariants: Variants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: { opacity: 1, x: 0 },
+  exit: { opacity: 0, x: -50, transition: { duration: 0.09 } },
+}
+
 function TranscriptViewerLayout(props: TranscriptViewerLayoutProps) {
   const transcriptOpen = useAtomValue(transcriptOpenAtom)
   const isOnHome = useAtomValue(isOnHomeAtom)
-  const hoveringClose = useAtomValue(hoveringCloseAtom)
 
   return (
     <AnimatePresence mode="popLayout">
       {transcriptOpen && (
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -50, transition: { duration: 0.09 } }}
+          variants={transcriptViewerVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
           className={cn(
             'sticky top-[104px] z-10 col-span-1 h-[calc(100vh-104px)] items-end border-r border-tertiary text-primary',
-            !transcriptOpen && 'hidden',
             isOnHome && 'top-[48px] h-[calc(100vh-48px)]',
           )}
         >
           <CloseTranscriptViewerButton />
-          <motion.div
-            initial={{ x: 0, opacity: 1, filter: 'blur(0px)' }}
-            animate={hoveringClose ? { x: -12, opacity: 0.6, filter: 'blur(1px)' } : {}}
-            className="h-full"
-          >
-            {props.children}
-          </motion.div>
+          {props.children}
         </motion.div>
       )}
     </AnimatePresence>
   )
 }
 
-function TranscriptViewerHeader() {
-  const { data } = useTranscript()
-  const setHeaderHeight = useSetAtom(headerHeightAtom)
+type TranscriptViewerHeaderLayoutProps = {
+  children: React.ReactNode
+}
+
+function TranscriptViewerHeaderLayout(props: TranscriptViewerHeaderLayoutProps) {
+  const hoveringClose = useAtomValue(hoveringCloseAtom)
   const [ref, bounds] = useMeasure()
+  const setHeaderHeight = useSetAtom(headerHeightAtom)
 
   React.useEffect(() => {
     setHeaderHeight(bounds.height)
   }, [bounds, setHeaderHeight])
 
-  if (!data?.transcript) return null
+  return (
+    <div ref={ref} className="border-b border-tertiary">
+      <motion.div
+        variants={hoveringCloseVariants}
+        custom={hoveringClose}
+        initial="idle"
+        animate="hover"
+        className="space-y-2 p-4"
+      >
+        {props.children}
+      </motion.div>
+    </div>
+  )
+}
 
-  const formattedTitle = formatTranscriptTitle(data.title)
+function TranscriptViewerHeader() {
+  const selectedAudioNote = useAtomValue(selectedAudioNoteAtom)
+  const formattedTitle = formatTranscriptTitle(selectedAudioNote?.title)
+  const hasValidDates = selectedAudioNote?.startedAt && selectedAudioNote?.endedAt
+
+  if (!selectedAudioNote?.transcript) {
+    return (
+      <TranscriptViewerHeaderLayout>
+        <h3 className="line-clamp-1 w-full text-ellipsis text-xl font-semibold tracking-tight">
+          No audio note selected
+        </h3>
+      </TranscriptViewerHeaderLayout>
+    )
+  }
 
   return (
-    <div ref={ref} className="space-y-2 border-b border-tertiary p-4">
+    <TranscriptViewerHeaderLayout>
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <VoiceSquare size={32} variant="Bold" className="hidden text-green xl:block" />
           <h3 className="line-clamp-1 w-full text-ellipsis text-xl font-semibold tracking-tight">{formattedTitle}</h3>
         </div>
       </div>
-      <p className="text-[15px] font-medium text-subtle">{formatHeaderTimestamp(data.startedAt, data.endedAt)}</p>
-    </div>
+      {hasValidDates && (
+        <p className="text-[15px] font-medium text-subtle">
+          {formatHeaderTimestamp(selectedAudioNote.startedAt!, selectedAudioNote.endedAt!)}
+        </p>
+      )}
+    </TranscriptViewerHeaderLayout>
   )
 }
 
 function CopyTranscript() {
-  const { data } = useTranscript()
-  const manualTranscriptText = useAtomValue(manualTranscriptTextAtom)
+  const selectedAudioNote = useAtomValue(selectedAudioNoteAtom)
 
   async function handleCopyClick() {
-    if (!data?.transcript && !manualTranscriptText) return
-    await window.navigator.clipboard.writeText(data?.transcript ?? manualTranscriptText)
+    if (!selectedAudioNote?.transcript) return
+    await window.navigator.clipboard.writeText(selectedAudioNote.transcript)
   }
 
   return (
     <div className="flex items-center gap-3">
       <p>Transcript</p>
-      <Tooltip position="top" tooltip="Copy">
+      <Tooltip side="right" content="Copy">
         <button aria-label="Copy Transcript" onClick={handleCopyClick} className="transition-transform active:scale-90">
           <ClipboardText variant="Bold" size={20} className="text-subtle" />
         </button>
@@ -160,41 +184,26 @@ function TranscriptMessageItem(props: TranscriptMessageItemProps) {
 }
 
 export function TranscriptViewer() {
-  const { data, isLoading, isError } = useTranscript()
+  const hoveringClose = useAtomValue(hoveringCloseAtom)
+  const selectedAudioNote = useAtomValue(selectedAudioNoteAtom)
   const headerHeight = useAtomValue(headerHeightAtom)
-  const manualTranscriptText = useAtomValue(manualTranscriptTextAtom)
-  const transcriptMessages = parseTranscript(data?.transcript ?? manualTranscriptText)
-
-  if (isLoading) {
-    return (
-      <TranscriptViewerLayout>
-        <LoadingSpinner size="20px" />
-      </TranscriptViewerLayout>
-    )
-  }
-
-  if (isError) {
-    return (
-      <TranscriptViewerLayout>
-        <ScrollArea style={{ height: `calc(100% - ${headerHeight}px` }}>
-          <div className="w-full space-y-6 p-4 pt-6">
-            <CopyTranscript />
-            {transcriptMessages?.map((message, index) => <TranscriptMessageItem key={index} message={message} />)}
-          </div>
-        </ScrollArea>
-      </TranscriptViewerLayout>
-    )
-  }
+  const transcriptMessages = parseTranscript(selectedAudioNote?.transcript)
 
   return (
     <TranscriptViewerLayout>
       <div className="h-full">
         <TranscriptViewerHeader />
         <ScrollArea style={{ height: `calc(100% - ${headerHeight}px` }}>
-          <div className="w-full space-y-6 p-4 pt-6">
+          <motion.div
+            variants={hoveringCloseVariants}
+            custom={hoveringClose}
+            initial="idle"
+            animate="hover"
+            className="w-full space-y-6 p-4 pt-6"
+          >
             <CopyTranscript />
             {transcriptMessages?.map((message, index) => <TranscriptMessageItem key={index} message={message} />)}
-          </div>
+          </motion.div>
         </ScrollArea>
       </div>
     </TranscriptViewerLayout>

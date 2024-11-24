@@ -1,8 +1,8 @@
 'use client'
 
 import React from 'react'
+import { isOnHomeAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import styles from '@/main.module.scss'
-import { motion } from 'framer-motion'
 import { useAtom, useSetAtom } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -24,7 +24,6 @@ import { useOnPromptChange } from '@/features/highlight-chat/hooks/use-on-prompt
 import { useOnPromptLoad } from '@/features/highlight-chat/hooks/use-on-prompt-load'
 import { HistorySidebar } from '@/features/history-sidebar/history-sidebar'
 import { NavigationTopBar } from '@/features/nav-header/top-bar/top-bar'
-import { isOnHomeAtom, transcriptOpenAtom } from '@/features/transcript-viewer/atoms'
 import { TranscriptViewer } from '@/features/transcript-viewer/transcript-viewer'
 
 export default function Home() {
