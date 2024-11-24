@@ -5,9 +5,8 @@ import { VoiceSquare } from 'iconsax-react'
 import { useSetAtom } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
+import { selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import { useStore } from '@/components/providers/store-provider'
-
-import { selectedTranscriptIdAtom, transcriptOpenAtom } from '@/features/transcript-viewer/atoms'
 
 import { OpenAppButton } from '../buttons/open-app-button'
 import Tooltip from '../Tooltip/Tooltip'
@@ -68,43 +67,45 @@ function ChatWithConversationButton(props: { conversation: ConversationData }) {
 export function LatestConversation(props: { focusInput: () => void }) {
   const { conversations } = useConversations()
   const setTranscriptOpen = useSetAtom(transcriptOpenAtom)
-  const setSelectedTranscriptId = useSetAtom(selectedTranscriptIdAtom)
+  const setSelectedAudioNote = useSetAtom(selectedAudioNoteAtom)
 
-  const mostRecentConversation = useMemo(() => {
-    if (conversations.length > 0) {
-      const mostRecentConversation = conversations[0]
+  const { formattedMostRecentConversation, mostRecentConversation } = useMemo(() => {
+    if (!conversations?.[0]) return { formattedMostRecentConversation: undefined, mostRecentConversation: undefined }
 
-      const formattedConversationTitle =
-        mostRecentConversation?.title.startsWith('Conversation ended') ||
-          mostRecentConversation?.title.startsWith('Audio Notes from')
-          ? 'Most Recent Audio Note'
-          : (mostRecentConversation?.title ?? 'Most Recent Audio Note')
+    const mostRecentConversation = conversations[0]
 
-      const conversationWordCount = mostRecentConversation?.transcript.split(' ').length
+    const formattedConversationTitle =
+      mostRecentConversation?.title.startsWith('Conversation ended') ||
+      mostRecentConversation?.title.startsWith('Audio Notes from')
+        ? 'Most Recent Audio Note'
+        : (mostRecentConversation?.title ?? 'Most Recent Audio Note')
 
-      const conversationDurationInMilliseconds =
-        mostRecentConversation?.endedAt.getTime() - mostRecentConversation?.startedAt.getTime()
-      const formattedConversationDuration = formatConversationDuration(conversationDurationInMilliseconds)
+    const conversationWordCount = mostRecentConversation?.transcript.split(' ').length
 
-      const formattedConversationEndDate = formatConversationEndDate(mostRecentConversation.endedAt)
+    const conversationDurationInMilliseconds =
+      mostRecentConversation?.endedAt.getTime() - mostRecentConversation?.startedAt.getTime()
+    const formattedConversationDuration = formatConversationDuration(conversationDurationInMilliseconds)
 
-      return {
+    const formattedConversationEndDate = formatConversationEndDate(mostRecentConversation.endedAt)
+
+    return {
+      formattedMostRecentConversation: {
         id: mostRecentConversation.id,
         title: formattedConversationTitle,
         wordCount: conversationWordCount,
         duration: formattedConversationDuration,
         endedAt: formattedConversationEndDate,
         conversation: mostRecentConversation,
-      }
+      },
+      mostRecentConversation,
     }
-  }, [conversations])
+  }, [conversations?.[0]])
 
-  if (!mostRecentConversation) return <NoAudioNote />
+  if (!formattedMostRecentConversation) return <NoAudioNote />
 
   function handleClick() {
-    if (!mostRecentConversation?.id) return
-
-    setSelectedTranscriptId(mostRecentConversation.id)
+    if (!mostRecentConversation) return
+    setSelectedAudioNote(mostRecentConversation)
     setTranscriptOpen(true)
   }
 
@@ -118,18 +119,18 @@ export function LatestConversation(props: { focusInput: () => void }) {
         <Tooltip position="top" tooltip="View audio note">
           <div className="flex items-center gap-3 font-medium text-primary">
             <VoiceSquare size={24} variant="Bold" className="text-green" />
-            <p>{mostRecentConversation.title}</p>
+            <p>{formattedMostRecentConversation.title}</p>
           </div>
         </Tooltip>
         <div className="flex items-center gap-3 text-sm capitalize text-subtle">
           <Tooltip position="top" tooltip="Ended">
-            <p>{mostRecentConversation.endedAt}</p>
+            <p>{formattedMostRecentConversation.endedAt}</p>
           </Tooltip>
           <Tooltip position="top" tooltip="Duration">
-            <p>{mostRecentConversation.duration}</p>
+            <p>{formattedMostRecentConversation.duration}</p>
           </Tooltip>
           <Tooltip position="top" tooltip="Word count">
-            <p>{`${mostRecentConversation.wordCount} Words`}</p>
+            <p>{`${formattedMostRecentConversation.wordCount} Words`}</p>
           </Tooltip>
         </div>
       </div>
@@ -137,7 +138,7 @@ export function LatestConversation(props: { focusInput: () => void }) {
         onClick={props.focusInput}
         className="flex items-center gap-3 opacity-0 transition-opacity group-hover:opacity-100"
       >
-        <ChatWithConversationButton conversation={mostRecentConversation.conversation} />
+        <ChatWithConversationButton conversation={formattedMostRecentConversation.conversation} />
       </div>
     </button>
   )

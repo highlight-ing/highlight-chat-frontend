@@ -3,7 +3,6 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Highlight from '@highlight-ai/app-runtime'
-import { useSetAtom } from 'jotai'
 
 import { DEFAULT_PROMPT_EXTERNAL_IDS } from '@/lib/promptapps'
 import { useChatHistory } from '@/hooks/useChatHistory'
@@ -13,12 +12,9 @@ import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 import { useStore } from '@/components/providers/store-provider'
 
 import { useIntegration } from '@/features/integrations/_hooks/use-integration'
-import { useIntegrations } from '@/features/integrations/_hooks/use-integrations'
-import { selectedTranscriptIdAtom, transcriptOpenAtom } from '@/features/transcript-viewer/atoms'
 
 export function useOnExternalMessage() {
   const router = useRouter()
-  const integrations = useIntegrations()
   const { setConversationId, openModal, closeAllModals, isModalOpen } = useStore((state) => ({
     setConversationId: state.setConversationId,
     openModal: state.openModal,

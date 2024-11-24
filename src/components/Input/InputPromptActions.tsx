@@ -14,17 +14,14 @@ import { ScrollArea } from '../ui/scroll-area'
 const actionItemVariants: Variants = {
   hidden: {
     opacity: 0,
-    filter: 'blur(4px)',
     y: -10,
   },
   show: {
     opacity: 1,
-    filter: 'blur(0px)',
     y: 0,
   },
   exit: {
     opacity: 0,
-    filter: 'blur(4px)',
     y: -10,
   },
 }

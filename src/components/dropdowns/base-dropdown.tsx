@@ -1,6 +1,7 @@
 import { PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react'
-import { Portal } from 'react-portal'
 import { calculatePositionedStyle } from '@/utils/components'
+import { Portal } from 'react-portal'
+
 import styles from './base-dropdown.module.scss'
 
 type Position = 'top' | 'bottom' | 'left' | 'right'

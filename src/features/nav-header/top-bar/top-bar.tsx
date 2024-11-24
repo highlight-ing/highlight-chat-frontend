@@ -75,22 +75,22 @@ export const NavigationTopBarTab = React.forwardRef<HTMLDivElement, TopTabProps>
       return [
         ...(conversationId !== conversation.id
           ? [
-            {
-              label: 'Open',
-              onClick: () => onOpen(conversation),
-            },
-          ]
+              {
+                label: 'Open',
+                onClick: () => onOpen(conversation),
+              },
+            ]
           : []),
         ...(openConversationMessages[conversation.id]?.length > 0
           ? [
-            {
-              label: 'Reload',
-              onClick: () => {
-                clearConversationMessages(conversation.id)
-                trackEvent('HL Chat Tab', { action: 'Reload' })
+              {
+                label: 'Reload',
+                onClick: () => {
+                  clearConversationMessages(conversation.id)
+                  trackEvent('HL Chat Tab', { action: 'Reload' })
+                },
               },
-            },
-          ]
+            ]
           : []),
         {
           divider: true,
@@ -101,29 +101,29 @@ export const NavigationTopBarTab = React.forwardRef<HTMLDivElement, TopTabProps>
         },
         ...(openConversations.length > 1
           ? [
-            {
-              label: 'Close all others',
-              onClick: () => {
-                if (conversationId !== conversation.id) {
-                  setConversationId(conversation.id)
-                }
-                setOpenConversations([conversation])
-                clearAllOtherConversationMessages(conversation.id)
-                trackEvent('HL Chat Tab', { action: 'Close all others' })
+              {
+                label: 'Close all others',
+                onClick: () => {
+                  if (conversationId !== conversation.id) {
+                    setConversationId(conversation.id)
+                  }
+                  setOpenConversations([conversation])
+                  clearAllOtherConversationMessages(conversation.id)
+                  trackEvent('HL Chat Tab', { action: 'Close all others' })
+                },
               },
-            },
-            {
-              label: 'Close all',
-              onClick: () => {
-                setOpenConversations([])
-                clearAllConversationMessages()
-                if (conversationId) {
-                  startNewConversation()
-                }
-                trackEvent('HL Chat Tab', { action: 'Close all' })
+              {
+                label: 'Close all',
+                onClick: () => {
+                  setOpenConversations([])
+                  clearAllConversationMessages()
+                  if (conversationId) {
+                    startNewConversation()
+                  }
+                  trackEvent('HL Chat Tab', { action: 'Close all' })
+                },
               },
-            },
-          ]
+            ]
           : []),
         {
           divider: true,
@@ -312,10 +312,10 @@ export function NavigationTopBar({ showHistory, setShowHistory }: TopBarProps) {
             wrapperStyle={
               showHistory || !setShowHistory
                 ? {
-                  visibility: 'hidden',
-                  paddingInlineStart: `calc(${variables.chatHistoryWidth} - 36px)`,
-                  transition: 'padding 250ms ease',
-                }
+                    visibility: 'hidden',
+                    paddingInlineStart: `calc(${variables.chatHistoryWidth} - 36px)`,
+                    transition: 'padding 250ms ease',
+                  }
                 : { transition: 'padding 250ms ease' }
             }
           >
