@@ -49,7 +49,7 @@ function SlackMessageFormComponent({ data, onSuccess }: { data: SendSlackMessage
   })
 
   useEffect(() => {
-    ; (async () => {
+    ;(async () => {
       // @ts-ignore
       const hlToken = (await highlight.internal.getAuthorizationToken()) as string
       const token = await getIntegrationTokenForUser(hlToken, 'slack')

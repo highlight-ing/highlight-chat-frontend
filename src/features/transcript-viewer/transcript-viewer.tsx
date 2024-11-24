@@ -1,11 +1,11 @@
 import React from 'react'
-import { isOnHomeAtom, selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import { AnimatePresence, motion, Variants } from 'framer-motion'
 import { ArrowLeft, ClipboardText, VoiceSquare } from 'iconsax-react'
 import { atom, useAtomValue, useSetAtom } from 'jotai'
 import useMeasure from 'react-use-measure'
 
 import { cn } from '@/lib/utils'
+import { isOnHomeAtom, selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tooltip } from '@/components/ui/tooltip'
 

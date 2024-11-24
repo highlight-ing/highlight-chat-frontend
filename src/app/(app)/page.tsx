@@ -1,12 +1,12 @@
 'use client'
 
 import React from 'react'
-import { isOnHomeAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import styles from '@/main.module.scss'
 import { useAtom, useSetAtom } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
 import { cn } from '@/lib/utils'
+import { isOnHomeAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
 import { Input } from '@/components/Input/Input'
 import Messages from '@/components/Messages/Messages'

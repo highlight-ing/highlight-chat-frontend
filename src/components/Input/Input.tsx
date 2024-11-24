@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import { transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import { Attachment as AttachmentType, isFileAttachmentType } from '@/types'
 import { trackEvent } from '@/utils/amplitude'
 import { getDisplayValue } from '@/utils/attachments'
@@ -10,6 +9,7 @@ import useMeasure from 'react-use-measure'
 import { useShallow } from 'zustand/react/shallow'
 
 import { cn } from '@/lib/utils'
+import { transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 import { useStore } from '@/components/providers/store-provider'
 

@@ -2,7 +2,6 @@
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
-import { manualTranscriptTextAtom, selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import { trackEvent } from '@/utils/amplitude'
 import { processAttachments } from '@/utils/contextprocessor'
 import { countPromptView, getPromptAppBySlug } from '@/utils/prompts'
@@ -12,6 +11,7 @@ import { debounce } from 'throttle-debounce'
 import { useShallow } from 'zustand/react/shallow'
 
 import { Prompt } from '@/types/supabase-helpers'
+import { manualTranscriptTextAtom, selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import useAuth from '@/hooks/useAuth'
 import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 import { useStore } from '@/components/providers/store-provider'

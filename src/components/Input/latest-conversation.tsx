@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
-import { selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import { useConversations } from '@/context/ConversationContext'
 import { ConversationData } from '@highlight-ai/app-runtime'
 import { VoiceSquare } from 'iconsax-react'
 import { useSetAtom } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
+import { selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import { useStore } from '@/components/providers/store-provider'
 
 import { OpenAppButton } from '../buttons/open-app-button'
@@ -76,7 +76,7 @@ export function LatestConversation(props: { focusInput: () => void }) {
 
     const formattedConversationTitle =
       mostRecentConversation?.title.startsWith('Conversation ended') ||
-        mostRecentConversation?.title.startsWith('Audio Notes from')
+      mostRecentConversation?.title.startsWith('Audio Notes from')
         ? 'Most Recent Audio Note'
         : (mostRecentConversation?.title ?? 'Most Recent Audio Note')
 
