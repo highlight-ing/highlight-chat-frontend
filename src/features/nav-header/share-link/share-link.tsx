@@ -66,9 +66,9 @@ function CopyLinkButton(props: { shareLinkId: string }) {
       <AnimatePresence initial={false} mode="popLayout">
         <motion.span
           key={showSuccessState ? 'true' : 'false'}
-          initial={{ y: 10, opacity: 0, filter: 'blur(4px)' }}
-          animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
-          exit={{ y: -10, opacity: 0, filter: 'blur(4px)' }}
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -10, opacity: 0 }}
         >
           {showSuccessState ? 'Copied' : 'Copy Link'}
         </motion.span>
