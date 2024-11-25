@@ -392,6 +392,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
                   value={selectedTags}
                   onChange={onChange}
                   isMulti
+                  className="min-w-[320px] lg:min-w-[384px]"
                   components={animatedComponents}
                   placeholder="Add #tags to make your action more easy to find..."
                   options={promptTags}
@@ -400,6 +401,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
                     control: (baseStyles, state) => ({
                       ...baseStyles,
                       fontSize: '16px',
+                      minWidth: '100%',
                       border: state.isFocused ? `1px solid ${variables.light40}` : `1px solid ${variables.light10}`,
                       padding: '10px',
                       borderRadius: '10px',
