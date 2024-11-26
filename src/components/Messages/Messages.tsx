@@ -25,6 +25,7 @@ const Messages = () => {
   const [completedMessageIndices, setCompletedMessageIndices] = useState<number[]>([])
   const [activeThinkingIndices, setActiveThinkingIndices] = useState<number[]>([])
   const streamingTimeoutRef = useRef<NodeJS.Timeout>()
+  const [messageStates, setMessageStates] = useState<{ [key: number]: 'thinking' | 'completed' }>({})
 
   const handleScroll = () => {
     if (!scrollContainerRef.current) {
@@ -62,30 +63,33 @@ const Messages = () => {
     return () => observer.disconnect()
   }, [])
 
+  // Initialize thinking and completed states when messages change
   useEffect(() => {
-    // When input becomes enabled (streaming ends)
-    if (!inputIsDisabled) {
-      // Clear any existing timeout
-      if (streamingTimeoutRef.current) {
-        clearTimeout(streamingTimeoutRef.current);
-      }
-      // Set a new timeout to ensure we don't have any race conditions
-      streamingTimeoutRef.current = setTimeout(() => {
-        const lastUserIndex = messages.findLastIndex(m => m.role === 'user')
-        if (lastUserIndex !== -1) {
-          setCompletedMessageIndices(prev => [...prev, lastUserIndex])
-          // Remove from active indices when completed
-          setActiveThinkingIndices(prev => prev.filter(i => i !== lastUserIndex))
+    const newThinkingIndices: number[] = [];
+    const newCompletedIndices: number[] = [];
+    const newActiveThinkingIndices: number[] = [];
+    
+    // Set states for all existing messages
+    messages.forEach((message, index) => {
+      if (message.role === 'user') {
+        // If there's a following assistant message, mark as completed
+        const hasAssistantResponse = messages[index + 1]?.role === 'assistant';
+        if (hasAssistantResponse) {
+          newCompletedIndices.push(index);
+        } else {
+          newThinkingIndices.push(index);
+          // Only the last thinking message should be active
+          if (index === messages.findLastIndex(m => m.role === 'user')) {
+            newActiveThinkingIndices.push(index);
+          }
         }
-      }, 100);
-    }
-
-    return () => {
-      if (streamingTimeoutRef.current) {
-        clearTimeout(streamingTimeoutRef.current);
       }
-    };
-  }, [inputIsDisabled, messages]);
+    });
+    
+    setThinkingMessageIndices(newThinkingIndices);
+    setCompletedMessageIndices(newCompletedIndices);
+    setActiveThinkingIndices(newActiveThinkingIndices);
+  }, []); // Run only on mount
 
   useEffect(() => {
     const prevMessages = prevMessagesRef.current
@@ -94,7 +98,7 @@ const Messages = () => {
     // If we have a new message
     if (currentMessages.length > prevMessages.length) {
       const lastMessage = currentMessages[currentMessages.length - 1]
-      
+
       // If it's a user message, immediately show blue thinking message
       if (lastMessage?.role === 'user') {
         const newIndex = currentMessages.length - 1
@@ -103,7 +107,7 @@ const Messages = () => {
         // Set this as the only active thinking message
         setActiveThinkingIndices([newIndex])
       }
-      
+
       // If it's an assistant message
       if (lastMessage?.role === 'assistant') {
         // Find the last user message before this assistant message
@@ -134,6 +138,31 @@ const Messages = () => {
     }
   }, [inputIsDisabled, messages, thinkingMessageIndices])
 
+  useEffect(() => {
+    // When input becomes enabled (streaming ends)
+    if (!inputIsDisabled) {
+      // Clear any existing timeout
+      if (streamingTimeoutRef.current) {
+        clearTimeout(streamingTimeoutRef.current);
+      }
+      // Set a new timeout to ensure we don't have any race conditions
+      streamingTimeoutRef.current = setTimeout(() => {
+        const lastUserIndex = messages.findLastIndex(m => m.role === 'user')
+        if (lastUserIndex !== -1) {
+          setCompletedMessageIndices(prev => [...prev, lastUserIndex])
+          // Remove from active indices when completed
+          setActiveThinkingIndices(prev => prev.filter(i => i !== lastUserIndex))
+        }
+      }, 100);
+    }
+
+    return () => {
+      if (streamingTimeoutRef.current) {
+        clearTimeout(streamingTimeoutRef.current);
+      }
+    };
+  }, [inputIsDisabled, messages]);
+
   return (
     <Scrollable className={styles.messagesContainer} ref={scrollContainerRef} onScroll={handleScroll}>
       <div className={styles.messages}>
@@ -147,9 +176,9 @@ const Messages = () => {
               return ''
             }
 
-            const showThinkingAfterMessage = 
+            const showThinkingAfterMessage =
               message.role === 'user' && (
-                inputIsDisabled || 
+                inputIsDisabled ||
                 thinkingMessageIndices.includes(index)
               )
 
@@ -157,9 +186,9 @@ const Messages = () => {
               <React.Fragment key={index}>
                 <Message message={message} />
                 {showThinkingAfterMessage && (
-                  <ThinkingMessage 
+                  <ThinkingMessage
                     isAnimating={!completedMessageIndices.includes(index)}
-                    isLatest={activeThinkingIndices.includes(index)} 
+                    isLatest={activeThinkingIndices.includes(index)}
                   />
                 )}
               </React.Fragment>
