@@ -202,17 +202,17 @@
   color: $light-60;
   
   &.animating {
-    animation: shimmerWave 2s ease-in-out infinite;
+    animation: shimmerWave 2s linear infinite;
     
     @for $i from 1 through 100 {
       &:nth-child(#{$i}) {
-        animation-delay: #{($i % 30) * 0.067}s;
+        animation-delay: #{($i * 0.05)}s;
       }
     }
   }
   
   &.static {
-    animation: shimmerWave 2s ease-in-out;
+    animation: shimmerWave 2s linear;
     animation-play-state: paused;
   }
 }
@@ -230,7 +230,7 @@
 }
 
 @keyframes shimmerWave {
-  0%, 100% {
+  0% {
     opacity: 0.4;
     color: $light-60;
     transform: scale(0.95);
@@ -239,6 +239,11 @@
     opacity: 1;
     color: $light-100;
     transform: scale(1.05);
+  }
+  100% {
+    opacity: 0.4;
+    color: $light-60;
+    transform: scale(0.95);
   }
 }
 
