@@ -165,10 +165,11 @@ export function useIntegrations(): UseIntegrationsAPI {
 
     if (!connected) {
       const promise = new Promise<void>((resolve) => {
+        const content = previousContent.get(conversationId) || getLastConversationMessage(conversationId)?.content as string || ''
         // @ts-expect-error
         updateLastConversationMessage(conversationId!, {
           content: (
-            <MessageWithComponent content={previousContent.get(conversationId)}>
+            <MessageWithComponent content={content}>
               <SetupConnection
                 name={integrationName}
                 checkConnectionStatus={checkConnectionStatus}
