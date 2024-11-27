@@ -202,7 +202,7 @@
   color: $light-60;
   
   &.animating {
-    animation: shimmerWave 2s linear infinite;
+    animation: shimmerWave 3s linear 2;
     
     @for $i from 1 through 100 {
       &:nth-child(#{$i}) {
@@ -212,7 +212,7 @@
   }
   
   &.static {
-    animation: shimmerWave 2s linear;
+    animation: shimmerWave 3s linear;
     animation-play-state: paused;
   }
 }

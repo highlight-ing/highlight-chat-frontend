@@ -351,7 +351,7 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
       if (char === ' ') {
         return (
           <span 
-            key={index} 
+            key={index}
             style={{ whiteSpace: 'pre' }}
           >
             {char}
@@ -361,7 +361,7 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
       
       return (
         <span 
-          key={`${index}-${char}`}
+          key={index}
           className={`${styles.waveChar} ${isLocalAnimating ? styles.animating : styles.static}`}
           style={{ 
             whiteSpace: 'pre',
