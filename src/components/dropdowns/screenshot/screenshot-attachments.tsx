@@ -26,6 +26,8 @@ export const ScreenshotAttachments = () => {
   const onClickWindow = async (windowTitle: string) => {
     const screenshot = await Highlight.user.getWindowScreenshot(windowTitle)
 
+    console.log(screenshot)
+
     if (screenshot.length > 0) {
       onAddScreenshot(screenshot, 'window')
     }
@@ -67,15 +69,15 @@ export const ScreenshotAttachments = () => {
   if (attachmentOptions && attachmentOptions?.length === 0) {
     return (
       <>
-        <div className="relative mt-1 flex cursor-pointer select-none items-center gap-2 rounded-[16px] border border-tertiary p-1 text-sm outline-none transition-colors first:mt-0 hover:bg-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0">
+        <div className="[&>svg]:size-4 relative mt-1 flex cursor-pointer select-none items-center gap-2 rounded-[16px] border border-tertiary p-1 text-sm outline-none transition-colors first:mt-0 hover:bg-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:shrink-0">
           <Skeleton className={`${styles.image} ${styles.displayImage}`} />
           <Skeleton className="h-3.5 w-1/3 rounded-sm bg-hover" />
         </div>
-        <div className="relative mt-1 flex cursor-pointer select-none items-center gap-2 rounded-[16px] border border-tertiary p-1 text-sm outline-none transition-colors first:mt-0 hover:bg-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0">
+        <div className="[&>svg]:size-4 relative mt-1 flex cursor-pointer select-none items-center gap-2 rounded-[16px] border border-tertiary p-1 text-sm outline-none transition-colors first:mt-0 hover:bg-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:shrink-0">
           <Skeleton className={`${styles.image} ${styles.displayImage}`} />
           <Skeleton className="h-3.5 w-1/3 rounded-sm bg-hover" />
         </div>
-        <div className="relative mt-1 flex cursor-pointer select-none items-center gap-2 rounded-[16px] border border-tertiary p-1 text-sm outline-none transition-colors first:mt-0 hover:bg-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0">
+        <div className="[&>svg]:size-4 relative mt-1 flex cursor-pointer select-none items-center gap-2 rounded-[16px] border border-tertiary p-1 text-sm outline-none transition-colors first:mt-0 hover:bg-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:shrink-0">
           <Skeleton className={`${styles.image} ${styles.displayImage}`} />
           <Skeleton className="h-3.5 w-1/3 rounded-sm bg-hover" />
         </div>
@@ -89,7 +91,7 @@ export const ScreenshotAttachments = () => {
         <div
           key={index}
           onClick={option.onClick}
-          className="relative mt-1 flex cursor-pointer select-none items-center gap-2 rounded-[16px] border border-tertiary p-1 text-sm outline-none transition-colors first:mt-0 hover:bg-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0"
+          className="[&>svg]:size-4 relative mt-1 flex cursor-pointer select-none items-center gap-2 rounded-[16px] border border-tertiary p-1 text-sm outline-none transition-colors first:mt-0 hover:bg-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:shrink-0"
         >
           {option.imageComponent}
           <div className="flex flex-col">

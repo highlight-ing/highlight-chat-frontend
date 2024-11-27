@@ -8,6 +8,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 import { useApi } from '@/hooks/useApi'
 import { useChatHistory } from '@/hooks/useChatHistory'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import CircleButton from '@/components/CircleButton/CircleButton'
 import ContextMenu from '@/components/ContextMenu/ContextMenu'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
@@ -215,7 +216,7 @@ export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarPr
           </CircleButton>
         </Tooltip>
       </div>
-      <div className={styles.chats}>
+      <ScrollArea className={styles.chats}>
         {!history?.length ? (
           <div className={styles.baseHistoryItem}>No chat history available</div>
         ) : (
@@ -320,7 +321,7 @@ export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarPr
             )}
           </div>
         )}
-      </div>
+      </ScrollArea>
     </div>
   )
 }

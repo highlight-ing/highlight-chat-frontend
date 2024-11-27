@@ -16,6 +16,8 @@
     "^types$",
     "^@/types/(.*)$",
     "^@/lib/(.*)$",
+    "^@/utils/(.*)$",
+    "^@/atoms/(.*)$",
     "^@/hooks/(.*)$",
     "^@/components/ui/(.*)$",
     "^@/components/(.*)$",

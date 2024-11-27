@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { PromptTag } from '@/types'
-import { trackEvent } from '@/utils/amplitude'
 import variables from '@/variables.module.scss'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowDown2, ArrowUp2 } from 'iconsax-react'
@@ -17,6 +16,7 @@ import { z } from 'zod'
 import { supabaseLoader } from '@/lib/supabase'
 import { promptTags } from '@/lib/tags'
 import { PreferredAttachment, PreferredAttachmentSchema, videoUrlSchema } from '@/lib/zod'
+import { trackEvent } from '@/utils/amplitude'
 import Button from '@/components/Button/Button'
 import { Switch } from '@/components/catalyst/switch'
 import ContextMenu from '@/components/ContextMenu/ContextMenu'
@@ -297,6 +297,14 @@ const VisibilityToggle = ({
   )
 }
 
+const RoleplaySetting = ({ enabled, onToggle }: { enabled: boolean; onToggle: (enabled: boolean) => void }) => {
+  return (
+    <SettingOption label={'Roleplay'} description={'Enable roleplay mode'}>
+      <Switch color={'cyan'} checked={enabled} onChange={(checked) => onToggle(checked)} />
+    </SettingOption>
+  )
+}
+
 export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
   const { promptEditorData, setPromptEditorData, setSettingsHasNoErrors, onboarding } = usePromptEditorStore()
   const [selectedTags, setSelectedTags] = useState<PromptTag[]>(promptEditorData.tags || [])
@@ -384,6 +392,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
                   value={selectedTags}
                   onChange={onChange}
                   isMulti
+                  className="min-w-[320px] lg:min-w-[384px]"
                   components={animatedComponents}
                   placeholder="Add #tags to make your action more easy to find..."
                   options={promptTags}
@@ -392,6 +401,7 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
                     control: (baseStyles, state) => ({
                       ...baseStyles,
                       fontSize: '16px',
+                      minWidth: '100%',
                       border: state.isFocused ? `1px solid ${variables.light40}` : `1px solid ${variables.light10}`,
                       padding: '10px',
                       borderRadius: '10px',
@@ -454,6 +464,10 @@ export default function SettingsScreen({ onClose }: { onClose?: () => void }) {
               visibility={promptEditorData.visibility}
               onToggle={(visibility) => setPromptEditorData({ visibility })}
               disabled={disabled}
+            />
+            <RoleplaySetting
+              enabled={promptEditorData.roleplay}
+              onToggle={(enabled) => setPromptEditorData({ roleplay: enabled })}
             />
             <ShareLinkButton />
             <DeletePromptButton />

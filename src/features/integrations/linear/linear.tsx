@@ -87,6 +87,7 @@ function LinearTicketForm({ title, description, onSubmitSuccess }: LinearTicketF
 
   const form = useForm<z.infer<typeof linearTicketFormSchema>>({
     resolver: zodResolver(linearTicketFormSchema),
+    shouldFocusError: true,
     defaultValues: {
       title,
       description: description + '\n\nCreated with [Highlight](https://highlightai.com)',
@@ -197,6 +198,7 @@ export function CreateLinearTicket(props: CreateLinearTicketProps) {
         checkConnectionStatus={checkLinearConnectionStatus}
         onConnect={() => {
           queryClient.invalidateQueries({ queryKey: ['linear-api-token'] })
+          queryClient.invalidateQueries({ queryKey: ['linear-check-connection'] })
           setState('form')
         }}
         icon={<LinearIcon size={16} />}

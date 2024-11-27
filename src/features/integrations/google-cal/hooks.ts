@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { useHighlightToken } from '../_hooks/use-hl-token'
 import { checkGoogleConnectionStatus, createGoogleCalendarEvent } from './actions'
@@ -19,13 +19,12 @@ export function useCheckGoogleCalConnection() {
       return connected as boolean
     },
     enabled: !!hlToken,
-    refetchInterval: 7 * 1000,
-    retry: false,
   })
 }
 
 export function useCreateGoogleCalEvent(onSuccess: ((url: string) => void) | undefined) {
   const { data: hlToken } = useHighlightToken()
+  const queryClient = useQueryClient()
 
   return useMutation({
     mutationKey: ['create-google-cal-event'],
@@ -33,6 +32,12 @@ export function useCreateGoogleCalEvent(onSuccess: ((url: string) => void) | und
       if (!hlToken) {
         console.warn('Highlight token not set, please try again later.')
         throw new Error('No Highligh token available')
+      }
+
+      const connected = await checkGoogleConnectionStatus(hlToken)
+
+      if (!connected) {
+        throw new Error('Not connected to Google Cal')
       }
 
       const link = await createGoogleCalendarEvent(hlToken, data)
@@ -47,6 +52,9 @@ export function useCreateGoogleCalEvent(onSuccess: ((url: string) => void) | und
       if (onSuccess) onSuccess(link)
     },
     onError: (error) => {
+      if (error.message.includes('Not connected')) {
+        queryClient.invalidateQueries({ queryKey: ['google-cal-check-connection'] })
+      }
       console.warn(error.message)
     },
   })

@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import { Attachment as AttachmentType, isFileAttachmentType } from '@/types'
-import { trackEvent } from '@/utils/amplitude'
-import { getDisplayValue } from '@/utils/attachments'
 import { AnimatePresence, motion, MotionConfig, Transition } from 'framer-motion'
 import { AddCircle, BoxAdd } from 'iconsax-react'
+import { useAtomValue } from 'jotai'
 import useMeasure from 'react-use-measure'
 import { useShallow } from 'zustand/react/shallow'
 
 import { cn } from '@/lib/utils'
+import { trackEvent } from '@/utils/amplitude'
+import { getDisplayValue } from '@/utils/attachments'
+import { transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 import { useStore } from '@/components/providers/store-provider'
 
@@ -54,6 +56,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   const { handleSubmit } = useSubmitQuery()
   const [isInputFocused, setIsInputFocused] = useState(false)
   const [input, setInput] = useState('')
+  const transcriptOpen = useAtomValue(transcriptOpenAtom)
 
   let inputRef = useRef<HTMLTextAreaElement>(null)
   let inputBlurTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -255,7 +258,14 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
           layout
           initial={{ height: 68 }}
           animate={{ height: bounds.height }}
-          transition={{ ...inputTransition, duration: isInputFocused ? 0.2 : 0.25, delay: isInputFocused ? 0 : 0.15 }}
+          transition={{
+            duration: 0,
+            height: {
+              ...inputTransition,
+              duration: isInputFocused ? 0.2 : 0.25,
+              delay: transcriptOpen ? 0 : isInputFocused ? 0 : 0.15,
+            },
+          }}
           className={`${styles.inputContainer} ${isActiveChat ? styles.active : ''} min-h-[68px]`}
           onClick={focusInput}
         >
@@ -285,13 +295,18 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
                 <div className={`${styles.attachmentsRow} mt-1.5`}>
                   {attachments.map((attachment: AttachmentType, index: number) => (
                     <motion.div
-                      initial={{ opacity: 0, filter: 'blur(4px)', y: -5 }}
-                      animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
+                      key={index}
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
                       transition={{ ...inputTransition, delay: 0.15 }}
                     >
                       <Attachment
                         type={attachment.type}
                         value={getDisplayValue(attachment)}
+                        id={attachment?.id}
+                        title={attachment?.title}
+                        startedAt={attachment.startedAt}
+                        endedAt={attachment.endedAt}
                         isFile={
                           attachment.type === 'pdf' ||
                           (attachment.type === 'image' && !!attachment.file) ||

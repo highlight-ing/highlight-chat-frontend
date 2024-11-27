@@ -34,6 +34,7 @@ export interface PromptEditorData {
   appPrompt: string
   systemPrompt: string
   visibility: 'public' | 'private'
+  roleplay: boolean
   videoUrl?: string
   image?: string
   uploadingImage?: File
@@ -158,6 +159,7 @@ export const initialPromptEditorState: PromptEditorState = {
     name: '',
     description: '',
     visibility: 'private',
+    roleplay: false,
     tags: [],
     preferredAttachment: 'default',
     enabledAutomations: {

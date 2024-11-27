@@ -1,7 +1,6 @@
 /**
  * Most of the integrations require auth, this file contains a unified auth component that can be used for each integration.
  */
-
 import { useEffect, useState } from 'react'
 
 import Button from '@/components/Button/Button'
@@ -27,6 +26,7 @@ export function SetupConnection({
   icon: React.ReactNode
 }) {
   const [connectClicked, setConnectClicked] = useState(false)
+  let interval: NodeJS.Timeout | null = null
 
   async function _checkConnectionStatus() {
     // @ts-ignore
@@ -36,17 +36,20 @@ export function SetupConnection({
 
     if (connected) {
       onConnect()
+      if (interval) clearInterval(interval)
     }
   }
 
   useEffect(() => {
     if (connectClicked) {
       // Create an interval that checks the connection status every 2 seconds
-      const interval = setInterval(() => {
+      interval = setInterval(() => {
         _checkConnectionStatus()
       }, 2000)
 
-      return () => clearInterval(interval)
+      return () => {
+        if (interval) clearInterval(interval)
+      }
     }
   }, [connectClicked])
 

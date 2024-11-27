@@ -12,11 +12,9 @@ import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 import { useStore } from '@/components/providers/store-provider'
 
 import { useIntegration } from '@/features/integrations/_hooks/use-integration'
-import { useIntegrations } from '@/features/integrations/_hooks/use-integrations'
 
 export function useOnExternalMessage() {
   const router = useRouter()
-  const integrations = useIntegrations()
   const { setConversationId, openModal, closeAllModals, isModalOpen } = useStore((state) => ({
     setConversationId: state.setConversationId,
     openModal: state.openModal,
@@ -36,6 +34,9 @@ export function useOnExternalMessage() {
 
   useEffect(() => {
     const removeListener = Highlight.app.addListener('onExternalMessage', async (caller: string, message: any) => {
+      console.log('Received external message from:', caller)
+      console.log('Message content:', message)
+
       if (message.type === 'refresh-pinned-prompts') {
         await refreshPinnedPrompts(true)
         return

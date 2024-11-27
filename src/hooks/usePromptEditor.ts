@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { usePromptsStore } from '@/stores/prompts'
-import { openApp, sendExternalMessage } from '@/utils/highlightService'
-import { removePromptFromUser, savePrompt } from '@/utils/prompts'
 
 import { DEFAULT_PROMPT_EXTERNAL_IDS } from '@/lib/promptapps'
+import { openApp, sendExternalMessage } from '@/utils/highlightService'
+import { removePromptFromUser, savePrompt } from '@/utils/prompts'
 import { useStore } from '@/components/providers/store-provider'
 
 import useAuth from './useAuth'
@@ -64,6 +64,7 @@ export function usePromptEditor() {
     formData.append('appPrompt', promptEditorData.appPrompt)
     formData.append('systemPrompt', promptEditorData.systemPrompt)
     formData.append('visibility', promptEditorData.visibility)
+    formData.append('roleplay', promptEditorData.roleplay ? 'true' : 'false')
     formData.append('tags', JSON.stringify(promptEditorData.tags ?? []))
 
     if (promptEditorData.preferredAttachment) {

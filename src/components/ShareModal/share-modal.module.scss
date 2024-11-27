@@ -6,11 +6,12 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 2;
+  z-index: 30;
   visibility: hidden;
   background-color: $dark-20;
   opacity: 0;
   transition: opacity 100ms;
+
   &.visible {
     opacity: 1;
     visibility: visible;
@@ -21,7 +22,7 @@
   position: absolute;
   right: 16px;
   top: calc($topbar-height + 56px);
-  z-index: 2;
+  z-index: 30;
   opacity: 0;
   visibility: hidden;
   transform: translateY(-10px);
@@ -93,7 +94,8 @@
   color: $light-100;
 }
 
-.disableButton, .copyButton {
+.disableButton,
+.copyButton {
   width: 100%;
   padding: 8px 16px;
   border-radius: 8px;

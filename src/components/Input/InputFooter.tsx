@@ -7,18 +7,15 @@ import { OpenAppButton } from '../buttons/open-app-button'
 const footerVariants: Variants = {
   hidden: {
     opacity: 0,
-    filter: 'blur(4px)',
     y: -10,
   },
   show: {
     opacity: 1,
-    filter: 'blur(0px)',
     y: 0,
     transition: { type: 'spring', duration: 0.25, bounce: 0.3, delay: 0.2 },
   },
   exit: {
     opacity: 0,
-    filter: 'blur(4px)',
     y: -10,
   },
 }

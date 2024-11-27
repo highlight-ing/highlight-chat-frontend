@@ -1,18 +1,26 @@
-import { SendSlackMessageParams } from '@/features/integrations/types'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useId, useRef, useState } from 'react'
+import {
+  checkIntegrationStatus,
+  createMagicLinkForIntegration,
+  getIntegrationTokenForUser,
+} from '@/utils/integrations-server-actions'
+import { listConversations, sendMessage } from '@/utils/slack-server-actions'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
+import { ArrowDown2, ArrowUp2, Hashtag, User } from 'iconsax-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+
 import Button from '@/components/Button/Button'
-import { sendMessage, listConversations } from '@/utils/slack-server-actions'
-import { checkIntegrationStatus, createMagicLinkForIntegration, getIntegrationTokenForUser } from '@/utils/integrations-server-actions'
 import BaseDropdown, { DropdownItem } from '@/components/dropdowns/base-dropdown'
-import { ArrowDown2, ArrowUp2, Hashtag, User } from 'iconsax-react'
+import { SlackIcon } from '@/components/icons'
 import TextArea from '@/components/TextInput/TextArea'
-import { useCheckSlackConnection } from './hooks'
+
+import { SendSlackMessageParams } from '@/features/integrations/types'
+
 import { IntegrationsLoader } from '../_components/loader'
 import { SetupConnection } from '../_components/setup-connection'
-import { SlackIcon } from '@/components/icons'
+import { useCheckSlackConnection } from './hooks'
 
 const sendSlackMessageFormSchema = z.object({
   message: z.string(),
@@ -158,8 +166,8 @@ export function SendSlackMessageComponent({ data }: { data: SendSlackMessagePara
     isLoading: connectionIsLoading,
     isSuccess: connectionCheckSuccess,
   } = useCheckSlackConnection()
-
   const [state, setState] = useState<'form' | 'success'>('form')
+  const queryClient = useQueryClient()
 
   if (connectionIsLoading) {
     return <IntegrationsLoader />
@@ -175,6 +183,7 @@ export function SendSlackMessageComponent({ data }: { data: SendSlackMessagePara
         name={'Slack'}
         checkConnectionStatus={(token) => checkIntegrationStatus(token, 'slack')}
         onConnect={() => {
+          queryClient.invalidateQueries({ queryKey: ['slack-check-connection'] })
           setState('form')
         }}
         icon={<SlackIcon size={16} />}
@@ -184,11 +193,11 @@ export function SendSlackMessageComponent({ data }: { data: SendSlackMessagePara
   }
 
   if (connectionCheckSuccess && connectedToSlack) {
-  return (
-    <div className="mt-2">
-      {state === 'form' && <SlackMessageFormComponent data={data} onSuccess={onSuccess} />}
-      {state === 'success' && <span>Slack message sent successfully</span>}
-    </div>
+    return (
+      <div className="mt-2">
+        {state === 'form' && <SlackMessageFormComponent data={data} onSuccess={onSuccess} />}
+        {state === 'success' && <span>Slack message sent successfully</span>}
+      </div>
     )
   }
 }

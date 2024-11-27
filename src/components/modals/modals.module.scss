@@ -11,13 +11,14 @@
   align-items: center;
   justify-content: center;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 2;
+  z-index: 30;
   backdrop-filter: blur(12px);
 
   &.top {
     justify-content: flex-start;
     padding: 64px 0;
   }
+
   &.bottom {
     justify-content: flex-end;
     padding: 64px 0;
@@ -37,18 +38,23 @@
   &.xsmall {
     width: min(400px, 100%);
   }
+
   &.small {
     width: min(555px, 100%);
   }
+
   &.medium {
     width: min(700px, 100%);
   }
+
   &.large {
     width: min(900px, 100%);
   }
+
   &.xlarge {
     width: min(1200px, 100%);
   }
+
   &.fullscreen {
     width: 100%;
     height: 100%;

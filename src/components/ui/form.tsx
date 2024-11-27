@@ -101,6 +101,7 @@ const FormLabel = React.forwardRef<
     <Label
       ref={ref}
       data-slot="label"
+      variant="form"
       className={cn(value && 'opacity-100', className)}
       htmlFor={formItemId}
       {...props}
@@ -134,7 +135,7 @@ const FormDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttribu
       <p
         ref={ref}
         id={formDescriptionId}
-        className={cn('text-[0.8rem] text-neutral-500 dark:text-neutral-400', className)}
+        className={cn('dark:text-neutral-400 text-[0.8rem] text-neutral-500', className)}
         {...props}
       />
     )
@@ -176,7 +177,7 @@ const FormSelectTrigger = React.forwardRef<
     <SelectTrigger
       ref={ref}
       data-slot="select"
-      className={cn(error && 'border-red/70 hover:border-red data-[state=open]:border-red', className)}
+      className={cn(className, error && 'border-red/70 hover:border-red data-[state=open]:border-red')}
       {...props}
     >
       {children}
@@ -195,21 +196,21 @@ const FormPopoverTrigger = React.forwardRef<
     <PopoverTrigger
       ref={ref}
       className={cn(
-        'relative flex w-full gap-2 rounded-2xl border border-light-10 bg-secondary px-3 py-2 text-[15px] text-primary outline-none transition-[padding] placeholder:text-subtle hover:border-light-20 disabled:cursor-not-allowed disabled:opacity-50 group-has-[label]:pb-2 group-has-[label]:pt-7 group-has-[label]:leading-snug data-[state=open]:border-light-20 data-[state=open]:bg-tertiary [&>span]:line-clamp-1',
+        'group-has-[label]:pb-2 group-has-[label]:pt-7 group-has-[label]:leading-snug relative flex w-full gap-2 rounded-2xl border border-light-10 bg-secondary px-3 py-2 text-[15px] text-primary outline-none transition-[padding] placeholder:text-subtle hover:border-light-20 disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:border-light-20 data-[state=open]:bg-tertiary [&>span]:line-clamp-1',
         error && 'border-red/70 hover:border-red data-[state=open]:border-red',
         className,
       )}
       {...props}
     >
       {children}
-      <ChevronDownIcon className="absolute right-3 top-1/2 size-4 -translate-y-1/2 text-subtle" />
+      <ChevronDownIcon className="size-4 absolute right-3 top-1/2 -translate-y-1/2 text-subtle" />
     </PopoverTrigger>
   )
 })
 FormPopoverTrigger.displayName = PopoverTrigger.displayName
 
 const FormTextarea = React.forwardRef<HTMLTextAreaElement, React.ComponentProps<'textarea'>>(
-  ({ className, rows = 4, ...props }, ref) => {
+  ({ className, ...props }, ref) => {
     const { error } = useFormField()
 
     return (
@@ -242,12 +243,12 @@ FormInput.displayName = 'Input'
 export {
   useFormField,
   Form,
+  FormField,
   FormItem,
   FormLabel,
   FormControl,
   FormDescription,
   FormMessage,
-  FormField,
   FormSelectTrigger,
   FormTextarea,
   FormInput,

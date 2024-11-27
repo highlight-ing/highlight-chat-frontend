@@ -1,5 +1,5 @@
 import { LinearClient } from '@linear/sdk'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { useHighlightToken } from '../_hooks/use-hl-token'
 import { checkLinearConnectionStatus, getLinearTokenForUser } from './actions'
@@ -21,6 +21,7 @@ export function useLinearApiToken() {
       return linearToken
     },
     enabled: !!hlToken,
+    staleTime: 2 * 60 * 1000,
   })
 }
 
@@ -32,6 +33,24 @@ export function useLinearClient() {
     queryFn: () => new LinearClient({ accessToken: linearToken }),
     enabled: !!linearToken,
     staleTime: Infinity,
+  })
+}
+
+export function useCheckLinearConnection() {
+  const { data: hlToken } = useHighlightToken()
+
+  return useQuery({
+    queryKey: ['linear-check-connection'],
+    queryFn: async () => {
+      if (!hlToken) {
+        throw new Error('No Linear token available')
+      }
+
+      const connected = await checkLinearConnectionStatus(hlToken)
+
+      return connected as boolean
+    },
+    enabled: !!hlToken,
   })
 }
 
@@ -51,26 +70,7 @@ export function useLinearTeams() {
       return teams.nodes
     },
     enabled: !!client,
-  })
-}
-
-export function useCheckLinearConnection() {
-  const { data: hlToken } = useHighlightToken()
-
-  return useQuery({
-    queryKey: ['linear-check-connection'],
-    queryFn: async () => {
-      if (!hlToken) {
-        throw new Error('No Linear token available')
-      }
-
-      const connected = await checkLinearConnectionStatus(hlToken)
-
-      return connected as boolean
-    },
-    enabled: !!hlToken,
-    refetchInterval: 7 * 1000,
-    retry: false,
+    staleTime: 2 * 60 * 1000,
   })
 }
 
@@ -89,6 +89,7 @@ export function useLinearWorkflowStates() {
       return workflowStates.nodes.sort((a, b) => a.position - b.position)
     },
     enabled: !!client,
+    staleTime: 2 * 60 * 1000,
   })
 }
 
@@ -107,16 +108,29 @@ export function useLinearAssignees() {
       return assignees.nodes.sort((a, b) => a.displayName.localeCompare(b.displayName))
     },
     enabled: !!client,
+    staleTime: 2 * 60 * 1000,
   })
 }
 
 export function useCreateLinearTicket(onSubmitSuccess: ((url: string) => void) | undefined) {
   const { data: client } = useLinearClient()
   const { data: teams } = useLinearTeams()
+  const { data: hlToken } = useHighlightToken()
+  const queryClient = useQueryClient()
 
   return useMutation({
     mutationKey: ['create-linear-ticket'],
     mutationFn: async (data: LinearTicketFormSchema) => {
+      if (!hlToken) {
+        throw new Error('No Linear token available')
+      }
+
+      const connected = await checkLinearConnectionStatus(hlToken)
+
+      if (!connected) {
+        throw new Error('Not connected to Linear')
+      }
+
       const team = teams?.[0]
 
       if (!team?.id) {
@@ -155,6 +169,9 @@ export function useCreateLinearTicket(onSubmitSuccess: ((url: string) => void) |
       if (onSubmitSuccess) onSubmitSuccess(issueUrl)
     },
     onError: (error) => {
+      if (error.message.includes('Not connected')) {
+        queryClient.invalidateQueries({ queryKey: ['linear-check-connection'] })
+      }
       console.warn(error.message)
     },
   })
