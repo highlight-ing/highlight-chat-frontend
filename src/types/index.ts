@@ -282,8 +282,7 @@ export type MetadataEvent = {
   message_id: string
   model?: string
   llm_provider?: string
-  has_live_data?: boolean
-  requires_live_data?: string
+  search?: boolean
   tool_activated?: boolean
   tool_name?: string
   tool_id?: string

@@ -63,6 +63,11 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
   const [messageState, setMessageState] = useState<'thinking' | 'model' | 'provider' | 'generating'>('thinking');
   const [currentModel, setCurrentModel] = useState<string>('');
   const [currentProvider, setCurrentProvider] = useState<string>('');
+  const [toolState, setToolState] = useState<{
+    active: boolean;
+    name?: string;
+    id?: string;
+  }>({ active: false });
 
   const { promptApp } = useStore(
     useShallow((state: any) => ({
@@ -103,7 +108,39 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
       }
 
       const metadata = event.detail;
-      
+
+      // Handle tool activation
+      if (metadata.tool_activated) {
+        setToolState({
+          active: true,
+          name: metadata.tool_name,
+          id: metadata.tool_id
+        });
+      }
+
+      // Handle loading state
+      if (metadata.type === 'loading') {
+        if (metadata.loaded === true) {
+          setIsLocalAnimating(false);
+          return;
+        }
+      }
+
+      // Handle done event
+      if (metadata.type === 'done') {
+        setToolState({ active: false });
+        setIsLocalAnimating(false);
+        return;
+      }
+
+      // Handle loading state and done event
+      if (event.detail.type === 'loading' || event.detail.type === 'done') {
+        if (event.detail.type === 'done' || event.detail.loaded === true) {
+          setIsLocalAnimating(false);
+          return;
+        }
+      }
+
       // Update model and provider state
       if (metadata.model) {
         setCurrentModel(metadata.model);
@@ -138,7 +175,7 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
         });
 
         // Add Search status only if live data is enabled
-        if (metadata.has_live_data) {
+        if (metadata.search === true) {
           newLogs.push({
             timestamp: Date.now(),
             type: 'Search',
@@ -358,6 +395,9 @@ const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
             onToggle={() => {
               console.log('Drawer toggled, current logs:', logs);
               setIsDrawerOpen(!isDrawerOpen);
+              if (!isDrawerOpen) {
+                setIsLocalAnimating(false);
+              }
             }}
             logs={logs}
             ref={drawerRef}

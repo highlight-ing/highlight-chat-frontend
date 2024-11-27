@@ -143,161 +143,65 @@ export function useIntegrations(): UseIntegrationsAPI {
     const lastMessage = getLastConversationMessage(conversationId)
     const textContents = lastMessage?.content as string
 
+    // Store the previous content for restoring later
     previousContent.set(conversationId, textContents)
 
-    if (functionName === 'highlight_search' && !loaded) {
-      // @ts-expect-error
-      updateLastConversationMessage(conversationId!, {
-        content: (
-          <MessageWithComponent content={textContents}>
-            <IntegrationsLoader />
-          </MessageWithComponent>
-        ),
-        role: 'assistant',
+    // Send loading state metadata event
+    const event = new CustomEvent('metadata', {
+      detail: {
+        type: 'loading',
+        loaded: loaded,
+        name: functionName
+      }
+    });
+    window.dispatchEvent(event);
+  }
+
+  async function handleIntegrationConnection(conversationId: string, functionName: string, integrationName: string, checkConnectionStatus: (token: string) => Promise<boolean>, createMagicLink: (token: string) => Promise<string>) {
+    //@ts-ignore
+    const hlToken = (await highlight.internal.getAuthorizationToken()) as string
+
+    const connected = await checkConnectionStatus(hlToken)
+
+    if (!connected) {
+      const promise = new Promise<void>((resolve) => {
+        // @ts-expect-error
+        updateLastConversationMessage(conversationId!, {
+          content: (
+            <MessageWithComponent content={previousContent.get(conversationId)}>
+              <SetupConnection
+                name={integrationName}
+                checkConnectionStatus={checkConnectionStatus}
+                onConnect={() => resolve()}
+                icon={getIntegrationIcon(integrationName)}
+                createMagicLink={createMagicLink}
+              />
+            </MessageWithComponent>
+          ),
+          role: 'assistant',
+        })
       })
+
+      integrationAuthorized.set(integrationName, promise)
+
+      return
     }
+    integrationAuthorized.set(integrationName, Promise.resolve())
+  }
 
-    // The two if blocks below handle the case where the user needs to connect their integration
-    // We have a map that stores a Promise for each integration that is pending.
-    if (functionName === 'create_linear_ticket' && !loaded) {
-      //@ts-ignore
-      const hlToken = (await highlight.internal.getAuthorizationToken()) as string
-
-      const connected = await checkLinearConnectionStatus(hlToken)
-
-      if (!connected) {
-        const promise = new Promise<void>((resolve) => {
-          // @ts-expect-error
-          updateLastConversationMessage(conversationId!, {
-            content: (
-              <MessageWithComponent content={textContents}>
-                <SetupConnection
-                  name={'Linear'}
-                  checkConnectionStatus={checkLinearConnectionStatus}
-                  onConnect={() => resolve()}
-                  icon={<LinearIcon size={16} />}
-                  createMagicLink={createMagicLinkForLinear}
-                />
-              </MessageWithComponent>
-            ),
-            role: 'assistant',
-          })
-        })
-
-        integrationAuthorized.set('linear', promise)
-
-        return
-      }
-      integrationAuthorized.set('linear', Promise.resolve())
+  function getIntegrationIcon(integrationName: string) {
+    switch (integrationName) {
+      case 'linear':
+        return <LinearIcon size={16} />
+      case 'notion':
+        return <NotionIcon size={16} />
+      case 'slack':
+        return <SlackIcon size={16} />
+      case 'google':
+        return <GoogleIcon size={16} />
+      default:
+        return null
     }
-
-    if (functionName === 'create_notion_page' && !loaded) {
-      //@ts-ignore
-      const hlToken = (await highlight.internal.getAuthorizationToken()) as string
-
-      const connected = await checkNotionConnectionStatus(hlToken)
-
-      if (!connected) {
-        const promise = new Promise<void>((resolve) => {
-          // @ts-expect-error
-          updateLastConversationMessage(conversationId!, {
-            content: (
-              <MessageWithComponent content={textContents}>
-                <SetupConnection
-                  name={'Notion'}
-                  checkConnectionStatus={checkNotionConnectionStatus}
-                  onConnect={() => resolve()}
-                  icon={<NotionIcon size={16} />}
-                  createMagicLink={createMagicLinkForNotion}
-                />
-              </MessageWithComponent>
-            ),
-            role: 'assistant',
-          })
-        })
-
-        integrationAuthorized.set('notion', promise)
-
-        return
-      }
-      integrationAuthorized.set('notion', Promise.resolve())
-    }
-
-    if (functionName === 'send_slack_message' && !loaded) {
-      //@ts-ignore
-      const hlToken = (await highlight.internal.getAuthorizationToken()) as string
-
-      const connected = await checkIntegrationStatus(hlToken, 'slack')
-
-      if (!connected) {
-        const promise = new Promise<void>((resolve) => {
-          // @ts-expect-error
-          updateLastConversationMessage(conversationId!, {
-            content: (
-              <MessageWithComponent content={textContents}>
-                <SetupConnection
-                  name={'Slack'}
-                  checkConnectionStatus={(token) => checkIntegrationStatus(token, 'slack')}
-                  onConnect={() => resolve()}
-                  icon={<SlackIcon size={16} />}
-                  createMagicLink={(token) => createMagicLinkForIntegration(token, 'slack')}
-                />
-              </MessageWithComponent>
-            ),
-            role: 'assistant',
-          })
-        })
-
-        integrationAuthorized.set('notion', promise)
-
-        return
-      }
-      integrationAuthorized.set('notion', Promise.resolve())
-    }
-
-    if (functionName === 'create_google_calendar_event' && !loaded) {
-      //@ts-ignore
-      const hlToken = (await highlight.internal.getAuthorizationToken()) as string
-
-      const connected = await checkGoogleConnectionStatus(hlToken)
-
-      console.log('Google Connected', connected)
-
-      if (!connected) {
-        const promise = new Promise<void>((resolve) => {
-          // @ts-expect-error
-          updateLastConversationMessage(conversationId!, {
-            content: (
-              <MessageWithComponent content={textContents}>
-                <SetupConnection
-                  name={'Google'}
-                  checkConnectionStatus={checkGoogleConnectionStatus}
-                  onConnect={() => resolve()}
-                  icon={<GoogleIcon size={16} />}
-                  createMagicLink={createMagicLinkForGoogle}
-                />
-              </MessageWithComponent>
-            ),
-            role: 'assistant',
-          })
-        })
-
-        integrationAuthorized.set('google', promise)
-
-        return
-      }
-      integrationAuthorized.set('google', Promise.resolve())
-    }
-
-    // @ts-expect-error
-    updateLastConversationMessage(conversationId!, {
-      content: (
-        <MessageWithComponent content={textContents}>
-          <IntegrationsLoader />
-        </MessageWithComponent>
-      ),
-      role: 'assistant',
-    })
   }
 
   return { createLinearTicket, createNotionPage, createGoogleCalendarEvent, showLoading, sendSlackMessage }

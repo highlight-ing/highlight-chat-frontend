@@ -35,6 +35,7 @@ import { useStore } from '@/components/providers/store-provider'
 import { useIntegrations } from '@/features/integrations/_hooks/use-integrations'
 
 import { useUploadFile } from './useUploadFile'
+import { search } from '@notionhq/client/build/src/api-endpoints'
 
 // Create a type guard for FileAttachment
 function isUploadableAttachment(attachment: Attachment): attachment is PdfAttachment | ImageAttachment {
@@ -356,8 +357,7 @@ export const useSubmitQuery = () => {
                   type: 'metadata',
                   model: metadata.model,
                   llm_provider: metadata.llm_provider,
-                  has_live_data: metadata.has_live_data || false,
-                  requires_live_data: metadata.requires_live_data || 'none',
+                  search: metadata.search || false,
                 };
 
                 console.log('Emitting metadata event:', metadataEvent);
