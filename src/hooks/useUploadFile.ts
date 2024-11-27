@@ -38,7 +38,7 @@ export const useUploadFile = () => {
     })
   }
 
-  const uploadFile = async (fileOrUrl: File | string, conversationId: string) => {
+  const uploadFile = async (fileOrUrl: File | string, conversationId: string, chatRequest?: any) => {
     const startTime = Date.now()
 
     try {
@@ -68,6 +68,11 @@ export const useUploadFile = () => {
       formData.append('file', fileToUpload)
       formData.append('conversation_id', conversationId)
       formData.append('file_type', fileType)
+      
+      // Add chat request object if provided
+      if (chatRequest) {
+        formData.append('chat_request', JSON.stringify(chatRequest))
+      }
 
       const response = await post('file-upload/', formData, { version: 'v4', signal: abortController.signal })
 
