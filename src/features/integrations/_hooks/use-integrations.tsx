@@ -168,7 +168,7 @@ export function useIntegrations(): UseIntegrationsAPI {
         // @ts-expect-error
         updateLastConversationMessage(conversationId!, {
           content: (
-            <MessageWithComponent content={previousContent.get(conversationId)}>
+            <MessageWithComponent content={previousContent.get(conversationId) || ''}>
               <SetupConnection
                 name={integrationName}
                 checkConnectionStatus={checkConnectionStatus}

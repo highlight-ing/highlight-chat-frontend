@@ -204,16 +204,15 @@
   &.animating {
     animation: shimmerWave 2s linear infinite;
     
-    @for $i from 1 through 100 {
+    @for $i from 1 through 2000 {
       &:nth-child(#{$i}) {
-        animation-delay: #{($i * 0.05)}s;
+        animation-delay: #{($i * 0.01)}s;
       }
     }
   }
   
   &.static {
     animation: shimmerWave 2s linear;
-    animation-play-state: paused;
   }
 }
 
