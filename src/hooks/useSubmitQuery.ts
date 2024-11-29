@@ -35,6 +35,7 @@ import { useStore } from '@/components/providers/store-provider'
 import { useIntegrations } from '@/features/integrations/_hooks/use-integrations'
 
 import { useUploadFile } from './useUploadFile'
+import { search } from '@notionhq/client/build/src/api-endpoints'
 
 // Create a type guard for FileAttachment
 function isUploadableAttachment(attachment: Attachment): attachment is PdfAttachment | ImageAttachment {
@@ -277,7 +278,6 @@ export const useSubmitQuery = () => {
     promptApp?: Prompt | null,
     toolOverrides?: ToolOverrides,
   ) => {
-    setInputIsDisabled(true)
     const startTime = Date.now()
 
     console.log('promptApp: ', promptApp)
@@ -318,13 +318,26 @@ export const useSubmitQuery = () => {
 
       let accumulatedMessage = ''
 
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
+      // Add empty assistant message to trigger thinking message removal
+      addConversationMessage(conversationId, {
+        role: 'assistant',
+        content: '',
+        id: 'streaming-' + Date.now(),
+        conversation_id: conversationId,
+        version: 'v4',
+        given_feedback: null
+      })
 
-        checkAbortSignal()
+      try {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) {
+            break
+          }
 
-        const chunk = new TextDecoder().decode(value)
+          checkAbortSignal()
+
+          const chunk = new TextDecoder().decode(value)
 
         const { content, windowName, conversation, factIndex, fact, messageId } = await parseAndHandleStreamChunk(
           chunk,
@@ -334,124 +347,109 @@ export const useSubmitQuery = () => {
             integrations,
             conversationId,
             onMetadata: (metadata) => {
-              if (metadata.provider_switch) {
-                console.log('[Provider Switch Event]:', {
-                  from: metadata.from_provider,
-                  to: metadata.to_provider,
-                  reason: metadata.switch_reason,
-                  model: metadata.model,
-                  llm_provider: metadata.llm_provider,
-                  has_live_data: metadata.has_live_data,
-                  requires_live_data: metadata.requires_live_data,
-                })
-              } else if (metadata.tool_activated) {
-                console.log('[Tool Activation Event]:', {
+              if (metadata.tool_name) {
+                trackEvent('HL_CHAT_TOOL_USED', {
                   tool_name: metadata.tool_name,
                   tool_id: metadata.tool_id,
                 })
               } else if (metadata.model && metadata.llm_provider) {
-                console.log('[Initial Chat Event]:', {
+                const metadataEvent = {
+                  type: 'metadata',
                   model: metadata.model,
                   llm_provider: metadata.llm_provider,
-                  has_live_data: metadata.has_live_data,
-                  requires_live_data: metadata.requires_live_data,
-                })
+                  search: metadata.search || false,
+                };
+
+                console.log('Emitting metadata event:', metadataEvent);
+                window.dispatchEvent(new CustomEvent('highlight:metadata', { detail: metadataEvent }));
               }
             },
           },
         )
 
-        if (content) {
-          accumulatedMessage += content
-          updateLastConversationMessage(conversationId, {
-            role: 'assistant',
-            content: accumulatedMessage,
-            conversation_id: conversationId,
-            id: messageId,
-            given_feedback: null,
-          })
-        }
-
-        if (conversation) {
-          const conversation_data = await Highlight.conversations.getConversationById(conversation)
-          if (conversation_data) {
-            addAttachment({
-              type: 'audio',
-              value: conversation_data.transcript,
-              duration: Math.floor(
-                (new Date(conversation_data.endedAt).getTime() - new Date(conversation_data.startedAt).getTime()) /
-                  60000,
-              ),
-            })
-          } else {
-            addToast({
-              title: 'Failed to request Conversation',
-              description: 'We were unable to request conversation with this ID',
+          if (content) {
+            accumulatedMessage += content
+            updateLastConversationMessage(conversationId, {
+              role: 'assistant',
+              content: accumulatedMessage,
+              conversation_id: conversationId,
+              id: messageId,
+              given_feedback: null,
             })
           }
-        }
 
-        if (typeof factIndex === 'number' && fact) {
-          updateLastConversationMessage(conversationId, {
-            role: 'assistant',
-            content: accumulatedMessage,
-            conversation_id: conversationId,
-            factIndex: factIndex,
-            fact: fact,
-            id: messageId,
-            given_feedback: null,
-          })
-        } else if (fact) {
-          updateLastConversationMessage(conversationId, {
-            role: 'assistant',
-            content: accumulatedMessage,
-            conversation_id: conversationId,
-            fact: fact,
-            id: messageId,
-            given_feedback: null,
-          })
-        }
+          if (conversation) {
+            const conversation_data = await Highlight.conversations.getConversationById(conversation)
+            if (conversation_data) {
+              addAttachment({
+                type: 'audio',
+                value: conversation_data.transcript,
+                duration: Math.floor(
+                  (new Date(conversation_data.endedAt).getTime() - new Date(conversation_data.startedAt).getTime()) /
+                    60000,
+                ),
+              })
+            } else {
+              addToast({
+                title: 'Failed to request Conversation',
+                description: 'We were unable to request conversation with this ID',
+              })
+            }
+          }
 
-        if (windowName) {
-          const contextGranted = await Highlight.permissions.requestWindowContextPermission()
-          const screenshotGranted = await Highlight.permissions.requestScreenshotPermission()
-          if (contextGranted && screenshotGranted) {
-            addToast({
-              title: 'Context Granted',
-              description: `Context granted for ${windowName}`,
-              type: 'success',
-              timeout: 5000,
+          if (typeof factIndex === 'number' && fact) {
+            updateLastConversationMessage(conversationId, {
+              role: 'assistant',
+              content: accumulatedMessage,
+              conversation_id: conversationId,
+              factIndex: factIndex,
+              fact: fact,
+              id: messageId,
+              given_feedback: null,
             })
-            const screenshot = await Highlight.user.getWindowScreenshot(windowName)
-            addAttachment({ type: 'image', value: screenshot })
-
-            const windowContext = await Highlight.user.getWindowContext(windowName)
-            const ocrScreenContents = windowContext.application.focusedWindow.rawContents
-              ? windowContext.application.focusedWindow.rawContents
-              : windowContext.environment.ocrScreenContents || ''
-            addAttachment({ type: 'window_context', value: ocrScreenContents })
-
-            await handleSubmit("Here's the context you requested.", promptApp, {
-              image: screenshot,
-              window_context: ocrScreenContents,
+          } else if (fact) {
+            updateLastConversationMessage(conversationId, {
+              role: 'assistant',
+              content: accumulatedMessage,
+              conversation_id: conversationId,
+              fact: fact,
+              id: messageId,
+              given_feedback: null,
             })
           }
+
+          if (windowName) {
+            const contextGranted = await Highlight.permissions.requestWindowContextPermission()
+            const screenshotGranted = await Highlight.permissions.requestScreenshotPermission()
+            if (contextGranted && screenshotGranted) {
+              addToast({
+                title: 'Context Granted',
+                description: `Context granted for ${windowName}`,
+                type: 'success',
+                timeout: 5000,
+              })
+              const screenshot = await Highlight.user.getWindowScreenshot(windowName)
+              addAttachment({ type: 'image', value: screenshot })
+
+              const windowContext = await Highlight.user.getWindowContext(windowName)
+              const ocrScreenContents = windowContext.application.focusedWindow.rawContents
+                ? windowContext.application.focusedWindow.rawContents
+                : windowContext.environment.ocrScreenContents || ''
+              addAttachment({ type: 'window_context', value: ocrScreenContents })
+
+              await handleSubmit("Here's the context you requested.", promptApp, {
+                image: screenshot,
+                window_context: ocrScreenContents,
+              })
+            }
+          }
         }
+      } catch (error: any) {
+        throw error
       }
     } catch (error: any) {
-      const endTime = Date.now()
-      const duration = (endTime - startTime) / 1000
-
-      if (error.message.includes('aborted')) {
-        console.log('Skipping message request, aborted')
-      } else {
-        handleError(error, {
-          conversationId,
-          isPromptApp,
-          duration,
-          endpoint: 'chat/',
-        })
-      }
+      handleError(error, { method: 'fetchResponse' })
+      throw error
     } finally {
       const endTime = Date.now()
       const duration = endTime - startTime
@@ -462,7 +460,6 @@ export const useSubmitQuery = () => {
         success: !abortControllerRef.current?.signal.aborted,
       })
 
-      setInputIsDisabled(false)
       abortControllerRef.current = undefined
     }
   }
@@ -766,7 +763,7 @@ export const useSubmitQuery = () => {
     } catch (error: any) {
       handleError(error, { method: 'handleSubmit' })
     } finally {
-      setInputIsDisabled(false)
+      setInputIsDisabled(false) // Always reset input state after completion or error
     }
   }
 

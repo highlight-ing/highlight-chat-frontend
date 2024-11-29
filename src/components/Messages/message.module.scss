@@ -16,6 +16,13 @@
   max-width: $chat-body-width;
   position: relative;
   animation: fadeIn 200ms forwards;
+  transition: margin-bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 0;
+
+  &.drawer-open {
+    margin-bottom: calc(var(--drawer-height, 0px) + 16px);
+    transition: margin-bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 
   &.placeholder {
     @extend .loadingGradient;
@@ -55,6 +62,27 @@
   position: absolute;
   top: 0;
   left: -40px;
+  svg {
+    color: rgba($text-accent, 0.8);
+  }
+}
+
+.thinkingAvatar {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: -40px;
+  svg {
+    color: $text-accent;
+    animation: spinGear 8s linear infinite;
+  }
+
+  &.inactive {
+    svg {
+      color: rgba($light-60, 0.8);
+      animation: none;
+    }
+  }
 }
 
 .messageBody {
@@ -148,10 +176,83 @@
 }
 
 .thinking {
-  color: $light-40;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
   font-size: 15px;
-  font-weight: 300;
-  padding: 5px 0;
+  display: flex;
+  align-items: baseline;
+  color: $light-80;
+  line-height: 1.5;
+  min-height: 22px;
+  
+  &.completed {
+    color: $light-60;
+  }
+}
+
+.waveChar {
+  display: inline-block;
+  position: relative;
+  will-change: opacity, color, transform;
+  -webkit-font-smoothing: subpixel-antialiased;
+  vertical-align: baseline;
+  height: 100%;
+  opacity: 0.4;
+  color: $light-60;
+  
+  &.animating {
+    animation: shimmerWave 2s linear infinite;
+    
+    @for $i from 1 through 2000 {
+      &:nth-child(#{$i}) {
+        animation-delay: #{($i * 0.03)}s;
+      }
+    }
+  }
+  
+  &.static {
+    animation: shimmerWave 2s linear;
+  }
+}
+
+.thinkingContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.thinkingHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@keyframes shimmerWave {
+  0% {
+    opacity: 0.4;
+    color: $light-60;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    color: $light-100;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0.4;
+    color: $light-60;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes spinGear {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(30deg);
+  }
 }
 
 .codeBlock {
@@ -222,4 +323,193 @@
   0% { transform: scale(1); }
   50% { transform: scale(1.05); }
   100% { transform: scale(1); }
+}
+
+@keyframes lineAppear {
+  0% {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes lineDisappear {
+  0% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+}
+
+@keyframes drawerOpen {
+  0% {
+    max-height: 0;
+    opacity: 0;
+  }
+  100% {
+    max-height: 500px;
+    opacity: 1;
+  }
+}
+
+@keyframes drawerClose {
+  0% {
+    max-height: 500px;
+    opacity: 1;
+  }
+  100% {
+    max-height: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes lineOpen {
+  0% {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes lineClose {
+  0% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+}
+
+.drawerContainer {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+}
+
+.drawerToggle {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: $light-60;
+  transform: rotate(0deg);
+
+  &:disabled {
+    pointer-events: none;
+  }
+
+  &.animated {
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  &.open {
+    transform: rotate(180deg);
+  }
+  
+  &:hover:not(:disabled) {
+    color: $light-80;
+  }
+}
+
+.drawer {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 8px;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  z-index: 10;
+
+  &.animated {
+    visibility: visible;
+    
+    &:not(.open) {
+      animation: drawerClose 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    
+    &.open {
+      pointer-events: auto;
+      animation: drawerOpen 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+  }
+
+  &:not(.animated) {
+    &.open {
+      max-height: 500px;
+      opacity: 1;
+      pointer-events: auto;
+      visibility: visible;
+    }
+  }
+}
+
+.drawerContent {
+  position: relative;
+  padding: 8px 0 8px 24px;
+}
+
+.verticalLine {
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: $text-accent;
+  transform-origin: center;
+  opacity: 0;
+  transform: scaleY(0);
+
+  .drawer.animated:not(.open) & {
+    animation: lineClose 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .drawer.animated.open & {
+    animation: lineOpen 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .drawer:not(.animated).open & {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+.logContainer {
+  opacity: 0;
+  transform: translateY(-5px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  .open & {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.logEntry {
+  color: $light-80;
+  font-size: 14px;
+  
+  span {
+    margin-right: 8px;
+  }
+}
+
+.emptyLog {
+  color: $light-60;
+  font-style: italic;
+  font-size: 14px;
 }

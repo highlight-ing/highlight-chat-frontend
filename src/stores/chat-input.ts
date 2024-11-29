@@ -5,28 +5,35 @@ import { StateCreator } from 'zustand'
  */
 
 export interface ChatInputState {
-  inputOverride: string | null
+  fileInputRef: React.RefObject<HTMLInputElement> | null
+  input: string
   inputIsDisabled: boolean
-  fileInputRef?: React.RefObject<HTMLInputElement>
+  inputOverride: string | null
 }
 
 export type ChatInputSlice = ChatInputState & {
+  setFileInputRef: (ref: React.RefObject<HTMLInputElement>) => void
+  setInput: (input: string) => void
+  setInputIsDisabled: (isDisabled: boolean) => void
   setInputOverride: (input: string | null) => void
   clearInputOverride: () => void
-  setInputIsDisabled: (isDisabled: boolean) => void
-  setFileInputRef: (ref: React.RefObject<HTMLInputElement>) => void
 }
 
 export const initialChatInputState: ChatInputState = {
-  inputOverride: null,
+  fileInputRef: null,
+  input: '',
   inputIsDisabled: false,
-  fileInputRef: undefined,
+  inputOverride: null,
 }
 
 export const createChatInputSlice: StateCreator<ChatInputSlice> = (set) => ({
   ...initialChatInputState,
-  setInputOverride: (input: string | null) => set({ inputOverride: input }),
+  setInput: (input: string) => set({ input }),
+  setInputOverride: (inputOverride: string | null) => set({ inputOverride }),
   clearInputOverride: () => set({ inputOverride: null }),
   setInputIsDisabled: (isDisabled: boolean) => set({ inputIsDisabled: isDisabled }),
-  setFileInputRef: (ref: React.RefObject<HTMLInputElement>) => set({ fileInputRef: ref }),
+  setFileInputRef: (ref: React.RefObject<HTMLInputElement>) => {
+    // Don't persist the ref to avoid circular references
+    set((state: ChatInputState) => ({ ...state, fileInputRef: ref }), false)
+  },
 })

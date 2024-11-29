@@ -1,11 +1,16 @@
+import { GoogleIcon, LinearIcon, NotionIcon, SlackIcon } from '@/components/icons'
 import { useStore } from '@/components/providers/store-provider'
-
 import { IntegrationsLoader } from '../_components/loader'
+import { SetupConnection } from '../_components/setup-connection'
+import { checkGoogleConnectionStatus, createMagicLinkForGoogle } from '../google-cal/actions'
 import { CreateGoogleCalEvent } from '../google-cal/google-cal'
+import { checkLinearConnectionStatus, createMagicLinkForLinear } from '../linear/actions'
 import { CreateLinearTicket } from '../linear/linear'
+import { checkNotionConnectionStatus, createMagicLinkForNotion } from '../notion/actions'
 import { CreateNotionPage } from '../notion/notion'
-import { SendSlackMessageComponent } from '../slack/slack'
 import { SendSlackMessageParams } from '../types'
+import { checkIntegrationStatus, createMagicLinkForIntegration } from '@/utils/integrations-server-actions'
+import { SendSlackMessageComponent } from '../slack/slack'
 
 interface CreateNotionPageParams {
   title: string
@@ -26,7 +31,7 @@ export interface UseIntegrationsAPI {
   createNotionPage: (conversationId: string, params: CreateNotionPageParams) => Promise<void>
   createGoogleCalendarEvent: (conversationId: string, params: CreateGoogleCalendarEventParams) => Promise<void>
   sendSlackMessage: (conversationId: string, params: SendSlackMessageParams) => Promise<void>
-  showLoading: (conversationId: string, loaded: boolean) => void
+  showLoading: (conversationId: string, functionName: string, loaded: boolean) => Promise<void>
 }
 
 function MessageWithComponent({ content, children }: { content: string; children?: React.ReactNode }) {
@@ -40,12 +45,17 @@ function MessageWithComponent({ content, children }: { content: string; children
 
 // Holds the previous content of the conversation to be able to append to it
 const previousContent = new Map<string, string>()
+// Holds the name of the integration and if the authorization check is pending
+// This is so that the user can sign in while the contents of notion/linear are still loading.
+const integrationAuthorized = new Map<string, Promise<void>>()
 
 export function useIntegrations(): UseIntegrationsAPI {
   const getLastConversationMessage = useStore((state) => state.getLastConversationMessage)
   const updateLastConversationMessage = useStore((state) => state.updateLastConversationMessage)
 
   async function createLinearTicket(conversationId: string, title: string, description: string) {
+    await integrationAuthorized.get('linear')
+
     let lastMessage = previousContent.get(conversationId)
 
     if (!lastMessage) {
@@ -66,6 +76,8 @@ export function useIntegrations(): UseIntegrationsAPI {
   }
 
   async function createNotionPage(conversationId: string, params: CreateNotionPageParams) {
+    await integrationAuthorized.get('notion')
+
     let lastMessage = previousContent.get(conversationId)
 
     if (!lastMessage) {
@@ -86,6 +98,8 @@ export function useIntegrations(): UseIntegrationsAPI {
   }
 
   async function createGoogleCalendarEvent(conversationId: string, params: CreateGoogleCalendarEventParams) {
+    await integrationAuthorized.get('google')
+
     let lastMessage = previousContent.get(conversationId)
 
     if (!lastMessage) {
@@ -106,6 +120,8 @@ export function useIntegrations(): UseIntegrationsAPI {
   }
 
   async function sendSlackMessage(conversationId: string, params: SendSlackMessageParams) {
+    await integrationAuthorized.get('slack')
+
     let lastMessage = previousContent.get(conversationId)
 
     if (!lastMessage) {
@@ -123,23 +139,70 @@ export function useIntegrations(): UseIntegrationsAPI {
     })
   }
 
-  function showLoading(conversationId: string, loaded: boolean) {
-    if (loaded) return
-
+  async function showLoading(conversationId: string, functionName: string, loaded: boolean) {
     const lastMessage = getLastConversationMessage(conversationId)
     const textContents = lastMessage?.content as string
 
+    // Store the previous content for restoring later
     previousContent.set(conversationId, textContents)
 
-    // @ts-expect-error
-    updateLastConversationMessage(conversationId!, {
-      content: (
-        <MessageWithComponent content={textContents}>
-          <IntegrationsLoader />
-        </MessageWithComponent>
-      ),
-      role: 'assistant',
-    })
+    // Send loading state metadata event
+    const event = new CustomEvent('metadata', {
+      detail: {
+        type: 'loading',
+        loaded: loaded,
+        name: functionName
+      }
+    });
+    window.dispatchEvent(event);
+  }
+
+  async function handleIntegrationConnection(conversationId: string, functionName: string, integrationName: string, checkConnectionStatus: (token: string) => Promise<boolean>, createMagicLink: (token: string) => Promise<string>) {
+    //@ts-ignore
+    const hlToken = (await highlight.internal.getAuthorizationToken()) as string
+
+    const connected = await checkConnectionStatus(hlToken)
+
+    if (!connected) {
+      const promise = new Promise<void>((resolve) => {
+        const content = previousContent.get(conversationId) || getLastConversationMessage(conversationId)?.content as string || ''
+        // @ts-expect-error
+        updateLastConversationMessage(conversationId!, {
+          content: (
+            <MessageWithComponent content={content}>
+              <SetupConnection
+                name={integrationName}
+                checkConnectionStatus={checkConnectionStatus}
+                onConnect={() => resolve()}
+                icon={getIntegrationIcon(integrationName)}
+                createMagicLink={createMagicLink}
+              />
+            </MessageWithComponent>
+          ),
+          role: 'assistant',
+        })
+      })
+
+      integrationAuthorized.set(integrationName, promise)
+
+      return
+    }
+    integrationAuthorized.set(integrationName, Promise.resolve())
+  }
+
+  function getIntegrationIcon(integrationName: string) {
+    switch (integrationName) {
+      case 'linear':
+        return <LinearIcon size={16} />
+      case 'notion':
+        return <NotionIcon size={16} />
+      case 'slack':
+        return <SlackIcon size={16} />
+      case 'google':
+        return <GoogleIcon size={16} />
+      default:
+        return null
+    }
   }
 
   return { createLinearTicket, createNotionPage, createGoogleCalendarEvent, showLoading, sendSlackMessage }

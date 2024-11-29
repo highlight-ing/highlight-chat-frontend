@@ -1,4 +1,4 @@
-import { createContext, useContext, useRef, type ReactNode } from 'react'
+import React, { createContext, ReactNode, useContext, useRef } from 'react'
 /**
  * This is setup to support Next.JS and our Zustand store
  * This is all boilerplate
@@ -17,7 +17,7 @@ export const StoreProvider = ({ children }: { children: ReactNode }) => {
   return <StoreContext.Provider value={storeRef.current}>{children}</StoreContext.Provider>
 }
 
-export const useStore = <T,>(selector: (store: Store) => T): T => {
+export const useStore = <T,>(selector: (state: Store) => T): T => {
   const storeContext = useContext(StoreContext)
 
   if (!storeContext) {
