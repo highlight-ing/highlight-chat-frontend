@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
+import { APIProvider, useMapsLibrary } from '@vis.gl/react-google-maps'
 import { format } from 'date-fns'
 import { ControllerRenderProps, useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -30,6 +31,8 @@ import { IntegrationSuccessMessage } from '../_components/success-message'
 import { checkGoogleConnectionStatus, createMagicLinkForGoogle } from './actions'
 import { useCheckGoogleCalConnection, useCreateGoogleCalEvent } from './hooks'
 import { extractDateAndTime } from './utils'
+
+const GOOGLE_MAPS_API_KEY = 'AIzaSyDQDl9RiOxREU45HQHr_GoU0KL8EBVLi38'
 
 const googleCalEventFormSchema = z
   .object({
@@ -135,9 +138,80 @@ function TimeSelectDropdown(props: GoogleCalEventDropdownProps) {
   )
 }
 
+function InviteeDropdown() {
+  return (
+    <Select>
+      <FormSelectTrigger>
+        <SelectValue placeholder="Select an invitee" />
+      </FormSelectTrigger>
+      <SelectContent className="max-h-[270px]" sideOffset={4}>
+        <SelectItem key="james" value="james">
+          James Swingos
+        </SelectItem>
+        <SelectItem key="pim" value="pim">
+          Pim de Witte
+        </SelectItem>
+        <SelectItem key="pim" value="pim">
+          Jeroen van der Heijden
+        </SelectItem>
+      </SelectContent>
+    </Select>
+  )
+}
+
 type GoogleCalEventFormProps = {
   data: CreateGoogleCalendarEventParams
   onSuccess?: (url: string) => void
+}
+
+interface PlaceAutocompleteProps {
+  value: string
+  onChange: (place: string) => void
+}
+
+const PlaceAutocomplete = ({ value, onChange }: PlaceAutocompleteProps) => {
+  const [placeAutocomplete, setPlaceAutocomplete] = useState<google.maps.places.Autocomplete | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const places = useMapsLibrary('places')
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.value = value
+    }
+  }, [value])
+
+  useEffect(() => {
+    if (!places || !inputRef.current) return
+
+    const options = {
+      fields: [],
+    }
+
+    setPlaceAutocomplete(new places.Autocomplete(inputRef.current, options))
+  }, [places])
+
+  useEffect(() => {
+    if (!inputRef.current) return
+
+    const handleInputChange = () => {
+      onChange(inputRef.current?.value ?? '')
+    }
+
+    inputRef.current.addEventListener('input', handleInputChange)
+    return () => {
+      inputRef.current?.removeEventListener('input', handleInputChange)
+    }
+  }, [onChange])
+
+  return (
+    <div className="autocomplete-container">
+      <FormInput placeholder="Event location" ref={inputRef} />
+    </div>
+  )
+}
+
+const GoogleAPIWrapper = ({ children }: { children: React.ReactNode }) => {
+  return <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>{children}</APIProvider>
 }
 
 export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
@@ -248,12 +322,16 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
             <FormItem>
               <FormLabel>Location</FormLabel>
               <FormControl>
-                <FormInput placeholder="Event location" {...field} />
+                <GoogleAPIWrapper>
+                  <PlaceAutocomplete value={field.value ?? ''} onChange={(place) => form.setValue('location', place)} />
+                </GoogleAPIWrapper>
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
+        {/* <InviteeDropdown /> */}
 
         <FormField
           control={form.control}

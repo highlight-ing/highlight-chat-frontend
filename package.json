@@ -49,6 +49,7 @@
     "@tanstack/react-query-devtools": "^5.59.20",
     "@tryfabric/martian": "^1.2.4",
     "@uiw/react-textarea-code-editor": "^3.0.2",
+    "@vis.gl/react-google-maps": "^1.4.2",
     "ai": "^3.2.15",
     "browser-image-compression": "^2.0.2",
     "class-variance-authority": "^0.7.0",
