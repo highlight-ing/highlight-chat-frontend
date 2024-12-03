@@ -13,6 +13,7 @@ export interface FormDataInputs {
   llmProvider?: string
   attachedContext: AttachedContexts
   availableContexts: AvailableContexts
+  timezone: string
 }
 
 export interface TextFileAttachmentMetadata {
@@ -123,6 +124,7 @@ export const buildFormData = async ({
   llmProvider = 'anthropic',
   attachedContext,
   availableContexts,
+  timezone,
 }: FormDataInputs): Promise<FormData> => {
   const formData = new FormData()
 
@@ -130,6 +132,7 @@ export const buildFormData = async ({
   formData.append('prompt', prompt)
   formData.append('conversation_id', conversationId)
   formData.append('llm_provider', llmProvider)
+  formData.append('timezone', timezone)
 
   // Append attached_context_metadata
   const attachedContextMetadata = JSON.stringify(attachedContext)

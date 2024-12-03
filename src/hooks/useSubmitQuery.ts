@@ -614,6 +614,7 @@ export const useSubmitQuery = () => {
         llmProvider: 'anthropic',
         attachedContext,
         availableContexts,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       })
 
       await fetchResponse(conversationId, formData, !!promptApp, promptApp)
@@ -745,6 +746,7 @@ export const useSubmitQuery = () => {
         llmProvider: 'anthropic',
         attachedContext,
         availableContexts,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       })
 
       // @ts-expect-error
