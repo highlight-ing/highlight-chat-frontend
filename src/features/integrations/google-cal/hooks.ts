@@ -22,6 +22,89 @@ export function useCheckGoogleCalConnection() {
   })
 }
 
+interface ScopeCheckResponse {
+  scopes: string
+}
+
+/**
+ * Ensures the user has the proper scopes for Google Calendar
+ */
+export function useCheckGoogleCalScope() {
+  const { data: hlToken } = useHighlightToken()
+
+  return useQuery({
+    queryKey: ['google-cal-check-scope'],
+    queryFn: async () => {
+      const response = await fetch('https://backend.highlightai.com/v1/gcal/scopes', {
+        headers: {
+          Authorization: `Bearer ${hlToken}`,
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error('Error checking Google Calendar scope')
+      }
+
+      const data = (await response.json()) as ScopeCheckResponse
+
+      if (!data.scopes.includes('https://www.googleapis.com/auth/contacts.readonly')) {
+        return false
+      }
+
+      if (!data.scopes.includes('https://www.googleapis.com/auth/calendar.events')) {
+        return false
+      }
+
+      return true
+    },
+    enabled: !!hlToken,
+  })
+}
+
+interface GoogleCalContactsResponse {
+  contacts: {
+    resourceName: string
+    etag: string
+    names: {
+      displayName: string
+      familyName: string
+      givenName: string
+      displayNameLastFirst: string
+      unstructuredName: string
+    }[]
+    emailAddresses: {
+      value: string
+      metadata: {
+        primary: boolean
+      }
+    }[]
+  }[]
+}
+
+export function useFetchGoogleCalContacts() {
+  const { data: hlToken } = useHighlightToken()
+
+  return useQuery({
+    queryKey: ['google-cal-fetch-contacts'],
+    queryFn: async () => {
+      const response = await fetch('https://backend.highlightai.com/v1/gcal/contacts', {
+        headers: {
+          Authorization: `Bearer ${hlToken}`,
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error('Error checking Google Calendar scope')
+      }
+
+      const data = (await response.json()) as GoogleCalContactsResponse
+
+      return data.contacts
+    },
+    enabled: !!hlToken,
+  })
+}
+
 export function useCreateGoogleCalEvent(onSuccess: ((url: string) => void) | undefined) {
   const { data: hlToken } = useHighlightToken()
   const queryClient = useQueryClient()
