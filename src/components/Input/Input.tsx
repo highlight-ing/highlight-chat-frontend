@@ -25,6 +25,7 @@ import { InputDivider } from './InputDivider'
 import InputFooter from './InputFooter'
 import InputPromptActions from './InputPromptActions'
 import { LatestConversation } from './latest-conversation'
+import SearchBar from './SearchBar'
 
 const MAX_INPUT_HEIGHT = 160
 
@@ -366,10 +367,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
 
             <Stacker className={cn('w-full transition-transform', isInputFocused && '-translate-y-16')}>
               <StackerItem index={0}>
-                <LatestConversation focusInput={focusInput} />
-              </StackerItem>
-              <StackerItem index={1}>
-                <ViewChangelogBanner />
+                <SearchBar />
               </StackerItem>
             </Stacker>
           </div>
