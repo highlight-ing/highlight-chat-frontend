@@ -29,7 +29,7 @@ import { SetupConnection } from '../_components/setup-connection'
 import { IntegrationSubmitButton } from '../_components/submit-button'
 import { IntegrationSuccessMessage } from '../_components/success-message'
 import { checkGoogleConnectionStatus, createMagicLinkForGoogle } from './actions'
-import { useCheckGoogleCalConnection, useCreateGoogleCalEvent } from './hooks'
+import { useCheckGoogleCalConnection, useCreateGoogleCalEvent, useFetchGoogleCalContacts } from './hooks'
 import { extractDateAndTime } from './utils'
 
 const GOOGLE_MAPS_API_KEY = 'AIzaSyDQDl9RiOxREU45HQHr_GoU0KL8EBVLi38'
@@ -139,21 +139,23 @@ function TimeSelectDropdown(props: GoogleCalEventDropdownProps) {
 }
 
 function InviteeDropdown() {
+  const { data: contacts } = useFetchGoogleCalContacts()
+
+  // Need to add search input for filtering contacts
+  // Need to add multiple selection, not sure what the best UX is for this
+  // so that multiple invitees can be selected
+
   return (
     <Select>
       <FormSelectTrigger>
         <SelectValue placeholder="Select an invitee" />
       </FormSelectTrigger>
       <SelectContent className="max-h-[270px]" sideOffset={4}>
-        <SelectItem key="james" value="james">
-          James Swingos
-        </SelectItem>
-        <SelectItem key="pim" value="pim">
-          Pim de Witte
-        </SelectItem>
-        <SelectItem key="pim" value="pim">
-          Jeroen van der Heijden
-        </SelectItem>
+        {contacts?.map((contact) => (
+          <SelectItem key={contact.resourceName} value={contact.resourceName}>
+            {contact.names[0].displayName}
+          </SelectItem>
+        ))}
       </SelectContent>
     </Select>
   )
@@ -331,7 +333,7 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
           )}
         />
 
-        {/* <InviteeDropdown /> */}
+        <InviteeDropdown />
 
         <FormField
           control={form.control}
