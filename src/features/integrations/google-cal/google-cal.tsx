@@ -333,7 +333,13 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
           )}
         />
 
-        <InviteeDropdown />
+        <FormItem>
+          <FormLabel>Invitees</FormLabel>
+          <FormControl>
+            <InviteeDropdown />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
 
         <FormField
           control={form.control}
