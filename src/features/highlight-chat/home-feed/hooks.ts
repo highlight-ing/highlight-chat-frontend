@@ -3,6 +3,8 @@
 import Highlight from '@highlight-ai/app-runtime'
 import { useQuery } from '@tanstack/react-query'
 
+const THIRTY_MINUTES_IN_MS = 30 * 60 * 1000
+
 export function useAudioNotes() {
   return useQuery({
     queryKey: ['audio-notes'],
@@ -11,5 +13,6 @@ export function useAudioNotes() {
 
       return recentConversations
     },
+    staleTime: THIRTY_MINUTES_IN_MS,
   })
 }

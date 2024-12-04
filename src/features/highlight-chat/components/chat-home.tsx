@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
-import { trackEvent } from '@/utils/amplitude'
 import { useShallow } from 'zustand/react/shallow'
 
 import { cn } from '@/lib/utils'
+import { trackEvent } from '@/utils/amplitude'
 import { HighlightIcon } from '@/components/icons'
 import { Input } from '@/components/Input/Input'
 import { useStore } from '@/components/providers/store-provider'
+
+import { AudioNotesFeed } from '../home-feed/audio-notes-feed'
 
 function InputHeading() {
   const { promptName, promptDescription } = useStore(
@@ -49,15 +51,18 @@ export function ChatHome({ isShowing }: { isShowing: boolean }) {
   return (
     <div
       className={cn(
-        'pointer-events-none fixed flex h-full w-[min(800px,95%)] flex-col justify-between gap-6 pb-3 pt-[8vh] opacity-0',
+        'pointer-events-none fixed flex h-full w-[min(800px,95%)] flex-col justify-between gap-6 pb-3 pt-24 opacity-0',
         {
           'pointer-events-auto relative opacity-100': isShowing,
         },
       )}
     >
-      <div className="flex flex-col gap-16">
-        <InputHeading />
-        {isVisible && <Input isActiveChat={false} />}
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-12">
+          <InputHeading />
+          {isVisible && <Input isActiveChat={false} />}
+        </div>
+        <AudioNotesFeed />
       </div>
 
       <div className="mx-auto flex items-center gap-1 font-semibold text-subtle">

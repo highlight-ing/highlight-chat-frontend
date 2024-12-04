@@ -23,7 +23,6 @@ import { useOnExternalMessage } from '@/features/highlight-chat/hooks/use-on-ext
 import { useOnPromptChange } from '@/features/highlight-chat/hooks/use-on-prompt-change'
 import { useOnPromptLoad } from '@/features/highlight-chat/hooks/use-on-prompt-load'
 import { HistorySidebar } from '@/features/history-sidebar/history-sidebar'
-import { AudioNotesFeed } from '@/features/home-feed/audio-notes-feed'
 import { NavigationTopBar } from '@/features/nav-header/top-bar/top-bar'
 import { TranscriptViewer } from '@/features/transcript-viewer/transcript-viewer'
 
@@ -63,6 +62,7 @@ export default function Home() {
         className={cn(
           `${styles.contents} ${showHistory ? styles.partial : styles.full} ${messages.length > 0 || inputIsDisabled || !!promptApp ? styles.justifyEnd : ''}`,
           'grid grid-cols-3 transition duration-700',
+          isChatting && styles.isChatting,
         )}
       >
         <TranscriptViewer />
@@ -78,7 +78,6 @@ export default function Home() {
           {isConversationLoading && messages.length === 0 && !inputIsDisabled && <MessagesPlaceholder />}
           <ChatHome isShowing={!isChatting && !promptApp && !isConversationLoading} />
           {(isChatting || promptApp) && <Input isActiveChat={true} />}
-          <AudioNotesFeed />
           <IntercomChat />
         </div>
       </div>
