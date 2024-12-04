@@ -17,10 +17,10 @@ import styles from './message.module.scss'
 
 import 'katex/dist/katex.min.css'
 
-import { getDisplayValue } from '@/utils/attachments'
-import { AttachedContextContextTypes } from '@/utils/formDataUtils'
 import { MessageText } from 'iconsax-react'
 
+import { getDisplayValue } from '@/utils/attachments'
+import { AttachedContextContextTypes } from '@/utils/formDataUtils'
 import Button from '@/components/Button/Button'
 import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
 import { useStore } from '@/components/providers/store-provider'
@@ -169,31 +169,6 @@ export const Message = ({ message, isThinking }: MessageProps) => {
       )}
       {!isThinking ? (
         <div className={styles.message}>
-          {message.role === 'user' && hasAttachment(message as UserMessage) && (
-            <div className={`mb-2 flex gap-2`}>
-              {message.version === 'v4' && message.attached_context && message.attached_context.length > 0 ? (
-                message.attached_context?.map((attachment, index) => (
-                  <div key={index}>{renderAttachment(attachment)}</div>
-                ))
-              ) : (
-                <>
-                  {message.screenshot && <Attachment type="image" value={message.screenshot} />}
-                  {message.audio && <Attachment type="audio" value={message.audio} />}
-                  {message.window && message.window?.title && (
-                    <Attachment type="window" value={message.window.title} appIcon={message.window.appIcon} />
-                  )}
-                  {message.clipboard_text && <Attachment type="clipboard" value={message.clipboard_text} />}
-                  {message.file_title && <Attachment type="pdf" value={message.file_title} />}
-                  {message.image_url && <Attachment type="image" value={message.image_url} />}
-                  {message.file_attachments &&
-                    message.file_attachments.map((a, index) => {
-                      return <Attachment type={a.type} value={getDisplayValue(a)} key={index} />
-                    })}
-                  {message.window_context && <Attachment type="window_context" value={message.window_context} />}
-                </>
-              )}
-            </div>
-          )}
           <div className={styles.messageBody}>
             <Markdown
               remarkPlugins={[remarkGfm, remarkMath]}
@@ -257,6 +232,35 @@ export const Message = ({ message, isThinking }: MessageProps) => {
               {typeof message.content === 'string' ? preprocessLaTeX(message.content) : ''}
             </Markdown>
             {typeof message.content !== 'string' && message.content}
+          </div>
+
+          {message.role === 'user' && hasAttachment(message as UserMessage) && (
+            <div className={`mt-2 flex gap-2`}>
+              {message.version === 'v4' && message.attached_context && message.attached_context.length > 0 ? (
+                message.attached_context?.map((attachment, index) => (
+                  <div key={index}>{renderAttachment(attachment)}</div>
+                ))
+              ) : (
+                <>
+                  {message.screenshot && <Attachment type="image" value={message.screenshot} />}
+                  {message.audio && <Attachment type="audio" value={message.audio} />}
+                  {message.window && message.window?.title && (
+                    <Attachment type="window" value={message.window.title} appIcon={message.window.appIcon} />
+                  )}
+                  {message.clipboard_text && <Attachment type="clipboard" value={message.clipboard_text} />}
+                  {message.file_title && <Attachment type="pdf" value={message.file_title} />}
+                  {message.image_url && <Attachment type="image" value={message.image_url} />}
+                  {message.file_attachments &&
+                    message.file_attachments.map((a, index) => {
+                      return <Attachment type={a.type} value={getDisplayValue(a)} key={index} />
+                    })}
+                  {message.window_context && <Attachment type="window_context" value={message.window_context} />}
+                </>
+              )}
+            </div>
+          )}
+
+          <div className={styles.messageBody}>
             <div className="mt-2 flex gap-2">
               {typeof message.content === 'string' && (
                 <AssistantMessageButton

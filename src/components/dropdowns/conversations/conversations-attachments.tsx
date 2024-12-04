@@ -1,9 +1,9 @@
 import { useConversations } from '@/context/ConversationContext'
-import { getConversationDisplayTitle, getConversationWordCount } from '@/utils/conversations'
-import { getWordCountFormatted } from '@/utils/string'
 import { Setting2, VoiceSquare } from 'iconsax-react'
 import { useShallow } from 'zustand/react/shallow'
 
+import { getConversationDisplayTitle, getConversationWordCount } from '@/utils/conversations'
+import { getWordCountFormatted } from '@/utils/string'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import AnimatedVoiceSquare from '@/components/Conversations/AnimatedVoiceSquare'
 import { useStore } from '@/components/providers/store-provider'
@@ -75,7 +75,7 @@ export const ConversationAttachments = () => {
 
   const enableAudioTranscriptOption = {
     imageComponent: (
-      <div className="size-12 grid shrink-0 place-items-center rounded-[12px] bg-green-20 text-green">
+      <div className="size-10 grid shrink-0 place-items-center rounded-[12px] bg-green-20 text-green">
         <Setting2 size={16} variant="Bold" />
       </div>
     ),

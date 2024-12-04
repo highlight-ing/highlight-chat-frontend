@@ -179,20 +179,23 @@ export const Attachment = ({
         {type === 'conversation' || type === 'audio' ? (
           <button
             onClick={handleAudioClick}
-            className="text-nowrap flex h-[48px] w-40 items-center gap-2.5 rounded-[16px] border border-light-10 bg-secondary p-[5px] text-base leading-none"
+            className="text-nowrap flex h-[48px] w-40 items-center gap-2 rounded-[16px] border border-light-10 bg-secondary p-[5px] text-base leading-none"
           >
             <div className="size-9 grid shrink-0 place-items-center rounded-[12px] bg-green-20 text-green">
               <VoiceSquare size={16} variant="Bold" />
             </div>
-            <div className="line-clamp-1 flex flex-col items-start truncate">
-              <span className="text-sm font-medium text-secondary">{formatTitle(title)}</span>
+            <div className="flex flex-col items-start">
+              <p className="w-28 truncate whitespace-nowrap pr-2 text-left text-[13px] font-medium text-secondary">
+                {formatTitle(title)}
+              </p>
               {value && <span className="text-xs text-tertiary">{`${getWordCountFormatted(value)} words`}</span>}
             </div>
           </button>
         ) : (
           <div
-            className={`flex h-[48px] items-center justify-center rounded-[16px] border border-light-10 bg-secondary ${type === 'pdf' || type === 'text_file' ? 'max-w-40' : ''
-              } ${type !== 'image' ? 'min-w-12' : 'min-w-[52px]'} w-fit overflow-hidden`}
+            className={`flex h-[48px] items-center justify-center rounded-[16px] border border-light-10 bg-secondary ${
+              type === 'pdf' || type === 'text_file' ? 'max-w-40' : ''
+            } ${type !== 'image' ? 'min-w-12' : 'min-w-[52px]'} w-fit overflow-hidden`}
           >
             {renderAttachmentContent()}
           </div>
