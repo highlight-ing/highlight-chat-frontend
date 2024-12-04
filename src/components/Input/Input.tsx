@@ -334,47 +334,6 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
             </AnimatePresence>
           </div>
         </motion.div>
-
-        {!isActiveChat && (
-          <div className="flex w-full flex-col items-center space-y-16">
-            <div className="flex items-center gap-4">
-              <OpenAppButton
-                appId="prompts"
-                disabled={isInputFocused}
-                className={cn(
-                  'flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary opacity-0 transition hover:bg-hover',
-                  {
-                    'opacity-100': !isInputFocused,
-                  },
-                )}
-              >
-                <span>Browse Shortcuts</span>
-                <BoxAdd size={20} variant="Bold" className="opacity-80" />
-              </OpenAppButton>
-              <CreateShortcutButton
-                disabled={isInputFocused}
-                className={cn(
-                  'flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary opacity-0 transition hover:bg-hover',
-                  {
-                    'opacity-100': !isInputFocused,
-                  },
-                )}
-              >
-                <span>Create Shortcut</span>
-                <AddCircle size={20} variant="Bold" className="opacity-80" />
-              </CreateShortcutButton>
-            </div>
-
-            <Stacker className={cn('w-full transition-transform', isInputFocused && '-translate-y-16')}>
-              <StackerItem index={0}>
-                <LatestConversation focusInput={focusInput} />
-              </StackerItem>
-              <StackerItem index={1}>
-                <ViewChangelogBanner />
-              </StackerItem>
-            </Stacker>
-          </div>
-        )}
       </div>
     </MotionConfig>
   )

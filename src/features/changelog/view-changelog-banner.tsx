@@ -1,7 +1,7 @@
-import { trackEvent } from '@/utils/amplitude'
 import { ArrowRight } from 'iconsax-react'
 import Markdown from 'react-markdown'
 
+import { trackEvent } from '@/utils/amplitude'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { HighlightIcon } from '@/components/icons'
@@ -30,7 +30,7 @@ export function ViewChangelogBanner() {
             Highlight <span className="text-teal">{mostRecentChangelogNote.version}</span> has been released!
           </p>
         </div>
-        <div className="flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary opacity-0 transition hover:bg-hover group-hover:opacity-100">
+        <div className="flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary opacity-0 transition group-hover:bg-hover group-hover:opacity-100">
           <span>View changelog</span>
           <ArrowRight size={20} variant="Bold" className="opacity-80" />
         </div>
