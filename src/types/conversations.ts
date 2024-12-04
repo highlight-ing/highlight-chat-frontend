@@ -1,7 +1,41 @@
-import { ConversationData } from '@highlight-ai/app-runtime'
 import { v4 as uuidv4 } from 'uuid'
 
 export type FormatType = 'CardTranscript' | 'DialogueTranscript'
+
+type MeetingAppName = 'Google Meet' | 'Zoom'
+
+export type MeetingApp = {
+  name: MeetingAppName
+  titlePattern: RegExp
+  urlPattern?: RegExp
+  isBrowser?: boolean
+}
+
+export type Meeting = {
+  app: MeetingApp
+  appName: string
+  windowTitle: string
+  url?: string
+  titleMatch?: string
+  start?: number
+  end?: number
+  duration?: number
+}
+
+export interface ConversationData {
+  id: string
+  title: string
+  summary: string
+  startedAt: Date
+  endedAt: Date
+  timestamp: Date
+  topic: string
+  transcript: string
+  summarized: boolean
+  shareLink: string
+  userId: string
+  meeting?: Meeting
+}
 
 export const createConversation = (transcript: string): ConversationData => {
   let uuid = uuidv4()

@@ -1,6 +1,8 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
-import Highlight, { ConversationData } from '@highlight-ai/app-runtime'
+import Highlight from '@highlight-ai/app-runtime'
+import { useQueryClient } from '@tanstack/react-query'
 
+import { ConversationData } from '@/types/conversations'
 import { useAudioPermission } from '@/hooks/useAudioPermission'
 
 const POLL_MIC_ACTIVITY = 300
@@ -36,6 +38,7 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [micActivity, setMicActivity] = useState(0)
   const [isAudioTranscripEnabled, setIsAudioTranscripEnabled] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const queryClient = useQueryClient()
 
   const setupListeners = useCallback(() => {
     const removeCurrentConversationListener = Highlight.app.addListener(
@@ -52,6 +55,7 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       (updatedConversations: ConversationData[]) => {
         if (isAudioTranscripEnabled) {
           setConversations(updatedConversations)
+          queryClient.setQueryData(['audio-notes'], updatedConversations)
         }
       },
     )
