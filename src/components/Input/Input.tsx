@@ -290,6 +290,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
                 <AttachmentDropdowns />
               </div>
             </div>
+
             <AnimatePresence mode="popLayout">
               {attachments.length > 0 && (
                 <div className={`${styles.attachmentsRow} mt-1.5`}>
