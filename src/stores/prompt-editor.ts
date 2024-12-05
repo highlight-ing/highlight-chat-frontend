@@ -23,6 +23,7 @@ export interface PromptEditorOnboarding {
 export interface EnabledAutomations {
   createLinearIssue: boolean
   createNotionPage: boolean
+  enableAgentMode: boolean
 }
 
 export interface PromptEditorData {
@@ -165,6 +166,7 @@ export const initialPromptEditorState: PromptEditorState = {
     enabledAutomations: {
       createLinearIssue: false,
       createNotionPage: false,
+      enableAgentMode: false,
     },
   },
   needSave: false,

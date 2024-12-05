@@ -1,6 +1,12 @@
 // src/hooks/useSubmitQuery.ts
 import { useEffect, useRef } from 'react'
 import { Attachment, FileAttachment, ImageAttachment, PdfAttachment } from '@/types'
+import Highlight, { HighlightContext } from '@highlight-ai/app-runtime'
+import * as Sentry from '@sentry/react'
+import { v4 as uuidv4 } from 'uuid'
+import { useShallow } from 'zustand/react/shallow'
+
+import { Prompt } from '@/types/supabase-helpers'
 import { trackEvent } from '@/utils/amplitude'
 import { fetchWindows } from '@/utils/attachmentUtils'
 import { processAttachments } from '@/utils/contextprocessor'
@@ -23,12 +29,6 @@ import {
 } from '@/utils/formDataUtils'
 import { parseAndHandleStreamChunk } from '@/utils/streamParser'
 import { formatDateForConversation, getWordCount } from '@/utils/string'
-import Highlight, { HighlightContext } from '@highlight-ai/app-runtime'
-import * as Sentry from '@sentry/react'
-import { v4 as uuidv4 } from 'uuid'
-import { useShallow } from 'zustand/react/shallow'
-
-import { Prompt } from '@/types/supabase-helpers'
 import { useApi } from '@/hooks/useApi'
 import { useStore } from '@/components/providers/store-provider'
 
@@ -280,8 +280,19 @@ export const useSubmitQuery = () => {
     setInputIsDisabled(true)
     const startTime = Date.now()
 
-    console.log('promptApp: ', promptApp)
     try {
+      // Check for Agent Mode
+      // TODO(umut): we should check for version here and enable agent mode if the version is >= 0.0.330 or something?
+      let agentModeEnabled = false
+      // @ts-expect-error
+      if (globalThis.Highlight.version >= '0.0.330') {
+        if (await Highlight.app.checkAgentEnabled()) {
+          if (promptApp?.enable_agent_mode) {
+            agentModeEnabled = true
+          }
+        }
+      }
+
       const tools = {
         create_linear_ticket:
           (promptApp?.linear_integration_enabled ?? false) || (toolOverrides?.create_linear_ticket ?? false),
@@ -289,6 +300,8 @@ export const useSubmitQuery = () => {
           (promptApp?.create_notion_page_integration_enabled ?? false) || (toolOverrides?.create_notion_page ?? false),
         create_google_calendar_event: promptApp?.create_gcal_event_integration_enabled ?? false,
         send_slack_message: promptApp?.send_slack_message_integration_enabled ?? false,
+        // TODO(umut): we should check for version here and enable agent mode if the version is >= 0.0.330 or something?
+        enable_agent_mode: agentModeEnabled,
       }
 
       formData.append('conversation_id', conversationId)

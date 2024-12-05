@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 
 import { Switch } from '@/components/catalyst/switch'
-import { LinearIcon, NotionIcon } from '@/components/icons'
+import { AgentModeIcon, LinearIcon, NotionIcon } from '@/components/icons'
 
 import IntelliPrompt from '../IntelliPrompt'
 import OnboardingBox from '../OnboardingBox'
@@ -187,6 +187,21 @@ export default function AppScreen() {
             }}
             title="Create Notion Page"
             description="Create a Notion page using the prompt output"
+          />
+
+          <IntegrationToggle
+            icon={<AgentModeIcon />}
+            checked={promptEditorData.enabledAutomations?.enableAgentMode || false}
+            onToggle={(checked) => {
+              setPromptEditorData({
+                enabledAutomations: {
+                  ...promptEditorData.enabledAutomations,
+                  enableAgentMode: checked,
+                },
+              })
+            }}
+            title="Enable Agent Mode"
+            description="Enable agent mode to let Highlight control user's websites. This is a Pre-Alpha feature and may not work as expected. Highlight version 0.0.310 or later is required."
           />
         </div>
       </div>
