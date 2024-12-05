@@ -139,17 +139,6 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   // Use to handle the auto closing when the window is focused
   // and to prevent toggling the input focus when pressing a dropdown
   useEffect(() => {
-    let windowFocusTimeout: NodeJS.Timeout | null
-
-    const onWindowFocus = () => {
-      if (!isActiveChat) {
-        windowFocusTimeout = setTimeout(() => {
-          inputRef.current?.focus()
-          setIsInputFocused(true)
-        }, 100)
-      }
-    }
-
     const onInputFocus = () => {
       if (inputBlurTimeoutRef.current) {
         clearTimeout(inputBlurTimeoutRef.current)
@@ -163,10 +152,6 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
       }, 100)
     }
 
-    const input = document.getElementById('textarea-input')
-    input?.focus()
-    setIsInputFocused(true)
-
     const inputElement = inputRef.current
 
     if (inputElement) {
@@ -174,20 +159,15 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
       inputElement.addEventListener('blur', onInputBlur)
     }
 
-    window.addEventListener('focus', onWindowFocus)
-
     return () => {
-      window.removeEventListener('focus', onWindowFocus)
-
       if (inputElement) {
         inputElement.removeEventListener('focus', onInputFocus)
         inputElement.removeEventListener('blur', onInputBlur)
       }
 
-      if (windowFocusTimeout) clearTimeout(windowFocusTimeout)
       if (inputBlurTimeoutRef.current) clearTimeout(inputBlurTimeoutRef.current)
     }
-  }, [inputRef, inputBlurTimeoutRef])
+  }, [inputRef.current, inputBlurTimeoutRef])
 
   useEffect(() => {
     function handleEsc(e: KeyboardEvent) {

@@ -6,14 +6,17 @@ import { MessageText, VoiceSquare } from 'iconsax-react'
 import { useSetAtom } from 'jotai'
 
 import { ConversationData } from '@/types/conversations'
+import { cn } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { formatConversationDuration, formatTitle } from '@/utils/conversations'
 import { selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import { useHistory } from '@/hooks/useHistory'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useStore } from '@/components/providers/store-provider'
 
 import { useAudioNotes } from './hooks'
+import { isChatHistoryItem, isConversationData } from './utils'
 
 const FEED_LENGTH_LIMIT = 10
 
@@ -21,12 +24,39 @@ type HomeFeedListItemLayoutProps = React.ComponentProps<'div'> & {
   children: React.ReactNode
 }
 
-function HomeFeedListItemLayout({ children, ...props }: HomeFeedListItemLayoutProps) {
+function HomeFeedListItemLayout({ className, children, ...props }: HomeFeedListItemLayoutProps) {
   return (
-    <div className="cursor-pointer rounded-xl px-3 hover:bg-secondary [&_div]:last:border-transparent" {...props}>
+    <div
+      className={cn('cursor-pointer rounded-xl px-3 hover:bg-secondary [&_div]:last:border-transparent', className)}
+      {...props}
+    >
       <div className="flex items-center justify-between gap-2 border-b border-subtle py-3 transition-colors">
         {children}
       </div>
+    </div>
+  )
+}
+
+function HomeFeedLoadingListItem() {
+  return (
+    <HomeFeedListItemLayout className="cursor-default [&:nth-child(2)]:opacity-70 [&:nth-child(3)]:opacity-40">
+      <div className="flex items-center gap-2 font-medium">
+        <Skeleton className="size-5" />
+        <Skeleton className="h-5 w-64" />
+      </div>
+      <div className="flex items-center gap-2 text-sm font-medium text-subtle">
+        <Skeleton className="h-5 w-16" />
+      </div>
+    </HomeFeedListItemLayout>
+  )
+}
+
+function HomeFeedLoadingList() {
+  return (
+    <div>
+      <HomeFeedLoadingListItem />
+      <HomeFeedLoadingListItem />
+      <HomeFeedLoadingListItem />
     </div>
   )
 }
@@ -62,51 +92,50 @@ export function AudioNotesListItem(props: AudioNotesListItemProps) {
   )
 }
 
-type AudioNotesListProps = {
-  audioNotes: Array<ConversationData>
-}
+function MeetingNotesTabContent() {
+  const { data, isLoading } = useAudioNotes()
 
-export function AudioNotesList(props: AudioNotesListProps) {
-  if (!props.audioNotes || props.audioNotes.length === 0) {
-    return <div>No audio notes.</div>
+  const tenRecentMeetingNotes = React.useMemo(() => {
+    return data?.filter((audioNote) => audioNote.meeting).slice(0, FEED_LENGTH_LIMIT) ?? []
+  }, [data])
+
+  if (isLoading) {
+    return <HomeFeedLoadingList />
+  }
+
+  if (tenRecentMeetingNotes.length === 0) {
+    return <div>No meeting notes.</div>
   }
 
   return (
-    <div>
-      {props.audioNotes.map((audioNote) => (
-        <AudioNotesListItem key={audioNote.id} audioNote={audioNote} />
+    <>
+      {tenRecentMeetingNotes.map((meetingNote) => (
+        <AudioNotesListItem key={meetingNote.id} audioNote={meetingNote} />
       ))}
-    </div>
+    </>
   )
 }
 
 function AudioNotesTabContent() {
   const { data, isLoading } = useAudioNotes()
 
-  const { meetingNotes, nonMeetingNotes, allAudioNotes } = React.useMemo(() => {
-    const tenRecentMeetingNotes = data?.filter((audioNote) => audioNote.meeting).slice(0, FEED_LENGTH_LIMIT) ?? []
-    const tenRecentNonMeetingNotes = data?.filter((audioNote) => !audioNote.meeting).slice(0, FEED_LENGTH_LIMIT) ?? []
-    const tenRecentAudioNotes = data?.slice(0, FEED_LENGTH_LIMIT) ?? []
-
-    return {
-      meetingNotes: tenRecentMeetingNotes,
-      nonMeetingNotes: tenRecentNonMeetingNotes,
-      allAudioNotes: tenRecentAudioNotes,
-    }
+  const tenRecentNonMeetingNotes = React.useMemo(() => {
+    return data?.filter((audioNote) => !audioNote.meeting).slice(0, FEED_LENGTH_LIMIT) ?? []
   }, [data])
 
   if (isLoading) {
-    return <div>Loading audio notes...</div>
+    return <HomeFeedLoadingList />
+  }
+
+  if (tenRecentNonMeetingNotes.length === 0) {
+    return <div>No audio notes.</div>
   }
 
   return (
     <>
-      <TabsContent value="meeting-notes">
-        <AudioNotesList audioNotes={meetingNotes} />
-      </TabsContent>
-      <TabsContent value="audio-notes">
-        <AudioNotesList audioNotes={nonMeetingNotes} />
-      </TabsContent>
+      {tenRecentNonMeetingNotes.map((audioNote) => (
+        <AudioNotesListItem key={audioNote.id} audioNote={audioNote} />
+      ))}
     </>
   )
 }
@@ -146,7 +175,7 @@ function ChatsTabContent() {
   const tenRecentChats = React.useMemo(() => data?.slice(0, FEED_LENGTH_LIMIT) ?? [], [data])
 
   if (isLoading) {
-    return <div>Loading audio notes...</div>
+    return <HomeFeedLoadingList />
   }
 
   if (tenRecentChats.length === 0) {
@@ -154,11 +183,11 @@ function ChatsTabContent() {
   }
 
   return (
-    <TabsContent value="chats">
+    <>
       {tenRecentChats.map((chat) => (
         <ChatListItem key={chat.id} chat={chat} />
       ))}
-    </TabsContent>
+    </>
   )
 }
 
@@ -171,12 +200,10 @@ function RecentActivityTabContent() {
       historyData
         ?.slice(0, FEED_LENGTH_LIMIT)
         .map((chat) => ({ ...chat, updatedAt: new Date(chat.updated_at).getTime() })) ?? []
-
     const tenRecentAudioNotes =
       audioNotesData
         ?.slice(0, FEED_LENGTH_LIMIT)
         .map((audioNote) => ({ ...audioNote, updatedAt: audioNote.endedAt.getTime() })) ?? []
-
     const recentActionsSortedByUpdatedAt = [...tenRecentChats, ...tenRecentAudioNotes].sort(
       (a, b) => b.updatedAt - a.updatedAt,
     )
@@ -187,24 +214,24 @@ function RecentActivityTabContent() {
   }, [historyData, audioNotesData])
 
   if (isLoadingHistory || isLoadingAudioNotes) {
-    return <div>Loading recent activity...</div>
+    return <HomeFeedLoadingList />
   }
 
   if (tenRecentActions.length === 0) {
     return <div>No recent activity.</div>
   }
 
-  const renderRecentActions = tenRecentActions.map((action: unknown) => {
-    if (action?.transcript) {
-      const audioNote = action as ConversationData
+  const renderRecentActions = tenRecentActions.map((action) => {
+    if (isConversationData(action)) {
+      const audioNote = action
       return <AudioNotesListItem key={audioNote.id} audioNote={audioNote} />
-    } else {
-      const chat = action as ChatHistoryItem
+    } else if (isChatHistoryItem(action)) {
+      const chat = action
       return <ChatListItem key={chat.id} chat={chat} />
     }
   })
 
-  return <TabsContent value="recent-activity">{renderRecentActions}</TabsContent>
+  return renderRecentActions
 }
 
 export function HomeFeed() {
@@ -214,16 +241,25 @@ export function HomeFeed() {
         <div className="flex w-full items-center justify-between border-b border-subtle py-1.5">
           <div className="flex items-center gap-2">
             <TabsTrigger value="recent-activity">Recent Activity</TabsTrigger>
-            <TabsTrigger value="chats">Chats</TabsTrigger>
             <TabsTrigger value="meeting-notes">Meeting Notes</TabsTrigger>
             <TabsTrigger value="audio-notes">Audio Notes</TabsTrigger>
+            <TabsTrigger value="chats">Chats</TabsTrigger>
           </div>
           <div>Search</div>
         </div>
       </TabsList>
-      <RecentActivityTabContent />
-      <ChatsTabContent />
-      <AudioNotesTabContent />
+      <TabsContent value="recent-activity">
+        <RecentActivityTabContent />
+      </TabsContent>
+      <TabsContent value="meeting-notes">
+        <MeetingNotesTabContent />
+      </TabsContent>
+      <TabsContent value="audio-notes">
+        <AudioNotesTabContent />
+      </TabsContent>
+      <TabsContent value="chats">
+        <ChatsTabContent />
+      </TabsContent>
     </Tabs>
   )
 }
