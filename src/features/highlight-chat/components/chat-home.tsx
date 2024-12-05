@@ -10,7 +10,7 @@ import { Stacker, StackerItem } from '@/components/stacker'
 
 import { ViewChangelogBanner } from '@/features/changelog/view-changelog-banner'
 
-import { AudioNotesFeed } from '../home-feed/audio-notes-feed'
+import { HomeFeed } from '../home-feed/home-feed'
 
 function InputHeading() {
   const { promptName, promptDescription } = useStore(
@@ -70,7 +70,7 @@ export function ChatHome({ isShowing }: { isShowing: boolean }) {
             </StackerItem>
           </Stacker>
         </div>
-        <AudioNotesFeed />
+        <HomeFeed />
       </div>
 
       <div className="mx-auto flex items-center gap-1 font-semibold text-subtle">

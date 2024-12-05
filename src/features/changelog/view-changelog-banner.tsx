@@ -42,7 +42,7 @@ export function ViewChangelogBanner() {
         </SheetHeader>
         <ScrollArea className="size-full pb-6 pr-1">
           {allChangelogNotes.map((note) => (
-            <div className="border-b border-secondary/60 pt-3 last:border-b-0">
+            <div key={note.version} className="border-b border-secondary/60 pt-3 last:border-b-0">
               <p className="font-semibold text-teal">{note.version}</p>
               <Markdown className="markdown">{note.releaseNotes}</Markdown>
             </div>

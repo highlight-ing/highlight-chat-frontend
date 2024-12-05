@@ -1,13 +1,14 @@
 import * as React from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ChatHistoryItem } from '@/types'
-import { trackEvent } from '@/utils/amplitude'
 import variables from '@/variables.module.scss'
 import { Clock, Trash } from 'iconsax-react'
 import { useShallow } from 'zustand/react/shallow'
 
+import { trackEvent } from '@/utils/amplitude'
 import { useApi } from '@/hooks/useApi'
 import { useChatHistory } from '@/hooks/useChatHistory'
+import { useHistory } from '@/hooks/useHistory'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import CircleButton from '@/components/CircleButton/CircleButton'
 import ContextMenu from '@/components/ContextMenu/ContextMenu'
@@ -16,7 +17,7 @@ import { useStore } from '@/components/providers/store-provider'
 import Tooltip from '@/components/Tooltip/Tooltip'
 
 import styles from './history-sidebar.module.scss'
-import { NEW_CONVERSATION_TITLE, useAddNewChat, useHistory, useUpdateConversationTitle } from './hooks'
+import { NEW_CONVERSATION_TITLE, useAddNewChat, useUpdateConversationTitle } from './hooks'
 import { sortArrayByDate } from './utils'
 
 const CONVERSATION_FETCH_DELAY = 2 * 1000
