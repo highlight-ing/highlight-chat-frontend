@@ -53,10 +53,8 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const removeConversationsUpdatedListener = Highlight.app.addListener(
       'onConversationsUpdated',
       (updatedConversations: ConversationData[]) => {
-        if (isAudioTranscripEnabled) {
-          setConversations(updatedConversations)
-          queryClient.setQueryData(['audio-notes'], updatedConversations)
-        }
+        setConversations(updatedConversations)
+        queryClient.setQueryData(['audio-notes'], () => updatedConversations)
       },
     )
 
@@ -85,6 +83,7 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     const removeSaveConversationListener = Highlight.app.addListener('onConversationSaved', async () => {
       fetchLatestData()
+      queryClient.invalidateQueries({ queryKey: ['audio-notes'] })
     })
 
     const removeConversationSavedListener = Highlight.app.addListener('onConversationSaved', () => {
