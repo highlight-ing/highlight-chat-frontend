@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { ChatHistoryItem } from '@/types'
-import { ArrowRight, MessageText, VoiceSquare } from 'iconsax-react'
+import { ArrowRight, Clock, MessageText, VoiceSquare } from 'iconsax-react'
 import { useAtomValue, useSetAtom } from 'jotai'
 
 import { ConversationData } from '@/types/conversations'
@@ -190,12 +190,18 @@ function ChatsTabContent() {
   }
 
   return (
-    <div>
+    <>
       {tenRecentChats.map((chat) => (
         <ChatListItem key={chat.id} chat={chat} />
       ))}
-      <button type="button" aria-label="Toggle history sidebar" onClick={handleShowMoreClick} className="w-full">
-        <HomeFeedListItemLayout className="group flex items-center justify-center">
+      <button
+        type="button"
+        aria-label="Toggle history sidebar"
+        onClick={handleShowMoreClick}
+        className="group w-full text-left text-subtle hover:text-primary"
+      >
+        <HomeFeedListItemLayout className="flex items-center">
+          <Clock variant={'Bold'} size={20} />
           <p>{`${historySidebarIsOpen ? 'Hide' : 'View full'} chat history`}</p>
           <ArrowRight
             size={20}
@@ -207,7 +213,7 @@ function ChatsTabContent() {
           />
         </HomeFeedListItemLayout>
       </button>
-    </div>
+    </>
   )
 }
 

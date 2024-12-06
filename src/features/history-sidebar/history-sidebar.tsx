@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ChatHistoryItem } from '@/types'
 import variables from '@/variables.module.scss'
+import { useQueryClient } from '@tanstack/react-query'
 import { Clock, Trash } from 'iconsax-react'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -31,6 +32,8 @@ type HistorySidebarItemProps = {
 }
 
 function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenChat }: HistorySidebarItemProps) {
+  const queryClient = useQueryClient()
+
   const { addOrUpdateOpenConversation, openModal, setConversationId } = useStore(
     useShallow((state) => ({
       setConversationId: state.setConversationId,
@@ -45,6 +48,8 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
     if (typeof onOpenChat === 'function') {
       onOpenChat()
     }
+
+    queryClient.setQueryData(['history'], (previousHistory: Array<ChatHistoryItem>) => [chat, ...previousHistory])
     addOrUpdateOpenConversation(chat)
     setConversationId(chat.id)
 
