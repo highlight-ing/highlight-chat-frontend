@@ -6,7 +6,7 @@ import { useAtom, useSetAtom } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
 import { cn } from '@/lib/utils'
-import { showHistoryAtom } from '@/atoms/history-sidebar'
+import { showHistoryAtom } from '@/atoms/history'
 import { isOnHomeAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
 import { Input } from '@/components/Input/Input'

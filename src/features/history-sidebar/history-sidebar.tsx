@@ -7,9 +7,9 @@ import { Clock, Trash } from 'iconsax-react'
 import { useShallow } from 'zustand/react/shallow'
 
 import { trackEvent } from '@/utils/amplitude'
+import { useHistory } from '@/hooks/history'
 import { useApi } from '@/hooks/useApi'
 import { useChatHistory } from '@/hooks/useChatHistory'
-import { useHistory } from '@/hooks/useHistory'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import CircleButton from '@/components/CircleButton/CircleButton'
 import ContextMenu from '@/components/ContextMenu/ContextMenu'
@@ -49,7 +49,6 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
       onOpenChat()
     }
 
-    queryClient.setQueryData(['history'], (previousHistory: Array<ChatHistoryItem>) => [chat, ...previousHistory])
     addOrUpdateOpenConversation(chat)
     setConversationId(chat.id)
 

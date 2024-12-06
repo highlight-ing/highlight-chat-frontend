@@ -38,7 +38,7 @@ export const useChatHistory = (): {
       for (const chat of data.conversations) {
         if (openConversations.find((conv) => conv.id === chat.id)) {
           addOrUpdateOpenConversation(chat)
-          queryClient.setQueryData(['history'], (currentHistory: Array<ChatHistoryItem>) => [chat, ...currentHistory])
+          await queryClient.invalidateQueries({ queryKey: ['recently-updated-history'] })
         }
       }
       return data.conversations
@@ -80,10 +80,7 @@ export const useChatHistory = (): {
       setHistory(newHistory)
       if (openConversations.some((chat) => chat.id === conversationId) || addOpenConversation) {
         addOrUpdateOpenConversation(data.conversation)
-        queryClient.setQueryData(['history'], (currentHistory: Array<ChatHistoryItem>) => [
-          data.conversation,
-          ...currentHistory,
-        ])
+        await queryClient.invalidateQueries({ queryKey: ['recently-updated-history'] })
       }
       return data.conversation
     } catch (error) {

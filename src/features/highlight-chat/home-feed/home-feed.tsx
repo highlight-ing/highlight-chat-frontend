@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { ChatHistoryItem } from '@/types'
+import { useQueryClient } from '@tanstack/react-query'
 import { ArrowRight, Clock, MessageText, VoiceSquare } from 'iconsax-react'
 import { useAtomValue, useSetAtom } from 'jotai'
 
@@ -9,14 +10,14 @@ import { ConversationData } from '@/types/conversations'
 import { cn } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { formatConversationDuration, formatTitle } from '@/utils/conversations'
-import { showHistoryAtom, toggleShowHistoryAtom } from '@/atoms/history-sidebar'
+import { showHistoryAtom, toggleShowHistoryAtom } from '@/atoms/history'
 import { selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
-import { useHistory } from '@/hooks/useHistory'
+import { usePaginatedHistory } from '@/hooks/history'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useStore } from '@/components/providers/store-provider'
 
-import { useAudioNotes } from './hooks'
+import { useAudioNotes, useRecentlyUpdatedHistory } from './hooks'
 import { formatUpdatedAtDate, isChatHistoryItem, isConversationData } from './utils'
 
 const FEED_LENGTH_LIMIT = 10
@@ -171,7 +172,7 @@ export function ChatListItem(props: ChatListItemProps) {
 }
 
 function ChatsTabContent() {
-  const { data, isLoading } = useHistory()
+  const { data, isLoading } = useRecentlyUpdatedHistory()
   const historySidebarIsOpen = useAtomValue(showHistoryAtom)
   const toggleShowHistory = useSetAtom(toggleShowHistoryAtom)
 
@@ -218,7 +219,7 @@ function ChatsTabContent() {
 }
 
 function RecentActivityTabContent() {
-  const { data: historyData, isLoading: isLoadingHistory } = useHistory()
+  const { data: historyData, isLoading: isLoadingHistory } = usePaginatedHistory()
   const { data: audioNotesData, isLoading: isLoadingAudioNotes } = useAudioNotes()
 
   const tenRecentActions = React.useMemo(() => {
