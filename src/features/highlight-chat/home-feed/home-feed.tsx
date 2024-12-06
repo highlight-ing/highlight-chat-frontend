@@ -2,13 +2,14 @@
 
 import React from 'react'
 import { ChatHistoryItem } from '@/types'
-import { MessageText, VoiceSquare } from 'iconsax-react'
-import { useSetAtom } from 'jotai'
+import { ArrowRight, MessageText, VoiceSquare } from 'iconsax-react'
+import { useAtomValue, useSetAtom } from 'jotai'
 
 import { ConversationData } from '@/types/conversations'
 import { cn } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { formatConversationDuration, formatTitle } from '@/utils/conversations'
+import { showHistoryAtom, toggleShowHistoryAtom } from '@/atoms/history-sidebar'
 import { selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import { useHistory } from '@/hooks/useHistory'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -171,8 +172,14 @@ export function ChatListItem(props: ChatListItemProps) {
 
 function ChatsTabContent() {
   const { data, isLoading } = useHistory()
+  const historySidebarIsOpen = useAtomValue(showHistoryAtom)
+  const toggleShowHistory = useSetAtom(toggleShowHistoryAtom)
 
   const tenRecentChats = React.useMemo(() => data?.slice(0, FEED_LENGTH_LIMIT) ?? [], [data])
+
+  function handleShowMoreClick() {
+    toggleShowHistory()
+  }
 
   if (isLoading) {
     return <HomeFeedLoadingList />
@@ -183,11 +190,24 @@ function ChatsTabContent() {
   }
 
   return (
-    <>
+    <div>
       {tenRecentChats.map((chat) => (
         <ChatListItem key={chat.id} chat={chat} />
       ))}
-    </>
+      <button type="button" aria-label="Toggle history sidebar" onClick={handleShowMoreClick} className="w-full">
+        <HomeFeedListItemLayout className="group flex items-center justify-center">
+          <p>{`${historySidebarIsOpen ? 'Hide' : 'View full'} chat history`}</p>
+          <ArrowRight
+            size={20}
+            strokeWidth={4}
+            className={cn(
+              'transition-transform group-hover:translate-x-1',
+              historySidebarIsOpen && 'translate-x-1 -rotate-180 group-hover:translate-x-0',
+            )}
+          />
+        </HomeFeedListItemLayout>
+      </button>
+    </div>
   )
 }
 

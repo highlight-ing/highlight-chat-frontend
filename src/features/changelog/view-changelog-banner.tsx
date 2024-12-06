@@ -35,7 +35,7 @@ export function ViewChangelogBanner() {
           <ArrowRight size={20} variant="Bold" className="opacity-80" />
         </div>
       </SheetTrigger>
-      <SheetContent onOpenAutoFocus={(e) => e.preventDefault()} className="pl-3 pr-2">
+      <SheetContent onOpenAutoFocus={(e) => e.preventDefault()} className="pl-3 pr-2 duration-75 sm:max-w-lg">
         <SheetHeader className="pb-2">
           <SheetTitle>Highlight Updates</SheetTitle>
           <SheetDescription className="sr-only">Ongoing change log for all Highlight chat updates</SheetDescription>

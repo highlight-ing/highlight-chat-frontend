@@ -6,6 +6,7 @@ import { useAtom, useSetAtom } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
 import { cn } from '@/lib/utils'
+import { showHistoryAtom } from '@/atoms/history-sidebar'
 import { isOnHomeAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
 import { Input } from '@/components/Input/Input'
@@ -27,7 +28,7 @@ import { NavigationTopBar } from '@/features/nav-header/top-bar/top-bar'
 import { TranscriptViewer } from '@/features/transcript-viewer/transcript-viewer'
 
 export default function Home() {
-  const [showHistory, setShowHistory] = React.useState(false)
+  const [showHistory, setShowHistory] = useAtom(showHistoryAtom)
   const [transcriptOpen, setTransactionOpen] = useAtom(transcriptOpenAtom)
   const setIsOnHome = useSetAtom(isOnHomeAtom)
   const { inputIsDisabled, promptApp, isConversationLoading } = useStore(
