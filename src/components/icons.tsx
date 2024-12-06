@@ -434,7 +434,7 @@ export const SlackIcon = ({ size = 24 }: IconPropTypes) => {
   )
 }
 
-const MeetingIcon = ({ meeting, size = 24 }: { meeting: Meeting; size: number }) => {
+export const MeetingIcon = ({ meeting, size }: { meeting: Meeting; size: number }) => {
   switch (meeting.app.name) {
     case 'Google Meet':
       return (
@@ -533,6 +533,6 @@ const MeetingIcon = ({ meeting, size = 24 }: { meeting: Meeting; size: number })
       )
 
     default:
-      return <VoiceSquare />
+      return <VoiceSquare size={size} variant="Bold" />
   }
 }

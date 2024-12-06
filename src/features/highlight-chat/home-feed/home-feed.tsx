@@ -15,6 +15,7 @@ import { selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-vi
 import { usePaginatedHistory } from '@/hooks/history'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { MeetingIcon } from '@/components/icons'
 import { useStore } from '@/components/providers/store-provider'
 
 import { useAudioNotes, useRecentlyUpdatedHistory } from './hooks'
@@ -82,7 +83,11 @@ export function AudioNotesListItem(props: AudioNotesListItemProps) {
   return (
     <HomeFeedListItemLayout onClick={handleClick}>
       <div className="flex items-center gap-2 font-medium">
-        <VoiceSquare size={20} variant="Bold" className="text-green" />
+        {props.audioNote?.meeting ? (
+          <MeetingIcon meeting={props.audioNote.meeting} size={20} />
+        ) : (
+          <VoiceSquare size={20} variant="Bold" className="text-green" />
+        )}
         <h3 className="max-w-64 truncate tracking-tight text-primary">{formattedTitle}</h3>
         <p className="text-sm text-tertiary">{formatUpdatedAtDate(props.audioNote.endedAt)}</p>
       </div>

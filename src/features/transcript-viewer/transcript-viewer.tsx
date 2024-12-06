@@ -9,6 +9,7 @@ import { formatTitle } from '@/utils/conversations'
 import { isOnHomeAtom, selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tooltip } from '@/components/ui/tooltip'
+import { MeetingIcon } from '@/components/icons'
 
 import { TranscriptMessage } from './types'
 import { formatHeaderTimestamp, parseTranscript } from './utils'
@@ -116,7 +117,13 @@ function TranscriptViewerHeader() {
     <HeaderLayout>
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <VoiceSquare size={32} variant="Bold" className="hidden text-green xl:block" />
+          <div className="hidden xl:block">
+            {selectedAudioNote?.meeting ? (
+              <MeetingIcon meeting={selectedAudioNote.meeting} size={32} />
+            ) : (
+              <VoiceSquare size={32} variant="Bold" className="text-green" />
+            )}
+          </div>
           <h3 className="line-clamp-1 w-full text-ellipsis text-xl font-semibold tracking-tight">{formattedTitle}</h3>
         </div>
       </div>
