@@ -7,11 +7,11 @@ export const calculatePositionedStyle = (
   positionedElement: HTMLElement,
   position: 'top' | 'bottom' | 'left' | 'right',
   offset?: number,
+  offsetX?: number,
 ) => {
   const targetRect = targetElement.getBoundingClientRect()
   const positionOffset = offset ?? 0
-
-  // This will be used to set styles of the tooltip.
+  const positionOffsetX = offsetX ?? 0
   const styles: CSSProperties = {
     position: 'fixed',
   }
@@ -40,23 +40,22 @@ export const calculatePositionedStyle = (
     }
   }
 
-  // Determine styles based on desired position.
   switch (position) {
     case 'top':
       styles.bottom = window.innerHeight - targetRect.top + PIXEL_SPACING + positionOffset
-      styles.left = targetRect.left + targetRect.width / 2 - positionedElement.offsetWidth / 2
+      styles.left = targetRect.left + targetRect.width / 2 - positionedElement.offsetWidth / 2 + positionOffsetX
       correctVertical()
       correctLeft()
       break
     case 'bottom':
       styles.top = targetRect.bottom + PIXEL_SPACING + positionOffset
-      styles.left = targetRect.left + targetRect.width / 2 - positionedElement.offsetWidth / 2
+      styles.left = targetRect.left + targetRect.width / 2 - positionedElement.offsetWidth / 2 + positionOffsetX
       correctVertical()
       correctLeft()
       break
     case 'left':
-      styles.top = targetRect.top
-      styles.right = window.innerWidth - targetRect.left + PIXEL_SPACING + positionOffset
+      styles.top = targetRect.top + positionOffset
+      styles.right = window.innerWidth - targetRect.left + PIXEL_SPACING + positionOffsetX
       styles.maxWidth = targetRect.left - PIXEL_SPACING * 2
 
       // if positioned left is too small, position right instead
@@ -70,8 +69,8 @@ export const calculatePositionedStyle = (
       }
       break
     case 'right':
-      styles.top = targetRect.top
-      styles.left = targetRect.right + PIXEL_SPACING + positionOffset
+      styles.top = targetRect.top + positionOffset
+      styles.left = targetRect.right + PIXEL_SPACING + positionOffsetX
       styles.maxWidth = window.innerWidth - (targetRect.right + PIXEL_SPACING * 2)
 
       // if positioned right is too small, position left instead

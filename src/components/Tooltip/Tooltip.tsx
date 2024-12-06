@@ -1,6 +1,7 @@
 import { CSSProperties, PropsWithChildren, ReactElement, useEffect, useRef, useState } from 'react'
-import { calculatePositionedStyle } from '@/utils/components'
 import { Portal } from 'react-portal'
+
+import { calculatePositionedStyle } from '@/utils/components'
 
 import styles from './tooltip.module.scss'
 
@@ -11,6 +12,7 @@ interface TooltipProps {
   disabled?: boolean
   position: 'top' | 'bottom' | 'left' | 'right'
   offset?: number
+  offsetX?: number
   tooltip?: string | ReactElement
   wrapperStyle?: CSSProperties
   tooltipContainerStyle?: CSSProperties
@@ -20,6 +22,7 @@ const Tooltip = ({
   children,
   position,
   offset = 0,
+  offsetX = 0,
   tooltip,
   disabled,
   wrapperStyle = emptyObj,
@@ -34,7 +37,7 @@ const Tooltip = ({
     if (!targetRef.current || !tooltipRef.current) {
       return
     }
-    const styles = calculatePositionedStyle(targetRef.current, tooltipRef.current, position, offset)
+    const styles = calculatePositionedStyle(targetRef.current, tooltipRef.current, position, offset, offsetX)
     setTooltipStyle(styles)
   }
 
@@ -44,7 +47,7 @@ const Tooltip = ({
     } else if (!tooltip && tooltipVisible) {
       setTooltipVisible(false)
     }
-  }, [tooltipVisible, tooltip, position, offset])
+  }, [tooltipVisible, tooltip, position, offset, offsetX])
 
   if (tooltip === undefined || disabled) {
     return children

@@ -4,6 +4,7 @@ import styles from './inputfield.module.scss'
 
 interface InputFieldProps {
   label?: string
+  labelAlwaysVisible?: boolean
   placeholder?: string
   size: 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge'
   value?: string
@@ -13,10 +14,28 @@ interface InputFieldProps {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void
   error?: string
+  className?: string
 }
 
 const InputField: React.FC<InputFieldProps> = forwardRef<HTMLInputElement, InputFieldProps>(
-  ({ label, placeholder, value, size, onBlur, onChange, onFocus, onKeyDown, error, disabled, ...props }, ref) => {
+  (
+    {
+      label,
+      placeholder,
+      value,
+      size,
+      onBlur,
+      onChange,
+      onFocus,
+      onKeyDown,
+      error,
+      disabled,
+      className,
+      labelAlwaysVisible,
+      ...props
+    },
+    ref,
+  ) => {
     const inputRef = useRef<HTMLInputElement>(null)
     const [showLabel, setShowLabel] = useState(!!value?.length)
 
@@ -63,9 +82,11 @@ const InputField: React.FC<InputFieldProps> = forwardRef<HTMLInputElement, Input
     }, [])
 
     return (
-      <div className={'relative flex flex-col gap-2'}>
+      <div className={`relative flex flex-col gap-2 ${className}`}>
         <span
-          className={`${styles.inputLabel} ${size === 'xxlarge' ? styles.inline : ''} ${size === 'xxlarge' && showLabel ? styles.visible : ''}`}
+          className={`${styles.inputLabel} ${size === 'xxlarge' ? styles.inline : ''} ${
+            size === 'xxlarge' && (showLabel || labelAlwaysVisible) ? styles.visible : ''
+          }`}
         >
           {label}
         </span>

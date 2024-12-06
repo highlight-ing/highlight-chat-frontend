@@ -1,8 +1,10 @@
+import { Button } from '@/components/ui/button'
 import { useStore } from '@/components/providers/store-provider'
 
 import { EnableAgentModeParams } from '@/features/integrations/agent-mode/types'
 
 import { IntegrationsLoader } from '../_components/loader'
+import { EnableAgentMode } from '../agent-mode/agent-mode'
 import { CreateGoogleCalEvent } from '../google-cal/google-cal'
 import { CreateLinearTicket } from '../linear/linear'
 import { CreateNotionPage } from '../notion/notion'
@@ -137,8 +139,11 @@ export function useIntegrations(): UseIntegrationsAPI {
     updateLastConversationMessage(conversationId!, {
       content: (
         <MessageWithComponent content={lastMessage}>
-          <div>Enable Agent Mode</div>
-          <div>{JSON.stringify(params)}</div>
+          <EnableAgentMode
+            agentInstructions={params.agent_instructions}
+            agentGoals={params.agent_goals}
+            url={params.url}
+          />
         </MessageWithComponent>
       ),
       role: 'assistant',
