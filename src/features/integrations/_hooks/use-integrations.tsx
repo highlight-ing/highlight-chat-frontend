@@ -1,5 +1,7 @@
 import { useStore } from '@/components/providers/store-provider'
 
+import { EnableAgentModeParams } from '@/features/integrations/agent-mode/types'
+
 import { IntegrationsLoader } from '../_components/loader'
 import { CreateGoogleCalEvent } from '../google-cal/google-cal'
 import { CreateLinearTicket } from '../linear/linear'
@@ -27,6 +29,7 @@ export interface UseIntegrationsAPI {
   createGoogleCalendarEvent: (conversationId: string, params: CreateGoogleCalendarEventParams) => Promise<void>
   sendSlackMessage: (conversationId: string, params: SendSlackMessageParams) => Promise<void>
   showLoading: (conversationId: string, loaded: boolean) => void
+  enableAgentMode: (conversationId: string, params: EnableAgentModeParams) => Promise<void>
 }
 
 function MessageWithComponent({ content, children }: { content: string; children?: React.ReactNode }) {
@@ -123,6 +126,25 @@ export function useIntegrations(): UseIntegrationsAPI {
     })
   }
 
+  async function enableAgentMode(conversationId: string, params: EnableAgentModeParams) {
+    let lastMessage = previousContent.get(conversationId)
+
+    if (!lastMessage) {
+      lastMessage = getLastConversationMessage(conversationId)?.content as string
+    }
+
+    // @ts-expect-error
+    updateLastConversationMessage(conversationId!, {
+      content: (
+        <MessageWithComponent content={lastMessage}>
+          <div>Enable Agent Mode</div>
+          <div>{JSON.stringify(params)}</div>
+        </MessageWithComponent>
+      ),
+      role: 'assistant',
+    })
+  }
+
   function showLoading(conversationId: string, loaded: boolean) {
     if (loaded) return
 
@@ -142,5 +164,12 @@ export function useIntegrations(): UseIntegrationsAPI {
     })
   }
 
-  return { createLinearTicket, createNotionPage, createGoogleCalendarEvent, showLoading, sendSlackMessage }
+  return {
+    createLinearTicket,
+    createNotionPage,
+    createGoogleCalendarEvent,
+    showLoading,
+    sendSlackMessage,
+    enableAgentMode,
+  }
 }

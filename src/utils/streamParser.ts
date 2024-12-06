@@ -160,6 +160,9 @@ export async function parseAndHandleStreamChunk(
               }
             }
           }
+          if (jsonChunk.name === 'enable_agent_mode') {
+            integrations.enableAgentMode(conversationId, jsonChunk.input)
+          }
           break
 
         case 'done':

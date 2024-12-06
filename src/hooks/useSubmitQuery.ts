@@ -283,15 +283,14 @@ export const useSubmitQuery = () => {
     try {
       // Check for Agent Mode
       // TODO(umut): we should check for version here and enable agent mode if the version is >= 0.0.330 or something?
-      let agentModeEnabled = false
-      // @ts-expect-error
-      if (globalThis.Highlight.version >= '0.0.330') {
-        if (await Highlight.app.checkAgentEnabled()) {
-          if (promptApp?.enable_agent_mode) {
-            agentModeEnabled = true
-          }
-        }
-      }
+      let agentModeEnabled = true
+      // if (globalThis.Highlight.version >= '0.0.330') {
+      //   if (await Highlight.app.checkAgentEnabled()) {
+      //     if (promptApp?.enable_agent_mode) {
+      //       agentModeEnabled = true
+      //     }
+      //   }
+      // }
 
       const tools = {
         create_linear_ticket:
