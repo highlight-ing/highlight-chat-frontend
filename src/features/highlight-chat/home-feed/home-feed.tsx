@@ -17,7 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useStore } from '@/components/providers/store-provider'
 
 import { useAudioNotes } from './hooks'
-import { isChatHistoryItem, isConversationData } from './utils'
+import { formatUpdatedAtDate, isChatHistoryItem, isConversationData } from './utils'
 
 const FEED_LENGTH_LIMIT = 10
 
@@ -83,7 +83,7 @@ export function AudioNotesListItem(props: AudioNotesListItemProps) {
       <div className="flex items-center gap-2 font-medium">
         <VoiceSquare size={20} variant="Bold" className="text-green" />
         <h3 className="max-w-64 truncate tracking-tight text-primary">{formattedTitle}</h3>
-        <p className="text-sm text-tertiary">3:30pm</p>
+        <p className="text-sm text-tertiary">{formatUpdatedAtDate(props.audioNote.endedAt)}</p>
       </div>
       <div className="flex items-center gap-2 text-sm font-medium text-subtle">
         <p className="capitalize">{audioNoteDuration}</p>
@@ -164,8 +164,8 @@ export function ChatListItem(props: ChatListItemProps) {
       <div className="flex items-center gap-2 font-medium">
         <MessageText variant={'Bold'} size={20} className="text-subtle" />
         <h3 className="max-w-sm truncate tracking-tight text-primary">{props.chat.title}</h3>
+        <p className="text-sm text-tertiary">{formatUpdatedAtDate(props.chat.updated_at)}</p>
       </div>
-      <p className="text-sm text-tertiary">{props.chat.updated_at}</p>
     </HomeFeedListItemLayout>
   )
 }
@@ -219,13 +219,13 @@ function RecentActivityTabContent() {
     const tenRecentChats =
       historyData
         ?.slice(0, FEED_LENGTH_LIMIT)
-        .map((chat) => ({ ...chat, updatedAt: new Date(chat.updated_at).getTime() })) ?? []
+        .map((chat) => ({ ...chat, updatedAt: new Date(chat.updated_at).toISOString() })) ?? []
     const tenRecentAudioNotes =
       audioNotesData
         ?.slice(0, FEED_LENGTH_LIMIT)
-        .map((audioNote) => ({ ...audioNote, updatedAt: audioNote.endedAt.getTime() })) ?? []
-    const recentActionsSortedByUpdatedAt = [...tenRecentChats, ...tenRecentAudioNotes].sort(
-      (a, b) => b.updatedAt - a.updatedAt,
+        .map((audioNote) => ({ ...audioNote, updatedAt: audioNote.endedAt.toISOString() })) ?? []
+    const recentActionsSortedByUpdatedAt = [...tenRecentChats, ...tenRecentAudioNotes].sort((a, b) =>
+      b.updatedAt.localeCompare(a.updatedAt),
     )
 
     console.log(recentActionsSortedByUpdatedAt)
