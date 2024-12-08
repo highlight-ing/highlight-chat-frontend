@@ -43,7 +43,7 @@ function ChatWithConversationButton(props: { conversation: ConversationData }) {
     startNewConversation()
 
     addAttachment({
-      id: props.conversation.id,
+      id: props.conversation?.id,
       type: 'conversation',
       title: props.conversation.title,
       value: props.conversation.transcript,
@@ -76,7 +76,7 @@ export function LatestConversation(props: { focusInput: () => void }) {
 
     const formattedConversationTitle =
       mostRecentConversation?.title.startsWith('Conversation ended') ||
-      mostRecentConversation?.title.startsWith('Audio Notes from')
+        mostRecentConversation?.title.startsWith('Audio Notes from')
         ? 'Most Recent Audio Note'
         : (mostRecentConversation?.title ?? 'Most Recent Audio Note')
 
@@ -90,7 +90,7 @@ export function LatestConversation(props: { focusInput: () => void }) {
 
     return {
       formattedMostRecentConversation: {
-        id: mostRecentConversation.id,
+        id: mostRecentConversation?.id,
         title: formattedConversationTitle,
         wordCount: conversationWordCount,
         duration: formattedConversationDuration,

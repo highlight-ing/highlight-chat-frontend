@@ -1,6 +1,12 @@
 // src/hooks/useSubmitQuery.ts
 import { useEffect, useRef } from 'react'
 import { Attachment, FileAttachment, ImageAttachment, PdfAttachment } from '@/types'
+import Highlight, { HighlightContext } from '@highlight-ai/app-runtime'
+import * as Sentry from '@sentry/react'
+import { v4 as uuidv4 } from 'uuid'
+import { useShallow } from 'zustand/react/shallow'
+
+import { Prompt } from '@/types/supabase-helpers'
 import { trackEvent } from '@/utils/amplitude'
 import { fetchWindows } from '@/utils/attachmentUtils'
 import { processAttachments } from '@/utils/contextprocessor'
@@ -23,12 +29,6 @@ import {
 } from '@/utils/formDataUtils'
 import { parseAndHandleStreamChunk } from '@/utils/streamParser'
 import { formatDateForConversation, getWordCount } from '@/utils/string'
-import Highlight, { HighlightContext } from '@highlight-ai/app-runtime'
-import * as Sentry from '@sentry/react'
-import { v4 as uuidv4 } from 'uuid'
-import { useShallow } from 'zustand/react/shallow'
-
-import { Prompt } from '@/types/supabase-helpers'
 import { useApi } from '@/hooks/useApi'
 import { useStore } from '@/components/providers/store-provider'
 
@@ -380,7 +380,7 @@ export const useSubmitQuery = () => {
               value: conversation_data.transcript,
               duration: Math.floor(
                 (new Date(conversation_data.endedAt).getTime() - new Date(conversation_data.startedAt).getTime()) /
-                  60000,
+                60000,
               ),
             })
           } else {
