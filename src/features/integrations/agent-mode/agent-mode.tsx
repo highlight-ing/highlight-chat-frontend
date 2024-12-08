@@ -1,7 +1,7 @@
 import { useState } from 'react'
+import Highlight, { StartAgentOptions } from '@highlight-ai/app-runtime'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { TrashIcon } from 'lucide-react'
-import { useFormState } from 'react-dom'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -37,6 +37,12 @@ export function EnableAgentMode({ agentInstructions, agentGoals, url }: EnableAg
   const handleSubmit = async () => {
     setIsPending(true)
     console.log('submitting form', form.getValues())
+    const options: StartAgentOptions = {
+      agentInstructions: form.getValues('agentInstructions'),
+      targetURL: form.getValues('url'),
+      agentTasks: form.getValues('agentGoals'),
+    }
+    Highlight.agents.startAgent(options)
   }
 
   const handleDeleteGoal = (index: number) => {
