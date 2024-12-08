@@ -1,7 +1,7 @@
-import { trackEvent } from '@/utils/amplitude'
 import { ArrowRight } from 'iconsax-react'
 import Markdown from 'react-markdown'
 
+import { trackEvent } from '@/utils/amplitude'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { HighlightIcon } from '@/components/icons'
@@ -41,8 +41,8 @@ export function ViewChangelogBanner() {
           <SheetDescription className="sr-only">Ongoing change log for all Highlight chat updates</SheetDescription>
         </SheetHeader>
         <ScrollArea className="size-full pb-6 pr-1">
-          {allChangelogNotes.map((note) => (
-            <div className="border-b border-secondary/60 pt-3 last:border-b-0">
+          {allChangelogNotes.map((note, index) => (
+            <div key={index} className="border-b border-secondary/60 pt-3 last:border-b-0">
               <p className="font-semibold text-teal">{note.version}</p>
               <Markdown className="markdown">{note.releaseNotes}</Markdown>
             </div>
