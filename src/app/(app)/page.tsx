@@ -62,11 +62,10 @@ export default function Home() {
       <div
         className={cn(
           `${styles.contents} ${showHistory ? styles.partial : styles.full} ${messages.length > 0 || inputIsDisabled || !!promptApp ? styles.justifyEnd : ''}`,
-          'grid grid-cols-3 transition duration-700',
+          'grid grid-cols-3 overflow-x-hidden transition duration-700',
           isChatting && styles.isChatting,
         )}
       >
-        <TranscriptViewer />
         <div
           className={cn(
             'col-span-3 flex w-full flex-col items-center justify-end transition delay-100',
@@ -81,6 +80,7 @@ export default function Home() {
           {(isChatting || promptApp) && <Input isActiveChat={true} />}
           <IntercomChat />
         </div>
+        <TranscriptViewer />
       </div>
     </div>
   )

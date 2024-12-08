@@ -1,6 +1,6 @@
 import React from 'react'
 import { AnimatePresence, motion, Variants } from 'framer-motion'
-import { ArrowLeft, ClipboardText, VoiceSquare } from 'iconsax-react'
+import { ArrowRight, ClipboardText, VoiceSquare } from 'iconsax-react'
 import { atom, useAtomValue, useSetAtom } from 'jotai'
 import useMeasure from 'react-use-measure'
 
@@ -23,8 +23,8 @@ type CloseHoverAnimateLayoutProps = {
 }
 
 const hoveringCloseVariants: Variants = {
-  idle: { x: 0, opacity: 1 },
-  hover: (hoveringClose: boolean) => (hoveringClose ? { x: -12, opacity: 0.5 } : {}),
+  idle: { translateX: 0, opacity: 1 },
+  hover: (hoveringClose: boolean) => (hoveringClose ? { translateX: 12, opacity: 0.5 } : {}),
 }
 
 function CloseHoverAnimateLayout(props: CloseHoverAnimateLayoutProps) {
@@ -35,7 +35,7 @@ function CloseHoverAnimateLayout(props: CloseHoverAnimateLayoutProps) {
       custom={hoveringClose}
       initial="idle"
       animate="hover"
-      className={props.className}
+      className={cn(props.className)}
     >
       {props.children}
     </motion.div>
@@ -52,8 +52,8 @@ function CloseTranscriptViewerButton() {
   }
 
   return (
-    <Tooltip content="Close" side="left">
-      <div className="absolute -right-8 top-0">
+    <Tooltip content="Close" side="right">
+      <div className="absolute -left-8 top-0">
         <motion.button
           onHoverStart={() => setHoveringClose(true)}
           onHoverEnd={() => setHoveringClose(false)}
@@ -61,7 +61,7 @@ function CloseTranscriptViewerButton() {
           onClick={handleClick}
           className="size-8 group relative grid place-items-center border border-t-0 border-tertiary bg-bg-layer-1 transition-colors hover:bg-secondary"
         >
-          <ArrowLeft size={18} className="text-tertiary transition-colors group-hover:text-primary" />
+          <ArrowRight size={18} className="text-tertiary transition-colors group-hover:text-primary" />
         </motion.button>
       </div>
     </Tooltip>
@@ -81,7 +81,7 @@ function HeaderLayout(props: HeaderLayoutProps) {
   }, [bounds, setHeaderHeight])
 
   return (
-    <div ref={ref} className="border-b border-tertiary">
+    <div ref={ref} className="overflow-x-hidden border-b border-tertiary">
       <CloseHoverAnimateLayout className="space-y-2 p-4">{props.children}</CloseHoverAnimateLayout>
     </div>
   )
@@ -175,9 +175,9 @@ function TranscriptMessageItem(props: TranscriptMessageItemProps) {
 }
 
 const transcriptViewerVariants: Variants = {
-  hidden: { opacity: 0, x: -20 },
+  hidden: { opacity: 0, x: 20 },
   visible: { opacity: 1, x: 0 },
-  exit: { opacity: 0, x: -50, transition: { duration: 0.09 } },
+  exit: { opacity: 0, x: 50, transition: { duration: 0.09 } },
 }
 
 export function TranscriptViewer() {
@@ -196,12 +196,12 @@ export function TranscriptViewer() {
           animate="visible"
           exit="exit"
           className={cn(
-            'sticky top-[104px] z-10 col-span-1 h-[calc(100vh-104px)] items-end border-r border-tertiary text-primary',
+            'sticky top-[104px] z-10 col-span-1 h-[calc(100vh-104px)] border-l border-tertiary text-primary',
             isOnHome && 'top-[48px] h-[calc(100vh-48px)]',
           )}
         >
           <TranscriptViewerHeader />
-          <ScrollArea style={{ height: `calc(100% - ${headerHeight}px` }}>
+          <ScrollArea style={{ height: `calc(100% - ${headerHeight}px` }} className="overflow-x-hidden">
             <CloseHoverAnimateLayout className="w-full space-y-6 p-4 pt-6">
               <CopyTranscript />
               {transcriptMessages?.map((message, index) => <TranscriptMessageItem key={index} message={message} />)}

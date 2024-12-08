@@ -16,6 +16,7 @@ import { usePaginatedHistory } from '@/hooks/history'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { MeetingIcon } from '@/components/icons'
+import { SearchIcon } from '@/components/Input/Input'
 import { useStore } from '@/components/providers/store-provider'
 
 import { useAudioNotes, useRecentlyUpdatedHistory } from './hooks'
@@ -272,12 +273,14 @@ export function HomeFeed() {
       <TabsList className="mb-0 w-full">
         <div className="flex w-full items-center justify-between border-b border-subtle py-1.5">
           <div className="flex items-center gap-2">
-            <TabsTrigger value="recent-activity">Recent Activity</TabsTrigger>
+            <TabsTrigger value="recent-activity">Recent</TabsTrigger>
             <TabsTrigger value="meeting-notes">Meeting Notes</TabsTrigger>
             <TabsTrigger value="audio-notes">Audio Notes</TabsTrigger>
             <TabsTrigger value="chats">Chats</TabsTrigger>
           </div>
-          <div>Search</div>
+          <div>
+            <SearchIcon />
+          </div>
         </div>
       </TabsList>
       <TabsContent value="recent-activity">
