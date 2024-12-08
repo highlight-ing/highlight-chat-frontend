@@ -110,7 +110,7 @@ export function LatestConversation(props: { focusInput: () => void }) {
   }
 
   return (
-    <button
+    <div
       aria-label="View Audio Note"
       onClick={handleClick}
       className="group flex w-full items-start justify-between rounded-2xl border border-[#191919] bg-secondary p-4 shadow-md transition-colors ease-out hover:bg-secondary"
@@ -140,6 +140,6 @@ export function LatestConversation(props: { focusInput: () => void }) {
       >
         <ChatWithConversationButton conversation={formattedMostRecentConversation.conversation} />
       </div>
-    </button>
+    </div>
   )
 }
