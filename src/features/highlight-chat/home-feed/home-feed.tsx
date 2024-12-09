@@ -3,7 +3,7 @@
 import React from 'react'
 import { ChatHistoryItem } from '@/types'
 import { motion, Variants } from 'framer-motion'
-import { ArrowRight, Clock, MessageText, VoiceSquare } from 'iconsax-react'
+import { Clock, MessageText, VoiceSquare } from 'iconsax-react'
 import { useAtomValue, useSetAtom } from 'jotai'
 
 import { ConversationData } from '@/types/conversations'
@@ -62,7 +62,7 @@ function HomeFeedListItemLayout({ className, children, ...props }: HomeFeedListI
   )
 }
 
-function HomeFeedLoadingListItem() {
+function LoadingListItem() {
   return (
     <HomeFeedListItemLayout className="cursor-default [&:nth-child(2)]:opacity-70 [&:nth-child(3)]:opacity-40">
       <div className="flex items-center gap-2 font-medium">
@@ -76,19 +76,23 @@ function HomeFeedLoadingListItem() {
   )
 }
 
-function HomeFeedLoadingList() {
+function LoadingList() {
   return (
     <div>
-      <HomeFeedLoadingListItem />
-      <HomeFeedLoadingListItem />
-      <HomeFeedLoadingListItem />
+      <LoadingListItem />
+      <LoadingListItem />
+      <LoadingListItem />
     </div>
   )
 }
 
-function HomeFeedEmptyListItem() {
+type EmptyListItemProps = {
+  className?: string
+}
+
+function EmptyListItem(props: EmptyListItemProps) {
   return (
-    <HomeFeedListItemLayout className="cursor-default [&:nth-child(2)]:opacity-70 [&:nth-child(3)]:opacity-40">
+    <HomeFeedListItemLayout className={cn('cursor-default', props.className)}>
       <div className="flex items-center gap-2 font-medium">
         <div className="size-5 rounded-md bg-hover" />
         <div className="h-5 w-64 rounded-md bg-hover" />
@@ -104,17 +108,17 @@ type HomeFeedEmptyListProps = {
   label: string
 }
 
-function HomeFeedEmptyList(props: HomeFeedEmptyListProps) {
+function EmptyList(props: HomeFeedEmptyListProps) {
   return (
     <div className="relative">
-      <div className="blur-sm">
-        <HomeFeedEmptyListItem />
-        <HomeFeedEmptyListItem />
-        <HomeFeedEmptyListItem />
+      <div>
+        <EmptyListItem />
+        <EmptyListItem className="opacity-60" />
+        <EmptyListItem className="opacity-30" />
       </div>
       <div className="size-full left-o absolute top-0 flex flex-col items-center justify-center">
         <div className="rounded-xl border border-tertiary bg-hover/10 px-6 py-4 backdrop-blur">
-          <p className="text-primary">{props.label}</p>
+          <p className="text-subtle">{props.label}</p>
         </div>
       </div>
     </div>
@@ -164,11 +168,11 @@ function MeetingNotesTabContent() {
   }, [data])
 
   if (isLoading) {
-    return <HomeFeedLoadingList />
+    return <LoadingList />
   }
 
   if (tenRecentMeetingNotes.length === 0) {
-    return <HomeFeedEmptyList label="You have no meeting notes" />
+    return <EmptyList label="No meeting notes" />
   }
 
   return (
@@ -188,11 +192,11 @@ function AudioNotesTabContent() {
   }, [data])
 
   if (isLoading) {
-    return <HomeFeedLoadingList />
+    return <LoadingList />
   }
 
   if (tenRecentNonMeetingNotes.length === 0) {
-    return <HomeFeedEmptyList label="You have no audio notes" />
+    return <EmptyList label="No audio notes" />
   }
 
   return (
@@ -245,11 +249,11 @@ function ChatsTabContent() {
   }
 
   if (isLoading) {
-    return <HomeFeedLoadingList />
+    return <LoadingList />
   }
 
   if (tenRecentChats.length === 0) {
-    return <HomeFeedEmptyList label="You have no chats" />
+    return <EmptyList label="No chats" />
   }
 
   return (
@@ -294,11 +298,11 @@ function RecentActivityTabContent() {
   }, [historyData, audioNotesData])
 
   if (isLoadingHistory || isLoadingAudioNotes) {
-    return <HomeFeedLoadingList />
+    return <LoadingList />
   }
 
   if (tenRecentActions.length === 0) {
-    return <HomeFeedEmptyList label="You have no recent activity" />
+    return <EmptyList label="No recent activity" />
   }
 
   const renderRecentActions = tenRecentActions.map((action) => {
