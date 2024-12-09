@@ -114,7 +114,7 @@ function HomeFeedEmptyList(props: HomeFeedEmptyListProps) {
       </div>
       <div className="size-full left-o absolute top-0 flex flex-col items-center justify-center">
         <div className="rounded-xl border border-tertiary bg-hover/10 px-6 py-4 backdrop-blur">
-          <p>{props.label}</p>
+          <p className="text-primary">{props.label}</p>
         </div>
       </div>
     </div>
@@ -168,7 +168,7 @@ function MeetingNotesTabContent() {
   }
 
   if (tenRecentMeetingNotes.length === 0) {
-    return <HomeFeedEmptyList label="No meeting notes found" />
+    return <HomeFeedEmptyList label="You have no meeting notes" />
   }
 
   return (
@@ -192,7 +192,7 @@ function AudioNotesTabContent() {
   }
 
   if (tenRecentNonMeetingNotes.length === 0) {
-    return <HomeFeedEmptyList label="No audio notes found" />
+    return <HomeFeedEmptyList label="You have no audio notes" />
   }
 
   return (
@@ -249,7 +249,7 @@ function ChatsTabContent() {
   }
 
   if (tenRecentChats.length === 0) {
-    return <HomeFeedEmptyList label="No chats found" />
+    return <HomeFeedEmptyList label="You have no chats" />
   }
 
   return (
@@ -267,14 +267,6 @@ function ChatsTabContent() {
         <HomeFeedListItemLayout className="flex items-center">
           <Clock variant={'Bold'} size={20} />
           <p>{`${historySidebarIsOpen ? 'Hide' : 'View full'} chat history`}</p>
-          <ArrowRight
-            size={20}
-            strokeWidth={4}
-            className={cn(
-              'transition-transform group-hover:translate-x-1',
-              historySidebarIsOpen && 'translate-x-1 -rotate-180 group-hover:translate-x-0',
-            )}
-          />
         </HomeFeedListItemLayout>
       </motion.button>
     </HomeFeedListLayout>
@@ -306,7 +298,7 @@ function RecentActivityTabContent() {
   }
 
   if (tenRecentActions.length === 0) {
-    return <HomeFeedEmptyList label="No activity recorded" />
+    return <HomeFeedEmptyList label="You have no recent activity" />
   }
 
   const renderRecentActions = tenRecentActions.map((action) => {
