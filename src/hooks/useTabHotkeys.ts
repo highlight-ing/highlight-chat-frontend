@@ -17,14 +17,14 @@ export const useTabHotkeys = () => {
       if ((e.key === 'n' || e.key === 't') && isCtrlOrMeta) {
         startNewConversation()
       } else if ((e.key === '[' || (e.key === 'Tab' && e.shiftKey)) && isCtrlOrMeta && openConversations.length > 0) {
-        const currentTabIndex = openConversations.findIndex((chat) => chat.id === conversationId)
+        const currentTabIndex = openConversations.findIndex((chat) => chat?.id === conversationId)
         if (currentTabIndex <= 0) {
           setConversationId(openConversations[openConversations.length - 1].id)
         } else {
           setConversationId(openConversations[currentTabIndex - 1].id)
         }
       } else if ((e.key === ']' || e.key === 'Tab') && isCtrlOrMeta && openConversations.length > 0) {
-        const currentTabIndex = openConversations.findIndex((chat) => chat.id === conversationId)
+        const currentTabIndex = openConversations.findIndex((chat) => chat?.id === conversationId)
         if (currentTabIndex === openConversations.length - 1) {
           setConversationId(openConversations[0].id)
         } else {
