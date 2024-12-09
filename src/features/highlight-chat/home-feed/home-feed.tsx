@@ -2,7 +2,6 @@
 
 import React from 'react'
 import { ChatHistoryItem } from '@/types'
-import { useQueryClient } from '@tanstack/react-query'
 import { ArrowRight, Clock, MessageText, VoiceSquare } from 'iconsax-react'
 import { useAtomValue, useSetAtom } from 'jotai'
 
@@ -16,7 +15,6 @@ import { usePaginatedHistory } from '@/hooks/history'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { MeetingIcon } from '@/components/icons'
-import { SearchIcon } from '@/components/Input/Input'
 import { useStore } from '@/components/providers/store-provider'
 
 import { useAudioNotes, useRecentlyUpdatedHistory } from './hooks'
@@ -31,7 +29,10 @@ type HomeFeedListItemLayoutProps = React.ComponentProps<'div'> & {
 function HomeFeedListItemLayout({ className, children, ...props }: HomeFeedListItemLayoutProps) {
   return (
     <div
-      className={cn('cursor-pointer rounded-xl px-3 hover:bg-secondary [&_div]:last:border-transparent', className)}
+      className={cn(
+        'cursor-pointer rounded-xl px-3 transition-colors hover:bg-secondary [&_div]:last:border-transparent',
+        className,
+      )}
       {...props}
     >
       <div className="flex items-center justify-between gap-2 border-b border-subtle py-3 transition-colors">
@@ -61,6 +62,41 @@ function HomeFeedLoadingList() {
       <HomeFeedLoadingListItem />
       <HomeFeedLoadingListItem />
       <HomeFeedLoadingListItem />
+    </div>
+  )
+}
+
+function HomeFeedEmptyListItem() {
+  return (
+    <HomeFeedListItemLayout className="cursor-default [&:nth-child(2)]:opacity-70 [&:nth-child(3)]:opacity-40">
+      <div className="flex items-center gap-2 font-medium">
+        <div className="size-5 rounded-md bg-hover" />
+        <div className="h-5 w-64 rounded-md bg-hover" />
+      </div>
+      <div className="flex items-center gap-2 text-sm font-medium text-subtle">
+        <div className="h-5 w-16 rounded-md bg-hover" />
+      </div>
+    </HomeFeedListItemLayout>
+  )
+}
+
+type HomeFeedEmptyListProps = {
+  label: string
+}
+
+function HomeFeedEmptyList(props: HomeFeedEmptyListProps) {
+  return (
+    <div className="relative">
+      <div className="blur-sm">
+        <HomeFeedEmptyListItem />
+        <HomeFeedEmptyListItem />
+        <HomeFeedEmptyListItem />
+      </div>
+      <div className="size-full left-o absolute top-0 flex flex-col items-center justify-center">
+        <div className="rounded-xl border border-tertiary bg-hover/10 px-6 py-4 backdrop-blur">
+          <p>{props.label}</p>
+        </div>
+      </div>
     </div>
   )
 }
@@ -112,7 +148,7 @@ function MeetingNotesTabContent() {
   }
 
   if (tenRecentMeetingNotes.length === 0) {
-    return <div>No meeting notes.</div>
+    return <HomeFeedEmptyList label="No meeting notes found" />
   }
 
   return (
@@ -136,7 +172,7 @@ function AudioNotesTabContent() {
   }
 
   if (tenRecentNonMeetingNotes.length === 0) {
-    return <div>No audio notes.</div>
+    return <HomeFeedEmptyList label="No audio notes found" />
   }
 
   return (
@@ -193,7 +229,7 @@ function ChatsTabContent() {
   }
 
   if (tenRecentChats.length === 0) {
-    return <div>No recent chats.</div>
+    return <HomeFeedEmptyList label="No chats found" />
   }
 
   return (
@@ -241,8 +277,6 @@ function RecentActivityTabContent() {
       b.updatedAt.localeCompare(a.updatedAt),
     )
 
-    console.log(recentActionsSortedByUpdatedAt)
-
     return recentActionsSortedByUpdatedAt.slice(0, FEED_LENGTH_LIMIT)
   }, [historyData, audioNotesData])
 
@@ -251,7 +285,7 @@ function RecentActivityTabContent() {
   }
 
   if (tenRecentActions.length === 0) {
-    return <div>No recent activity.</div>
+    return <HomeFeedEmptyList label="No activity recorded" />
   }
 
   const renderRecentActions = tenRecentActions.map((action) => {
