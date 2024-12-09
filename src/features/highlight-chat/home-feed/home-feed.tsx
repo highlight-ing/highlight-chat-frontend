@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { ChatHistoryItem } from '@/types'
-import { motion, Variants } from 'framer-motion'
+import { AnimatePresence, motion, Variants } from 'framer-motion'
 import { Clock, MessageText, VoiceSquare } from 'iconsax-react'
 import { useAtomValue, useSetAtom } from 'jotai'
 
@@ -167,20 +167,22 @@ function MeetingNotesTabContent() {
     return data?.filter((audioNote) => audioNote.meeting).slice(0, FEED_LENGTH_LIMIT) ?? []
   }, [data])
 
-  if (isLoading) {
-    return <LoadingList />
-  }
-
-  if (tenRecentMeetingNotes.length === 0) {
+  if (!isLoading && tenRecentMeetingNotes.length === 0) {
     return <EmptyList label="No meeting notes" />
   }
 
   return (
-    <HomeFeedListLayout>
-      {tenRecentMeetingNotes.map((meetingNote) => (
-        <AudioNotesListItem key={meetingNote.id} audioNote={meetingNote} />
-      ))}
-    </HomeFeedListLayout>
+    <AnimatePresence mode="popLayout" initial={false}>
+      {isLoading ? (
+        <LoadingList />
+      ) : (
+        <HomeFeedListLayout>
+          {tenRecentMeetingNotes.map((meetingNote) => (
+            <AudioNotesListItem key={meetingNote.id} audioNote={meetingNote} />
+          ))}
+        </HomeFeedListLayout>
+      )}
+    </AnimatePresence>
   )
 }
 
@@ -191,20 +193,22 @@ function AudioNotesTabContent() {
     return data?.filter((audioNote) => !audioNote.meeting).slice(0, FEED_LENGTH_LIMIT) ?? []
   }, [data])
 
-  if (isLoading) {
-    return <LoadingList />
-  }
-
-  if (tenRecentNonMeetingNotes.length === 0) {
+  if (!isLoading && tenRecentNonMeetingNotes.length === 0) {
     return <EmptyList label="No audio notes" />
   }
 
   return (
-    <HomeFeedListLayout>
-      {tenRecentNonMeetingNotes.map((audioNote) => (
-        <AudioNotesListItem key={audioNote.id} audioNote={audioNote} />
-      ))}
-    </HomeFeedListLayout>
+    <AnimatePresence mode="popLayout" initial={false}>
+      {isLoading ? (
+        <LoadingList />
+      ) : (
+        <HomeFeedListLayout>
+          {tenRecentNonMeetingNotes.map((audioNote) => (
+            <AudioNotesListItem key={audioNote.id} audioNote={audioNote} />
+          ))}
+        </HomeFeedListLayout>
+      )}
+    </AnimatePresence>
   )
 }
 
@@ -248,38 +252,41 @@ function ChatsTabContent() {
     toggleShowHistory()
   }
 
-  if (isLoading) {
-    return <LoadingList />
-  }
-
-  if (tenRecentChats.length === 0) {
+  if (!isLoading && tenRecentChats.length === 0) {
     return <EmptyList label="No chats" />
   }
 
   return (
-    <HomeFeedListLayout>
-      {tenRecentChats.map((chat) => (
-        <ChatListItem key={chat.id} chat={chat} />
-      ))}
-      <motion.button
-        variants={homeFeedListItemVariants}
-        type="button"
-        aria-label="Toggle history sidebar"
-        onClick={handleShowMoreClick}
-        className="group w-full text-left text-subtle hover:text-primary"
-      >
-        <HomeFeedListItemLayout className="flex items-center">
-          <Clock variant={'Bold'} size={20} />
-          <p>{`${historySidebarIsOpen ? 'Hide' : 'View full'} chat history`}</p>
-        </HomeFeedListItemLayout>
-      </motion.button>
-    </HomeFeedListLayout>
+    <AnimatePresence mode="popLayout" initial={false}>
+      {isLoading ? (
+        <LoadingList />
+      ) : (
+        <HomeFeedListLayout>
+          {tenRecentChats.map((chat) => (
+            <ChatListItem key={chat.id} chat={chat} />
+          ))}
+          <motion.button
+            variants={homeFeedListItemVariants}
+            type="button"
+            aria-label="Toggle history sidebar"
+            onClick={handleShowMoreClick}
+            className="group w-full text-left text-subtle hover:text-primary"
+          >
+            <HomeFeedListItemLayout className="flex items-center">
+              <Clock variant={'Bold'} size={20} />
+              <p>{`${historySidebarIsOpen ? 'Hide' : 'View full'} chat history`}</p>
+            </HomeFeedListItemLayout>
+          </motion.button>
+        </HomeFeedListLayout>
+      )}
+    </AnimatePresence>
   )
 }
 
 function RecentActivityTabContent() {
   const { data: historyData, isLoading: isLoadingHistory } = usePaginatedHistory()
   const { data: audioNotesData, isLoading: isLoadingAudioNotes } = useAudioNotes()
+  const isLoading = isLoadingHistory || isLoadingAudioNotes
 
   const tenRecentActions = React.useMemo(() => {
     const tenRecentChats =
@@ -297,11 +304,7 @@ function RecentActivityTabContent() {
     return recentActionsSortedByUpdatedAt.slice(0, FEED_LENGTH_LIMIT)
   }, [historyData, audioNotesData])
 
-  if (isLoadingHistory || isLoadingAudioNotes) {
-    return <LoadingList />
-  }
-
-  if (tenRecentActions.length === 0) {
+  if (!isLoading && tenRecentActions.length === 0) {
     return <EmptyList label="No recent activity" />
   }
 
@@ -315,7 +318,11 @@ function RecentActivityTabContent() {
     }
   })
 
-  return <HomeFeedListLayout>{renderRecentActions}</HomeFeedListLayout>
+  return (
+    <AnimatePresence mode="popLayout" initial={false}>
+      {isLoading ? <LoadingList /> : <HomeFeedListLayout>{renderRecentActions}</HomeFeedListLayout>}
+    </AnimatePresence>
+  )
 }
 
 export function HomeFeed() {
