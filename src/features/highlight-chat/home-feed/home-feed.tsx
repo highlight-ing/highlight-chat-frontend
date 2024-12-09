@@ -84,11 +84,7 @@ function LoadingList() {
   )
 }
 
-type HomeFeedEmptyListProps = {
-  label: string
-}
-
-function EmptyList(props: HomeFeedEmptyListProps) {
+function EmptyList(props: { label: string }) {
   return (
     <div className="relative">
       <div>
@@ -129,11 +125,7 @@ function EmptyList(props: HomeFeedEmptyListProps) {
   )
 }
 
-type HomeFeedListLayoutProps = {
-  children: React.ReactNode
-}
-
-function HomeFeedListLayout(props: HomeFeedListLayoutProps) {
+function HomeFeedListLayout(props: { children: React.ReactNode }) {
   return (
     <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ staggerChildren: 0.01 }}>
       {props.children}
@@ -141,11 +133,7 @@ function HomeFeedListLayout(props: HomeFeedListLayoutProps) {
   )
 }
 
-type AudioNotesListItemProps = {
-  audioNote: ConversationData
-}
-
-export function AudioNotesListItem(props: AudioNotesListItemProps) {
+function AudioNotesListItem(props: { audioNote: ConversationData }) {
   const formattedTitle = formatTitle(props.audioNote.title)
   const audioNoteDuration = formatConversationDuration(props.audioNote)
   const wordCount = props.audioNote?.transcript.split(' ').length
@@ -228,11 +216,7 @@ function AudioNotesTabContent() {
   )
 }
 
-type ChatListItemProps = {
-  chat: ChatHistoryItem
-}
-
-export function ChatListItem(props: ChatListItemProps) {
+function ChatListItem(props: { chat: ChatHistoryItem }) {
   const addOrUpdateOpenConversation = useStore((store) => store.addOrUpdateOpenConversation)
   const setConversationId = useStore((store) => store.setConversationId)
 
