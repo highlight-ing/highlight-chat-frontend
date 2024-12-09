@@ -111,6 +111,8 @@
     "@types/react-syntax-highlighter": "^15.5.13",
     "@types/throttle-debounce": "^5.0.2",
     "@types/uuid": "^10.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.17.0",
+    "@typescript-eslint/parser": "^8.17.0",
     "autoprefixer": "^10.4.20",
     "eslint": "^8",
     "eslint-config-next": "14.2.4",
