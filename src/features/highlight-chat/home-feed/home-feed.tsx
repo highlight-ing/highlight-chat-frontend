@@ -23,18 +23,6 @@ import { formatUpdatedAtDate, isChatHistoryItem, isConversationData } from './ut
 
 const FEED_LENGTH_LIMIT = 10
 
-type HomeFeedListLayoutProps = {
-  children: React.ReactNode
-}
-
-function HomeFeedListLayout(props: HomeFeedListLayoutProps) {
-  return (
-    <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ staggerChildren: 0.01 }}>
-      {props.children}
-    </motion.div>
-  )
-}
-
 const homeFeedListItemVariants: Variants = {
   hidden: { opacity: 0, y: -5 },
   visible: { opacity: 1, y: 0, transition: { type: 'spring', bounce: 0, duration: 0.4 } },
@@ -62,45 +50,37 @@ function HomeFeedListItemLayout({ className, children, ...props }: HomeFeedListI
   )
 }
 
-function LoadingListItem() {
-  return (
-    <HomeFeedListItemLayout className="cursor-default [&:nth-child(2)]:opacity-70 [&:nth-child(3)]:opacity-40">
-      <div className="flex items-center gap-2 font-medium">
-        <Skeleton className="size-5" />
-        <Skeleton className="h-5 w-64" />
-      </div>
-      <div className="flex items-center gap-2 text-sm font-medium text-subtle">
-        <Skeleton className="h-5 w-16" />
-      </div>
-    </HomeFeedListItemLayout>
-  )
-}
-
 function LoadingList() {
   return (
     <div>
-      <LoadingListItem />
-      <LoadingListItem />
-      <LoadingListItem />
+      <HomeFeedListItemLayout className="cursor-default [&:nth-child(2)]:opacity-70 [&:nth-child(3)]:opacity-40">
+        <div className="flex items-center gap-2 font-medium">
+          <Skeleton className="size-5" />
+          <Skeleton className="h-5 w-64" />
+        </div>
+        <div className="flex items-center gap-2 text-sm font-medium text-subtle">
+          <Skeleton className="h-5 w-16" />
+        </div>
+      </HomeFeedListItemLayout>
+      <HomeFeedListItemLayout className="cursor-default [&:nth-child(2)]:opacity-70 [&:nth-child(3)]:opacity-40">
+        <div className="flex items-center gap-2 font-medium">
+          <Skeleton className="size-5" />
+          <Skeleton className="h-5 w-64" />
+        </div>
+        <div className="flex items-center gap-2 text-sm font-medium text-subtle">
+          <Skeleton className="h-5 w-16" />
+        </div>
+      </HomeFeedListItemLayout>
+      <HomeFeedListItemLayout className="cursor-default [&:nth-child(2)]:opacity-70 [&:nth-child(3)]:opacity-40">
+        <div className="flex items-center gap-2 font-medium">
+          <Skeleton className="size-5" />
+          <Skeleton className="h-5 w-64" />
+        </div>
+        <div className="flex items-center gap-2 text-sm font-medium text-subtle">
+          <Skeleton className="h-5 w-16" />
+        </div>
+      </HomeFeedListItemLayout>
     </div>
-  )
-}
-
-type EmptyListItemProps = {
-  className?: string
-}
-
-function EmptyListItem(props: EmptyListItemProps) {
-  return (
-    <HomeFeedListItemLayout className={cn('cursor-default', props.className)}>
-      <div className="flex items-center gap-2 font-medium">
-        <div className="size-5 rounded-md bg-hover" />
-        <div className="h-5 w-64 rounded-md bg-hover" />
-      </div>
-      <div className="flex items-center gap-2 text-sm font-medium text-subtle">
-        <div className="h-5 w-16 rounded-md bg-hover" />
-      </div>
-    </HomeFeedListItemLayout>
   )
 }
 
@@ -112,9 +92,33 @@ function EmptyList(props: HomeFeedEmptyListProps) {
   return (
     <div className="relative">
       <div>
-        <EmptyListItem />
-        <EmptyListItem className="opacity-60" />
-        <EmptyListItem className="opacity-30" />
+        <HomeFeedListItemLayout>
+          <div className="flex items-center gap-2 font-medium">
+            <div className="size-5 rounded-md bg-hover" />
+            <div className="h-5 w-64 rounded-md bg-hover" />
+          </div>
+          <div className="flex items-center gap-2 text-sm font-medium text-subtle">
+            <div className="h-5 w-16 rounded-md bg-hover" />
+          </div>
+        </HomeFeedListItemLayout>
+        <HomeFeedListItemLayout className="opacity-60">
+          <div className="flex items-center gap-2 font-medium">
+            <div className="size-5 rounded-md bg-hover" />
+            <div className="h-5 w-64 rounded-md bg-hover" />
+          </div>
+          <div className="flex items-center gap-2 text-sm font-medium text-subtle">
+            <div className="h-5 w-16 rounded-md bg-hover" />
+          </div>
+        </HomeFeedListItemLayout>
+        <HomeFeedListItemLayout className="opacity-30">
+          <div className="flex items-center gap-2 font-medium">
+            <div className="size-5 rounded-md bg-hover" />
+            <div className="h-5 w-64 rounded-md bg-hover" />
+          </div>
+          <div className="flex items-center gap-2 text-sm font-medium text-subtle">
+            <div className="h-5 w-16 rounded-md bg-hover" />
+          </div>
+        </HomeFeedListItemLayout>
       </div>
       <div className="size-full left-o absolute top-0 flex flex-col items-center justify-center">
         <div className="rounded-xl border border-tertiary bg-hover/10 px-6 py-4 backdrop-blur">
@@ -122,6 +126,18 @@ function EmptyList(props: HomeFeedEmptyListProps) {
         </div>
       </div>
     </div>
+  )
+}
+
+type HomeFeedListLayoutProps = {
+  children: React.ReactNode
+}
+
+function HomeFeedListLayout(props: HomeFeedListLayoutProps) {
+  return (
+    <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ staggerChildren: 0.01 }}>
+      {props.children}
+    </motion.div>
   )
 }
 
@@ -304,10 +320,6 @@ function RecentActivityTabContent() {
     return recentActionsSortedByUpdatedAt.slice(0, FEED_LENGTH_LIMIT)
   }, [historyData, audioNotesData])
 
-  if (!isLoading && tenRecentActions.length === 0) {
-    return <EmptyList label="No recent activity" />
-  }
-
   const renderRecentActions = tenRecentActions.map((action) => {
     if (isConversationData(action)) {
       const audioNote = action
@@ -317,6 +329,10 @@ function RecentActivityTabContent() {
       return <ChatListItem key={chat.id} chat={chat} />
     }
   })
+
+  if (!isLoading && tenRecentActions.length === 0) {
+    return <EmptyList label="No recent activity" />
+  }
 
   return (
     <AnimatePresence mode="popLayout" initial={false}>
