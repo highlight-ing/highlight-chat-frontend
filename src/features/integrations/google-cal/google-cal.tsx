@@ -19,6 +19,8 @@ import {
   FormSelectTrigger,
   FormTextarea,
 } from '@/components/ui/form'
+import { Label } from '@/components/ui/label'
+import MultipleSelector, { Option } from '@/components/ui/multiselect'
 import { Popover, PopoverContent } from '@/components/ui/popover'
 import { Select, SelectContent, SelectItem, SelectValue } from '@/components/ui/select'
 import { GoogleIcon } from '@/components/icons'
@@ -41,6 +43,7 @@ const googleCalEventFormSchema = z
     description: z.string().optional(),
     start: z.string().optional(),
     end: z.string().optional(),
+    invitees: z.array(z.string()).optional(),
   })
   .refine(
     (data) => {
@@ -57,11 +60,11 @@ const googleCalEventFormSchema = z
 
 export type GoogleCalEventFormSchema = z.infer<typeof googleCalEventFormSchema>
 
-type GoogleCalEventDropdownProps = {
-  field: ControllerRenderProps<GoogleCalEventFormSchema>
+type DatePickerAndTimeDropdownProps = {
+  field: ControllerRenderProps<GoogleCalEventFormSchema, 'start' | 'end'>
 }
 
-function DatePickerDropdown(props: GoogleCalEventDropdownProps) {
+function DatePickerDropdown(props: DatePickerAndTimeDropdownProps) {
   const { date: dateValue, time: timeValue } = extractDateAndTime(props.field.value)
 
   function handleChange(date: Date | undefined, time: string) {
@@ -86,7 +89,7 @@ function DatePickerDropdown(props: GoogleCalEventDropdownProps) {
   )
 }
 
-function TimeSelectDropdown(props: GoogleCalEventDropdownProps) {
+function TimeSelectDropdown(props: DatePickerAndTimeDropdownProps) {
   const { date: dateValue, time: timeValue } = extractDateAndTime(props.field.value)
 
   const timeOptions = React.useMemo(() => {
@@ -138,26 +141,96 @@ function TimeSelectDropdown(props: GoogleCalEventDropdownProps) {
   )
 }
 
-function InviteeDropdown() {
+type InviteeDropdownProps = {
+  field: ControllerRenderProps<GoogleCalEventFormSchema, 'invitees'>
+}
+
+function InviteeDropdown(props: InviteeDropdownProps) {
   const { data: contacts } = useFetchGoogleCalContacts()
 
-  // Need to add search input for filtering contacts
-  // Need to add multiple selection, not sure what the best UX is for this
-  // so that multiple invitees can be selected
+  const frameworks: Option[] = [
+    {
+      value: 'next.js',
+      label: 'Next.js',
+    },
+    {
+      value: 'sveltekit',
+      label: 'SvelteKit',
+    },
+    {
+      value: 'nuxt.js',
+      label: 'Nuxt.js',
+      disable: true,
+    },
+    {
+      value: 'remix',
+      label: 'Remix',
+    },
+    {
+      value: 'astro',
+      label: 'Astro',
+    },
+    {
+      value: 'angular',
+      label: 'Angular',
+    },
+    {
+      value: 'vue',
+      label: 'Vue.js',
+    },
+    {
+      value: 'react',
+      label: 'React',
+    },
+    {
+      value: 'ember',
+      label: 'Ember.js',
+    },
+    {
+      value: 'gatsby',
+      label: 'Gatsby',
+    },
+    {
+      value: 'eleventy',
+      label: 'Eleventy',
+      disable: true,
+    },
+    {
+      value: 'solid',
+      label: 'SolidJS',
+    },
+    {
+      value: 'preact',
+      label: 'Preact',
+    },
+    {
+      value: 'qwik',
+      label: 'Qwik',
+    },
+    {
+      value: 'alpine',
+      label: 'Alpine.js',
+    },
+    {
+      value: 'lit',
+      label: 'Lit',
+    },
+  ]
 
   return (
-    <Select>
-      <FormSelectTrigger>
-        <SelectValue placeholder="Select an invitee" />
-      </FormSelectTrigger>
-      <SelectContent className="max-h-[270px]" sideOffset={4}>
-        {contacts?.map((contact) => (
-          <SelectItem key={contact.resourceName} value={contact.resourceName}>
-            {contact.names[0].displayName}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div className="space-y-2">
+      <MultipleSelector
+        commandProps={{
+          label: 'Select frameworks',
+        }}
+        value={frameworks.slice(0, 2)}
+        defaultOptions={frameworks}
+        placeholder="Select frameworks"
+        hideClearAllButton
+        hidePlaceholderWhenSelected
+        emptyIndicator={<p className="text-center text-sm">No results found</p>}
+      />
+    </div>
   )
 }
 
@@ -228,6 +301,7 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
       description: props.data.description,
       start: props.data.start ?? new Date().toISOString(),
       end: props.data.end ?? new Date().toISOString(),
+      invitees: [],
     },
   })
 
@@ -333,13 +407,19 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
           )}
         />
 
-        <FormItem>
-          <FormLabel>Invitees</FormLabel>
-          <FormControl>
-            <InviteeDropdown />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
+        <FormField
+          control={form.control}
+          name="invitees"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Invitees</FormLabel>
+              <FormControl>
+                <InviteeDropdown field={field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}
