@@ -61,7 +61,7 @@ const Messages = () => {
   }, [])
 
   return (
-    <ScrollArea type="scroll" className={styles.messagesContainer}>
+    <Scrollable className={styles.messagesContainer}>
       <div className={cn(styles.messages, 'items-end')}>
         {messages.length > 0 &&
           messages.map((message, index) => {
@@ -81,7 +81,7 @@ const Messages = () => {
               //@ts-ignore
               !messages[messages.length - 1]?.content?.trim()?.length)) && <ThinkingMessage />}
       </div>
-    </ScrollArea>
+    </Scrollable>
   )
 }
 
