@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { ChatHistoryItem } from '@/types'
+import { motion, Variants } from 'framer-motion'
 import { ArrowRight, Clock, MessageText, VoiceSquare } from 'iconsax-react'
 import { useAtomValue, useSetAtom } from 'jotai'
 
@@ -22,23 +23,42 @@ import { formatUpdatedAtDate, isChatHistoryItem, isConversationData } from './ut
 
 const FEED_LENGTH_LIMIT = 10
 
+type HomeFeedListLayoutProps = {
+  children: React.ReactNode
+}
+
+function HomeFeedListLayout(props: HomeFeedListLayoutProps) {
+  return (
+    <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ staggerChildren: 0.01 }}>
+      {props.children}
+    </motion.div>
+  )
+}
+
+const homeFeedListItemVariants: Variants = {
+  hidden: { opacity: 0, y: -5 },
+  visible: { opacity: 1, y: 0, transition: { type: 'spring', bounce: 0, duration: 0.4 } },
+}
+
 type HomeFeedListItemLayoutProps = React.ComponentProps<'div'> & {
   children: React.ReactNode
 }
 
 function HomeFeedListItemLayout({ className, children, ...props }: HomeFeedListItemLayoutProps) {
   return (
-    <div
-      className={cn(
-        'cursor-pointer rounded-xl px-3 transition-colors hover:bg-secondary [&_div]:last:border-transparent',
-        className,
-      )}
-      {...props}
-    >
-      <div className="flex items-center justify-between gap-2 border-b border-subtle py-3 transition-colors">
-        {children}
+    <motion.div variants={homeFeedListItemVariants}>
+      <div
+        className={cn(
+          'cursor-pointer rounded-xl px-3 transition-colors hover:bg-secondary [&_div]:last:border-transparent',
+          className,
+        )}
+        {...props}
+      >
+        <div className="flex items-center justify-between gap-2 border-b border-subtle py-3 transition-colors">
+          {children}
+        </div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
@@ -152,11 +172,11 @@ function MeetingNotesTabContent() {
   }
 
   return (
-    <>
+    <HomeFeedListLayout>
       {tenRecentMeetingNotes.map((meetingNote) => (
         <AudioNotesListItem key={meetingNote.id} audioNote={meetingNote} />
       ))}
-    </>
+    </HomeFeedListLayout>
   )
 }
 
@@ -176,11 +196,11 @@ function AudioNotesTabContent() {
   }
 
   return (
-    <>
+    <HomeFeedListLayout>
       {tenRecentNonMeetingNotes.map((audioNote) => (
         <AudioNotesListItem key={audioNote.id} audioNote={audioNote} />
       ))}
-    </>
+    </HomeFeedListLayout>
   )
 }
 
@@ -233,11 +253,12 @@ function ChatsTabContent() {
   }
 
   return (
-    <>
+    <HomeFeedListLayout>
       {tenRecentChats.map((chat) => (
         <ChatListItem key={chat.id} chat={chat} />
       ))}
-      <button
+      <motion.button
+        variants={homeFeedListItemVariants}
         type="button"
         aria-label="Toggle history sidebar"
         onClick={handleShowMoreClick}
@@ -255,8 +276,8 @@ function ChatsTabContent() {
             )}
           />
         </HomeFeedListItemLayout>
-      </button>
-    </>
+      </motion.button>
+    </HomeFeedListLayout>
   )
 }
 
@@ -298,7 +319,7 @@ function RecentActivityTabContent() {
     }
   })
 
-  return renderRecentActions
+  return <HomeFeedListLayout>{renderRecentActions}</HomeFeedListLayout>
 }
 
 export function HomeFeed() {
