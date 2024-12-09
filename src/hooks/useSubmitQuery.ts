@@ -326,7 +326,7 @@ export const useSubmitQuery = () => {
 
         const chunk = new TextDecoder().decode(value)
 
-        const { content, windowName, conversation, factIndex, fact, messageId } = await parseAndHandleStreamChunk(
+        const { content, windowName, conversation, factIndex, fact, messageId, visualization } = await parseAndHandleStreamChunk(
           chunk,
           {
             showConfirmationModal,
@@ -369,6 +369,7 @@ export const useSubmitQuery = () => {
             conversation_id: conversationId,
             id: messageId,
             given_feedback: null,
+            visualization: visualization
           })
         }
 
@@ -400,6 +401,7 @@ export const useSubmitQuery = () => {
             fact: fact,
             id: messageId,
             given_feedback: null,
+            visualization: visualization
           })
         } else if (fact) {
           updateLastConversationMessage(conversationId, {
@@ -409,6 +411,7 @@ export const useSubmitQuery = () => {
             fact: fact,
             id: messageId,
             given_feedback: null,
+            visualization: visualization
           })
         }
 
