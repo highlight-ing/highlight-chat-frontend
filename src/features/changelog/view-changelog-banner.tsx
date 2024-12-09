@@ -30,19 +30,19 @@ export function ViewChangelogBanner() {
             Highlight <span className="text-teal">{mostRecentChangelogNote.version}</span> has been released!
           </p>
         </div>
-        <div className="flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary opacity-0 transition hover:bg-hover group-hover:opacity-100">
+        <div className="flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary opacity-0 transition group-hover:bg-hover group-hover:opacity-100">
           <span>View changelog</span>
           <ArrowRight size={20} variant="Bold" className="opacity-80" />
         </div>
       </SheetTrigger>
-      <SheetContent onOpenAutoFocus={(e) => e.preventDefault()} className="pl-3 pr-2">
+      <SheetContent onOpenAutoFocus={(e) => e.preventDefault()} className="pl-3 pr-2 duration-75 sm:max-w-lg">
         <SheetHeader className="pb-2">
           <SheetTitle>Highlight Updates</SheetTitle>
           <SheetDescription className="sr-only">Ongoing change log for all Highlight chat updates</SheetDescription>
         </SheetHeader>
         <ScrollArea className="size-full pb-6 pr-1">
-          {allChangelogNotes.map((note, index) => (
-            <div key={index} className="border-b border-secondary/60 pt-3 last:border-b-0">
+          {allChangelogNotes.map((note) => (
+            <div key={note.version} className="border-b border-secondary/60 pt-3 last:border-b-0">
               <p className="font-semibold text-teal">{note.version}</p>
               <Markdown className="markdown">{note.releaseNotes}</Markdown>
             </div>

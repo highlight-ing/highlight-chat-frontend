@@ -46,7 +46,7 @@ type StackerProps = {
 
 export function Stacker({ side = 'bottom', ...props }: StackerProps) {
   return (
-    <motion.div initial="idle" whileHover="hover" className={cn('group isolate flex flex-col gap-3', props.className)}>
+    <motion.div initial="idle" whileHover="hover" className={cn('isolate flex flex-col gap-3', props.className)}>
       {props.children}
     </motion.div>
   )

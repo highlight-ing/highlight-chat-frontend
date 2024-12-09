@@ -61,7 +61,7 @@ export const VariablesTool: React.FC<VariablesToolProps> = ({ disabled, onSelect
       {
         label: (
           <>
-            <TextalignLeft variant="Bold" size={20} color={sassVariables.primary100} /> User "About Me"
+            <TextalignLeft variant="Bold" size={20} color={sassVariables.primary100} /> User &ldquo;About Me&rdquo;
           </>
         ),
         onClick: () => onSelect('about me', 'Using the user\'s "about me", ...'),

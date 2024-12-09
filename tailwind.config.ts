@@ -13,6 +13,10 @@ const config: Config = {
         sans: ['var(--font-public-sans)'],
         mono: ['var(--font-dm-mono)'],
       },
+      fontSize: {
+        sm: '13px',
+        base: '15px',
+      },
       colors: {
         transparent: 'transparent',
         'light-5': 'rgba(255,255,255,0.05)',
@@ -117,6 +121,7 @@ const config: Config = {
         primary: '#00FAFF',
         secondary: '#444444',
         tertiary: '#222222',
+        subtle: '#191919',
         'conv-primary': 'rgba(34, 34, 34, 1)',
         'conv-light': 'rgba(255, 255, 255, 1.0)',
       },

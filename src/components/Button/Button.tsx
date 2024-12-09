@@ -29,9 +29,8 @@ const Button = forwardRef(
     return (
       <button
         ref={ref}
-        className={`${styles.button} ${styles[size]} ${styles[variant]} ${
-          disabled ? styles.disabled : ''
-        } ${className ?? ''} ${hidden ? styles.hidden : ''}`}
+        className={`${styles.button} ${styles[size]} ${styles[variant]} ${disabled ? styles.disabled : ''
+          } ${className ?? ''} ${hidden ? styles.hidden : ''}`}
         {...rest}
       >
         {children}
@@ -39,5 +38,6 @@ const Button = forwardRef(
     )
   },
 )
+Button.displayName = 'Button'
 
 export default Button
