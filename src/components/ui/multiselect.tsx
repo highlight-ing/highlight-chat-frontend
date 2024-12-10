@@ -432,9 +432,9 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
       >
         <div
           className={cn(
-            'min-h-10 rounded-md text-sm',
+            'text-[15px] text-primary outline-none',
             {
-              'cursor-text': !disabled && selected.length !== 0,
+              'text-primary': !disabled && selected.length !== 0,
             },
             className,
           )}
@@ -500,7 +500,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
               }}
               placeholder={hidePlaceholderWhenSelected && selected.length !== 0 ? '' : placeholder}
               className={cn(
-                'placeholder:text-muted-foreground flex-1 bg-transparent outline-none',
+                'flex-1 bg-transparent outline-none placeholder:text-subtle',
                 {
                   'w-full': hidePlaceholderWhenSelected,
                 },

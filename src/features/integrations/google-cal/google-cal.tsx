@@ -222,14 +222,14 @@ function InviteeDropdown(props: InviteeDropdownProps) {
     <div className="space-y-2">
       <MultipleSelector
         commandProps={{
-          label: 'Select frameworks',
+          label: 'Select contacts',
         }}
         value={frameworks.slice(0, 2)}
         defaultOptions={frameworks}
-        placeholder="Select frameworks"
+        placeholder="Select contacts"
         hideClearAllButton
         hidePlaceholderWhenSelected
-        emptyIndicator={<p className="text-center text-sm">No results found</p>}
+        emptyIndicator={<p className="text-center text-sm">No contacts</p>}
       />
     </div>
   )
