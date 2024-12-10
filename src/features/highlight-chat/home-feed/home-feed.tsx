@@ -14,6 +14,7 @@ import { showHistoryAtom, toggleShowHistoryAtom } from '@/atoms/history'
 import { selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { OpenAppButton } from '@/components/buttons/open-app-button'
 import { MeetingIcon } from '@/components/icons'
 import { useStore } from '@/components/providers/store-provider'
 
@@ -167,6 +168,19 @@ function AudioNotesListItem(props: { audioNote: ConversationData }) {
   )
 }
 
+function OpenConversationsButton() {
+  return (
+    <OpenAppButton appId="conversations">
+      <motion.div variants={homeFeedListItemVariants} className="group w-full text-left text-subtle hover:text-primary">
+        <HomeFeedListItemLayout className="flex items-center">
+          <VoiceSquare variant={'Bold'} size={20} />
+          <p>View all conversations</p>
+        </HomeFeedListItemLayout>
+      </motion.div>
+    </OpenAppButton>
+  )
+}
+
 function MeetingNotesTabContent() {
   const { data, isLoading } = useAudioNotes()
 
@@ -187,6 +201,7 @@ function MeetingNotesTabContent() {
           {tenRecentMeetingNotes.map((meetingNote) => (
             <AudioNotesListItem key={meetingNote.id} audioNote={meetingNote} />
           ))}
+          <OpenConversationsButton />
         </HomeFeedListLayout>
       )}
     </AnimatePresence>
@@ -213,6 +228,7 @@ function AudioNotesTabContent() {
           {tenRecentNonMeetingNotes.map((audioNote) => (
             <AudioNotesListItem key={audioNote.id} audioNote={audioNote} />
           ))}
+          <OpenConversationsButton />
         </HomeFeedListLayout>
       )}
     </AnimatePresence>
