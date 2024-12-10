@@ -299,7 +299,7 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
     defaultValues: {
       summary: props.data.summary,
       location: props.data.location,
-      description: props.data.description,
+      description: `${props.data.description}`,
       start: props.data.start ?? new Date().toISOString(),
       end: props.data.end ?? new Date().toISOString(),
       invitees: [],
@@ -309,6 +309,7 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
   async function onSubmit(data: GoogleCalEventFormSchema) {
     createGoogleCalEvent({
       ...data,
+      description: `${props.data.description}\n\nCreated with <a href="https://highlightai.com">Highlight</a>`,
       start: data.start ? new Date(data.start).toISOString() : undefined,
       end: data.end ? new Date(data.end).toISOString() : undefined,
     })

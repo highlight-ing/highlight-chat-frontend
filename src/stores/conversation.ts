@@ -1,4 +1,5 @@
 import { ChatHistoryItem, Message } from '@/types'
+import { useQueryClient } from '@tanstack/react-query'
 import { v4 as uuidv4 } from 'uuid'
 import { StateCreator } from 'zustand'
 

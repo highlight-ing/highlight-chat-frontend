@@ -3,12 +3,12 @@ import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import globalStyles from '@/global.module.scss'
 import { ChatHistoryItem } from '@/types'
-import { trackEvent } from '@/utils/amplitude'
 import variables from '@/variables.module.scss'
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
 import { Add, Clock, MessageText } from 'iconsax-react'
 import { useShallow } from 'zustand/react/shallow'
 
+import { trackEvent } from '@/utils/amplitude'
 import { useOpenConverationsPersistence } from '@/hooks/useOpenConverationsPersistence'
 import { usePromptApp } from '@/hooks/usePromptApp'
 import { useTabHotkeys } from '@/hooks/useTabHotkeys'
@@ -75,22 +75,22 @@ export const NavigationTopBarTab = React.forwardRef<HTMLDivElement, TopTabProps>
       return [
         ...(conversationId !== conversation.id
           ? [
-              {
-                label: 'Open',
-                onClick: () => onOpen(conversation),
-              },
-            ]
+            {
+              label: 'Open',
+              onClick: () => onOpen(conversation),
+            },
+          ]
           : []),
         ...(openConversationMessages[conversation.id]?.length > 0
           ? [
-              {
-                label: 'Reload',
-                onClick: () => {
-                  clearConversationMessages(conversation.id)
-                  trackEvent('HL Chat Tab', { action: 'Reload' })
-                },
+            {
+              label: 'Reload',
+              onClick: () => {
+                clearConversationMessages(conversation.id)
+                trackEvent('HL Chat Tab', { action: 'Reload' })
               },
-            ]
+            },
+          ]
           : []),
         {
           divider: true,
@@ -101,29 +101,29 @@ export const NavigationTopBarTab = React.forwardRef<HTMLDivElement, TopTabProps>
         },
         ...(openConversations.length > 1
           ? [
-              {
-                label: 'Close all others',
-                onClick: () => {
-                  if (conversationId !== conversation.id) {
-                    setConversationId(conversation.id)
-                  }
-                  setOpenConversations([conversation])
-                  clearAllOtherConversationMessages(conversation.id)
-                  trackEvent('HL Chat Tab', { action: 'Close all others' })
-                },
+            {
+              label: 'Close all others',
+              onClick: () => {
+                if (conversationId !== conversation.id) {
+                  setConversationId(conversation.id)
+                }
+                setOpenConversations([conversation])
+                clearAllOtherConversationMessages(conversation.id)
+                trackEvent('HL Chat Tab', { action: 'Close all others' })
               },
-              {
-                label: 'Close all',
-                onClick: () => {
-                  setOpenConversations([])
-                  clearAllConversationMessages()
-                  if (conversationId) {
-                    startNewConversation()
-                  }
-                  trackEvent('HL Chat Tab', { action: 'Close all' })
-                },
+            },
+            {
+              label: 'Close all',
+              onClick: () => {
+                setOpenConversations([])
+                clearAllConversationMessages()
+                if (conversationId) {
+                  startNewConversation()
+                }
+                trackEvent('HL Chat Tab', { action: 'Close all' })
               },
-            ]
+            },
+          ]
           : []),
         {
           divider: true,
@@ -223,6 +223,7 @@ export const NavigationTopBarTab = React.forwardRef<HTMLDivElement, TopTabProps>
     )
   },
 )
+NavigationTopBarTab.displayName = 'NavigationTopBarTab'
 
 type TopBarProps = {
   showHistory: boolean
@@ -273,7 +274,7 @@ export function NavigationTopBar({ showHistory, setShowHistory }: TopBarProps) {
   }
 
   const onSelectChat = async (chat: ChatHistoryItem) => {
-    setConversationId(chat.id)
+    setConversationId(chat?.id)
     trackEvent('HL Chat Tab', { action: 'Select' })
   }
 
@@ -299,7 +300,7 @@ export function NavigationTopBar({ showHistory, setShowHistory }: TopBarProps) {
 
   // Find the current conversation in history
   const currentConversation = useMemo(() => {
-    return history.find((chat) => chat.id === conversationId)
+    return history.find((chat) => chat?.id === conversationId)
   }, [conversationId, history])
 
   return (
@@ -312,10 +313,10 @@ export function NavigationTopBar({ showHistory, setShowHistory }: TopBarProps) {
             wrapperStyle={
               showHistory || !setShowHistory
                 ? {
-                    visibility: 'hidden',
-                    paddingInlineStart: `calc(${variables.chatHistoryWidth} - 36px)`,
-                    transition: 'padding 250ms ease',
-                  }
+                  visibility: 'hidden',
+                  paddingInlineStart: `calc(${variables.chatHistoryWidth} - 36px)`,
+                  transition: 'padding 250ms ease',
+                }
                 : { transition: 'padding 250ms ease' }
             }
           >

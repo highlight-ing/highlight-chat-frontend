@@ -1,11 +1,13 @@
 import * as React from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ChatHistoryItem } from '@/types'
-import { trackEvent } from '@/utils/amplitude'
 import variables from '@/variables.module.scss'
+import { useQueryClient } from '@tanstack/react-query'
 import { Clock, Trash } from 'iconsax-react'
 import { useShallow } from 'zustand/react/shallow'
 
+import { trackEvent } from '@/utils/amplitude'
+import { useHistory } from '@/hooks/history'
 import { useApi } from '@/hooks/useApi'
 import { useChatHistory } from '@/hooks/useChatHistory'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -16,7 +18,7 @@ import { useStore } from '@/components/providers/store-provider'
 import Tooltip from '@/components/Tooltip/Tooltip'
 
 import styles from './history-sidebar.module.scss'
-import { NEW_CONVERSATION_TITLE, useAddNewChat, useHistory, useUpdateConversationTitle } from './hooks'
+import { NEW_CONVERSATION_TITLE, useAddNewChat, useUpdateConversationTitle } from './hooks'
 import { sortArrayByDate } from './utils'
 
 const CONVERSATION_FETCH_DELAY = 2 * 1000
@@ -30,6 +32,8 @@ type HistorySidebarItemProps = {
 }
 
 function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenChat }: HistorySidebarItemProps) {
+  const queryClient = useQueryClient()
+
   const { addOrUpdateOpenConversation, openModal, setConversationId } = useStore(
     useShallow((state) => ({
       setConversationId: state.setConversationId,
@@ -44,12 +48,13 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
     if (typeof onOpenChat === 'function') {
       onOpenChat()
     }
+
     addOrUpdateOpenConversation(chat)
-    setConversationId(chat.id)
+    setConversationId(chat?.id)
 
     // @TODO move to use chat loading hook
     trackEvent('HL Chat Opened', {
-      chatId: chat.id,
+      chatId: chat?.id,
       // messageCount: messages.length,
       source: 'history_item',
     })
@@ -58,7 +63,7 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
   const onDeleteChat = async (chat: ChatHistoryItem) => {
     openModal('delete-chat', chat)
     trackEvent('HL Chat Delete Initiated', {
-      chatId: chat.id,
+      chatId: chat?.id,
       source: 'history',
     })
   }
@@ -70,9 +75,9 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
   }
 
   useEffect(() => {
-    if (chat.id === history?.[0].id && chat.title === NEW_CONVERSATION_TITLE) {
+    if (chat?.id === history?.[0].id && chat.title === NEW_CONVERSATION_TITLE) {
       const timeout = setTimeout(() => {
-        updateConversationTitle(chat.id)
+        updateConversationTitle(chat?.id)
       }, CONVERSATION_FETCH_DELAY)
       return () => clearTimeout(timeout)
     }
@@ -80,14 +85,14 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
 
   return (
     <ContextMenu
-      key={`menu-${chat.id}`}
+      key={`menu-${chat?.id}`}
       items={[
         {
           label: 'Open Chat',
           onClick: () => {
             handleOpenChat(chat)
             trackEvent('HL Chat Opened', {
-              chatId: chat.id,
+              chatId: chat?.id,
               source: 'context_menu',
             })
           },
@@ -99,15 +104,15 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
         },
       ]}
       position={'bottom'}
-      triggerId={`chat-${chat.id}`}
+      triggerId={`chat-${chat?.id}`}
       wrapperStyle={{ position: 'relative', width: '100%' }}
     >
       {isSelecting && (
         <div className={`${styles.selector} ${isSelected ? styles.selected : ''}`} onClick={handleSelectChat} />
       )}
       <div
-        key={chat.id}
-        id={`chat-${chat.id}`}
+        key={chat?.id}
+        id={`chat-${chat?.id}`}
         className={`${styles.chat} ${isSelecting ? styles.selecting : ''}`}
         onClick={() => (isSelecting ? handleSelectChat() : handleOpenChat(chat))}
       >
@@ -185,7 +190,7 @@ export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarPr
 
   // Handle fetching history, and detecting new chats to fetch
   useEffect(() => {
-    if (conversationId && !history.some((chat) => chat.id === conversationId)) {
+    if (conversationId && !history.some((chat) => chat?.id === conversationId)) {
       const timeout = setTimeout(() => {
         addNewChat()
       }, CONVERSATION_FETCH_DELAY)
@@ -231,12 +236,12 @@ export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarPr
                 </div>
                 {today.map((chat) => (
                   <HistorySidebarItem
-                    key={chat.id}
+                    key={chat?.id}
                     chat={chat}
                     onOpenChat={onOpenChat}
                     isSelecting={isSelecting}
-                    isSelected={selectedHistoryItems.includes(chat.id)}
-                    onSelect={() => onSelectChat(chat.id)}
+                    isSelected={selectedHistoryItems.includes(chat?.id)}
+                    onSelect={() => onSelectChat(chat?.id)}
                   />
                 ))}
               </>
@@ -251,12 +256,12 @@ export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarPr
                 </div>
                 {lastWeek.map((chat) => (
                   <HistorySidebarItem
-                    key={chat.id}
+                    key={chat?.id}
                     chat={chat}
                     onOpenChat={onOpenChat}
                     isSelecting={isSelecting}
-                    isSelected={selectedHistoryItems.includes(chat.id)}
-                    onSelect={() => onSelectChat(chat.id)}
+                    isSelected={selectedHistoryItems.includes(chat?.id)}
+                    onSelect={() => onSelectChat(chat?.id)}
                   />
                 ))}
               </>
@@ -271,12 +276,12 @@ export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarPr
                 </div>
                 {lastMonth.map((chat) => (
                   <HistorySidebarItem
-                    key={chat.id}
+                    key={chat?.id}
                     chat={chat}
                     onOpenChat={onOpenChat}
                     isSelecting={isSelecting}
-                    isSelected={selectedHistoryItems.includes(chat.id)}
-                    onSelect={() => onSelectChat(chat.id)}
+                    isSelected={selectedHistoryItems.includes(chat?.id)}
+                    onSelect={() => onSelectChat(chat?.id)}
                   />
                 ))}
               </>
@@ -291,12 +296,12 @@ export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarPr
                 </div>
                 {older.map((chat) => (
                   <HistorySidebarItem
-                    key={chat.id}
+                    key={chat?.id}
                     chat={chat}
                     onOpenChat={onOpenChat}
                     isSelecting={isSelecting}
-                    isSelected={selectedHistoryItems.includes(chat.id)}
-                    onSelect={() => onSelectChat(chat.id)}
+                    isSelected={selectedHistoryItems.includes(chat?.id)}
+                    onSelect={() => onSelectChat(chat?.id)}
                   />
                 ))}
               </>

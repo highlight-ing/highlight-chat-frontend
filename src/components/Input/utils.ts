@@ -1,4 +1,4 @@
-import { differenceInMinutes, format, formatDuration, intervalToDuration, isThisHour, isToday } from 'date-fns'
+import { differenceInMinutes, format, isThisHour, isToday } from 'date-fns'
 
 export function formatConversationEndDate(date: Date) {
   if (isThisHour(date)) {
@@ -13,10 +13,4 @@ export function formatConversationEndDate(date: Date) {
   }
 
   return format(date, 'MMM d, yyyy - H:mm a')
-}
-
-export function formatConversationDuration(conversationDurationInMilliseconds: number) {
-  const conversationDuration = intervalToDuration({ start: 0, end: conversationDurationInMilliseconds })
-  const formattedConversationDuration = formatDuration(conversationDuration, { format: ['hours', 'minutes'] })
-  return formattedConversationDuration
 }
