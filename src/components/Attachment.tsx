@@ -56,8 +56,7 @@ export const Attachment = ({
 }: AttachmentProps) => {
   const appName = (props as WindowContextAttachmentProps).appName
   const [isImageLoaded, setIsImageLoaded] = useState(false)
-  const conversationIdState = useStore((state) => state.conversationId)
-  const conversationId = version === 'v4' ? conversationIdState : undefined
+  const conversationId = version === 'v4' ? useStore((state) => state.conversationId) : undefined
   const isConversationLoading = useStore((state) => state.isConversationLoading)
   const inputIsDisabled = useStore((state) => state.inputIsDisabled)
   const [appIconUrl, setAppIconUrl] = useState<string | null>(null)
@@ -194,8 +193,9 @@ export const Attachment = ({
           </button>
         ) : (
           <div
-            className={`flex h-[48px] items-center justify-center rounded-[16px] border border-light-10 bg-secondary ${type === 'pdf' || type === 'text_file' ? 'max-w-40' : ''
-              } ${type !== 'image' ? 'min-w-12' : 'min-w-[52px]'} w-fit overflow-hidden`}
+            className={`flex h-[48px] items-center justify-center rounded-[16px] border border-light-10 bg-secondary ${
+              type === 'pdf' || type === 'text_file' ? 'max-w-40' : ''
+            } ${type !== 'image' ? 'min-w-12' : 'min-w-[52px]'} w-fit overflow-hidden`}
           >
             {renderAttachmentContent()}
           </div>

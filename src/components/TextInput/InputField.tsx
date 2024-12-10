@@ -75,6 +75,5 @@ const InputField: React.FC<InputFieldProps> = forwardRef<HTMLInputElement, Input
     )
   },
 )
-InputField.displayName = 'InputField'
 
 export default InputField

@@ -1,8 +1,5 @@
-'use client'
-
+import { ConversationData } from '@highlight-ai/app-runtime'
 import { atom } from 'jotai'
-
-import { ConversationData } from '@/types/conversations'
 
 export const transcriptOpenAtom = atom(false)
 

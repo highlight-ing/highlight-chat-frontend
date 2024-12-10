@@ -1,10 +1,24 @@
 import { ChatHistoryItem } from '@/types'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 
 import { useChatHistory } from '@/hooks/useChatHistory'
 
 const RETRY_ATTEMPTS = 4
 export const NEW_CONVERSATION_TITLE = 'New Conversation'
+
+export function useHistory() {
+  const { refreshChatHistory } = useChatHistory()
+
+  return useQuery({
+    queryKey: ['history'],
+    queryFn: async () => {
+      const history = await refreshChatHistory()
+
+      return history ?? []
+    },
+    staleTime: Infinity,
+  })
+}
 
 export function useUpdateConversationTitle() {
   const { refreshChatItem } = useChatHistory()

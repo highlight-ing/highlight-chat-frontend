@@ -6,7 +6,6 @@ import { useAtom, useSetAtom } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
 import { cn } from '@/lib/utils'
-import { showHistoryAtom } from '@/atoms/history'
 import { isOnHomeAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
 import { Input } from '@/components/Input/Input'
@@ -28,7 +27,7 @@ import { NavigationTopBar } from '@/features/nav-header/top-bar/top-bar'
 import { TranscriptViewer } from '@/features/transcript-viewer/transcript-viewer'
 
 export default function Home() {
-  const [showHistory, setShowHistory] = useAtom(showHistoryAtom)
+  const [showHistory, setShowHistory] = React.useState(false)
   const [transcriptOpen, setTransactionOpen] = useAtom(transcriptOpenAtom)
   const setIsOnHome = useSetAtom(isOnHomeAtom)
   const { inputIsDisabled, promptApp, isConversationLoading } = useStore(
@@ -62,10 +61,10 @@ export default function Home() {
       <div
         className={cn(
           `${styles.contents} ${showHistory ? styles.partial : styles.full} ${messages.length > 0 || inputIsDisabled || !!promptApp ? styles.justifyEnd : ''}`,
-          'grid grid-cols-3 overflow-x-hidden transition duration-700',
-          isChatting && styles.isChatting,
+          'grid grid-cols-3 transition duration-700',
         )}
       >
+        <TranscriptViewer />
         <div
           className={cn(
             'col-span-3 flex w-full flex-col items-center justify-end transition delay-100',
@@ -80,7 +79,6 @@ export default function Home() {
           {(isChatting || promptApp) && <Input isActiveChat={true} />}
           <IntercomChat />
         </div>
-        <TranscriptViewer />
       </div>
     </div>
   )

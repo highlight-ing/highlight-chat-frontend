@@ -1,8 +1,8 @@
 import { ModalObjectProps } from '@/types'
-
-import { Prompt } from '@/types/supabase-helpers'
 import { trackEvent } from '@/utils/amplitude'
 import { addPromptToUser } from '@/utils/prompts'
+
+import { Prompt } from '@/types/supabase-helpers'
 import useAuth from '@/hooks/useAuth'
 import usePromptApps from '@/hooks/usePromptApps'
 import ConfirmationModal from '@/components/modals/ConfirmationModal'
@@ -61,8 +61,8 @@ export default function PinPromptModal({ id, context }: ModalObjectProps) {
       }}
     >
       <div>
-        By pinning this shortcut, you&apos;ll have quick access to it whenever you summon Highlight. Pinned shortcuts
-        appear prominently in your assistant, making them easily accessible for frequent use.
+        By pinning this shortcut, you'll have quick access to it whenever you summon Highlight. Pinned shortcuts appear
+        prominently in your assistant, making them easily accessible for frequent use.
       </div>
     </ConfirmationModal>
   )

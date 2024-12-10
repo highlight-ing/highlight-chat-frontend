@@ -139,6 +139,17 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   // Use to handle the auto closing when the window is focused
   // and to prevent toggling the input focus when pressing a dropdown
   useEffect(() => {
+    let windowFocusTimeout: NodeJS.Timeout | null
+
+    const onWindowFocus = () => {
+      if (!isActiveChat) {
+        windowFocusTimeout = setTimeout(() => {
+          inputRef.current?.focus()
+          setIsInputFocused(true)
+        }, 100)
+      }
+    }
+
     const onInputFocus = () => {
       if (inputBlurTimeoutRef.current) {
         clearTimeout(inputBlurTimeoutRef.current)
@@ -152,6 +163,10 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
       }, 100)
     }
 
+    const input = document.getElementById('textarea-input')
+    input?.focus()
+    setIsInputFocused(true)
+
     const inputElement = inputRef.current
 
     if (inputElement) {
@@ -159,15 +174,20 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
       inputElement.addEventListener('blur', onInputBlur)
     }
 
+    window.addEventListener('focus', onWindowFocus)
+
     return () => {
+      window.removeEventListener('focus', onWindowFocus)
+
       if (inputElement) {
         inputElement.removeEventListener('focus', onInputFocus)
         inputElement.removeEventListener('blur', onInputBlur)
       }
 
+      if (windowFocusTimeout) clearTimeout(windowFocusTimeout)
       if (inputBlurTimeoutRef.current) clearTimeout(inputBlurTimeoutRef.current)
     }
-  }, [inputRef.current, inputBlurTimeoutRef])
+  }, [inputRef, inputBlurTimeoutRef])
 
   useEffect(() => {
     function handleEsc(e: KeyboardEvent) {
@@ -314,6 +334,47 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
             </AnimatePresence>
           </div>
         </motion.div>
+
+        {!isActiveChat && (
+          <div className="flex w-full flex-col items-center space-y-16">
+            <div className="flex items-center gap-4">
+              <OpenAppButton
+                appId="prompts"
+                disabled={isInputFocused}
+                className={cn(
+                  'flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary opacity-0 transition hover:bg-hover',
+                  {
+                    'opacity-100': !isInputFocused,
+                  },
+                )}
+              >
+                <span>Browse Shortcuts</span>
+                <BoxAdd size={20} variant="Bold" className="opacity-80" />
+              </OpenAppButton>
+              <CreateShortcutButton
+                disabled={isInputFocused}
+                className={cn(
+                  'flex items-center gap-2 rounded-xl border border-tertiary px-3 py-1.5 text-sm font-medium text-tertiary opacity-0 transition hover:bg-hover',
+                  {
+                    'opacity-100': !isInputFocused,
+                  },
+                )}
+              >
+                <span>Create Shortcut</span>
+                <AddCircle size={20} variant="Bold" className="opacity-80" />
+              </CreateShortcutButton>
+            </div>
+
+            <Stacker className={cn('w-full transition-transform', isInputFocused && '-translate-y-16')}>
+              <StackerItem index={0}>
+                <LatestConversation focusInput={focusInput} />
+              </StackerItem>
+              <StackerItem index={1}>
+                <ViewChangelogBanner />
+              </StackerItem>
+            </Stacker>
+          </div>
+        )}
       </div>
     </MotionConfig>
   )

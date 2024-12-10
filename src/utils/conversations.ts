@@ -1,6 +1,4 @@
-import { formatDuration, intervalToDuration } from 'date-fns'
-
-import { ConversationData } from '@/types/conversations'
+import { ConversationData } from '@highlight-ai/app-runtime'
 
 import { getTimeAgo, getWordCountFormatted } from './string'
 
@@ -67,15 +65,4 @@ export function formatTitle(originalTitle: string | undefined) {
   }
 
   return originalTitle
-}
-
-export function formatConversationDuration(conversation?: ConversationData) {
-  if (!conversation) return undefined
-
-  const durationInMilliseconds = conversation?.endedAt.getTime() - conversation?.startedAt.getTime()
-  const duration = intervalToDuration({ start: 0, end: durationInMilliseconds })
-  const formattedDuration = formatDuration(duration, { format: ['hours', 'minutes'] })
-  const replaceHoursAndMinutes = formattedDuration.replace('hour', 'hr').replace('minute', 'min')
-
-  return replaceHoursAndMinutes
 }

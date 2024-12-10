@@ -189,11 +189,8 @@ function PromptListItem({ prompt }: { prompt: PromptWithTags }) {
         <div className="flex items-center justify-center gap-1 rounded-md border border-[#222222] px-2 py-0.5">
           <div className="text-[13px] font-medium leading-tight text-[#3a3a3a]">{prompt.public_use_number} Uses</div>
         </div>
-        {prompt.added_prompt_tags?.map((tag, index) => (
-          <div
-            key={index}
-            className="flex items-center justify-center gap-1 rounded-md border border-[#222222] px-2 py-0.5"
-          >
+        {prompt.added_prompt_tags?.map((tag) => (
+          <div className="flex items-center justify-center gap-1 rounded-md border border-[#222222] px-2 py-0.5">
             <div className="text-[13px] font-medium leading-tight text-[#3a3a3a]">{tag.tags?.tag}</div>
           </div>
         ))}

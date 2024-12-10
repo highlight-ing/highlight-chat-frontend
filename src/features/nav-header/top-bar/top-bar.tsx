@@ -223,7 +223,6 @@ export const NavigationTopBarTab = React.forwardRef<HTMLDivElement, TopTabProps>
     )
   },
 )
-NavigationTopBarTab.displayName = 'NavigationTopBarTab'
 
 type TopBarProps = {
   showHistory: boolean

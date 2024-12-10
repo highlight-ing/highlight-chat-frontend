@@ -1,5 +1,4 @@
 import { ChatHistoryItem } from '@/types'
-import { useQueryClient } from '@tanstack/react-query'
 import equal from 'fast-deep-equal'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -15,7 +14,6 @@ export const useChatHistory = (): {
   refreshChatHistory: () => Promise<ChatHistoryItem[]>
   refreshChatItem: (conversationId: string, addOpenConversation?: boolean) => Promise<ChatHistoryItem | null>
 } => {
-  const queryClient = useQueryClient()
   const { get } = useApi()
   const { history, setHistory, addOrUpdateOpenConversation, openConversations } = useStore(
     useShallow((state) => ({
@@ -38,7 +36,6 @@ export const useChatHistory = (): {
       for (const chat of data.conversations) {
         if (openConversations.find((conv) => conv.id === chat?.id)) {
           addOrUpdateOpenConversation(chat)
-          await queryClient.invalidateQueries({ queryKey: ['recently-updated-history'] })
         }
       }
       return data.conversations
@@ -80,7 +77,6 @@ export const useChatHistory = (): {
       setHistory(newHistory)
       if (openConversations.some((chat) => chat?.id === conversationId) || addOpenConversation) {
         addOrUpdateOpenConversation(data.conversation)
-        await queryClient.invalidateQueries({ queryKey: ['recently-updated-history'] })
       }
       return data.conversation
     } catch (error) {

@@ -12,7 +12,8 @@
   flex: 1;
   position: relative;
   overflow-y: auto;
-  height: 100%;
+  margin-top: $topbar-height;
+  height: calc(100% - $topbar-height);
 
   &.justifyEnd {
     justify-content: flex-end;
@@ -24,11 +25,6 @@
 
   &.partial {
     animation: history-show 250ms forwards;
-  }
-
-  &.isChatting {
-    margin-top: $topbar-height;
-    height: calc(100% - $topbar-height);
   }
 }
 

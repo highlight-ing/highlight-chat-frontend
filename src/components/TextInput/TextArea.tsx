@@ -62,6 +62,5 @@ const TextArea: React.FC<TextAreaProps> = forwardRef<HTMLTextAreaElement, TextAr
     )
   },
 )
-TextArea.displayName = 'TextArea'
 
 export default TextArea

@@ -5,13 +5,12 @@ import { VoiceSquare } from 'iconsax-react'
 import { useSetAtom } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
-import { formatConversationDuration } from '@/utils/conversations'
 import { selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import { useStore } from '@/components/providers/store-provider'
 
 import { OpenAppButton } from '../buttons/open-app-button'
 import Tooltip from '../Tooltip/Tooltip'
-import { formatConversationEndDate } from './utils'
+import { formatConversationDuration, formatConversationEndDate } from './utils'
 
 function NoAudioNote() {
   return (
@@ -83,7 +82,9 @@ export function LatestConversation(props: { focusInput: () => void }) {
 
     const conversationWordCount = mostRecentConversation?.transcript.split(' ').length
 
-    const formattedConversationDuration = formatConversationDuration(mostRecentConversation)
+    const conversationDurationInMilliseconds =
+      mostRecentConversation?.endedAt.getTime() - mostRecentConversation?.startedAt.getTime()
+    const formattedConversationDuration = formatConversationDuration(conversationDurationInMilliseconds)
 
     const formattedConversationEndDate = formatConversationEndDate(mostRecentConversation.endedAt)
 
