@@ -219,6 +219,30 @@ function AudioNotesTabContent() {
   )
 }
 
+function ToggleChatHistroyButton() {
+  const historySidebarIsOpen = useAtomValue(showHistoryAtom)
+  const toggleShowHistory = useSetAtom(toggleShowHistoryAtom)
+
+  function handleShowMoreClick() {
+    toggleShowHistory()
+  }
+
+  return (
+    <motion.button
+      variants={homeFeedListItemVariants}
+      type="button"
+      aria-label="Toggle history sidebar"
+      onClick={handleShowMoreClick}
+      className="group w-full text-left text-subtle hover:text-primary"
+    >
+      <HomeFeedListItemLayout className="flex items-center">
+        <Clock variant={'Bold'} size={20} />
+        <p>{`${historySidebarIsOpen ? 'Hide' : 'View full'} chat history`}</p>
+      </HomeFeedListItemLayout>
+    </motion.button>
+  )
+}
+
 function ChatListItem(props: { chat: ChatHistoryItem }) {
   const addOrUpdateOpenConversation = useStore((store) => store.addOrUpdateOpenConversation)
   const setConversationId = useStore((store) => store.setConversationId)
@@ -246,14 +270,8 @@ function ChatListItem(props: { chat: ChatHistoryItem }) {
 
 function ChatsTabContent() {
   const { data, isLoading } = useRecentlyUpdatedHistory()
-  const historySidebarIsOpen = useAtomValue(showHistoryAtom)
-  const toggleShowHistory = useSetAtom(toggleShowHistoryAtom)
 
   const tenRecentChats = React.useMemo(() => data?.slice(0, FEED_LENGTH_LIMIT) ?? [], [data])
-
-  function handleShowMoreClick() {
-    toggleShowHistory()
-  }
 
   if (!isLoading && tenRecentChats.length === 0) {
     return <EmptyList label="No chats" />
@@ -268,18 +286,7 @@ function ChatsTabContent() {
           {tenRecentChats.map((chat) => (
             <ChatListItem key={chat.id} chat={chat} />
           ))}
-          <motion.button
-            variants={homeFeedListItemVariants}
-            type="button"
-            aria-label="Toggle history sidebar"
-            onClick={handleShowMoreClick}
-            className="group w-full text-left text-subtle hover:text-primary"
-          >
-            <HomeFeedListItemLayout className="flex items-center">
-              <Clock variant={'Bold'} size={20} />
-              <p>{`${historySidebarIsOpen ? 'Hide' : 'View full'} chat history`}</p>
-            </HomeFeedListItemLayout>
-          </motion.button>
+          <ToggleChatHistroyButton />
         </HomeFeedListLayout>
       )}
     </AnimatePresence>
@@ -323,7 +330,14 @@ function RecentActivityTabContent() {
 
   return (
     <AnimatePresence initial={false}>
-      {isLoading ? <LoadingList /> : <HomeFeedListLayout>{renderRecentActions}</HomeFeedListLayout>}
+      {isLoading ? (
+        <LoadingList />
+      ) : (
+        <HomeFeedListLayout>
+          {renderRecentActions}
+          <ToggleChatHistroyButton />
+        </HomeFeedListLayout>
+      )}
     </AnimatePresence>
   )
 }
