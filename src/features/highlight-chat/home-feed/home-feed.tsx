@@ -142,6 +142,12 @@ function AudioNotesListItem(props: { audioNote: ConversationData }) {
   function handleClick() {
     setSelectedAudioNote(props.audioNote)
     setTranscriptOpen(true)
+
+    trackEvent('Audio Note Previewed', {
+      audioNoteId: props.audioNote.id,
+      meetingNote: !!props.audioNote?.meeting,
+      source: 'home_feed',
+    })
   }
 
   return (
@@ -225,7 +231,7 @@ function ChatListItem(props: { chat: ChatHistoryItem }) {
 
     trackEvent('HL Chat Opened', {
       chatId: props.chat.id,
-      source: 'home_feed_recent_chat',
+      source: 'home_feed',
     })
   }
 
