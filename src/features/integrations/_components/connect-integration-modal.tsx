@@ -16,8 +16,8 @@ export function ConnectIntegrationModal({ id, context }: ModalObjectProps) {
     <Modal id={id} size="large">
       <div>
         <p>
-          It looks like you don't have a connection to {getIntegrationLanguage(type)} yet. Would you like to connect
-          your account?
+          It looks like you don&apos;t have a connection to {getIntegrationLanguage(type)} yet. Would you like to
+          connect your account?
         </p>
       </div>
     </Modal>

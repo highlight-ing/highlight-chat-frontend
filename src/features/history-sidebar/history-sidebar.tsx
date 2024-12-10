@@ -2,10 +2,12 @@ import * as React from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ChatHistoryItem } from '@/types'
 import variables from '@/variables.module.scss'
+import { useQueryClient } from '@tanstack/react-query'
 import { Clock, Trash } from 'iconsax-react'
 import { useShallow } from 'zustand/react/shallow'
 
 import { trackEvent } from '@/utils/amplitude'
+import { useHistory } from '@/hooks/history'
 import { useApi } from '@/hooks/useApi'
 import { useChatHistory } from '@/hooks/useChatHistory'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -16,7 +18,7 @@ import { useStore } from '@/components/providers/store-provider'
 import Tooltip from '@/components/Tooltip/Tooltip'
 
 import styles from './history-sidebar.module.scss'
-import { NEW_CONVERSATION_TITLE, useAddNewChat, useHistory, useUpdateConversationTitle } from './hooks'
+import { NEW_CONVERSATION_TITLE, useAddNewChat, useUpdateConversationTitle } from './hooks'
 import { sortArrayByDate } from './utils'
 
 const CONVERSATION_FETCH_DELAY = 2 * 1000
@@ -30,6 +32,8 @@ type HistorySidebarItemProps = {
 }
 
 function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenChat }: HistorySidebarItemProps) {
+  const queryClient = useQueryClient()
+
   const { addOrUpdateOpenConversation, openModal, setConversationId } = useStore(
     useShallow((state) => ({
       setConversationId: state.setConversationId,
@@ -44,6 +48,7 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
     if (typeof onOpenChat === 'function') {
       onOpenChat()
     }
+
     addOrUpdateOpenConversation(chat)
     setConversationId(chat?.id)
 
