@@ -19,7 +19,6 @@ import {
   FormSelectTrigger,
   FormTextarea,
 } from '@/components/ui/form'
-import { Label } from '@/components/ui/label'
 import MultipleSelector, { Option } from '@/components/ui/multiselect'
 import { Popover, PopoverContent } from '@/components/ui/popover'
 import { Select, SelectContent, SelectItem, SelectValue } from '@/components/ui/select'
@@ -147,6 +146,8 @@ type InviteeDropdownProps = {
 
 function InviteeDropdown(props: InviteeDropdownProps) {
   const { data: contacts } = useFetchGoogleCalContacts()
+
+  console.log(contacts)
 
   const frameworks: Option[] = [
     {
