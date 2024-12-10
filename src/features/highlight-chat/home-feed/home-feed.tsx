@@ -14,6 +14,7 @@ import { showHistoryAtom, toggleShowHistoryAtom } from '@/atoms/history'
 import { selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { OpenAppButton } from '@/components/buttons/open-app-button'
 import { MeetingIcon } from '@/components/icons'
 import { useStore } from '@/components/providers/store-provider'
 
@@ -167,6 +168,19 @@ function AudioNotesListItem(props: { audioNote: ConversationData }) {
   )
 }
 
+function OpenConversationsButton() {
+  return (
+    <OpenAppButton appId="conversations">
+      <motion.div variants={homeFeedListItemVariants} className="group w-full text-left text-subtle hover:text-primary">
+        <HomeFeedListItemLayout className="flex items-center">
+          <VoiceSquare variant={'Bold'} size={20} />
+          <p>View all conversations</p>
+        </HomeFeedListItemLayout>
+      </motion.div>
+    </OpenAppButton>
+  )
+}
+
 function MeetingNotesTabContent() {
   const { data, isLoading } = useAudioNotes()
 
@@ -187,6 +201,7 @@ function MeetingNotesTabContent() {
           {tenRecentMeetingNotes.map((meetingNote) => (
             <AudioNotesListItem key={meetingNote.id} audioNote={meetingNote} />
           ))}
+          <OpenConversationsButton />
         </HomeFeedListLayout>
       )}
     </AnimatePresence>
@@ -213,9 +228,34 @@ function AudioNotesTabContent() {
           {tenRecentNonMeetingNotes.map((audioNote) => (
             <AudioNotesListItem key={audioNote.id} audioNote={audioNote} />
           ))}
+          <OpenConversationsButton />
         </HomeFeedListLayout>
       )}
     </AnimatePresence>
+  )
+}
+
+function ToggleChatHistroyButton() {
+  const historySidebarIsOpen = useAtomValue(showHistoryAtom)
+  const toggleShowHistory = useSetAtom(toggleShowHistoryAtom)
+
+  function handleShowMoreClick() {
+    toggleShowHistory()
+  }
+
+  return (
+    <motion.button
+      variants={homeFeedListItemVariants}
+      type="button"
+      aria-label="Toggle history sidebar"
+      onClick={handleShowMoreClick}
+      className="group w-full text-left text-subtle hover:text-primary"
+    >
+      <HomeFeedListItemLayout className="flex items-center">
+        <Clock variant={'Bold'} size={20} />
+        <p>{`${historySidebarIsOpen ? 'Hide' : 'View full'} chat history`}</p>
+      </HomeFeedListItemLayout>
+    </motion.button>
   )
 }
 
@@ -246,14 +286,8 @@ function ChatListItem(props: { chat: ChatHistoryItem }) {
 
 function ChatsTabContent() {
   const { data, isLoading } = useRecentlyUpdatedHistory()
-  const historySidebarIsOpen = useAtomValue(showHistoryAtom)
-  const toggleShowHistory = useSetAtom(toggleShowHistoryAtom)
 
   const tenRecentChats = React.useMemo(() => data?.slice(0, FEED_LENGTH_LIMIT) ?? [], [data])
-
-  function handleShowMoreClick() {
-    toggleShowHistory()
-  }
 
   if (!isLoading && tenRecentChats.length === 0) {
     return <EmptyList label="No chats" />
@@ -268,18 +302,7 @@ function ChatsTabContent() {
           {tenRecentChats.map((chat) => (
             <ChatListItem key={chat.id} chat={chat} />
           ))}
-          <motion.button
-            variants={homeFeedListItemVariants}
-            type="button"
-            aria-label="Toggle history sidebar"
-            onClick={handleShowMoreClick}
-            className="group w-full text-left text-subtle hover:text-primary"
-          >
-            <HomeFeedListItemLayout className="flex items-center">
-              <Clock variant={'Bold'} size={20} />
-              <p>{`${historySidebarIsOpen ? 'Hide' : 'View full'} chat history`}</p>
-            </HomeFeedListItemLayout>
-          </motion.button>
+          <ToggleChatHistroyButton />
         </HomeFeedListLayout>
       )}
     </AnimatePresence>
@@ -323,7 +346,14 @@ function RecentActivityTabContent() {
 
   return (
     <AnimatePresence initial={false}>
-      {isLoading ? <LoadingList /> : <HomeFeedListLayout>{renderRecentActions}</HomeFeedListLayout>}
+      {isLoading ? (
+        <LoadingList />
+      ) : (
+        <HomeFeedListLayout>
+          {renderRecentActions}
+          <ToggleChatHistroyButton />
+        </HomeFeedListLayout>
+      )}
     </AnimatePresence>
   )
 }
