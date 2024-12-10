@@ -27,9 +27,7 @@ const homeFeedListItemVariants: Variants = {
   visible: { opacity: 1, y: 0, transition: { type: 'spring', bounce: 0, duration: 0.4 } },
 }
 
-type HomeFeedListItemLayoutProps = React.ComponentProps<'div'> & {
-  children: React.ReactNode
-}
+type HomeFeedListItemLayoutProps = React.ComponentPropsWithoutRef<'div'>
 
 function HomeFeedListItemLayout({ className, children, ...props }: HomeFeedListItemLayoutProps) {
   return (
@@ -181,7 +179,7 @@ function MeetingNotesTabContent() {
   }
 
   return (
-    <AnimatePresence mode="popLayout" initial={false}>
+    <AnimatePresence initial={false}>
       {isLoading ? (
         <LoadingList />
       ) : (
@@ -207,7 +205,7 @@ function AudioNotesTabContent() {
   }
 
   return (
-    <AnimatePresence mode="popLayout" initial={false}>
+    <AnimatePresence initial={false}>
       {isLoading ? (
         <LoadingList />
       ) : (
@@ -262,7 +260,7 @@ function ChatsTabContent() {
   }
 
   return (
-    <AnimatePresence mode="popLayout" initial={false}>
+    <AnimatePresence initial={false}>
       {isLoading ? (
         <LoadingList />
       ) : (
@@ -324,7 +322,7 @@ function RecentActivityTabContent() {
   }
 
   return (
-    <AnimatePresence mode="popLayout" initial={false}>
+    <AnimatePresence initial={false}>
       {isLoading ? <LoadingList /> : <HomeFeedListLayout>{renderRecentActions}</HomeFeedListLayout>}
     </AnimatePresence>
   )
