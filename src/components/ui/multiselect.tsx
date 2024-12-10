@@ -423,8 +423,13 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
           handleKeyDown(e)
           commandProps?.onKeyDown?.(e)
         }}
+        onClick={() => {
+          if (disabled) return
+          inputRef?.current?.focus()
+        }}
         className={cn(
-          'group-has-[label]:pb-2 group-has-[label]:pt-7 group-has-[label]:leading-snug relative flex w-full overflow-visible rounded-2xl border border-light-10 bg-secondary px-3 py-2 text-[15px] text-primary outline-none transition-[padding] hover:border-light-20 disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:border-light-20 data-[state=open]:bg-tertiary data-[placeholder]:text-subtle [&>span]:line-clamp-1',
+          'group-has-[label]:pb-2.5 group-has-[label]:pt-7 group-has-[label]:leading-snug relative flex w-full cursor-pointer overflow-visible rounded-2xl border border-light-10 bg-secondary px-3 py-2 text-[15px] text-primary outline-none transition-[padding] hover:border-light-20 disabled:cursor-not-allowed disabled:opacity-50 data-[placeholder]:text-subtle [&>span]:line-clamp-1',
+          open && 'border-light-20 bg-tertiary',
           commandProps?.className,
         )}
         shouldFilter={commandProps?.shouldFilter !== undefined ? commandProps.shouldFilter : !onSearch} // When onSearch is provided, we don't want to filter the options. You can still override it.
@@ -438,10 +443,6 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
             },
             className,
           )}
-          onClick={() => {
-            if (disabled) return
-            inputRef?.current?.focus()
-          }}
         >
           <div className="relative flex flex-wrap gap-1">
             {selected.map((option) => {
@@ -453,6 +454,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                     'data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground',
                     badgeClassName,
                   )}
+                  onClick={(e) => e.stopPropagation()}
                   data-fixed={option.fixed}
                   data-disabled={disabled || undefined}
                 >
@@ -473,7 +475,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                     }}
                     onClick={() => handleUnselect(option)}
                   >
-                    <X className="text-muted-foreground hover:text-foreground h-3 w-3" />
+                    <X className="size-3.5 text-subtle" />
                   </button>
                 </Badge>
               )
@@ -519,7 +521,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                   disabled ||
                   selected.length < 1 ||
                   selected.filter((s) => s.fixed).length === selected.length) &&
-                  'hidden',
+                'hidden',
               )}
             >
               <X />
@@ -529,7 +531,10 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
         <div className="relative">
           {open && (
             <CommandList
-              className="bg-popover text-popover-foreground absolute top-1 z-10 w-full rounded-md border shadow-md outline-none animate-in"
+              className={cn(
+                'absolute top-1 max-h-[270px] w-full overflow-y-visible',
+                open ? 'animate-in fade-in-0 zoom-in-95' : 'animate-out fade-out-0 zoom-out-95',
+              )}
               onMouseLeave={() => {
                 setOnScrollbar(false)
               }}

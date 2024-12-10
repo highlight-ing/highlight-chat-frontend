@@ -9,6 +9,7 @@ import { useStore } from '@/components/providers/store-provider'
 import { Stacker, StackerItem } from '@/components/stacker'
 
 import { ViewChangelogBanner } from '@/features/changelog/view-changelog-banner'
+import { CreateGoogleCalEvent } from '@/features/integrations/google-cal/google-cal'
 
 import { HomeFeed } from '../home-feed/home-feed'
 
@@ -63,12 +64,15 @@ export function ChatHome({ isShowing }: { isShowing: boolean }) {
       <div className="space-y-12">
         <div className="space-y-6">
           <InputHeading />
+
           <Stacker>
             <StackerItem index={0}>{isVisible && <Input isActiveChat={false} />}</StackerItem>
             <StackerItem index={1}>
               <ViewChangelogBanner />
             </StackerItem>
           </Stacker>
+
+          <CreateGoogleCalEvent summary="Test" />
         </div>
         <HomeFeed />
       </div>

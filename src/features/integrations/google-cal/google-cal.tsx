@@ -129,7 +129,7 @@ function TimeSelectDropdown(props: DatePickerAndTimeDropdownProps) {
       <FormSelectTrigger value={timeValue} className="">
         {isCustomTimeValue ? timeValue : timeValue ? <SelectValue /> : <span>Select a time</span>}
       </FormSelectTrigger>
-      <SelectContent className="w-36" sideOffset={4}>
+      <SelectContent sideOffset={4}>
         {timeOptions.map((time) => (
           <SelectItem key={time} value={time}>
             {formatTimeForDisplay(time)}
@@ -219,19 +219,16 @@ function InviteeDropdown(props: InviteeDropdownProps) {
   ]
 
   return (
-    <div className="space-y-2">
-      <MultipleSelector
-        commandProps={{
-          label: 'Select contacts',
-        }}
-        value={frameworks.slice(0, 2)}
-        defaultOptions={frameworks}
-        placeholder="Select contacts"
-        hideClearAllButton
-        hidePlaceholderWhenSelected
-        emptyIndicator={<p className="text-center text-sm">No contacts</p>}
-      />
-    </div>
+    <MultipleSelector
+      commandProps={{
+        label: 'Add quests',
+      }}
+      value={frameworks.slice(0, 2)}
+      defaultOptions={frameworks}
+      placeholder="Add quests"
+      hideClearAllButton
+      emptyIndicator={<p className="text-center text-sm">No quests</p>}
+    />
   )
 }
 
