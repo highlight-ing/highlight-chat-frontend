@@ -3,7 +3,7 @@
 import React from 'react'
 import { ChatHistoryItem } from '@/types'
 import { AnimatePresence, motion, Variants } from 'framer-motion'
-import { Clock, MessageText, VoiceSquare } from 'iconsax-react'
+import { Clock, Eye, EyeSlash, MessageText, VoiceSquare } from 'iconsax-react'
 import { useAtomValue, useSetAtom } from 'jotai'
 
 import { ConversationData } from '@/types/conversations'
@@ -14,10 +14,13 @@ import { showHistoryAtom, toggleShowHistoryAtom } from '@/atoms/history'
 import { selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tooltip } from '@/components/ui/tooltip'
+import Button from '@/components/Button/Button'
 import { OpenAppButton } from '@/components/buttons/open-app-button'
 import { MeetingIcon } from '@/components/icons'
 import { useStore } from '@/components/providers/store-provider'
 
+import { feedHiddenAtom, toggleFeedVisibilityAtom } from './atoms'
 import { useAudioNotes, useRecentlyUpdatedHistory } from './hooks'
 import { formatUpdatedAtDate, isChatHistoryItem, isConversationData } from './utils'
 
@@ -56,7 +59,7 @@ function HomeFeedListLayout(props: { children: React.ReactNode }) {
   )
 }
 
-function LoadingList() {
+function ListLoadingState() {
   return (
     <div>
       <HomeFeedListItemLayout className="cursor-default [&:nth-child(2)]:opacity-70 [&:nth-child(3)]:opacity-40">
@@ -90,7 +93,7 @@ function LoadingList() {
   )
 }
 
-function EmptyList(props: { label: string }) {
+function ListEmptyState(props: { label: string }) {
   return (
     <div className="relative">
       <div>
@@ -123,8 +126,58 @@ function EmptyList(props: { label: string }) {
         </HomeFeedListItemLayout>
       </div>
       <div className="size-full left-o absolute top-0 flex flex-col items-center justify-center">
-        <div className="rounded-xl border border-tertiary bg-hover/10 px-6 py-4 backdrop-blur">
+        <div className="rounded-xl border border-tertiary/50 bg-hover/10 px-6 py-4 backdrop-blur">
           <p className="text-subtle">{props.label}</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function FeedHiddenState() {
+  const toggleFeedVisibility = useSetAtom(toggleFeedVisibilityAtom)
+
+  function handleClick() {
+    toggleFeedVisibility()
+  }
+
+  return (
+    <div className="relative">
+      <div className="blur-sm">
+        <HomeFeedListItemLayout>
+          <div className="flex items-center gap-2 font-medium">
+            <div className="size-5 rounded-md bg-hover" />
+            <div className="h-5 w-64 rounded-md bg-hover" />
+          </div>
+          <div className="flex items-center gap-2 text-sm font-medium text-subtle">
+            <div className="h-5 w-16 rounded-md bg-hover" />
+          </div>
+        </HomeFeedListItemLayout>
+        <HomeFeedListItemLayout className="opacity-60">
+          <div className="flex items-center gap-2 font-medium">
+            <div className="size-5 rounded-md bg-hover" />
+            <div className="h-5 w-64 rounded-md bg-hover" />
+          </div>
+          <div className="flex items-center gap-2 text-sm font-medium text-subtle">
+            <div className="h-5 w-16 rounded-md bg-hover" />
+          </div>
+        </HomeFeedListItemLayout>
+        <HomeFeedListItemLayout className="opacity-30">
+          <div className="flex items-center gap-2 font-medium">
+            <div className="size-5 rounded-md bg-hover" />
+            <div className="h-5 w-64 rounded-md bg-hover" />
+          </div>
+          <div className="flex items-center gap-2 text-sm font-medium text-subtle">
+            <div className="h-5 w-16 rounded-md bg-hover" />
+          </div>
+        </HomeFeedListItemLayout>
+      </div>
+      <div className="size-full left-o absolute top-0 flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center gap-3 rounded-xl border border-tertiary/50 bg-hover/10 px-6 py-4 backdrop-blur">
+          <p className="text-subtle">Home feed hidden</p>
+          <Button variant="ghost" size="medium" onClick={handleClick}>
+            Show feed
+          </Button>
         </div>
       </div>
     </div>
@@ -189,13 +242,13 @@ function MeetingNotesTabContent() {
   }, [data])
 
   if (!isLoading && tenRecentMeetingNotes.length === 0) {
-    return <EmptyList label="No meeting notes" />
+    return <ListEmptyState label="No meeting notes" />
   }
 
   return (
     <AnimatePresence initial={false}>
       {isLoading ? (
-        <LoadingList />
+        <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
           {tenRecentMeetingNotes.map((meetingNote) => (
@@ -216,13 +269,13 @@ function AudioNotesTabContent() {
   }, [data])
 
   if (!isLoading && tenRecentNonMeetingNotes.length === 0) {
-    return <EmptyList label="No audio notes" />
+    return <ListEmptyState label="No audio notes" />
   }
 
   return (
     <AnimatePresence initial={false}>
       {isLoading ? (
-        <LoadingList />
+        <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
           {tenRecentNonMeetingNotes.map((audioNote) => (
@@ -290,13 +343,13 @@ function ChatsTabContent() {
   const tenRecentChats = React.useMemo(() => data?.slice(0, FEED_LENGTH_LIMIT) ?? [], [data])
 
   if (!isLoading && tenRecentChats.length === 0) {
-    return <EmptyList label="No chats" />
+    return <ListEmptyState label="No chats" />
   }
 
   return (
     <AnimatePresence initial={false}>
       {isLoading ? (
-        <LoadingList />
+        <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
           {tenRecentChats.map((chat) => (
@@ -341,13 +394,13 @@ function RecentActivityTabContent() {
   })
 
   if (!isLoading && tenRecentActions.length === 0) {
-    return <EmptyList label="No recent activity" />
+    return <ListEmptyState label="No recent activity" />
   }
 
   return (
     <AnimatePresence initial={false}>
       {isLoading ? (
-        <LoadingList />
+        <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
           {renderRecentActions}
@@ -358,31 +411,55 @@ function RecentActivityTabContent() {
   )
 }
 
+function HomeFeedVisibilityToggle() {
+  const feedHidden = useAtomValue(feedHiddenAtom)
+  const toggleFeedVisibility = useSetAtom(toggleFeedVisibilityAtom)
+
+  function handleClick() {
+    toggleFeedVisibility()
+  }
+
+  return (
+    <button type="button" aria-label="Toggle feed visibility" onClick={handleClick}>
+      <Tooltip content={feedHidden ? 'Show feed' : 'Hide feed'}>
+        {feedHidden ? <Eye size={20} /> : <EyeSlash size={20} />}
+      </Tooltip>
+    </button>
+  )
+}
+
+function HomeFeedTabContent(props: { value: string; children: React.ReactNode }) {
+  const feedHidden = useAtomValue(feedHiddenAtom)
+
+  return <TabsContent value={props.value}>{feedHidden ? <FeedHiddenState /> : props.children}</TabsContent>
+}
+
 export function HomeFeed() {
   return (
     <Tabs defaultValue="recent-activity">
       <TabsList className="mb-0 w-full">
-        <div className="flex w-full items-center justify-start border-b border-subtle py-1.5">
+        <div className="flex w-full items-center justify-between border-b border-subtle py-1.5">
           <div className="flex items-center gap-2">
             <TabsTrigger value="recent-activity">Recent</TabsTrigger>
             <TabsTrigger value="meeting-notes">Meeting Notes</TabsTrigger>
             <TabsTrigger value="audio-notes">Audio Notes</TabsTrigger>
             <TabsTrigger value="chats">Chats</TabsTrigger>
           </div>
+          <HomeFeedVisibilityToggle />
         </div>
       </TabsList>
-      <TabsContent value="recent-activity">
+      <HomeFeedTabContent value="recent-activity">
         <RecentActivityTabContent />
-      </TabsContent>
-      <TabsContent value="meeting-notes">
+      </HomeFeedTabContent>
+      <HomeFeedTabContent value="meeting-notes">
         <MeetingNotesTabContent />
-      </TabsContent>
-      <TabsContent value="audio-notes">
+      </HomeFeedTabContent>
+      <HomeFeedTabContent value="audio-notes">
         <AudioNotesTabContent />
-      </TabsContent>
-      <TabsContent value="chats">
+      </HomeFeedTabContent>
+      <HomeFeedTabContent value="chats">
         <ChatsTabContent />
-      </TabsContent>
+      </HomeFeedTabContent>
     </Tabs>
   )
 }
