@@ -170,9 +170,9 @@ function AudioNotesListItem(props: { audioNote: ConversationData }) {
 
 function OpenConversationsButton() {
   return (
-    <OpenAppButton appId="conversations">
+    <OpenAppButton appId="conversations" className="w-full">
       <motion.div variants={homeFeedListItemVariants} className="group w-full text-left text-subtle hover:text-primary">
-        <HomeFeedListItemLayout className="flex items-center">
+        <HomeFeedListItemLayout className="flex items-center delay-0 duration-0">
           <VoiceSquare variant={'Bold'} size={20} />
           <p>View all conversations</p>
         </HomeFeedListItemLayout>
@@ -249,9 +249,9 @@ function ToggleChatHistroyButton() {
       type="button"
       aria-label="Toggle history sidebar"
       onClick={handleShowMoreClick}
-      className="group w-full text-left text-subtle hover:text-primary"
+      className="group w-full text-left text-subtle"
     >
-      <HomeFeedListItemLayout className="flex items-center">
+      <HomeFeedListItemLayout className="flex items-center duration-0 hover:text-primary">
         <Clock variant={'Bold'} size={20} />
         <p>{`${historySidebarIsOpen ? 'Hide' : 'View full'} chat history`}</p>
       </HomeFeedListItemLayout>
