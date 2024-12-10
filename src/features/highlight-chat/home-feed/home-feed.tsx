@@ -12,7 +12,6 @@ import { trackEvent } from '@/utils/amplitude'
 import { formatConversationDuration, formatTitle } from '@/utils/conversations'
 import { showHistoryAtom, toggleShowHistoryAtom } from '@/atoms/history'
 import { selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
-import { usePaginatedHistory } from '@/hooks/history'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { MeetingIcon } from '@/components/icons'
@@ -46,6 +45,14 @@ function HomeFeedListItemLayout({ className, children, ...props }: HomeFeedListI
           {children}
         </div>
       </div>
+    </motion.div>
+  )
+}
+
+function HomeFeedListLayout(props: { children: React.ReactNode }) {
+  return (
+    <motion.div initial="hidden" animate="visible" transition={{ staggerChildren: 0.01 }}>
+      {props.children}
     </motion.div>
   )
 }
@@ -122,14 +129,6 @@ function EmptyList(props: { label: string }) {
         </div>
       </div>
     </div>
-  )
-}
-
-function HomeFeedListLayout(props: { children: React.ReactNode }) {
-  return (
-    <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ staggerChildren: 0.01 }}>
-      {props.children}
-    </motion.div>
   )
 }
 
@@ -284,7 +283,7 @@ function ChatsTabContent() {
 }
 
 function RecentActivityTabContent() {
-  const { data: historyData, isLoading: isLoadingHistory } = usePaginatedHistory()
+  const { data: historyData, isLoading: isLoadingHistory } = useRecentlyUpdatedHistory()
   const { data: audioNotesData, isLoading: isLoadingAudioNotes } = useAudioNotes()
   const isLoading = isLoadingHistory || isLoadingAudioNotes
 
