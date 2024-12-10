@@ -81,6 +81,14 @@ export async function GET(request: Request) {
     return Response.json({ error: error.message }, { status: 500 })
   }
 
+  const { data: shortcutPreferences, error: shortcutPreferencesError } = await supabase
+    .from('app_shortcut_preferences')
+    .select('*')
+    .eq('user_id', userId)
+
+  console.log('shortcutPreferences', shortcutPreferences)
+  console.log('user_id', userId)
+
   // Select all prompts that the user owns
   const { data: ownedPrompts, error: ownedPromptsError } = await supabase
     .from('prompts')
@@ -88,6 +96,7 @@ export async function GET(request: Request) {
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
 
+  console.log('ownedPrompts', ownedPrompts)
   if (ownedPromptsError) {
     return Response.json({ error: ownedPromptsError.message }, { status: 500 })
   }
@@ -122,9 +131,19 @@ export async function GET(request: Request) {
   })
 
   const filteredPromptsWithUsages = filteredPrompts.map((prompt) => {
+    const scope = shortcutPreferences
+      ?.filter((pref) => pref.prompt_id === prompt.id)
+      .flatMap((pref) => {
+        return {
+          application_name_darwin: pref.application_name_darwin,
+          application_name_win32: pref.application_name_win32,
+        }
+      })
+
     return {
       ...prompt,
       last_usage: null,
+      scope,
     }
   })
 
