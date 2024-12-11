@@ -9,6 +9,8 @@ import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command'
 
+import { ScrollArea } from './scroll-area'
+
 export interface Option {
   value: string
   label: string
@@ -193,7 +195,6 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
   ) => {
     const inputRef = React.useRef<HTMLInputElement>(null)
     const [open, setOpen] = React.useState(false)
-    const [onScrollbar, setOnScrollbar] = React.useState(false)
     const [isLoading, setIsLoading] = React.useState(false)
     const dropdownRef = React.useRef<HTMLDivElement>(null) // Added this
 
@@ -490,9 +491,6 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                 inputProps?.onValueChange?.(value)
               }}
               onBlur={(event) => {
-                if (!onScrollbar) {
-                  setOpen(false)
-                }
                 inputProps?.onBlur?.(event)
               }}
               onFocus={(event) => {
@@ -532,60 +530,59 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
           {open && (
             <CommandList
               className={cn(
-                'absolute top-1 max-h-[270px] w-full overflow-y-visible',
+                'absolute top-1 w-full',
                 open ? 'animate-in fade-in-0 zoom-in-95' : 'animate-out fade-out-0 zoom-out-95',
               )}
-              onMouseLeave={() => {
-                setOnScrollbar(false)
-              }}
-              onMouseEnter={() => {
-                setOnScrollbar(true)
-              }}
               onMouseUp={() => {
                 inputRef?.current?.focus()
               }}
             >
-              {isLoading ? (
-                <>{loadingIndicator}</>
-              ) : (
-                <>
-                  {EmptyItem()}
-                  {CreatableItem()}
-                  {!selectFirstItem && <CommandItem value="-" className="hidden" />}
-                  {Object.entries(selectables).map(([key, dropdowns]) => (
-                    <CommandGroup key={key} heading={key} className="h-full overflow-auto">
-                      <>
-                        {dropdowns.map((option) => {
-                          return (
-                            <CommandItem
-                              key={option.value}
-                              value={option.label}
-                              disabled={option.disable}
-                              onMouseDown={(e) => {
-                                e.preventDefault()
-                                e.stopPropagation()
-                              }}
-                              onSelect={() => {
-                                if (selected.length >= maxSelected) {
-                                  onMaxSelected?.(selected.length)
-                                  return
-                                }
-                                setInputValue('')
-                                const newOptions = [...selected, option]
-                                setSelected(newOptions)
-                                onChange?.(newOptions)
-                              }}
-                              className={cn('cursor-pointer', option.disable && 'text-muted-foreground cursor-default')}
-                            >
-                              {option.label}
-                            </CommandItem>
-                          )
-                        })}
-                      </>
-                    </CommandGroup>
-                  ))}
-                </>
-              )}
+              <ScrollArea className="h-[270px] w-full">
+                {isLoading ? (
+                  <>{loadingIndicator}</>
+                ) : (
+                  <>
+                    {EmptyItem()}
+                    {CreatableItem()}
+                    {!selectFirstItem && <CommandItem value="-" className="hidden" />}
+                    {Object.entries(selectables).map(([key, dropdowns]) => (
+                      <CommandGroup key={key} heading={key} className="h-full overflow-auto">
+                        <>
+                          {dropdowns.map((option) => {
+                            return (
+                              <CommandItem
+                                key={option.value}
+                                value={option.label}
+                                disabled={option.disable}
+                                onMouseDown={(e) => {
+                                  e.preventDefault()
+                                  e.stopPropagation()
+                                }}
+                                onSelect={() => {
+                                  if (selected.length >= maxSelected) {
+                                    onMaxSelected?.(selected.length)
+                                    return
+                                  }
+                                  setInputValue('')
+                                  const newOptions = [...selected, option]
+                                  setSelected(newOptions)
+                                  onChange?.(newOptions)
+                                }}
+                                className={cn(
+                                  'min-h-8 relative flex w-full cursor-pointer select-none items-center rounded-md py-1.5 pl-2 pr-8 text-sm text-primary outline-none focus:bg-neutral-100 focus:bg-tertiary data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+                                  option.disable && 'text-muted-foreground cursor-default',
+                                )}
+                              >
+                                {option.label}
+                              </CommandItem>
+                            )
+                          })}
+                        </>
+                      </CommandGroup>
+                    ))}
+                  </>
+                )}
+              </ScrollArea>
             </CommandList>
           )}
         </div>
