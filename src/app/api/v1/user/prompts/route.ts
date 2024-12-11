@@ -131,19 +131,28 @@ export async function GET(request: Request) {
   })
 
   const filteredPromptsWithUsages = filteredPrompts.map((prompt) => {
-    const scope = shortcutPreferences
+    const darwinAppNames: string[] = []
+    const win32AppNames: string[] = []
+
+    shortcutPreferences
       ?.filter((pref) => pref.prompt_id === prompt.id)
-      .flatMap((pref) => {
-        return {
-          application_name_darwin: pref.application_name_darwin,
-          application_name_win32: pref.application_name_win32,
+      .forEach((pref) => {
+        if (pref.application_name_darwin) {
+          darwinAppNames.push(...pref.application_name_darwin.split(',').map((app) => app.trim()))
+        }
+
+        if (pref.application_name_win32) {
+          win32AppNames.push(...pref.application_name_win32.split(',').map((app) => app.trim()))
         }
       })
 
     return {
       ...prompt,
       last_usage: null,
-      scope,
+      scope: {
+        application_name_darwin: darwinAppNames,
+        application_name_win32: win32AppNames,
+      },
     }
   })
 
