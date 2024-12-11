@@ -612,3 +612,129 @@ export async function countPromptView(externalId: string, authToken: string) {
     return { error: ERROR_MESSAGES.DATABASE_ERROR }
   }
 }
+
+/**
+ * Fetches the app shortcut preferences for a specific prompt and user
+ */
+export async function getPromptShortcutPreferences(promptId: number, authToken: string) {
+  let userId: string;
+
+  try {
+    userId = await validateUserAuth(authToken);
+  } catch (error) {
+    return {error: ERROR_MESSAGES.INVALID_AUTH_TOKEN}
+  }
+  
+  const supabase = supabaseAdmin();
+
+  const {data: preferences, error} = await supabase
+    .from('app_shortcut_preferences')
+    .select('*')
+    .eq('prompt_id', promptId)
+    .eq('user_id', userId)
+    .maybeSingle()
+
+    if (error) {
+      console.error('Error fetching app shortcut preferences:', error)
+      return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
+    }
+  
+    return { preferences }
+}
+
+export async function deletePromptShortcutPreferences(
+  promptId: number,
+  authToken: string
+) {
+  let userId: string
+  try {
+    userId = await validateUserAuth(authToken)
+  } catch (error) {
+    return { error: ERROR_MESSAGES.INVALID_AUTH_TOKEN }
+  }
+
+  const supabase = supabaseAdmin()
+
+  const { error } = await supabase
+    .from('app_shortcut_preferences')
+    .delete()
+    .eq('prompt_id', promptId)
+    .eq('user_id', userId)
+
+  if (error) {
+    console.error('Error deleting app shortcut preferences:', error)
+    return { error: ERROR_MESSAGES.DATABASE_ERROR }
+  }
+
+  return { success: true }
+}
+
+
+/**
+ * Updates or creates app shortcut preferences for a specific prompt
+ */
+export async function upsertPromptShortcutPreferences(
+  promptId: number,
+  preferences: {
+    application_name_darwin?: string | null
+    application_name_win32?: string | null
+  },
+  authToken: string
+) {
+  let userId: string
+  try {
+    userId = await validateUserAuth(authToken)
+  } catch (error) {
+    return { error: ERROR_MESSAGES.INVALID_AUTH_TOKEN }
+  }
+
+  const supabase = supabaseAdmin()
+
+  const record = {
+    prompt_id: promptId,
+    user_id: userId,
+    application_name_darwin: preferences.application_name_darwin,
+    application_name_win32: preferences.application_name_win32
+  }
+
+  // Use onConflict to specify which fields determine a unique record
+  const { error } = await supabase
+    .from('app_shortcut_preferences')
+    .upsert(record, {
+      onConflict: 'prompt_id,user_id'  // Add this line
+    })
+
+  if (error) {
+    console.error('Error updating app shortcut preferences:', error)
+    return { error: ERROR_MESSAGES.DATABASE_ERROR }
+  }
+
+  return { success: true }
+}
+
+/**
+ * Removes app shortcut preferences for a specific prompt
+ */
+export async function removePromptShortcutPreferences(promptId: number, authToken: string) {
+  let userId: string
+  try {
+    userId = await validateUserAuth(authToken)
+  } catch (error) {
+    return { error: ERROR_MESSAGES.INVALID_AUTH_TOKEN }
+  }
+
+  const supabase = supabaseAdmin()
+
+  const { error } = await supabase
+    .from('app_shortcut_preferences')
+    .delete()
+    .eq('prompt_id', promptId)
+    .eq('user_id', userId)
+
+  if (error) {
+    console.error('Error removing app shortcut preferences:', error)
+    return { error: ERROR_MESSAGES.DATABASE_ERROR }
+  }
+
+  return { success: true }
+}
