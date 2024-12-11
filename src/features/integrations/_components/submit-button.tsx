@@ -12,7 +12,13 @@ type IntegrationSubmitButtonProps = {
 
 export function IntegrationSubmitButton(props: IntegrationSubmitButtonProps) {
   return (
-    <Button size={'medium'} variant={'accent'} type={'submit'} disabled={props.isPending} style={{ gap: 8 }}>
+    <Button
+      size={'medium'}
+      variant={'accent'}
+      type={'submit'}
+      disabled={props.isPending}
+      style={{ gap: 8, width: '100%' }}
+    >
       <AnimatePresence initial={false} mode="popLayout">
         <motion.span
           key={props.isPending ? 'true' : 'false'}
