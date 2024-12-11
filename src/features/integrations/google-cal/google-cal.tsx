@@ -182,21 +182,90 @@ const PlaceAutocomplete = ({ value, onChange }: PlaceAutocompleteProps) => {
 
   useEffect(() => {
     if (!places || !inputRef.current) return
-
     const options = {
       fields: [],
     }
 
     setPlaceAutocomplete(new places.Autocomplete(inputRef.current, options))
-  }, [places])
+
+    // Apply custom styles
+    const style = document.createElement('style')
+    style.textContent = `
+      /* Main container styles */
+      .pac-container {
+        background-color: #191919;
+        box-shadow: 0px 16px 24px 0px rgba(0, 0, 0, 0.20), 0px 2px 6px 0px rgba(0, 0, 0, 0.20), 0px 0px 1px 0px rgba(0, 0, 0, 0.50);
+        border-radius: 12px;
+        margin-top: 6px;
+        border: none;
+        outline: none;
+      }
+
+      /* Hide the Google logo and powered by text */
+      .pac-container:after {
+        display: none;
+      }
+
+      /* Individual suggestion item */
+      .pac-item {
+        padding: 8px 16px;
+        cursor: pointer;
+        font-size: 14px;
+        line-height: 20px;
+        border-top: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      /* Hover state */
+      .pac-item:hover {
+        background-color: #222;
+      }
+
+      /* Selected/active state */
+      .pac-item-selected {
+        background-color: #222;
+      }
+
+      /* Main text in suggestions */
+      .pac-item-query {
+        font-size: 15px;
+        color: #B4B4B4;
+        font-weight: 500;
+        padding: 0;
+      }
+
+      /* Secondary text */
+      .pac-item span:not(.pac-item-query) {
+        font-size: 15px;
+        color: #B4B4B4;
+      }
+
+      /* Location icon */
+      .pac-icon {
+        // width: 16px;
+        // height: 16px;
+      }
+
+      /* Match highlighted text */
+      .pac-matched {
+        font-weight: 600;
+        color: #EEE;
+      }
+    `
+    document.head.appendChild(style)
+
+    return () => {
+      style.remove()
+    }
+  }, [places, value])
 
   useEffect(() => {
     if (!inputRef.current) return
-
     const handleInputChange = () => {
       onChange(inputRef.current?.value ?? '')
     }
-
     inputRef.current.addEventListener('input', handleInputChange)
     return () => {
       inputRef.current?.removeEventListener('input', handleInputChange)
