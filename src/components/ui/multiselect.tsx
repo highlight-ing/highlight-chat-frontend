@@ -195,6 +195,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
   ) => {
     const inputRef = React.useRef<HTMLInputElement>(null)
     const [open, setOpen] = React.useState(false)
+    const [onScrollbar, setOnScrollbar] = React.useState(false)
     const [isLoading, setIsLoading] = React.useState(false)
     const dropdownRef = React.useRef<HTMLDivElement>(null) // Added this
 
@@ -429,8 +430,8 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
           inputRef?.current?.focus()
         }}
         className={cn(
-          'group-has-[label]:pb-2.5 group-has-[label]:pt-7 group-has-[label]:leading-snug relative flex w-full cursor-pointer overflow-visible rounded-2xl border border-light-10 bg-secondary px-3 py-2 text-[15px] text-primary outline-none transition-[padding] hover:border-light-20 disabled:cursor-not-allowed disabled:opacity-50 data-[placeholder]:text-subtle [&>span]:line-clamp-1',
-          open && 'border-light-20 bg-tertiary',
+          'group-has-[label]:pb-1 group-has-[label]:pt-7 group-has-[label]:leading-snug relative flex h-auto w-full cursor-pointer gap-2 overflow-visible rounded-2xl border border-light-10 bg-secondary px-3 py-2 text-[15px] text-primary outline-none transition-[padding] placeholder:text-subtle hover:border-light-20 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1',
+          open && 'bg-tertiary',
           commandProps?.className,
         )}
         shouldFilter={commandProps?.shouldFilter !== undefined ? commandProps.shouldFilter : !onSearch} // When onSearch is provided, we don't want to filter the options. You can still override it.
@@ -438,7 +439,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
       >
         <div
           className={cn(
-            'text-[15px] text-primary outline-none',
+            'h-full w-full',
             {
               'text-primary': !disabled && selected.length !== 0,
             },
@@ -476,11 +477,12 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                     }}
                     onClick={() => handleUnselect(option)}
                   >
-                    <X className="size-3.5 text-subtle" />
+                    <X className="text-muted-foreground hover:text-foreground h-3 w-3" />
                   </button>
                 </Badge>
               )
             })}
+            {/* Avoid having the "Search" Icon */}
             <CommandPrimitive.Input
               {...inputProps}
               ref={inputRef}
@@ -491,6 +493,9 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                 inputProps?.onValueChange?.(value)
               }}
               onBlur={(event) => {
+                if (!onScrollbar) {
+                  setOpen(false)
+                }
                 inputProps?.onBlur?.(event)
               }}
               onFocus={(event) => {
@@ -503,6 +508,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                 'flex-1 bg-transparent outline-none placeholder:text-subtle',
                 {
                   'w-full': hidePlaceholderWhenSelected,
+                  'ml-1': selected.length !== 0,
                 },
                 inputProps?.className,
               )}
@@ -530,14 +536,20 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
           {open && (
             <CommandList
               className={cn(
-                'absolute top-1 w-full',
-                open ? 'animate-in fade-in-0 zoom-in-95' : 'animate-out fade-out-0 zoom-out-95',
+                'absolute top-1 z-10 w-full pr-0 outline-none',
+                open ? 'animate-in fade-in-0 zoom-in-95' : 'tate=closed]:fade-out-0 animate-out zoom-out-95',
               )}
+              onMouseLeave={() => {
+                setOnScrollbar(false)
+              }}
+              onMouseEnter={() => {
+                setOnScrollbar(true)
+              }}
               onMouseUp={() => {
                 inputRef?.current?.focus()
               }}
             >
-              <ScrollArea className="h-[270px] w-full">
+              <ScrollArea className="h-[270px] w-full pr-1.5">
                 {isLoading ? (
                   <>{loadingIndicator}</>
                 ) : (
@@ -546,7 +558,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                     {CreatableItem()}
                     {!selectFirstItem && <CommandItem value="-" className="hidden" />}
                     {Object.entries(selectables).map(([key, dropdowns]) => (
-                      <CommandGroup key={key} heading={key} className="h-full overflow-auto">
+                      <CommandGroup key={key} heading={key} className="h-full overflow-auto p-0">
                         <>
                           {dropdowns.map((option) => {
                             return (
@@ -568,10 +580,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                   setSelected(newOptions)
                                   onChange?.(newOptions)
                                 }}
-                                className={cn(
-                                  'min-h-8 relative flex w-full cursor-pointer select-none items-center rounded-md py-1.5 pl-2 pr-8 text-sm text-primary outline-none focus:bg-neutral-100 focus:bg-tertiary data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-                                  option.disable && 'text-muted-foreground cursor-default',
-                                )}
+                                className={cn('cursor-pointer', option.disable && 'cursor-default text-primary')}
                               >
                                 {option.label}
                               </CommandItem>

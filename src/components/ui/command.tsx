@@ -14,10 +14,7 @@ const Command = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive
     ref={ref}
-    className={cn(
-      'dark:bg-neutral-950 dark:text-neutral-50 flex h-full w-full flex-col overflow-hidden rounded-md bg-white text-neutral-950',
-      className,
-    )}
+    className={cn('flex h-full w-full flex-col overflow-hidden rounded-md bg-white', className)}
     {...props}
   />
 ))
@@ -61,7 +58,7 @@ const CommandList = React.forwardRef<
   <CommandPrimitive.List
     ref={ref}
     className={cn(
-      'relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-lg border border-light-5 bg-secondary p-1.5 text-neutral-950 shadow-2xl slide-in-from-top-2',
+      'rounded-lg border border-light-5 bg-secondary p-1.5 text-neutral-950 shadow-2xl slide-in-from-top-2',
       className,
     )}
     {...props}
@@ -112,7 +109,7 @@ const CommandItem = React.forwardRef<
   <CommandPrimitive.Item
     ref={ref}
     className={cn(
-      'min-h-8 relative flex w-full cursor-default select-none items-center rounded-md py-1.5 pl-2 pr-8 text-sm text-primary outline-none focus:bg-neutral-100 focus:bg-tertiary data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      '[&_svg]:size-4 min-h-8 relative flex w-full cursor-default select-none items-center gap-2 rounded-md px-2 py-1.5 pl-2 pr-8 text-sm text-primary outline-none data-[disabled=true]:pointer-events-none data-[selected=true]:bg-tertiary data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
       className,
     )}
     {...props}

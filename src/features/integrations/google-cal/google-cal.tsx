@@ -410,7 +410,7 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
           control={form.control}
           name="invitees"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="z-10">
               <FormLabel>Invitees</FormLabel>
               <FormControl>
                 <InviteeDropdown field={field} />
