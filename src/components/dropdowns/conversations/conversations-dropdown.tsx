@@ -13,7 +13,7 @@ import styles from './conversations-dropdown.module.scss'
 import ConversationToggle from './conversations-toggle'
 
 export const ConversationsDropdown = () => {
-  const { isAudioTranscripEnabled, micActivity } = useConversations()
+  const { isAudioTranscripEnabled } = useConversations()
   const { attachments } = useStore(
     useShallow((state) => ({
       attachments: state.attachments,
