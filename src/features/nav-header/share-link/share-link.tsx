@@ -165,7 +165,7 @@ export function ShareLink(props: { conversation: ChatHistoryItem | null }) {
   }
 
   return (
-    <div className="flex items-center gap-0.5">
+    <div className="flex items-center gap-px">
       <CopyLinkButton shareLinkId={mostRecentShareLinkId} />
       <ShareLinkModal conversation={props.conversation} />
     </div>
