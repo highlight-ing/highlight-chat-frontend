@@ -64,15 +64,12 @@ export function ChatHome({ isShowing }: { isShowing: boolean }) {
       <div className="space-y-12">
         <div className="space-y-6">
           <InputHeading />
-
           <Stacker>
             <StackerItem index={0}>{isVisible && <Input isActiveChat={false} />}</StackerItem>
             <StackerItem index={1}>
               <ViewChangelogBanner />
             </StackerItem>
           </Stacker>
-
-          <CreateGoogleCalEvent summary="Test" />
         </div>
         <HomeFeed />
       </div>
