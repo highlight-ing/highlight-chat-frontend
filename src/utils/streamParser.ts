@@ -110,7 +110,14 @@ export async function parseAndHandleStreamChunk(
             const start = jsonChunk.input.start ?? undefined
             const end = jsonChunk.input.end ?? undefined
 
-            integrations.createGoogleCalendarEvent(conversationId, { summary, location, description, start, end })
+            integrations.createGoogleCalendarEvent(conversationId, {
+              summary,
+              location,
+              description,
+              start,
+              end,
+              includeGoogleMeetDetails: false,
+            })
           }
 
           if (jsonChunk.name === 'get_more_context_from_conversations') {

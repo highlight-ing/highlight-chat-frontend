@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { APIProvider, useMapsLibrary } from '@vis.gl/react-google-maps'
 import { format } from 'date-fns'
+import { Add } from 'iconsax-react'
 import { ControllerRenderProps, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -21,7 +22,7 @@ import {
 } from '@/components/ui/form'
 import { Popover, PopoverContent } from '@/components/ui/popover'
 import { Select, SelectContent, SelectItem, SelectValue } from '@/components/ui/select'
-import { GoogleIcon } from '@/components/icons'
+import { GoogleIcon, GoogleMeetIcon, XIcon } from '@/components/icons'
 
 import { CreateGoogleCalendarEventParams } from '../_hooks/use-integrations'
 import { IntegrationsLoader } from '../_components/loader'
@@ -41,6 +42,7 @@ const googleCalEventFormSchema = z
     description: z.string().optional(),
     start: z.string().optional(),
     end: z.string().optional(),
+    includeGoogleMeetDetails: z.boolean(),
   })
   .refine(
     (data) => {
@@ -62,7 +64,9 @@ type GoogleCalEventDropdownProps = {
 }
 
 function DatePickerDropdown(props: GoogleCalEventDropdownProps) {
-  const { date: dateValue, time: timeValue } = extractDateAndTime(props.field.value)
+  const { date: dateValue, time: timeValue } = extractDateAndTime(
+    typeof props.field.value !== 'string' ? undefined : props.field.value,
+  )
 
   function handleChange(date: Date | undefined, time: string) {
     if (!date) return
@@ -87,7 +91,9 @@ function DatePickerDropdown(props: GoogleCalEventDropdownProps) {
 }
 
 function TimeSelectDropdown(props: GoogleCalEventDropdownProps) {
-  const { date: dateValue, time: timeValue } = extractDateAndTime(props.field.value)
+  const { date: dateValue, time: timeValue } = extractDateAndTime(
+    typeof props.field.value !== 'string' ? undefined : props.field.value,
+  )
 
   const timeOptions = React.useMemo(() => {
     const times = []
@@ -214,6 +220,30 @@ const GoogleAPIWrapper = ({ children }: { children: React.ReactNode }) => {
   return <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>{children}</APIProvider>
 }
 
+interface GoogleMeetLinkProps {
+  value: boolean
+  onChange: (value: boolean) => void
+}
+
+function GoogleMeetLink({ value, onChange }: GoogleMeetLinkProps) {
+  return (
+    <div
+      className="h-10 rounded-2xl border border-light-10 flex items-center justify-between px-3 py-2 cursor-pointer  hover:border-tertiary hover:bg-tertiary"
+      onClick={() => onChange(!value)}
+    >
+      <div className={`flex items-center gap-2 select-none ${value ? 'text-secondary ' : 'text-tertiary'}`}>
+        {value ? <GoogleMeetIcon size={20} /> : <Add size={20} />}
+        {value ? 'Google Meet included' : 'Add Google Meet video conferencing'}
+      </div>
+      {value && (
+        <span className="text-subtle">
+          <XIcon size={20} onClick={() => onChange(false)} />
+        </span>
+      )}
+    </div>
+  )
+}
+
 export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
   const { mutate: createGoogleCalEvent, isPending } = useCreateGoogleCalEvent(props.onSuccess)
 
@@ -226,6 +256,7 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
       description: `${props.data.description}`,
       start: props.data.start ?? new Date().toISOString(),
       end: props.data.end ?? new Date().toISOString(),
+      includeGoogleMeetDetails: false,
     },
   })
 
@@ -260,7 +291,6 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
             control={form.control}
             name="start"
             render={({ field, fieldState }) => {
-              console.log({ fieldState })
               return (
                 <FormItem className="col-span-2">
                   <FormLabel>Start date</FormLabel>
@@ -315,6 +345,18 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
             )}
           />
         </div>
+
+        <FormField
+          control={form.control}
+          name="includeGoogleMeetDetails"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <GoogleMeetLink value={field.value} onChange={field.onChange} />
+              </FormControl>
+            </FormItem>
+          )}
+        ></FormField>
 
         <FormField
           control={form.control}
