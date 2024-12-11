@@ -110,7 +110,7 @@ export type Database = {
         Insert: {
           application_name_darwin?: string | null
           application_name_win32?: string | null
-          created_at?: string 
+          created_at?: string
           id?: number
           prompt_id: number
           user_id: string

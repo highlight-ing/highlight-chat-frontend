@@ -81,6 +81,14 @@ export async function GET(request: Request) {
     return Response.json({ error: error.message }, { status: 500 })
   }
 
+  const { data: shortcutPreferences, error: shortcutPreferencesError } = await supabase
+    .from('app_shortcut_preferences')
+    .select('*')
+    .eq('user_id', userId)
+
+  console.log('shortcutPreferences', shortcutPreferences)
+  console.log('user_id', userId)
+
   // Select all prompts that the user owns
   const { data: ownedPrompts, error: ownedPromptsError } = await supabase
     .from('prompts')
@@ -88,6 +96,7 @@ export async function GET(request: Request) {
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
 
+  console.log('ownedPrompts', ownedPrompts)
   if (ownedPromptsError) {
     return Response.json({ error: ownedPromptsError.message }, { status: 500 })
   }
@@ -122,9 +131,36 @@ export async function GET(request: Request) {
   })
 
   const filteredPromptsWithUsages = filteredPrompts.map((prompt) => {
+    let darwinAppNames: string[] = []
+    let win32AppNames: string[] = []
+
+    shortcutPreferences
+      ?.filter((pref) => pref.prompt_id === prompt.id)
+      .forEach((pref) => {
+        if (pref.application_name_darwin) {
+          if (pref.application_name_darwin === '*') {
+            darwinAppNames = ['*']
+          } else {
+            darwinAppNames = JSON.parse(pref.application_name_darwin || '[]') as string[]
+          }
+        }
+
+        if (pref.application_name_win32) {
+          if (pref.application_name_win32 === '*') {
+            win32AppNames = ['*']
+          } else {
+            win32AppNames = JSON.parse(pref.application_name_win32 || '[]') as string[]
+          }
+        }
+      })
+
     return {
       ...prompt,
       last_usage: null,
+      scope: {
+        application_name_darwin: darwinAppNames,
+        application_name_win32: win32AppNames,
+      },
     }
   })
 
