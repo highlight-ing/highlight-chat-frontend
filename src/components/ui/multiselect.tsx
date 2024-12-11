@@ -9,8 +9,6 @@ import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command'
 
-import { ScrollArea } from './scroll-area'
-
 export interface Option {
   value: string
   label: string
@@ -536,7 +534,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
           {open && (
             <CommandList
               className={cn(
-                'absolute top-1 z-10 w-full pr-0 outline-none',
+                'absolute top-1 z-10 max-h-[270px] w-full overflow-y-auto overflow-x-hidden outline-none',
                 open ? 'animate-in fade-in-0 zoom-in-95' : 'tate=closed]:fade-out-0 animate-out zoom-out-95',
               )}
               onMouseLeave={() => {
@@ -549,49 +547,47 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                 inputRef?.current?.focus()
               }}
             >
-              <ScrollArea className="h-[270px] w-full pr-1.5">
-                {isLoading ? (
-                  <>{loadingIndicator}</>
-                ) : (
-                  <>
-                    {EmptyItem()}
-                    {CreatableItem()}
-                    {!selectFirstItem && <CommandItem value="-" className="hidden" />}
-                    {Object.entries(selectables).map(([key, dropdowns]) => (
-                      <CommandGroup key={key} heading={key} className="h-full overflow-auto p-0">
-                        <>
-                          {dropdowns.map((option) => {
-                            return (
-                              <CommandItem
-                                key={option.value}
-                                value={option.label}
-                                disabled={option.disable}
-                                onMouseDown={(e) => {
-                                  e.preventDefault()
-                                  e.stopPropagation()
-                                }}
-                                onSelect={() => {
-                                  if (selected.length >= maxSelected) {
-                                    onMaxSelected?.(selected.length)
-                                    return
-                                  }
-                                  setInputValue('')
-                                  const newOptions = [...selected, option]
-                                  setSelected(newOptions)
-                                  onChange?.(newOptions)
-                                }}
-                                className={cn('cursor-pointer', option.disable && 'cursor-default text-primary')}
-                              >
-                                {option.label}
-                              </CommandItem>
-                            )
-                          })}
-                        </>
-                      </CommandGroup>
-                    ))}
-                  </>
-                )}
-              </ScrollArea>
+              {isLoading ? (
+                <>{loadingIndicator}</>
+              ) : (
+                <>
+                  {EmptyItem()}
+                  {CreatableItem()}
+                  {!selectFirstItem && <CommandItem value="-" className="hidden" />}
+                  {Object.entries(selectables).map(([key, dropdowns]) => (
+                    <CommandGroup key={key} heading={key} className="h-full overflow-auto p-0">
+                      <>
+                        {dropdowns.map((option) => {
+                          return (
+                            <CommandItem
+                              key={option.value}
+                              value={option.label}
+                              disabled={option.disable}
+                              onMouseDown={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                              }}
+                              onSelect={() => {
+                                if (selected.length >= maxSelected) {
+                                  onMaxSelected?.(selected.length)
+                                  return
+                                }
+                                setInputValue('')
+                                const newOptions = [...selected, option]
+                                setSelected(newOptions)
+                                onChange?.(newOptions)
+                              }}
+                              className={cn('cursor-pointer', option.disable && 'cursor-default text-primary')}
+                            >
+                              {option.label}
+                            </CommandItem>
+                          )
+                        })}
+                      </>
+                    </CommandGroup>
+                  ))}
+                </>
+              )}
             </CommandList>
           )}
         </div>

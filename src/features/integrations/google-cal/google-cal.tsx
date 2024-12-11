@@ -42,7 +42,7 @@ const googleCalEventFormSchema = z
     description: z.string().optional(),
     start: z.string().optional(),
     end: z.string().optional(),
-    invitees: z.array(z.string()).optional(),
+    invitees: z.array(z.object({ value: z.string(), label: z.string() })).optional(),
   })
   .refine(
     (data) => {
@@ -147,74 +147,54 @@ type InviteeDropdownProps = {
 function InviteeDropdown(props: InviteeDropdownProps) {
   const { data: contacts } = useFetchGoogleCalContacts()
 
-  console.log(contacts)
-
-  const frameworks: Option[] = [
+  const mockContacts: Option[] = [
     {
-      value: 'next.js',
-      label: 'Next.js',
+      value: 'sam',
+      label: 'Sam',
     },
     {
-      value: 'sveltekit',
-      label: 'SvelteKit',
+      value: 'julian',
+      label: 'Julian',
     },
     {
-      value: 'nuxt.js',
-      label: 'Nuxt.js',
-      disable: true,
+      value: 'vaun',
+      label: 'Vaun',
     },
     {
-      value: 'remix',
-      label: 'Remix',
+      value: 'haris',
+      label: 'Haris',
     },
     {
-      value: 'astro',
-      label: 'Astro',
+      value: 'lin',
+      label: 'Lin',
     },
     {
-      value: 'angular',
-      label: 'Angular',
+      value: 'josh',
+      label: 'Josh',
     },
     {
-      value: 'vue',
-      label: 'Vue.js',
+      value: 'sam-2',
+      label: 'Sam 2',
     },
     {
-      value: 'react',
-      label: 'React',
+      value: 'julian-2',
+      label: 'Julian 2',
     },
     {
-      value: 'ember',
-      label: 'Ember.js',
+      value: 'vaun-2',
+      label: 'Vaun 2',
     },
     {
-      value: 'gatsby',
-      label: 'Gatsby',
+      value: 'haris-2',
+      label: 'Haris 2',
     },
     {
-      value: 'eleventy',
-      label: 'Eleventy',
-      disable: true,
+      value: 'lin-2',
+      label: 'Lin 2',
     },
     {
-      value: 'solid',
-      label: 'SolidJS',
-    },
-    {
-      value: 'preact',
-      label: 'Preact',
-    },
-    {
-      value: 'qwik',
-      label: 'Qwik',
-    },
-    {
-      value: 'alpine',
-      label: 'Alpine.js',
-    },
-    {
-      value: 'lit',
-      label: 'Lit',
+      value: 'josh-2',
+      label: 'Josh 2',
     },
   ]
 
@@ -223,11 +203,12 @@ function InviteeDropdown(props: InviteeDropdownProps) {
       commandProps={{
         label: 'Add quests',
       }}
-      value={frameworks.slice(0, 2)}
-      defaultOptions={frameworks}
+      value={props.field.value}
+      onChange={props.field.onChange}
+      options={mockContacts}
       placeholder="Add quests"
       hideClearAllButton
-      emptyIndicator={<p className="text-center text-sm">No quests</p>}
+      emptyIndicator={<p className="text-center text-sm text-primary">No quests</p>}
     />
   )
 }
