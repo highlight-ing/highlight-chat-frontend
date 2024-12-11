@@ -64,11 +64,9 @@ type GoogleCalEventDropdownProps = {
 }
 
 function DatePickerDropdown(props: GoogleCalEventDropdownProps) {
-  if (typeof props.field.value === 'boolean') {
-    return
-  }
-
-  const { date: dateValue, time: timeValue } = extractDateAndTime(props.field.value)
+  const { date: dateValue, time: timeValue } = extractDateAndTime(
+    typeof props.field.value !== 'string' ? undefined : props.field.value,
+  )
 
   function handleChange(date: Date | undefined, time: string) {
     if (!date) return
@@ -93,11 +91,9 @@ function DatePickerDropdown(props: GoogleCalEventDropdownProps) {
 }
 
 function TimeSelectDropdown(props: GoogleCalEventDropdownProps) {
-  if (typeof props.field.value === 'boolean') {
-    return
-  }
-
-  const { date: dateValue, time: timeValue } = extractDateAndTime(props.field.value)
+  const { date: dateValue, time: timeValue } = extractDateAndTime(
+    typeof props.field.value !== 'string' ? undefined : props.field.value,
+  )
 
   const timeOptions = React.useMemo(() => {
     const times = []
