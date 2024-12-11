@@ -1,6 +1,7 @@
 'use server'
 
 import { google } from 'googleapis'
+import { v4 as uuidv4 } from 'uuid'
 
 import type { CreateGoogleCalendarEventParams } from '../_hooks/use-integrations'
 
@@ -108,6 +109,7 @@ export async function createGoogleCalendarEvent(accessToken: string, data: Creat
   const event = await calendar.events.insert({
     auth: oauth2Client,
     calendarId: 'primary',
+    conferenceDataVersion: data.includeGoogleMeetDetails ? 1 : 0,
     requestBody: {
       summary: data.summary,
       description: data.description,
@@ -118,6 +120,16 @@ export async function createGoogleCalendarEvent(accessToken: string, data: Creat
         dateTime: data.end,
       },
       location: data.location,
+      conferenceData: data.includeGoogleMeetDetails
+        ? {
+            createRequest: {
+              conferenceSolutionKey: {
+                type: 'hangoutsMeet',
+              },
+              requestId: uuidv4(),
+            },
+          }
+        : undefined,
     },
   })
 

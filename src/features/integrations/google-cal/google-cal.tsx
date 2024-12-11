@@ -42,7 +42,7 @@ const googleCalEventFormSchema = z
     description: z.string().optional(),
     start: z.string().optional(),
     end: z.string().optional(),
-    googleMeetLink: z.boolean(),
+    includeGoogleMeetDetails: z.boolean(),
   })
   .refine(
     (data) => {
@@ -252,7 +252,7 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
       description: `${props.data.description}`,
       start: props.data.start ?? new Date().toISOString(),
       end: props.data.end ?? new Date().toISOString(),
-      googleMeetLink: false,
+      includeGoogleMeetDetails: false,
     },
   })
 
@@ -344,7 +344,7 @@ export function GoogleCalEventForm(props: GoogleCalEventFormProps) {
 
         <FormField
           control={form.control}
-          name="googleMeetLink"
+          name="includeGoogleMeetDetails"
           render={({ field }) => (
             <FormItem>
               <FormControl>

@@ -15,6 +15,7 @@ interface CreateNotionPageParams {
 
 export interface CreateGoogleCalendarEventParams {
   summary: string
+  includeGoogleMeetDetails: boolean
   location?: string
   description?: string
   start?: string
