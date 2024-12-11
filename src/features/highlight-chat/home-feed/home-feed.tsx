@@ -176,7 +176,7 @@ function FeedHiddenState() {
         <div className="flex flex-col items-center gap-3 rounded-xl border border-tertiary/50 bg-hover/10 px-6 py-4 backdrop-blur">
           <p className="text-subtle">Home feed hidden</p>
           <Button variant="ghost" size="medium" onClick={handleClick}>
-            Show feed
+            Show activity
           </Button>
         </div>
       </div>
