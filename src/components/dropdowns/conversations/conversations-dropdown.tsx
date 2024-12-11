@@ -38,7 +38,7 @@ export const ConversationsDropdown = () => {
               height={24}
               backgroundColor="transparent"
               lineColor="rgba(76, 237, 160, 1.0)"
-              shouldAnimate={micActivity > 0}
+              shouldAnimate={false}
               transitionDuration={2500}
             />
           ) : (
