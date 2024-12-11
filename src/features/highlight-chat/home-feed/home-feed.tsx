@@ -174,7 +174,7 @@ function FeedHiddenState() {
       </div>
       <div className="size-full left-o absolute top-0 flex flex-col items-center justify-center">
         <div className="flex flex-col items-center gap-3 rounded-xl border border-tertiary/50 bg-hover/10 px-6 py-4 backdrop-blur">
-          <p className="text-subtle">Home feed hidden</p>
+          <p className="text-subtle">Home activity hidden</p>
           <Button variant="ghost" size="medium" onClick={handleClick}>
             Show activity
           </Button>
@@ -421,7 +421,7 @@ function HomeFeedVisibilityToggle() {
 
   return (
     <button type="button" aria-label="Toggle feed visibility" onClick={handleClick}>
-      <Tooltip content={feedHidden ? 'Show feed' : 'Hide feed'}>
+      <Tooltip content={feedHidden ? 'Show activity' : 'Hide activity'}>
         {feedHidden ? <Eye size={20} /> : <EyeSlash size={20} />}
       </Tooltip>
     </button>
