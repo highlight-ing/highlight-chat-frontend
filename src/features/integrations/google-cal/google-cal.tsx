@@ -64,6 +64,10 @@ type GoogleCalEventDropdownProps = {
 }
 
 function DatePickerDropdown(props: GoogleCalEventDropdownProps) {
+  if (typeof props.field.value === 'boolean') {
+    return
+  }
+
   const { date: dateValue, time: timeValue } = extractDateAndTime(props.field.value)
 
   function handleChange(date: Date | undefined, time: string) {

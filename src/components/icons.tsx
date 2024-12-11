@@ -561,16 +561,16 @@ export const XIcon = ({ size = 24, color = 'currentColor' }: IconPropTypes) => {
       <path
         d="M4.16663 15.8333L15.8333 4.16663"
         stroke={color}
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M15.8333 15.8333L4.16663 4.16663"
         stroke={color}
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   )
