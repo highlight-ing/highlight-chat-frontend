@@ -13,7 +13,7 @@ type WindowAttachment = {
 }
 
 export type BaseMessage = {
-  id: string
+  id?: string | null
   conversation_id: string
   role: 'user' | 'assistant'
   version?: string
@@ -42,9 +42,13 @@ export type UserMessage = BaseMessage & {
 
 export type AssistantMessage = BaseMessage & {
   role: 'assistant'
+  content?: string
+  conversation_id: string
+  id?: string | null
+  given_feedback: string | null
   factIndex?: number
   fact?: string
-  given_feedback?: string | null
+  visualization?: VisualizationData
 }
 
 export type Message = UserMessage | AssistantMessage
@@ -297,4 +301,13 @@ export type MetadataEvent = {
   switch_reason?: string
   from_provider?: string
   to_provider?: string
+  provider?: string
+  visualization?: boolean
+}
+
+export interface VisualizationData {
+  iframe: string
+  description: string
+  title: string
+  url: string
 }
