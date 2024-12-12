@@ -55,8 +55,6 @@ export default function Home() {
   useOnPromptLoad()
   useOnExternalMessage()
 
-  console.log(messages)
-
   return (
     <div className={styles.page}>
       <HistorySidebar showHistory={showHistory} setShowHistory={setShowHistory} />
