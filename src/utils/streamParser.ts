@@ -1,4 +1,4 @@
-import { MetadataEvent, Toast } from '@/types'
+import { MetadataEvent, Toast, VisualizationData } from '@/types'
 
 import { UseIntegrationsAPI } from '@/features/integrations/_hooks/use-integrations'
 import { integrationFunctionNames } from '@/features/integrations/utils'
@@ -11,15 +11,42 @@ type StreamParserProps = {
   onMetadata?: (metadata: MetadataEvent) => void
 }
 
+type StreamParserResult = {
+  content: string
+  windowName: string | null
+  conversation: string | null
+  factIndex: number | null
+  fact: string | null
+  messageId: string | null
+  visualization?: VisualizationData
+}
+
+function extractIframeFromContent(content: string): { text: string; iframe?: string } {
+  const iframeMatch = content.match(/<iframe[^>]*>.*?<\/iframe>/i);
+  if (!iframeMatch) {
+    return { text: content };
+  }
+
+  // Remove the script tag if it exists
+  const cleanContent = content.replace(/<script.*?<\/script>/i, '');
+  
+  return {
+    text: '', // Don't keep the text description
+    iframe: iframeMatch[0]
+  };
+}
+
 export async function parseAndHandleStreamChunk(
   chunk: string,
   { showConfirmationModal, addToast, integrations, conversationId, onMetadata }: StreamParserProps,
-) {
+): Promise<StreamParserResult> {
   let contextConfirmed: boolean | null = null
   let accumulatedContent = ''
   let factIndex = null
   let fact = null
   let messageId = null
+  let visualization: VisualizationData | undefined = undefined
+  let isVisualizationMessage = false
 
   // Split the chunk into individual data objects
   const dataObjects = chunk.split(/\n(?=data: )/)
@@ -40,17 +67,26 @@ export async function parseAndHandleStreamChunk(
           if (jsonChunk.conversation_id && jsonChunk.message_id) {
             console.log('Received metadata event:', jsonChunk)
             if (onMetadata) {
-              console.log('Calling onMetadata callback with:', jsonChunk)
               onMetadata(jsonChunk as MetadataEvent)
             }
-          } else {
-            console.warn('Received metadata event with missing required fields:', jsonChunk)
+            // Check if this is a visualization message
+            if (jsonChunk.visualization) {
+              isVisualizationMessage = true;
+              accumulatedContent = ''; // Reset content for visualization messages
+            }
           }
           break
 
         case 'text':
-          accumulatedContent += jsonChunk.content
           messageId = jsonChunk.message_id
+          
+          // Always accumulate content, including the iframe
+          accumulatedContent += jsonChunk.content;
+          
+          // If visualization data is present, store it
+          if (jsonChunk.visualization) {
+            visualization = jsonChunk.visualization;
+          }
           break
 
         case 'loading':
@@ -178,6 +214,7 @@ export async function parseAndHandleStreamChunk(
             factIndex: null,
             fact: null,
             messageId: messageId,
+            visualization: visualization
           }
 
         case 'message_delta':
@@ -217,5 +254,6 @@ export async function parseAndHandleStreamChunk(
     factIndex: null,
     fact: null,
     messageId: messageId,
+    visualization: visualization
   }
 }

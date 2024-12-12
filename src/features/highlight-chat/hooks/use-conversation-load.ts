@@ -81,7 +81,16 @@ export function useConversationLoad() {
               attached_context: message.attached_context,
             } as UserMessage
           } else {
-            return baseMessage as AssistantMessage
+            return {
+              ...baseMessage,
+              id: message.id,
+              role: message.role,
+              content: message.content,
+              version,
+              conversation_id: conversationId,
+              given_feedback: message.given_feedback,
+              visualization: message?.visualization,
+            } as AssistantMessage
           }
         })
 

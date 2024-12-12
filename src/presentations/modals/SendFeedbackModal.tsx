@@ -1,9 +1,9 @@
 import React, { useState, type PropsWithChildren } from 'react'
 import { Message } from '@/types'
-import { trackEvent } from '@/utils/amplitude'
-import client from '@/utils/api-client'
 import { z } from 'zod'
 
+import { trackEvent } from '@/utils/amplitude'
+import client from '@/utils/api-client'
 import useAuth from '@/hooks/useAuth'
 // Components
 import Button from '@/components/Button/Button'
@@ -77,7 +77,7 @@ const SendFeedbackModal = ({
       feedback: feedbackDetails ?? '',
       feedback_type: feedbackType,
       conversation_id: message.conversation_id,
-      message_id: message.id,
+      message_id: message.id ?? '',
     }
     try {
       const { data, error } = await client.POST('/api/v2/feedback/add', {

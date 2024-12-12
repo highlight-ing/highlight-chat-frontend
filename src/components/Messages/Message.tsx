@@ -11,7 +11,7 @@ import { AssistantIcon, PersonalizeIcon } from '@/components/icons'
 import CodeBlock from '@/components/Messages/CodeBlock'
 import TypedText from '@/components/TypedText/TypedText'
 
-import { Message as MessageType, UserMessage } from '../../types'
+import { Message as MessageType, UserMessage, VisualizationData } from '../../types'
 import { Attachment } from '../Attachment'
 import styles from './message.module.scss'
 
@@ -92,11 +92,12 @@ const FactButton = ({ factIndex, fact }: { factIndex?: number; fact?: string }) 
  * @param content
  */
 const preprocessLaTeX = (content: string) => {
-  // Replace block-level LaTeX delimiters \[ \] with $$ $$
   const blockProcessedContent = content.replace(/\\\[(.*?)\\\]/g, (_, equation) => `$$${equation}$$`)
-  // Replace inline LaTeX delimiters \( \) with $ $
-  const inlineProcessedContent = blockProcessedContent.replace(/\\\((.*?)\\\)/g, (_, equation) => `$${equation}$`)
-  return inlineProcessedContent
+  return blockProcessedContent.replace(/\\\((.*?)\\\)/g, (_, equation) => `$${equation}$`)
+}
+
+const Visualization = ({ visualization }: { visualization: VisualizationData }) => {
+  return <iframe src={visualization.url} className="mt-2 min-h-[485px] w-full rounded-xl" />
 }
 
 export const Message = ({ message, isThinking }: MessageProps) => {
@@ -169,48 +170,49 @@ export const Message = ({ message, isThinking }: MessageProps) => {
       )}
       {!isThinking ? (
         <div className={styles.message}>
-          <div className={styles.messageBody}>
-            <Markdown
-              remarkPlugins={[remarkGfm, remarkMath]}
-              rehypePlugins={[rehypeKatex]}
-              components={{
-                a({ children, href }) {
-                  return (
-                    <a href={href} target="_blank" rel="noopener noreferrer">
-                      {children}
-                    </a>
-                  )
-                },
-                // @ts-ignore
-                code({ node, inline, className, children, ...props }) {
-                  const match = /language-(\w+)/.exec(className || '')
-                  const isStringWithNewlines = typeof children === 'string' && children.includes('\n')
-                  if ((!inline && match) || isStringWithNewlines) {
-                    return <CodeBlock language={match?.[1] ?? 'plaintext'}>{children}</CodeBlock>
-                  }
-                  return (
-                    <code className={className} {...props}>
-                      {children}
-                    </code>
-                  )
-                },
-                td({ children }) {
-                  if (typeof children === 'string') {
-                    return <td>{children}</td>
-                  }
-                  if (Array.isArray(children)) {
+          {message.content ? (
+            <div className={styles.messageBody}>
+              <Markdown
+                remarkPlugins={[remarkGfm, remarkMath]}
+                rehypePlugins={[rehypeKatex]}
+                components={{
+                  a({ children, href }) {
                     return (
-                      <td>
-                        {/*// @ts-ignore*/}
-                        {children.map((child, index) => (
-                          <Fragment key={index}>{child === '<br>' ? <br /> : child}</Fragment>
-                        ))}
-                      </td>
+                      <a href={href} target="_blank" rel="noopener noreferrer">
+                        {children}
+                      </a>
                     )
-                  }
-                  return <td>{children}</td>
-                },
-              }}
+                  },
+                  // @ts-ignore
+                  code({ node, inline, className, children, ...props }) {
+                    const match = /language-(\w+)/.exec(className || '')
+                    const isStringWithNewlines = typeof children === 'string' && children.includes('\n')
+                    if ((!inline && match) || isStringWithNewlines) {
+                      return <CodeBlock language={match?.[1] ?? 'plaintext'}>{children}</CodeBlock>
+                    }
+                    return (
+                      <code className={className} {...props}>
+                        {children}
+                      </code>
+                    )
+                  },
+                  td({ children }) {
+                    if (typeof children === 'string') {
+                      return <td>{children}</td>
+                    }
+                    if (Array.isArray(children)) {
+                      return (
+                        <td>
+                          {/*// @ts-ignore*/}
+                          {children.map((child, index) => (
+                            <Fragment key={index}>{child === '<br>' ? <br /> : child}</Fragment>
+                          ))}
+                        </td>
+                      )
+                    }
+                    return <td>{children}</td>
+                  },
+                }}
               // remarkToRehypeOptions={{
               //   allowDangerousHtml: true
               // }}
@@ -228,16 +230,23 @@ export const Message = ({ message, isThinking }: MessageProps) => {
               //       return <code {...props}/>
               //     }
               // }}}
-            >
-              {typeof message.content === 'string' ? preprocessLaTeX(message.content) : ''}
-            </Markdown>
-            {typeof message.content !== 'string' && message.content}
-          </div>
+              >
+                {typeof message.content === 'string' ? preprocessLaTeX(message.content) : ''}
+              </Markdown>
+              {typeof message.content !== 'string' && message.content}
+            </div>
+          ) : null}
+
+          {message.role === 'assistant' && message.visualization && (
+            <Visualization visualization={message.visualization} />
+          )}
 
           {message.role === 'user' && hasAttachment(message as UserMessage) && (
             <div className={`mt-2 flex gap-2`}>
-              {message.version === 'v4' && message.attached_context && message.attached_context.length > 0 ? (
-                message.attached_context?.map((attachment, index) => (
+              {message.version === 'v4' &&
+                Array.isArray(message.attached_context) &&
+                message.attached_context.length > 0 ? (
+                message.attached_context.map((attachment, index) => (
                   <div key={index}>{renderAttachment(attachment)}</div>
                 ))
               ) : (
