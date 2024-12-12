@@ -1,8 +1,8 @@
 import { ReactNode } from 'react'
-import { AttachedContextContextTypes } from '@/utils/formDataUtils'
 import { RichTextItemResponse } from '@notionhq/client/build/src/api-endpoints'
 
 import { Prompt } from '@/types/supabase-helpers'
+import { AttachedContextContextTypes } from '@/utils/formDataUtils'
 import { ButtonVariantType } from '@/components/Button/Button'
 import { ColorScheme } from '@/components/PersonalPrompts/customVariables'
 
