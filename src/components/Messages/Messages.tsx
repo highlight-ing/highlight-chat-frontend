@@ -60,8 +60,6 @@ const Messages = () => {
     return () => observer.disconnect()
   }, [])
 
-  console.log(messages)
-
   return (
     <Scrollable className={styles.messagesContainer}>
       <div className={cn(styles.messages, 'items-end')}>
