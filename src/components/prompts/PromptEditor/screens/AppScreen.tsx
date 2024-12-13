@@ -153,7 +153,7 @@ export default function AppScreen() {
           </span>
         </div>
 
-        <div className="max-w-96 basis-1/3 border-l border-[#ffffff0d] p-[17px]">
+        <div className="max-w-96 basis-1/3 border-l border-[#ffffff0d] p-[17px] overflow-y-auto">
           <div>
             <div className="flex flex-col space-y-[6px]">
               <h3 className="text-base font-semibold text-white">Automations</h3>
@@ -194,9 +194,9 @@ export default function AppScreen() {
             <div className="flex flex-col space-y-[6px] mt-8">
               <AppSelector shortcutName={promptEditorData.name}/>
             </div>
-            {/* <div className="flex flex-col space-y-[6px] mt-8">
+            <div className="flex flex-col space-y-[6px] mt-8">
               <ContextSelector />
-            </div> */}
+            </div>
           </div>
       </div>
       {onboarding.isOnboarding && onboarding.index === 0 && <OnboardingIndex0 />}

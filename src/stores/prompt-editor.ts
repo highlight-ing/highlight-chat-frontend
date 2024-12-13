@@ -11,7 +11,7 @@ import { useStore } from '@/components/providers/store-provider'
  */
 export type PromptEditorScreen = 'startWithTemplate' | 'app' | 'settings' | 'variables'
 
-export type AppAvailability = 'all' | 'specific' | 'hidden'
+export type AppAvailability = 'all' | 'specific' | 'hidden'  | undefined
 
 export interface PromptEditorOnboarding {
   /**
@@ -181,7 +181,7 @@ export const initialPromptEditorState: PromptEditorState = {
     isOnboarding: false,
     hasOnboardedOnceBefore: false,
   },
-  selectedApp: "hidden",
+  selectedApp: undefined as AppAvailability | undefined,
   appVisibility: {},
 }
 
