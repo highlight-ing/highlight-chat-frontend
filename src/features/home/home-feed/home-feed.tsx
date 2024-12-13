@@ -23,10 +23,8 @@ import { MeetingIcon } from '@/components/icons'
 import { useStore } from '@/components/providers/store-provider'
 
 import { feedHiddenAtom, toggleFeedVisibilityAtom } from './atoms'
-import { useAudioNotes, useRecentlyUpdatedHistory } from './hooks'
+import { useAudioNotes } from './hooks'
 import { formatUpdatedAtDate, isChatHistoryItem, isConversationData } from './utils'
-
-const FEED_LENGTH_LIMIT = 10
 
 const homeFeedListItemVariants: Variants = {
   hidden: { opacity: 0, y: -5 },
@@ -239,11 +237,11 @@ function OpenConversationsButton() {
 function MeetingNotesTabContent() {
   const { data, isLoading } = useAudioNotes()
 
-  const tenRecentMeetingNotes = React.useMemo(() => {
-    return data?.filter((audioNote) => audioNote.meeting).slice(0, FEED_LENGTH_LIMIT) ?? []
+  const recentMeetingNotes = React.useMemo(() => {
+    return data?.filter((audioNote) => audioNote.meeting) ?? []
   }, [data])
 
-  if (!isLoading && tenRecentMeetingNotes.length === 0) {
+  if (!isLoading && recentMeetingNotes.length === 0) {
     return <ListEmptyState label="No meeting notes" />
   }
 
@@ -253,7 +251,7 @@ function MeetingNotesTabContent() {
         <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
-          {tenRecentMeetingNotes.map((meetingNote) => (
+          {recentMeetingNotes.map((meetingNote) => (
             <AudioNotesListItem key={meetingNote.id} audioNote={meetingNote} />
           ))}
           <OpenConversationsButton />
@@ -266,11 +264,11 @@ function MeetingNotesTabContent() {
 function AudioNotesTabContent() {
   const { data, isLoading } = useAudioNotes()
 
-  const tenRecentNonMeetingNotes = React.useMemo(() => {
-    return data?.filter((audioNote) => !audioNote.meeting).slice(0, FEED_LENGTH_LIMIT) ?? []
+  const recentNonMeetingNotes = React.useMemo(() => {
+    return data?.filter((audioNote) => !audioNote.meeting) ?? []
   }, [data])
 
-  if (!isLoading && tenRecentNonMeetingNotes.length === 0) {
+  if (!isLoading && recentNonMeetingNotes.length === 0) {
     return <ListEmptyState label="No audio notes" />
   }
 
@@ -280,7 +278,7 @@ function AudioNotesTabContent() {
         <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
-          {tenRecentNonMeetingNotes.map((audioNote) => (
+          {recentNonMeetingNotes.map((audioNote) => (
             <AudioNotesListItem key={audioNote.id} audioNote={audioNote} />
           ))}
           <OpenConversationsButton />
@@ -342,6 +340,8 @@ function ChatListItem(props: { chat: ChatHistoryItem }) {
 function ChatsTabContent() {
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteHistory()
 
+  const allChatRows = data ? data.pages.flatMap((d) => d) : []
+
   if (!isLoading && !data) {
     return <ListEmptyState label="No chats" />
   }
@@ -352,12 +352,8 @@ function ChatsTabContent() {
         <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
-          {data?.pages.map((group, i) => (
-            <React.Fragment key={i}>
-              {group.map((chat) => (
-                <ChatListItem key={chat.id} chat={chat} />
-              ))}
-            </React.Fragment>
+          {allChatRows.map((chat) => (
+            <ChatListItem key={chat.id} chat={chat} />
           ))}
           <ToggleChatHistroyButton />
           <div className="flex w-full justify-center py-2">
@@ -377,27 +373,26 @@ function ChatsTabContent() {
 }
 
 function RecentActivityTabContent() {
-  const { data: historyData, isLoading: isLoadingHistory } = useRecentlyUpdatedHistory()
+  const { data: historyData, isLoading: isLoadingHistory } = useInfiniteHistory()
   const { data: audioNotesData, isLoading: isLoadingAudioNotes } = useAudioNotes()
   const isLoading = isLoadingHistory || isLoadingAudioNotes
 
-  const tenRecentActions = React.useMemo(() => {
-    const tenRecentChats =
-      historyData
-        ?.slice(0, FEED_LENGTH_LIMIT)
-        .map((chat) => ({ ...chat, updatedAt: new Date(chat.updated_at).toISOString() })) ?? []
-    const tenRecentAudioNotes =
-      audioNotesData
-        ?.slice(0, FEED_LENGTH_LIMIT)
-        .map((audioNote) => ({ ...audioNote, updatedAt: audioNote.endedAt.toISOString() })) ?? []
-    const recentActionsSortedByUpdatedAt = [...tenRecentChats, ...tenRecentAudioNotes].sort((a, b) =>
+  const recentActions = React.useMemo(() => {
+    const recentChats = historyData?.pages
+      ? historyData.pages.flatMap((page) =>
+          page.map((chat) => ({ ...chat, updatedAt: new Date(chat.updated_at).toISOString() })),
+        )
+      : []
+    const recentAudioNotes =
+      audioNotesData?.map((audioNote) => ({ ...audioNote, updatedAt: audioNote.endedAt.toISOString() })) ?? []
+    const recentActionsSortedByUpdatedAt = [...recentChats, ...recentAudioNotes].sort((a, b) =>
       b.updatedAt.localeCompare(a.updatedAt),
     )
 
-    return recentActionsSortedByUpdatedAt.slice(0, FEED_LENGTH_LIMIT)
+    return recentActionsSortedByUpdatedAt
   }, [historyData, audioNotesData])
 
-  const renderRecentActions = tenRecentActions.map((action) => {
+  const renderRecentActions = recentActions.map((action) => {
     if (isConversationData(action)) {
       const audioNote = action
       return <AudioNotesListItem key={audioNote.id} audioNote={audioNote} />
@@ -407,7 +402,7 @@ function RecentActivityTabContent() {
     }
   })
 
-  if (!isLoading && tenRecentActions.length === 0) {
+  if (!isLoading && recentActions.length === 0) {
     return <ListEmptyState label="No recent activity" />
   }
 
