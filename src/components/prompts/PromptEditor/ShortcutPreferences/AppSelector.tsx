@@ -65,13 +65,13 @@ export default function AppSelector({shortcutName}: {shortcutName: string}) {
     {
       value: "all",
       icon: <Global variant="Bold" size={20} color={sassVariables.green100}/>,
-      text: "Always",
+      text: "All Apps",
       color: sassVariables.green100
     },
     {
       value: "specific",
       icon: <Category2 variant="Bold" size={20} color={sassVariables.green100}/>,
-      text: "Specify Visibility",
+      text: "Specify Apps",
       color: sassVariables.green100
     },
     {

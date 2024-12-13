@@ -771,3 +771,153 @@ export const SafariIcon = ({ size = 32 }: IconPropTypes) => {
     </svg>
   );
 };
+
+export const ClipboardIcon = ({ size = 32 }: IconPropTypes) => {
+  return (
+    <svg
+      width="${size}"
+      height="${size}"
+      viewBox="0 0 64 64"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g clip-path="url(#clip0_2577_918)">
+        <rect width="64" height="64" rx="6" fill="#A2A6A7" />
+        <path
+          d="M24.8888 32.3556H37.3332"
+          stroke="black"
+          stroke-width="3.5"
+          stroke-miterlimit="10"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M24.8888 39.4667H32.6755"
+          stroke="black"
+          stroke-width="3.5"
+          stroke-miterlimit="10"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M28.4443 21.3333H35.5555C39.111 21.3333 39.111 19.5556 39.111 17.7778C39.111 14.2222 37.3332 14.2222 35.5555 14.2222H28.4443C26.6666 14.2222 24.8888 14.2222 24.8888 17.7778C24.8888 21.3333 26.6666 21.3333 28.4443 21.3333Z"
+          stroke="black"
+          stroke-width="3.5"
+          stroke-miterlimit="10"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M39.1111 17.8133C45.0311 18.1333 48 20.32 48 28.4445V39.1111C48 46.2222 46.2222 49.7778 37.3333 49.7778H26.6667C17.7778 49.7778 16 46.2222 16 39.1111V28.4445C16 20.3378 18.9689 18.1333 24.8889 17.8133"
+          stroke="black"
+          stroke-width="3.5"
+          stroke-miterlimit="10"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="clip0_2577_918">
+          <rect width="64" height="64" rx="32" fill="white" />
+        </clipPath>
+      </defs>
+    </svg>
+  );
+};
+
+
+export const AudioIcon = ({ size = 32 }: IconPropTypes) => {
+  return (
+    <svg
+      width="${size}"
+      height="${size}"
+      viewBox="0 0 64 64"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g clip-path="url(#clip0_2577_941)">
+        <rect width="64" height="64" rx="6" fill="#A2A6A7" />
+        <path
+          d="M16 25.3333V38.6667"
+          stroke="black"
+          stroke-width="3.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M24 20.8889V43.1111"
+          stroke="black"
+          stroke-width="3.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M32 16.4444V47.5556"
+          stroke="black"
+          stroke-width="3.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M40 20.8889V43.1111"
+          stroke="black"
+          stroke-width="3.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M48 25.3333V38.6667"
+          stroke="black"
+          stroke-width="3.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="clip0_2577_941">
+          <rect width="64" height="64" rx="32" fill="white" />
+        </clipPath>
+      </defs>
+    </svg>
+  );
+};
+
+
+export const TextIcon = ({ size = 32 }: IconPropTypes) => {
+  return (
+    <svg
+      width="${size}"
+      height="${size}"
+      viewBox="0 0 64 64"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g clip-path="url(#clip0_2381_21620)">
+        <rect width="64" height="64" rx="6" fill="#A2A6A7" />
+        <path
+          d="M28.4444 42.6667C36.2991 42.6667 42.6666 36.2992 42.6666 28.4445C42.6666 20.5897 36.2991 14.2222 28.4444 14.2222C20.5897 14.2222 14.2222 20.5897 14.2222 28.4445C14.2222 36.2992 20.5897 42.6667 28.4444 42.6667Z"
+          stroke="black"
+          stroke-width="4"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M49.7778 49.7778L39.1111 39.1111"
+          stroke="black"
+          stroke-width="4"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="clip0_2381_21620">
+          <rect width="64" height="64" rx="32" fill="white" />
+        </clipPath>
+      </defs>
+    </svg>
+  );
+};
+
+
+
+
