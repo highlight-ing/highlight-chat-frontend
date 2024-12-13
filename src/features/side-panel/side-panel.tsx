@@ -45,11 +45,14 @@ function CloseHoverAnimateLayout(props: CloseHoverAnimateLayoutProps) {
 function CloseTranscriptViewerButton() {
   const setHoveringClose = useSetAtom(hoveringCloseAtom)
   const setTranscriptOpen = useSetAtom(sidePanelOpenAtom)
+  const isOnHome = useAtomValue(isOnHomeAtom)
 
   function handleClick() {
     setTranscriptOpen(false)
     setHoveringClose(false)
   }
+
+  if (isOnHome) return null
 
   return (
     <Tooltip content="Close" side="right">

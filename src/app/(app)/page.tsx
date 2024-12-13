@@ -76,7 +76,7 @@ export default function Home() {
           <ChatHeader isShowing={!isConversationLoading && !!promptApp && messages.length === 0} />
           {(isChatting || (isConversationLoading && messages.length > 0)) && <Messages />}
           {isConversationLoading && messages.length === 0 && !inputIsDisabled && <MessagesPlaceholder />}
-          <ChatHome isShowing={!isChatting && !promptApp && !isConversationLoading} />
+          {!isChatting && !promptApp && !isConversationLoading && <ChatHome />}
           {(isChatting || promptApp) && <Input isActiveChat={true} />}
           <IntercomChat />
         </div>

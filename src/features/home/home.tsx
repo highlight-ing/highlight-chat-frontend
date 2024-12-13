@@ -1,13 +1,14 @@
+import React from 'react'
 import { useSetAtom } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
 import { cn } from '@/lib/utils'
+import { trackEvent } from '@/utils/amplitude'
 import { sidePanelOpenAtom } from '@/atoms/side-panel'
 import { HighlightIcon } from '@/components/icons'
 import { Input } from '@/components/Input/Input'
 import { useStore } from '@/components/providers/store-provider'
 
-import { useIsVisibleWithEventTracking } from './_hooks/use-is-visible'
 import { HomeFeed } from './home-feed/home-feed'
 
 function InputHeading() {
@@ -28,22 +29,26 @@ function InputHeading() {
   )
 }
 
-export function ChatHome(props: { isShowing: boolean }) {
-  const isVisible = useIsVisibleWithEventTracking(props.isShowing)
+export function ChatHome() {
   const setSidePanelOpen = useSetAtom(sidePanelOpenAtom)
+
+  React.useEffect(() => {
+    trackEvent('HL Chat Home Viewed', {})
+  }, [])
+
   setSidePanelOpen(true)
 
   return (
     <div
       className={cn(
-        'pointer-events-none fixed mt-12 flex h-full w-[min(800px,95%)] flex-col justify-between gap-6 pb-3 pt-4 opacity-0',
-        isVisible && 'pointer-events-auto relative opacity-100',
+        'pointer-events-none fixed mt-12 flex h-full w-full flex-col justify-between gap-6 px-3 py-4 opacity-0',
+        'pointer-events-auto relative opacity-100',
       )}
     >
       <div className="space-y-12">
         <div className="space-y-6">
           <InputHeading />
-          {isVisible && <Input isActiveChat={false} />}
+          <Input isActiveChat={false} />
         </div>
         <HomeFeed />
       </div>
