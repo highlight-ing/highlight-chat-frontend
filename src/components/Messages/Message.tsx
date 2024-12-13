@@ -49,22 +49,19 @@ interface MessageProps {
 }
 
 const FactButton = ({ factIndex, fact }: { factIndex?: number; fact?: string }) => {
-  const [clicked, setClicked] = useState(false)
+  if (!factIndex && !fact) {
+    return null
+  }
 
   const handleClick = () => {
-    setClicked(true)
     console.log('handleClick func fact: ', fact, 'factIndex: ', factIndex)
     if (typeof factIndex === 'number' && fact) {
       // If update
       Highlight.user.updateFact(factIndex, fact)
     } else if (fact) {
+      // If add
       Highlight.user.addFact(fact)
     }
-    window.open('highlight://about-me', '_blank')
-  }
-
-  if (clicked || (!factIndex && !fact)) {
-    return null
   }
 
   let buttonText = 'Personalize your About Me'
