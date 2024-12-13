@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { ChatHistoryItem } from '@/types'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import { AnimatePresence, motion, Variants } from 'framer-motion'
 import { Clock, Eye, EyeSlash, MessageText, VoiceSquare } from 'iconsax-react'
 import { useAtomValue, useSetAtom } from 'jotai'
@@ -339,8 +340,25 @@ function ChatListItem(props: { chat: ChatHistoryItem }) {
 
 function ChatsTabContent() {
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteHistory()
-
+  const parentRef = React.useRef<HTMLDivElement>(null)
   const allChatRows = data ? data.pages.flatMap((d) => d) : []
+
+  const rowVirtualizer = useVirtualizer({
+    count: hasNextPage ? allChatRows.length + 1 : allChatRows.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 49,
+    overscan: 5,
+  })
+  const virtualizerItems = rowVirtualizer.getVirtualItems()
+
+  React.useEffect(() => {
+    const [lastItem] = [...virtualizerItems].reverse()
+    if (!lastItem) return
+
+    if (lastItem.index >= allChatRows.length && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage()
+    }
+  }, [hasNextPage, fetchNextPage, allChatRows.length, isFetchingNextPage, virtualizerItems])
 
   if (!isLoading && !data) {
     return <ListEmptyState label="No chats" />
@@ -352,19 +370,43 @@ function ChatsTabContent() {
         <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
-          {allChatRows.map((chat) => (
-            <ChatListItem key={chat.id} chat={chat} />
-          ))}
-          <ToggleChatHistroyButton />
-          <div className="flex w-full justify-center py-2">
-            <Button
-              variant="primary-outline"
-              size="medium"
-              onClick={() => fetchNextPage()}
-              disabled={!hasNextPage || isFetchingNextPage}
+          <div ref={parentRef} className="h-[calc(100vh-200px)] w-full overflow-y-scroll">
+            <div
+              style={{
+                height: `${rowVirtualizer.getTotalSize()}px`,
+              }}
+              className="relative w-full"
             >
-              {isFetchingNextPage ? 'Loading more...' : hasNextPage ? 'Load More' : 'Nothing more to load'}
-            </Button>
+              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                const isLoaderRow = virtualRow.index > allChatRows.length - 1
+                const chat = allChatRows[virtualRow.index]
+
+                return (
+                  <div
+                    key={virtualRow.index}
+                    className={virtualRow.index % 2 ? 'ListItemOdd' : 'ListItemEven'}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: `${virtualRow.size}px`,
+                      transform: `translateY(${virtualRow.start}px)`,
+                    }}
+                  >
+                    {isLoaderRow ? (
+                      hasNextPage ? (
+                        'Loading more...'
+                      ) : (
+                        'Nothing more to load'
+                      )
+                    ) : (
+                      <ChatListItem key={chat.id} chat={chat} />
+                    )}
+                  </div>
+                )
+              })}
+            </div>
           </div>
         </HomeFeedListLayout>
       )}
@@ -373,24 +415,55 @@ function ChatsTabContent() {
 }
 
 function RecentActivityTabContent() {
-  const { data: historyData, isLoading: isLoadingHistory } = useInfiniteHistory()
+  const {
+    data: historyData,
+    isLoading: isLoadingHistory,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useInfiniteHistory()
   const { data: audioNotesData, isLoading: isLoadingAudioNotes } = useAudioNotes()
   const isLoading = isLoadingHistory || isLoadingAudioNotes
+  const parentRef = React.useRef<HTMLDivElement>(null)
 
-  const recentActions = React.useMemo(() => {
+  const { recentActions } = React.useMemo(() => {
     const recentChats = historyData?.pages
       ? historyData.pages.flatMap((page) =>
-          page.map((chat) => ({ ...chat, updatedAt: new Date(chat.updated_at).toISOString() })),
+          page.map((chat) => ({ ...chat, updatedAt: new Date(chat.updated_at).toISOString(), type: 'chat' })),
         )
       : []
     const recentAudioNotes =
-      audioNotesData?.map((audioNote) => ({ ...audioNote, updatedAt: audioNote.endedAt.toISOString() })) ?? []
+      audioNotesData?.map((audioNote) => ({
+        ...audioNote,
+        updatedAt: audioNote.endedAt.toISOString(),
+        type: 'audio-note',
+      })) ?? []
     const recentActionsSortedByUpdatedAt = [...recentChats, ...recentAudioNotes].sort((a, b) =>
       b.updatedAt.localeCompare(a.updatedAt),
     )
 
-    return recentActionsSortedByUpdatedAt
+    return {
+      recentActions: recentActionsSortedByUpdatedAt,
+      recentChats,
+    }
   }, [historyData, audioNotesData])
+
+  const rowVirtualizer = useVirtualizer({
+    count: hasNextPage ? recentActions.length + 1 : recentActions.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 49,
+    overscan: 5,
+  })
+  const virtualizerItems = rowVirtualizer.getVirtualItems()
+
+  React.useEffect(() => {
+    const [lastItem] = [...virtualizerItems].reverse()
+    if (!lastItem) return
+
+    if (lastItem.index >= recentActions.length && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage()
+    }
+  }, [hasNextPage, fetchNextPage, recentActions.length, isFetchingNextPage, virtualizerItems])
 
   const renderRecentActions = recentActions.map((action) => {
     if (isConversationData(action)) {
@@ -412,8 +485,27 @@ function RecentActivityTabContent() {
         <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
-          {renderRecentActions}
-          <ToggleChatHistroyButton />
+          <div ref={parentRef} className="h-[calc(100vh-200px)] w-full overflow-y-scroll">
+            <div
+              style={{
+                height: `${rowVirtualizer.getTotalSize()}px`,
+              }}
+              className="relative w-full"
+            >
+              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                const isLoaderRow = virtualRow.index > recentActions.length - 1
+                const row = renderRecentActions[virtualRow.index]
+
+                console.log({ isLoaderRow, row })
+
+                return (
+                  <div key={virtualRow.index}>
+                    {isLoaderRow ? (hasNextPage ? 'Loading more...' : 'Nothing more to load') : row}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
         </HomeFeedListLayout>
       )}
     </AnimatePresence>
@@ -445,7 +537,7 @@ function HomeFeedTabContent(props: { value: string; children: React.ReactNode })
 
 export function HomeFeed() {
   return (
-    <Tabs defaultValue="recent-activity">
+    <Tabs defaultValue="chats">
       <TabsList className="mb-0 w-full">
         <div className="flex w-full items-center justify-between border-b border-subtle py-1.5">
           <div className="flex items-center gap-2">
@@ -457,20 +549,18 @@ export function HomeFeed() {
           <HomeFeedVisibilityToggle />
         </div>
       </TabsList>
-      <ScrollArea className="h-[850px] w-full">
-        <HomeFeedTabContent value="recent-activity">
-          <RecentActivityTabContent />
-        </HomeFeedTabContent>
-        <HomeFeedTabContent value="meeting-notes">
-          <MeetingNotesTabContent />
-        </HomeFeedTabContent>
-        <HomeFeedTabContent value="audio-notes">
-          <AudioNotesTabContent />
-        </HomeFeedTabContent>
-        <HomeFeedTabContent value="chats">
-          <ChatsTabContent />
-        </HomeFeedTabContent>
-      </ScrollArea>
+      <HomeFeedTabContent value="recent-activity">
+        <RecentActivityTabContent />
+      </HomeFeedTabContent>
+      <HomeFeedTabContent value="meeting-notes">
+        <MeetingNotesTabContent />
+      </HomeFeedTabContent>
+      <HomeFeedTabContent value="audio-notes">
+        <AudioNotesTabContent />
+      </HomeFeedTabContent>
+      <HomeFeedTabContent value="chats">
+        <ChatsTabContent />
+      </HomeFeedTabContent>
     </Tabs>
   )
 }
