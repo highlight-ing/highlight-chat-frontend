@@ -33,7 +33,7 @@ export function App(props: { children: React.ReactNode }) {
       <ModalContainer />
       <ToastContainer />
       <ChangelogModal />
-      <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
+      {/* <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} /> */}
     </>
   )
 }

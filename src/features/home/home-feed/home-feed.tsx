@@ -21,6 +21,7 @@ import { Tooltip } from '@/components/ui/tooltip'
 import Button from '@/components/Button/Button'
 import { OpenAppButton } from '@/components/buttons/open-app-button'
 import { MeetingIcon } from '@/components/icons'
+import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 import { useStore } from '@/components/providers/store-provider'
 
 import { feedHiddenAtom, toggleFeedVisibilityAtom } from './atoms'
@@ -32,7 +33,7 @@ const homeFeedListItemVariants: Variants = {
   visible: { opacity: 1, y: 0, transition: { type: 'spring', bounce: 0, duration: 0.4 } },
 }
 
-type HomeFeedListItemLayoutProps = React.ComponentPropsWithoutRef<'div'>
+type HomeFeedListItemLayoutProps = React.ComponentPropsWithRef<'div'>
 
 function HomeFeedListItemLayout({ className, children, ...props }: HomeFeedListItemLayoutProps) {
   return (
@@ -340,25 +341,25 @@ function ChatListItem(props: { chat: ChatHistoryItem }) {
 
 function ChatsTabContent() {
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteHistory()
-  const parentRef = React.useRef<HTMLDivElement>(null)
   const allChatRows = data ? data.pages.flatMap((d) => d) : []
-
-  const rowVirtualizer = useVirtualizer({
-    count: hasNextPage ? allChatRows.length + 1 : allChatRows.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 49,
-    overscan: 5,
-  })
-  const virtualizerItems = rowVirtualizer.getVirtualItems()
+  const loadMoreRef = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
-    const [lastItem] = [...virtualizerItems].reverse()
-    if (!lastItem) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage()
+        }
+      },
+      { threshold: 1.0 },
+    )
 
-    if (lastItem.index >= allChatRows.length && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage()
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current)
     }
-  }, [hasNextPage, fetchNextPage, allChatRows.length, isFetchingNextPage, virtualizerItems])
+
+    return () => observer.disconnect()
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage])
 
   if (!isLoading && !data) {
     return <ListEmptyState label="No chats" />
@@ -370,43 +371,19 @@ function ChatsTabContent() {
         <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
-          <div ref={parentRef} className="h-[calc(100vh-200px)] w-full overflow-y-scroll">
-            <div
-              style={{
-                height: `${rowVirtualizer.getTotalSize()}px`,
-              }}
-              className="relative w-full"
-            >
-              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-                const isLoaderRow = virtualRow.index > allChatRows.length - 1
-                const chat = allChatRows[virtualRow.index]
-
-                return (
-                  <div
-                    key={virtualRow.index}
-                    className={virtualRow.index % 2 ? 'ListItemOdd' : 'ListItemEven'}
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      width: '100%',
-                      height: `${virtualRow.size}px`,
-                      transform: `translateY(${virtualRow.start}px)`,
-                    }}
-                  >
-                    {isLoaderRow ? (
-                      hasNextPage ? (
-                        'Loading more...'
-                      ) : (
-                        'Nothing more to load'
-                      )
-                    ) : (
-                      <ChatListItem key={chat.id} chat={chat} />
-                    )}
-                  </div>
-                )
-              })}
-            </div>
+          {allChatRows.map((chat) => (
+            <ChatListItem key={chat.id} chat={chat} />
+          ))}
+          <div ref={loadMoreRef}>
+            <HomeFeedListItemLayout className="text-subtle">
+              {isFetchingNextPage ? (
+                <LoadingSpinner size="16px" />
+              ) : hasNextPage ? (
+                'Load more'
+              ) : (
+                'No more items to load'
+              )}
+            </HomeFeedListItemLayout>
           </div>
         </HomeFeedListLayout>
       )}
@@ -424,9 +401,9 @@ function RecentActivityTabContent() {
   } = useInfiniteHistory()
   const { data: audioNotesData, isLoading: isLoadingAudioNotes } = useAudioNotes()
   const isLoading = isLoadingHistory || isLoadingAudioNotes
-  const parentRef = React.useRef<HTMLDivElement>(null)
+  const loadMoreRef = React.useRef<HTMLDivElement>(null)
 
-  const { recentActions } = React.useMemo(() => {
+  const recentActions = React.useMemo(() => {
     const recentChats = historyData?.pages
       ? historyData.pages.flatMap((page) =>
           page.map((chat) => ({ ...chat, updatedAt: new Date(chat.updated_at).toISOString(), type: 'chat' })),
@@ -442,28 +419,25 @@ function RecentActivityTabContent() {
       b.updatedAt.localeCompare(a.updatedAt),
     )
 
-    return {
-      recentActions: recentActionsSortedByUpdatedAt,
-      recentChats,
-    }
+    return recentActionsSortedByUpdatedAt
   }, [historyData, audioNotesData])
 
-  const rowVirtualizer = useVirtualizer({
-    count: hasNextPage ? recentActions.length + 1 : recentActions.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 49,
-    overscan: 5,
-  })
-  const virtualizerItems = rowVirtualizer.getVirtualItems()
-
   React.useEffect(() => {
-    const [lastItem] = [...virtualizerItems].reverse()
-    if (!lastItem) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage()
+        }
+      },
+      { threshold: 1.0 },
+    )
 
-    if (lastItem.index >= recentActions.length && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage()
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current)
     }
-  }, [hasNextPage, fetchNextPage, recentActions.length, isFetchingNextPage, virtualizerItems])
+
+    return () => observer.disconnect()
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage])
 
   const renderRecentActions = recentActions.map((action) => {
     if (isConversationData(action)) {
@@ -485,26 +459,17 @@ function RecentActivityTabContent() {
         <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
-          <div ref={parentRef} className="h-[calc(100vh-200px)] w-full overflow-y-scroll">
-            <div
-              style={{
-                height: `${rowVirtualizer.getTotalSize()}px`,
-              }}
-              className="relative w-full"
-            >
-              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-                const isLoaderRow = virtualRow.index > recentActions.length - 1
-                const row = renderRecentActions[virtualRow.index]
-
-                console.log({ isLoaderRow, row })
-
-                return (
-                  <div key={virtualRow.index}>
-                    {isLoaderRow ? (hasNextPage ? 'Loading more...' : 'Nothing more to load') : row}
-                  </div>
-                )
-              })}
-            </div>
+          {renderRecentActions}
+          <div ref={loadMoreRef}>
+            <HomeFeedListItemLayout className="text-subtle">
+              {isFetchingNextPage ? (
+                <LoadingSpinner size="16px" />
+              ) : hasNextPage ? (
+                'Load more'
+              ) : (
+                'No more items to load'
+              )}
+            </HomeFeedListItemLayout>
           </div>
         </HomeFeedListLayout>
       )}
@@ -532,7 +497,11 @@ function HomeFeedVisibilityToggle() {
 function HomeFeedTabContent(props: { value: string; children: React.ReactNode }) {
   const feedHidden = useAtomValue(feedHiddenAtom)
 
-  return <TabsContent value={props.value}>{feedHidden ? <FeedHiddenState /> : props.children}</TabsContent>
+  return (
+    <TabsContent value={props.value}>
+      {feedHidden ? <FeedHiddenState /> : <ScrollArea className="h-[calc(100vh-200px)]">{props.children}</ScrollArea>}
+    </TabsContent>
+  )
 }
 
 export function HomeFeed() {
