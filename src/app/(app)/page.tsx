@@ -7,29 +7,29 @@ import { useShallow } from 'zustand/react/shallow'
 
 import { cn } from '@/lib/utils'
 import { showHistoryAtom } from '@/atoms/history'
-import { isOnHomeAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
+import { isOnHomeAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
 import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
 import { Input } from '@/components/Input/Input'
 import Messages from '@/components/Messages/Messages'
 import MessagesPlaceholder from '@/components/Messages/MessagesPlaceholder'
 import { useStore } from '@/components/providers/store-provider'
 
-import { ChatHeader } from '@/features/highlight-chat/components/chat-header/chat-header'
-import { ChatHome } from '@/features/highlight-chat/components/chat-home'
-import { IntercomChat } from '@/features/highlight-chat/components/intercom-chat'
-import { useClipboardPaste } from '@/features/highlight-chat/hooks/use-clipboard-paste'
-import { useConversationLoad } from '@/features/highlight-chat/hooks/use-conversation-load'
-import { useOnAppOpen } from '@/features/highlight-chat/hooks/use-on-app-open'
-import { useOnExternalMessage } from '@/features/highlight-chat/hooks/use-on-external-message'
-import { useOnPromptChange } from '@/features/highlight-chat/hooks/use-on-prompt-change'
-import { useOnPromptLoad } from '@/features/highlight-chat/hooks/use-on-prompt-load'
+import { ChatHeader } from '@/features/chat/chat-header/chat-header'
 import { HistorySidebar } from '@/features/history-sidebar/history-sidebar'
+import { IntercomChat } from '@/features/home/_components/intercom-chat'
+import { useClipboardPaste } from '@/features/home/_hooks/use-clipboard-paste'
+import { useConversationLoad } from '@/features/home/_hooks/use-conversation-load'
+import { useOnAppOpen } from '@/features/home/_hooks/use-on-app-open'
+import { useOnExternalMessage } from '@/features/home/_hooks/use-on-external-message'
+import { useOnPromptChange } from '@/features/home/_hooks/use-on-prompt-change'
+import { useOnPromptLoad } from '@/features/home/_hooks/use-on-prompt-load'
+import { ChatHome } from '@/features/home/home'
 import { NavigationTopBar } from '@/features/nav-header/top-bar/top-bar'
-import { TranscriptViewer } from '@/features/transcript-viewer/transcript-viewer'
+import { SidePanel } from '@/features/side-panel/side-panel'
 
 export default function Home() {
   const [showHistory, setShowHistory] = useAtom(showHistoryAtom)
-  const [transcriptOpen, setTransactionOpen] = useAtom(transcriptOpenAtom)
+  const [sidePanelOpen, setSidePanelOpen] = useAtom(sidePanelOpenAtom)
   const setIsOnHome = useSetAtom(isOnHomeAtom)
   const { inputIsDisabled, promptApp, isConversationLoading } = useStore(
     useShallow((state) => ({
@@ -45,8 +45,8 @@ export default function Home() {
 
   React.useEffect(() => {
     setIsOnHome(!isChatting)
-    setTransactionOpen(false)
-  }, [isChatting, setIsOnHome, setTransactionOpen])
+    setSidePanelOpen(false)
+  }, [isChatting, setIsOnHome, setSidePanelOpen])
 
   useClipboardPaste()
   useConversationLoad()
@@ -70,7 +70,7 @@ export default function Home() {
           className={cn(
             'col-span-3 flex w-full flex-col items-center justify-end transition delay-100',
             styles.contents,
-            transcriptOpen && 'col-span-2',
+            sidePanelOpen && 'col-span-2',
           )}
         >
           <ChatHeader isShowing={!isConversationLoading && !!promptApp && messages.length === 0} />
@@ -80,7 +80,7 @@ export default function Home() {
           {(isChatting || promptApp) && <Input isActiveChat={true} />}
           <IntercomChat />
         </div>
-        <TranscriptViewer />
+        <SidePanel />
       </div>
     </div>
   )

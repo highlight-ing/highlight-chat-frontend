@@ -6,7 +6,7 @@ import useMeasure from 'react-use-measure'
 
 import { cn } from '@/lib/utils'
 import { formatTitle } from '@/utils/conversations'
-import { isOnHomeAtom, selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
+import { isOnHomeAtom, selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tooltip } from '@/components/ui/tooltip'
 import { MeetingIcon } from '@/components/icons'
@@ -44,7 +44,7 @@ function CloseHoverAnimateLayout(props: CloseHoverAnimateLayoutProps) {
 
 function CloseTranscriptViewerButton() {
   const setHoveringClose = useSetAtom(hoveringCloseAtom)
-  const setTranscriptOpen = useSetAtom(transcriptOpenAtom)
+  const setTranscriptOpen = useSetAtom(sidePanelOpenAtom)
 
   function handleClick() {
     setTranscriptOpen(false)
@@ -180,16 +180,16 @@ const transcriptViewerVariants: Variants = {
   exit: { opacity: 0, x: 50, transition: { duration: 0.09 } },
 }
 
-export function TranscriptViewer() {
+export function SidePanel() {
   const selectedAudioNote = useAtomValue(selectedAudioNoteAtom)
   const headerHeight = useAtomValue(headerHeightAtom)
   const transcriptMessages = parseTranscript(selectedAudioNote?.transcript)
-  const transcriptOpen = useAtomValue(transcriptOpenAtom)
+  const sidePanelOpen = useAtomValue(sidePanelOpenAtom)
   const isOnHome = useAtomValue(isOnHomeAtom)
 
   return (
     <AnimatePresence mode="popLayout">
-      {transcriptOpen && (
+      {sidePanelOpen && (
         <motion.div
           variants={transcriptViewerVariants}
           initial="hidden"

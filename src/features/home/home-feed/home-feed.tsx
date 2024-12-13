@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { formatConversationDuration, formatTitle } from '@/utils/conversations'
 import { showHistoryAtom, toggleShowHistoryAtom } from '@/atoms/history'
-import { selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
+import { selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Tooltip } from '@/components/ui/tooltip'
@@ -189,11 +189,11 @@ function AudioNotesListItem(props: { audioNote: ConversationData }) {
   const audioNoteDuration = formatConversationDuration(props.audioNote)
   const wordCount = props.audioNote?.transcript.split(' ').length
   const setSelectedAudioNote = useSetAtom(selectedAudioNoteAtom)
-  const setTranscriptOpen = useSetAtom(transcriptOpenAtom)
+  const setSidePanelOpen = useSetAtom(sidePanelOpenAtom)
 
   function handleClick() {
     setSelectedAudioNote(props.audioNote)
-    setTranscriptOpen(true)
+    setSidePanelOpen(true)
 
     trackEvent('Audio Note Previewed', {
       audioNoteId: props.audioNote.id,

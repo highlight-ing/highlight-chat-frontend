@@ -1,30 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
 import { Attachment as AttachmentType, isFileAttachmentType } from '@/types'
 import { AnimatePresence, motion, MotionConfig, Transition } from 'framer-motion'
-import { AddCircle, BoxAdd } from 'iconsax-react'
 import { useAtomValue } from 'jotai'
 import useMeasure from 'react-use-measure'
 import { useShallow } from 'zustand/react/shallow'
 
-import { cn } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { getDisplayValue } from '@/utils/attachments'
-import { transcriptOpenAtom } from '@/atoms/transcript-viewer'
+import { sidePanelOpenAtom } from '@/atoms/side-panel'
 import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 import { useStore } from '@/components/providers/store-provider'
 
-import { ViewChangelogBanner } from '@/features/changelog/view-changelog-banner'
-
 import { Attachment } from '../Attachment'
-import { CreateShortcutButton } from '../buttons/create-shortcut-button'
-import { OpenAppButton } from '../buttons/open-app-button'
 import { AttachmentDropdowns } from '../dropdowns/attachment-dropdowns'
-import { Stacker, StackerItem } from '../stacker'
 import styles from './chatinput.module.scss'
 import { InputDivider } from './InputDivider'
 import InputFooter from './InputFooter'
 import InputPromptActions from './InputPromptActions'
-import { LatestConversation } from './latest-conversation'
 
 const MAX_INPUT_HEIGHT = 160
 
@@ -56,7 +48,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
   const { handleSubmit } = useSubmitQuery()
   const [isInputFocused, setIsInputFocused] = useState(false)
   const [input, setInput] = useState('')
-  const transcriptOpen = useAtomValue(transcriptOpenAtom)
+  const transcriptOpen = useAtomValue(sidePanelOpenAtom)
 
   let inputRef = useRef<HTMLTextAreaElement>(null)
   let inputBlurTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -167,7 +159,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
 
       if (inputBlurTimeoutRef.current) clearTimeout(inputBlurTimeoutRef.current)
     }
-  }, [inputRef.current, inputBlurTimeoutRef])
+  }, [inputBlurTimeoutRef])
 
   useEffect(() => {
     function handleEsc(e: KeyboardEvent) {
@@ -197,7 +189,7 @@ export const Input = ({ isActiveChat }: { isActiveChat: boolean }) => {
       setInput(inputOverride)
       setInputOverride(null)
     }
-  }, [input, inputOverride])
+  }, [input, inputOverride, setInputOverride])
 
   const handleNonInputFocus = () => {
     if (inputBlurTimeoutRef.current) {

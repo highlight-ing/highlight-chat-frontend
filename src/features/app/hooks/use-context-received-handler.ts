@@ -11,7 +11,7 @@ import { Prompt } from '@/types/supabase-helpers'
 import { trackEvent } from '@/utils/amplitude'
 import { processAttachments } from '@/utils/contextprocessor'
 import { countPromptView, getPromptAppBySlug } from '@/utils/prompts'
-import { selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
+import { selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
 import useAuth from '@/hooks/useAuth'
 import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 import { useStore } from '@/components/providers/store-provider'
@@ -45,7 +45,7 @@ export function useContextReceivedHandler() {
 
   const router = useRouter()
 
-  const setTranscriptOpen = useSetAtom(transcriptOpenAtom)
+  const setSidePanelOpen = useSetAtom(sidePanelOpenAtom)
   const setSelectedAudioNote = useSetAtom(selectedAudioNoteAtom)
 
   React.useEffect(() => {
@@ -111,7 +111,7 @@ export function useContextReceivedHandler() {
         title: 'Audio Note',
         transcript: attachment,
       })
-      setTranscriptOpen(true)
+      setSidePanelOpen(true)
     })
 
     return () => {
