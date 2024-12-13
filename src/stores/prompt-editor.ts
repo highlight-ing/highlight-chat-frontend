@@ -11,6 +11,8 @@ import { useStore } from '@/components/providers/store-provider'
  */
 export type PromptEditorScreen = 'startWithTemplate' | 'app' | 'settings' | 'variables'
 
+export type AppAvailability = 'all' | 'specific' | 'hidden'  | undefined
+
 export interface PromptEditorOnboarding {
   /**
    * Where we currently are in the onboarding process.
@@ -49,6 +51,8 @@ export interface PromptEditorState {
   saving: boolean
   settingsHasNoErrors: boolean
   onboarding: PromptEditorOnboarding
+  selectedApp: AppAvailability;
+  appVisibility: Record<string, boolean>;
 }
 
 export type PromptEditorSlice = PromptEditorState & {
@@ -60,6 +64,8 @@ export type PromptEditorSlice = PromptEditorState & {
   setSettingsHasNoErrors: (hasSettingsError: boolean) => void
   setOnboarding: (onboarding: Partial<PromptEditorOnboarding>) => void
   startTutorial: () => void
+  setSelectedApp: (value: AppAvailability) => void;
+  setAppVisibility: (visibility: Record<string, boolean>) => void;
 }
 
 export const DEFAULT_SYSTEM_PROMPT = `
@@ -175,6 +181,8 @@ export const initialPromptEditorState: PromptEditorState = {
     isOnboarding: false,
     hasOnboardedOnceBefore: false,
   },
+  selectedApp: undefined as AppAvailability | undefined,
+  appVisibility: {},
 }
 
 export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, get) => ({
@@ -195,6 +203,8 @@ export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, ge
     }),
   startTutorial: () =>
     set({ onboarding: { isOnboarding: true, index: 0, hasOnboardedOnceBefore: true }, selectedScreen: 'app' }),
+  setSelectedApp: (value: AppAvailability) => set({ selectedApp: value }),
+  setAppVisibility: (visibility: Record<string, boolean>) => set({ appVisibility: visibility }),
 })
 
 export const usePromptEditorStore = () =>
@@ -214,5 +224,9 @@ export const usePromptEditorStore = () =>
       onboarding: state.onboarding,
       setOnboarding: state.setOnboarding,
       startTutorial: state.startTutorial,
+      selectedApp: state.selectedApp,
+      setSelectedApp: state.setSelectedApp,
+      appVisibility: state.appVisibility,
+      setAppVisibility: state.setAppVisibility,
     })),
   )
