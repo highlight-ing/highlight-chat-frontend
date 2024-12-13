@@ -23,8 +23,17 @@ export interface CreateGoogleCalendarEventParams {
 }
 
 export interface UseIntegrationsAPI {
-  createLinearTicket: (conversationId: string, title: string, description: string) => Promise<void>
-  createNotionPage: (conversationId: string, params: CreateNotionPageParams) => Promise<void>
+  createLinearTicket: (
+    conversationId: string,
+    title: string,
+    description: string,
+    includeLastMessage: boolean,
+  ) => Promise<void>
+  createNotionPage: (
+    conversationId: string,
+    params: CreateNotionPageParams,
+    includeLastMessage: boolean,
+  ) => Promise<void>
   createGoogleCalendarEvent: (conversationId: string, params: CreateGoogleCalendarEventParams) => Promise<void>
   sendSlackMessage: (conversationId: string, params: SendSlackMessageParams) => Promise<void>
   showLoading: (conversationId: string, loaded: boolean) => void
@@ -46,7 +55,12 @@ export function useIntegrations(): UseIntegrationsAPI {
   const getLastConversationMessage = useStore((state) => state.getLastConversationMessage)
   const updateLastConversationMessage = useStore((state) => state.updateLastConversationMessage)
 
-  async function createLinearTicket(conversationId: string, title: string, description: string) {
+  async function createLinearTicket(
+    conversationId: string,
+    title: string,
+    description: string,
+    includeLastMessage: boolean = false,
+  ) {
     let lastMessage = previousContent.get(conversationId)
 
     if (!lastMessage) {
@@ -58,7 +72,7 @@ export function useIntegrations(): UseIntegrationsAPI {
     // @ts-expect-error
     updateLastConversationMessage(conversationId!, {
       content: (
-        <MessageWithComponent content={lastMessage}>
+        <MessageWithComponent content={includeLastMessage ? lastMessage : ''}>
           <CreateLinearTicket title={title} description={description} />
         </MessageWithComponent>
       ),
@@ -66,7 +80,11 @@ export function useIntegrations(): UseIntegrationsAPI {
     })
   }
 
-  async function createNotionPage(conversationId: string, params: CreateNotionPageParams) {
+  async function createNotionPage(
+    conversationId: string,
+    params: CreateNotionPageParams,
+    includeLastMessage: boolean = false,
+  ) {
     let lastMessage = previousContent.get(conversationId)
 
     if (!lastMessage) {
@@ -78,7 +96,7 @@ export function useIntegrations(): UseIntegrationsAPI {
     // @ts-expect-error
     updateLastConversationMessage(conversationId!, {
       content: (
-        <MessageWithComponent content={lastMessage}>
+        <MessageWithComponent content={includeLastMessage ? lastMessage : ''}>
           <CreateNotionPage {...params} />
         </MessageWithComponent>
       ),
