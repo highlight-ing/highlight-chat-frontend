@@ -102,6 +102,7 @@ export type Database = {
         Row: {
           application_name_darwin: string | null
           application_name_win32: string | null
+          context_types: Json | null
           created_at: string
           id: number
           prompt_id: number
@@ -110,6 +111,7 @@ export type Database = {
         Insert: {
           application_name_darwin?: string | null
           application_name_win32?: string | null
+          context_types?: Json | null
           created_at?: string
           id?: number
           prompt_id: number
@@ -118,6 +120,7 @@ export type Database = {
         Update: {
           application_name_darwin?: string | null
           application_name_win32?: string | null
+          context_types?: Json | null
           created_at?: string
           id?: number
           prompt_id?: number

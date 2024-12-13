@@ -133,6 +133,13 @@ export async function GET(request: Request) {
   const filteredPromptsWithUsages = filteredPrompts.map((prompt) => {
     let darwinAppNames: string[] = []
     let win32AppNames: string[] = []
+    // default context types to false
+    let contextTypes = {
+      screenshot: false,
+      selected_text: false,
+      clipboard_text: false,
+      audio_transcription: false,
+    }
 
     shortcutPreferences
       ?.filter((pref) => pref.prompt_id === prompt.id)
@@ -152,14 +159,20 @@ export async function GET(request: Request) {
             win32AppNames = JSON.parse(pref.application_name_win32 || '[]') as string[]
           }
         }
+
+        if (pref.context_types) {
+          contextTypes = pref.context_types
+        }
       })
 
+    console.log('contextTypes', contextTypes)
     return {
       ...prompt,
       last_usage: null,
       scope: {
         application_name_darwin: darwinAppNames,
         application_name_win32: win32AppNames,
+        context_types: contextTypes,
       },
     }
   })
