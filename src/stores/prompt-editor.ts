@@ -181,8 +181,8 @@ export const initialPromptEditorState: PromptEditorState = {
     isOnboarding: false,
     hasOnboardedOnceBefore: false,
   },
-  selectedApp: undefined as AppAvailability | undefined,
-  appVisibility: {},
+  selectedApp: 'hidden',
+  appVisibility: {}, 
 }
 
 export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, get) => ({
@@ -190,7 +190,11 @@ export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, ge
   setSelectedScreen: (screen: PromptEditorScreen) => set({ selectedScreen: screen }),
   setPromptEditorData: (data: Partial<PromptEditorData>, skipNeedSave?: boolean) =>
     set({ promptEditorData: { ...get().promptEditorData, ...data }, needSave: !skipNeedSave }),
-  clearPromptEditorData: () => set({ promptEditorData: initialPromptEditorState.promptEditorData }),
+  clearPromptEditorData: () => set({ 
+    promptEditorData: initialPromptEditorState.promptEditorData,     
+    appVisibility: initialPromptEditorState.appVisibility,
+    selectedApp: initialPromptEditorState.selectedApp 
+  }),
   setNeedSave: (needSave: boolean) => set({ needSave }),
   setSaving: (saving: boolean) => set({ saving }),
   setSettingsHasNoErrors: (settingsHasNoErrors: boolean) => set({ settingsHasNoErrors }),
