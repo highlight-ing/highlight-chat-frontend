@@ -111,7 +111,7 @@ export default function ContextSelector() {
                   {option.icon}
                 </div>
                 <div className="flex flex-col items-start">
-                  <span className="text-xs">{option.label}</span>
+                  <span className="text-xs truncate w-full whitespace-nowrap">{option.label}</span>
                 </div>
               </div>
             </button>

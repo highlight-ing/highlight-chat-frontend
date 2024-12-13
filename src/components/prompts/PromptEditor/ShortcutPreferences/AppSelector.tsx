@@ -37,10 +37,8 @@ export default function AppSelector({shortcutName}: {shortcutName: string}) {
     setAppVisibility 
   } = usePromptEditorStore()
 
-    // Add this hook
     const { saveShortcutPreferences } = usePromptEditor()
 
-    // Add these effects
     useEffect(() => {
       if (selectedApp) {
         saveShortcutPreferences()
