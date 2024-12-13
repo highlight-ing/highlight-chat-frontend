@@ -35,64 +35,6 @@ export function usePromptEditor() {
     setSaveDisabled(!(settingsHasNoErrors && needSave && !saving))
   }, [settingsHasNoErrors, needSave, saving])
 
-
-  async function loadShortcutPreferences(promptId: number) {
-    const accessToken = await getAccessToken()
-    const result = await getPromptShortcutPreferences(promptId, accessToken)
-    
-    if (!result.preferences) {
-      console.log('No shortcut preferences found for prompt:', {
-        promptId,
-        message: 'Setting to hidden by default'
-      })
-      setSelectedApp("hidden")
-      setAppVisibility({})
-      return
-    }
-  
-    if (result.preferences.application_name_darwin === '*') {
-      setSelectedApp("all")
-      setAppVisibility({})
-      return
-    }
-  
-    try {
-      // Parse the JSON array of apps
-      const apps = JSON.parse(result.preferences.application_name_darwin || '[]') as string[]
-      
-      if (apps.length === 0) {
-        setSelectedApp("hidden")
-        setAppVisibility({})
-      } else {
-        setSelectedApp("specific")
-        const newVisibility: AppVisibility = {}
-        apps.forEach((app: string) => {
-          newVisibility[app] = true
-        })
-        setAppVisibility(newVisibility)
-      }
-    } catch (error) {
-      console.error('Error parsing app preferences:', error)
-      setSelectedApp("hidden")
-      setAppVisibility({})
-    }
-  }
-
-  // Add effect to load preferences when prompt is loaded
-  useEffect(() => {
-    if (promptEditorData.externalId) {
-      const prompt = prompts.find(p => p.external_id === promptEditorData.externalId)
-      if (prompt?.id) {
-        console.log('Loading preferences for prompt:', {
-          id: prompt.id,
-          externalId: prompt.external_id,
-          name: prompt.name
-        })
-        loadShortcutPreferences(prompt.id)
-      }
-    }
-  }, [promptEditorData.externalId, prompts])
-
   /**
    * Saves the prompt data from the prompt-editor store to the database.
    */

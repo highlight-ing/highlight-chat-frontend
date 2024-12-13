@@ -163,7 +163,7 @@ export function useOnExternalMessage() {
             return
           }
 
-          openModal('edit-prompt', { prompt: message.prompt })
+          openModal('edit-prompt', { data: message })
         }
 
         if (isModalOpen('edit-prompt')) {

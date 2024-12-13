@@ -13,11 +13,56 @@ import { useStore } from '@/components/providers/store-provider'
 
 import styles from './modals.module.scss'
 
-const EditPromptModal = ({ id, context }: ModalObjectProps) => {
-  const prompt = context?.prompt as Prompt
+interface AppVisibility {
+  [key: string]: boolean;
+}
 
-  const { setPromptEditorData, setSelectedScreen, setSettingsHasNoErrors } = usePromptEditorStore()
+const EditPromptModal = ({ id, context }: ModalObjectProps) => {
+  const prompt= context?.data.prompt as Prompt
+  const preferences = context?.data.promptShortcutPreferences as any
+
+
+  const { setPromptEditorData, setSelectedScreen, setSettingsHasNoErrors, selectedApp, setSelectedApp, appVisibility, setAppVisibility } = usePromptEditorStore()
   const closeModal = useStore((state) => state.closeModal)
+
+  useEffect(() => {
+    if (!preferences) {
+      console.log('No shortcut preferences found for prompt:', {
+        promptId: prompt.id,
+        message: 'Setting to hidden by default'
+      })
+      setSelectedApp("hidden")
+      setAppVisibility({})
+      return
+    }
+  
+    if (preferences.application_name_darwin === '*') {
+      setSelectedApp("all")
+      setAppVisibility({})
+      return
+    }
+  
+    try {
+      // Parse the JSON array of apps
+      const apps = JSON.parse(preferences.application_name_darwin || '[]') as string[]
+      
+      if (apps.length === 0) {
+        setSelectedApp("hidden")
+        setAppVisibility({})
+      } else {
+        setSelectedApp("specific")
+        const newVisibility: AppVisibility = {}
+        apps.forEach((app: string) => {
+          newVisibility[app] = true
+        })
+        setAppVisibility(newVisibility)
+      }
+    } catch (error) {
+      console.error('Error parsing app preferences:', error)
+      setSelectedApp("hidden")
+      setAppVisibility({})
+    }
+  }, [preferences]) // Only depend on preferences
 
   useEffect(() => {
     setSelectedScreen('app')
