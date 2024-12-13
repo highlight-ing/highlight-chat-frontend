@@ -12,6 +12,8 @@ import { trackEvent } from '@/utils/amplitude'
 import { formatConversationDuration, formatTitle } from '@/utils/conversations'
 import { showHistoryAtom, toggleShowHistoryAtom } from '@/atoms/history'
 import { selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
+import { useInfiniteHistory } from '@/hooks/history'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Tooltip } from '@/components/ui/tooltip'
@@ -338,11 +340,9 @@ function ChatListItem(props: { chat: ChatHistoryItem }) {
 }
 
 function ChatsTabContent() {
-  const { data, isLoading } = useRecentlyUpdatedHistory()
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteHistory()
 
-  const tenRecentChats = React.useMemo(() => data?.slice(0, FEED_LENGTH_LIMIT) ?? [], [data])
-
-  if (!isLoading && tenRecentChats.length === 0) {
+  if (!isLoading && !data) {
     return <ListEmptyState label="No chats" />
   }
 
@@ -352,10 +352,24 @@ function ChatsTabContent() {
         <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
-          {tenRecentChats.map((chat) => (
-            <ChatListItem key={chat.id} chat={chat} />
+          {data?.pages.map((group, i) => (
+            <React.Fragment key={i}>
+              {group.map((chat) => (
+                <ChatListItem key={chat.id} chat={chat} />
+              ))}
+            </React.Fragment>
           ))}
           <ToggleChatHistroyButton />
+          <div className="flex w-full justify-center py-2">
+            <Button
+              variant="primary-outline"
+              size="medium"
+              onClick={() => fetchNextPage()}
+              disabled={!hasNextPage || isFetchingNextPage}
+            >
+              {isFetchingNextPage ? 'Loading more...' : hasNextPage ? 'Load More' : 'Nothing more to load'}
+            </Button>
+          </div>
         </HomeFeedListLayout>
       )}
     </AnimatePresence>
@@ -448,18 +462,20 @@ export function HomeFeed() {
           <HomeFeedVisibilityToggle />
         </div>
       </TabsList>
-      <HomeFeedTabContent value="recent-activity">
-        <RecentActivityTabContent />
-      </HomeFeedTabContent>
-      <HomeFeedTabContent value="meeting-notes">
-        <MeetingNotesTabContent />
-      </HomeFeedTabContent>
-      <HomeFeedTabContent value="audio-notes">
-        <AudioNotesTabContent />
-      </HomeFeedTabContent>
-      <HomeFeedTabContent value="chats">
-        <ChatsTabContent />
-      </HomeFeedTabContent>
+      <ScrollArea className="h-[850px] w-full">
+        <HomeFeedTabContent value="recent-activity">
+          <RecentActivityTabContent />
+        </HomeFeedTabContent>
+        <HomeFeedTabContent value="meeting-notes">
+          <MeetingNotesTabContent />
+        </HomeFeedTabContent>
+        <HomeFeedTabContent value="audio-notes">
+          <AudioNotesTabContent />
+        </HomeFeedTabContent>
+        <HomeFeedTabContent value="chats">
+          <ChatsTabContent />
+        </HomeFeedTabContent>
+      </ScrollArea>
     </Tabs>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query'
 
 import { HistoryResponseData } from '@/types/history'
 
@@ -21,16 +21,15 @@ export function useHistory() {
   })
 }
 
-export function usePaginatedHistory() {
-  const page = 0
-  const LIMIT_PER_PAGE = 10
+export function useInfiniteHistory() {
+  const LIMIT_PER_PAGE = 30
   const { get } = useApi()
 
-  return useQuery({
-    queryKey: ['paginated-history', page],
-    queryFn: async () => {
+  return useInfiniteQuery({
+    queryKey: ['paginated-history'],
+    queryFn: async ({ pageParam }) => {
       try {
-        const response = await get(`history/paginated?skip=${LIMIT_PER_PAGE * page}&limit=${LIMIT_PER_PAGE}`, {
+        const response = await get(`history/paginated?skip=${LIMIT_PER_PAGE * pageParam}&limit=${LIMIT_PER_PAGE}`, {
           version: 'v4',
         })
 
@@ -45,7 +44,13 @@ export function usePaginatedHistory() {
         return []
       }
     },
-    placeholderData: keepPreviousData,
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, _, lastPageParam) => {
+      if (lastPage.length < LIMIT_PER_PAGE) {
+        return undefined
+      }
+      return lastPageParam + 1
+    },
     staleTime: Infinity,
   })
 }

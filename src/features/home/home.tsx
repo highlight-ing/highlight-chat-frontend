@@ -1,10 +1,10 @@
 import React from 'react'
-import { useSetAtom } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
 import { cn } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
-import { sidePanelOpenAtom } from '@/atoms/side-panel'
+import { isOnHomeAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
 import { HighlightIcon } from '@/components/icons'
 import { Input } from '@/components/Input/Input'
 import { useStore } from '@/components/providers/store-provider'
@@ -31,6 +31,7 @@ function InputHeading() {
 
 export function ChatHome() {
   const setSidePanelOpen = useSetAtom(sidePanelOpenAtom)
+  const isOnHome = useAtomValue(isOnHomeAtom)
 
   React.useEffect(() => {
     trackEvent('HL Chat Home Viewed', {})
@@ -41,21 +42,16 @@ export function ChatHome() {
   return (
     <div
       className={cn(
-        'pointer-events-none fixed mt-12 flex h-full w-full flex-col justify-between gap-6 px-3 py-4 opacity-0',
-        'pointer-events-auto relative opacity-100',
+        'pointer-events-none fixed flex h-full w-full flex-col justify-between gap-6 px-3 pb-4 pt-16 opacity-0',
+        isOnHome && 'pointer-events-auto relative opacity-100',
       )}
     >
-      <div className="space-y-12">
+      <div className="space-y-4">
         <div className="space-y-6">
           <InputHeading />
           <Input isActiveChat={false} />
         </div>
         <HomeFeed />
-      </div>
-
-      <div className="mx-auto flex items-center gap-1 font-semibold text-subtle">
-        <HighlightIcon size={20} color="#484848" />
-        <p>Highlight AI</p>
       </div>
     </div>
   )
