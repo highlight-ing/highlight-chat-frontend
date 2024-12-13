@@ -92,6 +92,33 @@ export type Database = {
         }
         Relationships: []
       }
+      app_shortcut_preferences: {
+        Row: {
+          application_name_darwin: string | null
+          application_name_win32: string | null
+          created_at: string
+          id: number
+          prompt_id: number
+          user_id: string
+        }
+        Insert: {
+          application_name_darwin?: string | null
+          application_name_win32?: string | null
+          created_at?: string 
+          id?: number
+          prompt_id: number
+          user_id: string
+        }
+        Update: {
+          application_name_darwin?: string | null
+          application_name_win32?: string | null
+          created_at?: string
+          id?: number
+          prompt_id?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       conversation: {
         Row: {
           app_id: string | null
