@@ -27,12 +27,12 @@ export interface UseIntegrationsAPI {
     conversationId: string,
     title: string,
     description: string,
-    includeLastMessage: boolean,
+    includeLastMessage?: boolean,
   ) => Promise<void>
   createNotionPage: (
     conversationId: string,
     params: CreateNotionPageParams,
-    includeLastMessage: boolean,
+    includeLastMessage?: boolean,
   ) => Promise<void>
   createGoogleCalendarEvent: (conversationId: string, params: CreateGoogleCalendarEventParams) => Promise<void>
   sendSlackMessage: (conversationId: string, params: SendSlackMessageParams) => Promise<void>

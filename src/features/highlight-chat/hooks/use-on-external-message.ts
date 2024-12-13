@@ -11,8 +11,6 @@ import usePromptApps from '@/hooks/usePromptApps'
 import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 import { useStore } from '@/components/providers/store-provider'
 
-import { useIntegration } from '@/features/integrations/_hooks/use-integration'
-
 export function useOnExternalMessage() {
   const router = useRouter()
   const { setConversationId, openModal, closeAllModals, isModalOpen } = useStore((state) => ({
@@ -26,10 +24,10 @@ export function useOnExternalMessage() {
     addToast: state.addToast,
   }))
   const addPendingIntegration = useStore((state) => state.addPendingIntegration)
+  const addPendingCreateAction = useStore((state) => state.addPendingCreateAction)
   const addAttachment = useStore((state) => state.addAttachment)
   const { handleSubmit } = useSubmitQuery()
   const { forkDefaultAction } = useForkDefaultAction()
-  const { createAction } = useIntegration()
   const { selectPrompt, refreshPinnedPrompts, getPrompt } = usePromptApps()
 
   useEffect(() => {
@@ -51,6 +49,8 @@ export function useOnExternalMessage() {
         }
         // Set the conversation ID
         setConversationId(message.conversationId)
+
+        conversation.id
 
         console.log('Refetching chat history from external message')
         await refreshChatHistory()
@@ -149,7 +149,10 @@ export function useOnExternalMessage() {
         }
 
         if (message.shareAction) {
-          await createAction(message.shareAction)
+          addPendingCreateAction({
+            actionName: message.shareAction,
+            conversationId: message.conversationId,
+          })
         }
       } else if (message.type === 'customize-prompt') {
         console.log('Customize prompt message received for prompt:', message.prompt)
