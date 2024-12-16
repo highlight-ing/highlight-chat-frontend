@@ -2,10 +2,10 @@
 
 import React from 'react'
 import { ChatHistoryItem } from '@/types'
-import { useVirtualizer } from '@tanstack/react-virtual'
 import { AnimatePresence, motion, Variants } from 'framer-motion'
 import { Clock, Eye, EyeSlash, MessageText, VoiceSquare } from 'iconsax-react'
 import { useAtomValue, useSetAtom } from 'jotai'
+import { Virtuoso } from 'react-virtuoso'
 
 import { ConversationData } from '@/types/conversations'
 import { cn } from '@/lib/utils'
@@ -342,24 +342,10 @@ function ChatListItem(props: { chat: ChatHistoryItem }) {
 function ChatsTabContent() {
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteHistory()
   const allChatRows = data ? data.pages.flatMap((d) => d) : []
-  const loadMoreRef = React.useRef<HTMLDivElement>(null)
 
-  React.useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage()
-        }
-      },
-      { threshold: 1.0 },
-    )
-
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current)
-    }
-
-    return () => observer.disconnect()
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage])
+  function handleFetchMore() {
+    if (hasNextPage) fetchNextPage()
+  }
 
   if (!isLoading && !data) {
     return <ListEmptyState label="No chats" />
@@ -371,20 +357,23 @@ function ChatsTabContent() {
         <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
-          {allChatRows.map((chat) => (
-            <ChatListItem key={chat.id} chat={chat} />
-          ))}
-          <div ref={loadMoreRef}>
-            <HomeFeedListItemLayout className="text-subtle">
-              {isFetchingNextPage ? (
-                <LoadingSpinner size="16px" />
-              ) : hasNextPage ? (
-                'Load more'
-              ) : (
-                'No more items to load'
-              )}
-            </HomeFeedListItemLayout>
-          </div>
+          <Virtuoso
+            data={allChatRows}
+            endReached={handleFetchMore}
+            style={{ height: 'calc(100vh - 200px)' }}
+            itemContent={(_, chat) => <ChatListItem key={chat.id} chat={chat} />}
+            components={{
+              Footer: () =>
+                isFetchingNextPage && (
+                  <HomeFeedListItemLayout>
+                    <div className="flex items-center gap-2 font-medium">
+                      <MessageText variant={'Bold'} size={20} className="animate-pulse text-subtle/50" />
+                      <p className="animate-pulse text-subtle">Loading more chats...</p>
+                    </div>
+                  </HomeFeedListItemLayout>
+                ),
+            }}
+          />
         </HomeFeedListLayout>
       )}
     </AnimatePresence>
@@ -401,13 +390,12 @@ function RecentActivityTabContent() {
   } = useInfiniteHistory()
   const { data: audioNotesData, isLoading: isLoadingAudioNotes } = useAudioNotes()
   const isLoading = isLoadingHistory || isLoadingAudioNotes
-  const loadMoreRef = React.useRef<HTMLDivElement>(null)
 
   const recentActions = React.useMemo(() => {
     const recentChats = historyData?.pages
       ? historyData.pages.flatMap((page) =>
-          page.map((chat) => ({ ...chat, updatedAt: new Date(chat.updated_at).toISOString(), type: 'chat' })),
-        )
+        page.map((chat) => ({ ...chat, updatedAt: new Date(chat.updated_at).toISOString(), type: 'chat' })),
+      )
       : []
     const recentAudioNotes =
       audioNotesData?.map((audioNote) => ({
@@ -422,32 +410,9 @@ function RecentActivityTabContent() {
     return recentActionsSortedByUpdatedAt
   }, [historyData, audioNotesData])
 
-  React.useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage()
-        }
-      },
-      { threshold: 1.0 },
-    )
-
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current)
-    }
-
-    return () => observer.disconnect()
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage])
-
-  const renderRecentActions = recentActions.map((action) => {
-    if (isConversationData(action)) {
-      const audioNote = action
-      return <AudioNotesListItem key={audioNote.id} audioNote={audioNote} />
-    } else if (isChatHistoryItem(action)) {
-      const chat = action
-      return <ChatListItem key={chat.id} chat={chat} />
-    }
-  })
+  function handleFetchMore() {
+    if (hasNextPage) fetchNextPage()
+  }
 
   if (!isLoading && recentActions.length === 0) {
     return <ListEmptyState label="No recent activity" />
@@ -455,24 +420,33 @@ function RecentActivityTabContent() {
 
   return (
     <AnimatePresence initial={false}>
-      {isLoading ? (
-        <ListLoadingState />
-      ) : (
-        <HomeFeedListLayout>
-          {renderRecentActions}
-          <div ref={loadMoreRef}>
-            <HomeFeedListItemLayout className="text-subtle">
-              {isFetchingNextPage ? (
-                <LoadingSpinner size="16px" />
-              ) : hasNextPage ? (
-                'Load more'
-              ) : (
-                'No more items to load'
-              )}
-            </HomeFeedListItemLayout>
-          </div>
-        </HomeFeedListLayout>
-      )}
+      <HomeFeedListLayout>
+        <Virtuoso
+          data={recentActions}
+          endReached={handleFetchMore}
+          style={{ height: 'calc(100vh - 200px)' }}
+          itemContent={(_, action) => {
+            if (isConversationData(action)) {
+              const audioNote = action
+              return <AudioNotesListItem key={audioNote.id} audioNote={audioNote} />
+            } else if (isChatHistoryItem(action)) {
+              const chat = action
+              return <ChatListItem key={chat.id} chat={chat} />
+            }
+          }}
+          components={{
+            Footer: () =>
+              isFetchingNextPage && (
+                <HomeFeedListItemLayout>
+                  <div className="flex items-center gap-2 font-medium">
+                    <MessageText variant={'Bold'} size={20} className="animate-pulse text-subtle/50" />
+                    <p className="animate-pulse text-subtle">Loading more chats...</p>
+                  </div>
+                </HomeFeedListItemLayout>
+              ),
+          }}
+        />
+      </HomeFeedListLayout>
     </AnimatePresence>
   )
 }
@@ -497,11 +471,7 @@ function HomeFeedVisibilityToggle() {
 function HomeFeedTabContent(props: { value: string; children: React.ReactNode }) {
   const feedHidden = useAtomValue(feedHiddenAtom)
 
-  return (
-    <TabsContent value={props.value}>
-      {feedHidden ? <FeedHiddenState /> : <ScrollArea className="h-[calc(100vh-200px)]">{props.children}</ScrollArea>}
-    </TabsContent>
-  )
+  return <TabsContent value={props.value}>{feedHidden ? <FeedHiddenState /> : props.children}</TabsContent>
 }
 
 export function HomeFeed() {
