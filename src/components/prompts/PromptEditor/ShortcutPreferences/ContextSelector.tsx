@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { usePromptEditorStore } from "@/stores/prompt-editor";
 import { Switch } from "@/components/catalyst/switch";
-import { AudioIcon, ClipboardIcon, TextIcon } from "@/components/icons";
+import { AudioIcon, ClipboardIcon, ScreenshotIcon, TextIcon } from "@/components/icons";
 
 interface ContextTypes {
   selected_text: boolean;
@@ -27,7 +27,7 @@ const contextOptions: ContextOption[] = [
   },
   {
     id: "audio_transcription",
-    label: "Audio Transcription",
+    label: "Audio",
     description: "Use with transcribed audio content",
     icon: <AudioIcon />,
   },
@@ -41,7 +41,7 @@ const contextOptions: ContextOption[] = [
     id: "screenshot",
     label: "Screenshot",
     description: "Use with captured screenshots",
-    icon: <ClipboardIcon />,
+    icon: <ScreenshotIcon />,
   },
 ];
 
