@@ -27,6 +27,13 @@ export interface EnabledAutomations {
   createNotionPage: boolean
 }
 
+export interface ContextTypes {
+  selected_text: boolean;
+  audio_transcription: boolean;
+  clipboard_text: boolean;
+  screenshot: boolean;
+}
+
 export interface PromptEditorData {
   externalId?: string
   slug: string
@@ -53,6 +60,7 @@ export interface PromptEditorState {
   onboarding: PromptEditorOnboarding
   selectedApp: AppAvailability;
   appVisibility: Record<string, boolean>;
+  contextTypes: ContextTypes; 
 }
 
 export type PromptEditorSlice = PromptEditorState & {
@@ -66,6 +74,7 @@ export type PromptEditorSlice = PromptEditorState & {
   startTutorial: () => void
   setSelectedApp: (value: AppAvailability) => void;
   setAppVisibility: (visibility: Record<string, boolean>) => void;
+  setContextTypes: (types: ContextTypes) => void; 
 }
 
 export const DEFAULT_SYSTEM_PROMPT = `
@@ -183,6 +192,12 @@ export const initialPromptEditorState: PromptEditorState = {
   },
   selectedApp: 'hidden',
   appVisibility: {}, 
+  contextTypes: {
+    selected_text: false,
+    audio_transcription: false,
+    clipboard_text: false,
+    screenshot: false
+  },
 }
 
 export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, get) => ({
@@ -193,7 +208,8 @@ export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, ge
   clearPromptEditorData: () => set({ 
     promptEditorData: initialPromptEditorState.promptEditorData,     
     appVisibility: initialPromptEditorState.appVisibility,
-    selectedApp: initialPromptEditorState.selectedApp 
+    selectedApp: initialPromptEditorState.selectedApp,
+    contextTypes: initialPromptEditorState.contextTypes
   }),
   setNeedSave: (needSave: boolean) => set({ needSave }),
   setSaving: (saving: boolean) => set({ saving }),
@@ -209,6 +225,7 @@ export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, ge
     set({ onboarding: { isOnboarding: true, index: 0, hasOnboardedOnceBefore: true }, selectedScreen: 'app' }),
   setSelectedApp: (value: AppAvailability) => set({ selectedApp: value }),
   setAppVisibility: (visibility: Record<string, boolean>) => set({ appVisibility: visibility }),
+  setContextTypes: (types: ContextTypes) => set({ contextTypes: types }),
 })
 
 export const usePromptEditorStore = () =>
@@ -232,5 +249,7 @@ export const usePromptEditorStore = () =>
       setSelectedApp: state.setSelectedApp,
       appVisibility: state.appVisibility,
       setAppVisibility: state.setAppVisibility,
+      contextTypes: state.contextTypes,
+      setContextTypes: state.setContextTypes,
     })),
   )

@@ -119,7 +119,7 @@ export default function AppSelector({shortcutName}: {shortcutName: string}) {
     { name: "Finder", icon: <NotionIcon />, theme: 'dark' },
     { name: "Discord", icon: <SlackIcon />, theme: 'dark' },
     { name: "Firefox", icon: <ChromeIcon />, theme: 'dark' },
-    { name: "Teams", icon: <VSCodeIcon />, theme: 'dark' },
+    { name: "Cursor", icon: <VSCodeIcon />, theme: 'dark' },
   ];
 
   const getVisibleApps = () => {

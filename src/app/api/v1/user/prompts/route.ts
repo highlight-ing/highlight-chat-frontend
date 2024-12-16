@@ -81,6 +81,11 @@ export async function GET(request: Request) {
     return Response.json({ error: error.message }, { status: 500 })
   }
 
+  const { data: shortcutPreferences, error: shortcutPreferencesError } = await supabase
+    .from('app_shortcut_preferences')
+    .select('*')
+    .eq('user_id', userId)
+
   // Select all prompts that the user owns
   const { data: ownedPrompts, error: ownedPromptsError } = await supabase
     .from('prompts')
@@ -122,9 +127,49 @@ export async function GET(request: Request) {
   })
 
   const filteredPromptsWithUsages = filteredPrompts.map((prompt) => {
+    let darwinAppNames: string[] = []
+    let win32AppNames: string[] = []
+    // default context types to false
+    let contextTypes = {
+      screenshot: false,
+      selected_text: false,
+      clipboard_text: false,
+      audio_transcription: false,
+    }
+
+    shortcutPreferences
+      ?.filter((pref) => pref.prompt_id === prompt.id)
+      .forEach((pref) => {
+        if (pref.application_name_darwin) {
+          if (pref.application_name_darwin === '*') {
+            darwinAppNames = ['*']
+          } else {
+            darwinAppNames = JSON.parse(pref.application_name_darwin || '[]') as string[]
+          }
+        }
+
+        if (pref.application_name_win32) {
+          if (pref.application_name_win32 === '*') {
+            win32AppNames = ['*']
+          } else {
+            win32AppNames = JSON.parse(pref.application_name_win32 || '[]') as string[]
+          }
+        }
+
+        if (pref.context_types) {
+          // @ts-ignore
+          contextTypes = pref.context_types
+        }
+      })
+
     return {
       ...prompt,
       last_usage: null,
+      scope: {
+        application_name_darwin: darwinAppNames,
+        application_name_win32: win32AppNames,
+        context_types: contextTypes,
+      },
     }
   })
 

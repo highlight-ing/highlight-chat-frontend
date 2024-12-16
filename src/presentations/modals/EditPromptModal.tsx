@@ -18,11 +18,10 @@ interface AppVisibility {
 }
 
 const EditPromptModal = ({ id, context }: ModalObjectProps) => {
-  const prompt= context?.data.prompt as Prompt
+  const prompt = context?.data.prompt as Prompt
   const preferences = context?.data.promptShortcutPreferences as any
 
-
-  const { setPromptEditorData, setSelectedScreen, setSettingsHasNoErrors, selectedApp, setSelectedApp, appVisibility, setAppVisibility } = usePromptEditorStore()
+  const { setPromptEditorData, setSelectedScreen, setSettingsHasNoErrors, selectedApp, setSelectedApp, appVisibility, setAppVisibility, setContextTypes } = usePromptEditorStore()
   const closeModal = useStore((state) => state.closeModal)
 
   useEffect(() => {
@@ -33,12 +32,26 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
       })
       setSelectedApp("hidden")
       setAppVisibility({})
+      // Set all context types to true when no preferences exist
+      setContextTypes({
+        selected_text: true,
+        audio_transcription: true,
+        clipboard_text: true,
+        screenshot: true
+      })
       return
     }
   
     if (preferences.application_name_darwin === '*') {
       setSelectedApp("all")
       setAppVisibility({})
+      // For "all" apps, set context types to true
+      setContextTypes({
+        selected_text: true,
+        audio_transcription: true,
+        clipboard_text: true,
+        screenshot: true
+      })
       return
     }
   
@@ -49,6 +62,13 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
       if (apps.length === 0) {
         setSelectedApp("hidden")
         setAppVisibility({})
+        // For hidden apps, set context types to true
+        setContextTypes({
+          selected_text: true,
+          audio_transcription: true,
+          clipboard_text: true,
+          screenshot: true
+        })
       } else {
         setSelectedApp("specific")
         const newVisibility: AppVisibility = {}
@@ -56,13 +76,32 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
           newVisibility[app] = true
         })
         setAppVisibility(newVisibility)
+        
+        // Set context types from preferences if they exist, otherwise set all to true
+        if (preferences.context_types) {
+          setContextTypes(preferences.context_types)
+        } else {
+          setContextTypes({
+            selected_text: true,
+            audio_transcription: true,
+            clipboard_text: true,
+            screenshot: true
+          })
+        }
       }
     } catch (error) {
       console.error('Error parsing app preferences:', error)
       setSelectedApp("hidden")
       setAppVisibility({})
+      // Set all context types to true on error
+      setContextTypes({
+        selected_text: true,
+        audio_transcription: true,
+        clipboard_text: true,
+        screenshot: true
+      })
     }
-  }, [preferences]) // Only depend on preferences
+  }, [preferences])
 
   useEffect(() => {
     setSelectedScreen('app')

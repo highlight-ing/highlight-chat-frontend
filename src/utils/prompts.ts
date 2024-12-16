@@ -669,7 +669,6 @@ export async function deletePromptShortcutPreferences(
   return { success: true }
 }
 
-
 /**
  * Updates or creates app shortcut preferences for a specific prompt
  */
@@ -678,6 +677,12 @@ export async function upsertPromptShortcutPreferences(
   preferences: {
     application_name_darwin?: string | null
     application_name_win32?: string | null
+    context_types?: {
+      selected_text: boolean
+      audio_transcription: boolean
+      clipboard_text: boolean
+      screenshot: boolean
+    } | null
   },
   authToken: string
 ) {
@@ -694,14 +699,15 @@ export async function upsertPromptShortcutPreferences(
     prompt_id: promptId,
     user_id: userId,
     application_name_darwin: preferences.application_name_darwin,
-    application_name_win32: preferences.application_name_win32
+    application_name_win32: preferences.application_name_win32,
+    context_types: preferences.context_types
   }
 
   // Use onConflict to specify which fields determine a unique record
   const { error } = await supabase
     .from('app_shortcut_preferences')
     .upsert(record, {
-      onConflict: 'prompt_id,user_id'  // Add this line
+      onConflict: 'prompt_id,user_id'
     })
 
   if (error) {

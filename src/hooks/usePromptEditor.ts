@@ -22,7 +22,7 @@ export function usePromptEditor() {
   const [saveDisabled, setSaveDisabled] = useState(false)
 
   // HOOKS
-  const { promptEditorData, setPromptEditorData, needSave, saving, setNeedSave, settingsHasNoErrors, setSaving, selectedApp, setSelectedApp, appVisibility, setAppVisibility } =
+  const { promptEditorData, setPromptEditorData, needSave, saving, setNeedSave, settingsHasNoErrors, setSaving, selectedApp, setSelectedApp, appVisibility, setAppVisibility, contextTypes } =
     usePromptEditorStore()
   const { updatePrompt, addPrompt, prompts } = usePromptsStore()
   const addToast = useStore((state) => state.addToast)
@@ -189,7 +189,8 @@ export function usePromptEditor() {
   
     const preferences = {
       application_name_darwin: null as string | null,
-      application_name_win32: null as string | null
+      application_name_win32: null as string | null,
+      context_types: contextTypes
     }
   
     switch (selectedApp) {
@@ -226,7 +227,6 @@ export function usePromptEditor() {
         console.warn('Unexpected selectedApp value:', selectedApp)
         return
     }
-  
     // Only proceed with save if we have valid preferences
     const result = await upsertPromptShortcutPreferences(
       prompt.id,
@@ -247,9 +247,16 @@ export function usePromptEditor() {
     console.log('Shortcut preferences saved successfully:', {
       promptId: prompt.id,
       selectedApp,
-      preferences
+      preferences,
+      contextTypes
     })
   }
+
+  useEffect(() => {
+    if (promptEditorData.externalId && selectedApp !== 'hidden') {
+      saveShortcutPreferences()
+    }
+  }, [contextTypes])
 
   return { save, saveDisabled, saveShortcutPreferences }
 }
