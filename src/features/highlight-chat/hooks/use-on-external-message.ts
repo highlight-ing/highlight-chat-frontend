@@ -42,6 +42,11 @@ export function useOnExternalMessage() {
         return
       }
 
+      if (message.type === 'refresh-conversations') {
+        refreshChatHistory()
+        return
+      }
+
       if (message.conversationId) {
         console.log('Opening conversation from external event:', message.conversationId)
         const conversation = await refreshChatItem(message.conversationId, true)
