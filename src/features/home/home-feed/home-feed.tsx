@@ -384,15 +384,11 @@ function ChatsTabContent() {
                 return (
                   <div
                     key={virtualRow.index}
-                    className={virtualRow.index % 2 ? 'ListItemOdd' : 'ListItemEven'}
                     style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      width: '100%',
                       height: `${virtualRow.size}px`,
                       transform: `translateY(${virtualRow.start}px)`,
                     }}
+                    className="absolute left-0 top-0 w-full"
                   >
                     {isLoaderRow ? (
                       hasNextPage ? (
@@ -426,7 +422,7 @@ function RecentActivityTabContent() {
   const isLoading = isLoadingHistory || isLoadingAudioNotes
   const parentRef = React.useRef<HTMLDivElement>(null)
 
-  const { recentActions } = React.useMemo(() => {
+  const recentActions = React.useMemo(() => {
     const recentChats = historyData?.pages
       ? historyData.pages.flatMap((page) =>
           page.map((chat) => ({ ...chat, updatedAt: new Date(chat.updated_at).toISOString(), type: 'chat' })),
@@ -442,10 +438,7 @@ function RecentActivityTabContent() {
       b.updatedAt.localeCompare(a.updatedAt),
     )
 
-    return {
-      recentActions: recentActionsSortedByUpdatedAt,
-      recentChats,
-    }
+    return recentActionsSortedByUpdatedAt
   }, [historyData, audioNotesData])
 
   const rowVirtualizer = useVirtualizer({
@@ -496,10 +489,15 @@ function RecentActivityTabContent() {
                 const isLoaderRow = virtualRow.index > recentActions.length - 1
                 const row = renderRecentActions[virtualRow.index]
 
-                console.log({ isLoaderRow, row })
-
                 return (
-                  <div key={virtualRow.index}>
+                  <div
+                    key={virtualRow.index}
+                    style={{
+                      height: `${virtualRow.size}px`,
+                      transform: `translateY(${virtualRow.start}px)`,
+                    }}
+                    className="absolute left-0 top-0 w-full"
+                  >
                     {isLoaderRow ? (hasNextPage ? 'Loading more...' : 'Nothing more to load') : row}
                   </div>
                 )
