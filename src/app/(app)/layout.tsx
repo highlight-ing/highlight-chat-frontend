@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { ConversationProvider } from '@/context/ConversationContext'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { ReactQueryProvider } from '@/components/providers/react-query-provider'
@@ -16,6 +17,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <ConversationProvider>
           <TooltipProvider>
             <App>{children}</App>
+            <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
           </TooltipProvider>
         </ConversationProvider>
       </ReactQueryProvider>

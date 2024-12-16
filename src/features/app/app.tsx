@@ -1,7 +1,6 @@
 'use client'
 
 import React from 'react'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 import { ModalContainer } from '@/components/modals/ModalContainer'
 import Modals from '@/components/modals/Modals'
@@ -33,7 +32,6 @@ export function App(props: { children: React.ReactNode }) {
       <ModalContainer />
       <ToastContainer />
       <ChangelogModal />
-      {/* <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} /> */}
     </>
   )
 }
