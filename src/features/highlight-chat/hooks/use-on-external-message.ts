@@ -50,8 +50,6 @@ export function useOnExternalMessage() {
         // Set the conversation ID
         setConversationId(message.conversationId)
 
-        conversation.id
-
         console.log('Refetching chat history from external message')
         await refreshChatHistory()
 
