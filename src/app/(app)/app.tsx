@@ -14,6 +14,7 @@ import { useInitializeAmplitudeAndSentry } from '@/features/app-layout/hooks/use
 import { useShowFollowUpFeedbackToast } from '@/features/app-layout/hooks/use-show-follow-up-feedback-toast'
 import { ChangelogModal } from '@/features/changelog/changelog-modal'
 import { usePendingIntegrations } from '@/features/integrations/_hooks/use-pending-integrations'
+import { usePendingShareActions } from '@/features/integrations/_hooks/use-pending-share-action'
 
 export function App({ children }: { children: React.ReactNode }) {
   useContextReceivedHandler()
@@ -21,6 +22,7 @@ export function App({ children }: { children: React.ReactNode }) {
   useAuthChangeHandler()
   useShowFollowUpFeedbackToast()
   usePendingIntegrations()
+  usePendingShareActions()
   useInitializeAmplitudeAndSentry()
 
   return (
