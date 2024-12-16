@@ -70,6 +70,7 @@ export function ChatHome({ isShowing }: { isShowing: boolean }) {
               <ViewChangelogBanner />
             </StackerItem>
           </Stacker>
+          <CreateGoogleCalEvent summary="test" />
         </div>
         <HomeFeed />
       </div>

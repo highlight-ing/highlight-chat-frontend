@@ -366,7 +366,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
             onChange?.(newOptions)
           }}
         >
-          {`Create "${inputValue}"`}
+          {`"${inputValue}"`}
         </CommandItem>
       )
 
@@ -523,7 +523,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                   disabled ||
                   selected.length < 1 ||
                   selected.filter((s) => s.fixed).length === selected.length) &&
-                'hidden',
+                  'hidden',
               )}
             >
               <X />

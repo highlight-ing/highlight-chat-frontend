@@ -205,6 +205,7 @@ function InviteeDropdown(props: InviteeDropdownProps) {
       }}
       value={props.field.value}
       onChange={props.field.onChange}
+      creatable
       options={mockContacts}
       placeholder="Add quests"
       hideClearAllButton
