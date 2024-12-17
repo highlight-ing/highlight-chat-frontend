@@ -1,9 +1,16 @@
 'use client'
 
 import { ChatHistoryItem } from '@/types'
-import { InfiniteData, useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  InfiniteData,
+  useInfiniteQuery,
+  UseInfiniteQueryOptions,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 
 import { HistoryResponseData } from '@/types/history'
+import { PAGINATION_LIMIT } from '@/lib/constants'
 
 import { useApi } from './useApi'
 import { useChatHistory } from './useChatHistory'
@@ -22,15 +29,14 @@ export function useHistory() {
   })
 }
 
-export function useInfiniteHistory() {
-  const LIMIT_PER_PAGE = 20
+export function useInfiniteHistory(options = {}) {
   const { get } = useApi()
 
   return useInfiniteQuery({
     queryKey: ['infinite-history'],
     queryFn: async ({ pageParam }) => {
       try {
-        const response = await get(`history/paginated?skip=${LIMIT_PER_PAGE * pageParam}&limit=${LIMIT_PER_PAGE}`, {
+        const response = await get(`history/paginated?skip=${PAGINATION_LIMIT * pageParam}&limit=${PAGINATION_LIMIT}`, {
           version: 'v4',
         })
 
@@ -47,12 +53,13 @@ export function useInfiniteHistory() {
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage, _, lastPageParam) => {
-      if (lastPage.length < LIMIT_PER_PAGE) {
+      if (lastPage.length < PAGINATION_LIMIT) {
         return undefined
       }
       return lastPageParam + 1
     },
     staleTime: Infinity,
+    ...options,
   })
 }
 
@@ -66,9 +73,9 @@ export function useHistoryStore() {
       const newChatHistory =
         existingChatIndex !== -1
           ? [
-            [...firstPage.slice(0, existingChatIndex), chat, ...firstPage.slice(existingChatIndex + 1)],
-            ...queryData.pages.slice(1),
-          ]
+              [...firstPage.slice(0, existingChatIndex), chat, ...firstPage.slice(existingChatIndex + 1)],
+              ...queryData.pages.slice(1),
+            ]
           : [[chat, ...firstPage], ...queryData.pages.slice(1)]
 
       return {
