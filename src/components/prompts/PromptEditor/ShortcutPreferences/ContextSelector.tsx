@@ -1,7 +1,8 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { usePromptEditorStore } from "@/stores/prompt-editor";
 import { Switch } from "@/components/catalyst/switch";
+import { usePromptEditor } from "@/hooks/usePromptEditor";
 import { AudioIcon, ClipboardIcon, ScreenshotIcon, TextIcon } from "@/components/icons";
 
 interface ContextTypes {
@@ -64,47 +65,48 @@ function ToggleSwitch({
 
 export default function ContextSelector() {
     const { selectedApp, contextTypes, setContextTypes } = usePromptEditorStore();
-    const [isEnabled, setIsEnabled] = useState(false);
-  
-    const toggleContext = (contextId: keyof ContextTypes) => {
-      setContextTypes({
-        ...contextTypes,
-        [contextId]: !contextTypes[contextId],
-      });
-    };
-  
-    // Effect to handle initial state and changes
-    useEffect(() => {
-      const allTypesEnabled = Object.values(contextTypes || {}).every(
-        (value) => value === true
-      );
-      setIsEnabled(!allTypesEnabled);
+    const { saveShortcutPreferences } = usePromptEditor();
+    
+    // Derive enabled state from contextTypes
+    const isEnabled = useMemo(() => {
+      if (!contextTypes) return false;
+      return Object.values(contextTypes).some(value => !value);
     }, [contextTypes]);
   
-    const handleMasterToggle = (enabled: boolean) => {
-      setIsEnabled(enabled);
-      if (enabled) {
-        // When turning ON context specification, set all to false
-        setContextTypes({
+    // Save to Supabase whenever contextTypes changes
+    useEffect(() => {
+      if (contextTypes) {
+        saveShortcutPreferences();
+      }
+    }, [contextTypes]);
+  
+    const toggleContext = (contextId: keyof ContextTypes) => {
+        const currentTypes = contextTypes ?? {
           selected_text: false,
           audio_transcription: false,
           clipboard_text: false,
-          screenshot: false,
-        });
-      } else {
-        // When turning OFF context specification, set all to true
+          screenshot: false
+        };
         setContextTypes({
-          selected_text: true,
-          audio_transcription: true,
-          clipboard_text: true,
-          screenshot: true,
-        });
-      }
+          ...currentTypes,
+        [contextId]: !currentTypes[contextId],
+      });
+    };
+  
+    const handleMasterToggle = (enabled: boolean) => {
+      const newContextTypes = {
+        selected_text: !enabled,
+        audio_transcription: !enabled,
+        clipboard_text: !enabled,
+        screenshot: !enabled,
+      };
+      setContextTypes(newContextTypes);
     };
   
     if (selectedApp === "hidden") {
       return null;
     }
+  
 
   return (
     <div className="flex flex-col space-y-3 rounded-2xl bg-[#222222] p-3">
@@ -128,7 +130,7 @@ export default function ContextSelector() {
               key={option.id}
               onClick={() => toggleContext(option.id)}
               className={`p-2 border h-14 rounded-lg flex items-center justify-between gap-2 text-xs ${
-                contextTypes[option.id]
+                contextTypes?.[option.id]
                   ? "border-green-40 bg-green-10"
                   : "border-[#252525] hover:bg-neutral-800/15"
               }`}

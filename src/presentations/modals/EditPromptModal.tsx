@@ -21,32 +21,32 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
   const prompt = context?.data.prompt as Prompt
   const preferences = context?.data.promptShortcutPreferences as any
 
-  const { setPromptEditorData, setSelectedScreen, setSettingsHasNoErrors, selectedApp, setSelectedApp, appVisibility, setAppVisibility, setContextTypes } = usePromptEditorStore()
+  const { 
+    setPromptEditorData, 
+    setSelectedScreen, 
+    setSettingsHasNoErrors, 
+    setSelectedApp, 
+    setAppVisibility, 
+    setContextTypes 
+  } = usePromptEditorStore()
+  
   const closeModal = useStore((state) => state.closeModal)
 
+  // Handle app visibility and context types initialization
   useEffect(() => {
     if (!preferences) {
-      console.log('No shortcut preferences found for prompt:', {
-        promptId: prompt.id,
-        message: 'Setting to hidden by default'
-      })
+      // No preferences found - set to hidden state
       setSelectedApp("hidden")
       setAppVisibility({})
-      // Set all context types to true when no preferences exist
-      setContextTypes({
-        selected_text: true,
-        audio_transcription: true,
-        clipboard_text: true,
-        screenshot: true
-      })
+      setContextTypes(null)
       return
     }
-  
+
+    // Handle "all apps" case
     if (preferences.application_name_darwin === '*') {
       setSelectedApp("all")
       setAppVisibility({})
-      // For "all" apps, set context types to true
-      setContextTypes({
+      setContextTypes(preferences.context_types ?? {
         selected_text: true,
         audio_transcription: true,
         clipboard_text: true,
@@ -54,22 +54,18 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
       })
       return
     }
-  
+
     try {
       // Parse the JSON array of apps
       const apps = JSON.parse(preferences.application_name_darwin || '[]') as string[]
       
       if (apps.length === 0) {
+        // Empty apps array - set to hidden state
         setSelectedApp("hidden")
         setAppVisibility({})
-        // For hidden apps, set context types to true
-        setContextTypes({
-          selected_text: true,
-          audio_transcription: true,
-          clipboard_text: true,
-          screenshot: true
-        })
+        setContextTypes(null)
       } else {
+        // Specific apps selected
         setSelectedApp("specific")
         const newVisibility: AppVisibility = {}
         apps.forEach((app: string) => {
@@ -77,32 +73,24 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
         })
         setAppVisibility(newVisibility)
         
-        // Set context types from preferences if they exist, otherwise set all to true
-        if (preferences.context_types) {
-          setContextTypes(preferences.context_types)
-        } else {
-          setContextTypes({
-            selected_text: true,
-            audio_transcription: true,
-            clipboard_text: true,
-            screenshot: true
-          })
-        }
+        // Use context types from preferences if they exist
+        setContextTypes(preferences.context_types ?? {
+          selected_text: true,
+          audio_transcription: true,
+          clipboard_text: true,
+          screenshot: true
+        })
       }
     } catch (error) {
       console.error('Error parsing app preferences:', error)
+      // Error case - set to hidden state
       setSelectedApp("hidden")
       setAppVisibility({})
-      // Set all context types to true on error
-      setContextTypes({
-        selected_text: true,
-        audio_transcription: true,
-        clipboard_text: true,
-        screenshot: true
-      })
+      setContextTypes(null)
     }
   }, [preferences])
 
+  // Initialize prompt editor data
   useEffect(() => {
     setSelectedScreen('app')
     setPromptEditorData(
@@ -151,15 +139,12 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
   )
 }
 
-export default EditPromptModal
-
 function ShareLinkButton() {
   const timeout = useRef<NodeJS.Timeout | null>(null)
   const { promptEditorData } = usePromptEditorStore()
 
   const slug = promptEditorData.slug
 
-  // const host = window.location.protocol + '//' + window.location.host
   const url = `https://chat.highlight.ing/prompts/${slug}`
 
   const [copied, setCopied] = useState(false)
@@ -182,8 +167,16 @@ function ShareLinkButton() {
   }
 
   return (
-    <Button onClick={onCopyLinkClick} size={'large'} variant={'ghost'} style={{ marginRight: '6px' }} disabled={!slug}>
+    <Button 
+      onClick={onCopyLinkClick} 
+      size={'large'} 
+      variant={'ghost'} 
+      style={{ marginRight: '6px' }} 
+      disabled={!slug}
+    >
       {copied ? 'Copied link to clipboard!' : 'Share'}
     </Button>
   )
 }
+
+export default EditPromptModal
