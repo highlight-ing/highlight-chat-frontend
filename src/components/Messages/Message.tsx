@@ -280,8 +280,16 @@ export const Message = ({ message, isThinking }: MessageProps) => {
               )}
               {typeof message.content === 'string' && message.role === 'assistant' && (
                 <>
-                  <AssistantMessageButton type="Notion" onClick={() => createAction('notion')} status={'idle'} />
-                  <AssistantMessageButton type="Linear" onClick={() => createAction('linear')} status={'idle'} />
+                  <AssistantMessageButton
+                    type="Notion"
+                    onClick={() => createAction('notion', message)}
+                    status={'idle'}
+                  />
+                  <AssistantMessageButton
+                    type="Linear"
+                    onClick={() => createAction('linear', message)}
+                    status={'idle'}
+                  />
                 </>
               )}
               {message.id && message.role === 'assistant' && (
