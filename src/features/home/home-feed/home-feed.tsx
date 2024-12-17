@@ -2,19 +2,17 @@
 
 import React from 'react'
 import { ChatHistoryItem } from '@/types'
-import { useVirtualizer } from '@tanstack/react-virtual'
 import { AnimatePresence, motion, Variants } from 'framer-motion'
-import { Clock, Eye, EyeSlash, MessageText, VoiceSquare } from 'iconsax-react'
+import { Eye, EyeSlash, MessageText, VoiceSquare } from 'iconsax-react'
 import { useAtomValue, useSetAtom } from 'jotai'
+import { Virtuoso } from 'react-virtuoso'
 
 import { ConversationData } from '@/types/conversations'
 import { cn } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { formatConversationDuration, formatTitle } from '@/utils/conversations'
-import { showHistoryAtom, toggleShowHistoryAtom } from '@/atoms/history'
 import { selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
 import { useInfiniteHistory } from '@/hooks/history'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Tooltip } from '@/components/ui/tooltip'
@@ -24,19 +22,14 @@ import { MeetingIcon } from '@/components/icons'
 import { useStore } from '@/components/providers/store-provider'
 
 import { feedHiddenAtom, toggleFeedVisibilityAtom } from './atoms'
-import { useAudioNotes } from './hooks'
-import { formatUpdatedAtDate, isChatHistoryItem, isConversationData } from './utils'
+import { useAudioNotes, useRecentActions } from './hooks'
+import { formatUpdatedAtDate } from './utils'
 
-const homeFeedListItemVariants: Variants = {
-  hidden: { opacity: 0, y: -5 },
-  visible: { opacity: 1, y: 0, transition: { type: 'spring', bounce: 0, duration: 0.4 } },
-}
-
-type HomeFeedListItemLayoutProps = React.ComponentPropsWithoutRef<'div'>
+type HomeFeedListItemLayoutProps = React.ComponentPropsWithRef<'div'>
 
 function HomeFeedListItemLayout({ className, children, ...props }: HomeFeedListItemLayoutProps) {
   return (
-    <motion.div variants={homeFeedListItemVariants}>
+    <div>
       <div
         className={cn(
           'cursor-pointer rounded-xl px-3 transition-colors hover:bg-secondary [&_div]:last:border-transparent',
@@ -48,13 +41,18 @@ function HomeFeedListItemLayout({ className, children, ...props }: HomeFeedListI
           {children}
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }
 
 function HomeFeedListLayout(props: { children: React.ReactNode }) {
+  const homeFeedListVariants: Variants = {
+    hidden: { opacity: 0, y: -5 },
+    visible: { opacity: 1, y: 0, transition: { type: 'spring', bounce: 0, duration: 0.4 } },
+  }
+
   return (
-    <motion.div initial="hidden" animate="visible" transition={{ staggerChildren: 0.01 }}>
+    <motion.div variants={homeFeedListVariants} initial="hidden" animate="visible">
       {props.children}
     </motion.div>
   )
@@ -225,12 +223,12 @@ function AudioNotesListItem(props: { audioNote: ConversationData }) {
 function OpenConversationsButton() {
   return (
     <OpenAppButton appId="conversations" className="w-full">
-      <motion.div variants={homeFeedListItemVariants} className="group w-full text-left text-subtle hover:text-primary">
+      <div className="group w-full text-left text-subtle hover:text-primary">
         <HomeFeedListItemLayout className="flex items-center delay-0 duration-0">
           <VoiceSquare variant={'Bold'} size={20} />
           <p>View all conversations</p>
         </HomeFeedListItemLayout>
-      </motion.div>
+      </div>
     </OpenAppButton>
   )
 }
@@ -252,10 +250,12 @@ function MeetingNotesTabContent() {
         <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
-          {recentMeetingNotes.map((meetingNote) => (
-            <AudioNotesListItem key={meetingNote.id} audioNote={meetingNote} />
-          ))}
-          <OpenConversationsButton />
+          <Virtuoso
+            data={recentMeetingNotes}
+            style={{ height: 'calc(100vh - 200px)' }}
+            itemContent={(_, meetingNote) => <AudioNotesListItem key={meetingNote.id} audioNote={meetingNote} />}
+            components={{ Footer: () => <OpenConversationsButton /> }}
+          />
         </HomeFeedListLayout>
       )}
     </AnimatePresence>
@@ -279,37 +279,15 @@ function AudioNotesTabContent() {
         <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
-          {recentNonMeetingNotes.map((audioNote) => (
-            <AudioNotesListItem key={audioNote.id} audioNote={audioNote} />
-          ))}
-          <OpenConversationsButton />
+          <Virtuoso
+            data={recentNonMeetingNotes}
+            style={{ height: 'calc(100vh - 200px)' }}
+            itemContent={(_, audioNote) => <AudioNotesListItem key={audioNote.id} audioNote={audioNote} />}
+            components={{ Footer: () => <OpenConversationsButton /> }}
+          />
         </HomeFeedListLayout>
       )}
     </AnimatePresence>
-  )
-}
-
-function ToggleChatHistroyButton() {
-  const historySidebarIsOpen = useAtomValue(showHistoryAtom)
-  const toggleShowHistory = useSetAtom(toggleShowHistoryAtom)
-
-  function handleShowMoreClick() {
-    toggleShowHistory()
-  }
-
-  return (
-    <motion.button
-      variants={homeFeedListItemVariants}
-      type="button"
-      aria-label="Toggle history sidebar"
-      onClick={handleShowMoreClick}
-      className="group w-full text-left text-subtle"
-    >
-      <HomeFeedListItemLayout className="flex items-center duration-0 hover:text-primary">
-        <Clock variant={'Bold'} size={20} />
-        <p>{`${historySidebarIsOpen ? 'Hide' : 'View full'} chat history`}</p>
-      </HomeFeedListItemLayout>
-    </motion.button>
   )
 }
 
@@ -340,25 +318,11 @@ function ChatListItem(props: { chat: ChatHistoryItem }) {
 
 function ChatsTabContent() {
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteHistory()
-  const parentRef = React.useRef<HTMLDivElement>(null)
   const allChatRows = data ? data.pages.flatMap((d) => d) : []
 
-  const rowVirtualizer = useVirtualizer({
-    count: hasNextPage ? allChatRows.length + 1 : allChatRows.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 49,
-    overscan: 5,
-  })
-  const virtualizerItems = rowVirtualizer.getVirtualItems()
-
-  React.useEffect(() => {
-    const [lastItem] = [...virtualizerItems].reverse()
-    if (!lastItem) return
-
-    if (lastItem.index >= allChatRows.length && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage()
-    }
-  }, [hasNextPage, fetchNextPage, allChatRows.length, isFetchingNextPage, virtualizerItems])
+  function handleFetchMore() {
+    if (hasNextPage) fetchNextPage()
+  }
 
   if (!isLoading && !data) {
     return <ListEmptyState label="No chats" />
@@ -370,40 +334,23 @@ function ChatsTabContent() {
         <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
-          <div ref={parentRef} className="h-[calc(100vh-200px)] w-full overflow-y-scroll">
-            <div
-              style={{
-                height: `${rowVirtualizer.getTotalSize()}px`,
-              }}
-              className="relative w-full"
-            >
-              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-                const isLoaderRow = virtualRow.index > allChatRows.length - 1
-                const chat = allChatRows[virtualRow.index]
-
-                return (
-                  <div
-                    key={virtualRow.index}
-                    style={{
-                      height: `${virtualRow.size}px`,
-                      transform: `translateY(${virtualRow.start}px)`,
-                    }}
-                    className="absolute left-0 top-0 w-full"
-                  >
-                    {isLoaderRow ? (
-                      hasNextPage ? (
-                        'Loading more...'
-                      ) : (
-                        'Nothing more to load'
-                      )
-                    ) : (
-                      <ChatListItem key={chat.id} chat={chat} />
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          </div>
+          <Virtuoso
+            data={allChatRows}
+            endReached={handleFetchMore}
+            style={{ height: 'calc(100vh - 200px)' }}
+            itemContent={(_, chat) => <ChatListItem key={chat.id} chat={chat} />}
+            components={{
+              Footer: () =>
+                isFetchingNextPage && (
+                  <HomeFeedListItemLayout>
+                    <div className="flex items-center gap-2 font-medium">
+                      <MessageText variant={'Bold'} size={20} className="animate-pulse text-subtle/50" />
+                      <p className="animate-pulse text-subtle">Loading more chats...</p>
+                    </div>
+                  </HomeFeedListItemLayout>
+                ),
+            }}
+          />
         </HomeFeedListLayout>
       )}
     </AnimatePresence>
@@ -411,64 +358,13 @@ function ChatsTabContent() {
 }
 
 function RecentActivityTabContent() {
-  const {
-    data: historyData,
-    isLoading: isLoadingHistory,
-    hasNextPage,
-    isFetchingNextPage,
-    fetchNextPage,
-  } = useInfiniteHistory()
-  const { data: audioNotesData, isLoading: isLoadingAudioNotes } = useAudioNotes()
-  const isLoading = isLoadingHistory || isLoadingAudioNotes
-  const parentRef = React.useRef<HTMLDivElement>(null)
+  const { data, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useRecentActions()
 
-  const recentActions = React.useMemo(() => {
-    const recentChats = historyData?.pages
-      ? historyData.pages.flatMap((page) =>
-          page.map((chat) => ({ ...chat, updatedAt: new Date(chat.updated_at).toISOString(), type: 'chat' })),
-        )
-      : []
-    const recentAudioNotes =
-      audioNotesData?.map((audioNote) => ({
-        ...audioNote,
-        updatedAt: audioNote.endedAt.toISOString(),
-        type: 'audio-note',
-      })) ?? []
-    const recentActionsSortedByUpdatedAt = [...recentChats, ...recentAudioNotes].sort((a, b) =>
-      b.updatedAt.localeCompare(a.updatedAt),
-    )
+  function handleFetchMore() {
+    if (hasNextPage) fetchNextPage()
+  }
 
-    return recentActionsSortedByUpdatedAt
-  }, [historyData, audioNotesData])
-
-  const rowVirtualizer = useVirtualizer({
-    count: hasNextPage ? recentActions.length + 1 : recentActions.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 49,
-    overscan: 5,
-  })
-  const virtualizerItems = rowVirtualizer.getVirtualItems()
-
-  React.useEffect(() => {
-    const [lastItem] = [...virtualizerItems].reverse()
-    if (!lastItem) return
-
-    if (lastItem.index >= recentActions.length && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage()
-    }
-  }, [hasNextPage, fetchNextPage, recentActions.length, isFetchingNextPage, virtualizerItems])
-
-  const renderRecentActions = recentActions.map((action) => {
-    if (isConversationData(action)) {
-      const audioNote = action
-      return <AudioNotesListItem key={audioNote.id} audioNote={audioNote} />
-    } else if (isChatHistoryItem(action)) {
-      const chat = action
-      return <ChatListItem key={chat.id} chat={chat} />
-    }
-  })
-
-  if (!isLoading && recentActions.length === 0) {
+  if (!isLoading && (!data || data?.length === 0)) {
     return <ListEmptyState label="No recent activity" />
   }
 
@@ -478,32 +374,29 @@ function RecentActivityTabContent() {
         <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
-          <div ref={parentRef} className="h-[calc(100vh-200px)] w-full overflow-y-scroll">
-            <div
-              style={{
-                height: `${rowVirtualizer.getTotalSize()}px`,
-              }}
-              className="relative w-full"
-            >
-              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-                const isLoaderRow = virtualRow.index > recentActions.length - 1
-                const row = renderRecentActions[virtualRow.index]
-
-                return (
-                  <div
-                    key={virtualRow.index}
-                    style={{
-                      height: `${virtualRow.size}px`,
-                      transform: `translateY(${virtualRow.start}px)`,
-                    }}
-                    className="absolute left-0 top-0 w-full"
-                  >
-                    {isLoaderRow ? (hasNextPage ? 'Loading more...' : 'Nothing more to load') : row}
-                  </div>
-                )
-              })}
-            </div>
-          </div>
+          <Virtuoso
+            data={data ?? []}
+            endReached={handleFetchMore}
+            style={{ height: 'calc(100vh - 200px)' }}
+            itemContent={(_, action) => {
+              if (action.type === 'audio-note') {
+                return <AudioNotesListItem key={action.id} audioNote={action} />
+              } else {
+                return <ChatListItem key={action.id} chat={action} />
+              }
+            }}
+            components={{
+              Footer: () =>
+                isFetchingNextPage && (
+                  <HomeFeedListItemLayout>
+                    <div className="flex items-center gap-2 font-medium">
+                      <MessageText variant={'Bold'} size={20} className="animate-pulse text-subtle/50" />
+                      <p className="animate-pulse text-subtle">Loading more chats...</p>
+                    </div>
+                  </HomeFeedListItemLayout>
+                ),
+            }}
+          />
         </HomeFeedListLayout>
       )}
     </AnimatePresence>

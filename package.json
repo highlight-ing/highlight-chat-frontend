@@ -89,6 +89,7 @@
     "react-social-icons": "^6.18.0",
     "react-syntax-highlighter": "^15.5.0",
     "react-use-measure": "^2.1.1",
+    "react-virtuoso": "^4.12.3",
     "rehype-katex": "^7.0.0",
     "remark-gfm": "^4.0.0",
     "remark-math": "^6.0.0",

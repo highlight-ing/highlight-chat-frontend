@@ -1,11 +1,15 @@
 'use client'
 
+import React from 'react'
 import Highlight from '@highlight-ai/app-runtime'
 import { useQuery } from '@tanstack/react-query'
+import { useAtom } from 'jotai'
 
 import { ConversationData } from '@/types/conversations'
-import { HistoryResponseData } from '@/types/history'
-import { useApi } from '@/hooks/useApi'
+import { PAGINATION_LIMIT } from '@/lib/constants'
+import { useInfiniteHistory } from '@/hooks/history'
+
+import { recentActionsPageAtom } from './atoms'
 
 const THIRTY_MINUTES_IN_MS = 30 * 60 * 1000
 
@@ -14,39 +18,107 @@ export function useAudioNotes() {
     queryKey: ['audio-notes'],
     queryFn: async () => {
       const recentConversations = await Highlight.conversations.getAllConversations()
-
       return recentConversations as Array<ConversationData> | undefined
     },
     staleTime: THIRTY_MINUTES_IN_MS,
   })
 }
 
-export function useRecentlyUpdatedHistory() {
-  const { get } = useApi()
+export function useRecentActions() {
+  const [localPage, setLocalPage] = useAtom(recentActionsPageAtom)
+  const [isLoadingMore, setIsLoadingMore] = React.useState(false)
+  const historyQuery = useInfiniteHistory({ enabled: false })
+  const audioQuery = useAudioNotes()
 
-  return useQuery({
-    queryKey: ['recently-updated-history'],
-    queryFn: async () => {
-      try {
-        const response = await get(`history/paginated`, {
-          version: 'v4',
-        })
+  const combinedData = React.useMemo(() => {
+    if (!historyQuery.data?.pages || !audioQuery.data) return null
 
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-        const data = (await response.json()) as HistoryResponseData
+    const allChats = historyQuery.data.pages.flat().map((chat) => ({
+      ...chat,
+      updatedAt: new Date(chat.updated_at).toISOString(),
+      type: 'chat' as const,
+    }))
 
-        const chatsSortedByUpdatedAt = data.conversations.sort((a, b) =>
-          new Date(b.updated_at).toISOString().localeCompare(new Date(a.updated_at).toISOString()),
-        )
+    const audioNotes = audioQuery.data.map((audioNote) => ({
+      ...audioNote,
+      updatedAt: audioNote.endedAt.toISOString(),
+      type: 'audio-note' as const,
+    }))
 
-        return chatsSortedByUpdatedAt ?? []
-      } catch (error) {
-        console.error('Error fetching response:', error)
-        return []
+    return [...allChats, ...audioNotes].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+  }, [historyQuery.data?.pages, audioQuery.data])
+
+  const fetchNextPage = React.useCallback(async () => {
+    if (isLoadingMore || !combinedData) return
+
+    try {
+      setIsLoadingMore(true)
+
+      const currentEnd = (localPage + 1) * PAGINATION_LIMIT
+      const nextBatchOfItems = combinedData.slice(currentEnd, currentEnd + PAGINATION_LIMIT)
+
+      if (!nextBatchOfItems.length) return
+
+      const remainingChats = combinedData.slice(currentEnd).filter((item) => item.type === 'chat')
+
+      if (remainingChats.length > PAGINATION_LIMIT) {
+        setLocalPage((prev) => prev + 1)
+        return
       }
-    },
-    staleTime: Infinity,
-  })
+
+      const oldestLoadedChat = historyQuery.data?.pages.flat().at(-1)
+      if (!oldestLoadedChat) {
+        await historyQuery.fetchNextPage({ cancelRefetch: true })
+        setLocalPage((prev) => prev + 1)
+        return
+      }
+      // Get the next chat's time (if it exists in our current data)
+      const nextChat = combinedData.find((item, index) => item.type === 'chat' && index >= currentEnd)
+
+      // If we know the next chat's time and it's after all items in the next batch,
+      // we can safely skip fetching more chat history
+      if (nextChat) {
+        const nextBatchOldestTime = nextBatchOfItems[nextBatchOfItems.length - 1].updatedAt
+        if (nextChat.updatedAt < nextBatchOldestTime) {
+          // Next chat is beyond this batch, safe to just show audio notes
+          setLocalPage((prev) => prev + 1)
+          return
+        }
+      }
+
+      const oldestChatTime = new Date(oldestLoadedChat.updated_at).toISOString()
+
+      // Only fetch if we don't know where the next chat falls
+      const needsMoreChats = nextBatchOfItems.some((item) => item.updatedAt > oldestChatTime)
+
+      if (needsMoreChats && historyQuery.hasNextPage) {
+        await historyQuery.fetchNextPage()
+      }
+
+      setLocalPage((prev) => prev + 1)
+    } finally {
+      setIsLoadingMore(false)
+    }
+  }, [isLoadingMore, historyQuery, combinedData, localPage, setLocalPage])
+
+  const visibleData = React.useMemo(() => {
+    if (!combinedData) return null
+    return combinedData.slice(0, (localPage + 1) * PAGINATION_LIMIT)
+  }, [combinedData, localPage])
+
+  const hasNextPage = React.useMemo(() => {
+    if (!combinedData) return false
+    return combinedData.length > (localPage + 1) * PAGINATION_LIMIT
+  }, [combinedData, localPage])
+
+  return {
+    data: visibleData,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage: isLoadingMore,
+    isLoading: historyQuery.isLoading || audioQuery.isLoading,
+    isError: historyQuery.isError || audioQuery.isError,
+    error: historyQuery.error || audioQuery.error,
+    historyQuery,
+  }
 }
