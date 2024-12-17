@@ -135,6 +135,7 @@ export async function GET(request: Request) {
       selected_text: false,
       clipboard_text: false,
       audio_transcription: false,
+      window: false,
     }
 
     shortcutPreferences

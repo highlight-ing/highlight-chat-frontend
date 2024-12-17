@@ -14,29 +14,29 @@ import { useStore } from '@/components/providers/store-provider'
 import styles from './modals.module.scss'
 
 interface AppVisibility {
-  [key: string]: boolean;
+  [key: string]: boolean
 }
 
 const EditPromptModal = ({ id, context }: ModalObjectProps) => {
   const prompt = context?.data.prompt as Prompt
   const preferences = context?.data.promptShortcutPreferences as any
 
-  const { 
-    setPromptEditorData, 
-    setSelectedScreen, 
-    setSettingsHasNoErrors, 
-    setSelectedApp, 
-    setAppVisibility, 
-    setContextTypes 
+  const {
+    setPromptEditorData,
+    setSelectedScreen,
+    setSettingsHasNoErrors,
+    setSelectedApp,
+    setAppVisibility,
+    setContextTypes,
   } = usePromptEditorStore()
-  
+
   const closeModal = useStore((state) => state.closeModal)
 
   // Handle app visibility and context types initialization
   useEffect(() => {
     if (!preferences) {
       // No preferences found - set to hidden state
-      setSelectedApp("hidden")
+      setSelectedApp('hidden')
       setAppVisibility({})
       setContextTypes(null)
       return
@@ -44,47 +44,53 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
 
     // Handle "all apps" case
     if (preferences.application_name_darwin === '*') {
-      setSelectedApp("all")
+      setSelectedApp('all')
       setAppVisibility({})
-      setContextTypes(preferences.context_types ?? {
-        selected_text: true,
-        audio_transcription: true,
-        clipboard_text: true,
-        screenshot: true
-      })
+      setContextTypes(
+        preferences.context_types ?? {
+          selected_text: true,
+          audio_transcription: true,
+          clipboard_text: true,
+          screenshot: true,
+          window: true,
+        },
+      )
       return
     }
 
     try {
       // Parse the JSON array of apps
       const apps = JSON.parse(preferences.application_name_darwin || '[]') as string[]
-      
+
       if (apps.length === 0) {
         // Empty apps array - set to hidden state
-        setSelectedApp("hidden")
+        setSelectedApp('hidden')
         setAppVisibility({})
         setContextTypes(null)
       } else {
         // Specific apps selected
-        setSelectedApp("specific")
+        setSelectedApp('specific')
         const newVisibility: AppVisibility = {}
         apps.forEach((app: string) => {
           newVisibility[app] = true
         })
         setAppVisibility(newVisibility)
-        
+
         // Use context types from preferences if they exist
-        setContextTypes(preferences.context_types ?? {
-          selected_text: true,
-          audio_transcription: true,
-          clipboard_text: true,
-          screenshot: true
-        })
+        setContextTypes(
+          preferences.context_types ?? {
+            selected_text: true,
+            audio_transcription: true,
+            clipboard_text: true,
+            screenshot: true,
+            window: true,
+          },
+        )
       }
     } catch (error) {
       console.error('Error parsing app preferences:', error)
       // Error case - set to hidden state
-      setSelectedApp("hidden")
+      setSelectedApp('hidden')
       setAppVisibility({})
       setContextTypes(null)
     }
@@ -134,8 +140,8 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
       }
       showClose={false}
     >
-      <PromptEditor onClose={() => closeModal(id)} isEditPrompt={true}/>
-    </Modal> 
+      <PromptEditor onClose={() => closeModal(id)} isEditPrompt={true} />
+    </Modal>
   )
 }
 
@@ -167,13 +173,7 @@ function ShareLinkButton() {
   }
 
   return (
-    <Button 
-      onClick={onCopyLinkClick} 
-      size={'large'} 
-      variant={'ghost'} 
-      style={{ marginRight: '6px' }} 
-      disabled={!slug}
-    >
+    <Button onClick={onCopyLinkClick} size={'large'} variant={'ghost'} style={{ marginRight: '6px' }} disabled={!slug}>
       {copied ? 'Copied link to clipboard!' : 'Share'}
     </Button>
   )

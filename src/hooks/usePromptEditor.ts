@@ -215,6 +215,16 @@ export function usePromptEditor() {
       case 'all':
         preferences.application_name_darwin = '*'
         preferences.application_name_win32 = '*'
+
+        if (!contextTypes) {
+          preferences.context_types = {
+            selected_text: true,
+            audio_transcription: true,
+            clipboard_text: true,
+            screenshot: true,
+            window: true,
+          }
+        }
         break
 
       case 'specific':
@@ -239,6 +249,15 @@ export function usePromptEditor() {
         const appsString = JSON.stringify(selectedApps)
         preferences.application_name_darwin = appsString
         preferences.application_name_win32 = appsString
+        if (!contextTypes) {
+          preferences.context_types = {
+            selected_text: true,
+            audio_transcription: true,
+            clipboard_text: true,
+            screenshot: true,
+            window: true,
+          }
+        }
         break
 
       default:
