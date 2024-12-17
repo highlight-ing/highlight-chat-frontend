@@ -5,7 +5,7 @@ import ContextMenu, {
 import { Button } from "@/components/ui/button";
 import { ArrowDown2, Category2, Global, CloseCircle } from "iconsax-react";
 import sassVariables from "@/variables.module.scss";
-import { ChromeIcon, NotionIcon, SafariIcon, SlackIcon, VSCodeIcon } from "@/components/icons";
+import { ChromeIcon, NotionIcon, SafariIcon, SlackIcon, VSCodeIcon, CursorIcon } from "@/components/icons";
 import { usePromptEditorStore } from '@/stores/prompt-editor' 
 import { usePromptEditor } from '@/hooks/usePromptEditor' 
 
@@ -110,16 +110,17 @@ export default function AppSelector({shortcutName}: {shortcutName: string}) {
   };
 
   const appOptions: AppOption[] = [
-    { name: "Chrome", icon: <ChromeIcon />, theme: 'dark' },
     { name: "Slack", icon: <SlackIcon />, theme: 'dark' },
+    { name: "Cursor", icon: <CursorIcon />, theme: 'dark' },
     { name: "VS Code", icon: <VSCodeIcon />, theme: 'dark' },
-    { name: "Notion", icon: <NotionIcon />, theme: 'dark' },
-    { name: "Safari", icon: <SafariIcon />, theme: 'dark' },
-    { name: "Terminal", icon: <VSCodeIcon />, theme: 'dark'  },
-    { name: "Finder", icon: <NotionIcon />, theme: 'dark' },
-    { name: "Discord", icon: <SlackIcon />, theme: 'dark' },
-    { name: "Firefox", icon: <ChromeIcon />, theme: 'dark' },
-    { name: "Cursor", icon: <VSCodeIcon />, theme: 'dark' },
+    { name: "Chrome", icon: <ChromeIcon />, theme: 'dark' },
+    // { name: "Notion", icon: <NotionIcon />, theme: 'dark' },
+    // { name: "Safari", icon: <SafariIcon />, theme: 'dark' },
+    // { name: "Terminal", icon: <VSCodeIcon />, theme: 'dark'  },
+    // { name: "Finder", icon: <NotionIcon />, theme: 'dark' },
+    // { name: "Discord", icon: <SlackIcon />, theme: 'dark' },
+    // { name: "Firefox", icon: <ChromeIcon />, theme: 'dark' },
+
   ];
 
   const getVisibleApps = () => {
@@ -197,7 +198,7 @@ export default function AppSelector({shortcutName}: {shortcutName: string}) {
               </button>
             );
           })}
-          {!isExpanded && (
+          {!isExpanded && appOptions.length > 5 && (
             <button
             onClick={() => setIsExpanded(true)}
             className="relative border border-[#252525] h-12 hover:bg-neutral-800/15 rounded-lg flex items-center justify-between px-3 text-xs"
