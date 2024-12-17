@@ -56,7 +56,7 @@ function ToggleSwitch({
   return (
     <div className="flex items-center space-x-2">
       <div className="text-right text-xs font-normal leading-snug text-white/40">
-        {checked ? "ON" : "OFF"}
+        {checked ? "Custom Contexts" : "All Contexts"}
       </div>
       <Switch checked={checked} color={"cyan"} onChange={onToggle} />
     </div>
@@ -109,7 +109,8 @@ export default function ContextSelector() {
   
 
   return (
-    <div className="flex flex-col space-y-3 rounded-2xl bg-[#222222] p-3">
+    <div className="flex flex-col space-y-3">
+      <div className="border-t border-white/5" />
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <h4 className="text-[13px] font-medium leading-normal text-[#eeeeee]">
@@ -118,10 +119,9 @@ export default function ContextSelector() {
         </div>
         <ToggleSwitch checked={isEnabled} onToggle={handleMasterToggle} />
       </div>
-      <div className="border-t border-white/5" />
-      <p className="text-xs font-normal leading-tight text-[#6e6e6e]">
-        Specify the context you want to use for this shortcut.
-      </p>
+      {/* <p className="text-xs font-normal leading-tight text-[#6e6e6e]">
+        Specify the context you want the shortcut to be surfaced.
+      </p> */}
 
       {isEnabled && (
         <div className="grid grid-cols-2 gap-2">

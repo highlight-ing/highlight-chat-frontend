@@ -134,8 +134,8 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
       }
       showClose={false}
     >
-      <PromptEditor onClose={() => closeModal(id)} />
-    </Modal>
+      <PromptEditor onClose={() => closeModal(id)} isEditPrompt={true}/>
+    </Modal> 
   )
 }
 
