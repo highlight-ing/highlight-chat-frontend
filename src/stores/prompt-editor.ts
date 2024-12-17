@@ -60,7 +60,7 @@ export interface PromptEditorState {
   onboarding: PromptEditorOnboarding
   selectedApp: AppAvailability;
   appVisibility: Record<string, boolean>;
-  contextTypes: ContextTypes; 
+  contextTypes: ContextTypes | null; 
 }
 
 export type PromptEditorSlice = PromptEditorState & {
@@ -74,7 +74,7 @@ export type PromptEditorSlice = PromptEditorState & {
   startTutorial: () => void
   setSelectedApp: (value: AppAvailability) => void;
   setAppVisibility: (visibility: Record<string, boolean>) => void;
-  setContextTypes: (types: ContextTypes) => void; 
+  setContextTypes: (types: ContextTypes | null) => void; 
 }
 
 export const DEFAULT_SYSTEM_PROMPT = `
@@ -192,12 +192,7 @@ export const initialPromptEditorState: PromptEditorState = {
   },
   selectedApp: 'hidden',
   appVisibility: {}, 
-  contextTypes: {
-    selected_text: false,
-    audio_transcription: false,
-    clipboard_text: false,
-    screenshot: false
-  },
+  contextTypes: null
 }
 
 export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, get) => ({
@@ -225,7 +220,7 @@ export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, ge
     set({ onboarding: { isOnboarding: true, index: 0, hasOnboardedOnceBefore: true }, selectedScreen: 'app' }),
   setSelectedApp: (value: AppAvailability) => set({ selectedApp: value }),
   setAppVisibility: (visibility: Record<string, boolean>) => set({ appVisibility: visibility }),
-  setContextTypes: (types: ContextTypes) => set({ contextTypes: types }),
+  setContextTypes: (types: ContextTypes | null) => set({ contextTypes: types }),
 })
 
 export const usePromptEditorStore = () =>

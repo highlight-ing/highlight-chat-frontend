@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 
-import { isAlpha } from '@/utils/appVersion'
+import { isAlpha, isDevelopment } from '@/utils/appVersion'
 import { Switch } from '@/components/catalyst/switch'
 import { LinearIcon, NotionIcon } from '@/components/icons'
 
@@ -142,7 +142,7 @@ function IntegrationToggle({
   )
 }
 
-export default function AppScreen() {
+export default function AppScreen({ isEditPrompt }: { isEditPrompt: boolean }) {
   const { promptEditorData, setPromptEditorData, onboarding } = usePromptEditorStore()
 
   return (
@@ -192,7 +192,7 @@ export default function AppScreen() {
               description="Create a Notion page using the prompt output"
             />
           </div>
-          {!isAlpha && (
+          {(isDevelopment || isAlpha) && isEditPrompt && (
             <>
               <div className="flex flex-col space-y-[6px] mt-8">
                 <AppSelector shortcutName={promptEditorData.name} />

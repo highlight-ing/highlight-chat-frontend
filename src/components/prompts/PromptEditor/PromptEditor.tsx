@@ -60,10 +60,10 @@ function VariablesEditorButton() {
   )
 }
 
-export default function PromptEditor({ onClose }: { onClose?: () => void }) {
+export default function PromptEditor({ onClose, isEditPrompt }: { onClose?: () => void, isEditPrompt?: boolean }) {
   const { selectedScreen, onboarding } = usePromptEditorStore()
 
-  return (
+  return (  
     <>
       {selectedScreen !== 'startWithTemplate' && (
         <div className={styles.editorTabs}>
@@ -86,7 +86,7 @@ export default function PromptEditor({ onClose }: { onClose?: () => void }) {
       )}
       <div className={'h-full'}>
         {selectedScreen === 'startWithTemplate' && <StartWithTemplateScreen />}
-        {selectedScreen === 'app' && <AppScreen />}
+        {selectedScreen === 'app' && <AppScreen isEditPrompt={isEditPrompt ?? false} />}
         {selectedScreen === 'variables' && <VariablesScreen />}
         {selectedScreen === 'settings' && <SettingsScreen onClose={onClose} />}
       </div>
