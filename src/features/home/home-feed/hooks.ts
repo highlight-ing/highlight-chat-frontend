@@ -27,7 +27,7 @@ export function useAudioNotes() {
 export function useRecentActions() {
   const [localPage, setLocalPage] = useAtom(recentActionsPageAtom)
   const [isLoadingMore, setIsLoadingMore] = React.useState(false)
-  const historyQuery = useInfiniteHistory({ enabled: false })
+  const historyQuery = useInfiniteHistory()
   const audioQuery = useAudioNotes()
 
   const combinedData = React.useMemo(() => {

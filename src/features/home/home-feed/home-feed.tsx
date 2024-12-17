@@ -428,7 +428,7 @@ function HomeFeedTabContent(props: { value: string; children: React.ReactNode })
 
 export function HomeFeed() {
   return (
-    <Tabs defaultValue="chats">
+    <Tabs defaultValue="recent-activity">
       <TabsList className="mb-0 w-full">
         <div className="flex w-full items-center justify-between border-b border-subtle py-1.5">
           <div className="flex items-center gap-2">
