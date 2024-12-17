@@ -1,18 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import { usePromptEditorStore } from '@/stores/prompt-editor'
+import { ContextTypes, usePromptEditorStore } from '@/stores/prompt-editor'
 import { DocumentText } from 'iconsax-react'
 
 import { usePromptEditor } from '@/hooks/usePromptEditor'
 import { Switch } from '@/components/catalyst/switch'
 import { AudioIcon, ClipboardIcon, ScreenshotIcon, TextIcon } from '@/components/icons'
-
-interface ContextTypes {
-  selected_text: boolean
-  audio_transcription: boolean
-  clipboard_text: boolean
-  screenshot: boolean
-  window: boolean
-}
 
 interface ContextOption {
   id: keyof ContextTypes
@@ -90,6 +82,7 @@ export default function ContextSelector() {
       screenshot: false,
       window: false,
     }
+
     setContextTypes({
       ...currentTypes,
       [contextId]: !currentTypes[contextId],
@@ -102,7 +95,9 @@ export default function ContextSelector() {
       audio_transcription: !enabled,
       clipboard_text: !enabled,
       screenshot: !enabled,
+      window: !enabled,
     }
+
     setContextTypes(newContextTypes)
   }
 
