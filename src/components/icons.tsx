@@ -405,8 +405,8 @@ export const GoogleIcon = ({ size = 24 }: { size: number }) => {
 export const GoogleMeetIcon = ({ size = 24 }: { size: number }) => {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width={size} height={size}>
-      <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-      <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+      <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+      <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
       <g id="SVGRepo_iconCarrier">
         <path d="M166 106v90h-90" fill="#ea4335"></path>
         <path d="M166 106v90h120v62l90-73v-49q0-30-30-30" fill="#ffba00"></path>
@@ -811,42 +811,42 @@ export const AudioIcon = ({ size = 32 }: IconPropTypes) => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g clip-path="url(#clip0_2577_941)">
+      <g clipPath="url(#clip0_2577_941)">
         <rect width="64" height="64" rx="6" fill="#A2A6A7" />
         <path
           d="M16 25.3333V38.6667"
           stroke="black"
-          stroke-width="3.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="3.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
         <path
           d="M24 20.8889V43.1111"
           stroke="black"
-          stroke-width="3.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="3.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
         <path
           d="M32 16.4444V47.5556"
           stroke="black"
-          stroke-width="3.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="3.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
         <path
           d="M40 20.8889V43.1111"
           stroke="black"
-          stroke-width="3.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="3.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
         <path
           d="M48 25.3333V38.6667"
           stroke="black"
-          stroke-width="3.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="3.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
       </g>
       <defs>
