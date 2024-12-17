@@ -212,7 +212,7 @@ export default function AppSelector({shortcutName}: {shortcutName: string}) {
                 </div>
                 ))}
             </div>
-            <button className="ml-2 bg-[#2f2f2f] py-2 px-2 rounded-md text-xs">More</button>
+            <span className="ml-2 bg-[#2f2f2f] py-2 px-2 rounded-md text-xs">More</span>
             {getVisibleAppCount() > 0 && (
               <div className="absolute top-0 -right-2 bg-green-60 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs">
                 {getVisibleAppCount()}
