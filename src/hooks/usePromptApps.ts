@@ -1,4 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useShallow } from 'zustand/react/shallow'
+
+import { Prompt } from '@/types/supabase-helpers'
 import { trackEvent } from '@/utils/amplitude'
 import {
   addPromptToUser,
@@ -9,15 +12,12 @@ import {
   serverGetPromptAppById,
   serverGetPromptByExternalId,
 } from '@/utils/prompts'
-import { useShallow } from 'zustand/react/shallow'
-
-import { Prompt } from '@/types/supabase-helpers'
 import useAuth from '@/hooks/useAuth'
 import { useStore } from '@/components/providers/store-provider'
 
 let loadPromptsPromise: Promise<Prompt[]> | null = null
 
-export default (loadPrompts?: boolean) => {
+const usePromptApps = (loadPrompts?: boolean) => {
   const { getAccessToken } = useAuth()
   const addToast = useStore((state) => state.addToast)
 
@@ -244,3 +244,5 @@ export default (loadPrompts?: boolean) => {
     selectPrompt,
   }
 }
+
+export default usePromptApps

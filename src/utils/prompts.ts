@@ -372,7 +372,7 @@ export async function fetchPrompts(authToken: string) {
   const { data: prompts, error: promptsError } = await supabase
     .from('prompts')
     .select(
-      'id, external_id, name, description, prompt_text, prompt_url, created_at, slug, user_id, public, suggestion_prompt_text, video_url, image, is_handlebar_prompt, public_use_number, system_prompt, can_trend, user_images(file_extension), preferred_attachment, added_prompt_tags(tags(external_id, tag, slug)), linear_integration_enabled, email_integration_enabled, create_notion_page_integration_enabled, create_gcal_event_integration_enabled, canShowOnPromptPage, send_slack_message_integration_enabled',
+      'id, external_id, name, description, prompt_text, prompt_url, created_at, slug, user_id, public, suggestion_prompt_text, video_url, image, is_handlebar_prompt, public_use_number, system_prompt, can_trend, user_images(file_extension), preferred_attachment, added_prompt_tags(tags(external_id, tag, slug)), linear_integration_enabled, email_integration_enabled, create_notion_page_integration_enabled, create_gcal_event_integration_enabled, canShowOnPromptPage, send_slack_message_integration_enabled, enable_agent_mode, roleplay',
     )
     .eq('user_id', userId)
 
@@ -387,7 +387,7 @@ export async function fetchPrompts(authToken: string) {
   const { data: trendingPrompts, error: trendingPromptsError } = await supabase
     .from('prompts')
     .select(
-      'id, external_id, name, description, prompt_text, prompt_url, created_at, slug, user_id, public, suggestion_prompt_text, video_url, image, is_handlebar_prompt, public_use_number, system_prompt, can_trend, user_images(file_extension), preferred_attachment, added_prompt_tags(tags(external_id, tag, slug)), linear_integration_enabled, email_integration_enabled, create_notion_page_integration_enabled, create_gcal_event_integration_enabled, canShowOnPromptPage, send_slack_message_integration_enabled',
+      'id, external_id, name, description, prompt_text, prompt_url, created_at, slug, user_id, public, suggestion_prompt_text, video_url, image, is_handlebar_prompt, public_use_number, system_prompt, can_trend, user_images(file_extension), preferred_attachment, added_prompt_tags(tags(external_id, tag, slug)), linear_integration_enabled, email_integration_enabled, create_notion_page_integration_enabled, create_gcal_event_integration_enabled, canShowOnPromptPage, send_slack_message_integration_enabled, enable_agent_mode, roleplay',
     )
     .eq('can_trend', true)
 
