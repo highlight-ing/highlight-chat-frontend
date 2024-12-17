@@ -617,35 +617,32 @@ export async function countPromptView(externalId: string, authToken: string) {
  * Fetches the app shortcut preferences for a specific prompt and user
  */
 export async function getPromptShortcutPreferences(promptId: number, authToken: string) {
-  let userId: string;
+  let userId: string
 
   try {
-    userId = await validateUserAuth(authToken);
+    userId = await validateUserAuth(authToken)
   } catch (error) {
-    return {error: ERROR_MESSAGES.INVALID_AUTH_TOKEN}
+    return { error: ERROR_MESSAGES.INVALID_AUTH_TOKEN }
   }
-  
-  const supabase = supabaseAdmin();
 
-  const {data: preferences, error} = await supabase
+  const supabase = supabaseAdmin()
+
+  const { data: preferences, error } = await supabase
     .from('app_shortcut_preferences')
     .select('*')
     .eq('prompt_id', promptId)
     .eq('user_id', userId)
     .maybeSingle()
 
-    if (error) {
-      console.error('Error fetching app shortcut preferences:', error)
-      return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
-    }
-  
-    return { preferences }
+  if (error) {
+    console.error('Error fetching app shortcut preferences:', error)
+    return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
+  }
+
+  return { preferences }
 }
 
-export async function deletePromptShortcutPreferences(
-  promptId: number,
-  authToken: string
-) {
+export async function deletePromptShortcutPreferences(promptId: number, authToken: string) {
   let userId: string
   try {
     userId = await validateUserAuth(authToken)
@@ -682,9 +679,10 @@ export async function upsertPromptShortcutPreferences(
       audio_transcription: boolean
       clipboard_text: boolean
       screenshot: boolean
+      window: boolean
     } | null
   },
-  authToken: string
+  authToken: string,
 ) {
   let userId: string
   try {
@@ -700,15 +698,13 @@ export async function upsertPromptShortcutPreferences(
     user_id: userId,
     application_name_darwin: preferences.application_name_darwin,
     application_name_win32: preferences.application_name_win32,
-    context_types: preferences.context_types
+    context_types: preferences.context_types,
   }
 
   // Use onConflict to specify which fields determine a unique record
-  const { error } = await supabase
-    .from('app_shortcut_preferences')
-    .upsert(record, {
-      onConflict: 'prompt_id,user_id'
-    })
+  const { error } = await supabase.from('app_shortcut_preferences').upsert(record, {
+    onConflict: 'prompt_id,user_id',
+  })
 
   if (error) {
     console.error('Error updating app shortcut preferences:', error)

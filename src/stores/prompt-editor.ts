@@ -11,7 +11,7 @@ import { useStore } from '@/components/providers/store-provider'
  */
 export type PromptEditorScreen = 'startWithTemplate' | 'app' | 'settings' | 'variables'
 
-export type AppAvailability = 'all' | 'specific' | 'hidden'  | undefined
+export type AppAvailability = 'all' | 'specific' | 'hidden' | undefined
 
 export interface PromptEditorOnboarding {
   /**
@@ -28,10 +28,11 @@ export interface EnabledAutomations {
 }
 
 export interface ContextTypes {
-  selected_text: boolean;
-  audio_transcription: boolean;
-  clipboard_text: boolean;
-  screenshot: boolean;
+  selected_text: boolean
+  audio_transcription: boolean
+  clipboard_text: boolean
+  screenshot: boolean
+  window: boolean
 }
 
 export interface PromptEditorData {
@@ -58,9 +59,9 @@ export interface PromptEditorState {
   saving: boolean
   settingsHasNoErrors: boolean
   onboarding: PromptEditorOnboarding
-  selectedApp: AppAvailability;
-  appVisibility: Record<string, boolean>;
-  contextTypes: ContextTypes | null; 
+  selectedApp: AppAvailability
+  appVisibility: Record<string, boolean>
+  contextTypes: ContextTypes | null
 }
 
 export type PromptEditorSlice = PromptEditorState & {
@@ -72,9 +73,9 @@ export type PromptEditorSlice = PromptEditorState & {
   setSettingsHasNoErrors: (hasSettingsError: boolean) => void
   setOnboarding: (onboarding: Partial<PromptEditorOnboarding>) => void
   startTutorial: () => void
-  setSelectedApp: (value: AppAvailability) => void;
-  setAppVisibility: (visibility: Record<string, boolean>) => void;
-  setContextTypes: (types: ContextTypes | null) => void; 
+  setSelectedApp: (value: AppAvailability) => void
+  setAppVisibility: (visibility: Record<string, boolean>) => void
+  setContextTypes: (types: ContextTypes | null) => void
 }
 
 export const DEFAULT_SYSTEM_PROMPT = `
@@ -191,8 +192,8 @@ export const initialPromptEditorState: PromptEditorState = {
     hasOnboardedOnceBefore: false,
   },
   selectedApp: 'hidden',
-  appVisibility: {}, 
-  contextTypes: null
+  appVisibility: {},
+  contextTypes: null,
 }
 
 export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, get) => ({
@@ -200,12 +201,13 @@ export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, ge
   setSelectedScreen: (screen: PromptEditorScreen) => set({ selectedScreen: screen }),
   setPromptEditorData: (data: Partial<PromptEditorData>, skipNeedSave?: boolean) =>
     set({ promptEditorData: { ...get().promptEditorData, ...data }, needSave: !skipNeedSave }),
-  clearPromptEditorData: () => set({ 
-    promptEditorData: initialPromptEditorState.promptEditorData,     
-    appVisibility: initialPromptEditorState.appVisibility,
-    selectedApp: initialPromptEditorState.selectedApp,
-    contextTypes: initialPromptEditorState.contextTypes
-  }),
+  clearPromptEditorData: () =>
+    set({
+      promptEditorData: initialPromptEditorState.promptEditorData,
+      appVisibility: initialPromptEditorState.appVisibility,
+      selectedApp: initialPromptEditorState.selectedApp,
+      contextTypes: initialPromptEditorState.contextTypes,
+    }),
   setNeedSave: (needSave: boolean) => set({ needSave }),
   setSaving: (saving: boolean) => set({ saving }),
   setSettingsHasNoErrors: (settingsHasNoErrors: boolean) => set({ settingsHasNoErrors }),

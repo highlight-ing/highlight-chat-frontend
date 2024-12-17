@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 
+import { isAlpha, isDevelopment } from '@/utils/appVersion'
 import { Switch } from '@/components/catalyst/switch'
 import { LinearIcon, NotionIcon } from '@/components/icons'
 
@@ -190,18 +191,18 @@ export default function AppScreen({ isEditPrompt }: { isEditPrompt: boolean }) {
               title="Create Notion Page"
               description="Create a Notion page using the prompt output"
             />
-            </div>
-            {isEditPrompt && 
+          </div>
+          {(isDevelopment || isAlpha) && isEditPrompt && (
             <>
-            <div className="flex flex-col space-y-[6px] mt-8">
-              <AppSelector shortcutName={promptEditorData.name}/>
-            </div>
-            <div className="flex flex-col space-y-[6px] mt-8 mb-32">
-              <ContextSelector />
+              <div className="flex flex-col space-y-[6px] mt-8">
+                <AppSelector shortcutName={promptEditorData.name} />
+              </div>
+              <div className="flex flex-col space-y-[6px] mt-8 mb-32">
+                <ContextSelector />
               </div>
             </>
-            } 
-          </div>
+          )}
+        </div>
       </div>
       {onboarding.isOnboarding && onboarding.index === 0 && <OnboardingIndex0 />}
       {onboarding.isOnboarding && onboarding.index === 1 && <OnboardingIndex1 />}
