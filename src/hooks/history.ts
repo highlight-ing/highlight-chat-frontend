@@ -73,9 +73,9 @@ export function useHistoryStore() {
       const newChatHistory =
         existingChatIndex !== -1
           ? [
-              [...firstPage.slice(0, existingChatIndex), chat, ...firstPage.slice(existingChatIndex + 1)],
-              ...queryData.pages.slice(1),
-            ]
+            [...firstPage.slice(0, existingChatIndex), chat, ...firstPage.slice(existingChatIndex + 1)],
+            ...queryData.pages.slice(1),
+          ]
           : [[chat, ...firstPage], ...queryData.pages.slice(1)]
 
       return {

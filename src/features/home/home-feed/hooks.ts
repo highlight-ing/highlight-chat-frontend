@@ -38,7 +38,6 @@ export function useRecentActions() {
       updatedAt: new Date(chat.updated_at).toISOString(),
       type: 'chat' as const,
     }))
-
     const audioNotes = audioQuery.data.map((audioNote) => ({
       ...audioNote,
       updatedAt: audioNote.endedAt.toISOString(),
@@ -67,28 +66,24 @@ export function useRecentActions() {
       }
 
       const oldestLoadedChat = historyQuery.data?.pages.flat().at(-1)
+
       if (!oldestLoadedChat) {
         await historyQuery.fetchNextPage({ cancelRefetch: true })
         setLocalPage((prev) => prev + 1)
         return
       }
-      // Get the next chat's time (if it exists in our current data)
+
       const nextChat = combinedData.find((item, index) => item.type === 'chat' && index >= currentEnd)
 
-      // If we know the next chat's time and it's after all items in the next batch,
-      // we can safely skip fetching more chat history
       if (nextChat) {
         const nextBatchOldestTime = nextBatchOfItems[nextBatchOfItems.length - 1].updatedAt
         if (nextChat.updatedAt < nextBatchOldestTime) {
-          // Next chat is beyond this batch, safe to just show audio notes
           setLocalPage((prev) => prev + 1)
           return
         }
       }
 
       const oldestChatTime = new Date(oldestLoadedChat.updated_at).toISOString()
-
-      // Only fetch if we don't know where the next chat falls
       const needsMoreChats = nextBatchOfItems.some((item) => item.updatedAt > oldestChatTime)
 
       if (needsMoreChats && historyQuery.hasNextPage) {
@@ -117,8 +112,6 @@ export function useRecentActions() {
     fetchNextPage,
     isFetchingNextPage: isLoadingMore,
     isLoading: historyQuery.isLoading || audioQuery.isLoading,
-    isError: historyQuery.isError || audioQuery.isError,
-    error: historyQuery.error || audioQuery.error,
     historyQuery,
   }
 }
