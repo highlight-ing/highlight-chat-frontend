@@ -8,8 +8,7 @@ import { useAtomValue, useSetAtom } from 'jotai'
 import { GroupedVirtuoso, Virtuoso } from 'react-virtuoso'
 
 import { ConversationData } from '@/types/conversations'
-import { DATE_GROUP_LABELS } from '@/lib/constants'
-import { cn, getChatDateGroupLengths } from '@/lib/utils'
+import { cn, getAudioDateGroupLengths, getChatDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { formatConversationDuration, formatTitle } from '@/utils/conversations'
 import { selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
@@ -237,8 +236,11 @@ function OpenConversationsButton() {
 function MeetingNotesTabContent() {
   const { data, isLoading } = useAudioNotes()
 
-  const recentMeetingNotes = React.useMemo(() => {
-    return data?.filter((audioNote) => audioNote.meeting) ?? []
+  const { recentMeetingNotes, audioGroupCounts, audioGroupLabels } = React.useMemo(() => {
+    const recentMeetingNotes = data?.filter((audioNote) => audioNote.meeting) ?? []
+    const { groupLengths, groupLabels } = getAudioDateGroupLengths(recentMeetingNotes)
+
+    return { recentMeetingNotes, audioGroupCounts: groupLengths, audioGroupLabels: groupLabels }
   }, [data])
 
   if (!isLoading && recentMeetingNotes.length === 0) {
@@ -251,11 +253,18 @@ function MeetingNotesTabContent() {
         <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
-          <Virtuoso
-            data={recentMeetingNotes}
+          <GroupedVirtuoso
             style={{ height: 'calc(100vh - 200px)' }}
-            itemContent={(_, meetingNote) => <AudioNotesListItem key={meetingNote.id} audioNote={meetingNote} />}
-            components={{ Footer: () => <OpenConversationsButton /> }}
+            groupCounts={audioGroupCounts}
+            groupContent={(index) => (
+              <div className="w-full bg-primary px-5 py-3 shadow-md">
+                <p className="font-medium text-subtle">{audioGroupLabels[index]}</p>
+              </div>
+            )}
+            itemContent={(index) => {
+              const meetingNote = recentMeetingNotes[index]
+              return <AudioNotesListItem key={meetingNote.id} audioNote={meetingNote} />
+            }}
           />
         </HomeFeedListLayout>
       )}
@@ -266,8 +275,11 @@ function MeetingNotesTabContent() {
 function AudioNotesTabContent() {
   const { data, isLoading } = useAudioNotes()
 
-  const recentNonMeetingNotes = React.useMemo(() => {
-    return data?.filter((audioNote) => !audioNote.meeting) ?? []
+  const { recentNonMeetingNotes, audioGroupCounts, audioGroupLabels } = React.useMemo(() => {
+    const recentNonMeetingNotes = data?.filter((audioNote) => audioNote.meeting) ?? []
+    const { groupLengths, groupLabels } = getAudioDateGroupLengths(recentNonMeetingNotes)
+
+    return { recentNonMeetingNotes, audioGroupCounts: groupLengths, audioGroupLabels: groupLabels }
   }, [data])
 
   if (!isLoading && recentNonMeetingNotes.length === 0) {
@@ -280,11 +292,18 @@ function AudioNotesTabContent() {
         <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
-          <Virtuoso
-            data={recentNonMeetingNotes}
+          <GroupedVirtuoso
             style={{ height: 'calc(100vh - 200px)' }}
-            itemContent={(_, audioNote) => <AudioNotesListItem key={audioNote.id} audioNote={audioNote} />}
-            components={{ Footer: () => <OpenConversationsButton /> }}
+            groupCounts={audioGroupCounts}
+            groupContent={(index) => (
+              <div className="w-full bg-primary px-5 py-3 shadow-md">
+                <p className="font-medium text-subtle">{audioGroupLabels[index]}</p>
+              </div>
+            )}
+            itemContent={(index) => {
+              const audioNote = recentNonMeetingNotes[index]
+              return <AudioNotesListItem key={audioNote.id} audioNote={audioNote} />
+            }}
           />
         </HomeFeedListLayout>
       )}
@@ -319,11 +338,11 @@ function ChatListItem(props: { chat: ChatHistoryItem }) {
 
 function ChatsTabContent() {
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteHistory()
-  const { allChatRows, chatGroupCounts } = React.useMemo(() => {
+  const { allChatRows, chatGroupCounts, chatGroupLabels } = React.useMemo(() => {
     const allChatRows = data ? data.pages.flatMap((d) => d) : []
-    const chatGroupCounts = getChatDateGroupLengths(allChatRows)
+    const { groupLengths, groupLabels } = getChatDateGroupLengths(allChatRows)
 
-    return { allChatRows, chatGroupCounts }
+    return { allChatRows, chatGroupCounts: groupLengths, chatGroupLabels: groupLabels }
   }, [data])
 
   function handleFetchMore() {
@@ -346,7 +365,7 @@ function ChatsTabContent() {
             groupCounts={chatGroupCounts}
             groupContent={(index) => (
               <div className="w-full bg-primary px-5 py-3 shadow-md">
-                <p className="font-medium text-subtle">{DATE_GROUP_LABELS[index]}</p>
+                <p className="font-medium text-subtle">{chatGroupLabels[index]}</p>
               </div>
             )}
             itemContent={(index) => {

@@ -8,6 +8,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+const DATE_GROUP_LABELS = ['Today', 'Past 7 days', 'Past 30 days', 'Older than 30 days'] as const
+
 export function sortChatsByDate(inputArray: Array<ChatHistoryItem>) {
   const now = new Date()
   const oneDayAgo = new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000)
@@ -47,10 +49,10 @@ export function getChatDateGroupLengths(inputArray: Array<ChatHistoryItem>) {
   const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
   const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
 
-  const today: ChatHistoryItem[] = []
-  const lastWeek: ChatHistoryItem[] = []
-  const lastMonth: ChatHistoryItem[] = []
-  const older: ChatHistoryItem[] = []
+  const today: Array<ChatHistoryItem> = []
+  const lastWeek: Array<ChatHistoryItem> = []
+  const lastMonth: Array<ChatHistoryItem> = []
+  const older: Array<ChatHistoryItem> = []
 
   inputArray.forEach((item) => {
     const createdAt = new Date(item.updated_at)
@@ -68,20 +70,24 @@ export function getChatDateGroupLengths(inputArray: Array<ChatHistoryItem>) {
 
   const groups = [today, lastWeek, lastMonth, older]
   const groupLengths = groups.flatMap((group) => group.length)
+  const groupLabels = groupLengths.map((groupLength, index) => (groupLength > 0 ? DATE_GROUP_LABELS[index] : undefined))
 
-  return groupLengths.filter((groupLength) => groupLength > 0)
+  return {
+    groupLengths: groupLengths.filter((groupLength) => groupLength > 0),
+    groupLabels: groupLabels.filter((groupLabel) => !!groupLabel),
+  }
 }
 
-export function sortConversationsByDate(inputArray: Array<ConversationData>) {
+export function getAudioDateGroupLengths(inputArray: Array<ConversationData>) {
   const now = new Date()
   const oneDayAgo = new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000)
   const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
   const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
 
-  const today: ConversationData[] = []
-  const lastWeek: ConversationData[] = []
-  const lastMonth: ConversationData[] = []
-  const older: ConversationData[] = []
+  const today: Array<ConversationData> = []
+  const lastWeek: Array<ConversationData> = []
+  const lastMonth: Array<ConversationData> = []
+  const older: Array<ConversationData> = []
 
   inputArray.forEach((item) => {
     const createdAt = new Date(item.endedAt)
@@ -97,10 +103,12 @@ export function sortConversationsByDate(inputArray: Array<ConversationData>) {
     }
   })
 
+  const groups = [today, lastWeek, lastMonth, older]
+  const groupLengths = groups.flatMap((group) => group.length)
+  const groupLabels = groupLengths.map((groupLength, index) => (groupLength > 0 ? DATE_GROUP_LABELS[index] : undefined))
+
   return {
-    today,
-    lastWeek,
-    lastMonth,
-    older,
+    groupLengths: groupLengths.filter((groupLength) => groupLength > 0),
+    groupLabels: groupLabels.filter((groupLabel) => !!groupLabel),
   }
 }
