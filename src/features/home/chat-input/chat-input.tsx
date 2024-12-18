@@ -215,7 +215,7 @@ export function ChatInput({ isActiveChat }: { isActiveChat: boolean }) {
 
   return (
     <MotionConfig transition={inputTransition}>
-      <div ref={inputContainerRef} className="relative flex min-h-[68px] w-full flex-col items-center gap-8">
+      <div ref={inputContainerRef} className="relative z-30 flex min-h-[68px] w-full flex-col items-center gap-8">
         <motion.div
           layout
           initial={{ height: 68 }}
@@ -231,6 +231,7 @@ export function ChatInput({ isActiveChat }: { isActiveChat: boolean }) {
           className={cn(
             'absolute isolate z-10 min-h-[68px] w-full cursor-text rounded-[24px] bg-[#1f1f1f]',
             isActiveChat && 'mb-5 max-w-[min(800px,83%)]',
+            isInputFocused && 'shadow-xl',
           )}
           onClick={focusInput}
         >
