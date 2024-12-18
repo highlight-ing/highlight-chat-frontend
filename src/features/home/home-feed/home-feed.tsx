@@ -5,10 +5,11 @@ import { ChatHistoryItem } from '@/types'
 import { AnimatePresence, motion, Variants } from 'framer-motion'
 import { Eye, EyeSlash, MessageText, VoiceSquare } from 'iconsax-react'
 import { useAtomValue, useSetAtom } from 'jotai'
-import { Virtuoso } from 'react-virtuoso'
+import { GroupedVirtuoso, Virtuoso } from 'react-virtuoso'
 
 import { ConversationData } from '@/types/conversations'
-import { cn } from '@/lib/utils'
+import { DATE_GROUP_LABELS } from '@/lib/constants'
+import { cn, getChatDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { formatConversationDuration, formatTitle } from '@/utils/conversations'
 import { selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
@@ -318,7 +319,12 @@ function ChatListItem(props: { chat: ChatHistoryItem }) {
 
 function ChatsTabContent() {
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteHistory()
-  const allChatRows = data ? data.pages.flatMap((d) => d) : []
+  const { allChatRows, chatGroupCounts } = React.useMemo(() => {
+    const allChatRows = data ? data.pages.flatMap((d) => d) : []
+    const chatGroupCounts = getChatDateGroupLengths(allChatRows)
+
+    return { allChatRows, chatGroupCounts }
+  }, [data])
 
   function handleFetchMore() {
     if (hasNextPage) fetchNextPage()
@@ -334,11 +340,19 @@ function ChatsTabContent() {
         <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
-          <Virtuoso
-            data={allChatRows}
+          <GroupedVirtuoso
             endReached={handleFetchMore}
             style={{ height: 'calc(100vh - 200px)' }}
-            itemContent={(_, chat) => <ChatListItem key={chat.id} chat={chat} />}
+            groupCounts={chatGroupCounts}
+            groupContent={(index) => (
+              <div className="w-full bg-primary px-5 py-3 shadow-md">
+                <p className="font-medium text-subtle">{DATE_GROUP_LABELS[index]}</p>
+              </div>
+            )}
+            itemContent={(index) => {
+              const chat = allChatRows[index]
+              return <ChatListItem key={chat.id} chat={chat} />
+            }}
             components={{
               Footer: () =>
                 isFetchingNextPage && (

@@ -6,6 +6,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Clock, Trash } from 'iconsax-react'
 import { useShallow } from 'zustand/react/shallow'
 
+import { sortChatsByDate } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { useHistory } from '@/hooks/history'
 import { useApi } from '@/hooks/useApi'
@@ -19,7 +20,6 @@ import Tooltip from '@/components/Tooltip/Tooltip'
 
 import styles from './history-sidebar.module.scss'
 import { NEW_CONVERSATION_TITLE, useAddNewChat, useUpdateConversationTitle } from './hooks'
-import { sortArrayByDate } from './utils'
 
 const CONVERSATION_FETCH_DELAY = 2 * 1000
 
@@ -32,8 +32,6 @@ type HistorySidebarItemProps = {
 }
 
 function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenChat }: HistorySidebarItemProps) {
-  const queryClient = useQueryClient()
-
   const { addOrUpdateOpenConversation, openModal, setConversationId } = useStore(
     useShallow((state) => ({
       setConversationId: state.setConversationId,
@@ -81,7 +79,7 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
       }, CONVERSATION_FETCH_DELAY)
       return () => clearTimeout(timeout)
     }
-  }, [chat, history])
+  }, [chat, history, updateConversationTitle])
 
   return (
     <ContextMenu
@@ -146,7 +144,7 @@ export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarPr
   useHistory()
 
   const { today, lastWeek, lastMonth, older } = useMemo(() => {
-    return sortArrayByDate(history)
+    return sortChatsByDate(history)
   }, [history])
 
   const toggleHistory = () => {
@@ -196,7 +194,7 @@ export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarPr
       }, CONVERSATION_FETCH_DELAY)
       return () => clearTimeout(timeout)
     }
-  }, [history, conversationId])
+  }, [history, addNewChat, conversationId])
 
   // Reset history selections upon collapse
   useEffect(() => {

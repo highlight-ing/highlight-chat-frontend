@@ -105,7 +105,7 @@ export function ChatInput() {
             },
           }}
           className={cn(
-            'absolute isolate z-10 w-full cursor-text rounded-[20px] border border-tertiary bg-primary transition-colors',
+            'absolute isolate z-10 w-full cursor-text rounded-[20px] border border-tertiary bg-primary',
             isInputFocused && 'bg-secondary shadow-xl',
           )}
           onClick={focusInput}
