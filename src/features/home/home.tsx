@@ -5,10 +5,10 @@ import { useShallow } from 'zustand/react/shallow'
 import { cn } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { isOnHomeAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
-import { HighlightIcon } from '@/components/icons'
-import { Input } from '@/components/Input/Input'
 import { useStore } from '@/components/providers/store-provider'
 
+import { chatInputIsFocusedAtom } from './atoms'
+import { ChatInput } from './chat-input/chat-input'
 import { HomeFeed } from './home-feed/home-feed'
 
 function InputHeading() {
@@ -49,7 +49,7 @@ export function ChatHome() {
       <div className="space-y-4">
         <div className="space-y-6">
           <InputHeading />
-          <Input isActiveChat={false} />
+          <ChatInput isActiveChat={false} />
         </div>
         <HomeFeed />
       </div>
