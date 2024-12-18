@@ -5,7 +5,6 @@ import { useShallow } from 'zustand/react/shallow'
 import { cn } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { isOnHomeAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
-import { HighlightIcon } from '@/components/icons'
 import { Input } from '@/components/Input/Input'
 import { useStore } from '@/components/providers/store-provider'
 

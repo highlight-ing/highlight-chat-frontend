@@ -21,6 +21,7 @@ import { OpenAppButton } from '@/components/buttons/open-app-button'
 import { MeetingIcon } from '@/components/icons'
 import { useStore } from '@/components/providers/store-provider'
 
+import { Todo } from '../auto-tasks/todo'
 import { feedHiddenAtom, toggleFeedVisibilityAtom } from './atoms'
 import { useAudioNotes, useRecentActions } from './hooks'
 import { formatUpdatedAtDate } from './utils'
@@ -420,7 +421,7 @@ function HomeFeedVisibilityToggle() {
   )
 }
 
-function HomeFeedTabContent(props: { value: string; children: React.ReactNode }) {
+function HideableTabContent(props: { value: string; children: React.ReactNode }) {
   const feedHidden = useAtomValue(feedHiddenAtom)
 
   return <TabsContent value={props.value}>{feedHidden ? <FeedHiddenState /> : props.children}</TabsContent>
@@ -436,22 +437,26 @@ export function HomeFeed() {
             <TabsTrigger value="meeting-notes">Meeting Notes</TabsTrigger>
             <TabsTrigger value="audio-notes">Audio Notes</TabsTrigger>
             <TabsTrigger value="chats">Chats</TabsTrigger>
+            <TabsTrigger value="tasks">Tasks</TabsTrigger>
           </div>
           <HomeFeedVisibilityToggle />
         </div>
       </TabsList>
-      <HomeFeedTabContent value="recent-activity">
+      <HideableTabContent value="recent-activity">
         <RecentActivityTabContent />
-      </HomeFeedTabContent>
-      <HomeFeedTabContent value="meeting-notes">
+      </HideableTabContent>
+      <HideableTabContent value="meeting-notes">
         <MeetingNotesTabContent />
-      </HomeFeedTabContent>
-      <HomeFeedTabContent value="audio-notes">
+      </HideableTabContent>
+      <HideableTabContent value="audio-notes">
         <AudioNotesTabContent />
-      </HomeFeedTabContent>
-      <HomeFeedTabContent value="chats">
+      </HideableTabContent>
+      <HideableTabContent value="chats">
         <ChatsTabContent />
-      </HomeFeedTabContent>
+      </HideableTabContent>
+      <TabsContent value="tasks">
+        <Todo />
+      </TabsContent>
     </Tabs>
   )
 }
