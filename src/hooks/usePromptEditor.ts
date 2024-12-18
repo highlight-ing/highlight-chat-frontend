@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { usePromptsStore } from '@/stores/prompts'
+import { debounce } from 'throttle-debounce'
 
 import { DEFAULT_PROMPT_EXTERNAL_IDS } from '@/lib/promptapps'
 import { openApp, sendExternalMessage } from '@/utils/highlightService'
 import {
   deletePromptShortcutPreferences,
-  getPromptShortcutPreferences,
   removePromptFromUser,
   savePrompt,
   upsertPromptShortcutPreferences,
@@ -16,8 +16,7 @@ import { useStore } from '@/components/providers/store-provider'
 import useAuth from './useAuth'
 import usePromptApps from './usePromptApps'
 
-// export const PROMPT_SLUG = 'prompts'
-export const PROMPT_SLUG = 'dev'
+export const PROMPT_SLUG = 'prompts'
 
 interface AppVisibility {
   [key: string]: boolean
@@ -37,9 +36,7 @@ export function usePromptEditor() {
     settingsHasNoErrors,
     setSaving,
     selectedApp,
-    setSelectedApp,
     appVisibility,
-    setAppVisibility,
     contextTypes,
   } = usePromptEditorStore()
   const { updatePrompt, addPrompt, prompts } = usePromptsStore()
@@ -202,6 +199,8 @@ export function usePromptEditor() {
       console.log('Shortcut preferences deleted successfully:', {
         promptId: prompt.id,
       })
+
+      refreshPinnedPrompts()
       return
     }
 
@@ -243,6 +242,8 @@ export function usePromptEditor() {
               type: 'error',
             })
           }
+
+          refreshPinnedPrompts()
           return
         }
 
@@ -290,11 +291,13 @@ export function usePromptEditor() {
     refreshPinnedPrompts()
   }
 
+  const debouncedSaveShortcutPreferences = debounce(300, saveShortcutPreferences)
+
   useEffect(() => {
-    if (promptEditorData.externalId && selectedApp !== 'hidden') {
+    if (promptEditorData.externalId) {
       saveShortcutPreferences()
     }
-  }, [contextTypes])
+  }, [contextTypes, selectedApp, appVisibility, promptEditorData.externalId])
 
-  return { save, saveDisabled, saveShortcutPreferences }
+  return { save, saveDisabled, saveShortcutPreferences: debouncedSaveShortcutPreferences }
 }

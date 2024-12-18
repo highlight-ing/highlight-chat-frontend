@@ -59,19 +59,11 @@ function ToggleSwitch({ checked, onToggle }: { checked: boolean; onToggle: (chec
 
 export default function ContextSelector() {
   const { selectedApp, contextTypes, setContextTypes } = usePromptEditorStore()
-  const { saveShortcutPreferences } = usePromptEditor()
 
   // Derive enabled state from contextTypes
   const isEnabled = useMemo(() => {
     if (!contextTypes) return false
     return Object.values(contextTypes).some((value) => !value)
-  }, [contextTypes])
-
-  // Save to Supabase whenever contextTypes changes
-  useEffect(() => {
-    if (contextTypes) {
-      saveShortcutPreferences()
-    }
   }, [contextTypes])
 
   const toggleContext = (contextId: keyof ContextTypes) => {
