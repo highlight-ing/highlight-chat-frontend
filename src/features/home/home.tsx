@@ -1,5 +1,4 @@
 import React from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -33,17 +32,15 @@ function InputHeading() {
 function ChatFocusedOverlay() {
   const chatInputIsFocused = useAtomValue(chatInputIsFocusedAtom)
 
+  if (!chatInputIsFocused) return null
+
   return (
-    <AnimatePresence>
-      {chatInputIsFocused && (
-        <motion.div
-          className={cn(
-            'bg-black/85 fixed inset-0 z-20',
-            chatInputIsFocused ? 'animate-in fade-in-0' : 'animate-out fade-out-0 ',
-          )}
-        />
+    <div
+      className={cn(
+        'fixed inset-0 z-20 bg-black/75',
+        chatInputIsFocused ? 'animate-in fade-in-0' : 'animate-out fade-out-0 ',
       )}
-    </AnimatePresence>
+    />
   )
 }
 
@@ -67,7 +64,7 @@ export function ChatHome() {
       <div className="space-y-4">
         <div className="space-y-6">
           <InputHeading />
-          <ChatInput isActiveChat={false} />
+          <ChatInput />
         </div>
         <HomeFeed />
       </div>

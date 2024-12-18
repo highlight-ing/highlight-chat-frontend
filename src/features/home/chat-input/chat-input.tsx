@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Attachment as AttachmentType, isFileAttachmentType } from '@/types'
 import { AnimatePresence, motion, MotionConfig, Transition, type Variants } from 'framer-motion'
-import { AddCircle, BoxAdd } from 'iconsax-react'
+import { AddCircle, BoxAdd, Setting } from 'iconsax-react'
 import { useAtom, useAtomValue } from 'jotai'
 import useMeasure from 'react-use-measure'
 import { useShallow } from 'zustand/react/shallow'
@@ -16,6 +16,7 @@ import { CreateShortcutButton } from '@/components/buttons/create-shortcut-butto
 import { OpenAppButton } from '@/components/buttons/open-app-button'
 import { AttachmentDropdowns } from '@/components/dropdowns/attachment-dropdowns'
 import { useStore } from '@/components/providers/store-provider'
+import Tooltip from '@/components/Tooltip/Tooltip'
 
 import { chatInputIsFocusedAtom } from '../atoms'
 import { PromptsList } from './prompts-list'
@@ -44,7 +45,7 @@ function InputFooter() {
       initial="hidden"
       animate="show"
       exit="exit"
-      className="flex items-center gap-5 rounded-full bg-[#1f1f1f] px-6 pt-3"
+      className="flex items-center gap-5 rounded-full px-6 pt-3"
     >
       <OpenAppButton
         appId="prompts"
@@ -69,12 +70,12 @@ export function InputDivider({ className }: { className?: string }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className={cn('w-full border-t border-[#191919]', className)}
+      className={cn('w-full border-t border-tertiary', className)}
     />
   )
 }
 
-export function ChatInput({ isActiveChat }: { isActiveChat: boolean }) {
+export function ChatInput() {
   const {
     attachments,
     inputOverride,
@@ -212,13 +213,14 @@ export function ChatInput({ isActiveChat }: { isActiveChat: boolean }) {
   const [ref, bounds] = useMeasure()
 
   const inputTransition: Transition = { type: 'spring', duration: 0.25, bounce: 0.3 }
+  const INPUT_HEIGHT = 48
 
   return (
     <MotionConfig transition={inputTransition}>
-      <div ref={inputContainerRef} className="relative z-30 flex min-h-[68px] w-full flex-col items-center gap-8">
+      <div ref={inputContainerRef} className="relative z-30 flex min-h-[60px] w-full flex-col items-center gap-8">
         <motion.div
           layout
-          initial={{ height: 68 }}
+          initial={{ height: INPUT_HEIGHT }}
           animate={{ height: bounds.height }}
           transition={{
             duration: 0,
@@ -229,13 +231,12 @@ export function ChatInput({ isActiveChat }: { isActiveChat: boolean }) {
             },
           }}
           className={cn(
-            'absolute isolate z-10 min-h-[68px] w-full cursor-text rounded-[24px] bg-[#1f1f1f]',
-            isActiveChat && 'mb-5 max-w-[min(800px,83%)]',
-            isInputFocused && 'shadow-xl',
+            'absolute isolate z-10 w-full cursor-text rounded-[20px] border border-tertiary bg-primary transition-colors',
+            isInputFocused && 'bg-secondary shadow-xl',
           )}
           onClick={focusInput}
         >
-          <div ref={ref} className="flec min-h-14 flex-col justify-between py-4">
+          <div ref={ref} className="min-h-14 flex flex-col justify-between py-3">
             <div className="flex w-full items-end justify-between gap-2 pl-6 pr-4">
               <div className="h-auto w-full">
                 <textarea
@@ -246,12 +247,24 @@ export function ChatInput({ isActiveChat }: { isActiveChat: boolean }) {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="h-6 max-h-[120px] w-full flex-1 resize-none overflow-y-auto bg-transparent text-base font-normal leading-6 outline-none placeholder:select-none placeholder:text-light-40 focus:outline-none"
+                  className={cn(
+                    'h-6 max-h-[120px] w-full flex-1 resize-none overflow-y-auto bg-transparent text-base font-normal leading-6 outline-none placeholder:select-none placeholder:text-light-40 focus:outline-none',
+                    !isInputFocused && 'max-h-6',
+                  )}
                 />
               </div>
-              <div onFocus={handleNonInputFocus}>
+              <motion.div layout className="flex items-center gap-2" onFocus={handleNonInputFocus}>
                 <AttachmentDropdowns />
-              </div>
+                {!isInputFocused && (
+                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
+                    <Tooltip tooltip="Pinned prompts" position="top">
+                      <button className="grid h-9 w-9 place-items-center rounded-full text-tertiary hover:bg-light-10">
+                        <Setting variant="Bold" size={20} />
+                      </button>
+                    </Tooltip>
+                  </motion.div>
+                )}
+              </motion.div>
             </div>
 
             <AnimatePresence mode="popLayout">
@@ -286,7 +299,7 @@ export function ChatInput({ isActiveChat }: { isActiveChat: boolean }) {
             </AnimatePresence>
 
             <AnimatePresence mode="popLayout">
-              {!isActiveChat && isInputFocused && (
+              {isInputFocused && (
                 <div className="pt-3">
                   <InputDivider />
                   <PromptsList input={input} />

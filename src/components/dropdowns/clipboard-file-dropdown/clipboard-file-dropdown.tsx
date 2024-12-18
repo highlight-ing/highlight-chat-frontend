@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { MAX_NUMBER_OF_ATTACHMENTS } from '@/stores/chat-attachments'
-import { trackEvent } from '@/utils/amplitude'
 import Highlight from '@highlight-ai/app-runtime'
 import { ClipboardText, DocumentUpload } from 'iconsax-react'
 import mammoth from 'mammoth'
 import * as pptxtojson from 'pptxtojson'
 import { useShallow } from 'zustand/react/shallow'
 
+import { trackEvent } from '@/utils/amplitude'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { PaperclipIcon } from '@/components/icons'
 import { useStore } from '@/components/providers/store-provider'
@@ -27,7 +27,7 @@ export const ClipboardFileDropdown = () => {
 
   useEffect(() => {
     setFileInputRef(fileInputRef)
-  }, [fileInputRef])
+  }, [fileInputRef, setFileInputRef])
 
   const handleAttachmentClick = () => {
     fileInputRef?.current?.click()
@@ -206,7 +206,7 @@ export const ClipboardFileDropdown = () => {
         <PopoverContent sideOffset={18} align="end" alignOffset={-98} className="w-44 p-0">
           <div
             onClick={handleAttachmentClick}
-            className="relative mt-0 flex h-12 cursor-pointer select-none items-center gap-2 rounded-[16px] border border-none border-tertiary p-0 text-sm outline-none transition-colors first:mt-0 first:rounded-b-none last:rounded-t-none hover:bg-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0"
+            className="[&>svg]:size-4 relative mt-0 flex h-12 cursor-pointer select-none items-center gap-2 rounded-[16px] border border-none border-tertiary p-0 text-sm outline-none transition-colors first:mt-0 first:rounded-b-none last:rounded-t-none hover:bg-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:shrink-0"
           >
             <div className="grid place-items-center pl-2.5 text-secondary">
               <DocumentUpload size={20} variant={'Bold'} />
@@ -217,7 +217,7 @@ export const ClipboardFileDropdown = () => {
           </div>
           <div
             onClick={onAddClipboard}
-            className="relative mt-0 flex h-12 cursor-pointer select-none items-center gap-2 rounded-[16px] border border-none border-tertiary p-0 text-sm outline-none transition-colors first:mt-0 first:rounded-b-none last:rounded-t-none hover:bg-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0"
+            className="[&>svg]:size-4 relative mt-0 flex h-12 cursor-pointer select-none items-center gap-2 rounded-[16px] border border-none border-tertiary p-0 text-sm outline-none transition-colors first:mt-0 first:rounded-b-none last:rounded-t-none hover:bg-hover data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:shrink-0"
           >
             <div className="grid place-items-center pl-2.5 text-secondary">
               <ClipboardText size={20} variant={'Bold'} />
