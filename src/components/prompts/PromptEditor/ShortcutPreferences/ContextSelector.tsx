@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ContextTypes, usePromptEditorStore } from '@/stores/prompt-editor'
-import { DocumentText } from 'iconsax-react'
+import { ClipboardText, Monitor, Smallcaps } from 'iconsax-react'
 
 import { usePromptEditor } from '@/hooks/usePromptEditor'
 import { Switch } from '@/components/catalyst/switch'
-import { AudioIcon, ClipboardIcon, ScreenshotIcon, TextIcon } from '@/components/icons'
+import { AudioIcon, ScreenshotIcon } from '@/components/icons'
 
 interface ContextOption {
   id: keyof ContextTypes
@@ -18,7 +18,7 @@ const contextOptions: ContextOption[] = [
     id: 'selected_text',
     label: 'Selected Text',
     description: 'Trigger this prompt when text is selected',
-    icon: <TextIcon />,
+    icon: <Smallcaps variant="Bold" />,
   },
   {
     id: 'audio_transcription',
@@ -30,7 +30,7 @@ const contextOptions: ContextOption[] = [
     id: 'clipboard_text',
     label: 'Clipboard Text',
     description: 'Access clipboard content with this prompt',
-    icon: <ClipboardIcon />,
+    icon: <ClipboardText variant="Bold" />,
   },
   {
     id: 'screenshot',
@@ -42,7 +42,7 @@ const contextOptions: ContextOption[] = [
     id: 'window',
     label: 'Window',
     description: 'Use with the focused window',
-    icon: <DocumentText />,
+    icon: <Monitor variant="Bold" />,
   },
 ]
 
