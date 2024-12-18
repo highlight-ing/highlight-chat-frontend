@@ -90,7 +90,7 @@ export default function AppSelector({ shortcutName }: { shortcutName: string }) 
     { displayName: 'Slack', id: 'Slack', icon: <SlackIcon />, theme: 'dark' },
     { displayName: 'Cursor', id: 'Cursor', icon: <CursorIcon />, theme: 'dark' },
     { displayName: 'VS Code', id: 'VS Code', icon: <VSCodeIcon />, theme: 'dark' },
-    { displayName: 'Chrome', id: 'Chrome', icon: <ChromeIcon />, theme: 'dark' },
+    { displayName: 'Chrome', id: 'Google Chrome', icon: <ChromeIcon />, theme: 'dark' },
     { displayName: 'Notion', id: 'Notion', icon: <NotionIcon />, theme: 'dark' },
     { displayName: 'Safari', id: 'Safari', icon: <SafariIcon />, theme: 'dark' },
     // { displayName: "Terminal", icon: <VSCodeIcon />, theme: 'dark'  },
