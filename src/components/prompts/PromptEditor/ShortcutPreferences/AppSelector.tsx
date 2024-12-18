@@ -5,7 +5,7 @@ import { ArrowDown2, Category2, CloseCircle, Global } from 'iconsax-react'
 
 import { Button } from '@/components/ui/button'
 import ContextMenu, { MenuItemType } from '@/components/ContextMenu/ContextMenu'
-import { ChromeIcon, CursorIcon, NotionIcon, SafariIcon, SlackIcon, VSCodeIcon } from '@/components/icons'
+import { ChromeIcon, CursorIcon, DiscordIcon, NotionIcon, SafariIcon, SlackIcon, VSCodeIcon } from '@/components/icons'
 
 type AppAvailability = 'all' | 'specific' | 'hidden'
 
@@ -17,7 +17,8 @@ type MenuOption = {
 }
 
 type AppOption = {
-  name: string
+  displayName: string
+  id: string
   icon?: React.ReactNode
   theme?: 'light' | 'dark'
 }
@@ -86,16 +87,16 @@ export default function AppSelector({ shortcutName }: { shortcutName: string }) 
   }
 
   const appOptions: AppOption[] = [
-    { name: 'Slack', icon: <SlackIcon />, theme: 'dark' },
-    { name: 'Cursor', icon: <CursorIcon />, theme: 'dark' },
-    { name: 'VS Code', icon: <VSCodeIcon />, theme: 'dark' },
-    { name: 'Chrome', icon: <ChromeIcon />, theme: 'dark' },
-    // { name: "Notion", icon: <NotionIcon />, theme: 'dark' },
-    // { name: "Safari", icon: <SafariIcon />, theme: 'dark' },
-    // { name: "Terminal", icon: <VSCodeIcon />, theme: 'dark'  },
-    // { name: "Finder", icon: <NotionIcon />, theme: 'dark' },
-    // { name: "Discord", icon: <SlackIcon />, theme: 'dark' },
-    // { name: "Firefox", icon: <ChromeIcon />, theme: 'dark' },
+    { displayName: 'Slack', id: 'Slack', icon: <SlackIcon />, theme: 'dark' },
+    { displayName: 'Cursor', id: 'Cursor', icon: <CursorIcon />, theme: 'dark' },
+    { displayName: 'VS Code', id: 'VS Code', icon: <VSCodeIcon />, theme: 'dark' },
+    { displayName: 'Chrome', id: 'Chrome', icon: <ChromeIcon />, theme: 'dark' },
+    { displayName: 'Notion', id: 'Notion', icon: <NotionIcon />, theme: 'dark' },
+    { displayName: 'Safari', id: 'Safari', icon: <SafariIcon />, theme: 'dark' },
+    // { displayName: "Terminal", icon: <VSCodeIcon />, theme: 'dark'  },
+    // { displayName: "Finder", icon: <NotionIcon />, theme: 'dark' },
+    { displayName: 'Discord', id: 'Discord', icon: <DiscordIcon />, theme: 'dark' },
+    // { displayName: "Firefox", icon: <ChromeIcon />, theme: 'dark' },
   ]
 
   const getVisibleApps = () => {
@@ -106,7 +107,7 @@ export default function AppSelector({ shortcutName }: { shortcutName: string }) 
   }
 
   const getVisibleAppCount = () => {
-    return appOptions.slice(5).filter((app) => appVisibility[app.name]).length
+    return appOptions.slice(5).filter((app) => appVisibility[app.displayName]).length
   }
 
   return (
@@ -148,11 +149,11 @@ export default function AppSelector({ shortcutName }: { shortcutName: string }) 
       {selectedApp === 'specific' && (
         <div className="grid grid-cols-3 gap-2 mt-4">
           {getVisibleApps().map((app) => {
-            const isVisible = appVisibility[app.name] || false
+            const isVisible = appVisibility[app.displayName] || false
             return (
               <button
-                key={app.name}
-                onClick={() => toggleAppVisibility(app.name)}
+                key={app.id}
+                onClick={() => toggleAppVisibility(app.id)}
                 className={`p-2 border h-12 rounded-lg flex items-center justify-start gap-2 text-xs ${
                   isVisible ? 'border-green-40 bg-green-10' : 'border-[#252525] hover:bg-neutral-800/15'
                 }`}
@@ -168,7 +169,7 @@ export default function AppSelector({ shortcutName }: { shortcutName: string }) 
                 >
                   {app.icon}
                 </div>
-                {app.name}
+                {app.displayName}
               </button>
             )
           })}
@@ -183,7 +184,7 @@ export default function AppSelector({ shortcutName }: { shortcutName: string }) 
                   .slice(0, 4)
                   .map((app) => (
                     <div
-                      key={app.name}
+                      key={app.id}
                       className="h-3.5 w-3.5 p-0.5 bg-[#2F2F2F] rounded-sm flex items-center justify-center"
                     >
                       {app.icon}
