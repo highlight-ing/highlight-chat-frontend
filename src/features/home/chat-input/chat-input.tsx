@@ -1,16 +1,14 @@
-import { useEffect, useRef, useState } from 'react'
-import { Attachment as AttachmentType, isFileAttachmentType } from '@/types'
+import React from 'react'
+import { Attachment as AttachmentType } from '@/types'
 import { AnimatePresence, motion, MotionConfig, Transition, type Variants } from 'framer-motion'
 import { AddCircle, BoxAdd, Setting } from 'iconsax-react'
-import { useAtom, useAtomValue } from 'jotai'
+import { useAtomValue } from 'jotai'
 import useMeasure from 'react-use-measure'
 import { useShallow } from 'zustand/react/shallow'
 
 import { cn } from '@/lib/utils'
-import { trackEvent } from '@/utils/amplitude'
 import { getDisplayValue } from '@/utils/attachments'
 import { sidePanelOpenAtom } from '@/atoms/side-panel'
-import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 import { Attachment } from '@/components/Attachment'
 import { CreateShortcutButton } from '@/components/buttons/create-shortcut-button'
 import { OpenAppButton } from '@/components/buttons/open-app-button'
@@ -19,6 +17,7 @@ import { useStore } from '@/components/providers/store-provider'
 import Tooltip from '@/components/Tooltip/Tooltip'
 
 import { chatInputIsFocusedAtom } from '../atoms'
+import { useChatInput } from './hooks'
 import { PromptsList } from './prompts-list'
 
 function InputFooter() {
@@ -62,8 +61,6 @@ function InputFooter() {
   )
 }
 
-const MAX_INPUT_HEIGHT = 160
-
 export function InputDivider({ className }: { className?: string }) {
   return (
     <motion.div
@@ -76,143 +73,20 @@ export function InputDivider({ className }: { className?: string }) {
 }
 
 export function ChatInput() {
-  const {
-    attachments,
-    inputOverride,
-    setInputOverride,
-    inputIsDisabled,
-    promptApp,
-    removeAttachment,
-    fileInputRef,
-    isConversationLoading,
-  } = useStore(
+  const { attachments, inputIsDisabled, isConversationLoading } = useStore(
     useShallow((state) => ({
       attachments: state.attachments,
       inputIsDisabled: state.inputIsDisabled,
-      inputOverride: state.inputOverride,
-      setInputOverride: state.setInputOverride,
-      promptApp: state.promptApp,
-      removeAttachment: state.removeAttachment,
-      fileInputRef: state.fileInputRef,
       isConversationLoading: state.isConversationLoading,
     })),
   )
-  const { handleSubmit } = useSubmitQuery()
-  const [isInputFocused, setIsInputFocused] = useAtom(chatInputIsFocusedAtom)
-  const [input, setInput] = useState('')
-  const transcriptOpen = useAtomValue(sidePanelOpenAtom)
-
-  let inputContainerRef = useRef<HTMLDivElement>(null)
-  let inputRef = useRef<HTMLTextAreaElement>(null)
-  let inputBlurTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-
-  // Use to handle the auto closing when the window is focused
-  // and to prevent toggling the input focus when pressing a dropdown
-  useEffect(() => {
-    const onInputFocus = () => {
-      if (inputBlurTimeoutRef.current) {
-        clearTimeout(inputBlurTimeoutRef.current)
-      }
-      setIsInputFocused(true)
-    }
-
-    const onInputBlur = () => {
-      inputBlurTimeoutRef.current = setTimeout(() => {
-        setIsInputFocused(false)
-      }, 100)
-    }
-
-    const inputElement = inputRef.current
-
-    if (inputElement) {
-      inputElement.addEventListener('focus', onInputFocus)
-      inputElement.addEventListener('blur', onInputBlur)
-    }
-
-    return () => {
-      if (inputElement) {
-        inputElement.removeEventListener('focus', onInputFocus)
-        inputElement.removeEventListener('blur', onInputBlur)
-      }
-
-      if (inputBlurTimeoutRef.current) clearTimeout(inputBlurTimeoutRef.current)
-    }
-  }, [inputBlurTimeoutRef, setIsInputFocused])
-
-  useEffect(() => {
-    function handleEsc(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        setIsInputFocused(false)
-        inputRef.current?.blur()
-      }
-    }
-    window.addEventListener('keydown', handleEsc)
-    return () => {
-      window.removeEventListener('keydown', handleEsc)
-    }
-  }, [inputRef, setIsInputFocused])
-
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (inputContainerRef.current && !inputContainerRef.current.contains(e.target as Node)) {
-        setIsInputFocused(false)
-        inputRef.current?.blur()
-      }
-    }
-    window.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      window.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [inputContainerRef, setIsInputFocused])
-
-  useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.style.height = '24px'
-      const scrollHeight = inputRef.current.scrollHeight
-
-      const newHeight = scrollHeight > MAX_INPUT_HEIGHT ? MAX_INPUT_HEIGHT : scrollHeight
-      inputRef.current.style.height = newHeight + 'px'
-    }
-  }, [inputRef, input])
-
-  useEffect(() => {
-    if (inputOverride && inputOverride?.length > 0 && input !== inputOverride) {
-      setInput(inputOverride)
-      setInputOverride(null)
-    }
-  }, [input, inputOverride, setInputOverride])
-
-  const handleNonInputFocus = () => {
-    if (inputBlurTimeoutRef.current) {
-      clearTimeout(inputBlurTimeoutRef.current)
-    }
-  }
-
-  const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (!inputIsDisabled && e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSubmit(input, promptApp)
-      setInput('')
-    }
-  }
-
-  const focusInput = () => {
-    inputRef.current?.focus()
-    trackEvent('HL Chat Input Focused', {})
-  }
-
-  const onRemoveAttachment = (attachment: AttachmentType) => {
-    if (isFileAttachmentType(attachment.type) && fileInputRef?.current) {
-      fileInputRef.current.value = ''
-    }
-
-    removeAttachment(attachment)
-    trackEvent('HL Chat Attachment Removed', { type: attachment.type })
-  }
+  const { input, setInput, inputContainerRef, inputRef, focusInput, handleKeyDown, onRemoveAttachment } = useChatInput()
 
   const [ref, bounds] = useMeasure()
+  const transcriptOpen = useAtomValue(sidePanelOpenAtom)
+  const isInputFocused = useAtomValue(chatInputIsFocusedAtom)
 
-  const inputTransition: Transition = { type: 'spring', duration: 0.25, bounce: 0.3 }
+  const inputTransition: Transition = { type: 'spring', duration: 0.25, bounce: 0.2 }
   const INPUT_HEIGHT = 48
 
   return (
@@ -253,7 +127,7 @@ export function ChatInput() {
                   )}
                 />
               </div>
-              <motion.div layout className="flex items-center gap-2" onFocus={handleNonInputFocus}>
+              <motion.div layout className="flex items-center gap-2">
                 <AttachmentDropdowns />
                 {!isInputFocused && (
                   <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
@@ -268,14 +142,14 @@ export function ChatInput() {
             </div>
 
             <AnimatePresence mode="popLayout">
-              {attachments.length > 0 && (
-                <div className="mt-1.5 flex items-center gap-2 px-6">
+              {isInputFocused && attachments.length > 0 && (
+                <div className="mt-1.5 flex items-center gap-2 px-[22px]">
                   {attachments.map((attachment: AttachmentType, index: number) => (
                     <motion.div
                       key={index}
                       initial={{ opacity: 0, y: -5 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ ...inputTransition, delay: 0.15 }}
+                      transition={{ ...inputTransition, delay: 0.1 }}
                     >
                       <Attachment
                         type={attachment.type}

@@ -1,5 +1,5 @@
 import React from 'react'
-import { useAtomValue, useSetAtom } from 'jotai'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
 import { cn } from '@/lib/utils'
@@ -30,12 +30,17 @@ function InputHeading() {
 }
 
 function ChatFocusedOverlay() {
-  const chatInputIsFocused = useAtomValue(chatInputIsFocusedAtom)
+  const [chatInputIsFocused, setChatInputIsFocused] = useAtom(chatInputIsFocusedAtom)
+
+  function handleClick() {
+    setChatInputIsFocused(false)
+  }
 
   if (!chatInputIsFocused) return null
 
   return (
     <div
+      onClick={handleClick}
       className={cn(
         'fixed inset-0 z-20 bg-black/75',
         chatInputIsFocused ? 'animate-in fade-in-0' : 'animate-out fade-out-0 ',

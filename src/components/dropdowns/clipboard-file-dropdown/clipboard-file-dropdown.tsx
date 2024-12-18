@@ -190,7 +190,7 @@ export const ClipboardFileDropdown = () => {
   const isDisabled = attachments.length >= MAX_NUMBER_OF_ATTACHMENTS
 
   return (
-    <>
+    <div>
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <Tooltip
           tooltip={isDisabled ? 'Max number of attahments added' : isOpen ? '' : 'Attach clipboard & files'}
@@ -237,6 +237,6 @@ export const ClipboardFileDropdown = () => {
         className={styles.hiddenInput}
         multiple
       />
-    </>
+    </div>
   )
 }
