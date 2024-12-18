@@ -18,6 +18,7 @@ export function useIntegration() {
       conversation_id: message.conversation_id,
       content: 'Creating Notion page...',
       role: 'assistant',
+      given_feedback: null,
     })
 
     let createLang = 'Generate a title for '
