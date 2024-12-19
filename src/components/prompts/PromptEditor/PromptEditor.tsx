@@ -25,7 +25,7 @@ function ScreenSelector({
   return (
     <div
       className={`${styles.tab} ${active ? styles.active : ''} ${disabled ? styles.disabled : ''}`}
-      onClick={disabled ? () => { } : () => setSelectedScreen(name)}
+      onClick={disabled ? () => {} : () => setSelectedScreen(name)}
     >
       {title}
     </div>
@@ -60,10 +60,10 @@ function VariablesEditorButton() {
   )
 }
 
-export default function PromptEditor({ onClose, isEditPrompt }: { onClose?: () => void, isEditPrompt?: boolean }) {
+export default function PromptEditor({ onClose }: { onClose?: () => void }) {
   const { selectedScreen, onboarding } = usePromptEditorStore()
 
-  return (  
+  return (
     <>
       {selectedScreen !== 'startWithTemplate' && (
         <div className={styles.editorTabs}>
@@ -86,7 +86,7 @@ export default function PromptEditor({ onClose, isEditPrompt }: { onClose?: () =
       )}
       <div className={'h-full'}>
         {selectedScreen === 'startWithTemplate' && <StartWithTemplateScreen />}
-        {selectedScreen === 'app' && <AppScreen isEditPrompt={isEditPrompt ?? false} />}
+        {selectedScreen === 'app' && <AppScreen />}
         {selectedScreen === 'variables' && <VariablesScreen />}
         {selectedScreen === 'settings' && <SettingsScreen onClose={onClose} />}
       </div>

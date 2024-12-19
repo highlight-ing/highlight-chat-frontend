@@ -125,6 +125,7 @@ export function usePromptEditor() {
     }
 
     if (res?.new) {
+      saveShortcutPreferences(res.prompt.id)
       // Reload Electron's prompt apps
       setPromptEditorData({
         externalId: res.prompt.external_id,
@@ -168,23 +169,28 @@ export function usePromptEditor() {
     setSaving(false)
   }
 
-  async function saveShortcutPreferences() {
-    if (!promptEditorData.externalId) {
-      console.log('Cannot save preferences - no prompt ID')
-      return
-    }
+  async function saveShortcutPreferences(maybePromptId?: number) {
+    let promptId = maybePromptId
+    if (!promptId) {
+      if (!promptEditorData.externalId) {
+        console.log('Cannot save preferences - missing promptId and externalId')
+        return
+      }
 
-    const prompt = prompts.find((p) => p.external_id === promptEditorData.externalId)
-    if (!prompt?.id) {
-      console.log('Cannot save preferences - prompt not found')
-      return
+      const prompt = prompts.find((p) => p.external_id === promptEditorData.externalId)
+      if (!prompt?.id) {
+        console.log('Cannot save preferences - prompt not found')
+        return
+      }
+
+      promptId = prompt.id
     }
 
     const accessToken = await getAccessToken()
 
     // If hidden/never, delete the record
     if (selectedApp === 'hidden') {
-      const result = await deletePromptShortcutPreferences(prompt.id, accessToken)
+      const result = await deletePromptShortcutPreferences(promptId, accessToken)
 
       if (result.error) {
         console.error('Error deleting shortcut preferences:', result.error)
@@ -197,7 +203,7 @@ export function usePromptEditor() {
       }
 
       console.log('Shortcut preferences deleted successfully:', {
-        promptId: prompt.id,
+        promptId,
       })
 
       refreshPinnedPrompts()
@@ -233,7 +239,7 @@ export function usePromptEditor() {
 
         // If no apps selected in specific mode, treat as hidden
         if (selectedApps.length === 0) {
-          const result = await deletePromptShortcutPreferences(prompt.id, accessToken)
+          const result = await deletePromptShortcutPreferences(promptId, accessToken)
           if (result.error) {
             console.error('Error deleting shortcut preferences:', result.error)
             addToast({
@@ -266,7 +272,7 @@ export function usePromptEditor() {
         return
     }
     // Only proceed with save if we have valid preferences
-    const result = await upsertPromptShortcutPreferences(prompt.id, preferences, accessToken)
+    const result = await upsertPromptShortcutPreferences(promptId, preferences, accessToken)
 
     if (result.error) {
       console.error('Error saving shortcut preferences:', result.error)
@@ -280,7 +286,7 @@ export function usePromptEditor() {
       return
     } else {
       console.log('Shortcut preferences saved successfully:', {
-        promptId: prompt.id,
+        promptId,
         selectedApp,
         preferences,
         contextTypes,
@@ -295,9 +301,9 @@ export function usePromptEditor() {
 
   useEffect(() => {
     if (promptEditorData.externalId) {
-      saveShortcutPreferences()
+      debouncedSaveShortcutPreferences()
     }
   }, [contextTypes, selectedApp, appVisibility, promptEditorData.externalId])
 
-  return { save, saveDisabled, saveShortcutPreferences: debouncedSaveShortcutPreferences }
+  return { save, saveDisabled }
 }

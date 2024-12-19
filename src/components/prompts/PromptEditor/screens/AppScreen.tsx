@@ -142,7 +142,7 @@ function IntegrationToggle({
   )
 }
 
-export default function AppScreen({ isEditPrompt }: { isEditPrompt: boolean }) {
+export default function AppScreen() {
   const { promptEditorData, setPromptEditorData, onboarding } = usePromptEditorStore()
 
   return (
@@ -192,7 +192,7 @@ export default function AppScreen({ isEditPrompt }: { isEditPrompt: boolean }) {
               description="Create a Notion page using the prompt output"
             />
           </div>
-          {(isDevelopment || isAlpha) && isEditPrompt && (
+          {(isDevelopment || isAlpha) && (
             <>
               <div className="flex flex-col space-y-[6px] mt-8">
                 <AppSelector shortcutName={promptEditorData.name} />

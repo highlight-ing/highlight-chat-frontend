@@ -149,7 +149,7 @@ export default function AppSelector({ shortcutName }: { shortcutName: string }) 
       {selectedApp === 'specific' && (
         <div className="grid grid-cols-3 gap-2 mt-4">
           {getVisibleApps().map((app) => {
-            const isVisible = appVisibility[app.displayName] || false
+            const isVisible = appVisibility[app.id] || false
             return (
               <button
                 key={app.id}
