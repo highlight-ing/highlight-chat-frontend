@@ -63,7 +63,7 @@
   font-size: 13px;
   color: $light-20;
   font-weight: 500;
-  padding: 8px 8px 2px;
+  padding: 12px 8px 8px;
 
   &:hover,
   &.selecting {
@@ -127,7 +127,7 @@ $selector-size: 17px;
 
 .baseHistoryItem {
   display: block;
-  padding: 8px;
+  padding: 10px 8px;
   border-radius: 8px;
   font-size: 13.5px;
   font-weight: 500;
@@ -156,8 +156,6 @@ $selector-size: 17px;
     background-color: transparent;
   }
 }
-
-.chatText {}
 
 @keyframes fadeInBottom {
   from {

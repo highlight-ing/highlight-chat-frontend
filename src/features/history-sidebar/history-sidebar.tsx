@@ -5,7 +5,7 @@ import { Clock, MessageText, Trash } from 'iconsax-react'
 import { GroupedVirtuoso } from 'react-virtuoso'
 import { useShallow } from 'zustand/react/shallow'
 
-import { getChatDateGroupLengths } from '@/lib/utils'
+import { cn, getChatDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { useChatHistoryStore, useHistory } from '@/hooks/chat-history'
 import { useApi } from '@/hooks/useApi'
@@ -106,7 +106,13 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
       wrapperStyle={{ position: 'relative', width: '100%' }}
     >
       {isSelecting && (
-        <div className={`${styles.selector} ${isSelected ? styles.selected : ''}`} onClick={handleSelectChat} />
+        <div
+          className={cn(
+            'absolute left-2 top-2 mr-2 h-[17px] w-[17px] cursor-pointer rounded-full border border-light-20 transition-colors fade-in hover:border-light-80',
+            isSelected && 'border-light-40 bg-light-40 outline outline-2 outline-offset-[-3px] outline-black',
+          )}
+          onClick={handleSelectChat}
+        />
       )}
       <div
         key={chat?.id}
@@ -114,7 +120,7 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
         className={`${styles.chat} ${isSelecting ? styles.selecting : ''}`}
         onClick={() => (isSelecting ? handleSelectChat() : handleOpenChat(chat))}
       >
-        <span className={styles.chatText}>
+        <span>
           {chat.title.charAt(0) === '"' && chat.title.charAt(chat.title.length - 1) === '"'
             ? chat.title.substring(1, chat.title.length - 1)
             : chat.title}
