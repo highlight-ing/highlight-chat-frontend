@@ -53,8 +53,6 @@ export function useNotionParentItems() {
 
       const items = (await response.json()) as NotionParentResponse
 
-      console.log('Items', items)
-
       return items.parents
     },
     enabled: !!hlToken,
