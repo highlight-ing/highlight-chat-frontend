@@ -5,7 +5,7 @@ import { Clock, MessageText, Trash } from 'iconsax-react'
 import { GroupedVirtuoso } from 'react-virtuoso'
 import { useShallow } from 'zustand/react/shallow'
 
-import { cn, getChatDateGroupLengths } from '@/lib/utils'
+import { cn, getDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { useChatHistoryStore, useHistory } from '@/hooks/chat-history'
 import { useApi } from '@/hooks/useApi'
@@ -149,7 +149,7 @@ export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarPr
   const { data: historyData, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useHistory()
   const { history, chatGroupCounts, chatGroupLabels } = React.useMemo(() => {
     const history = historyData ? historyData.pages.flat() : []
-    const { groupLengths, groupLabels } = getChatDateGroupLengths(history)
+    const { groupLengths, groupLabels } = getDateGroupLengths(history)
 
     return { history, chatGroupCounts: groupLengths, chatGroupLabels: groupLabels }
   }, [historyData])

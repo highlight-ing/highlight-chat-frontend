@@ -8,7 +8,7 @@ import { useAtomValue, useSetAtom } from 'jotai'
 import { GroupedVirtuoso, Virtuoso } from 'react-virtuoso'
 
 import { ConversationData } from '@/types/conversations'
-import { cn, getAudioDateGroupLengths, getChatDateGroupLengths } from '@/lib/utils'
+import { cn, getDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { formatConversationDuration, formatTitle } from '@/utils/conversations'
 import { selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
@@ -17,13 +17,14 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Tooltip } from '@/components/ui/tooltip'
 import Button from '@/components/Button/Button'
-import { OpenAppButton } from '@/components/buttons/open-app-button'
 import { MeetingIcon } from '@/components/icons'
 import { useStore } from '@/components/providers/store-provider'
 
 import { feedHiddenAtom, toggleFeedVisibilityAtom } from './atoms'
 import { useAudioNotes, useRecentActions } from './hooks'
 import { formatUpdatedAtDate } from './utils'
+
+const HOME_FEED_LIST_HEIGHT = 'calc(100vh - 192px)'
 
 type HomeFeedListItemLayoutProps = React.ComponentPropsWithRef<'div'>
 
@@ -183,6 +184,14 @@ function FeedHiddenState() {
   )
 }
 
+function GroupHeaderRow(props: { children: React.ReactNode }) {
+  return (
+    <div className="w-full bg-primary px-5 py-3 shadow-md">
+      <p className="font-medium text-subtle">{props.children}</p>
+    </div>
+  )
+}
+
 function AudioNotesListItem(props: { audioNote: ConversationData }) {
   const formattedTitle = formatTitle(props.audioNote.title)
   const audioNoteDuration = formatConversationDuration(props.audioNote)
@@ -225,8 +234,7 @@ function MeetingNotesTabContent() {
 
   const { recentMeetingNotes, audioGroupCounts, audioGroupLabels } = React.useMemo(() => {
     const recentMeetingNotes = data?.filter((audioNote) => audioNote.meeting) ?? []
-    const { groupLengths, groupLabels } = getAudioDateGroupLengths(recentMeetingNotes)
-
+    const { groupLengths, groupLabels } = getDateGroupLengths(recentMeetingNotes)
     return { recentMeetingNotes, audioGroupCounts: groupLengths, audioGroupLabels: groupLabels }
   }, [data])
 
@@ -241,13 +249,9 @@ function MeetingNotesTabContent() {
       ) : (
         <HomeFeedListLayout>
           <GroupedVirtuoso
-            style={{ height: 'calc(100vh - 200px)' }}
+            style={{ height: HOME_FEED_LIST_HEIGHT }}
             groupCounts={audioGroupCounts}
-            groupContent={(index) => (
-              <div className="w-full bg-primary px-5 py-3 shadow-md">
-                <p className="font-medium text-subtle">{audioGroupLabels[index]}</p>
-              </div>
-            )}
+            groupContent={(index) => <GroupHeaderRow>{audioGroupLabels[index]}</GroupHeaderRow>}
             itemContent={(index) => {
               const meetingNote = recentMeetingNotes[index]
               return <AudioNotesListItem key={meetingNote.id} audioNote={meetingNote} />
@@ -264,8 +268,7 @@ function AudioNotesTabContent() {
 
   const { recentNonMeetingNotes, audioGroupCounts, audioGroupLabels } = React.useMemo(() => {
     const recentNonMeetingNotes = data?.filter((audioNote) => audioNote.meeting) ?? []
-    const { groupLengths, groupLabels } = getAudioDateGroupLengths(recentNonMeetingNotes)
-
+    const { groupLengths, groupLabels } = getDateGroupLengths(recentNonMeetingNotes)
     return { recentNonMeetingNotes, audioGroupCounts: groupLengths, audioGroupLabels: groupLabels }
   }, [data])
 
@@ -280,13 +283,9 @@ function AudioNotesTabContent() {
       ) : (
         <HomeFeedListLayout>
           <GroupedVirtuoso
-            style={{ height: 'calc(100vh - 200px)' }}
+            style={{ height: HOME_FEED_LIST_HEIGHT }}
             groupCounts={audioGroupCounts}
-            groupContent={(index) => (
-              <div className="w-full bg-primary px-5 py-3 shadow-md">
-                <p className="font-medium text-subtle">{audioGroupLabels[index]}</p>
-              </div>
-            )}
+            groupContent={(index) => <GroupHeaderRow>{audioGroupLabels[index]}</GroupHeaderRow>}
             itemContent={(index) => {
               const audioNote = recentNonMeetingNotes[index]
               return <AudioNotesListItem key={audioNote.id} audioNote={audioNote} />
@@ -325,11 +324,10 @@ function ChatListItem(props: { chat: ChatHistoryItem }) {
 
 function ChatsTabContent() {
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useHistory()
-  const { allChatRows, chatGroupCounts, chatGroupLabels } = React.useMemo(() => {
-    const allChatRows = data ? data.pages.flat() : []
-    const { groupLengths, groupLabels } = getChatDateGroupLengths(allChatRows)
-
-    return { allChatRows, chatGroupCounts: groupLengths, chatGroupLabels: groupLabels }
+  const { chats, chatGroupCounts, chatGroupLabels } = React.useMemo(() => {
+    const chats = data ? data.pages.flat() : []
+    const { groupLengths, groupLabels } = getDateGroupLengths(chats)
+    return { chats, chatGroupCounts: groupLengths, chatGroupLabels: groupLabels }
   }, [data])
 
   function handleFetchMore() {
@@ -348,15 +346,11 @@ function ChatsTabContent() {
         <HomeFeedListLayout>
           <GroupedVirtuoso
             endReached={handleFetchMore}
-            style={{ height: 'calc(100vh - 200px)' }}
+            style={{ height: HOME_FEED_LIST_HEIGHT }}
             groupCounts={chatGroupCounts}
-            groupContent={(index) => (
-              <div className="w-full bg-primary px-5 py-3 shadow-md">
-                <p className="font-medium text-subtle">{chatGroupLabels[index]}</p>
-              </div>
-            )}
+            groupContent={(index) => <GroupHeaderRow>{chatGroupLabels[index]}</GroupHeaderRow>}
             itemContent={(index) => {
-              const chat = allChatRows[index]
+              const chat = chats[index]
               return <ChatListItem key={chat.id} chat={chat} />
             }}
             components={{
@@ -378,13 +372,17 @@ function ChatsTabContent() {
 }
 
 function RecentActivityTabContent() {
-  const { data, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useRecentActions()
+  const { data: recentActivity, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useRecentActions()
+  const { recentActivityGroupCounts, recentActivityGroupLabels } = React.useMemo(() => {
+    const { groupLengths, groupLabels } = getDateGroupLengths(recentActivity ?? [])
+    return { recentActivityGroupCounts: groupLengths, recentActivityGroupLabels: groupLabels }
+  }, [recentActivity])
 
   function handleFetchMore() {
     if (hasNextPage) fetchNextPage()
   }
 
-  if (!isLoading && (!data || data?.length === 0)) {
+  if (!isLoading && (!recentActivity || recentActivity?.length === 0)) {
     return <ListEmptyState label="No recent activity" />
   }
 
@@ -394,15 +392,18 @@ function RecentActivityTabContent() {
         <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
-          <Virtuoso
-            data={data ?? []}
+          <GroupedVirtuoso
             endReached={handleFetchMore}
-            style={{ height: 'calc(100vh - 200px)' }}
-            itemContent={(_, action) => {
-              if (action.type === 'audio-note') {
-                return <AudioNotesListItem key={action.id} audioNote={action} />
+            style={{ height: HOME_FEED_LIST_HEIGHT }}
+            groupCounts={recentActivityGroupCounts}
+            groupContent={(index) => <GroupHeaderRow>{recentActivityGroupLabels[index]}</GroupHeaderRow>}
+            itemContent={(index) => {
+              const activity = recentActivity?.[index]
+              if (!activity) return null
+              if (activity.type === 'audio-note') {
+                return <AudioNotesListItem key={activity.id} audioNote={activity} />
               } else {
-                return <ChatListItem key={action.id} chat={action} />
+                return <ChatListItem key={activity.id} chat={activity} />
               }
             }}
             components={{
@@ -411,7 +412,7 @@ function RecentActivityTabContent() {
                   <HomeFeedListItemLayout>
                     <div className="flex items-center gap-2 font-medium">
                       <MessageText variant={'Bold'} size={20} className="animate-pulse text-subtle/50" />
-                      <p className="animate-pulse text-subtle">Loading more chats...</p>
+                      <p className="animate-pulse text-subtle">Loading more activity...</p>
                     </div>
                   </HomeFeedListItemLayout>
                 ),

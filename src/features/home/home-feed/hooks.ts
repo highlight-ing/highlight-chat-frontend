@@ -31,18 +31,18 @@ export function useRecentActions() {
   const audioQuery = useAudioNotes()
 
   const combinedData = React.useMemo(() => {
-    if (!historyQuery.data?.pages || !audioQuery.data) return null
-
-    const allChats = historyQuery.data.pages.flat().map((chat) => ({
-      ...chat,
-      updatedAt: new Date(chat.updated_at).toISOString(),
-      type: 'chat' as const,
-    }))
-    const audioNotes = audioQuery.data.map((audioNote) => ({
-      ...audioNote,
-      updatedAt: audioNote.endedAt.toISOString(),
-      type: 'audio-note' as const,
-    }))
+    const allChats =
+      historyQuery.data?.pages.flat().map((chat) => ({
+        ...chat,
+        updatedAt: new Date(chat.updated_at).toISOString(),
+        type: 'chat' as const,
+      })) ?? []
+    const audioNotes =
+      audioQuery.data?.map((audioNote) => ({
+        ...audioNote,
+        updatedAt: audioNote.endedAt.toISOString(),
+        type: 'audio-note' as const,
+      })) ?? []
 
     return [...allChats, ...audioNotes].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
   }, [historyQuery.data?.pages, audioQuery.data])
