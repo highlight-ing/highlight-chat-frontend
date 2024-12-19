@@ -7,7 +7,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 import { getChatDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
-import { useChatHistoryStore, useInfiniteHistory } from '@/hooks/chat-history'
+import { useChatHistoryStore, useHistory } from '@/hooks/chat-history'
 import { useApi } from '@/hooks/useApi'
 import { useChatHistory } from '@/hooks/useChatHistory'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -39,7 +39,7 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
     })),
   )
   const { mutate: updateConversationTitle } = useUpdateConversationTitle()
-  const { data: historyData } = useInfiniteHistory()
+  const { data: historyData } = useHistory()
   const history = React.useMemo(() => historyData?.pages?.flat(), [historyData])
 
   const handleOpenChat = async (chat: ChatHistoryItem) => {
@@ -140,7 +140,7 @@ export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarPr
   const [isDeleting, setIsDeleting] = React.useState(false)
   const { removeChatsByIds } = useChatHistoryStore()
 
-  const { data: historyData, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteHistory()
+  const { data: historyData, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useHistory()
   const { history, chatGroupCounts, chatGroupLabels } = React.useMemo(() => {
     const history = historyData ? historyData.pages.flat() : []
     const { groupLengths, groupLabels } = getChatDateGroupLengths(history)

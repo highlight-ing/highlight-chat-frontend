@@ -7,7 +7,7 @@ import { useAtom } from 'jotai'
 
 import { ConversationData } from '@/types/conversations'
 import { PAGINATION_LIMIT } from '@/lib/constants'
-import { useInfiniteHistory } from '@/hooks/chat-history'
+import { useHistory } from '@/hooks/chat-history'
 
 import { recentActionsPageAtom } from './atoms'
 
@@ -27,7 +27,7 @@ export function useAudioNotes() {
 export function useRecentActions() {
   const [localPage, setLocalPage] = useAtom(recentActionsPageAtom)
   const [isLoadingMore, setIsLoadingMore] = React.useState(false)
-  const historyQuery = useInfiniteHistory()
+  const historyQuery = useHistory()
   const audioQuery = useAudioNotes()
 
   const combinedData = React.useMemo(() => {

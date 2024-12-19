@@ -12,7 +12,7 @@ import { cn, getAudioDateGroupLengths, getChatDateGroupLengths } from '@/lib/uti
 import { trackEvent } from '@/utils/amplitude'
 import { formatConversationDuration, formatTitle } from '@/utils/conversations'
 import { selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
-import { useInfiniteHistory } from '@/hooks/chat-history'
+import { useHistory } from '@/hooks/chat-history'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Tooltip } from '@/components/ui/tooltip'
@@ -220,19 +220,6 @@ function AudioNotesListItem(props: { audioNote: ConversationData }) {
   )
 }
 
-function OpenConversationsButton() {
-  return (
-    <OpenAppButton appId="conversations" className="w-full">
-      <div className="group w-full text-left text-subtle hover:text-primary">
-        <HomeFeedListItemLayout className="flex items-center delay-0 duration-0">
-          <VoiceSquare variant={'Bold'} size={20} />
-          <p>View all conversations</p>
-        </HomeFeedListItemLayout>
-      </div>
-    </OpenAppButton>
-  )
-}
-
 function MeetingNotesTabContent() {
   const { data, isLoading } = useAudioNotes()
 
@@ -337,7 +324,7 @@ function ChatListItem(props: { chat: ChatHistoryItem }) {
 }
 
 function ChatsTabContent() {
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteHistory()
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useHistory()
   const { allChatRows, chatGroupCounts, chatGroupLabels } = React.useMemo(() => {
     const allChatRows = data ? data.pages.flat() : []
     const { groupLengths, groupLabels } = getChatDateGroupLengths(allChatRows)

@@ -9,7 +9,7 @@ import { PAGINATION_LIMIT } from '@/lib/constants'
 import { useApi } from './useApi'
 import { useChatHistory } from './useChatHistory'
 
-export function useHistory() {
+export function DEPRECATED__useHistory() {
   const { refreshChatHistory } = useChatHistory()
 
   return useQuery({
@@ -23,11 +23,11 @@ export function useHistory() {
   })
 }
 
-export function useInfiniteHistory(options = {}) {
+export function useHistory(options = {}) {
   const { get } = useApi()
 
   return useInfiniteQuery({
-    queryKey: ['infinite-history'],
+    queryKey: ['chat-history'],
     queryFn: async ({ pageParam }) => {
       try {
         const response = await get(`history/paginated?skip=${PAGINATION_LIMIT * pageParam}&limit=${PAGINATION_LIMIT}`, {
