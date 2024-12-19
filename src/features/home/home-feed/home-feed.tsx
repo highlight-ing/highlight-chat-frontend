@@ -12,7 +12,7 @@ import { cn, getAudioDateGroupLengths, getChatDateGroupLengths } from '@/lib/uti
 import { trackEvent } from '@/utils/amplitude'
 import { formatConversationDuration, formatTitle } from '@/utils/conversations'
 import { selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
-import { useInfiniteHistory } from '@/hooks/history'
+import { useInfiniteHistory } from '@/hooks/chat-history'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Tooltip } from '@/components/ui/tooltip'
@@ -339,7 +339,7 @@ function ChatListItem(props: { chat: ChatHistoryItem }) {
 function ChatsTabContent() {
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteHistory()
   const { allChatRows, chatGroupCounts, chatGroupLabels } = React.useMemo(() => {
-    const allChatRows = data ? data.pages.flatMap((d) => d) : []
+    const allChatRows = data ? data.pages.flat() : []
     const { groupLengths, groupLabels } = getChatDateGroupLengths(allChatRows)
 
     return { allChatRows, chatGroupCounts: groupLengths, chatGroupLabels: groupLabels }

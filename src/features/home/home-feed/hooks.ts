@@ -7,7 +7,7 @@ import { useAtom } from 'jotai'
 
 import { ConversationData } from '@/types/conversations'
 import { PAGINATION_LIMIT } from '@/lib/constants'
-import { useInfiniteHistory } from '@/hooks/history'
+import { useInfiniteHistory } from '@/hooks/chat-history'
 
 import { recentActionsPageAtom } from './atoms'
 
