@@ -27,10 +27,13 @@ export function useIntegration() {
     const response = await fetch(`${HIGHLIGHT_BACKEND_BASE_URL}/v1/ai/summarize/title`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'text/plain',
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${hlToken}`,
       },
-      body: content,
+      body: JSON.stringify({
+        text: content,
+        type: action,
+      }),
     })
 
     const title = await response.text()
