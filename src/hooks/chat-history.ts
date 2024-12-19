@@ -61,7 +61,7 @@ export function useChatHistoryStore() {
   const queryClient = useQueryClient()
 
   function addOrUpdateChat(chat: ChatHistoryItem) {
-    queryClient.setQueryData(['infinite-history'], (queryData: InfiniteData<Array<ChatHistoryItem>>) => {
+    queryClient.setQueryData(['chat-history'], (queryData: InfiniteData<Array<ChatHistoryItem>>) => {
       const firstPage = queryData.pages?.[0]
       const existingChatIndex = firstPage.findIndex((existingChat) => existingChat.id === chat.id)
       const newChatHistory =
@@ -80,7 +80,7 @@ export function useChatHistoryStore() {
   }
 
   function removeChatsByIds(selectedHistoryIds: Array<ChatHistoryItem['id']>) {
-    queryClient.setQueryData(['infinite-history'], (queryData: InfiniteData<Array<ChatHistoryItem>>) => {
+    queryClient.setQueryData(['chat-history'], (queryData: InfiniteData<Array<ChatHistoryItem>>) => {
       const newChatHistory = queryData.pages.reduce((result: Array<Array<ChatHistoryItem>>, currentPage) => {
         const filteredPage = currentPage.filter((item) => !selectedHistoryIds.includes(item.id))
         result.push(filteredPage)
