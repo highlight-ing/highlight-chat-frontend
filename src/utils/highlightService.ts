@@ -85,6 +85,11 @@ export const setAudioSuperpowerEnabled = async (enabled: boolean): Promise<void>
   await window.highlight.internal.setAudioSuperpowerEnabled(enabled)
 }
 
+export const getInstalledApplications = async (): Promise<{ platform: string; applications: string[] }> => {
+  // @ts-ignore
+  return await window.highlight.internal.getInstalledApplications()
+}
+
 interface ProcessedConversationData {
   topics: string[]
   summary: string

@@ -25,7 +25,7 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
     setPromptEditorData,
     setSelectedScreen,
     setSettingsHasNoErrors,
-    setSelectedApp,
+    setShortcutAvailability,
     setAppVisibility,
     setContextTypes,
   } = usePromptEditorStore()
@@ -36,7 +36,7 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
   useEffect(() => {
     if (!preferences) {
       // No preferences found - set to hidden state
-      setSelectedApp('hidden')
+      setShortcutAvailability('hidden')
       setAppVisibility({})
       setContextTypes(null)
       return
@@ -44,7 +44,7 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
 
     // Handle "all apps" case
     if (preferences.application_name_darwin === '*') {
-      setSelectedApp('all')
+      setShortcutAvailability('all')
       setAppVisibility({})
       setContextTypes(
         preferences.context_types ?? {
@@ -64,12 +64,12 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
 
       if (apps.length === 0) {
         // Empty apps array - set to hidden state
-        setSelectedApp('hidden')
+        setShortcutAvailability('hidden')
         setAppVisibility({})
         setContextTypes(null)
       } else {
         // Specific apps selected
-        setSelectedApp('specific')
+        setShortcutAvailability('specific')
         const newVisibility: AppVisibility = {}
         apps.forEach((app: string) => {
           newVisibility[app] = true
@@ -90,7 +90,7 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
     } catch (error) {
       console.error('Error parsing app preferences:', error)
       // Error case - set to hidden state
-      setSelectedApp('hidden')
+      setShortcutAvailability('hidden')
       setAppVisibility({})
       setContextTypes(null)
     }

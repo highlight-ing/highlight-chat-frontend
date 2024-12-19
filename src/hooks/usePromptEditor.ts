@@ -35,7 +35,7 @@ export function usePromptEditor() {
     setNeedSave,
     settingsHasNoErrors,
     setSaving,
-    selectedApp,
+    shortcutAvailability,
     appVisibility,
     contextTypes,
   } = usePromptEditorStore()
@@ -189,7 +189,7 @@ export function usePromptEditor() {
     const accessToken = await getAccessToken()
 
     // If hidden/never, delete the record
-    if (selectedApp === 'hidden') {
+    if (shortcutAvailability === 'hidden') {
       const result = await deletePromptShortcutPreferences(promptId, accessToken)
 
       if (result.error) {
@@ -216,7 +216,7 @@ export function usePromptEditor() {
       context_types: contextTypes,
     }
 
-    switch (selectedApp) {
+    switch (shortcutAvailability) {
       case 'all':
         preferences.application_name_darwin = '*'
         preferences.application_name_win32 = '*'
@@ -268,7 +268,7 @@ export function usePromptEditor() {
         break
 
       default:
-        console.warn('Unexpected selectedApp value:', selectedApp)
+        console.warn('Unexpected shortcutAvailability value:', shortcutAvailability)
         return
     }
     // Only proceed with save if we have valid preferences
@@ -287,7 +287,7 @@ export function usePromptEditor() {
     } else {
       console.log('Shortcut preferences saved successfully:', {
         promptId,
-        selectedApp,
+        shortcutAvailability,
         preferences,
         contextTypes,
       })
@@ -303,7 +303,7 @@ export function usePromptEditor() {
     if (promptEditorData.externalId) {
       debouncedSaveShortcutPreferences()
     }
-  }, [contextTypes, selectedApp, appVisibility, promptEditorData.externalId])
+  }, [contextTypes, shortcutAvailability, appVisibility, promptEditorData.externalId])
 
   return { save, saveDisabled }
 }
