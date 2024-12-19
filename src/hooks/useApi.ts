@@ -10,6 +10,7 @@ interface FetchOptions {
   method: 'GET' | 'POST' | 'DELETE'
   bearerToken: string
   signal?: AbortSignal
+  headers?: Record<string, string>
 }
 
 interface PublicFetchOptions {
@@ -22,14 +23,16 @@ interface PublicFetchOptions {
 interface RequestOptions {
   version: ApiVersion
   signal?: AbortSignal
+  headers?: Record<string, string>
 }
 
-const fetchRequest = async (route: string, { bearerToken, body, version, method, signal }: FetchOptions) => {
+const fetchRequest = async (route: string, { bearerToken, body, version, method, signal, headers }: FetchOptions) => {
   return fetch(`${backendUrl}/api/${version ?? 'v3'}/${route}`, {
     method: method,
     body: body,
     headers: {
       Authorization: `Bearer ${bearerToken}`,
+      ...headers,
     },
     signal: signal,
   })
@@ -53,6 +56,7 @@ export const useApi = () => {
       method: 'GET',
       version: options?.version,
       signal: options?.signal,
+      headers: options?.headers,
     })
   }
 
@@ -64,6 +68,7 @@ export const useApi = () => {
       method: 'POST',
       version: options?.version,
       signal: options?.signal,
+      headers: options?.headers,
     })
   }
 
@@ -74,6 +79,7 @@ export const useApi = () => {
       method: 'DELETE',
       version: options?.version,
       signal: options?.signal,
+      headers: options?.headers,
     })
   }
 
@@ -88,6 +94,7 @@ export const useApi = () => {
       body: formData,
       version: options?.version,
       signal: options?.signal,
+      headers: options?.headers,
     })
 
     if (!response.ok) {
@@ -124,6 +131,7 @@ export const useApi = () => {
       method: 'GET',
       version: options?.version,
       signal: options?.signal,
+      headers: options?.headers,
     })
 
     if (!response.ok) {
