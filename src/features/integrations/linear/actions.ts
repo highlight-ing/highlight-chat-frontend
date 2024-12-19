@@ -85,11 +85,3 @@ export async function checkLinearConnectionStatus(accessToken: string) {
 
   return data.connected
 }
-
-export async function createLinearClientForUser(userId: string) {
-  // Make an outgoing fetch request to Highlight backend to get the user's Linear API key
-  // const linearToken = await getLinearTokenForUser(userId)
-  // return new LinearClient({
-  //   accessToken: linearToken,
-  // })
-}
