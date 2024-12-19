@@ -1,7 +1,10 @@
+import { NotionParentItem } from '@/types'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
+import { HIGHLIGHT_BACKEND_BASE_URL } from '@/lib/integrations-backend'
+
 import { useHighlightToken } from '../_hooks/use-hl-token'
-import { checkNotionConnectionStatus, createNotionPage, getNotionParentItems, getNotionTokenForUser } from './actions'
+import { checkNotionConnectionStatus, getNotionTokenForUser } from './actions'
 import { NotionPageFormSchema } from './notion'
 
 export function useNotionApiToken() {
@@ -23,21 +26,38 @@ export function useNotionApiToken() {
   })
 }
 
+interface NotionParentResponse {
+  parents: NotionParentItem[]
+}
+
 export function useNotionParentItems() {
-  const { data: notionToken } = useNotionApiToken()
+  const { data: hlToken } = useHighlightToken()
 
   return useQuery({
-    queryKey: ['notion-parent-items', notionToken],
+    queryKey: ['notion-parent-items'],
     queryFn: async () => {
-      if (!notionToken) {
-        throw new Error('No Notion token available')
+      if (!hlToken) {
+        throw new Error('No Highlight token available')
       }
 
-      const items = await getNotionParentItems(notionToken)
+      const response = await fetch(`${HIGHLIGHT_BACKEND_BASE_URL}/v1/notion/parents`, {
+        headers: {
+          Authorization: `Bearer ${hlToken}`,
+        },
+      })
 
-      return items
+      if (!response.ok) {
+        const responseText = await response.text()
+        throw new Error(`Failed to fetch parent items: ${responseText}`)
+      }
+
+      const items = (await response.json()) as NotionParentResponse
+
+      console.log('Items', items)
+
+      return items.parents
     },
-    enabled: !!notionToken,
+    enabled: !!hlToken,
     staleTime: 2 * 60 * 1000,
   })
 }
@@ -60,8 +80,11 @@ export function useCheckNotionConnection() {
   })
 }
 
+interface CreateNotionPageResponse {
+  url: string
+}
+
 export function useCreateNotionPage(onSubmitSuccess: (url: string | undefined) => void) {
-  const { data: notionToken } = useNotionApiToken()
   const { data: parentItems } = useNotionParentItems()
   const { data: hlToken } = useHighlightToken()
   const queryClient = useQueryClient()
@@ -79,25 +102,36 @@ export function useCreateNotionPage(onSubmitSuccess: (url: string | undefined) =
         throw new Error('Not connected to Notion')
       }
 
-      if (!notionToken) {
-        console.warn('Notion token not set, please try again later.')
-        throw new Error('No Notion token available')
-      }
-
-      const parentItem = parentItems?.find((item) => item.id === input.formData.parentId)
+      const parentItem = parentItems?.find((item: any) => item.id === input.formData.parentId)
 
       if (!parentItem) {
         throw new Error('Parent item not found')
       }
 
-      const response = await createNotionPage({
-        accessToken: notionToken,
-        parent: parentItem,
-        title: input.formData.title,
-        content: input.contentWithFooter,
+      const response = await fetch(`${HIGHLIGHT_BACKEND_BASE_URL}/v1/notion/page`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${hlToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          parent: {
+            type: parentItem.type,
+            id: parentItem.id,
+          },
+          title: input.formData.title,
+          content: input.contentWithFooter,
+        }),
       })
 
-      return response ?? undefined
+      if (!response.ok) {
+        const responseText = await response.text()
+        throw new Error(`Failed to create Notion page: ${responseText}`)
+      }
+
+      const data = (await response.json()) as CreateNotionPageResponse
+
+      return data.url ?? undefined
     },
     onSuccess: (response) => {
       if (onSubmitSuccess) onSubmitSuccess(response)
