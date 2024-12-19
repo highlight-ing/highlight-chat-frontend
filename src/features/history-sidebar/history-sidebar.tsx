@@ -140,7 +140,6 @@ export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarPr
   const conversationId = useStore((state) => state.conversationId)
   const startNewConversation = useStore((state) => state.startNewConversation)
   const removeOpenConversation = useStore((state) => state.removeOpenConversation)
-  const { refreshChatHistory } = useChatHistory()
   const [isSelecting, setIsSelecting] = React.useState(false)
   const [selectedHistoryItems, setSelectedHistoryItems] = React.useState<Array<string>>([])
   const [isDeleting, setIsDeleting] = React.useState(false)
@@ -189,7 +188,6 @@ export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarPr
       }
       removeOpenConversation(chatId)
     }
-    await refreshChatHistory()
     setSelectedHistoryItems([])
     setIsDeleting(false)
     setIsSelecting(false)

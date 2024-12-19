@@ -1,27 +1,12 @@
 'use client'
 
 import { ChatHistoryItem } from '@/types'
-import { InfiniteData, useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 
 import { HistoryResponseData } from '@/types/history'
 import { PAGINATION_LIMIT } from '@/lib/constants'
 
 import { useApi } from './useApi'
-import { useChatHistory } from './useChatHistory'
-
-export function DEPRECATED__useHistory() {
-  const { refreshChatHistory } = useChatHistory()
-
-  return useQuery({
-    queryKey: ['history'],
-    queryFn: async () => {
-      const history = await refreshChatHistory()
-
-      return history ?? []
-    },
-    staleTime: Infinity,
-  })
-}
 
 export function useHistory(options = {}) {
   const { get } = useApi()
@@ -60,6 +45,10 @@ export function useHistory(options = {}) {
 export function useChatHistoryStore() {
   const queryClient = useQueryClient()
 
+  async function invalidateChatHistory() {
+    await queryClient.invalidateQueries({ queryKey: ['chat-history'] })
+  }
+
   function addOrUpdateChat(chat: ChatHistoryItem) {
     queryClient.setQueryData(['chat-history'], (queryData: InfiniteData<Array<ChatHistoryItem>>) => {
       const firstPage = queryData.pages?.[0]
@@ -95,6 +84,7 @@ export function useChatHistoryStore() {
   }
 
   return {
+    invalidateChatHistory,
     addOrUpdateChat,
     removeChatsByIds,
   }

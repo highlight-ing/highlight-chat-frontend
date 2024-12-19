@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Highlight from '@highlight-ai/app-runtime'
 
 import { DEFAULT_PROMPT_EXTERNAL_IDS } from '@/lib/promptapps'
+import { useChatHistoryStore } from '@/hooks/chat-history'
 import { useChatHistory } from '@/hooks/useChatHistory'
 import useForkDefaultAction from '@/hooks/useForkDefaultAction'
 import usePromptApps from '@/hooks/usePromptApps'
@@ -21,7 +22,7 @@ export function useOnExternalMessage() {
     closeAllModals: state.closeAllModals,
     isModalOpen: state.isModalOpen,
   }))
-  const { refreshChatItem, refreshChatHistory } = useChatHistory()
+  const { refreshChatItem } = useChatHistory()
   const { addToast } = useStore((state) => ({
     addToast: state.addToast,
   }))
@@ -31,6 +32,7 @@ export function useOnExternalMessage() {
   const { forkDefaultAction } = useForkDefaultAction()
   const { createAction } = useIntegration()
   const { selectPrompt, refreshPinnedPrompts, getPrompt } = usePromptApps()
+  const { invalidateChatHistory } = useChatHistoryStore()
 
   useEffect(() => {
     const removeListener = Highlight.app.addListener('onExternalMessage', async (caller: string, message: any) => {
@@ -53,7 +55,7 @@ export function useOnExternalMessage() {
         setConversationId(message.conversationId)
 
         console.log('Refetching chat history from external message')
-        await refreshChatHistory()
+        await invalidateChatHistory()
 
         if (message.userInput?.length > 0) {
           // Handle user input from floaty
@@ -194,5 +196,22 @@ export function useOnExternalMessage() {
     return () => {
       removeListener()
     }
-  }, [setConversationId, openModal])
+  }, [
+    setConversationId,
+    openModal,
+    addAttachment,
+    addPendingIntegration,
+    addToast,
+    closeAllModals,
+    forkDefaultAction,
+    getPrompt,
+    handleSubmit,
+    invalidateChatHistory,
+    isModalOpen,
+    refreshChatItem,
+    createAction,
+    refreshPinnedPrompts,
+    router,
+    selectPrompt,
+  ])
 }
