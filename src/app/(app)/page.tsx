@@ -25,7 +25,7 @@ import { useOnPromptChange } from '@/features/home/_hooks/use-on-prompt-change'
 import { useOnPromptLoad } from '@/features/home/_hooks/use-on-prompt-load'
 import { ChatHome } from '@/features/home/home'
 import { NavigationTopBar } from '@/features/nav-header/top-bar/top-bar'
-import { SidePanel } from '@/features/side-panel/side-panel'
+import { HighlightSidePanel } from '@/features/side-panel/highlight-side-panel'
 
 export default function Home() {
   const [showHistory, setShowHistory] = useAtom(showHistoryAtom)
@@ -80,7 +80,7 @@ export default function Home() {
           {(isChatting || promptApp) && <Input isActiveChat={true} />}
           <IntercomChat />
         </div>
-        <SidePanel />
+        <HighlightSidePanel />
       </div>
     </div>
   )
