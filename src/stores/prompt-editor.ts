@@ -59,7 +59,7 @@ export interface PromptEditorState {
   saving: boolean
   settingsHasNoErrors: boolean
   onboarding: PromptEditorOnboarding
-  selectedApp: AppAvailability
+  shortcutAvailability: AppAvailability
   appVisibility: Record<string, boolean>
   contextTypes: ContextTypes | null
 }
@@ -73,7 +73,7 @@ export type PromptEditorSlice = PromptEditorState & {
   setSettingsHasNoErrors: (hasSettingsError: boolean) => void
   setOnboarding: (onboarding: Partial<PromptEditorOnboarding>) => void
   startTutorial: () => void
-  setSelectedApp: (value: AppAvailability) => void
+  setShortcutAvailability: (value: AppAvailability) => void
   setAppVisibility: (visibility: Record<string, boolean>) => void
   setContextTypes: (types: ContextTypes | null) => void
 }
@@ -191,7 +191,7 @@ export const initialPromptEditorState: PromptEditorState = {
     isOnboarding: false,
     hasOnboardedOnceBefore: false,
   },
-  selectedApp: 'hidden',
+  shortcutAvailability: 'hidden',
   appVisibility: {},
   contextTypes: null,
 }
@@ -205,7 +205,7 @@ export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, ge
     set({
       promptEditorData: initialPromptEditorState.promptEditorData,
       appVisibility: initialPromptEditorState.appVisibility,
-      selectedApp: initialPromptEditorState.selectedApp,
+      shortcutAvailability: initialPromptEditorState.shortcutAvailability,
       contextTypes: initialPromptEditorState.contextTypes,
     }),
   setNeedSave: (needSave: boolean) => set({ needSave }),
@@ -220,7 +220,7 @@ export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, ge
     }),
   startTutorial: () =>
     set({ onboarding: { isOnboarding: true, index: 0, hasOnboardedOnceBefore: true }, selectedScreen: 'app' }),
-  setSelectedApp: (value: AppAvailability) => set({ selectedApp: value }),
+  setShortcutAvailability: (value: AppAvailability) => set({ shortcutAvailability: value }),
   setAppVisibility: (visibility: Record<string, boolean>) => set({ appVisibility: visibility }),
   setContextTypes: (types: ContextTypes | null) => set({ contextTypes: types }),
 })
@@ -242,8 +242,8 @@ export const usePromptEditorStore = () =>
       onboarding: state.onboarding,
       setOnboarding: state.setOnboarding,
       startTutorial: state.startTutorial,
-      selectedApp: state.selectedApp,
-      setSelectedApp: state.setSelectedApp,
+      shortcutAvailability: state.shortcutAvailability,
+      setShortcutAvailability: state.setShortcutAvailability,
       appVisibility: state.appVisibility,
       setAppVisibility: state.setAppVisibility,
       contextTypes: state.contextTypes,

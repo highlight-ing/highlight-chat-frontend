@@ -1,11 +1,13 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import sassVariables from '@/variables.module.scss'
-import { ArrowDown2, Category2, CloseCircle, Global } from 'iconsax-react'
+import { ArrowDown2, Category2, CloseCircle, Global, HashtagSquare } from 'iconsax-react'
 
+import { getInstalledApplications } from '@/utils/highlightService'
 import { Button } from '@/components/ui/button'
 import ContextMenu, { MenuItemType } from '@/components/ContextMenu/ContextMenu'
 import { ChromeIcon, CursorIcon, DiscordIcon, NotionIcon, SafariIcon, SlackIcon, VSCodeIcon } from '@/components/icons'
+import Tooltip from '@/components/Tooltip/Tooltip'
 
 type AppAvailability = 'all' | 'specific' | 'hidden'
 
@@ -44,11 +46,42 @@ const menuOptions: MenuOption[] = [
   },
 ]
 
+const DEFAULT_APP_OPTIONS: AppOption[] = [
+  { displayName: 'Slack', id: 'Slack', icon: <SlackIcon />, theme: 'dark' },
+  { displayName: 'Cursor', id: 'Cursor', icon: <CursorIcon />, theme: 'dark' },
+  { displayName: 'VS Code', id: 'VS Code', icon: <VSCodeIcon />, theme: 'dark' },
+  { displayName: 'Chrome', id: 'Google Chrome', icon: <ChromeIcon />, theme: 'dark' },
+  { displayName: 'Notion', id: 'Notion', icon: <NotionIcon />, theme: 'dark' },
+  { displayName: 'Safari', id: 'Safari', icon: <SafariIcon />, theme: 'dark' },
+  // { displayName: "Terminal", icon: <VSCodeIcon />, theme: 'dark'  },
+  // { displayName: "Finder", icon: <NotionIcon />, theme: 'dark' },
+  { displayName: 'Discord', id: 'Discord', icon: <DiscordIcon />, theme: 'dark' },
+  // { displayName: "Firefox", icon: <ChromeIcon />, theme: 'dark' },
+]
+
 export default function AppSelector({ shortcutName }: { shortcutName: string }) {
   const [isExpanded, setIsExpanded] = useState(false)
+  const [installedApplications, setInstalledApplications] = useState<string[]>([])
+  const [availableApplications, setAvailableApplications] = useState<AppOption[]>([])
+  const [appOptions, setAppOptions] = useState<AppOption[]>(DEFAULT_APP_OPTIONS)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [showDropdown, setShowDropdown] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  const hasInitializedApps = useRef(false)
 
-  const { selectedApp, setSelectedApp, appVisibility, setAppVisibility } = usePromptEditorStore()
+  const { shortcutAvailability, setShortcutAvailability, appVisibility, setAppVisibility } = usePromptEditorStore()
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const toggleAppVisibility = (appName: string) => {
     setAppVisibility({
@@ -57,6 +90,15 @@ export default function AppSelector({ shortcutName }: { shortcutName: string }) 
     })
   }
 
+  useEffect(() => {
+    const loadApps = async () => {
+      const installedApps = await getInstalledApplications()
+      setInstalledApplications(installedApps.applications)
+    }
+
+    loadApps()
+  }, [])
+
   const contextMenuItems = useMemo(() => {
     const items: MenuItemType[] = menuOptions.map((option) => ({
       label: (
@@ -64,14 +106,19 @@ export default function AppSelector({ shortcutName }: { shortcutName: string }) 
           {option.icon} {option.text}
         </>
       ),
-      onClick: () => setSelectedApp(option.value), // Uses store's setSelectedApp
+      onClick: () => {
+        setShortcutAvailability(option.value)
+        if (option.value === 'hidden') {
+          setAppVisibility({})
+        }
+      },
     }))
 
     items.splice(items.length - 1, 0, { divider: true })
     return items
-  }, [setSelectedApp])
+  }, [setShortcutAvailability])
 
-  const activeMenuItem = menuOptions.find((option) => option.value === selectedApp)
+  const activeMenuItem = menuOptions.find((option) => option.value === shortcutAvailability)
 
   const getDescriptionText = (availability: AppAvailability, shortcutName: string) => {
     switch (availability) {
@@ -86,28 +133,49 @@ export default function AppSelector({ shortcutName }: { shortcutName: string }) 
     }
   }
 
-  const appOptions: AppOption[] = [
-    { displayName: 'Slack', id: 'Slack', icon: <SlackIcon />, theme: 'dark' },
-    { displayName: 'Cursor', id: 'Cursor', icon: <CursorIcon />, theme: 'dark' },
-    { displayName: 'VS Code', id: 'VS Code', icon: <VSCodeIcon />, theme: 'dark' },
-    { displayName: 'Chrome', id: 'Google Chrome', icon: <ChromeIcon />, theme: 'dark' },
-    { displayName: 'Notion', id: 'Notion', icon: <NotionIcon />, theme: 'dark' },
-    { displayName: 'Safari', id: 'Safari', icon: <SafariIcon />, theme: 'dark' },
-    // { displayName: "Terminal", icon: <VSCodeIcon />, theme: 'dark'  },
-    // { displayName: "Finder", icon: <NotionIcon />, theme: 'dark' },
-    { displayName: 'Discord', id: 'Discord', icon: <DiscordIcon />, theme: 'dark' },
-    // { displayName: "Firefox", icon: <ChromeIcon />, theme: 'dark' },
-  ]
+  useEffect(() => {
+    setAvailableApplications(appOptions.filter((option) => installedApplications.includes(option.id)))
+  }, [installedApplications, appOptions])
 
-  const getVisibleApps = () => {
+  const visibleApps = useMemo(() => {
     if (isExpanded) {
-      return appOptions
+      return availableApplications
     }
-    return appOptions.slice(0, 5)
-  }
 
-  const getVisibleAppCount = () => {
-    return appOptions.slice(5).filter((app) => appVisibility[app.displayName]).length
+    return availableApplications.slice(0, 5)
+  }, [isExpanded, availableApplications])
+
+  useEffect(() => {
+    if (!hasInitializedApps.current && appVisibility) {
+      const appVisibilityKeys = Object.keys(appVisibility)
+      const defaultAppIds = DEFAULT_APP_OPTIONS.map((app) => app.id)
+      const customApps: AppOption[] = appVisibilityKeys
+        .filter((app) => !defaultAppIds.includes(app))
+        .map((app) => ({
+          displayName: app,
+          id: app,
+          theme: 'dark',
+          icon: <HashtagSquare variant="Bold" />,
+        }))
+      setAppOptions([...appOptions, ...customApps])
+      hasInitializedApps.current = true
+    }
+  }, [appVisibility])
+
+  const hiddenAppsCount = availableApplications.length - visibleApps.length
+
+  const filteredApps = useMemo(() => {
+    return installedApplications.filter(
+      (app) => app.toLowerCase().includes(searchTerm.toLowerCase()) && !availableApplications.find((a) => a.id === app),
+    )
+  }, [searchTerm, installedApplications, availableApplications])
+
+  const onAddApp = (app: string) => {
+    setAppOptions([...appOptions, { displayName: app, id: app, theme: 'dark', icon: <HashtagSquare variant="Bold" /> }])
+    setAppVisibility({
+      ...appVisibility,
+      [app]: true,
+    })
   }
 
   return (
@@ -143,63 +211,98 @@ export default function AppSelector({ shortcutName }: { shortcutName: string }) 
           )
         }
       </ContextMenu>
-      {/* <p className="text-xs font-normal leading-tight text-[#6e6e6e] mt-2">
-        {getDescriptionText(selectedApp, shortcutName)}
-      </p> */}
-      {selectedApp === 'specific' && (
-        <div className="grid grid-cols-3 gap-2 mt-4">
-          {getVisibleApps().map((app) => {
-            const isVisible = appVisibility[app.id] || false
-            return (
-              <button
-                key={app.id}
-                onClick={() => toggleAppVisibility(app.id)}
-                className={`p-2 border h-12 rounded-lg flex items-center justify-start gap-2 text-xs ${
-                  isVisible ? 'border-green-40 bg-green-10' : 'border-[#252525] hover:bg-neutral-800/15'
-                }`}
-              >
-                <div
-                  className="flex items-center justify-center h-7 w-7 rounded-md p-1.5 border border-[0.25px] border-[#333333]"
-                  style={{
-                    background:
-                      app.theme === 'dark'
-                        ? 'linear-gradient(139deg, #333 3.52%, #161818 51.69%)'
-                        : 'linear-gradient(139deg, #FFFFFF 3.52%, #E5E5E5 51.69%)',
-                  }}
-                >
-                  {app.icon}
-                </div>
-                {app.displayName}
-              </button>
-            )
-          })}
-          {!isExpanded && appOptions.length > 5 && (
-            <button
-              onClick={() => setIsExpanded(true)}
-              className="relative border border-[#252525] h-12 hover:bg-neutral-800/15 rounded-lg flex items-center justify-between px-3 text-xs"
-            >
-              <div className="grid grid-cols-2 grid-rows-2 gap-0.5">
-                {appOptions
-                  .slice(5)
-                  .slice(0, 4)
-                  .map((app) => (
+      {shortcutAvailability === 'specific' && (
+        <>
+          <div className="grid grid-cols-3 gap-2 mt-4">
+            {visibleApps.map((app) => {
+              const isVisible = appVisibility[app.id] || false
+              return (
+                <Tooltip key={app.id} tooltip={app.displayName} position="top">
+                  <button
+                    key={app.id}
+                    onClick={() => toggleAppVisibility(app.id)}
+                    className={`p-2 border h-12 rounded-lg flex items-center justify-start gap-2 text-xs overflow-hidden ${
+                      isVisible ? 'border-green-40 bg-green-10' : 'border-[#252525] hover:bg-neutral-800/15'
+                    }`}
+                  >
                     <div
-                      key={app.id}
-                      className="h-3.5 w-3.5 p-0.5 bg-[#2F2F2F] rounded-sm flex items-center justify-center"
+                      className="flex items-center justify-center h-7 w-7 rounded-md p-1.5 border-[0.25px] border-[#333333]"
+                      style={{
+                        background:
+                          app.theme === 'dark'
+                            ? 'linear-gradient(139deg, #333 3.52%, #161818 51.69%)'
+                            : 'linear-gradient(139deg, #FFFFFF 3.52%, #E5E5E5 51.69%)',
+                      }}
                     >
                       {app.icon}
                     </div>
+                    <span className="truncate">{app.displayName}</span>
+                  </button>
+                </Tooltip>
+              )
+            })}
+            {!isExpanded && appOptions.length > 5 && (
+              <button
+                onClick={() => setIsExpanded(true)}
+                // className="relative border border-[#252525] h-12 hover:bg-neutral-800/15 rounded-lg flex items-center justify-between px-3 text-xs"
+              >
+                {/* <div className="grid grid-cols-2 grid-rows-2 gap-0.5">
+                  {appOptions
+                    .slice(5)
+                    .slice(0, 4)
+                    .map((app) => (
+                      <div
+                        key={app.id}
+                        className="h-3.5 w-3.5 p-0.5 bg-[#2F2F2F] rounded-sm flex items-center justify-center"
+                      >
+                        {app.icon}
+                      </div>
+                    ))}
+                </div> */}
+                <span className="ml-2 bg-[#2f2f2f] py-2 px-2 rounded-md text-xs">{hiddenAppsCount} More</span>
+                {/* {hiddenAppsCount > 0 && (
+                  <div className="absolute top-0 -right-2 bg-green-60 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs">
+                   
+                  </div>
+                )} */}
+              </button>
+            )}
+          </div>
+          {installedApplications.length > availableApplications.length && (
+            <div className="relative" ref={dropdownRef}>
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value)
+                  setShowDropdown(true)
+                }}
+                onFocus={() => setShowDropdown(true)}
+                placeholder="Search for more apps..."
+                className="w-full p-2 text-xs bg-[#222222] border border-[#252525] rounded-lg focus:outline-none focus:border-green-40"
+              />
+              {showDropdown && filteredApps.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-[#222222] border border-[#252525] rounded-lg max-h-48 overflow-y-auto">
+                  {filteredApps.map((app) => (
+                    <button
+                      key={app}
+                      onClick={() => {
+                        toggleAppVisibility(app)
+                        setShowDropdown(false)
+                        setSearchTerm('')
+                        onAddApp(app)
+                        setIsExpanded(true)
+                      }}
+                      className="w-full p-2 text-xs text-left hover:bg-neutral-800/15"
+                    >
+                      {app}
+                    </button>
                   ))}
-              </div>
-              <span className="ml-2 bg-[#2f2f2f] py-2 px-2 rounded-md text-xs">More</span>
-              {getVisibleAppCount() > 0 && (
-                <div className="absolute top-0 -right-2 bg-green-60 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs">
-                  {getVisibleAppCount()}
                 </div>
               )}
-            </button>
+            </div>
           )}
-        </div>
+        </>
       )}
     </div>
   )

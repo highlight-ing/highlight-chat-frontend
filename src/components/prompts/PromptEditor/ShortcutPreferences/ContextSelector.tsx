@@ -58,7 +58,7 @@ function ToggleSwitch({ checked, onToggle }: { checked: boolean; onToggle: (chec
 }
 
 export default function ContextSelector() {
-  const { selectedApp, contextTypes, setContextTypes } = usePromptEditorStore()
+  const { shortcutAvailability, contextTypes, setContextTypes } = usePromptEditorStore()
 
   // Derive enabled state from contextTypes
   const isEnabled = useMemo(() => {
@@ -93,7 +93,7 @@ export default function ContextSelector() {
     setContextTypes(newContextTypes)
   }
 
-  if (selectedApp === 'hidden') {
+  if (shortcutAvailability === 'hidden') {
     return null
   }
 
