@@ -6,8 +6,8 @@ import { atom } from 'jotai'
 import { ConversationData } from '@/types/conversations'
 
 type SidePanelContent = 'audio-note' | 'chat'
-type SelectedAudioNote = Partial<ConversationData> | null
-type SelectedChat = Partial<ChatHistoryItem> | null
+type SelectedAudioNote = ConversationData | null
+type SelectedChat = ChatHistoryItem | null
 
 export const sidePanelOpenAtom = atom(false)
 

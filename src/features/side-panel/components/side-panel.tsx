@@ -89,7 +89,7 @@ export function SidePanel(props: { children: React.ReactNode; hideCloseButton?: 
   )
 }
 
-export function SidePanelHeader(props: { children: React.ReactNode }) {
+export function SidePanelHeader(props: { children: React.ReactNode; className?: string }) {
   const [ref, bounds] = useMeasure()
   const setHeaderHeight = useSetAtom(headerHeightAtom)
 
@@ -99,17 +99,21 @@ export function SidePanelHeader(props: { children: React.ReactNode }) {
 
   return (
     <div ref={ref} className="overflow-x-hidden border-b border-tertiary">
-      <CloseHoverAnimateLayout className="space-y-2 p-4">{props.children}</CloseHoverAnimateLayout>
+      <CloseHoverAnimateLayout className={cn('space-y-2 p-5 pt-4', props.className)}>
+        {props.children}
+      </CloseHoverAnimateLayout>
     </div>
   )
 }
 
-export function SidePanelContent(props: { children: React.ReactNode }) {
+export function SidePanelContent(props: { children: React.ReactNode; className?: string }) {
   const headerHeight = useAtomValue(headerHeightAtom)
 
   return (
     <ScrollArea style={{ height: `calc(100% - ${headerHeight}px` }} className="overflow-x-hidden">
-      <CloseHoverAnimateLayout className="w-full space-y-6 p-4 pt-6">{props.children}</CloseHoverAnimateLayout>
+      <CloseHoverAnimateLayout className={cn('w-full space-y-6 p-4 pt-6', props.className)}>
+        {props.children}
+      </CloseHoverAnimateLayout>
     </ScrollArea>
   )
 }

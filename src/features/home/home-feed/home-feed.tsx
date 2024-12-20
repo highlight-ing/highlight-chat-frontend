@@ -5,7 +5,7 @@ import { ChatHistoryItem } from '@/types'
 import { AnimatePresence, motion, Variants } from 'framer-motion'
 import { Eye, EyeSlash, MessageText, VoiceSquare } from 'iconsax-react'
 import { useAtomValue, useSetAtom } from 'jotai'
-import { GroupedVirtuoso, Virtuoso } from 'react-virtuoso'
+import { GroupedVirtuoso } from 'react-virtuoso'
 
 import { ConversationData } from '@/types/conversations'
 import { cn, getDateGroupLengths } from '@/lib/utils'
@@ -18,7 +18,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Tooltip } from '@/components/ui/tooltip'
 import Button from '@/components/Button/Button'
 import { MeetingIcon } from '@/components/icons'
-import { useStore } from '@/components/providers/store-provider'
 
 import { feedHiddenAtom, toggleFeedVisibilityAtom } from './atoms'
 import { useAudioNotes, useRecentActions } from './hooks'
@@ -298,15 +297,10 @@ function AudioNotesTabContent() {
 }
 
 function ChatListItem(props: { chat: ChatHistoryItem }) {
-  const addOrUpdateOpenConversation = useStore((store) => store.addOrUpdateOpenConversation)
-  const setConversationId = useStore((store) => store.setConversationId)
   const setSelectedChatAtom = useSetAtom(selectedChatAtom)
 
   function handleClick() {
-    // addOrUpdateOpenConversation(props.chat)
-    // setConversationId(props.chat.id)
     setSelectedChatAtom(props.chat)
-
     trackEvent('HL Chat Opened', {
       chatId: props.chat.id,
       source: 'home_feed',
