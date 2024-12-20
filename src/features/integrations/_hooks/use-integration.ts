@@ -2,13 +2,16 @@ import { Message } from '@/types'
 import Highlight from '@highlight-ai/app-runtime'
 import { v4 as uuidv4 } from 'uuid'
 
+import { HIGHLIGHT_BACKEND_BASE_URL } from '@/lib/integrations-backend'
 import { useStore } from '@/components/providers/store-provider'
 
+import { useHighlightToken } from './use-hl-token'
 import { useIntegrations } from './use-integrations'
 
 export function useIntegration() {
   const { createNotionPage, createLinearTicket } = useIntegrations()
   const addConversationMessage = useStore((state) => state.addConversationMessage)
+  const { data: hlToken } = useHighlightToken()
 
   async function createAction(action: 'notion' | 'linear', message: Message) {
     const content = message.content as string
@@ -21,23 +24,19 @@ export function useIntegration() {
       given_feedback: null,
     })
 
-    let createLang = 'Generate a title for '
+    const response = await fetch(`${HIGHLIGHT_BACKEND_BASE_URL}/v1/ai/summarize/title`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${hlToken}`,
+      },
+      body: JSON.stringify({
+        text: content,
+        type: action,
+      }),
+    })
 
-    if (action === 'notion') {
-      createLang += "this Notion page using the user's text."
-    } else if (action === 'linear') {
-      createLang += "this Linear ticket using the user's text."
-    }
-
-    const generator = Highlight.inference.getTextPrediction([
-      { role: 'system', content: createLang },
-      { role: 'user', content },
-    ])
-
-    let title = ''
-    for await (const chunk of generator) {
-      title += chunk
-    }
+    const title = await response.text()
 
     switch (action) {
       case 'notion':
