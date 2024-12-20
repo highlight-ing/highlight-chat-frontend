@@ -11,7 +11,7 @@ import { ConversationData } from '@/types/conversations'
 import { cn, getDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { formatConversationDuration, formatTitle } from '@/utils/conversations'
-import { selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
+import { selectedAudioNoteAtom, selectedChatAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
 import { useHistory } from '@/hooks/chat-history'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -300,10 +300,12 @@ function AudioNotesTabContent() {
 function ChatListItem(props: { chat: ChatHistoryItem }) {
   const addOrUpdateOpenConversation = useStore((store) => store.addOrUpdateOpenConversation)
   const setConversationId = useStore((store) => store.setConversationId)
+  const setSelectedChatAtom = useSetAtom(selectedChatAtom)
 
   function handleClick() {
-    addOrUpdateOpenConversation(props.chat)
-    setConversationId(props.chat.id)
+    // addOrUpdateOpenConversation(props.chat)
+    // setConversationId(props.chat.id)
+    setSelectedChatAtom(props.chat)
 
     trackEvent('HL Chat Opened', {
       chatId: props.chat.id,

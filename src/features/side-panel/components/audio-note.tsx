@@ -9,7 +9,6 @@ import { MeetingIcon } from '@/components/icons'
 
 import { TranscriptMessage } from '../types'
 import { formatHeaderTimestamp, parseTranscript } from '../utils'
-import { SidePanelContent, SidePanelHeader } from './side-panel'
 
 function CopyTranscript() {
   const selectedAudioNote = useAtomValue(selectedAudioNoteAtom)
@@ -67,16 +66,12 @@ export function AudioNoteSidePanelHeader() {
 
   if (!selectedAudioNote?.transcript) {
     return (
-      <SidePanelHeader>
-        <h3 className="line-clamp-1 w-full text-ellipsis text-xl font-semibold tracking-tight">
-          No audio note selected
-        </h3>
-      </SidePanelHeader>
+      <h3 className="line-clamp-1 w-full text-ellipsis text-xl font-semibold tracking-tight">No audio note selected</h3>
     )
   }
 
   return (
-    <SidePanelHeader>
+    <>
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <div className="hidden xl:block">
@@ -90,7 +85,7 @@ export function AudioNoteSidePanelHeader() {
         </div>
       </div>
       <AudioNoteHeaderDates />
-    </SidePanelHeader>
+    </>
   )
 }
 
@@ -99,9 +94,9 @@ export function AudioNoteSidePanelContent() {
   const transcriptMessages = parseTranscript(selectedAudioNote?.transcript)
 
   return (
-    <SidePanelContent>
+    <>
       <CopyTranscript />
       {transcriptMessages?.map((message, index) => <TranscriptMessageItem key={index} message={message} />)}
-    </SidePanelContent>
+    </>
   )
 }
