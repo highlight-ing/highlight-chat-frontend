@@ -18,7 +18,7 @@ const CreatePromptModal = ({ id, context }: ModalObjectProps) => {
   const shouldShowTutorial = !onboarding.hasOnboardedOnceBefore && promptEditorData.externalId === undefined
 
   useEffect(() => {
-    setSelectedScreen('app')
+    setSelectedScreen('simplified-app')
     clearPromptEditorData()
 
     if (shouldShowTutorial) {

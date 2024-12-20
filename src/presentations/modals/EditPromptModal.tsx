@@ -98,7 +98,7 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
 
   // Initialize prompt editor data
   useEffect(() => {
-    setSelectedScreen('app')
+    setSelectedScreen('simplified-app')
     setPromptEditorData(
       {
         externalId: prompt.external_id,

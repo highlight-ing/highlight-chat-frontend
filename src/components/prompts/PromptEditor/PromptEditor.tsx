@@ -6,6 +6,7 @@ import Tooltip from '@/components/Tooltip/Tooltip'
 import styles from './prompteditor.module.scss'
 import AppScreen from './screens/AppScreen'
 import SettingsScreen from './screens/SettingsScreen'
+import SimplifiedAppScreen from './screens/SimplifiedAppScreen'
 import StartWithTemplateScreen from './screens/StartWithTemplateScreen'
 import VariablesScreen from './screens/VariablesScreen'
 
@@ -62,12 +63,19 @@ function VariablesEditorButton() {
 
 export default function PromptEditor({ onClose }: { onClose?: () => void }) {
   const { selectedScreen, onboarding } = usePromptEditorStore()
+  console.log('selectedScreen', selectedScreen)
 
   return (
     <>
       {selectedScreen !== 'startWithTemplate' && (
         <div className={styles.editorTabs}>
           <div className={styles.tabRow}>
+            <ScreenSelector
+              active={selectedScreen === 'simplified-app'}
+              name="simplified-app"
+              title="Simple"
+              disabled={onboarding.isOnboarding}
+            />
             <ScreenSelector
               active={selectedScreen === 'app'}
               name="app"
@@ -80,7 +88,7 @@ export default function PromptEditor({ onClose }: { onClose?: () => void }) {
               title="Settings"
               disabled={onboarding.isOnboarding}
             />
-            <VariablesEditorButton />
+            {selectedScreen !== 'simplified-app' && <VariablesEditorButton />}
           </div>
         </div>
       )}
@@ -89,6 +97,7 @@ export default function PromptEditor({ onClose }: { onClose?: () => void }) {
         {selectedScreen === 'app' && <AppScreen />}
         {selectedScreen === 'variables' && <VariablesScreen />}
         {selectedScreen === 'settings' && <SettingsScreen onClose={onClose} />}
+        {selectedScreen === 'simplified-app' && <SimplifiedAppScreen />}
       </div>
     </>
   )

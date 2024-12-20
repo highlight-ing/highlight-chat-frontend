@@ -114,7 +114,7 @@ function ToggleSwitch({ checked, onToggle }: { checked: boolean; onToggle: (chec
   )
 }
 
-function IntegrationToggle({
+export function IntegrationToggle({
   checked,
   onToggle,
   title,

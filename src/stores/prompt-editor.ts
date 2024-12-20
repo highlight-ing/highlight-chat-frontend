@@ -9,7 +9,7 @@ import { useStore } from '@/components/providers/store-provider'
  * Holds the state for the prompt editor,
  * when the user is creating or editing a prompt.
  */
-export type PromptEditorScreen = 'startWithTemplate' | 'app' | 'settings' | 'variables'
+export type PromptEditorScreen = 'startWithTemplate' | 'app' | 'settings' | 'variables' | 'simplified-app'
 
 export type AppAvailability = 'all' | 'specific' | 'hidden' | undefined
 
@@ -167,7 +167,7 @@ Clipboard Text: {{clipboard_text}}
 `
 
 export const initialPromptEditorState: PromptEditorState = {
-  selectedScreen: 'startWithTemplate',
+  selectedScreen: 'simplified-app',
   promptEditorData: {
     slug: '',
     appPrompt: '',
@@ -219,7 +219,10 @@ export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, ge
       },
     }),
   startTutorial: () =>
-    set({ onboarding: { isOnboarding: true, index: 0, hasOnboardedOnceBefore: true }, selectedScreen: 'app' }),
+    set({
+      onboarding: { isOnboarding: true, index: 0, hasOnboardedOnceBefore: true },
+      selectedScreen: 'simplified-app',
+    }),
   setSelectedApp: (value: AppAvailability) => set({ selectedApp: value }),
   setAppVisibility: (visibility: Record<string, boolean>) => set({ appVisibility: visibility }),
   setContextTypes: (types: ContextTypes | null) => set({ contextTypes: types }),

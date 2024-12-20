@@ -189,14 +189,15 @@
 // Editor styles
 .editorTabs {
   display: flex;
-  justify-content: center;
+  // justify-content: center;
+  margin-left: 8px;
   height: 48px;
   flex-shrink: 0;
   border-bottom: 1px solid $light-5;
 }
 
 .tabRow {
-  width: calc(100% - 64px);
+  // width: calc(100% - 64px);
   display: flex;
   align-items: center;
   height: 100%;
