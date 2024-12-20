@@ -42,7 +42,7 @@ function ChatFocusedOverlay() {
     <div
       onClick={handleClick}
       className={cn(
-        'fixed inset-0 z-[15] bg-black/75',
+        'fixed inset-0 z-[15] bg-black/70 backdrop-blur-[2px]',
         chatInputIsFocused ? 'animate-in fade-in-0' : 'animate-out fade-out-0 ',
       )}
     />
