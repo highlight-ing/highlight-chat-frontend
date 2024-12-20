@@ -19,6 +19,7 @@ import 'katex/dist/katex.min.css'
 
 import { MessageText } from 'iconsax-react'
 
+import { cn } from '@/lib/utils'
 import { getDisplayValue } from '@/utils/attachments'
 import { AttachedContextContextTypes } from '@/utils/formDataUtils'
 import Button from '@/components/Button/Button'
@@ -46,6 +47,8 @@ const hasAttachment = (message: UserMessage) => {
 interface MessageProps {
   isThinking?: boolean
   message: MessageType
+  hideAssistantIcon?: boolean
+  className?: string
 }
 
 const FactButton = ({ factIndex, fact }: { factIndex?: number; fact?: string }) => {
@@ -100,7 +103,7 @@ const Visualization = ({ visualization }: { visualization: VisualizationData }) 
   return <iframe src={visualization.url} className="mt-2 min-h-[485px] w-full rounded-xl" />
 }
 
-export const Message = ({ message, isThinking }: MessageProps) => {
+export const Message = ({ message, isThinking, hideAssistantIcon, className }: MessageProps) => {
   const promptApp = useStore((state) => state.promptApp)
   const openModal = useStore((state) => state.openModal)
   const [copyStatus, setCopyStatus] = useState<'idle' | 'success' | 'error'>('idle')
@@ -145,8 +148,8 @@ export const Message = ({ message, isThinking }: MessageProps) => {
   }
 
   return (
-    <div className={`${styles.messageContainer} ${message.role === 'user' ? styles.self : ''}`}>
-      {message.role === 'assistant' && (
+    <div className={cn('relative flex w-full max-w-[min(800px,83%)] fade-in', className)}>
+      {!hideAssistantIcon && message.role === 'assistant' && (
         <div className={styles.avatar}>
           {/* @todo icon type */}
           <div
@@ -169,7 +172,12 @@ export const Message = ({ message, isThinking }: MessageProps) => {
         </div>
       )}
       {!isThinking ? (
-        <div className={styles.message}>
+        <div
+          className={cn(
+            'flex w-full flex-col rounded-xl bg-light-5 p-4',
+            message.role === 'user' && 'border border-tertiary bg-transparent',
+          )}
+        >
           {message.content ? (
             <div className={styles.messageBody}>
               <Markdown

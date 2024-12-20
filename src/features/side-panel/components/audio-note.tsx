@@ -1,11 +1,11 @@
-import { Copy, Export, Flash, MessageText, VoiceSquare } from 'iconsax-react'
+import { Copy, MessageText, VoiceSquare } from 'iconsax-react'
 import { useAtomValue } from 'jotai'
 import { toast } from 'sonner'
 import { useShallow } from 'zustand/react/shallow'
 
 import { cn } from '@/lib/utils'
 import { formatTitle } from '@/utils/conversations'
-import { selectedAudioNoteAtom, selectedChatAtom } from '@/atoms/side-panel'
+import { selectedAudioNoteAtom } from '@/atoms/side-panel'
 import { MeetingIcon } from '@/components/icons'
 import { useStore } from '@/components/providers/store-provider'
 
@@ -13,6 +13,7 @@ import { useInputFocus } from '@/features/home/chat-input/chat-input'
 
 import { TranscriptMessage } from '../types'
 import { formatHeaderTimestamp, parseTranscript } from '../utils'
+import { SidePanelHeaderActionButton, SidePanelHeaderActions } from './side-panel'
 
 function AudioNoteHeaderDates() {
   const selectedAudioNote = useAtomValue(selectedAudioNoteAtom)
@@ -44,20 +45,7 @@ function TranscriptMessageItem(props: { message: TranscriptMessage }) {
   )
 }
 
-function HeaderActionButton({ className, ...props }: React.ComponentProps<'button'>) {
-  return (
-    <button
-      className={cn(
-        'flex w-full flex-col items-center rounded-[10px] bg-secondary p-2 text-sm font-medium tracking-tight text-tertiary',
-        className,
-      )}
-      {...props}
-    />
-  )
-}
-
-function HeaderActions() {
-  const selectedChat = useAtomValue(selectedChatAtom)
+function ChatAction() {
   const selectedAudioNote = useAtomValue(selectedAudioNoteAtom)
   const focusInput = useInputFocus()
 
@@ -86,6 +74,17 @@ function HeaderActions() {
     })
   }
 
+  return (
+    <SidePanelHeaderActionButton onClick={handleChatClick}>
+      <MessageText variant="Bold" size={16} />
+      <p>Chat</p>
+    </SidePanelHeaderActionButton>
+  )
+}
+
+function CopyAction() {
+  const selectedAudioNote = useAtomValue(selectedAudioNoteAtom)
+
   async function handleCopyClick() {
     if (!selectedAudioNote?.transcript) return
     await window.navigator.clipboard.writeText(selectedAudioNote.transcript)
@@ -93,24 +92,10 @@ function HeaderActions() {
   }
 
   return (
-    <div className="flex w-full gap-2.5">
-      <HeaderActionButton onClick={handleChatClick}>
-        <MessageText variant="Bold" size={16} />
-        <p>Chat</p>
-      </HeaderActionButton>
-      <HeaderActionButton>
-        <Flash variant="Bold" size={16} />
-        <p>Summarize</p>
-      </HeaderActionButton>
-      <HeaderActionButton onClick={handleCopyClick}>
-        <Copy variant="Bold" size={16} />
-        <p>Copy</p>
-      </HeaderActionButton>
-      <HeaderActionButton>
-        <Export variant="Bold" size={16} />
-        <p>Share</p>
-      </HeaderActionButton>
-    </div>
+    <SidePanelHeaderActionButton onClick={handleCopyClick}>
+      <Copy variant="Bold" size={16} />
+      <p>Copy</p>
+    </SidePanelHeaderActionButton>
   )
 }
 
@@ -141,7 +126,10 @@ export function AudioNoteSidePanelHeader() {
           <AudioNoteHeaderDates />
         </div>
       </div>
-      <HeaderActions />
+      <SidePanelHeaderActions>
+        <ChatAction />
+        <CopyAction />
+      </SidePanelHeaderActions>
     </div>
   )
 }

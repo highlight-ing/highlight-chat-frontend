@@ -106,6 +106,22 @@ export function SidePanelHeader(props: { children: React.ReactNode; className?: 
   )
 }
 
+export function SidePanelHeaderActionButton({ className, ...props }: React.ComponentProps<'button'>) {
+  return (
+    <button
+      className={cn(
+        'flex w-full flex-col items-center rounded-[10px] bg-secondary p-2 text-sm font-medium tracking-tight text-tertiary',
+        className,
+      )}
+      {...props}
+    />
+  )
+}
+
+export function SidePanelHeaderActions(props: { children: React.ReactNode }) {
+  return <div className="flex w-full gap-2.5">{props.children}</div>
+}
+
 export function SidePanelContent(props: { children: React.ReactNode; className?: string }) {
   const headerHeight = useAtomValue(headerHeightAtom)
 

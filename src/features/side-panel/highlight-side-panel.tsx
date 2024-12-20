@@ -4,6 +4,7 @@ import { useAtomValue } from 'jotai'
 import { isOnHomeAtom, sidePanelContentTypeAtom } from '@/atoms/side-panel'
 
 import { AudioNoteSidePanelContent, AudioNoteSidePanelHeader } from './components/audio-note'
+import { ChatSidePanelContent, ChatSidePanelHeader } from './components/chat'
 import { SidePanel, SidePanelContent, SidePanelHeader } from './components/side-panel'
 
 export function HighlightSidePanel() {
@@ -15,7 +16,7 @@ export function HighlightSidePanel() {
       case 'audio-note':
         return { header: <AudioNoteSidePanelHeader />, content: <AudioNoteSidePanelContent /> }
       case 'chat':
-        return { header: <div>CHAT header</div>, content: <div>CHAT content</div> }
+        return { header: <ChatSidePanelHeader />, content: <ChatSidePanelContent /> }
       default:
         return { header: null, content: null }
     }
