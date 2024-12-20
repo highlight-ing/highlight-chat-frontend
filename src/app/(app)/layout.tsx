@@ -17,7 +17,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <ConversationProvider>
           <TooltipProvider>
             <App>{children}</App>
-            <ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
+            <ReactQueryDevtools buttonPosition="bottom-right" initialIsOpen={false} />
           </TooltipProvider>
         </ConversationProvider>
       </ReactQueryProvider>
