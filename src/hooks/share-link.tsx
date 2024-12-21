@@ -78,7 +78,6 @@ export function useGenerateShareLink() {
 
 export function useDisableLink() {
   const { deleteRequest } = useApi()
-  const addToast = useStore((state) => state.addToast)
   const setShareId = useStore((state) => state.setShareId)
   const { addOrUpdateChat } = useChatHistoryStore()
 
@@ -104,25 +103,14 @@ export function useDisableLink() {
 
       trackEvent('HL Chat Disable Link', { conversation_id: chatId })
 
-      addToast({
-        title: 'Share Link Disabled',
-        description: 'All share links for this conversation have been disabled.',
-        type: 'success',
-        timeout: 4000,
-      })
-
-      toast('Link copied to clipboard')
+      toast('Share links disabled')
     },
     onError: (error, chatId) => {
       console.error('Failed to disable link:', error)
 
       trackEvent('HL Chat Disable Link Error', { conversation_id: chatId, error: error })
 
-      addToast({
-        title: 'Failed to Disable Link',
-        description: 'An error occurred while disabling the share link.',
-        type: 'error',
-      })
+      toast.error('Could disable share links')
     },
   })
 }

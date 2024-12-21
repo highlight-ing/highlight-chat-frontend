@@ -44,7 +44,7 @@ export function useHistoryByChatId(chatId: string | undefined) {
   const { get } = useApi()
 
   return useQuery({
-    queryKey: ['chat-history', chatId],
+    queryKey: ['chat', chatId],
     queryFn: async () => {
       if (!chatId) return
 
@@ -77,7 +77,7 @@ export function useChatHistoryStore() {
     await queryClient.invalidateQueries({ queryKey: ['chat-history'] })
   }
 
-  function addOrUpdateChat(chat: Partial<Omit<ChatHistoryItem, 'id'>> & { id: ChatHistoryItem['id'] }) {
+  async function addOrUpdateChat(chat: Partial<Omit<ChatHistoryItem, 'id'>> & { id: ChatHistoryItem['id'] }) {
     queryClient.setQueryData(['chat-history'], (queryData: InfiniteData<Array<ChatHistoryItem>>) => {
       const firstPage = queryData.pages?.[0]
       const existingChatIndex = firstPage.findIndex((existingChat) => existingChat.id === chat.id)
@@ -100,6 +100,8 @@ export function useChatHistoryStore() {
         pageParams: queryData.pageParams,
       }
     })
+
+    await queryClient.invalidateQueries({ queryKey: ['chat', chat.id] })
   }
 
   function removeChatsByIds(selectedHistoryIds: Array<ChatHistoryItem['id']>) {

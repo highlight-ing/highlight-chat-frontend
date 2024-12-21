@@ -85,27 +85,9 @@ function CopyLinkAction() {
   const [selectedChat, setSelectedChat] = useAtom(selectedChatAtom)
   const mostRecentShareLinkId = selectedChat?.shared_conversations?.[0]?.id
   const [showSuccessState, setShowSuccessState] = React.useState(false)
-  const {
-    mutate: generateShareLink,
-    isPending: isGeneratingLink,
-    isSuccess: linkGenerated,
-    data: generatedShareLink,
-  } = useGenerateShareLink()
+  const { mutate: generateShareLink, isPending: isGeneratingLink } = useGenerateShareLink()
   const { mutate: copyLink, isPending: isCopyingLink, isSuccess: linkCopied } = useCopyLink()
   const isPending = isGeneratingLink || isCopyingLink
-
-  // React.useEffect(() => {
-  //   if (linkGenerated && generatedShareLink) {
-  //     const newSelectedChat = {
-  //       ...selectedChat,
-  //       created_at: selectedChat?.created_at ?? new Date().toISOString(),
-  //       shared_conversations: [
-  //         { created_at: new Date().toISOString(), id: generatedShareLink, title: selectedChat?.title },
-  //       ],
-  //     }
-  //     setSelectedChat(newSelectedChat)
-  //   }
-  // }, [linkGenerated, generatedShareLink, setSelectedChat, selectedChat])
 
   React.useEffect(() => {
     let timeout: NodeJS.Timeout | null
