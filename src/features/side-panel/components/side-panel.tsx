@@ -58,7 +58,7 @@ function CloseTranscriptViewerButton() {
   )
 }
 
-export function SidePanel(props: { children: React.ReactNode; hideCloseButton?: boolean }) {
+export function SidePanel(props: { children: React.ReactNode; hideCloseButton?: boolean; className?: string }) {
   const sidePanelOpen = useAtomValue(sidePanelOpenAtom)
   const isOnHome = useAtomValue(isOnHomeAtom)
 
@@ -79,6 +79,7 @@ export function SidePanel(props: { children: React.ReactNode; hideCloseButton?: 
           className={cn(
             'sticky top-[104px] z-10 col-span-1 h-[calc(100vh-104px)] border-l border-tertiary text-primary',
             isOnHome && 'top-[48px] h-[calc(100vh-48px)]',
+            props.className,
           )}
         >
           {props.children}
@@ -110,7 +111,7 @@ export function SidePanelHeaderActionButton({ className, ...props }: React.Compo
   return (
     <button
       className={cn(
-        'flex w-full flex-col items-center rounded-[10px] bg-secondary p-2 text-sm font-medium tracking-tight text-tertiary',
+        'flex w-full flex-col items-center rounded-[10px] border border-transparent bg-secondary p-2 text-sm font-medium tracking-tight text-tertiary shadow-md transition hover:border-tertiary hover:bg-hover active:opacity-90 active:shadow-none',
         className,
       )}
       {...props}

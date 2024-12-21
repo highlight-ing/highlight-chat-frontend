@@ -5,13 +5,12 @@ import { ChatHistoryItem } from '@/types'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowDown2, EmojiHappy, Send2 } from 'iconsax-react'
 
+import { useCopyLink, useDisableLink, useGenerateShareLink } from '@/hooks/share-link'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import Button from '@/components/Button/Button'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 
-import { useCopyLink, useDisableLink, useGenerateShareLink } from './hooks'
-
-function GenerateShareLinkButton(props: { conversationId: string }) {
+function GenerateShareLinkButton(props: { conversation: ChatHistoryItem }) {
   const { mutate: generateShareLink, isPending } = useGenerateShareLink()
 
   return (
@@ -19,7 +18,7 @@ function GenerateShareLinkButton(props: { conversationId: string }) {
       variant="accent"
       size="small"
       disabled={isPending}
-      onClick={() => generateShareLink(props.conversationId)}
+      onClick={() => generateShareLink(props.conversation)}
       style={{ gap: 8 }}
     >
       Share
@@ -161,7 +160,7 @@ export function ShareLink(props: { conversation: ChatHistoryItem | null }) {
   if (!props.conversation) return null
 
   if (!mostRecentShareLinkId) {
-    return <GenerateShareLinkButton conversationId={props.conversation.id} />
+    return <GenerateShareLinkButton conversation={props.conversation} />
   }
 
   return (

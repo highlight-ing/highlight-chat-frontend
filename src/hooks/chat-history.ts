@@ -1,10 +1,12 @@
 'use client'
 
 import { ChatHistoryItem } from '@/types'
-import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useAtom } from 'jotai'
 
-import { HistoryResponseData } from '@/types/history'
+import { HistoryByIdResponseData, HistoryResponseData } from '@/types/history'
 import { PAGINATION_LIMIT } from '@/lib/constants'
+import { selectedChatAtom } from '@/atoms/side-panel'
 
 import { useApi } from './useApi'
 
@@ -14,21 +16,16 @@ export function useHistory(options = {}) {
   return useInfiniteQuery({
     queryKey: ['chat-history'],
     queryFn: async ({ pageParam }) => {
-      try {
-        const response = await get(`history/paginated?skip=${PAGINATION_LIMIT * pageParam}&limit=${PAGINATION_LIMIT}`, {
-          version: 'v4',
-        })
+      const response = await get(`history/paginated?skip=${PAGINATION_LIMIT * pageParam}&limit=${PAGINATION_LIMIT}`, {
+        version: 'v4',
+      })
 
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-        const data = (await response.json()) as HistoryResponseData
-
-        return data.conversations
-      } catch (error) {
-        console.error('Error fetching response:', error)
-        return []
+      if (!response.ok) {
+        throw new Error('Network response was not ok')
       }
+      const data = (await response.json()) as HistoryResponseData
+
+      return data.conversations ?? []
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage, _, lastPageParam) => {
@@ -42,24 +39,61 @@ export function useHistory(options = {}) {
   })
 }
 
+export function useHistoryByChatId(chatId: string | undefined) {
+  const queryClient = useQueryClient()
+  const { get } = useApi()
+
+  return useQuery({
+    queryKey: ['chat-history', chatId],
+    queryFn: async () => {
+      if (!chatId) return
+
+      const chatHistory = queryClient.getQueryData(['chat-history']) as InfiniteData<Array<ChatHistoryItem>>
+      const flattenedHistory = chatHistory.pages.flat()
+      const existingChat = flattenedHistory.find((chat) => chat.id === chatId)
+
+      if (existingChat) return existingChat
+
+      const response = await get(`history/${chatId}`, {
+        version: 'v4',
+      })
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok')
+      }
+      const data = (await response.json()) as HistoryByIdResponseData
+      return data.conversation
+    },
+    enabled: !!chatId,
+    gcTime: 60000,
+  })
+}
+
 export function useChatHistoryStore() {
   const queryClient = useQueryClient()
+  const [selectedChat, setSelectedChat] = useAtom(selectedChatAtom)
 
   async function invalidateChatHistory() {
     await queryClient.invalidateQueries({ queryKey: ['chat-history'] })
   }
 
-  function addOrUpdateChat(chat: ChatHistoryItem) {
+  function addOrUpdateChat(chat: Partial<Omit<ChatHistoryItem, 'id'>> & { id: ChatHistoryItem['id'] }) {
     queryClient.setQueryData(['chat-history'], (queryData: InfiniteData<Array<ChatHistoryItem>>) => {
       const firstPage = queryData.pages?.[0]
       const existingChatIndex = firstPage.findIndex((existingChat) => existingChat.id === chat.id)
+      const existingChat = firstPage.find((existingChat) => existingChat.id === chat.id)
+      const newChat = { ...existingChat, ...chat }
       const newChatHistory =
         existingChatIndex !== -1
           ? [
-            [...firstPage.slice(0, existingChatIndex), chat, ...firstPage.slice(existingChatIndex + 1)],
-            ...queryData.pages.slice(1),
-          ]
-          : [[chat, ...firstPage], ...queryData.pages.slice(1)]
+              [...firstPage.slice(0, existingChatIndex), newChat, ...firstPage.slice(existingChatIndex + 1)],
+              ...queryData.pages.slice(1),
+            ]
+          : [[newChat, ...firstPage], ...queryData.pages.slice(1)]
+
+      if (selectedChat.id === chat.id) {
+        setSelectedChat(newChat as ChatHistoryItem)
+      }
 
       return {
         pages: newChatHistory,

@@ -9,7 +9,6 @@ import { cn, getDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { useChatHistoryStore, useHistory } from '@/hooks/chat-history'
 import { useApi } from '@/hooks/useApi'
-import { useChatHistory } from '@/hooks/useChatHistory'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import CircleButton from '@/components/CircleButton/CircleButton'
 import ContextMenu from '@/components/ContextMenu/ContextMenu'
@@ -121,7 +120,7 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
         onClick={() => (isSelecting ? handleSelectChat() : handleOpenChat(chat))}
       >
         <span>
-          {chat.title.charAt(0) === '"' && chat.title.charAt(chat.title.length - 1) === '"'
+          {chat.title?.charAt(0) === '"' && chat.title.charAt(chat.title.length - 1) === '"'
             ? chat.title.substring(1, chat.title.length - 1)
             : chat.title}
         </span>

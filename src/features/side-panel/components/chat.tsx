@@ -1,10 +1,15 @@
+import React from 'react'
+import { AnimatePresence, motion, Variants } from 'framer-motion'
 import { Copy, Export, MessageText } from 'iconsax-react'
-import { useAtomValue } from 'jotai'
+import { useAtom, useAtomValue } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
 import { selectedAudioNoteAtom, selectedChatAtom } from '@/atoms/side-panel'
+import { useHistoryByChatId } from '@/hooks/chat-history'
 import { useMessages } from '@/hooks/chat-messages'
+import { useCopyLink, useDisableLink, useGenerateShareLink } from '@/hooks/share-link'
 import { Skeleton } from '@/components/ui/skeleton'
+import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 import { Message } from '@/components/Messages/Message'
 import { useStore } from '@/components/providers/store-provider'
 
@@ -77,18 +82,81 @@ function ChatAction() {
 }
 
 function CopyLinkAction() {
-  function handleCopyClick() { }
+  const [selectedChat, setSelectedChat] = useAtom(selectedChatAtom)
+  const mostRecentShareLinkId = selectedChat?.shared_conversations?.[0]?.id
+  const [showSuccessState, setShowSuccessState] = React.useState(false)
+  const {
+    mutate: generateShareLink,
+    isPending: isGeneratingLink,
+    isSuccess: linkGenerated,
+    data: generatedShareLink,
+  } = useGenerateShareLink()
+  const { mutate: copyLink, isPending: isCopyingLink, isSuccess: linkCopied } = useCopyLink()
+  const isPending = isGeneratingLink || isCopyingLink
+
+  // React.useEffect(() => {
+  //   if (linkGenerated && generatedShareLink) {
+  //     const newSelectedChat = {
+  //       ...selectedChat,
+  //       created_at: selectedChat?.created_at ?? new Date().toISOString(),
+  //       shared_conversations: [
+  //         { created_at: new Date().toISOString(), id: generatedShareLink, title: selectedChat?.title },
+  //       ],
+  //     }
+  //     setSelectedChat(newSelectedChat)
+  //   }
+  // }, [linkGenerated, generatedShareLink, setSelectedChat, selectedChat])
+
+  React.useEffect(() => {
+    let timeout: NodeJS.Timeout | null
+    if (linkCopied) {
+      setShowSuccessState(true)
+      timeout = setTimeout(() => {
+        setShowSuccessState(false)
+      }, 1200)
+    }
+    return () => {
+      if (timeout) clearTimeout(timeout)
+      setShowSuccessState(false)
+    }
+  }, [linkCopied, setShowSuccessState])
+
+  function handleCopyClick() {
+    if (!selectedChat) return
+
+    if (!mostRecentShareLinkId) {
+      generateShareLink(selectedChat)
+    } else {
+      copyLink(selectedChat.id)
+    }
+  }
+
+  const copyLabelVariants: Variants = {
+    initial: { x: 10, opacity: 0 },
+    animate: { x: 0, opacity: 1 },
+    exit: { x: -10, opacity: 0 },
+  }
 
   return (
-    <SidePanelHeaderActionButton onClick={handleCopyClick}>
-      <Copy variant="Bold" size={16} />
-      <p>Copy link</p>
+    <SidePanelHeaderActionButton onClick={handleCopyClick} disabled={isPending}>
+      {isPending ? <LoadingSpinner size={'16px'} color="#6e6e6e" /> : <Copy size={16} variant={'Bold'} />}
+      <AnimatePresence initial={false} mode="popLayout">
+        <motion.span
+          variants={copyLabelVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          key={showSuccessState ? 'true' : 'false'}
+        >
+          {showSuccessState ? 'Copied' : 'Copy Link'}
+        </motion.span>
+      </AnimatePresence>
     </SidePanelHeaderActionButton>
   )
 }
 
 function ShareAction() {
-  function handleShareClick() { }
+  function handleShareClick() {}
 
   return (
     <SidePanelHeaderActionButton onClick={handleShareClick}>

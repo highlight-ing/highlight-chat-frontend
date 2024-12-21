@@ -5,6 +5,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -26,9 +27,11 @@
     &:nth-child(1) {
       height: 64px;
     }
+
     &:nth-child(2) {
       height: 90px;
     }
+
     &:nth-child(3) {
       height: 64px;
     }
@@ -41,14 +44,15 @@
     }
   }
 
-  .message {
-    display: flex;
-    flex-direction: column;
-    border-radius: 12px;
-    padding: 16px;
-    background-color: $light-5;
-    width: 100%;
-  }
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  padding: 16px;
+  background-color: $light-5;
+  width: 100%;
 }
 
 .avatar {
@@ -84,19 +88,24 @@
     margin-inline-start: 1.5em;
     white-space: initial;
   }
+
   ul {
     list-style: disc;
     padding: 0;
     margin-inline-start: 1.5em;
     white-space: initial;
   }
+
   li {
     padding: 0;
     margin: 0.5em 0;
     white-space: initial;
   }
 
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     margin-top: 12px;
     color: $light-100;
     font-weight: 450;
@@ -128,20 +137,26 @@
     overflow: hidden;
     width: 100%;
   }
+
   th {
     background-color: $light-5;
   }
-  td, th {
+
+  td,
+  th {
     border: 1px solid $light-5;
     padding: 8px;
   }
+
   td {
     vertical-align: top;
     font-size: 15px;
   }
+
   tr:nth-child(odd) {
     background-color: $dark-20;
   }
+
   tr:nth-child(even) {
     background-color: $dark-10;
   }
@@ -219,9 +234,17 @@
 }
 
 @keyframes gentleScale {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .visualization {

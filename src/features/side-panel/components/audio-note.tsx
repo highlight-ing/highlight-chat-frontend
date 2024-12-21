@@ -88,7 +88,7 @@ function CopyAction() {
   async function handleCopyClick() {
     if (!selectedAudioNote?.transcript) return
     await window.navigator.clipboard.writeText(selectedAudioNote.transcript)
-    toast('Transcript copied to clipboard', { icon: <Copy variant="Bold" size="20" /> })
+    toast('Transcript copied to clipboard', { icon: <Copy variant="Bold" size={20} /> })
   }
 
   return (
