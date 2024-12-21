@@ -5,7 +5,6 @@ import { ChatHistoryItem } from '@/types'
 import { AnimatePresence, motion, Variants } from 'framer-motion'
 import { Eye, EyeSlash, MessageText, VoiceSquare } from 'iconsax-react'
 import { useAtomValue, useSetAtom } from 'jotai'
-import { GroupedVirtuoso } from 'react-virtuoso'
 
 import { ConversationData } from '@/types/conversations'
 import { cn, getDateGroupLengths } from '@/lib/utils'
@@ -20,6 +19,7 @@ import Button from '@/components/Button/Button'
 import { MeetingIcon } from '@/components/icons'
 
 import { feedHiddenAtom, toggleFeedVisibilityAtom } from './atoms'
+import { GroupedVirtualList, GroupHeaderRow } from './components/grouped-virtual-list'
 import { useAudioNotes, useRecentActions } from './hooks'
 import { formatUpdatedAtDate } from './utils'
 
@@ -29,17 +29,15 @@ type HomeFeedListItemLayoutProps = React.ComponentPropsWithRef<'div'>
 
 function HomeFeedListItemLayout({ className, children, ...props }: HomeFeedListItemLayoutProps) {
   return (
-    <div>
-      <div
-        className={cn(
-          'cursor-pointer rounded-xl px-3 transition-colors hover:bg-secondary [&_div]:last:border-transparent',
-          className,
-        )}
-        {...props}
-      >
-        <div className="flex items-center justify-between gap-2 border-b border-subtle py-3 transition-colors">
-          {children}
-        </div>
+    <div
+      className={cn(
+        'cursor-pointer rounded-xl px-3 transition-colors hover:bg-secondary focus-visible:bg-hover [&_div]:last:border-transparent',
+        className,
+      )}
+      {...props}
+    >
+      <div className="flex items-center justify-between gap-2 border-b border-subtle py-3 transition-colors">
+        {children}
       </div>
     </div>
   )
@@ -183,14 +181,6 @@ function FeedHiddenState() {
   )
 }
 
-function GroupHeaderRow(props: { children: React.ReactNode }) {
-  return (
-    <div className="w-full bg-primary px-5 py-3 shadow-md">
-      <p className="font-medium text-subtle">{props.children}</p>
-    </div>
-  )
-}
-
 function AudioNotesListItem(props: { audioNote: ConversationData }) {
   const formattedTitle = formatTitle(props.audioNote.title)
   const audioNoteDuration = formatConversationDuration(props.audioNote)
@@ -247,7 +237,7 @@ function MeetingNotesTabContent() {
         <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
-          <GroupedVirtuoso
+          <GroupedVirtualList
             style={{ height: HOME_FEED_LIST_HEIGHT }}
             groupCounts={audioGroupCounts}
             groupContent={(index) => <GroupHeaderRow>{audioGroupLabels[index]}</GroupHeaderRow>}
@@ -281,7 +271,7 @@ function AudioNotesTabContent() {
         <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
-          <GroupedVirtuoso
+          <GroupedVirtualList
             style={{ height: HOME_FEED_LIST_HEIGHT }}
             groupCounts={audioGroupCounts}
             groupContent={(index) => <GroupHeaderRow>{audioGroupLabels[index]}</GroupHeaderRow>}
@@ -340,7 +330,7 @@ function ChatsTabContent() {
         <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
-          <GroupedVirtuoso
+          <GroupedVirtualList
             endReached={handleFetchMore}
             style={{ height: HOME_FEED_LIST_HEIGHT }}
             groupCounts={chatGroupCounts}
@@ -388,7 +378,7 @@ function RecentActivityTabContent() {
         <ListLoadingState />
       ) : (
         <HomeFeedListLayout>
-          <GroupedVirtuoso
+          <GroupedVirtualList
             endReached={handleFetchMore}
             style={{ height: HOME_FEED_LIST_HEIGHT }}
             groupCounts={recentActivityGroupCounts}
