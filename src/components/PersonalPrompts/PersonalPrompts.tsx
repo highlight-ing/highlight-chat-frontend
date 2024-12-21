@@ -303,7 +303,7 @@ const PersonalPromptsItem = ({ prompt, colorScheme, isOwner, isPublic }: Persona
                   }}
                   onClick={(e) => {
                     e.stopPropagation()
-                    openModal('edit-prompt', { prompt })
+                    openModal('edit-prompt', { data: { prompt } })
                   }}
                   hidden={!isHovered}
                 >

@@ -38,7 +38,7 @@ const InputActionItem = ({ prompt, input }: { prompt: PinnedPrompt; input: strin
 
   function handleEditPromptClick(e: MouseEvent) {
     e.stopPropagation()
-    openModal('edit-prompt', { prompt })
+    openModal('edit-prompt', { data: { prompt } })
   }
 
   function handleUnpinPromptClick(e: MouseEvent) {

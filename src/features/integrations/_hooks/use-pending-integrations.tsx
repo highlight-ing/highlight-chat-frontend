@@ -21,7 +21,7 @@ export function usePendingIntegrations() {
       const lastMessage = getLastConversationMessage(integration.conversationId)
 
       if (!lastMessage) {
-        // Ignore until we've the store has the last message
+        // Ignore until the store has the last message
         return
       }
 

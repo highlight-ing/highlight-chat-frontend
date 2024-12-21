@@ -1,10 +1,16 @@
 import { useEffect, useState } from 'react'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { usePromptsStore } from '@/stores/prompts'
+import { debounce } from 'throttle-debounce'
 
 import { DEFAULT_PROMPT_EXTERNAL_IDS } from '@/lib/promptapps'
 import { openApp, sendExternalMessage } from '@/utils/highlightService'
-import { removePromptFromUser, savePrompt } from '@/utils/prompts'
+import {
+  deletePromptShortcutPreferences,
+  removePromptFromUser,
+  savePrompt,
+  upsertPromptShortcutPreferences,
+} from '@/utils/prompts'
 import { useStore } from '@/components/providers/store-provider'
 
 import useAuth from './useAuth'
@@ -12,14 +18,28 @@ import usePromptApps from './usePromptApps'
 
 export const PROMPT_SLUG = 'prompts'
 
+interface AppVisibility {
+  [key: string]: boolean
+}
+
 export function usePromptEditor() {
   // STATE
   const [saveDisabled, setSaveDisabled] = useState(false)
 
   // HOOKS
-  const { promptEditorData, setPromptEditorData, needSave, saving, setNeedSave, settingsHasNoErrors, setSaving } =
-    usePromptEditorStore()
-  const { updatePrompt, addPrompt } = usePromptsStore()
+  const {
+    promptEditorData,
+    setPromptEditorData,
+    needSave,
+    saving,
+    setNeedSave,
+    settingsHasNoErrors,
+    setSaving,
+    selectedApp,
+    appVisibility,
+    contextTypes,
+  } = usePromptEditorStore()
+  const { updatePrompt, addPrompt, prompts } = usePromptsStore()
   const addToast = useStore((state) => state.addToast)
   const closeModal = useStore((state) => state.closeModal)
   const { getAccessToken } = useAuth()
@@ -105,6 +125,7 @@ export function usePromptEditor() {
     }
 
     if (res?.new) {
+      saveShortcutPreferences(res.prompt.id)
       // Reload Electron's prompt apps
       setPromptEditorData({
         externalId: res.prompt.external_id,
@@ -147,6 +168,142 @@ export function usePromptEditor() {
     setNeedSave(false)
     setSaving(false)
   }
+
+  async function saveShortcutPreferences(maybePromptId?: number) {
+    let promptId = maybePromptId
+    if (!promptId) {
+      if (!promptEditorData.externalId) {
+        console.log('Cannot save preferences - missing promptId and externalId')
+        return
+      }
+
+      const prompt = prompts.find((p) => p.external_id === promptEditorData.externalId)
+      if (!prompt?.id) {
+        console.log('Cannot save preferences - prompt not found')
+        return
+      }
+
+      promptId = prompt.id
+    }
+
+    const accessToken = await getAccessToken()
+
+    // If hidden/never, delete the record
+    if (selectedApp === 'hidden') {
+      const result = await deletePromptShortcutPreferences(promptId, accessToken)
+
+      if (result.error) {
+        console.error('Error deleting shortcut preferences:', result.error)
+        addToast({
+          title: 'Error saving shortcut preferences',
+          description: result.error,
+          type: 'error',
+        })
+        return
+      }
+
+      console.log('Shortcut preferences deleted successfully:', {
+        promptId,
+      })
+
+      refreshPinnedPrompts()
+      return
+    }
+
+    const preferences = {
+      application_name_darwin: null as string | null,
+      application_name_win32: null as string | null,
+      context_types: contextTypes,
+    }
+
+    switch (selectedApp) {
+      case 'all':
+        preferences.application_name_darwin = '*'
+        preferences.application_name_win32 = '*'
+
+        if (!contextTypes) {
+          preferences.context_types = {
+            selected_text: true,
+            audio_transcription: true,
+            clipboard_text: true,
+            screenshot: true,
+            window: true,
+          }
+        }
+        break
+
+      case 'specific':
+        const selectedApps = Object.entries(appVisibility)
+          .filter(([_, isSelected]) => isSelected)
+          .map(([appName]) => appName)
+
+        // If no apps selected in specific mode, treat as hidden
+        if (selectedApps.length === 0) {
+          const result = await deletePromptShortcutPreferences(promptId, accessToken)
+          if (result.error) {
+            console.error('Error deleting shortcut preferences:', result.error)
+            addToast({
+              title: 'Error saving shortcut preferences',
+              description: result.error,
+              type: 'error',
+            })
+          }
+
+          refreshPinnedPrompts()
+          return
+        }
+
+        const appsString = JSON.stringify(selectedApps)
+        preferences.application_name_darwin = appsString
+        preferences.application_name_win32 = appsString
+        if (!contextTypes) {
+          preferences.context_types = {
+            selected_text: true,
+            audio_transcription: true,
+            clipboard_text: true,
+            screenshot: true,
+            window: true,
+          }
+        }
+        break
+
+      default:
+        console.warn('Unexpected selectedApp value:', selectedApp)
+        return
+    }
+    // Only proceed with save if we have valid preferences
+    const result = await upsertPromptShortcutPreferences(promptId, preferences, accessToken)
+
+    if (result.error) {
+      console.error('Error saving shortcut preferences:', result.error)
+      addToast({
+        title: 'Error saving shortcut preferences',
+        description: result.error,
+        type: 'error',
+      })
+
+      refreshPinnedPrompts()
+      return
+    } else {
+      console.log('Shortcut preferences saved successfully:', {
+        promptId,
+        selectedApp,
+        preferences,
+        contextTypes,
+      })
+    }
+
+    // Refresh prompts to update the pinned status in the assistant
+    refreshPinnedPrompts()
+  }
+
+  const debouncedSaveShortcutPreferences = debounce(300, saveShortcutPreferences)
+
+  useEffect(() => {
+    if (promptEditorData.externalId) {
+      debouncedSaveShortcutPreferences()
+    }
+  }, [contextTypes, selectedApp, appVisibility, promptEditorData.externalId])
 
   return { save, saveDisabled }
 }

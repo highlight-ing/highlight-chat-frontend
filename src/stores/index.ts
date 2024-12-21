@@ -22,6 +22,12 @@ import {
 import { createIntegrationsSlice, initialIntegrationsState, IntegrationsSlice, IntegrationsState } from './integrations'
 import { createMessagesSlice, initialMessagesState, MessagesSlice, MessagesState } from './messages'
 import { createModalsSlice, initialModalsState, ModalsSlice, ModalsState } from './modals'
+import {
+  createPendingCreateActionsSlice,
+  initialPendingCreateActionsState,
+  PendingCreateActionsSlice,
+  PendingCreateActionsState,
+} from './pending-create-actions'
 import { createPromptSlice, initialPromptState, PromptSlice, PromptState } from './prompt'
 import {
   createPromptEditorSlice,
@@ -50,7 +56,8 @@ export type StoreState = MessagesState &
   HistoryState &
   PromptEditorState &
   ToastState &
-  IntegrationsState
+  IntegrationsState &
+  PendingCreateActionsState
 
 export type Store = MessagesSlice &
   AuthSlice &
@@ -65,7 +72,8 @@ export type Store = MessagesSlice &
   HistorySlice &
   PromptEditorSlice &
   ToastSlice &
-  IntegrationsSlice
+  IntegrationsSlice &
+  PendingCreateActionsSlice
 
 const defaultState: StoreState = {
   ...initialMessagesState,
@@ -82,6 +90,7 @@ const defaultState: StoreState = {
   ...initialPromptEditorState,
   ...initialToastState,
   ...initialIntegrationsState,
+  ...initialPendingCreateActionsState,
 }
 
 export const initStore: () => StoreState = () => {
@@ -107,6 +116,7 @@ export const createStore = (initState: StoreState = defaultState) => {
         ...createPromptEditorSlice(...a),
         ...createToastSlice(...a),
         ...createIntegrationsSlice(...a),
+        ...createPendingCreateActionsSlice(...a),
       }),
       {
         name: 'highlight-store',

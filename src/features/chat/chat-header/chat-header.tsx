@@ -46,7 +46,7 @@ export function ChatHeader({ isShowing }: ChatHeaderProps) {
   }
 
   function onEditClick() {
-    openModal('edit-prompt', { prompt: isMyPrompt })
+    // openModal('edit-prompt', { prompt: isMyPrompt })
   }
 
   function onGoHomeClick() {
