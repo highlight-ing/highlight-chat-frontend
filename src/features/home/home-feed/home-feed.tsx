@@ -435,25 +435,25 @@ function HomeFeedTabContent(props: { value: string; children: React.ReactNode })
 
 export function HomeFeed() {
   return (
-    <Tabs defaultValue="recent-activity">
+    <Tabs defaultValue="recent">
       <TabsList className="mb-0 w-full">
         <div className="flex w-full items-center justify-between border-b border-subtle py-1.5">
           <div className="flex items-center gap-2">
-            <TabsTrigger value="recent-activity">Recent</TabsTrigger>
-            <TabsTrigger value="meeting-notes">Meeting Notes</TabsTrigger>
-            <TabsTrigger value="audio-notes">Audio Notes</TabsTrigger>
+            <TabsTrigger value="recent">Recent</TabsTrigger>
+            <TabsTrigger value="meeting">Meeting Notes</TabsTrigger>
+            <TabsTrigger value="audio">Audio Notes</TabsTrigger>
             <TabsTrigger value="chats">Chats</TabsTrigger>
           </div>
           <HomeFeedVisibilityToggle />
         </div>
       </TabsList>
-      <HomeFeedTabContent value="recent-activity">
+      <HomeFeedTabContent value="recent">
         <RecentActivityTabContent />
       </HomeFeedTabContent>
-      <HomeFeedTabContent value="meeting-notes">
+      <HomeFeedTabContent value="meeting">
         <MeetingNotesTabContent />
       </HomeFeedTabContent>
-      <HomeFeedTabContent value="audio-notes">
+      <HomeFeedTabContent value="audio">
         <AudioNotesTabContent />
       </HomeFeedTabContent>
       <HomeFeedTabContent value="chats">
