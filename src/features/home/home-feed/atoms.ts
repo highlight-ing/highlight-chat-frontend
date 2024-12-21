@@ -9,4 +9,4 @@ export const toggleFeedVisibilityAtom = atom(null, (_, set) => set(feedHiddenAto
 
 export const recentActionsPageAtom = atom(0)
 
-export const listIndexAtom = atom(0)
+export const currentListIndexAtom = atom(0)

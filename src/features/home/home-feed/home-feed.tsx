@@ -4,7 +4,7 @@ import React from 'react'
 import { ChatHistoryItem } from '@/types'
 import { AnimatePresence, motion, Variants } from 'framer-motion'
 import { Eye, EyeSlash, MessageText, VoiceSquare } from 'iconsax-react'
-import { useAtomValue, useSetAtom } from 'jotai'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { ScopeProvider } from 'jotai-scope'
 
 import { ConversationData } from '@/types/conversations'
@@ -19,7 +19,7 @@ import { Tooltip } from '@/components/ui/tooltip'
 import Button from '@/components/Button/Button'
 import { MeetingIcon } from '@/components/icons'
 
-import { feedHiddenAtom, listIndexAtom, toggleFeedVisibilityAtom } from './atoms'
+import { currentListIndexAtom, feedHiddenAtom, toggleFeedVisibilityAtom } from './atoms'
 import { GroupedVirtualList, GroupHeaderRow } from './components/grouped-virtual-list'
 import { useAudioNotes, useRecentActions } from './hooks'
 import { formatUpdatedAtDate } from './utils'
@@ -182,26 +182,40 @@ function FeedHiddenState() {
   )
 }
 
-function AudioNotesListItem(props: { audioNote: ConversationData }) {
+function AudioNotesListItem(props: { audioNote: ConversationData; listIndex: number }) {
   const formattedTitle = formatTitle(props.audioNote.title)
   const audioNoteDuration = formatConversationDuration(props.audioNote)
   const wordCount = props.audioNote?.transcript.split(' ').length
   const setSelectedAudioNote = useSetAtom(selectedAudioNoteAtom)
   const setSidePanelOpen = useSetAtom(sidePanelOpenAtom)
+  const [currentListIndex, setCurrentListIndex] = useAtom(currentListIndexAtom)
+  const isActiveElement = currentListIndex === props.listIndex
 
-  function handleClick() {
+  const handleClick = React.useCallback(() => {
     setSelectedAudioNote(props.audioNote)
     setSidePanelOpen(true)
+    setCurrentListIndex(props.listIndex)
 
     trackEvent('Audio Note Previewed', {
       audioNoteId: props.audioNote.id,
       meetingNote: !!props.audioNote?.meeting,
       source: 'home_feed',
     })
-  }
+  }, [props.audioNote, setCurrentListIndex, props.listIndex, setSelectedAudioNote, setSidePanelOpen])
+
+  React.useEffect(() => {
+    function handleEnterKeyPress(e: KeyboardEvent) {
+      if (isActiveElement && e.key === 'Enter') {
+        handleClick()
+      }
+    }
+
+    window.addEventListener('keydown', handleEnterKeyPress)
+    return () => window.removeEventListener('keydown', handleEnterKeyPress)
+  }, [isActiveElement, handleClick])
 
   return (
-    <HomeFeedListItemLayout onClick={handleClick}>
+    <HomeFeedListItemLayout onClick={handleClick} className={cn(isActiveElement && 'bg-hover')}>
       <div className="flex items-center gap-2 font-medium">
         {props.audioNote?.meeting ? (
           <MeetingIcon meeting={props.audioNote.meeting} size={20} />
@@ -244,7 +258,7 @@ function MeetingNotesTabContent() {
             groupContent={(index) => <GroupHeaderRow>{audioGroupLabels[index]}</GroupHeaderRow>}
             itemContent={(index) => {
               const meetingNote = recentMeetingNotes[index]
-              return <AudioNotesListItem key={meetingNote.id} audioNote={meetingNote} />
+              return <AudioNotesListItem key={meetingNote.id} audioNote={meetingNote} listIndex={index} />
             }}
           />
         </HomeFeedListLayout>
@@ -278,7 +292,7 @@ function AudioNotesTabContent() {
             groupContent={(index) => <GroupHeaderRow>{audioGroupLabels[index]}</GroupHeaderRow>}
             itemContent={(index) => {
               const audioNote = recentNonMeetingNotes[index]
-              return <AudioNotesListItem key={audioNote.id} audioNote={audioNote} />
+              return <AudioNotesListItem key={audioNote.id} audioNote={audioNote} listIndex={index} />
             }}
           />
         </HomeFeedListLayout>
@@ -287,19 +301,33 @@ function AudioNotesTabContent() {
   )
 }
 
-function ChatListItem(props: { chat: ChatHistoryItem }) {
-  const setSelectedChatAtom = useSetAtom(selectedChatAtom)
+function ChatListItem(props: { chat: ChatHistoryItem; listIndex: number }) {
+  const setSelectedChat = useSetAtom(selectedChatAtom)
+  const [currentListIndex, setCurrentListIndex] = useAtom(currentListIndexAtom)
+  const isActiveElement = currentListIndex === props.listIndex
 
-  function handleClick() {
-    setSelectedChatAtom(props.chat)
+  const handleClick = React.useCallback(() => {
+    setSelectedChat(props.chat)
+    setCurrentListIndex(props.listIndex)
     trackEvent('HL Chat Opened', {
       chatId: props.chat.id,
       source: 'home_feed',
     })
-  }
+  }, [props.chat, setSelectedChat, props.listIndex, setCurrentListIndex])
+
+  React.useEffect(() => {
+    function handleEnterKeyPress(e: KeyboardEvent) {
+      if (isActiveElement && e.key === 'Enter') {
+        handleClick()
+      }
+    }
+
+    window.addEventListener('keydown', handleEnterKeyPress)
+    return () => window.removeEventListener('keydown', handleEnterKeyPress)
+  }, [isActiveElement, handleClick])
 
   return (
-    <HomeFeedListItemLayout onClick={handleClick}>
+    <HomeFeedListItemLayout onClick={handleClick} className={cn(isActiveElement && 'bg-hover')}>
       <div className="flex items-center gap-2 font-medium">
         <MessageText variant={'Bold'} size={20} className="text-subtle" />
         <h3 className="max-w-sm truncate tracking-tight text-primary">{props.chat.title}</h3>
@@ -338,7 +366,7 @@ function ChatsTabContent() {
             groupContent={(index) => <GroupHeaderRow>{chatGroupLabels[index]}</GroupHeaderRow>}
             itemContent={(index) => {
               const chat = chats[index]
-              return <ChatListItem key={chat.id} chat={chat} />
+              return <ChatListItem key={chat.id} chat={chat} listIndex={index} />
             }}
             components={{
               Footer: () =>
@@ -388,9 +416,9 @@ function RecentActivityTabContent() {
               const activity = recentActivity?.[index]
               if (!activity) return null
               if (activity.type === 'audio-note') {
-                return <AudioNotesListItem key={activity.id} audioNote={activity} />
+                return <AudioNotesListItem key={activity.id} audioNote={activity} listIndex={index} />
               } else {
-                return <ChatListItem key={activity.id} chat={activity} />
+                return <ChatListItem key={activity.id} chat={activity} listIndex={index} />
               }
             }}
             components={{
@@ -432,7 +460,7 @@ function HomeFeedTabContent(props: { value: string; children: React.ReactNode })
   const feedHidden = useAtomValue(feedHiddenAtom)
 
   return (
-    <ScopeProvider atoms={[listIndexAtom]}>
+    <ScopeProvider atoms={[currentListIndexAtom]}>
       <TabsContent value={props.value}>{feedHidden ? <FeedHiddenState /> : props.children}</TabsContent>
     </ScopeProvider>
   )

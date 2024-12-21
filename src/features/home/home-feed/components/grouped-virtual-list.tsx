@@ -2,7 +2,7 @@ import React from 'react'
 import { useAtom } from 'jotai'
 import { GroupedVirtuoso, type GroupedVirtuosoHandle, type GroupedVirtuosoProps } from 'react-virtuoso'
 
-import { listIndexAtom } from '../atoms'
+import { currentListIndexAtom } from '../atoms'
 
 export function GroupHeaderRow(props: { children: React.ReactNode }) {
   return (
@@ -14,9 +14,15 @@ export function GroupHeaderRow(props: { children: React.ReactNode }) {
 
 export function GroupedVirtualList(props: GroupedVirtuosoProps<unknown, number>) {
   const virtuosoRef = React.useRef<GroupedVirtuosoHandle>(null)
-  const [currentIndex, setCurrentIndex] = useAtom(listIndexAtom)
+  const [currentListIndex, setCurrentListIndex] = useAtom(currentListIndexAtom)
 
-  console.log(currentIndex)
+  React.useEffect(() => {
+    if (currentListIndex) {
+      virtuosoRef.current?.scrollToIndex({
+        index: currentListIndex,
+      })
+    }
+  }, [currentListIndex])
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -26,11 +32,10 @@ export function GroupedVirtualList(props: GroupedVirtuosoProps<unknown, number>)
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault()
-          setCurrentIndex((prev) => {
+          setCurrentListIndex((prev) => {
             const nextIndex = prev + 1
             current.scrollToIndex({
               index: nextIndex,
-              align: 'center',
             })
             return nextIndex
           })
@@ -38,11 +43,10 @@ export function GroupedVirtualList(props: GroupedVirtuosoProps<unknown, number>)
 
         case 'ArrowUp':
           e.preventDefault()
-          setCurrentIndex((prev) => {
+          setCurrentListIndex((prev) => {
             const nextIndex = Math.max(0, prev - 1) // Prevent negative indices
             current.scrollToIndex({
               index: nextIndex,
-              align: 'center',
             })
             return nextIndex
           })
@@ -52,7 +56,7 @@ export function GroupedVirtualList(props: GroupedVirtuosoProps<unknown, number>)
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [virtuosoRef, setCurrentIndex])
+  }, [virtuosoRef, setCurrentListIndex])
 
   // TODO: Add keyboard handling logic
 
