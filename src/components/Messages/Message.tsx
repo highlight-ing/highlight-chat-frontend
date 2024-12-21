@@ -221,23 +221,23 @@ export const Message = ({ message, isThinking, hideAssistantIcon, className }: M
                     return <td>{children}</td>
                   },
                 }}
-              // remarkToRehypeOptions={{
-              //   allowDangerousHtml: true
-              // }}
-              // rehypeReactOptions={{
-              //   components: {
-              //     code: (props: any) => {
-              //       const match = /language-(\w+)/.exec(props.className || '')
-              //       if (match) {
-              //         return (
-              //           <CodeBlock language={match[1]}>
-              //             {props.children}
-              //           </CodeBlock>
-              //         )
-              //       }
-              //       return <code {...props}/>
-              //     }
-              // }}}
+                // remarkToRehypeOptions={{
+                //   allowDangerousHtml: true
+                // }}
+                // rehypeReactOptions={{
+                //   components: {
+                //     code: (props: any) => {
+                //       const match = /language-(\w+)/.exec(props.className || '')
+                //       if (match) {
+                //         return (
+                //           <CodeBlock language={match[1]}>
+                //             {props.children}
+                //           </CodeBlock>
+                //         )
+                //       }
+                //       return <code {...props}/>
+                //     }
+                // }}}
               >
                 {typeof message.content === 'string' ? preprocessLaTeX(message.content) : ''}
               </Markdown>
@@ -252,8 +252,8 @@ export const Message = ({ message, isThinking, hideAssistantIcon, className }: M
           {message.role === 'user' && hasAttachment(message as UserMessage) && (
             <div className={`mt-2 flex gap-2`}>
               {message.version === 'v4' &&
-                Array.isArray(message.attached_context) &&
-                message.attached_context.length > 0 ? (
+              Array.isArray(message.attached_context) &&
+              message.attached_context.length > 0 ? (
                 message.attached_context.map((attachment, index) => (
                   <div key={index}>{renderAttachment(attachment)}</div>
                 ))

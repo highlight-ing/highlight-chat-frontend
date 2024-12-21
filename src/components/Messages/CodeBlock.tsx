@@ -1,9 +1,9 @@
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
-import { trackEvent } from '@/utils/amplitude'
 import { Copy, TickCircle } from 'iconsax-react'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { darcula } from 'react-syntax-highlighter/dist/esm/styles/hljs'
 
+import { trackEvent } from '@/utils/amplitude'
 import Button from '@/components/Button/Button'
 
 import styles from './message.module.scss'

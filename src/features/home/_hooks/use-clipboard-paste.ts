@@ -1,8 +1,8 @@
 'use client'
 
 import React from 'react'
-import { trackEvent } from '@/utils/amplitude'
 
+import { trackEvent } from '@/utils/amplitude'
 import { useStore } from '@/components/providers/store-provider'
 
 /**

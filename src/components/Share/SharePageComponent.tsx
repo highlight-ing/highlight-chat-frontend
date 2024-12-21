@@ -1,9 +1,9 @@
 'use client'
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { initAmplitudeAnonymous, trackEvent } from '@/utils/amplitude'
 
 import { Message, UserMessage } from '@/types/index'
+import { initAmplitudeAnonymous, trackEvent } from '@/utils/amplitude'
 import { useApi } from '@/hooks/useApi'
 import { useDownloadOrRedirect } from '@/hooks/useDownloadOrRedirect'
 import {

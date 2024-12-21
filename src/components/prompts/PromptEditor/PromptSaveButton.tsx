@@ -1,6 +1,6 @@
 import { usePromptEditorStore } from '@/stores/prompt-editor'
-import { trackEvent } from '@/utils/amplitude'
 
+import { trackEvent } from '@/utils/amplitude'
 import { usePromptEditor } from '@/hooks/usePromptEditor'
 import Button from '@/components/Button/Button'
 

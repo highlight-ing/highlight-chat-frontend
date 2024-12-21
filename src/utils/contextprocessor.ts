@@ -1,4 +1,5 @@
 import { Attachment, ImageAttachment, PdfAttachment, SpreadsheetAttachment, TextFileAttachment } from '@/types'
+
 import { dataURItoFile } from '@/utils/attachments'
 
 export function processAttachments(attachments: any[]): Attachment[] {

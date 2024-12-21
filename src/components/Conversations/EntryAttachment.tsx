@@ -1,8 +1,8 @@
 import React from 'react'
-import { getWordCount } from '@/utils/string'
 import { ConversationData } from '@highlight-ai/app-runtime'
 import { VoiceSquare } from 'iconsax-react'
 
+import { getWordCount } from '@/utils/string'
 import { Tooltip } from '@/components/ui/tooltip'
 import { useInputFocus } from '@/components/Input/Input'
 import { useStore } from '@/components/providers/store-provider'

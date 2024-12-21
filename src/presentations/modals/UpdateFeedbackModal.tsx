@@ -1,9 +1,9 @@
 import React, { useEffect, useState, type PropsWithChildren } from 'react'
 import { Message } from '@/types'
-import { trackEvent } from '@/utils/amplitude'
-import client from '@/utils/api-client'
 import { z } from 'zod'
 
+import { trackEvent } from '@/utils/amplitude'
+import client from '@/utils/api-client'
 import useAuth from '@/hooks/useAuth'
 // Components
 import Button from '@/components/Button/Button'

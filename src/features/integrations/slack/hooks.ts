@@ -1,5 +1,6 @@
-import { checkIntegrationStatus } from '@/utils/integrations-server-actions'
 import { useQuery } from '@tanstack/react-query'
+
+import { checkIntegrationStatus } from '@/utils/integrations-server-actions'
 
 import { useHighlightToken } from '../_hooks/use-hl-token'
 

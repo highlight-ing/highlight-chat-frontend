@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { MAX_NUMBER_OF_ATTACHMENTS } from '@/stores/chat-attachments'
-import { trackEvent } from '@/utils/amplitude'
 import Highlight from '@highlight-ai/app-runtime'
 import { Gallery } from 'iconsax-react'
 import { useShallow } from 'zustand/react/shallow'
 
+import { trackEvent } from '@/utils/amplitude'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { useStore } from '@/components/providers/store-provider'
 import Tooltip from '@/components/Tooltip/Tooltip'

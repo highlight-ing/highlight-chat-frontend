@@ -1,7 +1,8 @@
 'use client'
 
-import { backendUrl } from '@/utils/chatBackendUrl'
 import { useQuery } from '@tanstack/react-query'
+
+import { backendUrl } from '@/utils/chatBackendUrl'
 
 type FileMetadata = {
   file_type: string

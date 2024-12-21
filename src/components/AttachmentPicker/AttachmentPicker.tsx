@@ -1,8 +1,8 @@
 import { ReactElement, useEffect, useRef, useState } from 'react'
-import { calculatePositionedStyle } from '@/utils/components'
 import { ArrowCircleLeft, CloseCircle } from 'iconsax-react'
 import { Portal } from 'react-portal'
 
+import { calculatePositionedStyle } from '@/utils/components'
 import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
 
 import styles from './attachment-picker.module.scss'

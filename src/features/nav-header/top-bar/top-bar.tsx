@@ -243,7 +243,6 @@ export function NavigationTopBar({ showHistory, setShowHistory }: TopBarProps) {
     setConversationId,
     setOpenConversations,
     removeOpenConversation,
-    history,
   } = useStore(
     useShallow((state) => ({
       startNewConversation: state.startNewConversation,
@@ -254,7 +253,6 @@ export function NavigationTopBar({ showHistory, setShowHistory }: TopBarProps) {
       setConversationId: state.setConversationId,
       setOpenConversations: state.setOpenConversations,
       removeOpenConversation: state.removeOpenConversation,
-      history: state.history,
       setShareId: state.setShareId,
     })),
   )

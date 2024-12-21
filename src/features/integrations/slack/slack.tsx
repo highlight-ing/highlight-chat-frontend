@@ -1,16 +1,16 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import {
-  checkIntegrationStatus,
-  createMagicLinkForIntegration,
-  getIntegrationTokenForUser,
-} from '@/utils/integrations-server-actions'
-import { listConversations, sendMessage } from '@/utils/slack-server-actions'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { ArrowDown2, ArrowUp2, Hashtag, User } from 'iconsax-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
+import {
+  checkIntegrationStatus,
+  createMagicLinkForIntegration,
+  getIntegrationTokenForUser,
+} from '@/utils/integrations-server-actions'
+import { listConversations, sendMessage } from '@/utils/slack-server-actions'
 import Button from '@/components/Button/Button'
 import BaseDropdown, { DropdownItem } from '@/components/dropdowns/base-dropdown'
 import { SlackIcon } from '@/components/icons'

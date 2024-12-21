@@ -210,9 +210,9 @@ export function useOnExternalMessage() {
     invalidateChatHistory,
     isModalOpen,
     refreshChatItem,
-    createAction,
     refreshPinnedPrompts,
     router,
     selectPrompt,
+    addPendingCreateAction,
   ])
 }

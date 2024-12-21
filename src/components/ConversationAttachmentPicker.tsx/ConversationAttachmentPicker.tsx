@@ -1,11 +1,11 @@
 import { useEffect } from 'react'
 import { useConversations } from '@/context/ConversationContext'
-import { trackEvent } from '@/utils/amplitude'
-import { getConversationDisplayTitle, getConversationSubtitle } from '@/utils/conversations'
-import { getTimeAgo, getWordCountFormatted } from '@/utils/string'
 import { Setting2, VoiceSquare } from 'iconsax-react'
 import { useShallow } from 'zustand/react/shallow'
 
+import { trackEvent } from '@/utils/amplitude'
+import { getConversationDisplayTitle, getConversationSubtitle } from '@/utils/conversations'
+import { getTimeAgo, getWordCountFormatted } from '@/utils/string'
 import { useStore } from '@/components/providers/store-provider'
 
 import { AttachmentPicker } from '../AttachmentPicker/AttachmentPicker'
