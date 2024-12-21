@@ -65,6 +65,7 @@
     "iconsax-react": "^0.0.8",
     "jose": "^5.6.3",
     "jotai": "^2.10.3",
+    "jotai-scope": "^0.7.2",
     "js-video-url-parser": "^0.5.1",
     "lucide-react": "^0.397.0",
     "mammoth": "^1.8.0",

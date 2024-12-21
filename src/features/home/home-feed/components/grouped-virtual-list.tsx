@@ -1,5 +1,8 @@
 import React from 'react'
+import { useAtom } from 'jotai'
 import { GroupedVirtuoso, type GroupedVirtuosoHandle, type GroupedVirtuosoProps } from 'react-virtuoso'
+
+import { listIndexAtom } from '../atoms'
 
 export function GroupHeaderRow(props: { children: React.ReactNode }) {
   return (
@@ -11,7 +14,7 @@ export function GroupHeaderRow(props: { children: React.ReactNode }) {
 
 export function GroupedVirtualList(props: GroupedVirtuosoProps<unknown, number>) {
   const virtuosoRef = React.useRef<GroupedVirtuosoHandle>(null)
-  const [currentIndex, setCurrentIndex] = React.useState(0)
+  const [currentIndex, setCurrentIndex] = useAtom(listIndexAtom)
 
   console.log(currentIndex)
 

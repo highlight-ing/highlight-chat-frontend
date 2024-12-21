@@ -5,6 +5,7 @@ import { ChatHistoryItem } from '@/types'
 import { AnimatePresence, motion, Variants } from 'framer-motion'
 import { Eye, EyeSlash, MessageText, VoiceSquare } from 'iconsax-react'
 import { useAtomValue, useSetAtom } from 'jotai'
+import { ScopeProvider } from 'jotai-scope'
 
 import { ConversationData } from '@/types/conversations'
 import { cn, getDateGroupLengths } from '@/lib/utils'
@@ -18,7 +19,7 @@ import { Tooltip } from '@/components/ui/tooltip'
 import Button from '@/components/Button/Button'
 import { MeetingIcon } from '@/components/icons'
 
-import { feedHiddenAtom, toggleFeedVisibilityAtom } from './atoms'
+import { feedHiddenAtom, listIndexAtom, toggleFeedVisibilityAtom } from './atoms'
 import { GroupedVirtualList, GroupHeaderRow } from './components/grouped-virtual-list'
 import { useAudioNotes, useRecentActions } from './hooks'
 import { formatUpdatedAtDate } from './utils'
@@ -430,7 +431,11 @@ function HomeFeedVisibilityToggle() {
 function HomeFeedTabContent(props: { value: string; children: React.ReactNode }) {
   const feedHidden = useAtomValue(feedHiddenAtom)
 
-  return <TabsContent value={props.value}>{feedHidden ? <FeedHiddenState /> : props.children}</TabsContent>
+  return (
+    <ScopeProvider atoms={[listIndexAtom]}>
+      <TabsContent value={props.value}>{feedHidden ? <FeedHiddenState /> : props.children}</TabsContent>
+    </ScopeProvider>
+  )
 }
 
 export function HomeFeed() {
