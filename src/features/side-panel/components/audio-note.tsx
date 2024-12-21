@@ -94,7 +94,7 @@ function CopyAction() {
   return (
     <SidePanelHeaderActionButton onClick={handleCopyClick}>
       <Copy variant="Bold" size={16} />
-      <p>Copy</p>
+      <p>Copy transcript</p>
     </SidePanelHeaderActionButton>
   )
 }

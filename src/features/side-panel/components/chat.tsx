@@ -1,11 +1,10 @@
 import React from 'react'
 import { AnimatePresence, motion, Variants } from 'framer-motion'
 import { Copy, Export, MessageText } from 'iconsax-react'
-import { useAtom, useAtomValue } from 'jotai'
+import { useAtomValue } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
 import { selectedAudioNoteAtom, selectedChatAtom } from '@/atoms/side-panel'
-import { useHistoryByChatId } from '@/hooks/chat-history'
 import { useMessages } from '@/hooks/chat-messages'
 import { useCopyLink, useDisableLink, useGenerateShareLink } from '@/hooks/share-link'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -82,7 +81,7 @@ function ChatAction() {
 }
 
 function CopyLinkAction() {
-  const [selectedChat, setSelectedChat] = useAtom(selectedChatAtom)
+  const selectedChat = useAtomValue(selectedChatAtom)
   const mostRecentShareLinkId = selectedChat?.shared_conversations?.[0]?.id
   const [showSuccessState, setShowSuccessState] = React.useState(false)
   const { mutate: generateShareLink, isPending: isGeneratingLink } = useGenerateShareLink()
@@ -137,17 +136,6 @@ function CopyLinkAction() {
   )
 }
 
-function ShareAction() {
-  function handleShareClick() {}
-
-  return (
-    <SidePanelHeaderActionButton onClick={handleShareClick}>
-      <Export variant="Bold" size={16} />
-      <p>Share</p>
-    </SidePanelHeaderActionButton>
-  )
-}
-
 export function ChatSidePanelHeader() {
   const selectedChat = useAtomValue(selectedChatAtom)
 
@@ -167,7 +155,6 @@ export function ChatSidePanelHeader() {
       <SidePanelHeaderActions>
         <ChatAction />
         <CopyLinkAction />
-        <ShareAction />
       </SidePanelHeaderActions>
     </div>
   )
