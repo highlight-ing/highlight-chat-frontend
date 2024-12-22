@@ -1,5 +1,5 @@
 import React from 'react'
-import { useSetAtom } from 'jotai'
+import { useAtom } from 'jotai'
 import { GroupedVirtuoso, type GroupedVirtuosoHandle, type GroupedVirtuosoProps } from 'react-virtuoso'
 
 import { currentListIndexAtom } from '../atoms'
@@ -14,7 +14,7 @@ export function GroupHeaderRow(props: { children: React.ReactNode }) {
 
 export function GroupedVirtualList(props: GroupedVirtuosoProps<unknown, number>) {
   const virtuosoRef = React.useRef<GroupedVirtuosoHandle>(null)
-  const setCurrentListIndex = useSetAtom(currentListIndexAtom)
+  const [currentListIndex, setCurrentListIndex] = useAtom(currentListIndexAtom)
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -28,7 +28,6 @@ export function GroupedVirtualList(props: GroupedVirtuosoProps<unknown, number>)
             const nextIndex = Math.max(0, prev - 1)
             current.scrollToIndex({
               index: nextIndex,
-              align: 'center',
             })
             return nextIndex
           })
@@ -40,7 +39,6 @@ export function GroupedVirtualList(props: GroupedVirtuosoProps<unknown, number>)
             const nextIndex = prev + 1
             current.scrollToIndex({
               index: nextIndex,
-              align: 'center',
             })
             return nextIndex
           })
@@ -52,5 +50,12 @@ export function GroupedVirtualList(props: GroupedVirtuosoProps<unknown, number>)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [virtuosoRef, setCurrentListIndex])
 
-  return <GroupedVirtuoso ref={virtuosoRef} style={{ height: 'calc(100vh - 192px)' }} {...props} />
+  return (
+    <GroupedVirtuoso
+      ref={virtuosoRef}
+      initialTopMostItemIndex={currentListIndex}
+      style={{ height: 'calc(100vh - 192px)' }}
+      {...props}
+    />
+  )
 }
