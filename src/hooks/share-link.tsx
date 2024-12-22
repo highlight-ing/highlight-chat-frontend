@@ -64,7 +64,7 @@ export function useGenerateShareLink() {
         share_link: `https://highlightai.com/share/${shareLink}`,
       })
 
-      toast('Link copied to clipboard', { icon: <Copy variant="Bold" size={20} /> })
+      toast('Link generated and copied to clipboard', { icon: <Copy variant="Bold" size={20} /> })
     },
     onError: (error, conversationId) => {
       console.error('Failed to copy link:', error)

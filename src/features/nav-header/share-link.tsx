@@ -98,7 +98,7 @@ function DisableShareLinkButton(props: DisableShareLinkButtonProps) {
   )
 }
 
-function ShareLinkModal(props: { conversation: ChatHistoryItem }) {
+function ShareLinkPopover(props: { conversation: ChatHistoryItem }) {
   const [open, setOpen] = React.useState(false)
 
   return (
@@ -135,7 +135,7 @@ export function ShareLink(props: { conversation: ChatHistoryItem | null }) {
   return (
     <div className="flex items-center gap-px">
       <CopyLinkButton shareLinkId={mostRecentShareLinkId} />
-      <ShareLinkModal conversation={props.conversation} />
+      <ShareLinkPopover conversation={props.conversation} />
     </div>
   )
 }

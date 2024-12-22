@@ -7,11 +7,13 @@ import { useShallow } from 'zustand/react/shallow'
 import { selectedAudioNoteAtom, selectedChatIdAtom } from '@/atoms/side-panel'
 import { useHistoryByChatId } from '@/hooks/chat-history'
 import { useMessages } from '@/hooks/chat-messages'
-import { useCopyLink, useDisableLink, useGenerateShareLink } from '@/hooks/share-link'
+import { useCopyLink, useGenerateShareLink } from '@/hooks/share-link'
+import { Popover, PopoverTrigger } from '@/components/ui/popover'
 import { Skeleton } from '@/components/ui/skeleton'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 import { Message } from '@/components/Messages/Message'
 import { useStore } from '@/components/providers/store-provider'
+import { SharePopoverContent } from '@/components/share-popover'
 
 import { formatHeaderTimestamp } from '../utils'
 import { SidePanelHeaderActionButton, SidePanelHeaderActions } from './side-panel'
@@ -88,8 +90,7 @@ function CopyLinkAction() {
   const mostRecentShareLinkId = selectedChat?.shared_conversations?.[0]?.id
   const [showSuccessState, setShowSuccessState] = React.useState(false)
   const { mutate: generateShareLink, isPending: isGeneratingLink } = useGenerateShareLink()
-  const { mutate: copyLink, isPending: isCopyingLink, isSuccess: linkCopied } = useCopyLink()
-  const isPending = isGeneratingLink || isCopyingLink
+  const { mutate: copyLink, isSuccess: linkCopied } = useCopyLink()
 
   React.useEffect(() => {
     let timeout: NodeJS.Timeout | null
@@ -122,8 +123,8 @@ function CopyLinkAction() {
   }
 
   return (
-    <SidePanelHeaderActionButton onClick={handleCopyClick} disabled={isPending}>
-      {isPending ? <LoadingSpinner size={'16px'} color="#6e6e6e" /> : <Copy size={16} variant={'Bold'} />}
+    <SidePanelHeaderActionButton onClick={handleCopyClick} disabled={isGeneratingLink}>
+      {isGeneratingLink ? <LoadingSpinner size={'16px'} color="#6e6e6e" /> : <Copy size={16} variant={'Bold'} />}
       <AnimatePresence initial={false} mode="popLayout">
         <motion.span
           variants={copyLabelVariants}
@@ -136,6 +137,41 @@ function CopyLinkAction() {
         </motion.span>
       </AnimatePresence>
     </SidePanelHeaderActionButton>
+  )
+}
+
+function ShareAction() {
+  const [open, setOpen] = React.useState(false)
+  const selectedChatId = useAtomValue(selectedChatIdAtom)
+  const { data: selectedChat } = useHistoryByChatId(selectedChatId)
+  const mostRecentShareLinkId = selectedChat?.shared_conversations?.[0]?.id
+  const { mutate: generateShareLink, isPending: isGeneratingLink } = useGenerateShareLink()
+
+  function handleShareClick() {
+    if (!selectedChat || mostRecentShareLinkId) return
+    generateShareLink(selectedChat)
+    setOpen(true)
+  }
+
+  if (!selectedChat) return null
+
+  if (!mostRecentShareLinkId) {
+    return (
+      <SidePanelHeaderActionButton onClick={handleShareClick} disabled={isGeneratingLink}>
+        {isGeneratingLink ? <LoadingSpinner size={'16px'} color="#6e6e6e" /> : <Export variant="Bold" size={16} />}
+        <p>Share</p>
+      </SidePanelHeaderActionButton>
+    )
+  }
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger className="flex w-full flex-col items-center rounded-[10px] border border-transparent bg-secondary p-2 text-sm font-medium tracking-tight text-tertiary shadow-md transition hover:border-tertiary hover:bg-hover active:opacity-90 active:shadow-none">
+        <Export variant="Bold" size={16} />
+        <p>Share</p>
+      </PopoverTrigger>
+      <SharePopoverContent conversation={selectedChat} />
+    </Popover>
   )
 }
 
@@ -159,6 +195,7 @@ export function ChatSidePanelHeader() {
       <SidePanelHeaderActions>
         <ChatAction />
         <CopyLinkAction />
+        <ShareAction />
       </SidePanelHeaderActions>
     </div>
   )
