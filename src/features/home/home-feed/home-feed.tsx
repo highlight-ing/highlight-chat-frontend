@@ -6,6 +6,7 @@ import { AnimatePresence, motion, Variants } from 'framer-motion'
 import { Eye, EyeSlash, MessageText, VoiceSquare } from 'iconsax-react'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { ScopeProvider } from 'jotai-scope'
+import { GroupedVirtuosoHandle } from 'react-virtuoso'
 
 import { ConversationData } from '@/types/conversations'
 import { cn, getDateGroupLengths } from '@/lib/utils'
@@ -19,7 +20,7 @@ import { Tooltip } from '@/components/ui/tooltip'
 import Button from '@/components/Button/Button'
 import { MeetingIcon } from '@/components/icons'
 
-import { currentListIndexAtom, feedHiddenAtom, toggleFeedVisibilityAtom } from './atoms'
+import { currentListIndexAtom, feedHiddenAtom, isMountedAtom, toggleFeedVisibilityAtom } from './atoms'
 import { GroupedVirtualList, GroupHeaderRow } from './components/grouped-virtual-list'
 import { useAudioNotes, useRecentActions } from './hooks'
 import { formatUpdatedAtDate } from './utils'
@@ -190,6 +191,7 @@ function AudioNotesListItem(props: { audioNote: ConversationData; listIndex: num
   const setSidePanelOpen = useSetAtom(sidePanelOpenAtom)
   const [currentListIndex, setCurrentListIndex] = useAtom(currentListIndexAtom)
   const isActiveElement = currentListIndex === props.listIndex
+  const [isMounted, setIsMounted] = useAtom(isMountedAtom)
 
   const handleClick = React.useCallback(() => {
     setSelectedAudioNote(props.audioNote)
@@ -202,6 +204,13 @@ function AudioNotesListItem(props: { audioNote: ConversationData; listIndex: num
       source: 'home_feed',
     })
   }, [props.audioNote, setCurrentListIndex, props.listIndex, setSelectedAudioNote, setSidePanelOpen])
+
+  React.useEffect(() => {
+    if (isActiveElement && !isMounted) {
+      handleClick()
+      setIsMounted(true)
+    }
+  }, [isActiveElement, handleClick, isMounted, setIsMounted])
 
   React.useEffect(() => {
     function handleEnterKeyPress(e: KeyboardEvent) {
@@ -305,6 +314,7 @@ function ChatListItem(props: { chat: ChatHistoryItem; listIndex: number }) {
   const setSelectedChat = useSetAtom(selectedChatAtom)
   const [currentListIndex, setCurrentListIndex] = useAtom(currentListIndexAtom)
   const isActiveElement = currentListIndex === props.listIndex
+  const [isMounted, setIsMounted] = useAtom(isMountedAtom)
 
   const handleClick = React.useCallback(() => {
     setSelectedChat(props.chat)
@@ -314,6 +324,13 @@ function ChatListItem(props: { chat: ChatHistoryItem; listIndex: number }) {
       source: 'home_feed',
     })
   }, [props.chat, setSelectedChat, props.listIndex, setCurrentListIndex])
+
+  React.useEffect(() => {
+    if (isActiveElement && !isMounted) {
+      handleClick()
+      setIsMounted(true)
+    }
+  }, [handleClick, isActiveElement, isMounted, setIsMounted])
 
   React.useEffect(() => {
     function handleEnterKeyPress(e: KeyboardEvent) {
