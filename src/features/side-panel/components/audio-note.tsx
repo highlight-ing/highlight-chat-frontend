@@ -58,14 +58,22 @@ function ChatAction() {
   )
 
   function handleChatClick() {
-    if (!selectedAudioNote) return
+    if (
+      !selectedAudioNote?.id ||
+      !selectedAudioNote?.title ||
+      !selectedAudioNote?.transcript ||
+      !selectedAudioNote?.startedAt ||
+      !selectedAudioNote?.endedAt
+    ) {
+      return
+    }
 
     clearPrompt()
     startNewConversation()
     focusInput()
 
     addAttachment({
-      id: selectedAudioNote?.id,
+      id: selectedAudioNote.id,
       type: 'conversation',
       title: selectedAudioNote.title,
       value: selectedAudioNote.transcript,

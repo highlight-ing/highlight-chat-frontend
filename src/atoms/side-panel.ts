@@ -1,13 +1,11 @@
 'use client'
 
-import { ChatHistoryItem } from '@/types'
 import { atom } from 'jotai'
 
 import { ConversationData } from '@/types/conversations'
 
 type SidePanelContent = 'audio-note' | 'chat'
-type SelectedAudioNote = ConversationData | null
-type SelectedChat = ChatHistoryItem
+type SelectedAudioNote = Partial<ConversationData> | null
 
 export const sidePanelOpenAtom = atom(false)
 
