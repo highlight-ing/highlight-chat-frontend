@@ -23,7 +23,7 @@ export function HighlightSidePanel() {
   }, [sidePanelContentType])
 
   return (
-    <SidePanel hideCloseButton={isOnHome}>
+    <SidePanel hideCloseButton={isOnHome} className="hidden lg:block">
       <SidePanelHeader>{header}</SidePanelHeader>
       <SidePanelContent>{content}</SidePanelContent>
     </SidePanel>

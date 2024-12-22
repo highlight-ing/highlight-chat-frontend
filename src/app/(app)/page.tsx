@@ -72,7 +72,7 @@ export default function Home() {
           className={cn(
             'col-span-3 flex w-full flex-col items-center justify-end transition delay-100',
             styles.contents,
-            sidePanelOpen && 'col-span-2',
+            sidePanelOpen && 'lg:col-span-2',
           )}
         >
           <ChatHeader isShowing={!isConversationLoading && !!promptApp && messages.length === 0} />
