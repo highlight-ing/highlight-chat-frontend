@@ -4,7 +4,8 @@ import { Copy, Export, MessageText } from 'iconsax-react'
 import { useAtomValue } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
-import { selectedAudioNoteAtom, selectedChatAtom } from '@/atoms/side-panel'
+import { selectedAudioNoteAtom, selectedChatIdAtom } from '@/atoms/side-panel'
+import { useHistoryByChatId } from '@/hooks/chat-history'
 import { useMessages } from '@/hooks/chat-messages'
 import { useCopyLink, useDisableLink, useGenerateShareLink } from '@/hooks/share-link'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -28,8 +29,8 @@ function AudioNoteHeaderDates() {
 }
 
 function Messages() {
-  const selectedChat = useAtomValue(selectedChatAtom)
-  const { data: messages, isLoading } = useMessages(selectedChat?.id)
+  const selectedChatId = useAtomValue(selectedChatIdAtom)
+  const { data: messages, isLoading } = useMessages(selectedChatId)
 
   if (isLoading) {
     return (
@@ -54,7 +55,8 @@ function Messages() {
 }
 
 function ChatAction() {
-  const selectedChat = useAtomValue(selectedChatAtom)
+  const selectedChatId = useAtomValue(selectedChatIdAtom)
+  const { data: selectedChat } = useHistoryByChatId(selectedChatId)
   const { clearPrompt, startNewConversation, addOrUpdateOpenConversation, setConversationId } = useStore(
     useShallow((state) => ({
       setConversationId: state.setConversationId,
@@ -81,7 +83,8 @@ function ChatAction() {
 }
 
 function CopyLinkAction() {
-  const selectedChat = useAtomValue(selectedChatAtom)
+  const selectedChatId = useAtomValue(selectedChatIdAtom)
+  const { data: selectedChat } = useHistoryByChatId(selectedChatId)
   const mostRecentShareLinkId = selectedChat?.shared_conversations?.[0]?.id
   const [showSuccessState, setShowSuccessState] = React.useState(false)
   const { mutate: generateShareLink, isPending: isGeneratingLink } = useGenerateShareLink()
@@ -137,7 +140,8 @@ function CopyLinkAction() {
 }
 
 export function ChatSidePanelHeader() {
-  const selectedChat = useAtomValue(selectedChatAtom)
+  const selectedChatId = useAtomValue(selectedChatIdAtom)
+  const { data: selectedChat } = useHistoryByChatId(selectedChatId)
 
   return (
     <div className="space-y-5">

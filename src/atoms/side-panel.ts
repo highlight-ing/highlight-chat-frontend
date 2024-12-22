@@ -20,9 +20,9 @@ export const selectedAudioNoteAtom = atom({} as SelectedAudioNote, (_, set, valu
   }
 })
 
-export const selectedChatAtom = atom({} as ChatHistoryItem, (_, set, value: SelectedChat) => {
-  set(selectedChatAtom, value)
-  if (value) {
+export const selectedChatIdAtom = atom('' as string, (_, set, chatId: string) => {
+  set(selectedChatIdAtom, chatId)
+  if (chatId) {
     set(sidePanelContentTypeAtom, 'chat')
   }
 })

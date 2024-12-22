@@ -2,11 +2,10 @@
 
 import { ChatHistoryItem } from '@/types'
 import { InfiniteData, useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useAtom } from 'jotai'
+import { useAtomValue } from 'jotai'
 
 import { HistoryByIdResponseData, HistoryResponseData } from '@/types/history'
 import { PAGINATION_LIMIT } from '@/lib/constants'
-import { selectedChatAtom } from '@/atoms/side-panel'
 
 import { useApi } from './useApi'
 
@@ -71,7 +70,6 @@ export function useHistoryByChatId(chatId: string | undefined) {
 
 export function useChatHistoryStore() {
   const queryClient = useQueryClient()
-  const [selectedChat, setSelectedChat] = useAtom(selectedChatAtom)
 
   async function invalidateChatHistory() {
     await queryClient.invalidateQueries({ queryKey: ['chat-history'] })
@@ -86,14 +84,10 @@ export function useChatHistoryStore() {
       const newChatHistory =
         existingChatIndex !== -1
           ? [
-              [...firstPage.slice(0, existingChatIndex), newChat, ...firstPage.slice(existingChatIndex + 1)],
-              ...queryData.pages.slice(1),
-            ]
+            [...firstPage.slice(0, existingChatIndex), newChat, ...firstPage.slice(existingChatIndex + 1)],
+            ...queryData.pages.slice(1),
+          ]
           : [[newChat, ...firstPage], ...queryData.pages.slice(1)]
-
-      if (selectedChat.id === chat.id) {
-        setSelectedChat(newChat as ChatHistoryItem)
-      }
 
       return {
         pages: newChatHistory,

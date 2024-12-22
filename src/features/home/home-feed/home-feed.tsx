@@ -6,13 +6,12 @@ import { AnimatePresence, motion, Variants } from 'framer-motion'
 import { Eye, EyeSlash, MessageText, VoiceSquare } from 'iconsax-react'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { ScopeProvider } from 'jotai-scope'
-import { GroupedVirtuosoHandle } from 'react-virtuoso'
 
 import { ConversationData } from '@/types/conversations'
 import { cn, getDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { formatConversationDuration, formatTitle } from '@/utils/conversations'
-import { selectedAudioNoteAtom, selectedChatAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
+import { selectedAudioNoteAtom, selectedChatIdAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
 import { useHistory } from '@/hooks/chat-history'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -244,7 +243,6 @@ function AudioNotesListItem(props: { audioNote: ConversationData; listIndex: num
 
 function MeetingNotesTabContent() {
   const { data, isLoading } = useAudioNotes()
-
   const { recentMeetingNotes, audioGroupCounts, audioGroupLabels } = React.useMemo(() => {
     const recentMeetingNotes = data?.filter((audioNote) => audioNote.meeting) ?? []
     const { groupLengths, groupLabels } = getDateGroupLengths(recentMeetingNotes)
@@ -278,9 +276,8 @@ function MeetingNotesTabContent() {
 
 function AudioNotesTabContent() {
   const { data, isLoading } = useAudioNotes()
-
   const { recentNonMeetingNotes, audioGroupCounts, audioGroupLabels } = React.useMemo(() => {
-    const recentNonMeetingNotes = data?.filter((audioNote) => audioNote.meeting) ?? []
+    const recentNonMeetingNotes = data?.filter((audioNote) => !audioNote.meeting) ?? []
     const { groupLengths, groupLabels } = getDateGroupLengths(recentNonMeetingNotes)
     return { recentNonMeetingNotes, audioGroupCounts: groupLengths, audioGroupLabels: groupLabels }
   }, [data])
@@ -311,19 +308,19 @@ function AudioNotesTabContent() {
 }
 
 function ChatListItem(props: { chat: ChatHistoryItem; listIndex: number }) {
-  const setSelectedChat = useSetAtom(selectedChatAtom)
+  const setSelectedChatId = useSetAtom(selectedChatIdAtom)
   const [currentListIndex, setCurrentListIndex] = useAtom(currentListIndexAtom)
   const isActiveElement = currentListIndex === props.listIndex
   const [isMounted, setIsMounted] = useAtom(isMountedAtom)
 
   const handleClick = React.useCallback(() => {
-    setSelectedChat(props.chat)
+    setSelectedChatId(props.chat.id)
     setCurrentListIndex(props.listIndex)
     trackEvent('HL Chat Opened', {
       chatId: props.chat.id,
       source: 'home_feed',
     })
-  }, [props.chat, setSelectedChat, props.listIndex, setCurrentListIndex])
+  }, [props.chat, setSelectedChatId, props.listIndex, setCurrentListIndex])
 
   React.useEffect(() => {
     if (isActiveElement && !isMounted) {
