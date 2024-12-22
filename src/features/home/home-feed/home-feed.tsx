@@ -7,6 +7,7 @@ import { Copy, Export, Eye, EyeSlash, MessageText, VoiceSquare } from 'iconsax-r
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { ScopeProvider } from 'jotai-scope'
 import { toast } from 'sonner'
+import { useShallow } from 'zustand/react/shallow'
 
 import { ConversationData } from '@/types/conversations'
 import { cn, getDateGroupLengths } from '@/lib/utils'
@@ -20,7 +21,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Tooltip } from '@/components/ui/tooltip'
 import Button from '@/components/Button/Button'
 import { MeetingIcon } from '@/components/icons'
+import { useStore } from '@/components/providers/store-provider'
 
+import { useInputFocus } from '../chat-input/chat-input'
 import { currentListIndexAtom, feedHiddenAtom, isMountedAtom, toggleFeedVisibilityAtom } from './atoms'
 import { GroupedVirtualList, GroupHeaderRow } from './components/grouped-virtual-list'
 import { useAudioNotes, useRecentActions } from './hooks'
@@ -34,7 +37,7 @@ function HomeFeedListItemLayout({ className, children, ...props }: HomeFeedListI
   return (
     <div
       className={cn(
-        'group cursor-pointer rounded-xl px-3 transition-colors hover:bg-secondary focus-visible:bg-hover [&_div]:last:border-transparent',
+        'group rounded-xl px-3 transition-colors hover:bg-secondary focus-visible:bg-hover lg:cursor-pointer [&_div]:last:border-transparent',
         className,
       )}
       {...props}
@@ -184,6 +187,48 @@ function FeedHiddenState() {
   )
 }
 
+function AttachAudioAction() {
+  const selectedAudioNote = useAtomValue(selectedAudioNoteAtom)
+  const focusInput = useInputFocus()
+
+  const { clearPrompt, addAttachment, startNewConversation } = useStore(
+    useShallow((state) => ({
+      clearPrompt: state.clearPrompt,
+      addAttachment: state.addAttachment,
+      startNewConversation: state.startNewConversation,
+    })),
+  )
+
+  function handleAttachClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    e.stopPropagation()
+    if (!selectedAudioNote) return
+
+    clearPrompt()
+    startNewConversation()
+    focusInput()
+
+    addAttachment({
+      id: selectedAudioNote?.id,
+      type: 'conversation',
+      title: selectedAudioNote.title,
+      value: selectedAudioNote.transcript,
+      startedAt: selectedAudioNote.startedAt,
+      endedAt: selectedAudioNote.endedAt,
+    })
+  }
+
+  return (
+    <Tooltip content="Chat">
+      <button
+        onClick={(e) => handleAttachClick(e)}
+        className="size-6 hidden place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:grid"
+      >
+        <MessageText variant="Bold" size={16} className="text-tertiary" />
+      </button>
+    </Tooltip>
+  )
+}
+
 function AudioNotesListItem(props: { audioNote: ConversationData; listIndex: number }) {
   const formattedTitle = formatTitle(props.audioNote.title)
   const setSelectedAudioNote = useSetAtom(selectedAudioNoteAtom)
@@ -234,6 +279,7 @@ function AudioNotesListItem(props: { audioNote: ConversationData; listIndex: num
       </div>
       <div className="flex items-center gap-2 font-medium">
         <p className="text-sm text-tertiary">{formatUpdatedAtDate(props.audioNote.endedAt)}</p>
+        <AttachAudioAction />
       </div>
     </HomeFeedListItemLayout>
   )
@@ -305,6 +351,40 @@ function AudioNotesTabContent() {
   )
 }
 
+function ChatAction() {
+  const selectedChatId = useAtomValue(selectedChatIdAtom)
+  const { data: selectedChat } = useHistoryByChatId(selectedChatId)
+  const { clearPrompt, startNewConversation, addOrUpdateOpenConversation, setConversationId } = useStore(
+    useShallow((state) => ({
+      setConversationId: state.setConversationId,
+      addOrUpdateOpenConversation: state.addOrUpdateOpenConversation,
+      clearPrompt: state.clearPrompt,
+      startNewConversation: state.startNewConversation,
+    })),
+  )
+
+  function handleChatClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    e.stopPropagation()
+    if (!selectedChat) return
+
+    clearPrompt()
+    startNewConversation()
+    addOrUpdateOpenConversation(selectedChat)
+    setConversationId(selectedChat?.id)
+  }
+
+  return (
+    <Tooltip content="Chat">
+      <button
+        onClick={(e) => handleChatClick(e)}
+        className="size-6 hidden place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:grid"
+      >
+        <MessageText variant="Bold" size={16} className="text-tertiary" />
+      </button>
+    </Tooltip>
+  )
+}
+
 function ChatShareLinkCopyButton() {
   const selectedChatId = useAtomValue(selectedChatIdAtom)
   const { data: selectedChat } = useHistoryByChatId(selectedChatId)
@@ -325,7 +405,7 @@ function ChatShareLinkCopyButton() {
   }
 
   return (
-    <Tooltip content="Copy link">
+    <Tooltip content="Share">
       <button
         onClick={(e) => handleCopyClick(e)}
         disabled={isGeneratingLink}
@@ -378,6 +458,7 @@ function ChatListItem(props: { chat: ChatHistoryItem; listIndex: number }) {
       </div>
       <div className="flex items-center gap-2 font-medium">
         <p className="text-sm text-tertiary">{formatUpdatedAtDate(props.chat.updated_at)}</p>
+        <ChatAction />
         <ChatShareLinkCopyButton />
       </div>
     </HomeFeedListItemLayout>
