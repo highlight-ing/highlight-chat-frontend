@@ -3,16 +3,18 @@
 import React from 'react'
 import { ChatHistoryItem } from '@/types'
 import { AnimatePresence, motion, Variants } from 'framer-motion'
-import { Eye, EyeSlash, MessageText, VoiceSquare } from 'iconsax-react'
+import { Copy, Export, Eye, EyeSlash, MessageText, VoiceSquare } from 'iconsax-react'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { ScopeProvider } from 'jotai-scope'
+import { toast } from 'sonner'
 
 import { ConversationData } from '@/types/conversations'
 import { cn, getDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
-import { formatConversationDuration, formatTitle } from '@/utils/conversations'
+import { formatTitle } from '@/utils/conversations'
 import { selectedAudioNoteAtom, selectedChatIdAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
-import { useHistory } from '@/hooks/chat-history'
+import { useHistory, useHistoryByChatId } from '@/hooks/chat-history'
+import { useCopyLink, useGenerateShareLink } from '@/hooks/share-link'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Tooltip } from '@/components/ui/tooltip'
@@ -32,7 +34,7 @@ function HomeFeedListItemLayout({ className, children, ...props }: HomeFeedListI
   return (
     <div
       className={cn(
-        'cursor-pointer rounded-xl px-3 transition-colors hover:bg-secondary focus-visible:bg-hover [&_div]:last:border-transparent',
+        'group cursor-pointer rounded-xl px-3 transition-colors hover:bg-secondary focus-visible:bg-hover [&_div]:last:border-transparent',
         className,
       )}
       {...props}
@@ -184,8 +186,6 @@ function FeedHiddenState() {
 
 function AudioNotesListItem(props: { audioNote: ConversationData; listIndex: number }) {
   const formattedTitle = formatTitle(props.audioNote.title)
-  const audioNoteDuration = formatConversationDuration(props.audioNote)
-  const wordCount = props.audioNote?.transcript.split(' ').length
   const setSelectedAudioNote = useSetAtom(selectedAudioNoteAtom)
   const setSidePanelOpen = useSetAtom(sidePanelOpenAtom)
   const [currentListIndex, setCurrentListIndex] = useAtom(currentListIndexAtom)
@@ -223,7 +223,7 @@ function AudioNotesListItem(props: { audioNote: ConversationData; listIndex: num
   }, [isActiveElement, handleClick])
 
   return (
-    <HomeFeedListItemLayout onClick={handleClick} className={cn(isActiveElement && 'bg-hover')}>
+    <HomeFeedListItemLayout onClick={handleClick} className={cn('justify-between', isActiveElement && 'bg-hover')}>
       <div className="flex items-center gap-2 font-medium">
         {props.audioNote?.meeting ? (
           <MeetingIcon meeting={props.audioNote.meeting} size={20} />
@@ -231,11 +231,9 @@ function AudioNotesListItem(props: { audioNote: ConversationData; listIndex: num
           <VoiceSquare size={20} variant="Bold" className="text-green" />
         )}
         <h3 className="max-w-64 truncate tracking-tight text-primary">{formattedTitle}</h3>
-        <p className="text-sm text-tertiary">{formatUpdatedAtDate(props.audioNote.endedAt)}</p>
       </div>
-      <div className="flex items-center gap-2 text-sm font-medium text-subtle">
-        <p className="capitalize">{audioNoteDuration}</p>
-        <p>{`${wordCount} Words`}</p>
+      <div className="flex items-center gap-2 font-medium">
+        <p className="text-sm text-tertiary">{formatUpdatedAtDate(props.audioNote.endedAt)}</p>
       </div>
     </HomeFeedListItemLayout>
   )
@@ -307,6 +305,38 @@ function AudioNotesTabContent() {
   )
 }
 
+function ChatShareLinkCopyButton() {
+  const selectedChatId = useAtomValue(selectedChatIdAtom)
+  const { data: selectedChat } = useHistoryByChatId(selectedChatId)
+  const mostRecentShareLinkId = selectedChat?.shared_conversations?.[0]?.id
+  const { mutate: generateShareLink, isPending: isGeneratingLink } = useGenerateShareLink()
+  const { mutateAsync: copyLink } = useCopyLink()
+
+  async function handleCopyClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    e.stopPropagation()
+    if (!selectedChat) return
+
+    if (!mostRecentShareLinkId) {
+      generateShareLink(selectedChat)
+    } else {
+      await copyLink(selectedChat.id)
+      toast('Link copied to clipboard', { icon: <Copy variant="Bold" size={20} /> })
+    }
+  }
+
+  return (
+    <Tooltip content="Copy link">
+      <button
+        onClick={(e) => handleCopyClick(e)}
+        disabled={isGeneratingLink}
+        className="size-6 hidden place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:grid"
+      >
+        <Export variant="Bold" size={16} className="text-tertiary" />
+      </button>
+    </Tooltip>
+  )
+}
+
 function ChatListItem(props: { chat: ChatHistoryItem; listIndex: number }) {
   const setSelectedChatId = useSetAtom(selectedChatIdAtom)
   const [currentListIndex, setCurrentListIndex] = useAtom(currentListIndexAtom)
@@ -341,11 +371,14 @@ function ChatListItem(props: { chat: ChatHistoryItem; listIndex: number }) {
   }, [isActiveElement, handleClick])
 
   return (
-    <HomeFeedListItemLayout onClick={handleClick} className={cn(isActiveElement && 'bg-hover')}>
+    <HomeFeedListItemLayout onClick={handleClick} className={cn('justify-between', isActiveElement && 'bg-hover')}>
       <div className="flex items-center gap-2 font-medium">
         <MessageText variant={'Bold'} size={20} className="text-subtle" />
         <h3 className="max-w-sm truncate tracking-tight text-primary">{props.chat.title}</h3>
+      </div>
+      <div className="flex items-center gap-2 font-medium">
         <p className="text-sm text-tertiary">{formatUpdatedAtDate(props.chat.updated_at)}</p>
+        <ChatShareLinkCopyButton />
       </div>
     </HomeFeedListItemLayout>
   )
