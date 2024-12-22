@@ -477,7 +477,7 @@ function HomeFeedTabContent(props: { value: string; children: React.ReactNode })
   const feedHidden = useAtomValue(feedHiddenAtom)
 
   return (
-    <ScopeProvider atoms={[currentListIndexAtom]}>
+    <ScopeProvider key={props.value} atoms={[currentListIndexAtom]}>
       <TabsContent value={props.value}>{feedHidden ? <FeedHiddenState /> : props.children}</TabsContent>
     </ScopeProvider>
   )

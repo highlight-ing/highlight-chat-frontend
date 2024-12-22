@@ -45,8 +45,10 @@ export default function Home() {
 
   React.useEffect(() => {
     setIsOnHome(!isChatting)
-    setSidePanelOpen(false)
-  }, [isChatting, setIsOnHome, setSidePanelOpen])
+    if (isChatting || isConversationLoading) {
+      setSidePanelOpen(false)
+    }
+  }, [isChatting, setIsOnHome, setSidePanelOpen, isConversationLoading])
 
   useClipboardPaste()
   useConversationLoad()
