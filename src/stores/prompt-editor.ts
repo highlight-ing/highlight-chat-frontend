@@ -62,6 +62,7 @@ export interface PromptEditorState {
   selectedApp: AppAvailability
   appVisibility: Record<string, boolean>
   contextTypes: ContextTypes | null
+  isInitialPreferencesLoad: boolean
 }
 
 export type PromptEditorSlice = PromptEditorState & {
@@ -76,6 +77,7 @@ export type PromptEditorSlice = PromptEditorState & {
   setSelectedApp: (value: AppAvailability) => void
   setAppVisibility: (visibility: Record<string, boolean>) => void
   setContextTypes: (types: ContextTypes | null) => void
+  setIsInitialPreferencesLoad: (isInitialPreferencesLoad: boolean) => void
 }
 
 export const DEFAULT_SYSTEM_PROMPT = `
@@ -194,6 +196,7 @@ export const initialPromptEditorState: PromptEditorState = {
   selectedApp: 'hidden',
   appVisibility: {},
   contextTypes: null,
+  isInitialPreferencesLoad: true
 }
 
 export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, get) => ({
@@ -223,6 +226,7 @@ export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, ge
   setSelectedApp: (value: AppAvailability) => set({ selectedApp: value }),
   setAppVisibility: (visibility: Record<string, boolean>) => set({ appVisibility: visibility }),
   setContextTypes: (types: ContextTypes | null) => set({ contextTypes: types }),
+  setIsInitialPreferencesLoad: (isInitial: boolean) => set({ isInitialPreferencesLoad: isInitial }),
 })
 
 export const usePromptEditorStore = () =>
@@ -248,5 +252,7 @@ export const usePromptEditorStore = () =>
       setAppVisibility: state.setAppVisibility,
       contextTypes: state.contextTypes,
       setContextTypes: state.setContextTypes,
+      isInitialPreferencesLoad: state.isInitialPreferencesLoad,
+      setIsInitialPreferencesLoad: state.setIsInitialPreferencesLoad,
     })),
   )
