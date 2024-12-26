@@ -159,7 +159,8 @@ export default function AppScreen() {
             <div className="flex flex-col space-y-[6px]">
               <h3 className="text-base font-semibold text-white">Automations</h3>
               <p className="text-xs font-normal leading-tight text-[#6e6e6e]">
-                Add automations to your shortcuts to allow Highlight to do things for you.
+                Add automations to your shortcuts to allow Highlight to do things for you. Enabling an automation will
+                allow Highlight to automatically run the automation based on the context provided.
               </p>
             </div>
             <IntegrationToggle
@@ -174,7 +175,7 @@ export default function AppScreen() {
                 })
               }}
               title="Create Linear Issue"
-              description="Create a Linear issue using the prompt output"
+              description="Allows your shortcut to automatically create a Linear ticket."
             />
 
             <IntegrationToggle
@@ -189,7 +190,7 @@ export default function AppScreen() {
                 })
               }}
               title="Create Notion Page"
-              description="Create a Notion page using the prompt output"
+              description="Allows your shortcut to automatically create a Notion page."
             />
           </div>
           {(isDevelopment || isAlpha) && (

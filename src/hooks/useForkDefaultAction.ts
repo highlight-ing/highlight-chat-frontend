@@ -15,7 +15,6 @@ export default function useForkDefaultAction() {
       setOnboarding({ isOnboarding: false, index: 0 })
       setSelectedScreen('startWithTemplate')
       setPromptEditorData({
-        externalId: prompt.external_id,
         appPrompt: prompt.prompt_text ?? '',
         name: prompt.name,
         description: prompt.description ?? '',
