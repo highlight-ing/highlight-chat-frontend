@@ -53,6 +53,10 @@ export interface PromptEditorData {
 }
 
 export interface PromptEditorState {
+  /**
+   * If we're forking a shortcut, we'll store the external ID here so that, when saved, we unpin the original shortcut.
+   */
+  forkingShortcutId: string | null
   selectedScreen: PromptEditorScreen
   promptEditorData: PromptEditorData
   needSave: boolean
@@ -77,6 +81,7 @@ export type PromptEditorSlice = PromptEditorState & {
   setSelectedApp: (value: AppAvailability) => void
   setAppVisibility: (visibility: Record<string, boolean>) => void
   setContextTypes: (types: ContextTypes | null) => void
+  setForkingShortcutId: (id: string | null) => void
   setIsInitialPreferencesLoad: (isInitialPreferencesLoad: boolean) => void
 }
 
@@ -185,6 +190,7 @@ export const initialPromptEditorState: PromptEditorState = {
       createNotionPage: false,
     },
   },
+  forkingShortcutId: null,
   needSave: false,
   saving: false,
   settingsHasNoErrors: false,
@@ -196,7 +202,7 @@ export const initialPromptEditorState: PromptEditorState = {
   selectedApp: 'hidden',
   appVisibility: {},
   contextTypes: null,
-  isInitialPreferencesLoad: true
+  isInitialPreferencesLoad: true,
 }
 
 export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, get) => ({
@@ -210,6 +216,7 @@ export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, ge
       appVisibility: initialPromptEditorState.appVisibility,
       selectedApp: initialPromptEditorState.selectedApp,
       contextTypes: initialPromptEditorState.contextTypes,
+      forkingShortcutId: null,
     }),
   setNeedSave: (needSave: boolean) => set({ needSave }),
   setSaving: (saving: boolean) => set({ saving }),
@@ -226,6 +233,7 @@ export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, ge
   setSelectedApp: (value: AppAvailability) => set({ selectedApp: value }),
   setAppVisibility: (visibility: Record<string, boolean>) => set({ appVisibility: visibility }),
   setContextTypes: (types: ContextTypes | null) => set({ contextTypes: types }),
+  setForkingShortcutId: (id: string | null) => set({ forkingShortcutId: id }),
   setIsInitialPreferencesLoad: (isInitial: boolean) => set({ isInitialPreferencesLoad: isInitial }),
 })
 
@@ -252,6 +260,8 @@ export const usePromptEditorStore = () =>
       setAppVisibility: state.setAppVisibility,
       contextTypes: state.contextTypes,
       setContextTypes: state.setContextTypes,
+      forkingShortcutId: state.forkingShortcutId,
+      setForkingShortcutId: state.setForkingShortcutId,
       isInitialPreferencesLoad: state.isInitialPreferencesLoad,
       setIsInitialPreferencesLoad: state.setIsInitialPreferencesLoad,
     })),
