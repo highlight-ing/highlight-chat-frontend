@@ -11,6 +11,8 @@ import { useStore } from '@/components/providers/store-provider'
  */
 export type PromptEditorScreen = 'startWithTemplate' | 'app' | 'settings' | 'variables' | 'simplified-app'
 
+export type EditorMode = 'simple' | 'advanced'
+
 export type AppAvailability = 'all' | 'specific' | 'hidden' | undefined
 
 export interface PromptEditorOnboarding {
@@ -54,6 +56,7 @@ export interface PromptEditorData {
 
 export interface PromptEditorState {
   selectedScreen: PromptEditorScreen
+  editorMode: EditorMode
   promptEditorData: PromptEditorData
   needSave: boolean
   saving: boolean
@@ -67,6 +70,7 @@ export interface PromptEditorState {
 
 export type PromptEditorSlice = PromptEditorState & {
   setSelectedScreen: (screen: PromptEditorScreen) => void
+  setEditorMode: (mode: EditorMode) => void
   setPromptEditorData: (data: Partial<PromptEditorData>, skipNeedSave?: boolean) => void
   clearPromptEditorData: () => void
   setNeedSave: (needSave: boolean) => void
@@ -79,6 +83,16 @@ export type PromptEditorSlice = PromptEditorState & {
   setContextTypes: (types: ContextTypes | null) => void
   setIsInitialPreferencesLoad: (isInitialPreferencesLoad: boolean) => void
 }
+
+export const DEFAULT_APP_PROMPT = `
+additional specific instructions: user message
+
+clipboard text
+audio 
+app text
+screen
+image
+`
 
 export const DEFAULT_SYSTEM_PROMPT = `
 {{!
@@ -170,9 +184,10 @@ Clipboard Text: {{clipboard_text}}
 
 export const initialPromptEditorState: PromptEditorState = {
   selectedScreen: 'simplified-app',
+  editorMode: 'simple',
   promptEditorData: {
     slug: '',
-    appPrompt: '',
+    appPrompt: DEFAULT_APP_PROMPT,
     systemPrompt: DEFAULT_SYSTEM_PROMPT,
     name: '',
     description: '',
@@ -196,12 +211,13 @@ export const initialPromptEditorState: PromptEditorState = {
   selectedApp: 'hidden',
   appVisibility: {},
   contextTypes: null,
-  isInitialPreferencesLoad: true
+  isInitialPreferencesLoad: true,
 }
 
 export const createPromptEditorSlice: StateCreator<PromptEditorSlice> = (set, get) => ({
   ...initialPromptEditorState,
   setSelectedScreen: (screen: PromptEditorScreen) => set({ selectedScreen: screen }),
+  setEditorMode: (mode: EditorMode) => set({ editorMode: mode }),
   setPromptEditorData: (data: Partial<PromptEditorData>, skipNeedSave?: boolean) =>
     set({ promptEditorData: { ...get().promptEditorData, ...data }, needSave: !skipNeedSave }),
   clearPromptEditorData: () =>
@@ -237,6 +253,8 @@ export const usePromptEditorStore = () =>
     useShallow((state) => ({
       selectedScreen: state.selectedScreen,
       setSelectedScreen: state.setSelectedScreen,
+      editorMode: state.editorMode,
+      setEditorMode: state.setEditorMode,
       promptEditorData: state.promptEditorData,
       setPromptEditorData: state.setPromptEditorData,
       clearPromptEditorData: state.clearPromptEditorData,

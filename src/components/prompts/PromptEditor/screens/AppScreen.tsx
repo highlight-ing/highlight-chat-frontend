@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 
 import { isAlpha, isDevelopment } from '@/utils/appVersion'
+import Button from '@/components/Button/Button'
 import { Switch } from '@/components/catalyst/switch'
 import { LinearIcon, NotionIcon } from '@/components/icons'
 
@@ -143,7 +144,18 @@ export function IntegrationToggle({
 }
 
 export default function AppScreen() {
-  const { promptEditorData, setPromptEditorData, onboarding } = usePromptEditorStore()
+  const { promptEditorData, setPromptEditorData, onboarding, editorMode, setEditorMode, setSelectedScreen } =
+    usePromptEditorStore()
+
+  const toggleEditorMode = () => {
+    if (editorMode === 'simple') {
+      setEditorMode('advanced')
+      setSelectedScreen('app')
+    } else {
+      setEditorMode('simple')
+      setSelectedScreen('simplified-app')
+    }
+  }
 
   return (
     <>
@@ -155,6 +167,11 @@ export default function AppScreen() {
         </div>
 
         <div className="max-w-96 basis-1/3 border-l border-[#ffffff0d] p-[17px] overflow-y-auto h-full">
+          <div className="mb-4">
+            <Button onClick={toggleEditorMode} size="small" variant="tertiary">
+              Switch to {editorMode === 'simple' ? 'Advanced' : 'Simple'} Editor
+            </Button>
+          </div>
           <div>
             <div className="flex flex-col space-y-[6px]">
               <h3 className="text-base font-semibold text-white">Automations</h3>

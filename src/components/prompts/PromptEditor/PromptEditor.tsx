@@ -62,33 +62,35 @@ function VariablesEditorButton() {
 }
 
 export default function PromptEditor({ onClose }: { onClose?: () => void }) {
-  const { selectedScreen, onboarding } = usePromptEditorStore()
-  console.log('selectedScreen', selectedScreen)
+  const { selectedScreen, editorMode, onboarding } = usePromptEditorStore()
 
   return (
     <>
       {selectedScreen !== 'startWithTemplate' && (
         <div className={styles.editorTabs}>
           <div className={styles.tabRow}>
-            <ScreenSelector
-              active={selectedScreen === 'simplified-app'}
-              name="simplified-app"
-              title="Simple"
-              disabled={onboarding.isOnboarding}
-            />
-            <ScreenSelector
-              active={selectedScreen === 'app'}
-              name="app"
-              title="App"
-              disabled={onboarding.isOnboarding}
-            />
+            {editorMode === 'simple' ? (
+              <ScreenSelector
+                active={selectedScreen === 'simplified-app'}
+                name="simplified-app"
+                title="Simple"
+                disabled={onboarding.isOnboarding}
+              />
+            ) : (
+              <ScreenSelector
+                active={selectedScreen === 'app'}
+                name="app"
+                title="App"
+                disabled={onboarding.isOnboarding}
+              />
+            )}
             <ScreenSelector
               active={selectedScreen === 'settings'}
               name="settings"
               title="Settings"
               disabled={onboarding.isOnboarding}
             />
-            {selectedScreen !== 'simplified-app' && <VariablesEditorButton />}
+            {editorMode === 'advanced' && <VariablesEditorButton />}
           </div>
         </div>
       )}
