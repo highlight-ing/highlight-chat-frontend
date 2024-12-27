@@ -49,7 +49,7 @@ export function usePromptEditor() {
   const previousPreferences = useRef({
     selectedApp,
     appVisibility: JSON.stringify(appVisibility),
-    contextTypes: JSON.stringify(contextTypes)
+    contextTypes: JSON.stringify(contextTypes),
   })
   const toastTimeoutRef = useRef<NodeJS.Timeout>()
   const isToastActiveRef = useRef(false)
@@ -75,44 +75,34 @@ export function usePromptEditor() {
     if (promptEditorData.externalId !== lastExternalIdRef.current) {
       console.log('Prompt switched:', {
         from: lastExternalIdRef.current,
-        to: promptEditorData.externalId
+        to: promptEditorData.externalId,
       })
       isExternalUpdate.current = true
       lastExternalIdRef.current = promptEditorData.externalId
-      
+
       // Reset previous preferences when switching prompts
       previousPreferences.current = {
         selectedApp,
         appVisibility: JSON.stringify(appVisibility),
-        contextTypes: JSON.stringify(contextTypes)
+        contextTypes: JSON.stringify(contextTypes),
       }
     }
   }, [promptEditorData.externalId, selectedApp, appVisibility, contextTypes])
 
   // Handle preference changes
   useEffect(() => {
-    console.log('Shortcut preferences deps changed:', {
-      contextTypes,
-      selectedApp,
-      appVisibility,
-      externalId: promptEditorData.externalId,
-      isExternalUpdate: isExternalUpdate.current
-    })
-
     if (!promptEditorData.externalId) return
 
     // Check if preferences actually changed
-    const prefsChanged = 
+    const prefsChanged =
       previousPreferences.current.selectedApp !== selectedApp ||
       previousPreferences.current.contextTypes !== JSON.stringify(contextTypes) ||
       previousPreferences.current.appVisibility !== JSON.stringify(appVisibility)
 
     // Only save if it's not an external update AND preferences changed
     if (!isExternalUpdate.current && prefsChanged) {
-      console.log('Triggering debouncedSaveShortcutPreferences - user initiated change')
       debouncedSaveShortcutPreferences()
     } else {
-      console.log('Skipping save - external update or no changes')
       isExternalUpdate.current = false // Reset for next change
     }
 
@@ -120,7 +110,7 @@ export function usePromptEditor() {
     previousPreferences.current = {
       selectedApp,
       appVisibility: JSON.stringify(appVisibility),
-      contextTypes: JSON.stringify(contextTypes)
+      contextTypes: JSON.stringify(contextTypes),
     }
   }, [contextTypes, selectedApp, appVisibility, promptEditorData.externalId])
 
