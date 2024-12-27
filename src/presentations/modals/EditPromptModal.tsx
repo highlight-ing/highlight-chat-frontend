@@ -28,17 +28,27 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
     setSelectedApp,
     setAppVisibility,
     setContextTypes,
+    setIsInitialPreferencesLoad,
   } = usePromptEditorStore()
 
   const closeModal = useStore((state) => state.closeModal)
 
+  const isInitializing = useRef(true)
+
+
   // Handle app visibility and context types initialization
   useEffect(() => {
+    if (!isInitializing.current) {
+      setIsInitialPreferencesLoad(true)
+    }
+
     if (!preferences) {
       // No preferences found - set to hidden state
       setSelectedApp('hidden')
       setAppVisibility({})
       setContextTypes(null)
+      setIsInitialPreferencesLoad(false) 
+
       return
     }
 
@@ -94,6 +104,8 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
       setAppVisibility({})
       setContextTypes(null)
     }
+    setIsInitialPreferencesLoad(false) 
+
   }, [preferences])
 
   // Initialize prompt editor data

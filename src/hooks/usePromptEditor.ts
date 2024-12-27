@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
 import { usePromptsStore } from '@/stores/prompts'
 import { debounce } from 'throttle-debounce'
@@ -44,8 +44,76 @@ export function usePromptEditor() {
   const closeModal = useStore((state) => state.closeModal)
   const { getAccessToken } = useAuth()
   const { selectPrompt, refreshPinnedPrompts } = usePromptApps()
+  const lastExternalIdRef = useRef(promptEditorData.externalId)
+  const isExternalUpdate = useRef(false)
+  const previousPreferences = useRef({
+    selectedApp,
+    appVisibility: JSON.stringify(appVisibility),
+    contextTypes: JSON.stringify(contextTypes),
+  })
+  const toastTimeoutRef = useRef<NodeJS.Timeout>()
+  const isToastActiveRef = useRef(false)
+
+  const showToast = (title: string, description: string, type: 'success' | 'error', timeout = 3000) => {
+    if (isToastActiveRef.current) return
+
+    isToastActiveRef.current = true
+    addToast({ title, description, type, timeout })
+
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current)
+    }
+
+    toastTimeoutRef.current = setTimeout(() => {
+      isToastActiveRef.current = false
+    }, timeout)
+  }
 
   // EFFECTS
+
+  useEffect(() => {
+    if (promptEditorData.externalId !== lastExternalIdRef.current) {
+      console.log('Prompt switched:', {
+        from: lastExternalIdRef.current,
+        to: promptEditorData.externalId,
+      })
+      isExternalUpdate.current = true
+      lastExternalIdRef.current = promptEditorData.externalId
+
+      // Reset previous preferences when switching prompts
+      previousPreferences.current = {
+        selectedApp,
+        appVisibility: JSON.stringify(appVisibility),
+        contextTypes: JSON.stringify(contextTypes),
+      }
+    }
+  }, [promptEditorData.externalId, selectedApp, appVisibility, contextTypes])
+
+  // Handle preference changes
+  useEffect(() => {
+    if (!promptEditorData.externalId) return
+
+    // Check if preferences actually changed
+    const prefsChanged =
+      previousPreferences.current.selectedApp !== selectedApp ||
+      previousPreferences.current.contextTypes !== JSON.stringify(contextTypes) ||
+      previousPreferences.current.appVisibility !== JSON.stringify(appVisibility)
+
+    // Only save if it's not an external update AND preferences changed
+    if (!isExternalUpdate.current && prefsChanged) {
+      debouncedSaveShortcutPreferences()
+    } else {
+      isExternalUpdate.current = false // Reset for next change
+    }
+
+    // Update previous preferences after checking for changes
+    previousPreferences.current = {
+      selectedApp,
+      appVisibility: JSON.stringify(appVisibility),
+      contextTypes: JSON.stringify(contextTypes),
+    }
+  }, [contextTypes, selectedApp, appVisibility, promptEditorData.externalId])
+
   useEffect(() => {
     setSaveDisabled(!(settingsHasNoErrors && needSave && !saving))
   }, [settingsHasNoErrors, needSave, saving])
@@ -285,12 +353,7 @@ export function usePromptEditor() {
       refreshPinnedPrompts()
       return
     } else {
-      console.log('Shortcut preferences saved successfully:', {
-        promptId,
-        selectedApp,
-        preferences,
-        contextTypes,
-      })
+      showToast('Preferences Updated', 'Your preferences have been successfully updated.', 'success')
     }
 
     // Refresh prompts to update the pinned status in the assistant
@@ -298,12 +361,6 @@ export function usePromptEditor() {
   }
 
   const debouncedSaveShortcutPreferences = debounce(300, saveShortcutPreferences)
-
-  useEffect(() => {
-    if (promptEditorData.externalId) {
-      debouncedSaveShortcutPreferences()
-    }
-  }, [contextTypes, selectedApp, appVisibility, promptEditorData.externalId])
 
   return { save, saveDisabled }
 }
