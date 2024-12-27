@@ -3,6 +3,53 @@ import { PROMPTS_TABLE_SELECT_FIELDS, promptSelectMapper, supabaseAdmin } from '
 
 const DEFAULT_PROMPT_IDS = [452, 453, 454, 455]
 
+const DEFAULT_PROMPT_PREFERENCES = {
+  452: {
+    application_name_darwin: '*',
+    application_name_win32: '*',
+    context_types: {
+      selected_text: true,
+      audio_transcription: false,
+      clipboard_text: true,
+      screenshot: false,
+      window: true,
+    },
+  },
+  453: {
+    application_name_darwin: JSON.stringify(['Safari', 'Chrome']),
+    application_name_win32: JSON.stringify(['chrome.exe']),
+    context_types: {
+      selected_text: true,
+      audio_transcription: false,
+      clipboard_text: false,
+      screenshot: false,
+      window: false,
+    },
+  },
+  454: {
+    application_name_darwin: JSON.stringify(['Safari', 'Chrome']),
+    application_name_win32: JSON.stringify(['chrome.exe']),
+    context_types: {
+      selected_text: true,
+      audio_transcription: false,
+      clipboard_text: false,
+      screenshot: false,
+      window: false,
+    },
+  },
+  455: {
+    application_name_darwin: JSON.stringify(['Safari', 'Chrome']),
+    application_name_win32: JSON.stringify(['chrome.exe']),
+    context_types: {
+      selected_text: true,
+      audio_transcription: false,
+      clipboard_text: false,
+      screenshot: false,
+      window: false,
+    },
+  },
+} as const
+
 async function checkIfDefaultPromptsAdded(userId: string) {
   const supabase = supabaseAdmin()
 
@@ -44,6 +91,20 @@ async function checkIfDefaultPromptsAdded(userId: string) {
     console.error('Error pinning default prompts:', insertError)
   }
 
+  for (const promptId of DEFAULT_PROMPT_IDS) {
+    const preferences = DEFAULT_PROMPT_PREFERENCES[promptId as keyof typeof DEFAULT_PROMPT_PREFERENCES]
+
+    const { error: prefError } = await supabase.from('app_shortcut_preferences').insert({
+      prompt_id: promptId,
+      user_id: userId,
+      ...preferences,
+    })
+
+    if (prefError) {
+      console.error(`Error setting shortcut preferences for prompt ${promptId}:`, prefError)
+    }
+  }
+
   return
 }
 
@@ -68,7 +129,7 @@ export async function GET(request: Request) {
   }
 
   // Check if the user has added the default prompts
-  // await checkIfDefaultPromptsAdded(userId)
+  await checkIfDefaultPromptsAdded(userId)
 
   // Select all prompts that the user has added
   const { data: selectResult, error } = await supabase
