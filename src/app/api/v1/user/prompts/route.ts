@@ -1,51 +1,177 @@
 import { authenticateApiUser } from '@/lib/api'
 import { PROMPTS_TABLE_SELECT_FIELDS, promptSelectMapper, supabaseAdmin } from '@/lib/supabase'
 
-const DEFAULT_PROMPT_IDS = [452, 453, 454, 455]
+const DEFAULT_PROMPT_IDS = [
+  87585, 87570, 87677, 87680, 87601, 87679, 87602, 87603, 87683, 87684, 87586, 87685, 87605, 87606,
+]
 
 const DEFAULT_PROMPT_PREFERENCES = {
-  452: {
+  // Complete Text
+  87585: {
+    application_name_darwin: '["Safari","Google Chrome","Discord","Notion","Slack"]',
+    application_name_win32: '["Safari","Google Chrome","Discord","Notion","Slack"]',
+    context_types: {
+      window: false,
+      screenshot: false,
+      selected_text: true,
+      clipboard_text: false,
+      audio_transcription: false,
+    },
+  },
+  // Complete Code
+  87602: {
+    application_name_darwin: '["Cursor","VS Code"]',
+    application_name_win32: '["Cursor","VS Code"]',
+    context_types: {
+      window: false,
+      screenshot: false,
+      selected_text: true,
+      clipboard_text: true,
+      audio_transcription: false,
+    },
+  },
+  // Draft Response
+  87605: {
     application_name_darwin: '*',
     application_name_win32: '*',
     context_types: {
+      window: false,
+      screenshot: true,
       selected_text: true,
+      clipboard_text: false,
       audio_transcription: false,
-      clipboard_text: true,
-      screenshot: false,
+    },
+  },
+  // Refactor Code
+  87601: {
+    application_name_darwin: '["Cursor","VS Code"]',
+    application_name_win32: '["Cursor","VS Code"]',
+    context_types: {
       window: true,
+      screenshot: false,
+      selected_text: true,
+      clipboard_text: true,
+      audio_transcription: false,
     },
   },
-  453: {
-    application_name_darwin: JSON.stringify(['Safari', 'Chrome']),
-    application_name_win32: JSON.stringify(['chrome.exe']),
+  // Fix Code
+  87603: {
+    application_name_darwin: '["Cursor","VS Code"]',
+    application_name_win32: '["Cursor","VS Code"]',
     context_types: {
-      selected_text: true,
-      audio_transcription: false,
-      clipboard_text: false,
-      screenshot: false,
       window: false,
+      screenshot: false,
+      selected_text: true,
+      clipboard_text: true,
+      audio_transcription: false,
     },
   },
-  454: {
-    application_name_darwin: JSON.stringify(['Safari', 'Chrome']),
-    application_name_win32: JSON.stringify(['chrome.exe']),
+  // Code Review
+  87677: {
+    application_name_darwin: '["Cursor","VS Code"]',
+    application_name_win32: '["Cursor","VS Code"]',
     context_types: {
-      selected_text: true,
-      audio_transcription: false,
-      clipboard_text: false,
+      window: true,
       screenshot: false,
-      window: false,
+      selected_text: false,
+      clipboard_text: false,
+      audio_transcription: false,
     },
   },
-  455: {
-    application_name_darwin: JSON.stringify(['Safari', 'Chrome']),
-    application_name_win32: JSON.stringify(['chrome.exe']),
+  // Explain Code
+  87679: {
+    application_name_darwin: '["Cursor","VS Code"]',
+    application_name_win32: '["Cursor","VS Code"]',
     context_types: {
-      selected_text: true,
-      audio_transcription: false,
-      clipboard_text: false,
+      window: true,
       screenshot: false,
+      selected_text: false,
+      clipboard_text: false,
+      audio_transcription: false,
+    },
+  },
+  // Draft Reply
+  87680: {
+    application_name_darwin: '["Slack"]',
+    application_name_win32: '["Slack"]',
+    context_types: {
+      window: true,
+      screenshot: false,
+      selected_text: false,
+      clipboard_text: false,
+      audio_transcription: false,
+    },
+  },
+  // Quick Recap
+  87683: {
+    application_name_darwin: '*',
+    application_name_win32: '*',
+    context_types: {
       window: false,
+      screenshot: false,
+      selected_text: false,
+      clipboard_text: false,
+      audio_transcription: true,
+    },
+  },
+  // Rewrite
+  87570: {
+    application_name_darwin: '["Slack","Safari","Google Chrome","Notion","Discord"]',
+    application_name_win32: '["Slack","Safari","Google Chrome","Notion","Discord"]',
+    context_types: {
+      window: false,
+      screenshot: false,
+      selected_text: true,
+      clipboard_text: true,
+      audio_transcription: false,
+    },
+  },
+  // Follow Up
+  87684: {
+    application_name_darwin: '*',
+    application_name_win32: '*',
+    context_types: {
+      window: false,
+      screenshot: false,
+      selected_text: false,
+      clipboard_text: false,
+      audio_transcription: true,
+    },
+  },
+  // Meeting Summary
+  87685: {
+    application_name_darwin: '*',
+    application_name_win32: '*',
+    context_types: {
+      window: false,
+      screenshot: false,
+      selected_text: false,
+      clipboard_text: false,
+      audio_transcription: true,
+    },
+  },
+  // Improve Text
+  87586: {
+    application_name_darwin: '["Slack","Google Chrome"]',
+    application_name_win32: '["Slack","Google Chrome"]',
+    context_types: {
+      window: false,
+      screenshot: false,
+      selected_text: true,
+      clipboard_text: false,
+      audio_transcription: false,
+    },
+  },
+  // Proof Read
+  87606: {
+    application_name_darwin: '["Safari"]',
+    application_name_win32: '["Safari"]',
+    context_types: {
+      window: false,
+      screenshot: false,
+      selected_text: true,
+      clipboard_text: false,
+      audio_transcription: false,
     },
   },
 } as const
@@ -93,6 +219,11 @@ async function checkIfDefaultPromptsAdded(userId: string) {
 
   for (const promptId of DEFAULT_PROMPT_IDS) {
     const preferences = DEFAULT_PROMPT_PREFERENCES[promptId as keyof typeof DEFAULT_PROMPT_PREFERENCES]
+
+    if (!preferences) {
+      console.error(`Missing default preferences for prompt ${promptId}`)
+      continue
+    }
 
     const { error: prefError } = await supabase.from('app_shortcut_preferences').insert({
       prompt_id: promptId,
