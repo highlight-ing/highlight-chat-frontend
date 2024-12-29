@@ -594,21 +594,21 @@ export const useSubmitQuery = () => {
         }
       })
 
-      const conversationData = await Highlight.conversations.getAllConversations()
-      const conversationAttachments: Array<ConversationAttachmentMetadata> = conversationData
-        .filter((conversation) => {
-          return Object.entries(conversation).every(([key, value]) => key !== undefined && value !== undefined)
-        })
-        .map((conversation) => ({
-          id: conversation.id,
-          type: 'conversation',
-          title: conversation.title,
-          words: conversation.transcript ? conversation.transcript.split(/\s+/).length : 0,
-          started_at: formatDateForConversation(conversation.startedAt),
-          ended_at: formatDateForConversation(conversation.endedAt),
-        }))
+      // const conversationData = await Highlight.conversations.getAllConversations()
+      // const conversationAttachments: Array<ConversationAttachmentMetadata> = conversationData
+      //   .filter((conversation) => {
+      //     return Object.entries(conversation).every(([key, value]) => key !== undefined && value !== undefined)
+      //   })
+      //   .map((conversation) => ({
+      //     id: conversation.id,
+      //     type: 'conversation',
+      //     title: conversation.title,
+      //     words: conversation.transcript ? conversation.transcript.split(/\s+/).length : 0,
+      //     started_at: formatDateForConversation(conversation.startedAt),
+      //     ended_at: formatDateForConversation(conversation.endedAt),
+      //   }))
 
-      availableContexts.context.push(...conversationAttachments)
+      // availableContexts.context.push(...conversationAttachments)
 
       if (rawContents) {
         const windowContentsAttachment: WindowContentsAttachment = {
@@ -713,21 +713,21 @@ export const useSubmitQuery = () => {
           if (metadata) attachedContext.context.push(metadata)
         })
 
-      const conversationData = await Highlight.conversations.getAllConversations()
-      const conversationAttachments: Array<ConversationAttachmentMetadata> = conversationData
-        .filter((conversation) => {
-          return Object.entries(conversation).every(([key, value]) => key !== undefined && value !== undefined)
-        })
-        .map((conversation) => ({
-          id: conversation.id,
-          type: 'conversation',
-          title: conversation.title,
-          words: conversation.transcript ? conversation.transcript.split(/\s+/).length : 0,
-          started_at: formatDateForConversation(conversation.startedAt),
-          ended_at: formatDateForConversation(conversation.endedAt),
-        }))
+      // const conversationData = await Highlight.conversations.getAllConversations()
+      // const conversationAttachments: Array<ConversationAttachmentMetadata> = conversationData
+      //   .filter((conversation) => {
+      //     return Object.entries(conversation).every(([key, value]) => key !== undefined && value !== undefined)
+      //   })
+      //   .map((conversation) => ({
+      //     id: conversation.id,
+      //     type: 'conversation',
+      //     title: conversation.title,
+      //     words: conversation.transcript ? conversation.transcript.split(/\s+/).length : 0,
+      //     started_at: formatDateForConversation(conversation.startedAt),
+      //     ended_at: formatDateForConversation(conversation.endedAt),
+      //   }))
 
-      availableContexts.context.push(...conversationAttachments)
+      // availableContexts.context.push(...conversationAttachments)
 
       if (context?.window_context) {
         const windowContentsAttachment: WindowContentsAttachment = {
