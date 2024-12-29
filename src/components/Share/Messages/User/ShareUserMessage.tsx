@@ -7,9 +7,9 @@ import remarkMath from 'remark-math'
 import 'katex/dist/katex.min.css'
 
 import { UserMessage } from '@/types'
-import { getDisplayValue } from '@/utils/attachments'
 import { DocumentText1, GallerySlash } from 'iconsax-react'
 
+import { getDisplayValue } from '@/utils/attachments'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip } from '@/components/ui/tooltip'
 import { Attachment } from '@/components/Attachment'

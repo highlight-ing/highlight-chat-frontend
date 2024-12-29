@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { DownloadPlatformType } from '@/types'
+
 import { trackEvent } from '@/utils/amplitude'
 import { buildDownloadURL } from '@/utils/downloadUrl'
 

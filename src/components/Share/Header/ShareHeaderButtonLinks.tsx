@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+
 import { trackEvent } from '@/utils/amplitude'
 
 const shareButtonClass =

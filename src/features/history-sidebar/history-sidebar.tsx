@@ -1,15 +1,14 @@
 import * as React from 'react'
-import { useEffect, useMemo, useRef, useState } from 'react'
 import { ChatHistoryItem } from '@/types'
 import variables from '@/variables.module.scss'
-import { useQueryClient } from '@tanstack/react-query'
-import { Clock, Trash } from 'iconsax-react'
+import { Clock, MessageText, Trash } from 'iconsax-react'
+import { GroupedVirtuoso } from 'react-virtuoso'
 import { useShallow } from 'zustand/react/shallow'
 
+import { cn, getDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
-import { useHistory } from '@/hooks/history'
+import { useChatHistoryStore, useHistory } from '@/hooks/chat-history'
 import { useApi } from '@/hooks/useApi'
-import { useChatHistory } from '@/hooks/useChatHistory'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import CircleButton from '@/components/CircleButton/CircleButton'
 import ContextMenu from '@/components/ContextMenu/ContextMenu'
@@ -19,7 +18,6 @@ import Tooltip from '@/components/Tooltip/Tooltip'
 
 import styles from './history-sidebar.module.scss'
 import { NEW_CONVERSATION_TITLE, useAddNewChat, useUpdateConversationTitle } from './hooks'
-import { sortArrayByDate } from './utils'
 
 const CONVERSATION_FETCH_DELAY = 2 * 1000
 
@@ -32,8 +30,6 @@ type HistorySidebarItemProps = {
 }
 
 function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenChat }: HistorySidebarItemProps) {
-  const queryClient = useQueryClient()
-
   const { addOrUpdateOpenConversation, openModal, setConversationId } = useStore(
     useShallow((state) => ({
       setConversationId: state.setConversationId,
@@ -41,8 +37,9 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
       addOrUpdateOpenConversation: state.addOrUpdateOpenConversation,
     })),
   )
-  const { history } = useChatHistory()
   const { mutate: updateConversationTitle } = useUpdateConversationTitle()
+  const { data: historyData } = useHistory()
+  const history = React.useMemo(() => historyData?.pages?.flat(), [historyData])
 
   const handleOpenChat = async (chat: ChatHistoryItem) => {
     if (typeof onOpenChat === 'function') {
@@ -74,14 +71,14 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
     }
   }
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (chat?.id === history?.[0].id && chat.title === NEW_CONVERSATION_TITLE) {
       const timeout = setTimeout(() => {
         updateConversationTitle(chat?.id)
       }, CONVERSATION_FETCH_DELAY)
       return () => clearTimeout(timeout)
     }
-  }, [chat, history])
+  }, [chat, history, updateConversationTitle])
 
   return (
     <ContextMenu
@@ -108,7 +105,13 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
       wrapperStyle={{ position: 'relative', width: '100%' }}
     >
       {isSelecting && (
-        <div className={`${styles.selector} ${isSelected ? styles.selected : ''}`} onClick={handleSelectChat} />
+        <div
+          className={cn(
+            'absolute left-2 top-2 mr-2 h-[17px] w-[17px] cursor-pointer rounded-full border border-light-20 transition-colors fade-in hover:border-light-80',
+            isSelected && 'border-light-40 bg-light-40 outline outline-2 outline-offset-[-3px] outline-black',
+          )}
+          onClick={handleSelectChat}
+        />
       )}
       <div
         key={chat?.id}
@@ -116,8 +119,8 @@ function HistorySidebarItem({ chat, isSelecting, isSelected, onSelect, onOpenCha
         className={`${styles.chat} ${isSelecting ? styles.selecting : ''}`}
         onClick={() => (isSelecting ? handleSelectChat() : handleOpenChat(chat))}
       >
-        <span className={styles.chatText}>
-          {chat.title.charAt(0) === '"' && chat.title.charAt(chat.title.length - 1) === '"'
+        <span>
+          {chat.title?.charAt(0) === '"' && chat.title.charAt(chat.title.length - 1) === '"'
             ? chat.title.substring(1, chat.title.length - 1)
             : chat.title}
         </span>
@@ -136,25 +139,23 @@ export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarPr
   const conversationId = useStore((state) => state.conversationId)
   const startNewConversation = useStore((state) => state.startNewConversation)
   const removeOpenConversation = useStore((state) => state.removeOpenConversation)
-  const setHistory = useStore((state) => state.setHistory)
-  const { history, refreshChatHistory } = useChatHistory()
-  const [isSelecting, setIsSelecting] = useState(false)
-  const [selectedHistoryItems, setSelectedHistoryItems] = useState<string[]>([])
-  const [isDeleting, setIsDeleting] = useState(false)
+  const [isSelecting, setIsSelecting] = React.useState(false)
+  const [selectedHistoryItems, setSelectedHistoryItems] = React.useState<Array<string>>([])
+  const [isDeleting, setIsDeleting] = React.useState(false)
+  const { removeChatsByIds } = useChatHistoryStore()
+
+  const { data: historyData, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useHistory()
+  const { history, chatGroupCounts, chatGroupLabels } = React.useMemo(() => {
+    const history = historyData ? historyData.pages.flat() : []
+    const { groupLengths, groupLabels } = getDateGroupLengths(history)
+
+    return { history, chatGroupCounts: groupLengths, chatGroupLabels: groupLabels }
+  }, [historyData])
 
   const { mutate: addNewChat } = useAddNewChat(conversationId)
-  useHistory()
-
-  const { today, lastWeek, lastMonth, older } = useMemo(() => {
-    return sortArrayByDate(history)
-  }, [history])
 
   const toggleHistory = () => {
     setShowHistory(!showHistory)
-  }
-
-  const onOpenChat = () => {
-    setShowHistory(false)
   }
 
   const onSelectChat = (chatId: string) => {
@@ -169,7 +170,7 @@ export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarPr
 
   const handleDeleteSelections = async () => {
     setIsDeleting(true)
-    setHistory(history.filter((item) => !selectedHistoryItems.includes(item.id)))
+    removeChatsByIds(selectedHistoryItems)
     for (const chatId of selectedHistoryItems) {
       const response = await deleteRequest(`history/${chatId}`)
       if (!response.ok) {
@@ -182,34 +183,41 @@ export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarPr
       }
       removeOpenConversation(chatId)
     }
-    await refreshChatHistory()
     setSelectedHistoryItems([])
     setIsDeleting(false)
     setIsSelecting(false)
   }
 
   // Handle fetching history, and detecting new chats to fetch
-  useEffect(() => {
+  React.useEffect(() => {
     if (conversationId && !history.some((chat) => chat?.id === conversationId)) {
       const timeout = setTimeout(() => {
         addNewChat()
       }, CONVERSATION_FETCH_DELAY)
       return () => clearTimeout(timeout)
     }
-  }, [history, conversationId])
+  }, [history, addNewChat, conversationId])
 
   // Reset history selections upon collapse
-  useEffect(() => {
+  React.useEffect(() => {
     if (!showHistory && isSelecting) {
       setIsSelecting(false)
     }
   }, [showHistory, isSelecting, selectedHistoryItems])
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!isSelecting && selectedHistoryItems.length > 0) {
       setSelectedHistoryItems([])
     }
   }, [isSelecting, selectedHistoryItems])
+
+  function handleFetchMore() {
+    if (hasNextPage) fetchNextPage()
+  }
+
+  if (isLoading) return <p className="animate-pulse text-subtle">Loading chats...</p>
+
+  if (!history.length) return <div className={styles.baseHistoryItem}>No chat history available</div>
 
   return (
     <div className={`${styles.history} ${showHistory ? styles.show : styles.hide}`}>
@@ -222,92 +230,40 @@ export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarPr
         </Tooltip>
       </div>
       <ScrollArea className={styles.chats}>
-        {!history?.length ? (
-          <div className={styles.baseHistoryItem}>No chat history available</div>
-        ) : (
-          <>
-            {today.length > 0 && (
-              <>
-                <div className={`${styles.chatGroupHeader} ${isSelecting ? styles.selecting : ''}`}>
-                  <span>Today</span>
-                  <div className={styles.edit} onClick={() => setIsSelecting(!isSelecting)}>
-                    {isSelecting ? 'Done' : 'Edit'}
-                  </div>
+        <GroupedVirtuoso
+          endReached={handleFetchMore}
+          style={{ height: 'calc(100vh - 56px)' }}
+          groupCounts={chatGroupCounts}
+          groupContent={(index) => (
+            <div className={`${styles.chatGroupHeader} ${isSelecting ? styles.selecting : ''} bg-[#121212] pb-1`}>
+              <span>{chatGroupLabels[index]}</span>
+              <div className={styles.edit} onClick={() => setIsSelecting(!isSelecting)}>
+                {isSelecting ? 'Done' : 'Edit'}
+              </div>
+            </div>
+          )}
+          itemContent={(index) => {
+            const chat = history[index]
+            return (
+              <HistorySidebarItem
+                key={chat?.id}
+                chat={chat}
+                isSelecting={isSelecting}
+                isSelected={selectedHistoryItems.includes(chat?.id)}
+                onSelect={() => onSelectChat(chat?.id)}
+              />
+            )
+          }}
+          components={{
+            Footer: () =>
+              isFetchingNextPage && (
+                <div className="flex items-center gap-2 font-medium">
+                  <MessageText variant={'Bold'} size={20} className="animate-pulse text-subtle/50" />
+                  <p className="animate-pulse text-subtle">Loading more chats...</p>
                 </div>
-                {today.map((chat) => (
-                  <HistorySidebarItem
-                    key={chat?.id}
-                    chat={chat}
-                    onOpenChat={onOpenChat}
-                    isSelecting={isSelecting}
-                    isSelected={selectedHistoryItems.includes(chat?.id)}
-                    onSelect={() => onSelectChat(chat?.id)}
-                  />
-                ))}
-              </>
-            )}
-            {lastWeek.length > 0 && (
-              <>
-                <div className={`${styles.chatGroupHeader} ${isSelecting ? styles.selecting : ''}`}>
-                  <span>Past 7 days</span>
-                  <div className={styles.edit} onClick={() => setIsSelecting(!isSelecting)}>
-                    {isSelecting ? 'Done' : 'Edit'}
-                  </div>
-                </div>
-                {lastWeek.map((chat) => (
-                  <HistorySidebarItem
-                    key={chat?.id}
-                    chat={chat}
-                    onOpenChat={onOpenChat}
-                    isSelecting={isSelecting}
-                    isSelected={selectedHistoryItems.includes(chat?.id)}
-                    onSelect={() => onSelectChat(chat?.id)}
-                  />
-                ))}
-              </>
-            )}
-            {lastMonth.length > 0 && (
-              <>
-                <div className={`${styles.chatGroupHeader} ${isSelecting ? styles.selecting : ''}`}>
-                  <span>Past 30 days</span>
-                  <div className={styles.edit} onClick={() => setIsSelecting(!isSelecting)}>
-                    {isSelecting ? 'Done' : 'Edit'}
-                  </div>
-                </div>
-                {lastMonth.map((chat) => (
-                  <HistorySidebarItem
-                    key={chat?.id}
-                    chat={chat}
-                    onOpenChat={onOpenChat}
-                    isSelecting={isSelecting}
-                    isSelected={selectedHistoryItems.includes(chat?.id)}
-                    onSelect={() => onSelectChat(chat?.id)}
-                  />
-                ))}
-              </>
-            )}
-            {older.length > 0 && (
-              <>
-                <div className={`${styles.chatGroupHeader} ${isSelecting ? styles.selecting : ''}`}>
-                  <span>Older than 30 days</span>
-                  <div className={styles.edit} onClick={() => setIsSelecting(!isSelecting)}>
-                    {isSelecting ? 'Done' : 'Edit'}
-                  </div>
-                </div>
-                {older.map((chat) => (
-                  <HistorySidebarItem
-                    key={chat?.id}
-                    chat={chat}
-                    onOpenChat={onOpenChat}
-                    isSelecting={isSelecting}
-                    isSelected={selectedHistoryItems.includes(chat?.id)}
-                    onSelect={() => onSelectChat(chat?.id)}
-                  />
-                ))}
-              </>
-            )}
-          </>
-        )}
+              ),
+          }}
+        />
         {selectedHistoryItems.length > 0 && (
           <div className={styles.selectionOptions}>
             {isDeleting ? (

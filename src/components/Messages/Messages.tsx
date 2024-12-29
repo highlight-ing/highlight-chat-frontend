@@ -9,8 +9,6 @@ import ThinkingMessage from '@/components/Messages/ThinkingMessage'
 import { useStore } from '@/components/providers/store-provider'
 import Scrollable from '@/components/Scrollable/Scrollable'
 
-import { ScrollArea } from '../ui/scroll-area'
-
 // The threshold in pixels to consider chat "scrolled up" by the user.
 const IS_SCROLLED_THRESHOLD_PX = 10
 

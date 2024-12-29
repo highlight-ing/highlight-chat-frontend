@@ -1,8 +1,8 @@
 import { useRef } from 'react'
-import { trackEvent } from '@/utils/amplitude'
 import * as Sentry from '@sentry/react'
 import { useShallow } from 'zustand/react/shallow'
 
+import { trackEvent } from '@/utils/amplitude'
 import { useApi } from '@/hooks/useApi'
 import { useStore } from '@/components/providers/store-provider'
 

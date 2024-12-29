@@ -1,8 +1,8 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { trackEvent } from '@/utils/amplitude'
 
+import { trackEvent } from '@/utils/amplitude'
 import Button from '@/components/Button/Button'
 
 export default function PromptShareButton() {

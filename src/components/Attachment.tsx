@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { AttachmentType } from '@/types'
 import { ClipboardText, DocumentText1, GallerySlash, Smallcaps, VoiceSquare } from 'iconsax-react'
-import { useSetAtom } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
 
 import { formatTitle } from '@/utils/conversations'
 import { getWordCountFormatted } from '@/utils/string'
-import { selectedAudioNoteAtom, transcriptOpenAtom } from '@/atoms/transcript-viewer'
+import { isOnHomeAtom, selectedAudioNoteAtom, showBackButtonAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
 import { useImageDownload } from '@/hooks/useImageDownload'
 import { CloseIcon } from '@/components/icons'
 import { useStore } from '@/components/providers/store-provider'
@@ -154,7 +154,9 @@ export const Attachment = ({
   }
 
   const setSelectedAudioNote = useSetAtom(selectedAudioNoteAtom)
-  const setTranscriptOpen = useSetAtom(transcriptOpenAtom)
+  const setSidePanelOpen = useSetAtom(sidePanelOpenAtom)
+  const setShowBackButton = useSetAtom(showBackButtonAtom)
+  const isOnHome = useAtomValue(isOnHomeAtom)
 
   function handleAudioClick() {
     if (!value) return
@@ -166,7 +168,11 @@ export const Attachment = ({
       startedAt: props.startedAt,
       endedAt: props.endedAt,
     })
-    setTranscriptOpen(true)
+    setSidePanelOpen(true)
+
+    if (isOnHome) {
+      setShowBackButton(true)
+    }
   }
 
   return (
@@ -194,8 +200,9 @@ export const Attachment = ({
           </button>
         ) : (
           <div
-            className={`flex h-[48px] items-center justify-center rounded-[16px] border border-light-10 bg-secondary ${type === 'pdf' || type === 'text_file' ? 'max-w-40' : ''
-              } ${type !== 'image' ? 'min-w-12' : 'min-w-[52px]'} w-fit overflow-hidden`}
+            className={`flex h-[48px] items-center justify-center rounded-[16px] border border-light-10 bg-secondary ${
+              type === 'pdf' || type === 'text_file' ? 'max-w-40' : ''
+            } ${type !== 'image' ? 'min-w-12' : 'min-w-[52px]'} w-fit overflow-hidden`}
           >
             {renderAttachmentContent()}
           </div>

@@ -22,18 +22,18 @@ type StreamParserResult = {
 }
 
 function extractIframeFromContent(content: string): { text: string; iframe?: string } {
-  const iframeMatch = content.match(/<iframe[^>]*>.*?<\/iframe>/i);
+  const iframeMatch = content.match(/<iframe[^>]*>.*?<\/iframe>/i)
   if (!iframeMatch) {
-    return { text: content };
+    return { text: content }
   }
 
   // Remove the script tag if it exists
-  const cleanContent = content.replace(/<script.*?<\/script>/i, '');
-  
+  const cleanContent = content.replace(/<script.*?<\/script>/i, '')
+
   return {
     text: '', // Don't keep the text description
-    iframe: iframeMatch[0]
-  };
+    iframe: iframeMatch[0],
+  }
 }
 
 export async function parseAndHandleStreamChunk(
@@ -71,21 +71,21 @@ export async function parseAndHandleStreamChunk(
             }
             // Check if this is a visualization message
             if (jsonChunk.visualization) {
-              isVisualizationMessage = true;
-              accumulatedContent = ''; // Reset content for visualization messages
+              isVisualizationMessage = true
+              accumulatedContent = '' // Reset content for visualization messages
             }
           }
           break
 
         case 'text':
           messageId = jsonChunk.message_id
-          
+
           // Always accumulate content, including the iframe
-          accumulatedContent += jsonChunk.content;
-          
+          accumulatedContent += jsonChunk.content
+
           // If visualization data is present, store it
           if (jsonChunk.visualization) {
-            visualization = jsonChunk.visualization;
+            visualization = jsonChunk.visualization
           }
           break
 
@@ -214,7 +214,7 @@ export async function parseAndHandleStreamChunk(
             factIndex: null,
             fact: null,
             messageId: messageId,
-            visualization: visualization
+            visualization: visualization,
           }
 
         case 'message_delta':
@@ -254,6 +254,6 @@ export async function parseAndHandleStreamChunk(
     factIndex: null,
     fact: null,
     messageId: messageId,
-    visualization: visualization
+    visualization: visualization,
   }
 }
