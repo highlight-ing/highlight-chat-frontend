@@ -114,7 +114,7 @@ function CopyLinkAction() {
     if (!mostRecentShareLinkId) {
       generateShareLink(selectedChat)
     } else {
-      copyLink(selectedChat.id)
+      copyLink(mostRecentShareLinkId)
     }
   }
 

@@ -1,12 +1,67 @@
 import React from 'react'
 import { ChatHistoryItem } from '@/types'
+import { AnimatePresence, motion, Variants } from 'framer-motion'
 import { EmojiHappy } from 'iconsax-react'
 
-import { useDisableLink } from '@/hooks/share-link'
+import { useCopyLink, useDisableLink } from '@/hooks/share-link'
 import { PopoverContent } from '@/components/ui/popover'
 
 import Button from './Button/Button'
 import LoadingSpinner from './LoadingSpinner/LoadingSpinner'
+
+function CopyShareLinkButton(props: { shareLinkId: string | undefined }) {
+  const [showSuccessState, setShowSuccessState] = React.useState(false)
+  const { mutate: copyLink, isPending, isSuccess: linkCopied } = useCopyLink()
+
+  React.useEffect(() => {
+    let timeout: NodeJS.Timeout | null
+    if (linkCopied) {
+      setShowSuccessState(true)
+      timeout = setTimeout(() => {
+        setShowSuccessState(false)
+      }, 1200)
+    }
+    return () => {
+      if (timeout) clearTimeout(timeout)
+      setShowSuccessState(false)
+    }
+  }, [linkCopied, setShowSuccessState])
+
+  function handleCopyClick() {
+    if (!props.shareLinkId) return
+    copyLink(props.shareLinkId)
+  }
+
+  const copyLabelVariants: Variants = {
+    initial: { x: 10, opacity: 0 },
+    animate: { x: 0, opacity: 1 },
+    exit: { x: -10, opacity: 0 },
+  }
+
+  if (!props.shareLinkId) return null
+
+  return (
+    <Button
+      size={'medium'}
+      variant={'primary'}
+      style={{ width: '100%' }}
+      disabled={isPending}
+      onClick={handleCopyClick}
+    >
+      <AnimatePresence initial={false} mode="popLayout">
+        <motion.span
+          variants={copyLabelVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          key={showSuccessState ? 'true' : 'false'}
+        >
+          {showSuccessState ? 'Copied' : 'Copy Link'}
+        </motion.span>
+      </AnimatePresence>
+    </Button>
+  )
+}
 
 function DisableShareLinkButton(props: { conversationId: string }) {
   const { mutate: disableShareLink, isPending } = useDisableLink()
@@ -57,6 +112,7 @@ export function SharePopoverContent(props: { conversation: ChatHistoryItem }) {
         </p>
       )}
 
+      <CopyShareLinkButton shareLinkId={mostRecentShareLinkId} />
       {mostRecentShareLinkId && <DisableShareLinkButton conversationId={props.conversation.id} />}
     </PopoverContent>
   )
