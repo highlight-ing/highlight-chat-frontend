@@ -400,7 +400,7 @@ function ChatShareLinkCopyButton() {
     if (!mostRecentShareLinkId) {
       generateShareLink(selectedChat)
     } else {
-      await copyLink(selectedChat.id)
+      await copyLink(mostRecentShareLinkId)
       toast('Link copied to clipboard', { icon: <Copy variant="Bold" size={20} /> })
     }
   }
