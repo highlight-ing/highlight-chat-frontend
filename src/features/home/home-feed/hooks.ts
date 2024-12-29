@@ -34,17 +34,17 @@ export function useRecentActions() {
     const allChats =
       historyQuery.data?.pages.flat().map((chat) => ({
         ...chat,
-        updatedAt: new Date(chat.updated_at).toISOString(),
+        updatedAt: new Date(chat.updated_at),
         type: 'chat' as const,
       })) ?? []
     const audioNotes =
       audioQuery.data?.map((audioNote) => ({
         ...audioNote,
-        updatedAt: audioNote.endedAt.toISOString(),
+        updatedAt: audioNote.endedAt,
         type: 'audio-note' as const,
       })) ?? []
 
-    return [...allChats, ...audioNotes].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+    return [...allChats, ...audioNotes].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
   }, [historyQuery.data?.pages, audioQuery.data])
 
   const fetchNextPage = React.useCallback(async () => {
@@ -83,8 +83,8 @@ export function useRecentActions() {
         }
       }
 
-      const oldestChatTime = new Date(oldestLoadedChat.updated_at).toISOString()
-      const needsMoreChats = nextBatchOfItems.some((item) => item.updatedAt > oldestChatTime)
+      const oldestChatTime = new Date(oldestLoadedChat.updated_at).getTime()
+      const needsMoreChats = nextBatchOfItems.some((item) => item.updatedAt.getTime() > oldestChatTime)
 
       if (needsMoreChats && historyQuery.hasNextPage) {
         await historyQuery.fetchNextPage()

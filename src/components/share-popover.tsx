@@ -82,7 +82,7 @@ function DisableShareLinkButton(props: { conversationId: string }) {
 
 export function SharePopoverContent(props: { conversation: ChatHistoryItem }) {
   const mostRecentShareLinkId = props.conversation?.shared_conversations?.[0]?.id
-  const formattedTitle = props.conversation?.title.replace(/^["']|["']$/g, '')
+  const formattedTitle = props.conversation?.title?.replace(/^["']|["']$/g, '')
 
   return (
     <PopoverContent align="end" sideOffset={8} className="w-[400px] space-y-3">
