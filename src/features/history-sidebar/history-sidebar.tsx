@@ -158,10 +158,6 @@ export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarPr
     setShowHistory(!showHistory)
   }
 
-  const onOpenChat = () => {
-    setShowHistory(false)
-  }
-
   const onSelectChat = (chatId: string) => {
     let newItems = [...selectedHistoryItems]
     if (newItems.includes(chatId)) {
@@ -252,7 +248,6 @@ export function HistorySidebar({ showHistory, setShowHistory }: HistorySidebarPr
               <HistorySidebarItem
                 key={chat?.id}
                 chat={chat}
-                onOpenChat={onOpenChat}
                 isSelecting={isSelecting}
                 isSelected={selectedHistoryItems.includes(chat?.id)}
                 onSelect={() => onSelectChat(chat?.id)}

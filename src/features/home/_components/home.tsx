@@ -4,6 +4,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 import { cn } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
+import { showHistoryAtom } from '@/atoms/history'
 import { isOnHomeAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
 import { useStore } from '@/components/providers/store-provider'
 
@@ -52,11 +53,13 @@ function ChatFocusedOverlay() {
 export function ChatHome() {
   const setSidePanelOpen = useSetAtom(sidePanelOpenAtom)
   const isOnHome = useAtomValue(isOnHomeAtom)
+  const setShowHistory = useSetAtom(showHistoryAtom)
 
   React.useEffect(() => {
     trackEvent('HL Chat Home Viewed', {})
   }, [])
 
+  setShowHistory(false)
   setSidePanelOpen(true)
 
   return (

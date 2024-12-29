@@ -45,7 +45,8 @@ export default function Home() {
   }, [inputIsDisabled, messages])
 
   React.useEffect(() => {
-    setIsOnHome(!isChatting)
+    setIsOnHome(!isChatting && !isConversationLoading)
+
     if (isChatting || isConversationLoading) {
       setSidePanelOpen(false)
       setShowBackButton(false)
