@@ -403,7 +403,7 @@ function ChatShareLinkCopyButton(props: { chat: ChatHistoryItem }) {
         disabled={isGeneratingLink}
         className="size-6 hidden place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:grid"
       >
-        <Export variant="Bold" size={16} className="text-tertiary" />
+        <Export variant="Bold" size={16} className={cn('text-tertiary', isGeneratingLink && 'opacity-50')} />
       </button>
     </Tooltip>
   )
