@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { AttachmentType } from '@/types'
 import { ClipboardText, DocumentText1, GallerySlash, Smallcaps, VoiceSquare } from 'iconsax-react'
-import { useSetAtom } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
 
 import { formatTitle } from '@/utils/conversations'
 import { getWordCountFormatted } from '@/utils/string'
-import { selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
+import { isOnHomeAtom, selectedAudioNoteAtom, showBackButtonAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
 import { useImageDownload } from '@/hooks/useImageDownload'
 import { CloseIcon } from '@/components/icons'
 import { useStore } from '@/components/providers/store-provider'
@@ -155,6 +155,8 @@ export const Attachment = ({
 
   const setSelectedAudioNote = useSetAtom(selectedAudioNoteAtom)
   const setSidePanelOpen = useSetAtom(sidePanelOpenAtom)
+  const setShowBackButton = useSetAtom(showBackButtonAtom)
+  const isOnHome = useAtomValue(isOnHomeAtom)
 
   function handleAudioClick() {
     if (!value) return
@@ -167,6 +169,10 @@ export const Attachment = ({
       endedAt: props.endedAt,
     })
     setSidePanelOpen(true)
+
+    if (isOnHome) {
+      setShowBackButton(true)
+    }
   }
 
   return (

@@ -7,7 +7,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 import { cn } from '@/lib/utils'
 import { showHistoryAtom } from '@/atoms/history'
-import { isOnHomeAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
+import { isOnHomeAtom, showBackButtonAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
 import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
 import { Input } from '@/components/Input/Input'
 import Messages from '@/components/Messages/Messages'
@@ -30,6 +30,7 @@ import { HighlightSidePanel } from '@/features/side-panel/components/highlight-s
 export default function Home() {
   const [showHistory, setShowHistory] = useAtom(showHistoryAtom)
   const [sidePanelOpen, setSidePanelOpen] = useAtom(sidePanelOpenAtom)
+  const setShowBackButton = useSetAtom(showBackButtonAtom)
   const setIsOnHome = useSetAtom(isOnHomeAtom)
   const { inputIsDisabled, promptApp, isConversationLoading } = useStore(
     useShallow((state) => ({
@@ -47,8 +48,9 @@ export default function Home() {
     setIsOnHome(!isChatting)
     if (isChatting || isConversationLoading) {
       setSidePanelOpen(false)
+      setShowBackButton(false)
     }
-  }, [isChatting, setIsOnHome, setSidePanelOpen, isConversationLoading])
+  }, [isChatting, setShowBackButton, setIsOnHome, setSidePanelOpen, isConversationLoading])
 
   useClipboardPaste()
   useConversationLoad()

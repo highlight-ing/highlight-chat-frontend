@@ -25,4 +25,6 @@ export const selectedChatIdAtom = atom('' as string, (_, set, chatId: string) =>
   }
 })
 
+export const showBackButtonAtom = atom(false)
+
 export const isOnHomeAtom = atom(false)

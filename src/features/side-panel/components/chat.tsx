@@ -1,7 +1,7 @@
 import React from 'react'
 import { AnimatePresence, motion, Variants } from 'framer-motion'
 import { Copy, Export, MessageText } from 'iconsax-react'
-import { useAtomValue } from 'jotai'
+import { useAtom, useAtomValue } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
 import { selectedAudioNoteAtom, selectedChatIdAtom } from '@/atoms/side-panel'
@@ -57,7 +57,7 @@ function Messages() {
 }
 
 function ChatAction() {
-  const selectedChatId = useAtomValue(selectedChatIdAtom)
+  const [selectedChatId, setSelectedChatId] = useAtom(selectedChatIdAtom)
   const { data: selectedChat } = useHistoryByChatId(selectedChatId)
   const { clearPrompt, startNewConversation, addOrUpdateOpenConversation, setConversationId } = useStore(
     useShallow((state) => ({
@@ -70,10 +70,12 @@ function ChatAction() {
 
   function handleChatClick() {
     if (!selectedChat) return
+
     clearPrompt()
     startNewConversation()
     addOrUpdateOpenConversation(selectedChat)
     setConversationId(selectedChat?.id)
+    setSelectedChatId('')
   }
 
   return (
