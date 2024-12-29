@@ -3,9 +3,9 @@ import { useAtomValue } from 'jotai'
 
 import { isOnHomeAtom, sidePanelContentTypeAtom } from '@/atoms/side-panel'
 
-import { AudioNoteSidePanelContent, AudioNoteSidePanelHeader } from './components/audio-note'
-import { ChatSidePanelContent, ChatSidePanelHeader } from './components/chat'
-import { SidePanel, SidePanelContent, SidePanelHeader } from './components/side-panel'
+import { AudioNoteSidePanelContent, AudioNoteSidePanelHeader } from './audio-note'
+import { ChatSidePanelContent, ChatSidePanelHeader } from './chat'
+import { SidePanel, SidePanelContent, SidePanelHeader } from './side-panel'
 
 export function HighlightSidePanel() {
   const isOnHome = useAtomValue(isOnHomeAtom)

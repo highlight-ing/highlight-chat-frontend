@@ -23,11 +23,11 @@ import Button from '@/components/Button/Button'
 import { MeetingIcon } from '@/components/icons'
 import { useStore } from '@/components/providers/store-provider'
 
-import { useInputFocus } from '../chat-input/chat-input'
-import { currentListIndexAtom, feedHiddenAtom, isMountedAtom, toggleFeedVisibilityAtom } from './atoms'
-import { GroupedVirtualList, GroupHeaderRow } from './components/grouped-virtual-list'
-import { useAudioNotes, useRecentActions } from './hooks'
-import { formatUpdatedAtDate } from './utils'
+import { GroupedVirtualList, GroupHeaderRow } from '../components/grouped-virtual-list'
+import { useInputFocus } from '../../chat-input/chat-input'
+import { currentListIndexAtom, feedHiddenAtom, isMountedAtom, toggleFeedVisibilityAtom } from '../atoms'
+import { useAudioNotes, useRecentActions } from '../hooks'
+import { formatUpdatedAtDate } from '../utils'
 
 const HOME_FEED_LIST_HEIGHT = 'calc(100vh - 192px)'
 
@@ -201,27 +201,20 @@ function AttachAudioAction() {
 
   function handleAttachClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     e.stopPropagation()
-    if (
-      !selectedAudioNote?.id ||
-      !selectedAudioNote?.title ||
-      !selectedAudioNote?.transcript ||
-      !selectedAudioNote?.startedAt ||
-      !selectedAudioNote?.endedAt
-    ) {
-      return
-    }
+
+    if (!selectedAudioNote?.transcript) return
 
     clearPrompt()
     startNewConversation()
     focusInput()
 
     addAttachment({
-      id: selectedAudioNote.id,
+      id: selectedAudioNote?.id ?? '',
       type: 'conversation',
-      title: selectedAudioNote.title,
+      title: selectedAudioNote?.title ?? '',
       value: selectedAudioNote.transcript,
-      startedAt: selectedAudioNote.startedAt,
-      endedAt: selectedAudioNote.endedAt,
+      startedAt: selectedAudioNote?.startedAt ?? new Date(),
+      endedAt: selectedAudioNote?.endedAt ?? new Date(),
     })
   }
 

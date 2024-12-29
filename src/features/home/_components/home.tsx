@@ -7,9 +7,9 @@ import { trackEvent } from '@/utils/amplitude'
 import { isOnHomeAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
 import { useStore } from '@/components/providers/store-provider'
 
-import { chatInputIsFocusedAtom } from './atoms'
-import { ChatInput } from './chat-input/chat-input'
-import { HomeFeed } from './home-feed/home-feed'
+import { chatInputIsFocusedAtom } from '../atoms'
+import { ChatInput } from '../chat-input/chat-input'
+import { HomeFeed } from '../home-feed/components/home-feed'
 
 function InputHeading() {
   const { promptName, promptDescription } = useStore(

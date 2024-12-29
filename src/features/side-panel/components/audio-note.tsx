@@ -58,27 +58,19 @@ function ChatAction() {
   )
 
   function handleChatClick() {
-    if (
-      !selectedAudioNote?.id ||
-      !selectedAudioNote?.title ||
-      !selectedAudioNote?.transcript ||
-      !selectedAudioNote?.startedAt ||
-      !selectedAudioNote?.endedAt
-    ) {
-      return
-    }
+    if (!selectedAudioNote?.transcript) return
 
     clearPrompt()
     startNewConversation()
     focusInput()
 
     addAttachment({
-      id: selectedAudioNote.id,
+      id: selectedAudioNote?.id ?? '',
       type: 'conversation',
-      title: selectedAudioNote.title,
+      title: selectedAudioNote?.title ?? '',
       value: selectedAudioNote.transcript,
-      startedAt: selectedAudioNote.startedAt,
-      endedAt: selectedAudioNote.endedAt,
+      startedAt: selectedAudioNote?.startedAt ?? new Date(),
+      endedAt: selectedAudioNote?.endedAt ?? new Date(),
     })
   }
 

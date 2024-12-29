@@ -16,6 +16,7 @@ import { useStore } from '@/components/providers/store-provider'
 
 import { ChatHeader } from '@/features/chat/chat-header/chat-header'
 import { HistorySidebar } from '@/features/history-sidebar/history-sidebar'
+import { ChatHome } from '@/features/home/_components/home'
 import { IntercomChat } from '@/features/home/_components/intercom-chat'
 import { useClipboardPaste } from '@/features/home/_hooks/use-clipboard-paste'
 import { useConversationLoad } from '@/features/home/_hooks/use-conversation-load'
@@ -23,9 +24,8 @@ import { useOnAppOpen } from '@/features/home/_hooks/use-on-app-open'
 import { useOnExternalMessage } from '@/features/home/_hooks/use-on-external-message'
 import { useOnPromptChange } from '@/features/home/_hooks/use-on-prompt-change'
 import { useOnPromptLoad } from '@/features/home/_hooks/use-on-prompt-load'
-import { ChatHome } from '@/features/home/home'
 import { NavigationTopBar } from '@/features/nav-header/top-bar/top-bar'
-import { HighlightSidePanel } from '@/features/side-panel/highlight-side-panel'
+import { HighlightSidePanel } from '@/features/side-panel/components/highlight-side-panel'
 
 export default function Home() {
   const [showHistory, setShowHistory] = useAtom(showHistoryAtom)
