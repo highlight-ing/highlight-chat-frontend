@@ -187,8 +187,7 @@ function FeedHiddenState() {
   )
 }
 
-function AttachAudioAction() {
-  const selectedAudioNote = useAtomValue(selectedAudioNoteAtom)
+function AttachAudioAction(props: { audioNote: ConversationData }) {
   const focusInput = useInputFocus()
 
   const { clearPrompt, addAttachment, startNewConversation } = useStore(
@@ -199,29 +198,27 @@ function AttachAudioAction() {
     })),
   )
 
-  function handleAttachClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-    e.stopPropagation()
-
-    if (!selectedAudioNote?.transcript) return
+  function handleAttachClick() {
+    if (!props.audioNote?.transcript) return
 
     clearPrompt()
     startNewConversation()
     focusInput()
 
     addAttachment({
-      id: selectedAudioNote?.id ?? '',
+      id: props.audioNote?.id ?? '',
       type: 'conversation',
-      title: selectedAudioNote?.title ?? '',
-      value: selectedAudioNote.transcript,
-      startedAt: selectedAudioNote?.startedAt ?? new Date(),
-      endedAt: selectedAudioNote?.endedAt ?? new Date(),
+      title: props.audioNote?.title ?? '',
+      value: props.audioNote.transcript,
+      startedAt: props.audioNote?.startedAt ?? new Date(),
+      endedAt: props.audioNote?.endedAt ?? new Date(),
     })
   }
 
   return (
     <Tooltip content="Chat">
       <button
-        onClick={(e) => handleAttachClick(e)}
+        onClick={handleAttachClick}
         className="size-6 hidden place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:grid"
       >
         <MessageText variant="Bold" size={16} className="text-tertiary" />
@@ -280,7 +277,7 @@ function AudioNotesListItem(props: { audioNote: ConversationData; listIndex: num
       </div>
       <div className="flex items-center gap-2 font-medium">
         <p className="text-sm text-tertiary">{formatUpdatedAtDate(props.audioNote.endedAt)}</p>
-        <AttachAudioAction />
+        <AttachAudioAction audioNote={props.audioNote} />
       </div>
     </HomeFeedListItemLayout>
   )
@@ -352,9 +349,7 @@ function AudioNotesTabContent() {
   )
 }
 
-function ChatAction() {
-  const selectedChatId = useAtomValue(selectedChatIdAtom)
-  const { data: selectedChat } = useHistoryByChatId(selectedChatId)
+function ChatAction(props: { chat: ChatHistoryItem }) {
   const { clearPrompt, startNewConversation, addOrUpdateOpenConversation, setConversationId } = useStore(
     useShallow((state) => ({
       setConversationId: state.setConversationId,
@@ -364,20 +359,19 @@ function ChatAction() {
     })),
   )
 
-  function handleChatClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-    e.stopPropagation()
-    if (!selectedChat) return
+  function handleChatClick() {
+    if (!props.chat) return
 
     clearPrompt()
     startNewConversation()
-    addOrUpdateOpenConversation(selectedChat)
-    setConversationId(selectedChat?.id)
+    addOrUpdateOpenConversation(props.chat)
+    setConversationId(props.chat?.id)
   }
 
   return (
     <Tooltip content="Chat">
       <button
-        onClick={(e) => handleChatClick(e)}
+        onClick={handleChatClick}
         className="size-6 hidden place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:grid"
       >
         <MessageText variant="Bold" size={16} className="text-tertiary" />
@@ -386,19 +380,16 @@ function ChatAction() {
   )
 }
 
-function ChatShareLinkCopyButton() {
-  const selectedChatId = useAtomValue(selectedChatIdAtom)
-  const { data: selectedChat } = useHistoryByChatId(selectedChatId)
-  const mostRecentShareLinkId = selectedChat?.shared_conversations?.[0]?.id
+function ChatShareLinkCopyButton(props: { chat: ChatHistoryItem }) {
+  const mostRecentShareLinkId = props.chat?.shared_conversations?.[0]?.id
   const { mutate: generateShareLink, isPending: isGeneratingLink } = useGenerateShareLink()
   const { mutateAsync: copyLink } = useCopyLink()
 
-  async function handleCopyClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-    e.stopPropagation()
-    if (!selectedChat) return
+  async function handleCopyClick() {
+    if (!props.chat) return
 
     if (!mostRecentShareLinkId) {
-      generateShareLink(selectedChat)
+      generateShareLink(props.chat)
     } else {
       await copyLink(mostRecentShareLinkId)
       toast('Link copied to clipboard', { icon: <Copy variant="Bold" size={20} /> })
@@ -408,7 +399,7 @@ function ChatShareLinkCopyButton() {
   return (
     <Tooltip content="Share">
       <button
-        onClick={(e) => handleCopyClick(e)}
+        onClick={handleCopyClick}
         disabled={isGeneratingLink}
         className="size-6 hidden place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:grid"
       >
@@ -459,8 +450,8 @@ function ChatListItem(props: { chat: ChatHistoryItem; listIndex: number }) {
       </div>
       <div className="flex items-center gap-2 font-medium">
         <p className="text-sm text-tertiary">{formatUpdatedAtDate(props.chat.updated_at)}</p>
-        <ChatAction />
-        <ChatShareLinkCopyButton />
+        <ChatAction chat={props.chat} />
+        <ChatShareLinkCopyButton chat={props.chat} />
       </div>
     </HomeFeedListItemLayout>
   )
