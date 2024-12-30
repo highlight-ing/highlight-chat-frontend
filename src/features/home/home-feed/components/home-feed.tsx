@@ -432,17 +432,14 @@ function ChatListItem(props: { chat: ChatHistoryItem; listIndex: number }) {
   const [isMounted, setIsMounted] = useAtom(isMountedAtom)
 
   const handleClick = React.useCallback(() => {
-    function handleClick() { }
     setSelectedChatId(props.chat.id)
     setCurrentListIndex(props.listIndex)
 
-    if (isMounted) {
-      trackEvent('HL Chat Previewed', {
-        chatId: props.chat.id,
-        source: 'home_feed',
-      })
-    }
-  }, [props.chat, isMounted, setSelectedChatId, props.listIndex, setCurrentListIndex])
+    trackEvent('HL Chat Previewed', {
+      chatId: props.chat.id,
+      source: 'home_feed',
+    })
+  }, [props.chat, setSelectedChatId, props.listIndex, setCurrentListIndex])
 
   React.useEffect(() => {
     if (isActiveElement && !isMounted) {
