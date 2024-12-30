@@ -235,35 +235,27 @@ function AudioNotesListItem(props: { audioNote: ConversationData; listIndex: num
   const isActiveElement = currentListIndex === props.listIndex
   const [isMounted, setIsMounted] = useAtom(isMountedAtom)
 
-  const handleClick = React.useCallback(() => {
+  const previewAudioNote = React.useCallback(() => {
     setSelectedAudioNote(props.audioNote)
     setSidePanelOpen(true)
     setCurrentListIndex(props.listIndex)
+  }, [props.audioNote, setCurrentListIndex, props.listIndex, setSelectedAudioNote, setSidePanelOpen])
 
+  const handleClick = React.useCallback(() => {
+    previewAudioNote()
     trackEvent('Audio Note Previewed', {
       audioNoteId: props.audioNote.id,
       meetingNote: !!props.audioNote?.meeting,
       source: 'home_feed',
     })
-  }, [props.audioNote, setCurrentListIndex, props.listIndex, setSelectedAudioNote, setSidePanelOpen])
+  }, [props.audioNote, previewAudioNote])
 
   React.useEffect(() => {
     if (isActiveElement && !isMounted) {
-      setSelectedAudioNote(props.audioNote)
-      setSidePanelOpen(true)
-      setCurrentListIndex(props.listIndex)
+      previewAudioNote()
       setIsMounted(true)
     }
-  }, [
-    isActiveElement,
-    props.audioNote,
-    props.listIndex,
-    setCurrentListIndex,
-    setSelectedAudioNote,
-    setIsMounted,
-    setSidePanelOpen,
-    isMounted,
-  ])
+  }, [isActiveElement, setIsMounted, isMounted, previewAudioNote])
 
   React.useEffect(() => {
     function handleEnterKeyPress(e: KeyboardEvent) {
@@ -431,23 +423,25 @@ function ChatListItem(props: { chat: ChatHistoryItem; listIndex: number }) {
   const isActiveElement = currentListIndex === props.listIndex
   const [isMounted, setIsMounted] = useAtom(isMountedAtom)
 
-  const handleClick = React.useCallback(() => {
+  const previewChat = React.useCallback(() => {
     setSelectedChatId(props.chat.id)
     setCurrentListIndex(props.listIndex)
+  }, [props.chat.id, setSelectedChatId, props.listIndex, setCurrentListIndex])
 
+  const handleClick = React.useCallback(() => {
+    previewChat()
     trackEvent('HL Chat Previewed', {
       chatId: props.chat.id,
       source: 'home_feed',
     })
-  }, [props.chat, setSelectedChatId, props.listIndex, setCurrentListIndex])
+  }, [props.chat, previewChat])
 
   React.useEffect(() => {
     if (isActiveElement && !isMounted) {
-      setSelectedChatId(props.chat.id)
-      setCurrentListIndex(props.listIndex)
+      previewChat()
       setIsMounted(true)
     }
-  }, [props.chat.id, props.listIndex, setCurrentListIndex, setSelectedChatId, isActiveElement, isMounted, setIsMounted])
+  }, [isActiveElement, isMounted, previewChat, setIsMounted])
 
   React.useEffect(() => {
     function handleEnterKeyPress(e: KeyboardEvent) {
