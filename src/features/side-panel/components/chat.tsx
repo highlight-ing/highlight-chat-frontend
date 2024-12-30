@@ -4,6 +4,7 @@ import { Copy, Export, MessageText } from 'iconsax-react'
 import { useAtom, useAtomValue } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
+import { trackEvent } from '@/utils/amplitude'
 import { selectedAudioNoteAtom, selectedChatIdAtom } from '@/atoms/side-panel'
 import { useHistoryByChatId } from '@/hooks/chat-history'
 import { useMessages } from '@/hooks/chat-messages'
@@ -76,6 +77,11 @@ function ChatAction() {
     addOrUpdateOpenConversation(selectedChat)
     setConversationId(selectedChat?.id)
     setSelectedChatId('')
+
+    trackEvent('HL Chat Opened', {
+      chatId: selectedChat.id,
+      source: 'side_panel',
+    })
   }
 
   return (

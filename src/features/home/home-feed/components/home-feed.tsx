@@ -249,10 +249,21 @@ function AudioNotesListItem(props: { audioNote: ConversationData; listIndex: num
 
   React.useEffect(() => {
     if (isActiveElement && !isMounted) {
-      handleClick()
+      setSelectedAudioNote(props.audioNote)
+      setSidePanelOpen(true)
+      setCurrentListIndex(props.listIndex)
       setIsMounted(true)
     }
-  }, [isActiveElement, handleClick, isMounted, setIsMounted])
+  }, [
+    isActiveElement,
+    props.audioNote,
+    props.listIndex,
+    setCurrentListIndex,
+    setSelectedAudioNote,
+    setIsMounted,
+    setSidePanelOpen,
+    isMounted,
+  ])
 
   React.useEffect(() => {
     function handleEnterKeyPress(e: KeyboardEvent) {
@@ -366,6 +377,11 @@ function ChatAction(props: { chat: ChatHistoryItem }) {
     startNewConversation()
     addOrUpdateOpenConversation(props.chat)
     setConversationId(props.chat?.id)
+
+    trackEvent('HL Chat Opened', {
+      chatId: props.chat.id,
+      source: 'home_feed',
+    })
   }
 
   return (
@@ -418,7 +434,8 @@ function ChatListItem(props: { chat: ChatHistoryItem; listIndex: number }) {
   const handleClick = React.useCallback(() => {
     setSelectedChatId(props.chat.id)
     setCurrentListIndex(props.listIndex)
-    trackEvent('HL Chat Opened', {
+
+    trackEvent('HL Chat Previewed', {
       chatId: props.chat.id,
       source: 'home_feed',
     })
@@ -426,10 +443,11 @@ function ChatListItem(props: { chat: ChatHistoryItem; listIndex: number }) {
 
   React.useEffect(() => {
     if (isActiveElement && !isMounted) {
-      handleClick()
+      setSelectedChatId(props.chat.id)
+      setCurrentListIndex(props.listIndex)
       setIsMounted(true)
     }
-  }, [handleClick, isActiveElement, isMounted, setIsMounted])
+  }, [props.chat.id, props.listIndex, setCurrentListIndex, setSelectedChatId, isActiveElement, isMounted, setIsMounted])
 
   React.useEffect(() => {
     function handleEnterKeyPress(e: KeyboardEvent) {
