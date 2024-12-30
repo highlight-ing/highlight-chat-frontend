@@ -62,7 +62,7 @@ export default function Home() {
 
   return (
     <div className={styles.page}>
-      <HistorySidebar showHistory={showHistory} setShowHistory={setShowHistory} />
+      <HistorySidebar />
       <NavigationTopBar showHistory={showHistory} setShowHistory={setShowHistory} />
       <div
         className={cn(
