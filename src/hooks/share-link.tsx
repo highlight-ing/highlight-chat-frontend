@@ -17,6 +17,11 @@ export function useCopyLink() {
     mutationFn: async (shareLink: string) => {
       await navigator.clipboard.writeText(`https://highlightai.com/share/${shareLink}`)
     },
+    onSuccess: (_, shareLink) => {
+      trackEvent('HL Chat Copy Link', {
+        share_link: `https://highlightai.com/share/${shareLink}`,
+      })
+    },
   })
 }
 
