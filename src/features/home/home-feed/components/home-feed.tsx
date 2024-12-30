@@ -249,10 +249,21 @@ function AudioNotesListItem(props: { audioNote: ConversationData; listIndex: num
 
   React.useEffect(() => {
     if (isActiveElement && !isMounted) {
-      handleClick()
+      setSelectedAudioNote(props.audioNote)
+      setSidePanelOpen(true)
+      setCurrentListIndex(props.listIndex)
       setIsMounted(true)
     }
-  }, [isActiveElement, handleClick, isMounted, setIsMounted])
+  }, [
+    isActiveElement,
+    props.audioNote,
+    props.listIndex,
+    setCurrentListIndex,
+    setSelectedAudioNote,
+    setIsMounted,
+    setSidePanelOpen,
+    isMounted,
+  ])
 
   React.useEffect(() => {
     function handleEnterKeyPress(e: KeyboardEvent) {
