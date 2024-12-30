@@ -366,6 +366,11 @@ function ChatAction(props: { chat: ChatHistoryItem }) {
     startNewConversation()
     addOrUpdateOpenConversation(props.chat)
     setConversationId(props.chat?.id)
+
+    trackEvent('HL Chat Opened', {
+      chatId: props.chat.id,
+      source: 'home_feed',
+    })
   }
 
   return (
@@ -416,20 +421,25 @@ function ChatListItem(props: { chat: ChatHistoryItem; listIndex: number }) {
   const [isMounted, setIsMounted] = useAtom(isMountedAtom)
 
   const handleClick = React.useCallback(() => {
+    function handleClick() { }
     setSelectedChatId(props.chat.id)
     setCurrentListIndex(props.listIndex)
-    trackEvent('HL Chat Opened', {
-      chatId: props.chat.id,
-      source: 'home_feed',
-    })
-  }, [props.chat, setSelectedChatId, props.listIndex, setCurrentListIndex])
+
+    if (isMounted) {
+      trackEvent('HL Chat Previewed', {
+        chatId: props.chat.id,
+        source: 'home_feed',
+      })
+    }
+  }, [props.chat, isMounted, setSelectedChatId, props.listIndex, setCurrentListIndex])
 
   React.useEffect(() => {
     if (isActiveElement && !isMounted) {
-      handleClick()
+      setSelectedChatId(props.chat.id)
+      setCurrentListIndex(props.listIndex)
       setIsMounted(true)
     }
-  }, [handleClick, isActiveElement, isMounted, setIsMounted])
+  }, [props.chat.id, props.listIndex, setCurrentListIndex, setSelectedChatId, isActiveElement, isMounted, setIsMounted])
 
   React.useEffect(() => {
     function handleEnterKeyPress(e: KeyboardEvent) {
