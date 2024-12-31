@@ -1,6 +1,7 @@
 import { PropsWithChildren, ReactElement, ReactHTMLElement, useCallback, useEffect, useRef, useState } from 'react'
-import { calculatePositionedStyle } from '@/utils/components'
 import { Portal } from 'react-portal'
+
+import { calculatePositionedStyle } from '@/utils/components'
 
 import styles from './contextmenu.module.scss'
 

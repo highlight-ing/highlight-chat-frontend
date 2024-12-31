@@ -92,6 +92,36 @@ export type Database = {
         }
         Relationships: []
       }
+      app_shortcut_preferences: {
+        Row: {
+          application_name_darwin: string | null
+          application_name_win32: string | null
+          context_types: Json | null
+          created_at: string
+          id: number
+          prompt_id: number
+          user_id: string
+        }
+        Insert: {
+          application_name_darwin?: string | null
+          application_name_win32?: string | null
+          context_types?: Json | null
+          created_at?: string
+          id?: number
+          prompt_id: number
+          user_id: string
+        }
+        Update: {
+          application_name_darwin?: string | null
+          application_name_win32?: string | null
+          context_types?: Json | null
+          created_at?: string
+          id?: number
+          prompt_id?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       conversation: {
         Row: {
           app_id: string | null
@@ -224,6 +254,8 @@ export type Database = {
           file_id: string | null
           file_type: string | null
           id: string
+          storage_provider: string | null
+          user_id: string | null
         }
         Insert: {
           conversation_id?: string | null
@@ -231,6 +263,8 @@ export type Database = {
           file_id?: string | null
           file_type?: string | null
           id?: string
+          storage_provider?: string | null
+          user_id?: string | null
         }
         Update: {
           conversation_id?: string | null
@@ -238,6 +272,8 @@ export type Database = {
           file_id?: string | null
           file_type?: string | null
           id?: string
+          storage_provider?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -415,6 +451,7 @@ export type Database = {
           created_at: string
           description: string | null
           email_integration_enabled: boolean | null
+          enable_agent_mode: boolean
           external_id: string
           id: number
           image: string | null
@@ -426,6 +463,7 @@ export type Database = {
           prompt_url: string | null
           public: boolean
           public_use_number: number
+          roleplay: boolean | null
           send_slack_message_integration_enabled: boolean | null
           slug: string
           suggestion_prompt_text: string | null
@@ -441,6 +479,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           email_integration_enabled?: boolean | null
+          enable_agent_mode?: boolean
           external_id?: string
           id?: number
           image?: string | null
@@ -452,6 +491,7 @@ export type Database = {
           prompt_url?: string | null
           public?: boolean
           public_use_number?: number
+          roleplay?: boolean | null
           send_slack_message_integration_enabled?: boolean | null
           slug: string
           suggestion_prompt_text?: string | null
@@ -467,6 +507,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           email_integration_enabled?: boolean | null
+          enable_agent_mode?: boolean
           external_id?: string
           id?: number
           image?: string | null
@@ -478,6 +519,7 @@ export type Database = {
           prompt_url?: string | null
           public?: boolean
           public_use_number?: number
+          roleplay?: boolean | null
           send_slack_message_integration_enabled?: boolean | null
           slug?: string
           suggestion_prompt_text?: string | null
@@ -662,6 +704,21 @@ export type Database = {
         }
         Returns: undefined
       }
+      get_conversations_with_files: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: {
+          id: string
+          user_id: string
+          title: string
+          app_id: string
+          created_at: string
+          updated_at: string
+          file_id: string
+          file_type: string
+        }[]
+      }
       get_conversations_with_shared:
         | {
             Args: {
@@ -758,6 +815,14 @@ export type Database = {
           shared_id: string
           shared_created_at: string
           shared_title: string
+        }[]
+      }
+      get_prompt_tags: {
+        Args: {
+          p_external_id: string
+        }
+        Returns: {
+          tag: string
         }[]
       }
       get_related_prompts: {

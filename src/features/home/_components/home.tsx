@@ -1,14 +1,16 @@
 import React from 'react'
-import { useAtomValue, useSetAtom } from 'jotai'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
 import { cn } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
+import { showHistoryAtom } from '@/atoms/history'
 import { isOnHomeAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
-import { Input } from '@/components/Input/Input'
 import { useStore } from '@/components/providers/store-provider'
 
-import { HomeFeed } from './home-feed/home-feed'
+import { chatInputIsFocusedAtom } from '../atoms'
+import { ChatInput } from '../chat-input/chat-input'
+import { HomeFeed } from '../home-feed/components/home-feed'
 
 function InputHeading() {
   const { promptName, promptDescription } = useStore(
@@ -28,14 +30,36 @@ function InputHeading() {
   )
 }
 
+function ChatFocusedOverlay() {
+  const [chatInputIsFocused, setChatInputIsFocused] = useAtom(chatInputIsFocusedAtom)
+
+  function handleClick() {
+    setChatInputIsFocused(false)
+  }
+
+  if (!chatInputIsFocused) return null
+
+  return (
+    <div
+      onClick={handleClick}
+      className={cn(
+        'fixed inset-0 z-[15] bg-black/70 backdrop-blur-[2px]',
+        chatInputIsFocused ? 'animate-in fade-in-0' : 'animate-out fade-out-0 ',
+      )}
+    />
+  )
+}
+
 export function ChatHome() {
   const setSidePanelOpen = useSetAtom(sidePanelOpenAtom)
   const isOnHome = useAtomValue(isOnHomeAtom)
+  const setShowHistory = useSetAtom(showHistoryAtom)
 
   React.useEffect(() => {
     trackEvent('HL Chat Home Viewed', {})
   }, [])
 
+  setShowHistory(false)
   setSidePanelOpen(true)
 
   return (
@@ -48,10 +72,11 @@ export function ChatHome() {
       <div className="space-y-4">
         <div className="space-y-6">
           <InputHeading />
-          <Input isActiveChat={false} />
+          <ChatInput />
         </div>
         <HomeFeed />
       </div>
+      <ChatFocusedOverlay />
     </div>
   )
 }

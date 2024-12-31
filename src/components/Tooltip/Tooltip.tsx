@@ -1,6 +1,7 @@
 import { CSSProperties, PropsWithChildren, ReactElement, useEffect, useRef, useState } from 'react'
-import { calculatePositionedStyle } from '@/utils/components'
 import { Portal } from 'react-portal'
+
+import { calculatePositionedStyle } from '@/utils/components'
 
 import styles from './tooltip.module.scss'
 

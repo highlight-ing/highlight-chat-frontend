@@ -1,8 +1,8 @@
 import { usePromptsStore } from '@/stores/prompts'
 import { ModalObjectProps } from '@/types'
-import { deletePrompt } from '@/utils/prompts'
 
 import { Prompt } from '@/types/supabase-helpers'
+import { deletePrompt } from '@/utils/prompts'
 import useAuth from '@/hooks/useAuth'
 import ConfirmationModal from '@/components/modals/ConfirmationModal'
 import { useStore } from '@/components/providers/store-provider'

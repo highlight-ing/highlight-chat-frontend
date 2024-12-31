@@ -326,9 +326,8 @@ export const useSubmitQuery = () => {
 
         const chunk = new TextDecoder().decode(value)
 
-        const { content, windowName, conversation, factIndex, fact, messageId, visualization } = await parseAndHandleStreamChunk(
-          chunk,
-          {
+        const { content, windowName, conversation, factIndex, fact, messageId, visualization } =
+          await parseAndHandleStreamChunk(chunk, {
             showConfirmationModal,
             addToast,
             integrations,
@@ -358,8 +357,7 @@ export const useSubmitQuery = () => {
                 })
               }
             },
-          },
-        )
+          })
 
         if (content) {
           accumulatedMessage += content
@@ -369,7 +367,7 @@ export const useSubmitQuery = () => {
             conversation_id: conversationId,
             id: messageId,
             given_feedback: null,
-            visualization: visualization
+            visualization: visualization,
           })
         }
 
@@ -381,7 +379,7 @@ export const useSubmitQuery = () => {
               value: conversation_data.transcript,
               duration: Math.floor(
                 (new Date(conversation_data.endedAt).getTime() - new Date(conversation_data.startedAt).getTime()) /
-                60000,
+                  60000,
               ),
             })
           } else {
@@ -401,7 +399,7 @@ export const useSubmitQuery = () => {
             fact: fact,
             id: messageId,
             given_feedback: null,
-            visualization: visualization
+            visualization: visualization,
           })
         } else if (fact) {
           updateLastConversationMessage(conversationId, {
@@ -411,7 +409,7 @@ export const useSubmitQuery = () => {
             fact: fact,
             id: messageId,
             given_feedback: null,
-            visualization: visualization
+            visualization: visualization,
           })
         }
 

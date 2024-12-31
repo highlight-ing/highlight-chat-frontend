@@ -10,6 +10,7 @@ export function IntercomChat() {
         Intercom({
           app_id: 'ibrkc80g',
           name: highlightUserEmail,
+          alignment: 'left',
         })
       }
       getUser()

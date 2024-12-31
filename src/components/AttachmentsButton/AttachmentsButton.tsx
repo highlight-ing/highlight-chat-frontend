@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { MAX_NUMBER_OF_ATTACHMENTS } from '@/stores/chat-attachments'
-import { trackEvent } from '@/utils/amplitude'
 import Highlight from '@highlight-ai/app-runtime'
 import { ClipboardText, DocumentUpload, GalleryAdd, VoiceSquare } from 'iconsax-react'
 import mammoth from 'mammoth'
 import * as pptxtojson from 'pptxtojson'
 import { useShallow } from 'zustand/react/shallow'
 
+import { trackEvent } from '@/utils/amplitude'
 import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
 import { PaperclipIcon } from '@/components/icons'
 import { useStore } from '@/components/providers/store-provider'

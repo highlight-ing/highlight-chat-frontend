@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { ChatHistoryItem } from '@/types'
-import { trackEvent } from '@/utils/amplitude'
 import variables from '@/variables.module.scss'
 import { EmojiHappy } from 'iconsax-react'
 
+import { trackEvent } from '@/utils/amplitude'
 import { useDeleteConversation, useShareConversation } from '@/hooks/useShareConversation'
 import Button from '@/components/Button/Button'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'

@@ -372,7 +372,7 @@ export async function fetchPrompts(authToken: string) {
   const { data: prompts, error: promptsError } = await supabase
     .from('prompts')
     .select(
-      'id, external_id, name, description, prompt_text, prompt_url, created_at, slug, user_id, public, suggestion_prompt_text, video_url, image, is_handlebar_prompt, public_use_number, system_prompt, can_trend, user_images(file_extension), preferred_attachment, added_prompt_tags(tags(external_id, tag, slug)), linear_integration_enabled, email_integration_enabled, create_notion_page_integration_enabled, create_gcal_event_integration_enabled, canShowOnPromptPage, send_slack_message_integration_enabled',
+      'id, external_id, name, description, prompt_text, prompt_url, created_at, slug, user_id, public, suggestion_prompt_text, video_url, image, is_handlebar_prompt, public_use_number, system_prompt, can_trend, user_images(file_extension), preferred_attachment, added_prompt_tags(tags(external_id, tag, slug)), linear_integration_enabled, email_integration_enabled, create_notion_page_integration_enabled, create_gcal_event_integration_enabled, canShowOnPromptPage, send_slack_message_integration_enabled, enable_agent_mode, roleplay',
     )
     .eq('user_id', userId)
 
@@ -387,7 +387,7 @@ export async function fetchPrompts(authToken: string) {
   const { data: trendingPrompts, error: trendingPromptsError } = await supabase
     .from('prompts')
     .select(
-      'id, external_id, name, description, prompt_text, prompt_url, created_at, slug, user_id, public, suggestion_prompt_text, video_url, image, is_handlebar_prompt, public_use_number, system_prompt, can_trend, user_images(file_extension), preferred_attachment, added_prompt_tags(tags(external_id, tag, slug)), linear_integration_enabled, email_integration_enabled, create_notion_page_integration_enabled, create_gcal_event_integration_enabled, canShowOnPromptPage, send_slack_message_integration_enabled',
+      'id, external_id, name, description, prompt_text, prompt_url, created_at, slug, user_id, public, suggestion_prompt_text, video_url, image, is_handlebar_prompt, public_use_number, system_prompt, can_trend, user_images(file_extension), preferred_attachment, added_prompt_tags(tags(external_id, tag, slug)), linear_integration_enabled, email_integration_enabled, create_notion_page_integration_enabled, create_gcal_event_integration_enabled, canShowOnPromptPage, send_slack_message_integration_enabled, enable_agent_mode, roleplay',
     )
     .eq('can_trend', true)
 
@@ -611,4 +611,132 @@ export async function countPromptView(externalId: string, authToken: string) {
     console.error('countPromptView: Error inserting prompt usage', promptUsageError)
     return { error: ERROR_MESSAGES.DATABASE_ERROR }
   }
+}
+
+/**
+ * Fetches the app shortcut preferences for a specific prompt and user
+ */
+export async function getPromptShortcutPreferences(promptId: number, authToken: string) {
+  let userId: string
+
+  try {
+    userId = await validateUserAuth(authToken)
+  } catch (error) {
+    return { error: ERROR_MESSAGES.INVALID_AUTH_TOKEN }
+  }
+
+  const supabase = supabaseAdmin()
+
+  const { data: preferences, error } = await supabase
+    .from('app_shortcut_preferences')
+    .select('*')
+    .eq('prompt_id', promptId)
+    .eq('user_id', userId)
+    .maybeSingle()
+
+  if (error) {
+    console.error('Error fetching app shortcut preferences:', error)
+    return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
+  }
+
+  return { preferences }
+}
+
+export async function deletePromptShortcutPreferences(promptId: number, authToken: string) {
+  let userId: string
+  try {
+    userId = await validateUserAuth(authToken)
+  } catch (error) {
+    return { error: ERROR_MESSAGES.INVALID_AUTH_TOKEN }
+  }
+
+  const supabase = supabaseAdmin()
+
+  const { error } = await supabase
+    .from('app_shortcut_preferences')
+    .delete()
+    .eq('prompt_id', promptId)
+    .eq('user_id', userId)
+
+  if (error) {
+    console.error('Error deleting app shortcut preferences:', error)
+    return { error: ERROR_MESSAGES.DATABASE_ERROR }
+  }
+
+  return { success: true }
+}
+
+/**
+ * Updates or creates app shortcut preferences for a specific prompt
+ */
+export async function upsertPromptShortcutPreferences(
+  promptId: number,
+  preferences: {
+    application_name_darwin?: string | null
+    application_name_win32?: string | null
+    context_types?: {
+      selected_text: boolean
+      audio_transcription: boolean
+      clipboard_text: boolean
+      screenshot: boolean
+      window: boolean
+    } | null
+  },
+  authToken: string,
+) {
+  let userId: string
+  try {
+    userId = await validateUserAuth(authToken)
+  } catch (error) {
+    return { error: ERROR_MESSAGES.INVALID_AUTH_TOKEN }
+  }
+
+  const supabase = supabaseAdmin()
+
+  const record = {
+    prompt_id: promptId,
+    user_id: userId,
+    application_name_darwin: preferences.application_name_darwin,
+    application_name_win32: preferences.application_name_win32,
+    context_types: preferences.context_types,
+  }
+
+  // Use onConflict to specify which fields determine a unique record
+  const { error } = await supabase.from('app_shortcut_preferences').upsert(record, {
+    onConflict: 'prompt_id,user_id',
+  })
+
+  if (error) {
+    console.error('Error updating app shortcut preferences:', error)
+    return { error: ERROR_MESSAGES.DATABASE_ERROR }
+  }
+
+  return { success: true }
+}
+
+/**
+ * Removes app shortcut preferences for a specific prompt
+ */
+export async function removePromptShortcutPreferences(promptId: number, authToken: string) {
+  let userId: string
+  try {
+    userId = await validateUserAuth(authToken)
+  } catch (error) {
+    return { error: ERROR_MESSAGES.INVALID_AUTH_TOKEN }
+  }
+
+  const supabase = supabaseAdmin()
+
+  const { error } = await supabase
+    .from('app_shortcut_preferences')
+    .delete()
+    .eq('prompt_id', promptId)
+    .eq('user_id', userId)
+
+  if (error) {
+    console.error('Error removing app shortcut preferences:', error)
+    return { error: ERROR_MESSAGES.DATABASE_ERROR }
+  }
+
+  return { success: true }
 }

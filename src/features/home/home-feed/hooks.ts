@@ -7,7 +7,7 @@ import { useAtom } from 'jotai'
 
 import { ConversationData } from '@/types/conversations'
 import { PAGINATION_LIMIT } from '@/lib/constants'
-import { useInfiniteHistory } from '@/hooks/history'
+import { useHistory } from '@/hooks/chat-history'
 
 import { recentActionsPageAtom } from './atoms'
 
@@ -27,24 +27,24 @@ export function useAudioNotes() {
 export function useRecentActions() {
   const [localPage, setLocalPage] = useAtom(recentActionsPageAtom)
   const [isLoadingMore, setIsLoadingMore] = React.useState(false)
-  const historyQuery = useInfiniteHistory()
+  const historyQuery = useHistory()
   const audioQuery = useAudioNotes()
 
   const combinedData = React.useMemo(() => {
-    if (!historyQuery.data?.pages || !audioQuery.data) return null
+    const allChats =
+      historyQuery.data?.pages.flat().map((chat) => ({
+        ...chat,
+        updatedAt: new Date(chat.updated_at),
+        type: 'chat' as const,
+      })) ?? []
+    const audioNotes =
+      audioQuery.data?.map((audioNote) => ({
+        ...audioNote,
+        updatedAt: audioNote.endedAt,
+        type: 'audio-note' as const,
+      })) ?? []
 
-    const allChats = historyQuery.data.pages.flat().map((chat) => ({
-      ...chat,
-      updatedAt: new Date(chat.updated_at).toISOString(),
-      type: 'chat' as const,
-    }))
-    const audioNotes = audioQuery.data.map((audioNote) => ({
-      ...audioNote,
-      updatedAt: audioNote.endedAt.toISOString(),
-      type: 'audio-note' as const,
-    }))
-
-    return [...allChats, ...audioNotes].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+    return [...allChats, ...audioNotes].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
   }, [historyQuery.data?.pages, audioQuery.data])
 
   const fetchNextPage = React.useCallback(async () => {
@@ -83,8 +83,8 @@ export function useRecentActions() {
         }
       }
 
-      const oldestChatTime = new Date(oldestLoadedChat.updated_at).toISOString()
-      const needsMoreChats = nextBatchOfItems.some((item) => item.updatedAt > oldestChatTime)
+      const oldestChatTime = new Date(oldestLoadedChat.updated_at).getTime()
+      const needsMoreChats = nextBatchOfItems.some((item) => item.updatedAt.getTime() > oldestChatTime)
 
       if (needsMoreChats && historyQuery.hasNextPage) {
         await historyQuery.fetchNextPage()

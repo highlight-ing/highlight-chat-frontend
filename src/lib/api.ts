@@ -1,6 +1,7 @@
 import { SharedChat } from '@/types'
-import { backendUrl } from '@/utils/chatBackendUrl'
 import { z } from 'zod'
+
+import { backendUrl } from '@/utils/chatBackendUrl'
 
 import { extractBearerToken, validateHighlightJWT } from './auth'
 

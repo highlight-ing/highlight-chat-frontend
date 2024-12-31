@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { DownloadPlatformType, PlatformType } from '@/types'
+
 import { trackEvent } from '@/utils/amplitude'
 import { buildDownloadURL } from '@/utils/downloadUrl'
-
 import { usePlatform } from '@/hooks/usePlatform'
 import {
   DropdownMenu,

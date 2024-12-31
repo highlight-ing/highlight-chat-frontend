@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { usePromptEditorStore } from '@/stores/prompt-editor'
-import { trackEvent } from '@/utils/amplitude'
 import variables from '@/variables.module.scss'
 import Editor, { Monaco } from '@monaco-editor/react'
 import { editor, IDisposable } from 'monaco-editor'
 
 import { buildSuggestions } from '@/lib/IntelliPrompt'
+import { trackEvent } from '@/utils/amplitude'
 
 import editorStyles from './EditorOverride.module.scss'
 import styles from './prompteditor.module.scss'

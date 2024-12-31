@@ -25,7 +25,7 @@ function ScreenSelector({
   return (
     <div
       className={`${styles.tab} ${active ? styles.active : ''} ${disabled ? styles.disabled : ''}`}
-      onClick={disabled ? () => { } : () => setSelectedScreen(name)}
+      onClick={disabled ? () => {} : () => setSelectedScreen(name)}
     >
       {title}
     </div>

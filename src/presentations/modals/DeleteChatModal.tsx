@@ -1,25 +1,24 @@
 import { ChatHistoryItem, ModalObjectProps } from '@/types'
 import { useShallow } from 'zustand/react/shallow'
 
+import { useChatHistoryStore } from '@/hooks/chat-history'
 import { useApi } from '@/hooks/useApi'
-import { useChatHistory } from '@/hooks/useChatHistory'
 import ConfirmationModal from '@/components/modals/ConfirmationModal'
 import { useStore } from '@/components/providers/store-provider'
 
 const DeleteChatModal = ({ id, context }: ModalObjectProps) => {
   const chat = context as ChatHistoryItem
   const { deleteRequest } = useApi()
-  const { refreshChatHistory } = useChatHistory()
-  const { conversationId, startNewConversation, closeModal, removeOpenConversation, clearConversationMessages } =
-    useStore(
-      useShallow((state) => ({
-        conversationId: state.conversationId,
-        startNewConversation: state.startNewConversation,
-        closeModal: state.closeModal,
-        removeOpenConversation: state.removeOpenConversation,
-        clearConversationMessages: state.clearConversationMessages,
-      })),
-    )
+  const { conversationId, startNewConversation, closeModal, removeOpenConversation } = useStore(
+    useShallow((state) => ({
+      conversationId: state.conversationId,
+      startNewConversation: state.startNewConversation,
+      closeModal: state.closeModal,
+      removeOpenConversation: state.removeOpenConversation,
+      clearConversationMessages: state.clearConversationMessages,
+    })),
+  )
+  const { removeChatsByIds } = useChatHistoryStore()
 
   const onDelete = async () => {
     const response = await deleteRequest(`history/${chat?.id}`, { version: 'v3' })
@@ -32,7 +31,7 @@ const DeleteChatModal = ({ id, context }: ModalObjectProps) => {
       startNewConversation()
     }
     removeOpenConversation(chat?.id)
-    await refreshChatHistory()
+    removeChatsByIds([chat.id])
     closeModal(id)
   }
 

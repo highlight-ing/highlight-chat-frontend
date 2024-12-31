@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { trackEvent } from '@/utils/amplitude'
 import Highlight from '@highlight-ai/app-runtime'
 
+import { trackEvent } from '@/utils/amplitude'
 import { useStore } from '@/components/providers/store-provider'
 
 import { AttachmentPicker } from '../AttachmentPicker/AttachmentPicker'

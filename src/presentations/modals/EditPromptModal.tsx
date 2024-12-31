@@ -13,12 +13,102 @@ import { useStore } from '@/components/providers/store-provider'
 
 import styles from './modals.module.scss'
 
-const EditPromptModal = ({ id, context }: ModalObjectProps) => {
-  const prompt = context?.prompt as Prompt
+interface AppVisibility {
+  [key: string]: boolean
+}
 
-  const { setPromptEditorData, setSelectedScreen, setSettingsHasNoErrors } = usePromptEditorStore()
+const EditPromptModal = ({ id, context }: ModalObjectProps) => {
+  const prompt = context?.data.prompt as Prompt
+  const preferences = context?.data.promptShortcutPreferences as any
+
+  const {
+    setPromptEditorData,
+    setSelectedScreen,
+    setSettingsHasNoErrors,
+    setSelectedApp,
+    setAppVisibility,
+    setContextTypes,
+    setIsInitialPreferencesLoad,
+  } = usePromptEditorStore()
+
   const closeModal = useStore((state) => state.closeModal)
 
+  const isInitializing = useRef(true)
+
+
+  // Handle app visibility and context types initialization
+  useEffect(() => {
+    if (!isInitializing.current) {
+      setIsInitialPreferencesLoad(true)
+    }
+
+    if (!preferences) {
+      // No preferences found - set to hidden state
+      setSelectedApp('hidden')
+      setAppVisibility({})
+      setContextTypes(null)
+      setIsInitialPreferencesLoad(false) 
+
+      return
+    }
+
+    // Handle "all apps" case
+    if (preferences.application_name_darwin === '*') {
+      setSelectedApp('all')
+      setAppVisibility({})
+      setContextTypes(
+        preferences.context_types ?? {
+          selected_text: true,
+          audio_transcription: true,
+          clipboard_text: true,
+          screenshot: true,
+          window: true,
+        },
+      )
+      return
+    }
+
+    try {
+      // Parse the JSON array of apps
+      const apps = JSON.parse(preferences.application_name_darwin || '[]') as string[]
+
+      if (apps.length === 0) {
+        // Empty apps array - set to hidden state
+        setSelectedApp('hidden')
+        setAppVisibility({})
+        setContextTypes(null)
+      } else {
+        // Specific apps selected
+        setSelectedApp('specific')
+        const newVisibility: AppVisibility = {}
+        apps.forEach((app: string) => {
+          newVisibility[app] = true
+        })
+        setAppVisibility(newVisibility)
+
+        // Use context types from preferences if they exist
+        setContextTypes(
+          preferences.context_types ?? {
+            selected_text: true,
+            audio_transcription: true,
+            clipboard_text: true,
+            screenshot: true,
+            window: true,
+          },
+        )
+      }
+    } catch (error) {
+      console.error('Error parsing app preferences:', error)
+      // Error case - set to hidden state
+      setSelectedApp('hidden')
+      setAppVisibility({})
+      setContextTypes(null)
+    }
+    setIsInitialPreferencesLoad(false) 
+
+  }, [preferences])
+
+  // Initialize prompt editor data
   useEffect(() => {
     setSelectedScreen('app')
     setPromptEditorData(
@@ -67,15 +157,12 @@ const EditPromptModal = ({ id, context }: ModalObjectProps) => {
   )
 }
 
-export default EditPromptModal
-
 function ShareLinkButton() {
   const timeout = useRef<NodeJS.Timeout | null>(null)
   const { promptEditorData } = usePromptEditorStore()
 
   const slug = promptEditorData.slug
 
-  // const host = window.location.protocol + '//' + window.location.host
   const url = `https://chat.highlight.ing/prompts/${slug}`
 
   const [copied, setCopied] = useState(false)
@@ -103,3 +190,5 @@ function ShareLinkButton() {
     </Button>
   )
 }
+
+export default EditPromptModal

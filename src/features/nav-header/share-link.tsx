@@ -5,13 +5,13 @@ import { ChatHistoryItem } from '@/types'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowDown2, EmojiHappy, Send2 } from 'iconsax-react'
 
+import { useCopyLink, useDisableLink, useGenerateShareLink } from '@/hooks/share-link'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import Button from '@/components/Button/Button'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
+import { SharePopoverContent } from '@/components/share-popover'
 
-import { useCopyLink, useDisableLink, useGenerateShareLink } from './hooks'
-
-function GenerateShareLinkButton(props: { conversationId: string }) {
+function GenerateShareLinkButton(props: { conversation: ChatHistoryItem }) {
   const { mutate: generateShareLink, isPending } = useGenerateShareLink()
 
   return (
@@ -19,7 +19,7 @@ function GenerateShareLinkButton(props: { conversationId: string }) {
       variant="accent"
       size="small"
       disabled={isPending}
-      onClick={() => generateShareLink(props.conversationId)}
+      onClick={() => generateShareLink(props.conversation)}
       style={{ gap: 8 }}
     >
       Share
@@ -98,12 +98,8 @@ function DisableShareLinkButton(props: DisableShareLinkButtonProps) {
   )
 }
 
-function ShareLinkModal(props: { conversation: ChatHistoryItem }) {
+function ShareLinkPopover(props: { conversation: ChatHistoryItem }) {
   const [open, setOpen] = React.useState(false)
-
-  const formattedTitle = props.conversation?.title.replace(/^["']|["']$/g, '')
-
-  const mostRecentShareLinkId = props.conversation?.shared_conversations?.[0]?.id
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -122,35 +118,7 @@ function ShareLinkModal(props: { conversation: ChatHistoryItem }) {
           </motion.span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" sideOffset={8} className="w-[400px] space-y-3">
-        <div className="flex flex-col justify-start">
-          <h3 className="text-md font-regular text-left text-white">Share Chat</h3>
-        </div>
-        {props.conversation ? (
-          <div className="relative rounded-2xl bg-tertiary">
-            <div className="flex items-center gap-3 border-b border-b-light-5 p-3">
-              <EmojiHappy size={24} variant="Bold" color="#712FFF" />
-              <div className="flex flex-col justify-center text-sm font-medium text-light-40">
-                <p className="text-light">{formattedTitle}</p>
-                <p className="text-[13px] font-medium leading-[16px] text-light-40">
-                  {mostRecentShareLinkId ? 'Public Chat' : 'Private Chat'}
-                </p>
-              </div>
-            </div>
-            <div className="p-3 text-sm font-medium text-light-20">
-              {mostRecentShareLinkId
-                ? `https://highlightai.com/share/${mostRecentShareLinkId}`
-                : 'All currently inside the chat will be shared. contents'}
-            </div>
-          </div>
-        ) : (
-          <p className="text-sm font-medium text-subtle">
-            You haven&apos;t selected a conversation yet. Please select one and try sharing again.
-          </p>
-        )}
-
-        {mostRecentShareLinkId && <DisableShareLinkButton conversationId={props.conversation.id} />}
-      </PopoverContent>
+      <SharePopoverContent conversation={props.conversation} />
     </Popover>
   )
 }
@@ -161,13 +129,13 @@ export function ShareLink(props: { conversation: ChatHistoryItem | null }) {
   if (!props.conversation) return null
 
   if (!mostRecentShareLinkId) {
-    return <GenerateShareLinkButton conversationId={props.conversation.id} />
+    return <GenerateShareLinkButton conversation={props.conversation} />
   }
 
   return (
     <div className="flex items-center gap-px">
       <CopyLinkButton shareLinkId={mostRecentShareLinkId} />
-      <ShareLinkModal conversation={props.conversation} />
+      <ShareLinkPopover conversation={props.conversation} />
     </div>
   )
 }

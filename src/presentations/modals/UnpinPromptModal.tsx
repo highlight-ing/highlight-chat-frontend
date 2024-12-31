@@ -1,9 +1,9 @@
 import { ModalObjectProps } from '@/types'
-import { trackEvent } from '@/utils/amplitude'
-import { removePromptFromUser } from '@/utils/prompts'
 import Highlight from '@highlight-ai/app-runtime'
 
 import { Prompt } from '@/types/supabase-helpers'
+import { trackEvent } from '@/utils/amplitude'
+import { removePromptFromUser } from '@/utils/prompts'
 import useAuth from '@/hooks/useAuth'
 import usePromptApps from '@/hooks/usePromptApps'
 import ConfirmationModal from '@/components/modals/ConfirmationModal'

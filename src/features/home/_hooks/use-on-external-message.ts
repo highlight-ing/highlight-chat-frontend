@@ -5,13 +5,12 @@ import { useRouter } from 'next/navigation'
 import Highlight from '@highlight-ai/app-runtime'
 
 import { DEFAULT_PROMPT_EXTERNAL_IDS } from '@/lib/promptapps'
+import { useChatHistoryStore } from '@/hooks/chat-history'
 import { useChatHistory } from '@/hooks/useChatHistory'
 import useForkDefaultAction from '@/hooks/useForkDefaultAction'
 import usePromptApps from '@/hooks/usePromptApps'
 import { useSubmitQuery } from '@/hooks/useSubmitQuery'
 import { useStore } from '@/components/providers/store-provider'
-
-import { useIntegration } from '@/features/integrations/_hooks/use-integration'
 
 export function useOnExternalMessage() {
   const router = useRouter()
@@ -21,16 +20,17 @@ export function useOnExternalMessage() {
     closeAllModals: state.closeAllModals,
     isModalOpen: state.isModalOpen,
   }))
-  const { refreshChatItem, refreshChatHistory } = useChatHistory()
+  const { refreshChatItem } = useChatHistory()
   const { addToast } = useStore((state) => ({
     addToast: state.addToast,
   }))
   const addPendingIntegration = useStore((state) => state.addPendingIntegration)
+  const addPendingCreateAction = useStore((state) => state.addPendingCreateAction)
   const addAttachment = useStore((state) => state.addAttachment)
   const { handleSubmit } = useSubmitQuery()
   const { forkDefaultAction } = useForkDefaultAction()
-  const { createAction } = useIntegration()
   const { selectPrompt, refreshPinnedPrompts, getPrompt } = usePromptApps()
+  const { invalidateChatHistory } = useChatHistoryStore()
 
   useEffect(() => {
     const removeListener = Highlight.app.addListener('onExternalMessage', async (caller: string, message: any) => {
@@ -53,7 +53,7 @@ export function useOnExternalMessage() {
         setConversationId(message.conversationId)
 
         console.log('Refetching chat history from external message')
-        await refreshChatHistory()
+        await invalidateChatHistory()
 
         if (message.userInput?.length > 0) {
           // Handle user input from floaty
@@ -149,7 +149,10 @@ export function useOnExternalMessage() {
         }
 
         if (message.shareAction) {
-          await createAction(message.shareAction)
+          addPendingCreateAction({
+            actionName: message.shareAction,
+            conversationId: message.conversationId,
+          })
         }
       } else if (message.type === 'customize-prompt') {
         console.log('Customize prompt message received for prompt:', message.prompt)
@@ -163,7 +166,7 @@ export function useOnExternalMessage() {
             return
           }
 
-          openModal('edit-prompt', { prompt: message.prompt })
+          openModal('edit-prompt', { data: message })
         }
 
         if (isModalOpen('edit-prompt')) {
@@ -194,5 +197,22 @@ export function useOnExternalMessage() {
     return () => {
       removeListener()
     }
-  }, [setConversationId, openModal])
+  }, [
+    setConversationId,
+    openModal,
+    addAttachment,
+    addPendingIntegration,
+    addToast,
+    closeAllModals,
+    forkDefaultAction,
+    getPrompt,
+    handleSubmit,
+    invalidateChatHistory,
+    isModalOpen,
+    refreshChatItem,
+    refreshPinnedPrompts,
+    router,
+    selectPrompt,
+    addPendingCreateAction,
+  ])
 }

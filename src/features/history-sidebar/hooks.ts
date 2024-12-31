@@ -1,6 +1,7 @@
 import { ChatHistoryItem } from '@/types'
 import { useMutation } from '@tanstack/react-query'
 
+import { useChatHistoryStore } from '@/hooks/chat-history'
 import { useChatHistory } from '@/hooks/useChatHistory'
 
 const RETRY_ATTEMPTS = 4
@@ -8,6 +9,7 @@ export const NEW_CONVERSATION_TITLE = 'New Conversation'
 
 export function useUpdateConversationTitle() {
   const { refreshChatItem } = useChatHistory()
+  const { addOrUpdateChat } = useChatHistoryStore()
 
   return useMutation({
     mutationKey: ['update-conversation-title'],
@@ -20,6 +22,9 @@ export function useUpdateConversationTitle() {
       }
 
       return updatedConversation
+    },
+    onSuccess: (chat) => {
+      addOrUpdateChat(chat)
     },
     retry: RETRY_ATTEMPTS,
     retryDelay: (attemptIndex) => {

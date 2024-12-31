@@ -1,10 +1,10 @@
 'use client'
 
 import React from 'react'
-import { initAmplitude, trackEvent } from '@/utils/amplitude'
 import * as Sentry from '@sentry/react'
 import { decodeJwt } from 'jose'
 
+import { initAmplitude, trackEvent } from '@/utils/amplitude'
 import useAuth from '@/hooks/useAuth'
 import { useStore } from '@/components/providers/store-provider'
 

@@ -7,7 +7,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 import { cn } from '@/lib/utils'
 import { showHistoryAtom } from '@/atoms/history'
-import { isOnHomeAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
+import { isOnHomeAtom, showBackButtonAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
 import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
 import { Input } from '@/components/Input/Input'
 import Messages from '@/components/Messages/Messages'
@@ -16,6 +16,7 @@ import { useStore } from '@/components/providers/store-provider'
 
 import { ChatHeader } from '@/features/chat/chat-header/chat-header'
 import { HistorySidebar } from '@/features/history-sidebar/history-sidebar'
+import { ChatHome } from '@/features/home/_components/home'
 import { IntercomChat } from '@/features/home/_components/intercom-chat'
 import { useClipboardPaste } from '@/features/home/_hooks/use-clipboard-paste'
 import { useConversationLoad } from '@/features/home/_hooks/use-conversation-load'
@@ -23,13 +24,13 @@ import { useOnAppOpen } from '@/features/home/_hooks/use-on-app-open'
 import { useOnExternalMessage } from '@/features/home/_hooks/use-on-external-message'
 import { useOnPromptChange } from '@/features/home/_hooks/use-on-prompt-change'
 import { useOnPromptLoad } from '@/features/home/_hooks/use-on-prompt-load'
-import { ChatHome } from '@/features/home/home'
 import { NavigationTopBar } from '@/features/nav-header/top-bar/top-bar'
-import { SidePanel } from '@/features/side-panel/side-panel'
+import { HighlightSidePanel } from '@/features/side-panel/components/highlight-side-panel'
 
 export default function Home() {
   const [showHistory, setShowHistory] = useAtom(showHistoryAtom)
   const [sidePanelOpen, setSidePanelOpen] = useAtom(sidePanelOpenAtom)
+  const setShowBackButton = useSetAtom(showBackButtonAtom)
   const setIsOnHome = useSetAtom(isOnHomeAtom)
   const { inputIsDisabled, promptApp, isConversationLoading } = useStore(
     useShallow((state) => ({
@@ -44,9 +45,13 @@ export default function Home() {
   }, [inputIsDisabled, messages])
 
   React.useEffect(() => {
-    setIsOnHome(!isChatting)
-    setSidePanelOpen(false)
-  }, [isChatting, setIsOnHome, setSidePanelOpen])
+    setIsOnHome(!isChatting && !isConversationLoading)
+
+    if (isChatting || isConversationLoading) {
+      setSidePanelOpen(false)
+      setShowBackButton(false)
+    }
+  }, [isChatting, setShowBackButton, setIsOnHome, setSidePanelOpen, isConversationLoading])
 
   useClipboardPaste()
   useConversationLoad()
@@ -57,7 +62,7 @@ export default function Home() {
 
   return (
     <div className={styles.page}>
-      <HistorySidebar showHistory={showHistory} setShowHistory={setShowHistory} />
+      <HistorySidebar />
       <NavigationTopBar showHistory={showHistory} setShowHistory={setShowHistory} />
       <div
         className={cn(
@@ -70,7 +75,7 @@ export default function Home() {
           className={cn(
             'col-span-3 flex w-full flex-col items-center justify-end transition delay-100',
             styles.contents,
-            sidePanelOpen && 'col-span-2',
+            sidePanelOpen && 'lg:col-span-2',
           )}
         >
           <ChatHeader isShowing={!isConversationLoading && !!promptApp && messages.length === 0} />
@@ -80,7 +85,7 @@ export default function Home() {
           {(isChatting || promptApp) && <Input isActiveChat={true} />}
           <IntercomChat />
         </div>
-        <SidePanel />
+        <HighlightSidePanel />
       </div>
     </div>
   )

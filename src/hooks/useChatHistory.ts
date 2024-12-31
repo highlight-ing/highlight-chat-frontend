@@ -1,13 +1,11 @@
-import { pages } from 'next/dist/build/templates/app-page'
 import { ChatHistoryItem } from '@/types'
-import { InfiniteData, useQueryClient } from '@tanstack/react-query'
 import equal from 'fast-deep-equal'
 import { useShallow } from 'zustand/react/shallow'
 
 import { useApi } from '@/hooks/useApi'
 import { useStore } from '@/components/providers/store-provider'
 
-import { useHistoryStore } from './history'
+import { useChatHistoryStore } from './chat-history'
 
 interface ChatHistoryResponse {
   conversations: ChatHistoryItem[]
@@ -18,7 +16,7 @@ export const useChatHistory = (): {
   refreshChatHistory: () => Promise<ChatHistoryItem[]>
   refreshChatItem: (conversationId: string, addOpenConversation?: boolean) => Promise<ChatHistoryItem | null>
 } => {
-  const { addOrUpdateChat } = useHistoryStore()
+  const { addOrUpdateChat } = useChatHistoryStore()
   const { get } = useApi()
   const { history, setHistory, addOrUpdateOpenConversation, openConversations } = useStore(
     useShallow((state) => ({

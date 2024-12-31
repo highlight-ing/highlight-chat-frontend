@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { trackEvent } from '@/utils/amplitude'
 import Highlight from '@highlight-ai/app-runtime'
 
+import { trackEvent } from '@/utils/amplitude'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useStore } from '@/components/providers/store-provider'

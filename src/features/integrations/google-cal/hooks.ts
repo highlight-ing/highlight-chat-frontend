@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
+import { HIGHLIGHT_BACKEND_BASE_URL } from '@/lib/integrations-backend'
+
 import { useHighlightToken } from '../_hooks/use-hl-token'
-import { checkGoogleConnectionStatus, createGoogleCalendarEvent } from './actions'
+import { checkGoogleConnectionStatus } from './actions'
 import { GoogleCalEventFormSchema } from './google-cal'
 
 export function useCheckGoogleCalConnection() {
@@ -22,31 +24,39 @@ export function useCheckGoogleCalConnection() {
   })
 }
 
+interface CreateGoogleCalEventResponse {
+  url: string
+}
+
 export function useCreateGoogleCalEvent(onSuccess: ((url: string) => void) | undefined) {
   const { data: hlToken } = useHighlightToken()
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationKey: ['create-google-cal-event'],
-    mutationFn: async (data: GoogleCalEventFormSchema) => {
+    mutationFn: async (input: GoogleCalEventFormSchema) => {
       if (!hlToken) {
         console.warn('Highlight token not set, please try again later.')
-        throw new Error('No Highligh token available')
+        throw new Error('No Highlight token available')
       }
 
-      const connected = await checkGoogleConnectionStatus(hlToken)
+      const response = await fetch(`${HIGHLIGHT_BACKEND_BASE_URL}/v1/gcal/event`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${hlToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(input),
+      })
 
-      if (!connected) {
-        throw new Error('Not connected to Google Cal')
+      if (!response.ok) {
+        const responseText = await response.text()
+        throw new Error(`Failed to create Google Calendar event: ${responseText}`)
       }
 
-      const link = await createGoogleCalendarEvent(hlToken, data)
+      const data = (await response.json()) as CreateGoogleCalEventResponse
 
-      if (!link) {
-        throw new Error('Error getting google cal event link')
-      }
-
-      return link
+      return data.url
     },
     onSuccess: (link) => {
       if (onSuccess) onSuccess(link)
