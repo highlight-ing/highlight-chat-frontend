@@ -9,7 +9,7 @@ interface NameContextType {
 
 const defaultContextValue: NameContextType = {
   name: '',
-  handleNameUpdate: async () => { }, // Provide a no-op function
+  handleNameUpdate: async () => {}, // Provide a no-op function
 }
 
 const NameContext = createContext<NameContextType>(defaultContextValue)
@@ -34,7 +34,7 @@ export const NameProvider: React.FC<NameProviderProps> = ({ children }) => {
   }, [])
 
   const handleNameUpdate = async (newName: string) => {
-    await Highlight.appStorage.set('name', newName)
+    Highlight.appStorage.set('name', newName)
     setName(newName)
   }
 

@@ -14,7 +14,7 @@ import { cn, getDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { formatTitle } from '@/utils/conversations'
 import { selectedAudioNoteAtom, selectedChatIdAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
-import { useHistory, useHistoryByChatId } from '@/hooks/chat-history'
+import { useHistory } from '@/hooks/chat-history'
 import { useCopyLink, useGenerateShareLink } from '@/hooks/share-link'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -24,6 +24,7 @@ import { MeetingIcon } from '@/components/icons'
 import { useStore } from '@/components/providers/store-provider'
 
 import { GroupedVirtualList, GroupHeaderRow } from '../components/grouped-virtual-list'
+import { Todo } from '../../auto-tasks/todo'
 import { useInputFocus } from '../../chat-input/chat-input'
 import { currentListIndexAtom, feedHiddenAtom, isMountedAtom, toggleFeedVisibilityAtom } from '../atoms'
 import { useAudioNotes, useRecentActions } from '../hooks'
@@ -613,13 +614,13 @@ export function HomeFeed() {
           <HomeFeedVisibilityToggle />
         </div>
       </TabsList>
-      <HomeFeedTabContent value="recent">
+      <HideableTabContent value="recent">
         <RecentActivityTabContent />
-      </HomeFeedTabContent>
-      <HomeFeedTabContent value="meeting">
+      </HideableTabContent>
+      <HideableTabContent value="meeting">
         <MeetingNotesTabContent />
-      </HomeFeedTabContent>
-      <HomeFeedTabContent value="audio">
+      </HideableTabContent>
+      <HideableTabContent value="audio">
         <AudioNotesTabContent />
       </HideableTabContent>
       <HideableTabContent value="chats">
