@@ -5,14 +5,7 @@ import { useAtomValue, useSetAtom } from 'jotai'
 import useMeasure from 'react-use-measure'
 
 import { cn } from '@/lib/utils'
-import {
-  homeSidePanelOpenAtom,
-  isOnHomeAtom,
-  showBackButtonAtom,
-  showSidePanelAtom,
-  sidePanelContentTypeAtom,
-  sidePanelOpenAtom,
-} from '@/atoms/side-panel'
+import { isOnHomeAtom, showSidePanelAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tooltip } from '@/components/ui/tooltip'
 
@@ -65,38 +58,9 @@ function CloseSidePanelButton() {
   )
 }
 
-function AudioNoteViewerBackButton() {
-  const setHoveringClose = useSetAtom(hoveringCloseAtom)
-  const setSidePanelContentType = useSetAtom(sidePanelContentTypeAtom)
-  const setShowBackButton = useSetAtom(showBackButtonAtom)
-
-  function handleClick() {
-    setHoveringClose(false)
-    setShowBackButton(false)
-    setSidePanelContentType('chat')
-  }
-
-  return (
-    <Tooltip content="Back" side="right" align="start">
-      <div className="absolute -left-5 top-0">
-        <motion.button
-          onHoverStart={() => setHoveringClose(true)}
-          onHoverEnd={() => setHoveringClose(false)}
-          aria-label="Close Transcript Viewer"
-          onClick={handleClick}
-          className="size-5 group relative grid place-items-center rounded-bl-lg border border-t-0 border-tertiary bg-bg-layer-1 transition-colors hover:bg-secondary"
-        >
-          <ArrowRight size={12} className="text-tertiary transition-colors group-hover:text-primary" />
-        </motion.button>
-      </div>
-    </Tooltip>
-  )
-}
-
 export function SidePanel(props: { children: React.ReactNode; className?: string }) {
   const showSidePanel = useAtomValue(showSidePanelAtom)
   const isOnHome = useAtomValue(isOnHomeAtom)
-  const showBackButton = useAtomValue(showBackButtonAtom)
 
   const sidePanelVariants: Variants = {
     hidden: { opacity: 0, x: 20 },
@@ -120,7 +84,6 @@ export function SidePanel(props: { children: React.ReactNode; className?: string
         >
           {props.children}
           {!isOnHome && <CloseSidePanelButton />}
-          {showBackButton && <AudioNoteViewerBackButton />}
         </motion.div>
       )}
     </AnimatePresence>
