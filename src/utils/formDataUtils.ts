@@ -139,7 +139,7 @@ export const buildFormData = async ({
   formData.append('attached_context', attachedContextMetadata)
 
   // Append available_context_metadata
-  const availableContextMetadata = JSON.stringify(availableContexts)
+  const availableContextMetadata = JSON.stringify({})
   formData.append('available_context', availableContextMetadata)
 
   return formData
