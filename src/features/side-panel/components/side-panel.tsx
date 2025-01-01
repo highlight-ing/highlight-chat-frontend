@@ -5,7 +5,14 @@ import { useAtomValue, useSetAtom } from 'jotai'
 import useMeasure from 'react-use-measure'
 
 import { cn } from '@/lib/utils'
-import { isOnHomeAtom, showBackButtonAtom, sidePanelContentTypeAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
+import {
+  homeSidePanelOpenAtom,
+  isOnHomeAtom,
+  showBackButtonAtom,
+  showSidePanelAtom,
+  sidePanelContentTypeAtom,
+  sidePanelOpenAtom,
+} from '@/atoms/side-panel'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tooltip } from '@/components/ui/tooltip'
 
@@ -87,7 +94,7 @@ function AudioNoteViewerBackButton() {
 }
 
 export function SidePanel(props: { children: React.ReactNode; className?: string }) {
-  const sidePanelOpen = useAtomValue(sidePanelOpenAtom)
+  const showSidePanel = useAtomValue(showSidePanelAtom)
   const isOnHome = useAtomValue(isOnHomeAtom)
   const showBackButton = useAtomValue(showBackButtonAtom)
 
@@ -99,7 +106,7 @@ export function SidePanel(props: { children: React.ReactNode; className?: string
 
   return (
     <AnimatePresence mode="popLayout">
-      {sidePanelOpen && (
+      {showSidePanel && (
         <motion.div
           variants={sidePanelVariants}
           initial="hidden"

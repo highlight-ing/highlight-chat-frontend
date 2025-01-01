@@ -2,13 +2,13 @@ import React from 'react'
 import { Attachment as AttachmentType } from '@/types'
 import { AnimatePresence, motion, MotionConfig, Transition, type Variants } from 'framer-motion'
 import { AddCircle, ArrowRight, BoxAdd, Setting } from 'iconsax-react'
-import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
 import useMeasure from 'react-use-measure'
 import { useShallow } from 'zustand/react/shallow'
 
 import { cn } from '@/lib/utils'
 import { getDisplayValue } from '@/utils/attachments'
-import { sidePanelOpenAtom, toggleSidePanelAtom } from '@/atoms/side-panel'
+import { homeSidePanelOpenAtom, sidePanelOpenAtom, toggleHomeSidePanelAtom } from '@/atoms/side-panel'
 import { Tooltip as ShadcnTooltip } from '@/components/ui/tooltip'
 import { Attachment } from '@/components/Attachment'
 import { CreateShortcutButton } from '@/components/buttons/create-shortcut-button'
@@ -74,15 +74,15 @@ export function InputDivider({ className }: { className?: string }) {
 }
 
 function CloseSidePanelButton() {
-  const sidePanelOpen = useAtomValue(sidePanelOpenAtom)
-  const toggleSidePanel = useSetAtom(toggleSidePanelAtom)
+  const homeSidePanelOpen = useAtomValue(homeSidePanelOpenAtom)
+  const toggleHomeSidePanel = useSetAtom(toggleHomeSidePanelAtom)
 
   function handleClick() {
-    toggleSidePanel()
+    toggleHomeSidePanel()
   }
 
   return (
-    <ShadcnTooltip content={sidePanelOpen ? 'Close' : 'Open'} side="right">
+    <ShadcnTooltip content={homeSidePanelOpen ? 'Close' : 'Open'} side="right">
       <div className="absolute -right-3 top-0">
         <button
           aria-label="Close Side Panel"
@@ -93,7 +93,7 @@ function CloseSidePanelButton() {
             size={18}
             className={cn(
               'translate-x-0.5 text-tertiary transition-all group-hover:text-primary',
-              sidePanelOpen ? 'rotate-0' : 'rotate-180',
+              homeSidePanelOpen ? 'rotate-0' : 'rotate-180',
             )}
           />
         </button>
@@ -113,7 +113,7 @@ export function ChatInput() {
   const { input, setInput, inputContainerRef, inputRef, focusInput, handleKeyDown, onRemoveAttachment } = useChatInput()
 
   const [ref, bounds] = useMeasure()
-  const transcriptOpen = useAtomValue(sidePanelOpenAtom)
+  const sidePanelOpen = useAtomValue(sidePanelOpenAtom)
   const isInputFocused = useAtomValue(chatInputIsFocusedAtom)
 
   const inputTransition: Transition = { type: 'spring', duration: 0.25, bounce: 0.2 }
@@ -132,7 +132,7 @@ export function ChatInput() {
               height: {
                 ...inputTransition,
                 duration: isInputFocused ? 0.2 : 0.25,
-                delay: transcriptOpen ? 0 : isInputFocused ? 0 : 0.15,
+                delay: sidePanelOpen ? 0 : isInputFocused ? 0 : 0.15,
               },
             }}
             className={cn(

@@ -8,10 +8,18 @@ import { ConversationData } from '@/types/conversations'
 type SidePanelContent = 'audio-note' | 'chat'
 type SelectedAudioNote = Partial<ConversationData> | null
 
-export const sidePanelOpenAtom = atomWithStorage('hl-side-panel-open', true)
+export const isOnHomeAtom = atom(false)
 
-export const toggleSidePanelAtom = atom(null, (get, set) => {
-  set(sidePanelOpenAtom, !get(sidePanelOpenAtom))
+export const sidePanelOpenAtom = atom(false)
+
+export const homeSidePanelOpenAtom = atomWithStorage('hl-side-panel-open', true)
+
+export const showSidePanelAtom = atom(
+  (get) => (get(isOnHomeAtom) && get(homeSidePanelOpenAtom)) || (!get(isOnHomeAtom) && get(sidePanelOpenAtom)),
+)
+
+export const toggleHomeSidePanelAtom = atom(null, (get, set) => {
+  set(homeSidePanelOpenAtom, !get(homeSidePanelOpenAtom))
 })
 
 export const sidePanelContentTypeAtom = atom<SidePanelContent | null>(null)
@@ -31,5 +39,3 @@ export const selectedChatIdAtom = atom('' as string, (_, set, chatId: string) =>
 })
 
 export const showBackButtonAtom = atom(false)
-
-export const isOnHomeAtom = atom(false)

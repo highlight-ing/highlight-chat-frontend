@@ -5,7 +5,7 @@ import { useShallow } from 'zustand/react/shallow'
 import { cn } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { showHistoryAtom } from '@/atoms/history'
-import { isOnHomeAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
+import { isOnHomeAtom } from '@/atoms/side-panel'
 import { useStore } from '@/components/providers/store-provider'
 
 import { chatInputIsFocusedAtom } from '../atoms'
