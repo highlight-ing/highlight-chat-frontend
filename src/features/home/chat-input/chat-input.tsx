@@ -1,15 +1,14 @@
 import React from 'react'
 import { Attachment as AttachmentType } from '@/types'
 import { AnimatePresence, motion, MotionConfig, Transition, type Variants } from 'framer-motion'
-import { AddCircle, ArrowRight, BoxAdd, Setting } from 'iconsax-react'
-import { useAtomValue, useSetAtom } from 'jotai'
+import { AddCircle, BoxAdd, Setting } from 'iconsax-react'
+import { useAtomValue } from 'jotai'
 import useMeasure from 'react-use-measure'
 import { useShallow } from 'zustand/react/shallow'
 
 import { cn } from '@/lib/utils'
 import { getDisplayValue } from '@/utils/attachments'
-import { homeSidePanelOpenAtom, sidePanelOpenAtom, toggleHomeSidePanelAtom } from '@/atoms/side-panel'
-import { Tooltip as ShadcnTooltip } from '@/components/ui/tooltip'
+import { sidePanelOpenAtom } from '@/atoms/side-panel'
 import { Attachment } from '@/components/Attachment'
 import { CreateShortcutButton } from '@/components/buttons/create-shortcut-button'
 import { OpenAppButton } from '@/components/buttons/open-app-button'
@@ -17,6 +16,7 @@ import { AttachmentDropdowns } from '@/components/dropdowns/attachment-dropdowns
 import { useStore } from '@/components/providers/store-provider'
 import Tooltip from '@/components/Tooltip/Tooltip'
 
+import { SidePanelToggle } from '../_components/side-panel-toggle'
 import { chatInputIsFocusedAtom } from '../atoms'
 import { useChatInput } from './hooks'
 import { PromptsList } from './prompts-list'
@@ -73,35 +73,6 @@ export function InputDivider({ className }: { className?: string }) {
   )
 }
 
-function CloseSidePanelButton() {
-  const homeSidePanelOpen = useAtomValue(homeSidePanelOpenAtom)
-  const toggleHomeSidePanel = useSetAtom(toggleHomeSidePanelAtom)
-
-  function handleClick() {
-    toggleHomeSidePanel()
-  }
-
-  return (
-    <ShadcnTooltip content={homeSidePanelOpen ? 'Close' : 'Open'} side="right">
-      <div className="absolute -right-3 top-0">
-        <button
-          aria-label="Close Side Panel"
-          onClick={handleClick}
-          className="group relative grid h-[60px] w-10 place-items-center rounded-l-[20px] border border-r-0 border-tertiary bg-bg-layer-1 transition-colors hover:bg-secondary"
-        >
-          <ArrowRight
-            size={18}
-            className={cn(
-              'translate-x-0.5 text-tertiary transition-all group-hover:text-primary',
-              homeSidePanelOpen ? 'rotate-0' : 'rotate-180',
-            )}
-          />
-        </button>
-      </div>
-    </ShadcnTooltip>
-  )
-}
-
 export function ChatInput() {
   const { attachments, inputIsDisabled, isConversationLoading } = useStore(
     useShallow((state) => ({
@@ -121,7 +92,7 @@ export function ChatInput() {
 
   return (
     <MotionConfig transition={inputTransition}>
-      <div className="relative flex items-center pr-10">
+      <div className="relative flex items-center lg:pr-10">
         <div ref={inputContainerRef} className="relative z-20 flex min-h-[60px] w-full flex-col items-center gap-8">
           <motion.div
             layout
@@ -216,7 +187,7 @@ export function ChatInput() {
             </div>
           </motion.div>
         </div>
-        <CloseSidePanelButton />
+        <SidePanelToggle />
       </div>
     </MotionConfig>
   )
