@@ -1,5 +1,6 @@
 import { Prompt } from '@/types/supabase-helpers'
 
+import { isAlpha } from './appVersion'
 import { addAttachmentsToFormData } from './attachmentUtils'
 
 export interface FormDataContext {
@@ -139,7 +140,7 @@ export const buildFormData = async ({
   formData.append('attached_context', attachedContextMetadata)
 
   // Append available_context_metadata
-  const availableContextMetadata = JSON.stringify({})
+  const availableContextMetadata = JSON.stringify(isAlpha ? {} : availableContexts)
   formData.append('available_context', availableContextMetadata)
 
   return formData
