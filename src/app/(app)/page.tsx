@@ -47,11 +47,11 @@ export default function Home() {
   React.useEffect(() => {
     setIsOnHome(!isChatting && !isConversationLoading)
 
-    if (isChatting || isConversationLoading) {
+    if (isChatting || isConversationLoading || promptApp) {
       setSidePanelOpen(false)
       setShowBackButton(false)
     }
-  }, [isChatting, setShowBackButton, setIsOnHome, setSidePanelOpen, isConversationLoading])
+  }, [isChatting, setShowBackButton, promptApp, setIsOnHome, setSidePanelOpen, isConversationLoading])
 
   useClipboardPaste()
   useConversationLoad()

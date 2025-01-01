@@ -61,7 +61,7 @@ function InputFooter() {
   )
 }
 
-export function InputDivider({ className }: { className?: string }) {
+function InputDivider({ className }: { className?: string }) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
