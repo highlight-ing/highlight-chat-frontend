@@ -3,8 +3,10 @@ import Image from 'next/image'
 import { PinnedPrompt } from '@/types'
 import { motion, Variants } from 'framer-motion'
 import { Archive, Edit2 } from 'iconsax-react'
+import { useSetAtom } from 'jotai'
 
 import { supabaseLoader } from '@/lib/supabase'
+import { sidePanelOpenAtom } from '@/atoms/side-panel'
 import usePromptApps from '@/hooks/usePromptApps'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useStore } from '@/components/providers/store-provider'
@@ -31,8 +33,10 @@ function PromptsListItem({ prompt, input }: { prompt: PinnedPrompt; input: strin
   const { selectPrompt } = usePromptApps()
   const openModal = useStore((state) => state.openModal)
   const setStoreInput = useStore((state) => state.setInputOverride)
+  const setSidePanelOpen = useSetAtom(sidePanelOpenAtom)
 
   function handlePromptClick() {
+    setSidePanelOpen(false)
     setStoreInput(input)
     selectPrompt(prompt.external_id, false)
   }
