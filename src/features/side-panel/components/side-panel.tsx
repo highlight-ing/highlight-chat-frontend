@@ -5,14 +5,7 @@ import { useAtomValue, useSetAtom } from 'jotai'
 import useMeasure from 'react-use-measure'
 
 import { cn } from '@/lib/utils'
-import {
-  isOnHomeAtom,
-  selectedAudioNoteAtom,
-  selectedChatIdAtom,
-  showBackButtonAtom,
-  sidePanelContentTypeAtom,
-  sidePanelOpenAtom,
-} from '@/atoms/side-panel'
+import { isOnHomeAtom, showBackButtonAtom, sidePanelContentTypeAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tooltip } from '@/components/ui/tooltip'
 
@@ -39,12 +32,12 @@ function CloseHoverAnimateLayout(props: { children: React.ReactNode; className?:
   )
 }
 
-function CloseTranscriptViewerButton() {
+function CloseSidePanelButton() {
   const setHoveringClose = useSetAtom(hoveringCloseAtom)
-  const setTranscriptOpen = useSetAtom(sidePanelOpenAtom)
+  const setSidePanelOpen = useSetAtom(sidePanelOpenAtom)
 
   function handleClick() {
-    setTranscriptOpen(false)
+    setSidePanelOpen(false)
     setHoveringClose(false)
   }
 
@@ -54,7 +47,7 @@ function CloseTranscriptViewerButton() {
         <motion.button
           onHoverStart={() => setHoveringClose(true)}
           onHoverEnd={() => setHoveringClose(false)}
-          aria-label="Close Transcript Viewer"
+          aria-label="Close Side Panel"
           onClick={handleClick}
           className="size-8 group relative grid place-items-center border border-t-0 border-tertiary bg-bg-layer-1 transition-colors hover:bg-secondary"
         >
@@ -65,7 +58,7 @@ function CloseTranscriptViewerButton() {
   )
 }
 
-function TranscriptViewerBackButton() {
+function AudioNoteViewerBackButton() {
   const setHoveringClose = useSetAtom(hoveringCloseAtom)
   const setSidePanelContentType = useSetAtom(sidePanelContentTypeAtom)
   const setShowBackButton = useSetAtom(showBackButtonAtom)
@@ -119,8 +112,8 @@ export function SidePanel(props: { children: React.ReactNode; hideCloseButton?: 
           )}
         >
           {props.children}
-          {!props.hideCloseButton && <CloseTranscriptViewerButton />}
-          {showBackButton && <TranscriptViewerBackButton />}
+          {!props.hideCloseButton && <CloseSidePanelButton />}
+          {showBackButton && <AudioNoteViewerBackButton />}
         </motion.div>
       )}
     </AnimatePresence>
