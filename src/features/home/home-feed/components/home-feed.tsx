@@ -84,7 +84,7 @@ export function ListLoadingState() {
   )
 }
 
-export function ListEmptyState(props: { label: string }) {
+export function ListEmptyState(props: { children: React.ReactNode; className?: string }) {
   return (
     <div className="relative">
       <div>
@@ -117,8 +117,10 @@ export function ListEmptyState(props: { label: string }) {
         </HomeFeedListItemLayout>
       </div>
       <div className="size-full left-o absolute top-0 flex flex-col items-center justify-center">
-        <div className="rounded-xl border border-tertiary/50 bg-hover/10 px-6 py-4 backdrop-blur">
-          <p className="text-subtle">{props.label}</p>
+        <div
+          className={cn('rounded-xl border border-tertiary/50 bg-hover/10 px-6 py-4 backdrop-blur', props.className)}
+        >
+          {props.children}
         </div>
       </div>
     </div>
@@ -187,7 +189,11 @@ function RecentActivityTabContent() {
   }
 
   if (!isLoading && (!recentActivity || recentActivity?.length === 0)) {
-    return <ListEmptyState label="No recent activity" />
+    return (
+      <ListEmptyState>
+        <p className="text-subtle">No recent activity</p>
+      </ListEmptyState>
+    )
   }
 
   return (

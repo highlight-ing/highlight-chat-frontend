@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useConversations } from '@/context/ConversationContext'
 import { AnimatePresence } from 'framer-motion'
 import { MessageText, VoiceSquare } from 'iconsax-react'
 import { useAtom, useSetAtom } from 'jotai'
@@ -11,8 +12,9 @@ import { cn, getDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { formatTitle } from '@/utils/conversations'
 import { selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
+import { Switch } from '@/components/ui/switch'
 import { Tooltip } from '@/components/ui/tooltip'
-import ConversationToggle from '@/components/dropdowns/conversations/conversations-toggle'
+import Button from '@/components/Button/Button'
 import { MeetingIcon } from '@/components/icons'
 import { useStore } from '@/components/providers/store-provider'
 
@@ -23,6 +25,42 @@ import { HOME_FEED_LIST_HEIGHT } from '../constants'
 import { useAudioNotes } from '../hooks'
 import { formatUpdatedAtDate } from '../utils'
 import { HomeFeedListItemLayout, HomeFeedListLayout, ListEmptyState, ListLoadingState } from './home-feed'
+
+function ToggleAudioTranscriptButton() {
+  const { isAudioTranscripEnabled, setIsAudioTranscriptEnabled } = useConversations()
+
+  const handleToggle = () => {
+    setIsAudioTranscriptEnabled(!isAudioTranscripEnabled)
+  }
+
+  return (
+    <Button size="small" variant={isAudioTranscripEnabled ? 'tertiary' : 'primary'} onClick={handleToggle}>
+      {`${isAudioTranscripEnabled ? 'Disable' : 'Enable'} Audio Transcription`}
+    </Button>
+  )
+}
+
+function ToggleAudioTranscriptSwitch() {
+  const { isAudioTranscripEnabled, setIsAudioTranscriptEnabled } = useConversations()
+
+  const handleToggle = () => {
+    setIsAudioTranscriptEnabled(!isAudioTranscripEnabled)
+  }
+
+  return (
+    <div className="relative inline-flex items-center gap-2">
+      <p className={cn('text-base font-medium text-subtle', isAudioTranscripEnabled && 'text-tertiary')}>
+        {`Audio Notes ${isAudioTranscripEnabled ? 'Enabled' : 'Disabled'}`}
+      </p>
+      <Switch
+        id="audio-switch"
+        checked={isAudioTranscripEnabled}
+        onCheckedChange={handleToggle}
+        className="h-[15px] w-[26px] data-[state=checked]:bg-conv-green"
+      />
+    </div>
+  )
+}
 
 function AttachAudioAction(props: { audioNote: ConversationData }) {
   const focusInput = useInputFocus()
@@ -132,7 +170,12 @@ export function MeetingNotesTabContent() {
   }, [data])
 
   if (!isLoading && recentMeetingNotes.length === 0) {
-    return <ListEmptyState label="No meeting notes" />
+    return (
+      <ListEmptyState className="flex flex-col items-center gap-2.5">
+        <p className="text-subtle">No meeting notes</p>
+        <ToggleAudioTranscriptButton />
+      </ListEmptyState>
+    )
   }
 
   return (
@@ -148,7 +191,7 @@ export function MeetingNotesTabContent() {
               <GroupHeaderRow>
                 <div className="flex w-full items-center justify-between">
                   <p>{audioGroupLabels[index]}</p>
-                  <p>Enable transcripts</p>
+                  {index === 0 && <ToggleAudioTranscriptSwitch />}
                 </div>
               </GroupHeaderRow>
             )}
@@ -172,7 +215,12 @@ export function AudioNotesTabContent() {
   }, [data])
 
   if (!isLoading && recentNonMeetingNotes.length === 0) {
-    return <ListEmptyState label="No audio notes" />
+    return (
+      <ListEmptyState>
+        <p className="text-subtle">No audio notes</p>
+        <ToggleAudioTranscriptButton />
+      </ListEmptyState>
+    )
   }
 
   return (
@@ -188,7 +236,7 @@ export function AudioNotesTabContent() {
               <GroupHeaderRow>
                 <div className="flex w-full items-center justify-between">
                   <p>{audioGroupLabels[index]}</p>
-                  <ConversationToggle />
+                  {index === 0 && <ToggleAudioTranscriptSwitch />}
                 </div>
               </GroupHeaderRow>
             )}

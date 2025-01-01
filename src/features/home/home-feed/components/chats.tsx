@@ -152,7 +152,11 @@ export function ChatsTabContent() {
   }
 
   if (!isLoading && !data) {
-    return <ListEmptyState label="No chats" />
+    return (
+      <ListEmptyState>
+        <p className="text-subtle">No chats</p>
+      </ListEmptyState>
+    )
   }
 
   return (
