@@ -5,6 +5,7 @@ import { motion, Variants } from 'framer-motion'
 import { Archive, Edit2 } from 'iconsax-react'
 
 import { supabaseLoader } from '@/lib/supabase'
+import useForkDefaultAction from '@/hooks/useForkDefaultAction'
 import usePromptApps from '@/hooks/usePromptApps'
 import { useStore } from '@/components/providers/store-provider'
 
@@ -29,8 +30,9 @@ const actionItemVariants: Variants = {
 const InputActionItem = ({ prompt, input }: { prompt: PinnedPrompt; input: string }) => {
   const { selectPrompt } = usePromptApps()
   const openModal = useStore((state) => state.openModal)
+  const userId = useStore((state) => state.userId)
   const setStoreInput = useStore((state) => state.setInputOverride)
-
+  const { forkDefaultAction } = useForkDefaultAction()
   function handlePromptClick() {
     setStoreInput(input)
     selectPrompt(prompt.external_id, false)
@@ -38,6 +40,14 @@ const InputActionItem = ({ prompt, input }: { prompt: PinnedPrompt; input: strin
 
   function handleEditPromptClick(e: MouseEvent) {
     e.stopPropagation()
+
+    if (userId && userId !== prompt.user_id) {
+      // We should for the prompt since it's not ours
+      // @ts-ignore
+      forkDefaultAction(prompt)
+      return
+    }
+
     openModal('edit-prompt', { data: { prompt } })
   }
 
@@ -66,26 +76,26 @@ const InputActionItem = ({ prompt, input }: { prompt: PinnedPrompt; input: strin
         <h3>{`${prompt.name}`}</h3>
       </div>
       <div className="flex items-center opacity-0 transition-opacity group-hover:opacity-100">
-        <Tooltip position="top" tooltip="Edit prompt">
+        <Tooltip position="top" tooltip="Edit shortcut">
           <button
             type="button"
-            aria-label="Edit prompt"
+            aria-label="Edit shortcut"
             onClick={(e) => handleEditPromptClick(e)}
             className="size-8 grid place-items-center"
           >
             <Edit2 variant="Bold" size={16} />
-            <span className="sr-only">Edit prompt</span>
+            <span className="sr-only">Edit shortcut</span>
           </button>
         </Tooltip>
-        <Tooltip position="top" tooltip="Unpin prompt">
+        <Tooltip position="top" tooltip="Unpin shortcut">
           <button
             type="button"
-            aria-label="Unpin prompt"
+            aria-label="Unpin shortcut"
             onClick={handleUnpinPromptClick}
             className="size-8 grid place-items-center"
           >
             <Archive variant="Bold" size={16} />
-            <span className="sr-only">Unpin prompt</span>
+            <span className="sr-only">Unpin shortcut</span>
           </button>
         </Tooltip>
       </div>

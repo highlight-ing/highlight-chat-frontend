@@ -252,7 +252,13 @@ export async function savePrompt(formData: FormData, authToken: string) {
       .select('*, user_images(file_extension)')
       .maybeSingle()
 
-    if (error || !prompt) {
+    if (!prompt) {
+      console.error('Prompt not found in Supabase')
+      return { error: ERROR_MESSAGES.PROMPT_NOT_FOUND }
+    }
+
+    if (error) {
+      console.error('Error updating prompt', error)
       return { error: ERROR_MESSAGES.DATABASE_ERROR }
     }
 
@@ -380,6 +386,7 @@ export async function fetchPrompts(authToken: string) {
   const mappedPrompts = prompts?.map(promptSelectMapper) ?? []
 
   if (promptsError) {
+    console.error('Error fetching prompts', promptsError)
     return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
   }
 
@@ -419,6 +426,7 @@ export async function fetchPinnedPrompts(authToken: string): Promise<{ error: st
     .order('created_at', { ascending: false })
 
   if (pinnedPromptsError) {
+    console.error('Error fetching pinned prompts', pinnedPromptsError)
     return { error: ERROR_MESSAGES.DATABASE_READ_ERROR }
   }
 
@@ -438,6 +446,7 @@ export async function deletePrompt(externalId: string, authToken: string) {
   const { error } = await supabase.from('prompts').delete().eq('external_id', externalId).eq('user_id', userId)
 
   if (error) {
+    console.error('Error removing prompt', error)
     return { error: ERROR_MESSAGES.DATABASE_ERROR }
   }
 }

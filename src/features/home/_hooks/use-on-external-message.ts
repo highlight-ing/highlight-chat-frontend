@@ -166,6 +166,12 @@ export function useOnExternalMessage() {
             return
           }
 
+          // Check if the fork attribute is set
+          if (message.fork) {
+            forkDefaultAction(message.prompt)
+            return
+          }
+
           openModal('edit-prompt', { data: message })
         }
 

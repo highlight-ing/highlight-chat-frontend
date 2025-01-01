@@ -31,7 +31,7 @@ const CreatePromptFromTemplateModal = ({ id, context }: ModalObjectProps) => {
       header={
         <div className={'flex w-full items-center justify-between'}>
           <CloseButton alignment="left" onClick={handleClose} />
-          <div className="flex grow justify-center">Create Action from Template</div>
+          <div className="flex grow justify-center">Fork Shortcut</div>
           <div className="absolute right-0 p-2">
             <PromptSaveButton />
           </div>
