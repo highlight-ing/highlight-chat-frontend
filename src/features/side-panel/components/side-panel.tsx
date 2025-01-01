@@ -86,7 +86,7 @@ function AudioNoteViewerBackButton() {
   )
 }
 
-export function SidePanel(props: { children: React.ReactNode; hideCloseButton?: boolean; className?: string }) {
+export function SidePanel(props: { children: React.ReactNode; className?: string }) {
   const sidePanelOpen = useAtomValue(sidePanelOpenAtom)
   const isOnHome = useAtomValue(isOnHomeAtom)
   const showBackButton = useAtomValue(showBackButtonAtom)
@@ -112,7 +112,7 @@ export function SidePanel(props: { children: React.ReactNode; hideCloseButton?: 
           )}
         >
           {props.children}
-          {!props.hideCloseButton && <CloseSidePanelButton />}
+          {!isOnHome && <CloseSidePanelButton />}
           {showBackButton && <AudioNoteViewerBackButton />}
         </motion.div>
       )}

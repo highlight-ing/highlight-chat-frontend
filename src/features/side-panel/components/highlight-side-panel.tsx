@@ -1,14 +1,13 @@
 import React from 'react'
 import { useAtomValue } from 'jotai'
 
-import { isOnHomeAtom, sidePanelContentTypeAtom } from '@/atoms/side-panel'
+import { sidePanelContentTypeAtom } from '@/atoms/side-panel'
 
 import { AudioNoteSidePanelContent, AudioNoteSidePanelHeader } from './audio-note'
 import { ChatSidePanelContent, ChatSidePanelHeader } from './chat'
 import { SidePanel, SidePanelContent, SidePanelHeader } from './side-panel'
 
 export function HighlightSidePanel() {
-  const isOnHome = useAtomValue(isOnHomeAtom)
   const sidePanelContentType = useAtomValue(sidePanelContentTypeAtom)
 
   const { header, content } = React.useMemo(() => {
@@ -23,7 +22,7 @@ export function HighlightSidePanel() {
   }, [sidePanelContentType])
 
   return (
-    <SidePanel hideCloseButton={isOnHome} className="hidden lg:block">
+    <SidePanel className="hidden lg:block">
       <SidePanelHeader>{header}</SidePanelHeader>
       <SidePanelContent>{content}</SidePanelContent>
     </SidePanel>

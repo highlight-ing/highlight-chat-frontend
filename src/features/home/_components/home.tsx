@@ -51,7 +51,6 @@ function ChatFocusedOverlay() {
 }
 
 export function ChatHome() {
-  const setSidePanelOpen = useSetAtom(sidePanelOpenAtom)
   const isOnHome = useAtomValue(isOnHomeAtom)
   const setShowHistory = useSetAtom(showHistoryAtom)
 
@@ -60,7 +59,6 @@ export function ChatHome() {
   }, [])
 
   setShowHistory(false)
-  setSidePanelOpen(true)
 
   return (
     <div

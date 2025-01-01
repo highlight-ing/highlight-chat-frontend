@@ -1,13 +1,18 @@
 'use client'
 
 import { atom } from 'jotai'
+import { atomWithStorage } from 'jotai/utils'
 
 import { ConversationData } from '@/types/conversations'
 
 type SidePanelContent = 'audio-note' | 'chat'
 type SelectedAudioNote = Partial<ConversationData> | null
 
-export const sidePanelOpenAtom = atom(false)
+export const sidePanelOpenAtom = atomWithStorage('hl-side-panel-open', true)
+
+export const toggleSidePanelAtom = atom(null, (get, set) => {
+  set(sidePanelOpenAtom, !get(sidePanelOpenAtom))
+})
 
 export const sidePanelContentTypeAtom = atom<SidePanelContent | null>(null)
 
