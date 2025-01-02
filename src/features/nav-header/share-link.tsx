@@ -5,11 +5,11 @@ import { ChatHistoryItem } from '@/types'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowDown2, Send2 } from 'iconsax-react'
 
-import { useCopyChatShareLink, useDisableChatShareLink, useGenerateChatShareLink } from '@/hooks/share-link'
+import { useCopyChatShareLink, useGenerateChatShareLink } from '@/hooks/share-link'
 import { Popover, PopoverTrigger } from '@/components/ui/popover'
 import Button from '@/components/Button/Button'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
-import { SharePopoverContent } from '@/components/share-popover'
+import { ShareChatPopoverContent } from '@/components/share-popover'
 
 function GenerateShareLinkButton(props: { conversation: ChatHistoryItem }) {
   const { mutate: generateShareLink, isPending } = useGenerateChatShareLink()
@@ -77,27 +77,6 @@ function CopyLinkButton(props: { shareLinkId: string }) {
   )
 }
 
-type DisableShareLinkButtonProps = {
-  conversationId: string
-}
-
-function DisableShareLinkButton(props: DisableShareLinkButtonProps) {
-  const { mutate: disableShareLink, isPending } = useDisableChatShareLink()
-
-  return (
-    <Button
-      size={'medium'}
-      variant={'tertiary'}
-      style={{ width: '100%' }}
-      disabled={isPending}
-      onClick={() => disableShareLink(props.conversationId)}
-    >
-      {isPending && <LoadingSpinner size={'20px'} />}
-      <span className="pl-2">{isPending ? 'Disabling links...' : 'Disable All Share Links'}</span>
-    </Button>
-  )
-}
-
 function ShareLinkPopover(props: { conversation: ChatHistoryItem }) {
   const [open, setOpen] = React.useState(false)
 
@@ -118,7 +97,7 @@ function ShareLinkPopover(props: { conversation: ChatHistoryItem }) {
           </motion.span>
         </Button>
       </PopoverTrigger>
-      <SharePopoverContent conversation={props.conversation} />
+      <ShareChatPopoverContent conversation={props.conversation} />
     </Popover>
   )
 }

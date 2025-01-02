@@ -1,6 +1,6 @@
 'use client'
 
-import { generateAudioNoteShareLink } from '@/actions/share-audio-note'
+import { deleteAudioNoteShareLink, generateAudioNoteShareLink } from '@/actions/share-audio-note'
 import { ChatHistoryItem } from '@/types'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Copy } from 'iconsax-react'
@@ -137,7 +137,7 @@ export function useCopyAudioShareLink() {
   })
 }
 
-export function useGenerateAuidoShareLink() {
+export function useGenerateAudioShareLink() {
   const { userId } = useAuth()
   const queryClient = useQueryClient()
 
@@ -155,15 +155,15 @@ export function useGenerateAuidoShareLink() {
     onSuccess: (shareLink, audioNote) => {
       if (!shareLink || !audioNote.id) return
 
-      queryClient.invalidateQueries({ queryKey: ['audio-notes'] })
-      // queryClient.setQueryData(['audio-notes'], (originalAudioNotes: Array<ConversationData>) => {
-      //   const audioNotes = [...originalAudioNotes]
-      //   const existingAudioNoteIndex = audioNotes.findIndex((note) => note.id === audioNote.id)
-      //
-      //   audioNotes[existingAudioNoteIndex] = { ...audioNotes[existingAudioNoteIndex], shareLink }
-      //
-      //   return audioNotes
-      // })
+      // queryClient.invalidateQueries({ queryKey: ['audio-notes'] })
+      queryClient.setQueryData(['audio-notes'], (originalAudioNotes: Array<ConversationData>) => {
+        const audioNotes = [...originalAudioNotes]
+        const existingAudioNoteIndex = audioNotes.findIndex((note) => note.id === audioNote.id)
+
+        audioNotes[existingAudioNoteIndex] = { ...audioNotes[existingAudioNoteIndex], shareLink }
+
+        return audioNotes
+      })
 
       trackEvent('HL Chat Audio Note Copy Link', {
         conversation_id: audioNote.id,
@@ -178,6 +178,44 @@ export function useGenerateAuidoShareLink() {
       trackEvent('HL Chat Audio Note Copy Link Error', { conversation_id: audioNote.id, error })
 
       toast.error('Could not copy link')
+    },
+  })
+}
+
+export function useDisableAudioShareLink() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationKey: ['disable-audio-share-link'],
+    mutationFn: async (audioNote: ConversationData) => {
+      if (!audioNote) return
+
+      const updatedAudioNote = await deleteAudioNoteShareLink(audioNote)
+
+      return updatedAudioNote
+    },
+    onSuccess: (updatedAudioNote) => {
+      if (!updatedAudioNote) return
+
+      queryClient.setQueryData(['audio-notes'], (originalAudioNotes: Array<ConversationData>) => {
+        const audioNotes = [...originalAudioNotes]
+        const existingAudioNoteIndex = audioNotes.findIndex((note) => note.id === updatedAudioNote.id)
+
+        audioNotes[existingAudioNoteIndex] = updatedAudioNote
+
+        return audioNotes
+      })
+
+      trackEvent('HL Chat Audio Note Disable Link', { conversation_id: updatedAudioNote.id })
+
+      toast('Share links disabled')
+    },
+    onError: (error, audioNote) => {
+      console.error('Failed to disable link:', error)
+
+      trackEvent('HL Chat Audio Note Disable Link Error', { conversation_id: audioNote, error: error })
+
+      toast.error('Could disable share links')
     },
   })
 }

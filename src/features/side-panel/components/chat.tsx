@@ -14,7 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 import { Message } from '@/components/Messages/Message'
 import { useStore } from '@/components/providers/store-provider'
-import { SharePopoverContent } from '@/components/share-popover'
+import { ShareChatPopoverContent } from '@/components/share-popover'
 
 import { formatHeaderTimestamp } from '../utils'
 import { SidePanelHeaderActionButton, SidePanelHeaderActions } from './side-panel'
@@ -178,7 +178,7 @@ function ShareAction() {
         <Export variant="Bold" size={16} />
         <p>Share</p>
       </PopoverTrigger>
-      <SharePopoverContent conversation={selectedChat} />
+      <ShareChatPopoverContent conversation={selectedChat} />
     </Popover>
   )
 }

@@ -13,7 +13,7 @@ import { cn, getDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { formatTitle } from '@/utils/conversations'
 import { selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
-import { useCopyAudioShareLink, useGenerateAuidoShareLink } from '@/hooks/share-link'
+import { useCopyAudioShareLink, useGenerateAudioShareLink } from '@/hooks/share-link'
 import { Switch } from '@/components/ui/switch'
 import { Tooltip } from '@/components/ui/tooltip'
 import Button from '@/components/Button/Button'
@@ -105,7 +105,7 @@ function AttachAudioAction(props: { audioNote: ConversationData }) {
 }
 
 function CopyAudioShareLinkButton(props: { audioNote: ConversationData }) {
-  const { mutate: generateShareLink, isPending: isGeneratingLink } = useGenerateAuidoShareLink()
+  const { mutate: generateShareLink, isPending: isGeneratingLink } = useGenerateAudioShareLink()
   const { mutateAsync: copyLink } = useCopyAudioShareLink()
   const shareLinkExsists = props.audioNote?.shareLink && props.audioNote.shareLink !== ''
 

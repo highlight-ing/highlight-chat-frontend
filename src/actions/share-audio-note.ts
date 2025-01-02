@@ -14,7 +14,7 @@ if (!supabaseUrl || !supabaseServiceRoleKey) {
 
 const supabase = createClient(supabaseUrl, supabaseServiceRoleKey)
 
-export async function generateAudioNoteShareLink(conversation: ConversationData, userId: string): Promise<string> {
+export async function generateAudioNoteShareLink(conversation: ConversationData, userId: string) {
   try {
     if (!userId) {
       throw new Error('User ID not found')
@@ -24,6 +24,7 @@ export async function generateAudioNoteShareLink(conversation: ConversationData,
     const endedAt = new Date(conversation.endedAt)
     const timestamp = new Date(conversation.timestamp)
 
+    // TODO: Figure out what is required to generate an audio note
     const shareData: ConversationData = {
       ...conversation,
       startedAt,
@@ -31,6 +32,13 @@ export async function generateAudioNoteShareLink(conversation: ConversationData,
       timestamp,
       userId,
     }
+    // id: string
+    // title: string
+    // summary: string
+    // topic: string
+    // transcript: string
+    // summarized: boolean
+    // shareLink: string
 
     const slug = uuidv4()
     const { error } = await supabase.from('conversations').insert({
@@ -54,10 +62,29 @@ export async function generateAudioNoteShareLink(conversation: ConversationData,
   }
 }
 
-export async function deleteConversation(slug: string): Promise<void> {
+export async function deleteAudioNoteShareLink(conversation: ConversationData) {
+  if (!conversation.shareLink) {
+    throw new Error('No share link found for this conversation')
+  }
+
+  const slug = conversation.shareLink.split('/').pop()
+
+  if (!slug) {
+    throw new Error(`Slug is undefined`)
+  }
+
   const { error } = await supabase.from('conversations').delete().eq('external_id', slug)
 
   if (error) {
     throw new Error(`Error deleting conversation: ${error.message}`)
   }
+
+  // Create a new conversation object with userId and shareLink set to empty strings
+  const updatedConversation: ConversationData = {
+    ...conversation,
+    userId: '',
+    shareLink: '',
+  }
+
+  return updatedConversation
 }
