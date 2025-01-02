@@ -34,7 +34,7 @@ function ToggleAudioTranscriptButton() {
   }
 
   return (
-    <Button size="small" variant={isAudioTranscripEnabled ? 'tertiary' : 'primary'} onClick={handleToggle}>
+    <Button size="small" variant={isAudioTranscripEnabled ? 'ghost-neutral' : 'ghost'} onClick={handleToggle}>
       {`${isAudioTranscripEnabled ? 'Disable' : 'Enable'} Audio Transcription`}
     </Button>
   )
