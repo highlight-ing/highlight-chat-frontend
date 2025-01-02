@@ -36,7 +36,7 @@ function OnboardingIndex1() {
     setPromptEditorData({
       appPrompt: `{{! These are comments, they won't effect the output of your app }}\n{{! Some tips for writing shortcuts. }}\nSummarize my meeting notes`,
     })
-  }, [])
+  }, [setPromptEditorData])
 
   function handleContinue() {
     setOnboarding({ index: 2 })
@@ -154,7 +154,7 @@ export default function AppScreen() {
           </span>
         </div>
 
-        <div className="max-w-96 basis-1/3 border-l border-[#ffffff0d] p-[17px] overflow-y-auto h-full">
+        <div className="max-w-96 h-full basis-1/3 overflow-y-auto border-l border-[#ffffff0d] p-[17px]">
           <div>
             <div className="flex flex-col space-y-[6px]">
               <h3 className="text-base font-semibold text-white">Automations</h3>
@@ -195,10 +195,10 @@ export default function AppScreen() {
           </div>
           {(isDevelopment || isAlpha) && (
             <>
-              <div className="flex flex-col space-y-[6px] mt-8">
+              <div className="mt-8 flex flex-col space-y-[6px]">
                 <AppSelector shortcutName={promptEditorData.name} />
               </div>
-              <div className="flex flex-col space-y-[6px] mt-8 mb-32">
+              <div className="mb-32 mt-8 flex flex-col space-y-[6px]">
                 <ContextSelector />
               </div>
             </>
