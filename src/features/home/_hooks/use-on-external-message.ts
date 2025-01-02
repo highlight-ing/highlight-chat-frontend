@@ -42,6 +42,16 @@ export function useOnExternalMessage() {
         return
       }
 
+      if (message.type === 'new-conversation') {
+        console.log('Adding new conversation to history:', message.conversationId)
+        const conversation = await refreshChatItem(message.conversationId, true)
+        if (!conversation) {
+          console.error('Failed to add conversation to history:', message.conversationId)
+        }
+
+        return
+      }
+
       if (message.conversationId) {
         console.log('Opening conversation from external event:', message.conversationId)
         const conversation = await refreshChatItem(message.conversationId, true)
