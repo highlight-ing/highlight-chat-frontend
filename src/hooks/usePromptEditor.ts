@@ -38,6 +38,8 @@ export function usePromptEditor() {
     selectedApp,
     appVisibility,
     contextTypes,
+    forkingShortcutId,
+    setForkingShortcutId,
   } = usePromptEditorStore()
   const { updatePrompt, addPrompt, prompts } = usePromptsStore()
   const addToast = useStore((state) => state.addToast)
@@ -143,6 +145,14 @@ export function usePromptEditor() {
         refreshPinnedPrompts()
       } else {
         formData.append('externalId', promptEditorData.externalId)
+      }
+
+      // Check to see if we're forking a shortcut
+      if (forkingShortcutId) {
+        const accessToken = await getAccessToken()
+        await removePromptFromUser(forkingShortcutId, accessToken)
+        refreshPinnedPrompts()
+        setForkingShortcutId(null)
       }
     }
 

@@ -7,15 +7,15 @@ import { useStore } from '@/components/providers/store-provider'
 export default function useForkDefaultAction() {
   const { setSelectedScreen, setPromptEditorData, clearPromptEditorData, setOnboarding } = usePromptEditorStore()
   const openModal = useStore((state) => state.openModal)
-  const { setNeedSave, setSettingsHasNoErrors } = usePromptEditorStore()
+  const { setNeedSave, setSettingsHasNoErrors, setForkingShortcutId } = usePromptEditorStore()
 
   return {
     forkDefaultAction: async (prompt: Prompt) => {
       clearPromptEditorData()
       setOnboarding({ isOnboarding: false, index: 0 })
       setSelectedScreen('startWithTemplate')
+      setForkingShortcutId(prompt.external_id)
       setPromptEditorData({
-        externalId: prompt.external_id,
         appPrompt: prompt.prompt_text ?? '',
         name: prompt.name,
         description: prompt.description ?? '',

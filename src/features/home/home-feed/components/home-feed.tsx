@@ -177,6 +177,335 @@ export function FeedHiddenState() {
   )
 }
 
+function AttachAudioAction(props: { audioNote: ConversationData }) {
+  const focusInput = useInputFocus()
+
+  const { clearPrompt, addAttachment, startNewConversation } = useStore(
+    useShallow((state) => ({
+      clearPrompt: state.clearPrompt,
+      addAttachment: state.addAttachment,
+      startNewConversation: state.startNewConversation,
+    })),
+  )
+
+  function handleAttachClick() {
+    if (!props.audioNote?.transcript) return
+
+    clearPrompt()
+    startNewConversation()
+    focusInput()
+
+    addAttachment({
+      id: props.audioNote?.id ?? '',
+      type: 'conversation',
+      title: props.audioNote?.title ?? '',
+      value: props.audioNote.transcript,
+      startedAt: props.audioNote?.startedAt ?? new Date(),
+      endedAt: props.audioNote?.endedAt ?? new Date(),
+    })
+  }
+
+  return (
+    <Tooltip content="Chat">
+      <button
+        onClick={handleAttachClick}
+        className="size-6 hidden place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:grid"
+      >
+        <MessageText variant="Bold" size={16} className="text-tertiary" />
+      </button>
+    </Tooltip>
+  )
+}
+
+function AudioNotesListItem(props: { audioNote: ConversationData; listIndex: number }) {
+  const formattedTitle = formatTitle(props.audioNote.title)
+  const setSelectedAudioNote = useSetAtom(selectedAudioNoteAtom)
+  const [currentListIndex, setCurrentListIndex] = useAtom(currentListIndexAtom)
+  const isActiveElement = currentListIndex === props.listIndex
+  const [isMounted, setIsMounted] = useAtom(isMountedAtom)
+
+  const previewAudioNote = React.useCallback(() => {
+    setSelectedAudioNote(props.audioNote)
+    setCurrentListIndex(props.listIndex)
+  }, [props.audioNote, setCurrentListIndex, props.listIndex, setSelectedAudioNote])
+
+  const handleClick = React.useCallback(() => {
+    previewAudioNote()
+    trackEvent('Audio Note Previewed', {
+      audioNoteId: props.audioNote.id,
+      meetingNote: !!props.audioNote?.meeting,
+      source: 'home_feed',
+    })
+  }, [props.audioNote, previewAudioNote])
+
+  React.useEffect(() => {
+    if (isActiveElement && !isMounted) {
+      previewAudioNote()
+      setIsMounted(true)
+    }
+  }, [isActiveElement, setIsMounted, isMounted, previewAudioNote])
+
+  React.useEffect(() => {
+    function handleEnterKeyPress(e: KeyboardEvent) {
+      if (isActiveElement && e.key === 'Enter') {
+        handleClick()
+      }
+    }
+
+    window.addEventListener('keydown', handleEnterKeyPress)
+    return () => window.removeEventListener('keydown', handleEnterKeyPress)
+  }, [isActiveElement, handleClick])
+
+  return (
+    <HomeFeedListItemLayout onClick={handleClick} className={cn('justify-between', isActiveElement && 'bg-hover')}>
+      <div className="flex items-center gap-2 font-medium">
+        {props.audioNote?.meeting ? (
+          <MeetingIcon meeting={props.audioNote.meeting} size={20} />
+        ) : (
+          <VoiceSquare size={20} variant="Bold" className="text-green" />
+        )}
+        <h3 className="max-w-64 truncate tracking-tight text-primary">{formattedTitle}</h3>
+      </div>
+      <div className="flex items-center gap-2 font-medium">
+        <p className="text-sm text-tertiary">{formatUpdatedAtDate(props.audioNote.endedAt)}</p>
+        <AttachAudioAction audioNote={props.audioNote} />
+      </div>
+    </HomeFeedListItemLayout>
+  )
+}
+
+function MeetingNotesTabContent() {
+  const { data, isLoading } = useAudioNotes()
+  const { recentMeetingNotes, audioGroupCounts, audioGroupLabels } = React.useMemo(() => {
+    const recentMeetingNotes = data?.filter((audioNote) => audioNote.meeting) ?? []
+    const { groupLengths, groupLabels } = getDateGroupLengths(recentMeetingNotes)
+    return { recentMeetingNotes, audioGroupCounts: groupLengths, audioGroupLabels: groupLabels }
+  }, [data])
+
+  if (!isLoading && recentMeetingNotes.length === 0) {
+    return <ListEmptyState label="No meeting notes" />
+  }
+
+  return (
+    <AnimatePresence initial={false}>
+      {isLoading ? (
+        <ListLoadingState />
+      ) : (
+        <HomeFeedListLayout>
+          <GroupedVirtualList
+            style={{ height: HOME_FEED_LIST_HEIGHT }}
+            groupCounts={audioGroupCounts}
+            groupContent={(index) => <GroupHeaderRow>{audioGroupLabels[index]}</GroupHeaderRow>}
+            itemContent={(index) => {
+              const meetingNote = recentMeetingNotes[index]
+              return <AudioNotesListItem key={meetingNote.id} audioNote={meetingNote} listIndex={index} />
+            }}
+          />
+        </HomeFeedListLayout>
+      )}
+    </AnimatePresence>
+  )
+}
+
+function AudioNotesTabContent() {
+  const { data, isLoading } = useAudioNotes()
+  const { recentNonMeetingNotes, audioGroupCounts, audioGroupLabels } = React.useMemo(() => {
+    const recentNonMeetingNotes = data?.filter((audioNote) => !audioNote.meeting) ?? []
+    const { groupLengths, groupLabels } = getDateGroupLengths(recentNonMeetingNotes)
+    return { recentNonMeetingNotes, audioGroupCounts: groupLengths, audioGroupLabels: groupLabels }
+  }, [data])
+
+  if (!isLoading && recentNonMeetingNotes.length === 0) {
+    return <ListEmptyState label="No audio notes" />
+  }
+
+  return (
+    <AnimatePresence initial={false}>
+      {isLoading ? (
+        <ListLoadingState />
+      ) : (
+        <HomeFeedListLayout>
+          <GroupedVirtualList
+            style={{ height: HOME_FEED_LIST_HEIGHT }}
+            groupCounts={audioGroupCounts}
+            groupContent={(index) => <GroupHeaderRow>{audioGroupLabels[index]}</GroupHeaderRow>}
+            itemContent={(index) => {
+              const audioNote = recentNonMeetingNotes[index]
+              return <AudioNotesListItem key={audioNote.id} audioNote={audioNote} listIndex={index} />
+            }}
+          />
+        </HomeFeedListLayout>
+      )}
+    </AnimatePresence>
+  )
+}
+
+function ChatAction(props: { chat: ChatHistoryItem }) {
+  const { clearPrompt, startNewConversation, addOrUpdateOpenConversation, setConversationId } = useStore(
+    useShallow((state) => ({
+      setConversationId: state.setConversationId,
+      addOrUpdateOpenConversation: state.addOrUpdateOpenConversation,
+      clearPrompt: state.clearPrompt,
+      startNewConversation: state.startNewConversation,
+    })),
+  )
+
+  function handleChatClick() {
+    if (!props.chat) return
+
+    clearPrompt()
+    startNewConversation()
+    addOrUpdateOpenConversation(props.chat)
+    setConversationId(props.chat?.id)
+
+    trackEvent('HL Chat Opened', {
+      chatId: props.chat.id,
+      source: 'home_feed',
+    })
+  }
+
+  return (
+    <Tooltip content="Chat">
+      <button
+        onClick={handleChatClick}
+        className="size-6 hidden place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:grid"
+      >
+        <MessageText variant="Bold" size={16} className="text-tertiary" />
+      </button>
+    </Tooltip>
+  )
+}
+
+function ChatShareLinkCopyButton(props: { chat: ChatHistoryItem }) {
+  const mostRecentShareLinkId = props.chat?.shared_conversations?.[0]?.id
+  const { mutate: generateShareLink, isPending: isGeneratingLink } = useGenerateShareLink()
+  const { mutateAsync: copyLink } = useCopyLink()
+
+  async function handleCopyClick() {
+    if (!props.chat) return
+
+    if (!mostRecentShareLinkId) {
+      generateShareLink(props.chat)
+    } else {
+      await copyLink(mostRecentShareLinkId)
+      toast('Link copied to clipboard', { icon: <Copy variant="Bold" size={20} /> })
+    }
+  }
+
+  return (
+    <Tooltip content="Share">
+      <button
+        onClick={handleCopyClick}
+        disabled={isGeneratingLink}
+        className="size-6 hidden place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:grid"
+      >
+        <Export variant="Bold" size={16} className={cn('text-tertiary', isGeneratingLink && 'opacity-50')} />
+      </button>
+    </Tooltip>
+  )
+}
+
+function ChatListItem(props: { chat: ChatHistoryItem; listIndex: number }) {
+  const setSelectedChatId = useSetAtom(selectedChatIdAtom)
+  const [currentListIndex, setCurrentListIndex] = useAtom(currentListIndexAtom)
+  const isActiveElement = currentListIndex === props.listIndex
+  const [isMounted, setIsMounted] = useAtom(isMountedAtom)
+
+  const previewChat = React.useCallback(() => {
+    setSelectedChatId(props.chat.id)
+    setCurrentListIndex(props.listIndex)
+  }, [props.chat.id, setSelectedChatId, props.listIndex, setCurrentListIndex])
+
+  const handleClick = React.useCallback(() => {
+    previewChat()
+    trackEvent('HL Chat Previewed', {
+      chatId: props.chat.id,
+      source: 'home_feed',
+    })
+  }, [props.chat, previewChat])
+
+  React.useEffect(() => {
+    if (isActiveElement && !isMounted) {
+      previewChat()
+      setIsMounted(true)
+    }
+  }, [isActiveElement, isMounted, previewChat, setIsMounted])
+
+  React.useEffect(() => {
+    function handleEnterKeyPress(e: KeyboardEvent) {
+      if (isActiveElement && e.key === 'Enter') {
+        handleClick()
+      }
+    }
+
+    window.addEventListener('keydown', handleEnterKeyPress)
+    return () => window.removeEventListener('keydown', handleEnterKeyPress)
+  }, [isActiveElement, handleClick])
+
+  return (
+    <HomeFeedListItemLayout onClick={handleClick} className={cn('justify-between', isActiveElement && 'bg-hover')}>
+      <div className="flex items-center gap-2 font-medium">
+        <MessageText variant={'Bold'} size={20} className="text-subtle" />
+        <h3 className="max-w-sm truncate tracking-tight text-primary">{props.chat.title}</h3>
+      </div>
+      <div className="flex items-center gap-2 font-medium">
+        <p className="text-sm text-tertiary">{formatUpdatedAtDate(props.chat.updated_at)}</p>
+        <ChatAction chat={props.chat} />
+        <ChatShareLinkCopyButton chat={props.chat} />
+      </div>
+    </HomeFeedListItemLayout>
+  )
+}
+
+function ChatsTabContent() {
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useHistory()
+  const { chats, chatGroupCounts, chatGroupLabels } = React.useMemo(() => {
+    const chats = data ? data.pages.flat() : []
+    const { groupLengths, groupLabels } = getDateGroupLengths(chats)
+    return { chats, chatGroupCounts: groupLengths, chatGroupLabels: groupLabels }
+  }, [data])
+
+  function handleFetchMore() {
+    if (hasNextPage) fetchNextPage()
+  }
+
+  if (!isLoading && !data) {
+    return <ListEmptyState label="No chats" />
+  }
+
+  return (
+    <AnimatePresence initial={false}>
+      {isLoading ? (
+        <ListLoadingState />
+      ) : (
+        <HomeFeedListLayout>
+          <GroupedVirtualList
+            endReached={handleFetchMore}
+            style={{ height: HOME_FEED_LIST_HEIGHT }}
+            groupCounts={chatGroupCounts}
+            groupContent={(index) => <GroupHeaderRow>{chatGroupLabels[index]}</GroupHeaderRow>}
+            itemContent={(index) => {
+              const chat = chats[index]
+              return <ChatListItem key={chat.id} chat={chat} listIndex={index} />
+            }}
+            components={{
+              Footer: () =>
+                isFetchingNextPage && (
+                  <HomeFeedListItemLayout>
+                    <div className="flex items-center gap-2 font-medium">
+                      <MessageText variant={'Bold'} size={20} className="animate-pulse text-subtle/50" />
+                      <p className="animate-pulse text-subtle">Loading more chats...</p>
+                    </div>
+                  </HomeFeedListItemLayout>
+                ),
+            }}
+          />
+        </HomeFeedListLayout>
+      )}
+    </AnimatePresence>
+  )
+}
+
 function RecentActivityTabContent() {
   const { data: recentActivity, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useRecentActions()
   const { recentActivityGroupCounts, recentActivityGroupLabels } = React.useMemo(() => {

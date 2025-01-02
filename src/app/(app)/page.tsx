@@ -2,12 +2,12 @@
 
 import React from 'react'
 import styles from '@/main.module.scss'
-import { useAtom, useSetAtom } from 'jotai'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
 import { cn } from '@/lib/utils'
 import { showHistoryAtom } from '@/atoms/history'
-import { isOnHomeAtom, showBackButtonAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
+import { isOnHomeAtom, showBackButtonAtom, showSidePanelAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
 import { useCurrentChatMessages } from '@/hooks/useCurrentChatMessages'
 import { Input } from '@/components/Input/Input'
 import Messages from '@/components/Messages/Messages'
@@ -29,7 +29,8 @@ import { HighlightSidePanel } from '@/features/side-panel/components/highlight-s
 
 export default function Home() {
   const [showHistory, setShowHistory] = useAtom(showHistoryAtom)
-  const [sidePanelOpen, setSidePanelOpen] = useAtom(sidePanelOpenAtom)
+  const setSidePanelOpen = useSetAtom(sidePanelOpenAtom)
+  const showSidePanel = useAtomValue(showSidePanelAtom)
   const setShowBackButton = useSetAtom(showBackButtonAtom)
   const setIsOnHome = useSetAtom(isOnHomeAtom)
   const { inputIsDisabled, promptApp, isConversationLoading } = useStore(
@@ -47,11 +48,11 @@ export default function Home() {
   React.useEffect(() => {
     setIsOnHome(!isChatting && !isConversationLoading)
 
-    if (isChatting || isConversationLoading) {
+    if (isChatting || isConversationLoading || promptApp) {
       setSidePanelOpen(false)
       setShowBackButton(false)
     }
-  }, [isChatting, setShowBackButton, setIsOnHome, setSidePanelOpen, isConversationLoading])
+  }, [isChatting, setShowBackButton, promptApp, setIsOnHome, setSidePanelOpen, isConversationLoading])
 
   useClipboardPaste()
   useConversationLoad()
@@ -75,7 +76,7 @@ export default function Home() {
           className={cn(
             'col-span-3 flex w-full flex-col items-center justify-end transition delay-100',
             styles.contents,
-            sidePanelOpen && 'lg:col-span-2',
+            showSidePanel && 'lg:col-span-2',
           )}
         >
           <ChatHeader isShowing={!isConversationLoading && !!promptApp && messages.length === 0} />

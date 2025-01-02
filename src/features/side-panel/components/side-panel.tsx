@@ -5,14 +5,7 @@ import { useAtomValue, useSetAtom } from 'jotai'
 import useMeasure from 'react-use-measure'
 
 import { cn } from '@/lib/utils'
-import {
-  isOnHomeAtom,
-  selectedAudioNoteAtom,
-  selectedChatIdAtom,
-  showBackButtonAtom,
-  sidePanelContentTypeAtom,
-  sidePanelOpenAtom,
-} from '@/atoms/side-panel'
+import { isOnHomeAtom, showSidePanelAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tooltip } from '@/components/ui/tooltip'
 
@@ -39,12 +32,12 @@ function CloseHoverAnimateLayout(props: { children: React.ReactNode; className?:
   )
 }
 
-function CloseTranscriptViewerButton() {
+function CloseSidePanelButton() {
   const setHoveringClose = useSetAtom(hoveringCloseAtom)
-  const setTranscriptOpen = useSetAtom(sidePanelOpenAtom)
+  const setSidePanelOpen = useSetAtom(sidePanelOpenAtom)
 
   function handleClick() {
-    setTranscriptOpen(false)
+    setSidePanelOpen(false)
     setHoveringClose(false)
   }
 
@@ -54,7 +47,7 @@ function CloseTranscriptViewerButton() {
         <motion.button
           onHoverStart={() => setHoveringClose(true)}
           onHoverEnd={() => setHoveringClose(false)}
-          aria-label="Close Transcript Viewer"
+          aria-label="Close Side Panel"
           onClick={handleClick}
           className="size-8 group relative grid place-items-center border border-t-0 border-tertiary bg-bg-layer-1 transition-colors hover:bg-secondary"
         >
@@ -65,38 +58,9 @@ function CloseTranscriptViewerButton() {
   )
 }
 
-function TranscriptViewerBackButton() {
-  const setHoveringClose = useSetAtom(hoveringCloseAtom)
-  const setSidePanelContentType = useSetAtom(sidePanelContentTypeAtom)
-  const setShowBackButton = useSetAtom(showBackButtonAtom)
-
-  function handleClick() {
-    setHoveringClose(false)
-    setShowBackButton(false)
-    setSidePanelContentType('chat')
-  }
-
-  return (
-    <Tooltip content="Back" side="right" align="start">
-      <div className="absolute -left-5 top-0">
-        <motion.button
-          onHoverStart={() => setHoveringClose(true)}
-          onHoverEnd={() => setHoveringClose(false)}
-          aria-label="Close Transcript Viewer"
-          onClick={handleClick}
-          className="size-5 group relative grid place-items-center rounded-bl-lg border border-t-0 border-tertiary bg-bg-layer-1 transition-colors hover:bg-secondary"
-        >
-          <ArrowRight size={12} className="text-tertiary transition-colors group-hover:text-primary" />
-        </motion.button>
-      </div>
-    </Tooltip>
-  )
-}
-
-export function SidePanel(props: { children: React.ReactNode; hideCloseButton?: boolean; className?: string }) {
-  const sidePanelOpen = useAtomValue(sidePanelOpenAtom)
+export function SidePanel(props: { children: React.ReactNode; className?: string }) {
+  const showSidePanel = useAtomValue(showSidePanelAtom)
   const isOnHome = useAtomValue(isOnHomeAtom)
-  const showBackButton = useAtomValue(showBackButtonAtom)
 
   const sidePanelVariants: Variants = {
     hidden: { opacity: 0, x: 20 },
@@ -106,7 +70,7 @@ export function SidePanel(props: { children: React.ReactNode; hideCloseButton?: 
 
   return (
     <AnimatePresence mode="popLayout">
-      {sidePanelOpen && (
+      {showSidePanel && (
         <motion.div
           variants={sidePanelVariants}
           initial="hidden"
@@ -119,8 +83,7 @@ export function SidePanel(props: { children: React.ReactNode; hideCloseButton?: 
           )}
         >
           {props.children}
-          {!props.hideCloseButton && <CloseTranscriptViewerButton />}
-          {showBackButton && <TranscriptViewerBackButton />}
+          {!isOnHome && <CloseSidePanelButton />}
         </motion.div>
       )}
     </AnimatePresence>
