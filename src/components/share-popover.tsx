@@ -3,7 +3,7 @@ import { ChatHistoryItem } from '@/types'
 import { AnimatePresence, motion, Variants } from 'framer-motion'
 import { EmojiHappy } from 'iconsax-react'
 
-import { useCopyLink, useDisableLink } from '@/hooks/share-link'
+import { useCopyChatShareLink, useDisableChatShareLink } from '@/hooks/share-link'
 import { PopoverContent } from '@/components/ui/popover'
 
 import Button from './Button/Button'
@@ -11,7 +11,7 @@ import LoadingSpinner from './LoadingSpinner/LoadingSpinner'
 
 function CopyShareLinkButton(props: { shareLinkId: string | undefined }) {
   const [showSuccessState, setShowSuccessState] = React.useState(false)
-  const { mutate: copyLink, isPending, isSuccess: linkCopied } = useCopyLink()
+  const { mutate: copyLink, isPending, isSuccess: linkCopied } = useCopyChatShareLink()
 
   React.useEffect(() => {
     let timeout: NodeJS.Timeout | null
@@ -64,7 +64,7 @@ function CopyShareLinkButton(props: { shareLinkId: string | undefined }) {
 }
 
 function DisableShareLinkButton(props: { conversationId: string }) {
-  const { mutate: disableShareLink, isPending } = useDisableLink()
+  const { mutate: disableShareLink, isPending } = useDisableChatShareLink()
 
   return (
     <Button

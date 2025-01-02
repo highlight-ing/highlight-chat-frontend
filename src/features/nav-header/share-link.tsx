@@ -3,16 +3,16 @@
 import React, { useEffect } from 'react'
 import { ChatHistoryItem } from '@/types'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowDown2, EmojiHappy, Send2 } from 'iconsax-react'
+import { ArrowDown2, Send2 } from 'iconsax-react'
 
-import { useCopyLink, useDisableLink, useGenerateShareLink } from '@/hooks/share-link'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { useCopyChatShareLink, useDisableChatShareLink, useGenerateChatShareLink } from '@/hooks/share-link'
+import { Popover, PopoverTrigger } from '@/components/ui/popover'
 import Button from '@/components/Button/Button'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 import { SharePopoverContent } from '@/components/share-popover'
 
 function GenerateShareLinkButton(props: { conversation: ChatHistoryItem }) {
-  const { mutate: generateShareLink, isPending } = useGenerateShareLink()
+  const { mutate: generateShareLink, isPending } = useGenerateChatShareLink()
 
   return (
     <Button
@@ -38,7 +38,7 @@ function GenerateShareLinkButton(props: { conversation: ChatHistoryItem }) {
 }
 
 function CopyLinkButton(props: { shareLinkId: string }) {
-  const { mutate: copyLink, isPending, isSuccess } = useCopyLink()
+  const { mutate: copyLink, isPending, isSuccess } = useCopyChatShareLink()
   const [showSuccessState, setShowSuccessState] = React.useState(false)
 
   useEffect(() => {
@@ -82,7 +82,7 @@ type DisableShareLinkButtonProps = {
 }
 
 function DisableShareLinkButton(props: DisableShareLinkButtonProps) {
-  const { mutate: disableShareLink, isPending } = useDisableLink()
+  const { mutate: disableShareLink, isPending } = useDisableChatShareLink()
 
   return (
     <Button

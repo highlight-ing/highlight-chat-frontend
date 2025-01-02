@@ -11,7 +11,7 @@ import { useStore } from '@/components/providers/store-provider'
 
 import { useChatHistoryStore } from './chat-history'
 
-export function useCopyLink() {
+export function useCopyChatShareLink() {
   return useMutation({
     mutationKey: ['copy-share-link'],
     mutationFn: async (shareLink: string) => {
@@ -25,7 +25,7 @@ export function useCopyLink() {
   })
 }
 
-export function useGenerateShareLink() {
+export function useGenerateChatShareLink() {
   const { post } = useApi()
   const setShareId = useStore((state) => state.setShareId)
   const { addOrUpdateChat } = useChatHistoryStore()
@@ -81,7 +81,7 @@ export function useGenerateShareLink() {
   })
 }
 
-export function useDisableLink() {
+export function useDisableChatShareLink() {
   const { deleteRequest } = useApi()
   const setShareId = useStore((state) => state.setShareId)
   const { addOrUpdateChat } = useChatHistoryStore()

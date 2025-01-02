@@ -8,7 +8,7 @@ import { trackEvent } from '@/utils/amplitude'
 import { selectedAudioNoteAtom, selectedChatIdAtom } from '@/atoms/side-panel'
 import { useHistoryByChatId } from '@/hooks/chat-history'
 import { useMessages } from '@/hooks/chat-messages'
-import { useCopyLink, useGenerateShareLink } from '@/hooks/share-link'
+import { useCopyChatShareLink, useGenerateChatShareLink } from '@/hooks/share-link'
 import { Popover, PopoverTrigger } from '@/components/ui/popover'
 import { Skeleton } from '@/components/ui/skeleton'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
@@ -97,8 +97,8 @@ function CopyLinkAction() {
   const { data: selectedChat } = useHistoryByChatId(selectedChatId)
   const mostRecentShareLinkId = selectedChat?.shared_conversations?.[0]?.id
   const [showSuccessState, setShowSuccessState] = React.useState(false)
-  const { mutate: generateShareLink, isPending: isGeneratingLink } = useGenerateShareLink()
-  const { mutate: copyLink, isSuccess: linkCopied } = useCopyLink()
+  const { mutate: generateShareLink, isPending: isGeneratingLink } = useGenerateChatShareLink()
+  const { mutate: copyLink, isSuccess: linkCopied } = useCopyChatShareLink()
 
   React.useEffect(() => {
     let timeout: NodeJS.Timeout | null
@@ -153,7 +153,7 @@ function ShareAction() {
   const selectedChatId = useAtomValue(selectedChatIdAtom)
   const { data: selectedChat } = useHistoryByChatId(selectedChatId)
   const mostRecentShareLinkId = selectedChat?.shared_conversations?.[0]?.id
-  const { mutate: generateShareLink, isPending: isGeneratingLink } = useGenerateShareLink()
+  const { mutate: generateShareLink, isPending: isGeneratingLink } = useGenerateChatShareLink()
 
   function handleShareClick() {
     if (!selectedChat || mostRecentShareLinkId) return
