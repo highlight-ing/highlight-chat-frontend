@@ -4,10 +4,12 @@ import { deleteAudioNoteShareLink, generateAudioNoteShareLink } from '@/actions/
 import { ChatHistoryItem } from '@/types'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Copy } from 'iconsax-react'
+import { useSetAtom } from 'jotai'
 import { toast } from 'sonner'
 
 import { ConversationData } from '@/types/conversations'
 import { trackEvent } from '@/utils/amplitude'
+import { selectedAudioNoteAtom } from '@/atoms/side-panel'
 import { useApi } from '@/hooks/useApi'
 import { useStore } from '@/components/providers/store-provider'
 
@@ -140,6 +142,7 @@ export function useCopyAudioShareLink() {
 export function useGenerateAudioShareLink() {
   const { userId } = useAuth()
   const queryClient = useQueryClient()
+  const setSelectedAudioNote = useSetAtom(selectedAudioNoteAtom)
 
   return useMutation({
     mutationKey: ['generate-chat-share-link'],
@@ -159,8 +162,10 @@ export function useGenerateAudioShareLink() {
       queryClient.setQueryData(['audio-notes'], (originalAudioNotes: Array<ConversationData>) => {
         const audioNotes = [...originalAudioNotes]
         const existingAudioNoteIndex = audioNotes.findIndex((note) => note.id === audioNote.id)
+        const updatedAudioNote = { ...audioNotes[existingAudioNoteIndex], shareLink }
 
-        audioNotes[existingAudioNoteIndex] = { ...audioNotes[existingAudioNoteIndex], shareLink }
+        audioNotes[existingAudioNoteIndex] = updatedAudioNote
+        setSelectedAudioNote(updatedAudioNote)
 
         return audioNotes
       })
@@ -184,6 +189,7 @@ export function useGenerateAudioShareLink() {
 
 export function useDisableAudioShareLink() {
   const queryClient = useQueryClient()
+  const setSelectedAudioNote = useSetAtom(selectedAudioNoteAtom)
 
   return useMutation({
     mutationKey: ['disable-audio-share-link'],
@@ -200,8 +206,10 @@ export function useDisableAudioShareLink() {
       queryClient.setQueryData(['audio-notes'], (originalAudioNotes: Array<ConversationData>) => {
         const audioNotes = [...originalAudioNotes]
         const existingAudioNoteIndex = audioNotes.findIndex((note) => note.id === updatedAudioNote.id)
+        const updatedAudioNote = { ...audioNotes[existingAudioNoteIndex], shareLink: '' }
 
         audioNotes[existingAudioNoteIndex] = updatedAudioNote
+        setSelectedAudioNote(updatedAudioNote)
 
         return audioNotes
       })
