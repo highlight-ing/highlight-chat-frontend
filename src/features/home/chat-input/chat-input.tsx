@@ -8,7 +8,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 import { cn } from '@/lib/utils'
 import { getDisplayValue } from '@/utils/attachments'
-import { sidePanelOpenAtom } from '@/atoms/side-panel'
+import { showSidePanelAtom } from '@/atoms/side-panel'
 import { Attachment } from '@/components/Attachment'
 import { CreateShortcutButton } from '@/components/buttons/create-shortcut-button'
 import { OpenAppButton } from '@/components/buttons/open-app-button'
@@ -84,7 +84,7 @@ export function ChatInput() {
   const { input, setInput, inputContainerRef, inputRef, focusInput, handleKeyDown, onRemoveAttachment } = useChatInput()
 
   const [ref, bounds] = useMeasure()
-  const sidePanelOpen = useAtomValue(sidePanelOpenAtom)
+  const showSidePanel = useAtomValue(showSidePanelAtom)
   const isInputFocused = useAtomValue(chatInputIsFocusedAtom)
 
   const inputTransition: Transition = { type: 'spring', duration: 0.25, bounce: 0.2 }
@@ -103,7 +103,7 @@ export function ChatInput() {
               height: {
                 ...inputTransition,
                 duration: isInputFocused ? 0.2 : 0.25,
-                delay: sidePanelOpen ? 0 : isInputFocused ? 0 : 0.15,
+                delay: showSidePanel ? 0 : isInputFocused ? 0 : 0.15,
               },
             }}
             className={cn(
