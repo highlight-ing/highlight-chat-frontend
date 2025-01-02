@@ -230,16 +230,14 @@ function AttachAudioAction(props: { audioNote: ConversationData }) {
 function AudioNotesListItem(props: { audioNote: ConversationData; listIndex: number }) {
   const formattedTitle = formatTitle(props.audioNote.title)
   const setSelectedAudioNote = useSetAtom(selectedAudioNoteAtom)
-  const setSidePanelOpen = useSetAtom(sidePanelOpenAtom)
   const [currentListIndex, setCurrentListIndex] = useAtom(currentListIndexAtom)
   const isActiveElement = currentListIndex === props.listIndex
   const [isMounted, setIsMounted] = useAtom(isMountedAtom)
 
   const previewAudioNote = React.useCallback(() => {
     setSelectedAudioNote(props.audioNote)
-    setSidePanelOpen(true)
     setCurrentListIndex(props.listIndex)
-  }, [props.audioNote, setCurrentListIndex, props.listIndex, setSelectedAudioNote, setSidePanelOpen])
+  }, [props.audioNote, setCurrentListIndex, props.listIndex, setSelectedAudioNote])
 
   const handleClick = React.useCallback(() => {
     previewAudioNote()

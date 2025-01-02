@@ -16,6 +16,7 @@ import { AttachmentDropdowns } from '@/components/dropdowns/attachment-dropdowns
 import { useStore } from '@/components/providers/store-provider'
 import Tooltip from '@/components/Tooltip/Tooltip'
 
+import { SidePanelToggle } from '../_components/side-panel-toggle'
 import { chatInputIsFocusedAtom } from '../atoms'
 import { useChatInput } from './hooks'
 import { PromptsList } from './prompts-list'
@@ -83,7 +84,7 @@ export function ChatInput() {
   const { input, setInput, inputContainerRef, inputRef, focusInput, handleKeyDown, onRemoveAttachment } = useChatInput()
 
   const [ref, bounds] = useMeasure()
-  const transcriptOpen = useAtomValue(sidePanelOpenAtom)
+  const sidePanelOpen = useAtomValue(sidePanelOpenAtom)
   const isInputFocused = useAtomValue(chatInputIsFocusedAtom)
 
   const inputTransition: Transition = { type: 'spring', duration: 0.25, bounce: 0.2 }
@@ -91,99 +92,102 @@ export function ChatInput() {
 
   return (
     <MotionConfig transition={inputTransition}>
-      <div ref={inputContainerRef} className="relative z-20 flex min-h-[60px] w-full flex-col items-center gap-8">
-        <motion.div
-          layout
-          initial={{ height: INPUT_HEIGHT }}
-          animate={{ height: bounds.height }}
-          transition={{
-            duration: 0,
-            height: {
-              ...inputTransition,
-              duration: isInputFocused ? 0.2 : 0.25,
-              delay: transcriptOpen ? 0 : isInputFocused ? 0 : 0.15,
-            },
-          }}
-          className={cn(
-            'absolute isolate z-10 w-full cursor-text rounded-[20px] border border-tertiary bg-primary',
-            isInputFocused && 'bg-secondary shadow-xl',
-          )}
-          onClick={focusInput}
-        >
-          <div ref={ref} className="min-h-14 flex flex-col justify-between py-3">
-            <div className="flex w-full items-end justify-between gap-2 pl-6 pr-4">
-              <div className="h-auto w-full">
-                <textarea
-                  id="textarea-input"
-                  ref={inputRef}
-                  disabled={isConversationLoading || inputIsDisabled}
-                  placeholder={isConversationLoading || inputIsDisabled ? 'Loading new chat...' : 'Ask Highlight'}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  className={cn(
-                    'h-6 max-h-[120px] w-full flex-1 resize-none overflow-y-auto bg-transparent text-base font-normal leading-6 outline-none placeholder:select-none placeholder:text-light-40 focus:outline-none',
-                    !isInputFocused && 'max-h-6',
-                  )}
-                />
-              </div>
-              <motion.div layout className="flex items-center gap-2">
-                <AttachmentDropdowns />
-                {!isInputFocused && (
-                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-                    <Tooltip tooltip="Pinned prompts" position="top">
-                      <button className="grid h-9 w-9 place-items-center rounded-full text-tertiary hover:bg-light-10">
-                        <Setting variant="Bold" size={20} />
-                      </button>
-                    </Tooltip>
-                  </motion.div>
-                )}
-              </motion.div>
-            </div>
-
-            <AnimatePresence mode="popLayout">
-              {isInputFocused && attachments.length > 0 && (
-                <div className="mt-1.5 flex items-center gap-2 px-[22px]">
-                  {attachments.map((attachment: AttachmentType, index: number) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, y: -5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ ...inputTransition, delay: 0.1 }}
-                    >
-                      <Attachment
-                        type={attachment.type}
-                        value={getDisplayValue(attachment)}
-                        id={attachment?.id}
-                        title={attachment?.title}
-                        startedAt={attachment.startedAt}
-                        endedAt={attachment.endedAt}
-                        isFile={
-                          attachment.type === 'pdf' ||
-                          (attachment.type === 'image' && !!attachment.file) ||
-                          attachment.type === 'spreadsheet'
-                        }
-                        onRemove={() => onRemoveAttachment(attachment)}
-                        key={index}
-                      />
+      <div className="relative flex items-center lg:pr-10">
+        <div ref={inputContainerRef} className="relative z-20 flex min-h-[60px] w-full flex-col items-center gap-8">
+          <motion.div
+            layout
+            initial={{ height: INPUT_HEIGHT }}
+            animate={{ height: bounds.height }}
+            transition={{
+              duration: 0,
+              height: {
+                ...inputTransition,
+                duration: isInputFocused ? 0.2 : 0.25,
+                delay: sidePanelOpen ? 0 : isInputFocused ? 0 : 0.15,
+              },
+            }}
+            className={cn(
+              'absolute isolate z-10 w-full cursor-text rounded-[20px] border border-tertiary bg-primary',
+              isInputFocused && 'bg-secondary shadow-xl',
+            )}
+            onClick={focusInput}
+          >
+            <div ref={ref} className="min-h-14 flex flex-col justify-between py-3">
+              <div className="flex w-full items-end justify-between gap-2 pl-6 pr-4">
+                <div className="h-auto w-full">
+                  <textarea
+                    id="textarea-input"
+                    ref={inputRef}
+                    disabled={isConversationLoading || inputIsDisabled}
+                    placeholder={isConversationLoading || inputIsDisabled ? 'Loading new chat...' : 'Ask Highlight'}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className={cn(
+                      'h-6 max-h-[120px] w-full flex-1 resize-none overflow-y-auto bg-transparent text-base font-normal leading-6 outline-none placeholder:select-none placeholder:text-light-40 focus:outline-none',
+                      !isInputFocused && 'max-h-6',
+                    )}
+                  />
+                </div>
+                <motion.div layout className="flex items-center gap-2">
+                  <AttachmentDropdowns />
+                  {!isInputFocused && (
+                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
+                      <Tooltip tooltip="Pinned prompts" position="top">
+                        <button className="grid h-9 w-9 place-items-center rounded-full text-tertiary hover:bg-light-10">
+                          <Setting variant="Bold" size={20} />
+                        </button>
+                      </Tooltip>
                     </motion.div>
-                  ))}
-                </div>
-              )}
-            </AnimatePresence>
+                  )}
+                </motion.div>
+              </div>
 
-            <AnimatePresence mode="popLayout">
-              {isInputFocused && (
-                <div className="pt-3">
-                  <InputDivider />
-                  <PromptsList input={input} />
-                  <InputDivider />
-                  <InputFooter />
-                </div>
-              )}
-            </AnimatePresence>
-          </div>
-        </motion.div>
+              <AnimatePresence mode="popLayout">
+                {isInputFocused && attachments.length > 0 && (
+                  <div className="mt-1.5 flex items-center gap-2 px-[22px]">
+                    {attachments.map((attachment: AttachmentType, index: number) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ ...inputTransition, delay: 0.1 }}
+                      >
+                        <Attachment
+                          type={attachment.type}
+                          value={getDisplayValue(attachment)}
+                          id={attachment?.id}
+                          title={attachment?.title}
+                          startedAt={attachment.startedAt}
+                          endedAt={attachment.endedAt}
+                          isFile={
+                            attachment.type === 'pdf' ||
+                            (attachment.type === 'image' && !!attachment.file) ||
+                            attachment.type === 'spreadsheet'
+                          }
+                          onRemove={() => onRemoveAttachment(attachment)}
+                          key={index}
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+              </AnimatePresence>
+
+              <AnimatePresence mode="popLayout">
+                {isInputFocused && (
+                  <div className="pt-3">
+                    <InputDivider />
+                    <PromptsList input={input} />
+                    <InputDivider />
+                    <InputFooter />
+                  </div>
+                )}
+              </AnimatePresence>
+            </div>
+          </motion.div>
+        </div>
+        <SidePanelToggle />
       </div>
     </MotionConfig>
   )
