@@ -3,8 +3,9 @@
 import React from 'react'
 import { useConversations } from '@/context/ConversationContext'
 import { AnimatePresence } from 'framer-motion'
-import { MessageText, VoiceSquare } from 'iconsax-react'
+import { Copy, Export, MessageText, VoiceSquare } from 'iconsax-react'
 import { useAtom, useSetAtom } from 'jotai'
+import { toast } from 'sonner'
 import { useShallow } from 'zustand/react/shallow'
 
 import { ConversationData } from '@/types/conversations'
@@ -12,6 +13,7 @@ import { cn, getDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { formatTitle } from '@/utils/conversations'
 import { selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
+import { useCopyAudioShareLink, useGenerateAuidoShareLink } from '@/hooks/share-link'
 import { Switch } from '@/components/ui/switch'
 import { Tooltip } from '@/components/ui/tooltip'
 import Button from '@/components/Button/Button'
@@ -102,6 +104,35 @@ function AttachAudioAction(props: { audioNote: ConversationData }) {
   )
 }
 
+function CopyAudioShareLinkButton(props: { audioNote: ConversationData }) {
+  const { mutate: generateShareLink, isPending: isGeneratingLink } = useGenerateAuidoShareLink()
+  const { mutateAsync: copyLink } = useCopyAudioShareLink()
+  const shareLinkExsists = props.audioNote?.shareLink && props.audioNote.shareLink !== ''
+
+  async function handleCopyClick() {
+    if (!props.audioNote) return
+
+    if (!shareLinkExsists) {
+      generateShareLink(props.audioNote)
+    } else {
+      await copyLink(props.audioNote.shareLink)
+      toast('Link copied to clipboard', { icon: <Copy variant="Bold" size={20} /> })
+    }
+  }
+
+  return (
+    <Tooltip content="Share">
+      <button
+        onClick={handleCopyClick}
+        disabled={isGeneratingLink}
+        className="size-6 hidden place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:grid"
+      >
+        <Export variant="Bold" size={16} className={cn('text-tertiary', isGeneratingLink && 'opacity-50')} />
+      </button>
+    </Tooltip>
+  )
+}
+
 export function AudioNotesListItem(props: { audioNote: ConversationData; listIndex: number }) {
   const formattedTitle = formatTitle(props.audioNote.title)
   const setSelectedAudioNote = useSetAtom(selectedAudioNoteAtom)
@@ -156,6 +187,7 @@ export function AudioNotesListItem(props: { audioNote: ConversationData; listInd
       <div className="flex items-center gap-2 font-medium">
         <p className="text-sm text-tertiary">{formatUpdatedAtDate(props.audioNote.endedAt)}</p>
         <AttachAudioAction audioNote={props.audioNote} />
+        <CopyAudioShareLinkButton audioNote={props.audioNote} />
       </div>
     </HomeFeedListItemLayout>
   )
