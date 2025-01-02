@@ -303,7 +303,7 @@ export const Message = ({ message, isThinking, hideAssistantIcon, className }: M
                   />
                 </>
               )}
-              {message.id && message.role === 'assistant' && (
+              {false && message.id && message.role === 'assistant' && (
                 <>
                   <AssistantMessageButton
                     type="Like"
