@@ -18,10 +18,12 @@ import styles from './message.module.scss'
 import 'katex/dist/katex.min.css'
 
 import { MessageText } from 'iconsax-react'
+import { useAtomValue } from 'jotai'
 
 import { cn } from '@/lib/utils'
 import { getDisplayValue } from '@/utils/attachments'
 import { AttachedContextContextTypes } from '@/utils/formDataUtils'
+import { isOnHomeAtom } from '@/atoms/side-panel'
 import Button from '@/components/Button/Button'
 import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
 import { useStore } from '@/components/providers/store-provider'
@@ -104,6 +106,7 @@ const Visualization = ({ visualization }: { visualization: VisualizationData }) 
 }
 
 export const Message = ({ message, isThinking, hideAssistantIcon, className }: MessageProps) => {
+  const isOnHome = useAtomValue(isOnHomeAtom)
   const promptApp = useStore((state) => state.promptApp)
   const openModal = useStore((state) => state.openModal)
   const [copyStatus, setCopyStatus] = useState<'idle' | 'success' | 'error'>('idle')
@@ -221,23 +224,23 @@ export const Message = ({ message, isThinking, hideAssistantIcon, className }: M
                     return <td>{children}</td>
                   },
                 }}
-                // remarkToRehypeOptions={{
-                //   allowDangerousHtml: true
-                // }}
-                // rehypeReactOptions={{
-                //   components: {
-                //     code: (props: any) => {
-                //       const match = /language-(\w+)/.exec(props.className || '')
-                //       if (match) {
-                //         return (
-                //           <CodeBlock language={match[1]}>
-                //             {props.children}
-                //           </CodeBlock>
-                //         )
-                //       }
-                //       return <code {...props}/>
-                //     }
-                // }}}
+              // remarkToRehypeOptions={{
+              //   allowDangerousHtml: true
+              // }}
+              // rehypeReactOptions={{
+              //   components: {
+              //     code: (props: any) => {
+              //       const match = /language-(\w+)/.exec(props.className || '')
+              //       if (match) {
+              //         return (
+              //           <CodeBlock language={match[1]}>
+              //             {props.children}
+              //           </CodeBlock>
+              //         )
+              //       }
+              //       return <code {...props}/>
+              //     }
+              // }}}
               >
                 {typeof message.content === 'string' ? preprocessLaTeX(message.content) : ''}
               </Markdown>
@@ -252,8 +255,8 @@ export const Message = ({ message, isThinking, hideAssistantIcon, className }: M
           {message.role === 'user' && hasAttachment(message as UserMessage) && (
             <div className={`mt-2 flex gap-2`}>
               {message.version === 'v4' &&
-              Array.isArray(message.attached_context) &&
-              message.attached_context.length > 0 ? (
+                Array.isArray(message.attached_context) &&
+                message.attached_context.length > 0 ? (
                 message.attached_context.map((attachment, index) => (
                   <div key={index}>{renderAttachment(attachment)}</div>
                 ))
@@ -286,7 +289,7 @@ export const Message = ({ message, isThinking, hideAssistantIcon, className }: M
                   status={copyStatus}
                 />
               )}
-              {typeof message.content === 'string' && message.role === 'assistant' && (
+              {!isOnHome && typeof message.content === 'string' && message.role === 'assistant' && (
                 <>
                   <AssistantMessageButton
                     type="Notion"
