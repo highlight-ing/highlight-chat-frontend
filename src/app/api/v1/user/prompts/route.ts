@@ -3,6 +3,7 @@ import { DEFAULT_PROMPT_IDS, DEFAULT_PROMPT_PREFERENCES } from '@/lib/default-pr
 import { PROMPTS_TABLE_SELECT_FIELDS, promptSelectMapper, supabaseAdmin } from '@/lib/supabase'
 
 async function checkIfDefaultPromptsAdded(userId: string) {
+  console.log('Checking default prompts for user:', userId)
   const supabase = supabaseAdmin()
 
   const { data: profile } = await supabase
@@ -13,10 +14,14 @@ async function checkIfDefaultPromptsAdded(userId: string) {
     .maybeSingle()
 
   let hasAddedDefaultPrompts = profile?.added_default_prompts ?? false
+  console.log('Has added default prompts:', hasAddedDefaultPrompts)
 
   if (hasAddedDefaultPrompts) {
+    console.log('User already has default prompts')
     return
   }
+
+  console.log('Adding default prompts for user')
 
   // Update the user's profile
 
@@ -41,6 +46,8 @@ async function checkIfDefaultPromptsAdded(userId: string) {
 
   if (insertError) {
     console.error('Error pinning default prompts:', insertError)
+  } else {
+    console.log('Successfully added default prompts')
   }
 
   for (const promptId of DEFAULT_PROMPT_IDS) {
@@ -51,11 +58,16 @@ async function checkIfDefaultPromptsAdded(userId: string) {
       continue
     }
 
-    const { error: prefError } = await supabase.from('app_shortcut_preferences').insert({
-      prompt_id: promptId,
-      user_id: userId,
-      ...preferences,
-    })
+    const { error: prefError } = await supabase.from('app_shortcut_preferences').upsert(
+      {
+        prompt_id: promptId,
+        user_id: userId,
+        ...preferences,
+      },
+      {
+        onConflict: 'prompt_id,user_id',
+      },
+    )
 
     if (prefError) {
       console.error(`Error setting shortcut preferences for prompt ${promptId}:`, prefError)
@@ -71,6 +83,8 @@ async function checkIfDefaultPromptsAdded(userId: string) {
  * This route is called by Highlight's Electron client.
  */
 export async function GET(request: Request) {
+  console.log('GET /api/v1/user/prompts called')
+
   const supabase = supabaseAdmin()
 
   const authUser = await authenticateApiUser(request)
