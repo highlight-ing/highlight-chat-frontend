@@ -28,6 +28,7 @@ export function GroupedVirtualList(props: GroupedVirtuosoProps<unknown, number>)
             const nextIndex = Math.max(0, prev - 1)
             current.scrollToIndex({
               index: nextIndex,
+              align: 'center',
             })
             return nextIndex
           })
@@ -39,6 +40,7 @@ export function GroupedVirtualList(props: GroupedVirtuosoProps<unknown, number>)
             const nextIndex = prev + 1
             current.scrollToIndex({
               index: nextIndex,
+              align: 'center',
             })
             return nextIndex
           })
