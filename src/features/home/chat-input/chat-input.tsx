@@ -92,7 +92,7 @@ export function ChatInput() {
 
   return (
     <MotionConfig transition={inputTransition}>
-      <div className="relative flex items-center lg:pr-10">
+      <div className="relative flex items-center lg:pr-[52px]">
         <div ref={inputContainerRef} className="relative z-20 flex min-h-[60px] w-full flex-col items-center gap-8">
           <motion.div
             layout

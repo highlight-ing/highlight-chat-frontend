@@ -25,7 +25,7 @@ export function HomeFeedListItemLayout({ className, children, ...props }: HomeFe
   return (
     <div
       className={cn(
-        'group rounded-xl px-3 transition-colors hover:bg-secondary focus-visible:bg-hover lg:cursor-pointer [&_div]:last:border-transparent',
+        'group mr-2 rounded-xl px-3 transition-colors hover:bg-secondary focus-visible:bg-hover lg:cursor-pointer [&_div]:last:border-transparent',
         className,
       )}
       {...props}

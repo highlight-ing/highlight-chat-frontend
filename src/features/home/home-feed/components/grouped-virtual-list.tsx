@@ -50,12 +50,5 @@ export function GroupedVirtualList(props: GroupedVirtuosoProps<unknown, number>)
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [virtuosoRef, setCurrentListIndex])
 
-  return (
-    <GroupedVirtuoso
-      ref={virtuosoRef}
-      initialTopMostItemIndex={currentListIndex}
-      style={{ height: 'calc(100vh - 192px)' }}
-      {...props}
-    />
-  )
+  return <GroupedVirtuoso ref={virtuosoRef} initialTopMostItemIndex={currentListIndex} {...props} />
 }
