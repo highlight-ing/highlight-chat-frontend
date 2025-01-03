@@ -21,6 +21,7 @@ interface PublicFetchOptions {
 interface RequestOptions {
   version: ApiVersion
   signal?: AbortSignal
+  headers?: Record<string, string>
 }
 
 const fetchRequest = async (route: string, { bearerToken, body, version, method, signal }: FetchOptions) => {
