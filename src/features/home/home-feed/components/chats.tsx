@@ -10,7 +10,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 import { cn, getDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
-import { selectedChatIdAtom } from '@/atoms/side-panel'
+import { homeSidePanelOpenAtom, selectedChatIdAtom } from '@/atoms/side-panel'
 import { useHistory } from '@/hooks/chat-history'
 import { useCopyLink, useGenerateShareLink } from '@/hooks/share-link'
 import { Tooltip } from '@/components/ui/tooltip'
@@ -88,15 +88,17 @@ function ChatShareLinkCopyButton(props: { chat: ChatHistoryItem }) {
 }
 
 export function ChatListItem(props: { chat: ChatHistoryItem; listIndex: number }) {
+  const setHomeSidePanelOpen = useSetAtom(homeSidePanelOpenAtom)
   const setSelectedChatId = useSetAtom(selectedChatIdAtom)
   const [currentListIndex, setCurrentListIndex] = useAtom(currentListIndexAtom)
   const isActiveElement = currentListIndex === props.listIndex
   const [isMounted, setIsMounted] = useAtom(isMountedAtom)
 
   const previewChat = React.useCallback(() => {
+    setHomeSidePanelOpen(true)
     setSelectedChatId(props.chat.id)
     setCurrentListIndex(props.listIndex)
-  }, [props.chat.id, setSelectedChatId, props.listIndex, setCurrentListIndex])
+  }, [setHomeSidePanelOpen, setSelectedChatId, props.chat.id, props.listIndex, setCurrentListIndex])
 
   const handleClick = React.useCallback(() => {
     previewChat()

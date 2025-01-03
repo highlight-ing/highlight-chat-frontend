@@ -11,7 +11,7 @@ import { ConversationData } from '@/types/conversations'
 import { cn, getDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { formatTitle } from '@/utils/conversations'
-import { selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
+import { homeSidePanelOpenAtom, selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
 import { Switch } from '@/components/ui/switch'
 import { Tooltip } from '@/components/ui/tooltip'
 import Button from '@/components/Button/Button'
@@ -104,6 +104,7 @@ function AttachAudioAction(props: { audioNote: ConversationData }) {
 
 export function AudioNotesListItem(props: { audioNote: ConversationData; listIndex: number }) {
   const formattedTitle = formatTitle(props.audioNote.title)
+  const setHomeSidePanelOpen = useSetAtom(homeSidePanelOpenAtom)
   const setSelectedAudioNote = useSetAtom(selectedAudioNoteAtom)
   const setSidePanelOpen = useSetAtom(sidePanelOpenAtom)
   const [currentListIndex, setCurrentListIndex] = useAtom(currentListIndexAtom)
@@ -113,8 +114,16 @@ export function AudioNotesListItem(props: { audioNote: ConversationData; listInd
   const previewAudioNote = React.useCallback(() => {
     setSelectedAudioNote(props.audioNote)
     setSidePanelOpen(true)
+    setHomeSidePanelOpen(true)
     setCurrentListIndex(props.listIndex)
-  }, [props.audioNote, setCurrentListIndex, props.listIndex, setSelectedAudioNote, setSidePanelOpen])
+  }, [
+    setSelectedAudioNote,
+    props.audioNote,
+    props.listIndex,
+    setSidePanelOpen,
+    setHomeSidePanelOpen,
+    setCurrentListIndex,
+  ])
 
   const handleClick = React.useCallback(() => {
     previewAudioNote()

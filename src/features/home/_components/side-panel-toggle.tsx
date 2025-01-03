@@ -19,7 +19,14 @@ export function SidePanelToggle() {
     <Tooltip content={homeSidePanelOpen ? 'Close' : 'Open'} side="right">
       <div className="absolute -right-3 top-0">
         <button
-          aria-label="Close Side Panel"
+          aria-hidden="true"
+          tabIndex={-1}
+          onKeyDown={(e) => {
+            if (e.key.startsWith('Arrow')) {
+              e.preventDefault()
+              e.currentTarget.blur()
+            }
+          }}
           onClick={handleClick}
           className="group relative hidden h-[60px] w-10 place-items-center rounded-l-[20px] border border-r-0 border-tertiary bg-bg-layer-1 transition-colors hover:bg-secondary lg:grid"
         >
