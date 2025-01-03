@@ -13,7 +13,7 @@ import { Tooltip } from '@/components/ui/tooltip'
 import Button from '@/components/Button/Button'
 
 import { GroupedVirtualList, GroupHeaderRow } from '../components/grouped-virtual-list'
-import { currentListIndexAtom, feedHiddenAtom, toggleFeedVisibilityAtom } from '../atoms'
+import { currentListIndexAtom, feedHiddenAtom, multiSelectedAudioNoteIdsAtom, toggleFeedVisibilityAtom } from '../atoms'
 import { HOME_FEED_LIST_HEIGHT } from '../constants'
 import { useRecentActions } from '../hooks'
 import { AudioNotesListItem, AudioNotesTabContent, MeetingNotesTabContent } from './audio-note'
@@ -255,7 +255,7 @@ function HomeFeedTabContent(props: { value: string; children: React.ReactNode })
   const feedHidden = useAtomValue(feedHiddenAtom)
 
   return (
-    <ScopeProvider key={props.value} atoms={[currentListIndexAtom]}>
+    <ScopeProvider key={props.value} atoms={[currentListIndexAtom, multiSelectedAudioNoteIdsAtom]}>
       <TabsContent value={props.value}>{feedHidden ? <FeedHiddenState /> : props.children}</TabsContent>
     </ScopeProvider>
   )
