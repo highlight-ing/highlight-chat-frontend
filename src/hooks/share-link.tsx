@@ -179,8 +179,7 @@ export function useGenerateAudioShareLink() {
 }
 
 export function useDisableAudioShareLink() {
-  const queryClient = useQueryClient()
-  const setSelectedAudioNote = useSetAtom(selectedAudioNoteAtom)
+  const { updateAudioNote } = useAudioNotesStore()
 
   return useMutation({
     mutationKey: ['disable-audio-share-link'],
@@ -192,18 +191,9 @@ export function useDisableAudioShareLink() {
       return updatedAudioNote
     },
     onSuccess: (updatedAudioNote) => {
-      if (!updatedAudioNote) return
+      if (!updatedAudioNote?.id) return
 
-      queryClient.setQueryData(['audio-notes'], (originalAudioNotes: Array<ConversationData>) => {
-        const audioNotes = [...originalAudioNotes]
-        const existingAudioNoteIndex = audioNotes.findIndex((note) => note.id === updatedAudioNote.id)
-        const updatedAudioNote = { ...audioNotes[existingAudioNoteIndex], shareLink: '' }
-
-        audioNotes[existingAudioNoteIndex] = updatedAudioNote
-        setSelectedAudioNote(updatedAudioNote)
-
-        return audioNotes
-      })
+      updateAudioNote({ id: updatedAudioNote.id, shareLink: '' })
 
       trackEvent('HL Chat Audio Note Disable Link', { conversation_id: updatedAudioNote.id })
 
