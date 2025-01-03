@@ -12,7 +12,7 @@ import { cn, getDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { selectedChatIdAtom } from '@/atoms/side-panel'
 import { useHistory } from '@/hooks/chat-history'
-import { useCopyLink, useGenerateShareLink } from '@/hooks/share-link'
+import { useCopyChatShareLink, useGenerateChatShareLink } from '@/hooks/share-link'
 import { Tooltip } from '@/components/ui/tooltip'
 import { useStore } from '@/components/providers/store-provider'
 
@@ -60,8 +60,8 @@ function ChatAction(props: { chat: ChatHistoryItem }) {
 
 function ChatShareLinkCopyButton(props: { chat: ChatHistoryItem }) {
   const mostRecentShareLinkId = props.chat?.shared_conversations?.[0]?.id
-  const { mutate: generateShareLink, isPending: isGeneratingLink } = useGenerateShareLink()
-  const { mutateAsync: copyLink } = useCopyLink()
+  const { mutate: generateShareLink, isPending: isGeneratingLink } = useGenerateChatShareLink()
+  const { mutateAsync: copyLink } = useCopyChatShareLink()
 
   async function handleCopyClick() {
     if (!props.chat) return
