@@ -111,7 +111,7 @@ function ShareAction() {
   const { mutate: generateShareLink, isPending: isGeneratingLink } = useGenerateAudioShareLink()
 
   function handleShareClick() {
-    if (!selectedAudioNote || !selectedAudioNote?.shareLink) return
+    if (!selectedAudioNote || selectedAudioNote?.shareLink) return
     generateShareLink(selectedAudioNote as ConversationData)
     setOpen(true)
   }

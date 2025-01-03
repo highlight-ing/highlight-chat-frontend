@@ -13,6 +13,7 @@ import { selectedAudioNoteAtom } from '@/atoms/side-panel'
 import { useApi } from '@/hooks/useApi'
 import { useStore } from '@/components/providers/store-provider'
 
+import { useAudioNotesStore } from './audio-notes'
 import { useChatHistoryStore } from './chat-history'
 import useAuth from './useAuth'
 
@@ -141,8 +142,7 @@ export function useCopyAudioShareLink() {
 
 export function useGenerateAudioShareLink() {
   const { userId } = useAuth()
-  const queryClient = useQueryClient()
-  const setSelectedAudioNote = useSetAtom(selectedAudioNoteAtom)
+  const { updateAudioNote } = useAudioNotesStore()
 
   return useMutation({
     mutationKey: ['generate-chat-share-link'],
@@ -159,16 +159,7 @@ export function useGenerateAudioShareLink() {
       if (!shareLink || !audioNote.id) return
 
       // queryClient.invalidateQueries({ queryKey: ['audio-notes'] })
-      queryClient.setQueryData(['audio-notes'], (originalAudioNotes: Array<ConversationData>) => {
-        const audioNotes = [...originalAudioNotes]
-        const existingAudioNoteIndex = audioNotes.findIndex((note) => note.id === audioNote.id)
-        const updatedAudioNote = { ...audioNotes[existingAudioNoteIndex], shareLink }
-
-        audioNotes[existingAudioNoteIndex] = updatedAudioNote
-        setSelectedAudioNote(updatedAudioNote)
-
-        return audioNotes
-      })
+      updateAudioNote({ id: audioNote.id, shareLink })
 
       trackEvent('HL Chat Audio Note Copy Link', {
         conversation_id: audioNote.id,
