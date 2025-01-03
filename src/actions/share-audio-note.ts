@@ -24,7 +24,6 @@ export async function generateAudioNoteShareLink(conversation: ConversationData,
     const endedAt = new Date(conversation.endedAt)
     const timestamp = new Date(conversation.timestamp)
 
-    // TODO: Figure out what is required to generate an audio note
     const shareData: ConversationData = {
       ...conversation,
       startedAt,
@@ -32,13 +31,6 @@ export async function generateAudioNoteShareLink(conversation: ConversationData,
       timestamp,
       userId,
     }
-    // id: string
-    // title: string
-    // summary: string
-    // topic: string
-    // transcript: string
-    // summarized: boolean
-    // shareLink: string
 
     const slug = uuidv4()
     const { error } = await supabase.from('conversations').insert({
