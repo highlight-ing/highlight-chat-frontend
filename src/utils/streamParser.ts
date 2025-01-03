@@ -92,8 +92,11 @@ export async function parseAndHandleStreamChunk(
         case 'loading':
           if (jsonChunk.name === 'highlight_search') {
             integrations.showLoading(conversationId, jsonChunk.loaded)
-          } else if (integrationFunctionNames.includes(jsonChunk.name) && jsonChunk.loaded === false) {
-            integrations.showLoading(conversationId, jsonChunk.loaded)
+          } else if (jsonChunk.agentName && jsonChunk.toolName) {
+            integrations.showMCPLoader(conversationId, jsonChunk.loaded, {
+              agentName: jsonChunk.agentName,
+              toolName: jsonChunk.toolName,
+            })
           }
           break
 
@@ -118,28 +121,22 @@ export async function parseAndHandleStreamChunk(
                 }
               }
             }
-          }
-          if (jsonChunk.name === 'create_linear_ticket') {
+          } else if (jsonChunk.name === 'create_linear_ticket') {
             const title = jsonChunk.input.title ?? ''
             const description = jsonChunk.input.description ?? ''
 
             integrations.createLinearTicket(conversationId, title, description)
-          }
-          if (jsonChunk.name === 'create_notion_page') {
+          } else if (jsonChunk.name === 'create_notion_page') {
             const title = jsonChunk.input.title ?? ''
             const description = jsonChunk.input.description ?? undefined
             const content = jsonChunk.input.content ?? ''
 
             integrations.createNotionPage(conversationId, { title, description, content })
-          }
-
-          if (jsonChunk.name === 'send_slack_message') {
+          } else if (jsonChunk.name === 'send_slack_message') {
             integrations.sendSlackMessage(conversationId, {
               message: jsonChunk.input.message ?? '',
             })
-          }
-
-          if (jsonChunk.name === 'create_google_calendar_event') {
+          } else if (jsonChunk.name === 'create_google_calendar_event') {
             const summary = jsonChunk.input.summary ?? ''
             const location = jsonChunk.input.location ?? undefined
             const description = jsonChunk.input.description ?? undefined
@@ -154,9 +151,7 @@ export async function parseAndHandleStreamChunk(
               end,
               includeGoogleMeetDetails: false,
             })
-          }
-
-          if (jsonChunk.name === 'get_more_context_from_conversations') {
+          } else if (jsonChunk.name === 'get_more_context_from_conversations') {
             if (contextConfirmed === null) {
               contextConfirmed = await showConfirmationModal(
                 'The assistant is requesting additional context. Do you want to allow this?',
@@ -175,8 +170,7 @@ export async function parseAndHandleStreamChunk(
                 }
               }
             }
-          }
-          if (jsonChunk.name === 'add_or_update_about_me_facts') {
+          } else if (jsonChunk.name === 'add_or_update_about_me_facts') {
             // This will update the fact at the specified index
             if (typeof jsonChunk.input.fact_index === 'number' && jsonChunk.input.fact) {
               factIndex = jsonChunk.input.fact_index
@@ -202,6 +196,17 @@ export async function parseAndHandleStreamChunk(
                 messageId: messageId,
               }
             }
+          } else if (jsonChunk.mcp_agent_id || jsonChunk.mcp_agent_name) {
+            console.log('Trying to find tool from MCP, Tool Name:', jsonChunk.name)
+            integrations.createMCPTool(conversationId, {
+              toolName: jsonChunk.name,
+              toolInput: jsonChunk.input,
+              toolId: jsonChunk.tool_id,
+              agentId: jsonChunk.mcp_agent_id,
+              agentName: jsonChunk.mcp_agent_name,
+            })
+          } else {
+            console.log('Unknown tool name:', jsonChunk.name)
           }
           break
 
