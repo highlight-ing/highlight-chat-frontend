@@ -15,7 +15,7 @@
     "prepare": "husky",
     "backend:get": "if grep -q 'NEXT_PUBLIC_URL=http://localhost:3000' .env; then npm run backend:local; else npm run backend:prod; fi",
     "backend:prod": "npx openapi-typescript https://chat-backend.highlight.ing/openapi.json -o ./src/types/backend-schema.d.ts",
-    "backend:local": "npx openapi-typescript http://localhost:8787/openapi.json -o ./src/types/backend-schema.d.ts",
+    "backend:local": "npx openapi-typescript http://localhost:8080/openapi.json -o ./src/types/backend-schema.d.ts",
     "test:ts": "tsc --noEmit"
   },
   "dependencies": {
