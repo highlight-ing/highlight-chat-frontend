@@ -25,22 +25,24 @@ export default function useForkDefaultAction() {
     forkDefaultAction: async (prompt: Prompt) => {
       setOnboarding({ isOnboarding: false, index: 0 })
       setSelectedScreen('startWithTemplate')
-      setForkingShortcutId(prompt.external_id)
 
-      // Set initial prompt data with externalId to enable preference saving
+      // Clear existing data but keep the external ID for preferences
+      clearPromptEditorData()
+
+      // Set forking ID and prompt data
+      setForkingShortcutId(prompt.external_id)
       setPromptEditorData({
-        externalId: prompt.external_id,
+        externalId: prompt.external_id, // Use a temporary ID for preferences
         appPrompt: prompt.prompt_text ?? '',
         name: prompt.name,
         description: prompt.description ?? '',
         image: `${prompt.image}.${prompt.user_images?.file_extension}`,
       })
 
-      // Fetch the original prompt's preferences
+      // Fetch and set preferences
       const authToken = await getAccessToken()
       const { preferences } = await getPromptShortcutPreferences(prompt.id, authToken)
 
-      // Set app visibility and context preferences
       if (preferences) {
         if (preferences.application_name_darwin === '*') {
           setSelectedApp('all')
