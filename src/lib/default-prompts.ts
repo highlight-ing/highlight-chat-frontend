@@ -13,7 +13,7 @@ type PromptPreference = {
 }
 
 export const DEFAULT_PROMPT_IDS = [
-  87585, 87570, 87677, 87680, 87601, 87679, 87602, 87603, 87683, 87684, 87586, 87685, 87605, 87606,
+  87585, 87570, 87832, 87680, 87831, 87679, 87602, 87603, 87683, 87684, 87586, 87830, 87605, 87606,
 ] as const
 
 export const DEFAULT_PROMPT_PREFERENCES: Record<number, PromptPreference> = {
@@ -53,8 +53,8 @@ export const DEFAULT_PROMPT_PREFERENCES: Record<number, PromptPreference> = {
       audio_transcription: false,
     },
   },
-  // Refactor Code
-  87601: {
+  // Refactor Code- 87831
+  87831: {
     application_name_darwin: '["Cursor","VS Code"]',
     application_name_win32: '["Cursor","VS Code"]',
     context_types: {
@@ -77,8 +77,8 @@ export const DEFAULT_PROMPT_PREFERENCES: Record<number, PromptPreference> = {
       audio_transcription: false,
     },
   },
-  // Code Review
-  87677: {
+  // Code Review- 87832
+  87832: {
     application_name_darwin: '["Cursor","VS Code"]',
     application_name_win32: '["Cursor","VS Code"]',
     context_types: {
@@ -149,8 +149,8 @@ export const DEFAULT_PROMPT_PREFERENCES: Record<number, PromptPreference> = {
       audio_transcription: true,
     },
   },
-  // Meeting Summary
-  87685: {
+  // Meeting Summary- 87830
+  87830: {
     application_name_darwin: '*',
     application_name_win32: '*',
     context_types: {
