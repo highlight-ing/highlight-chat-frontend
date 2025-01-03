@@ -132,27 +132,31 @@ export function usePromptEditor() {
     }
 
     const formData = new FormData()
+    const accessToken = await getAccessToken()
+
+    // Always unpin the original prompt when forking
+    if (forkingShortcutId) {
+      const res = await removePromptFromUser(forkingShortcutId, accessToken)
+      if (res && res.error) {
+        console.error('Error unpinning forked shortcut:', res.error)
+        setSaving(false)
+        return
+      }
+      await refreshPinnedPrompts()
+      setForkingShortcutId(null)
+    }
 
     if (promptEditorData.externalId) {
-      // This logic handles default prompts being forked.
-      // Check if the externalId is in the DEFAULT_PROMPT_EXTERNAL_IDS array
       if (DEFAULT_PROMPT_EXTERNAL_IDS.includes(promptEditorData.externalId)) {
-        // We want the prompt to have a new externalId since we're essentially forking it.
-
-        // Unpin the prompt
-        const accessToken = await getAccessToken()
-        await removePromptFromUser(promptEditorData.externalId, accessToken)
-        refreshPinnedPrompts()
+        const res = await removePromptFromUser(promptEditorData.externalId, accessToken)
+        if (res && res.error) {
+          console.error('Error unpinning prompt during fork:', res.error)
+          setSaving(false)
+          return
+        }
+        await refreshPinnedPrompts()
       } else {
         formData.append('externalId', promptEditorData.externalId)
-      }
-
-      // Check to see if we're forking a shortcut
-      if (forkingShortcutId) {
-        const accessToken = await getAccessToken()
-        await removePromptFromUser(forkingShortcutId, accessToken)
-        refreshPinnedPrompts()
-        setForkingShortcutId(null)
       }
     }
 
@@ -181,7 +185,6 @@ export function usePromptEditor() {
       formData.append('enabledAutomations', JSON.stringify(promptEditorData.enabledAutomations))
     }
 
-    const accessToken = await getAccessToken()
     const res = await savePrompt(formData, accessToken)
 
     if (res && res.error) {
