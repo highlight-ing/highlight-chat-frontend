@@ -54,7 +54,7 @@ function PromptsListItem({ prompt, input }: { prompt: PinnedPrompt; input: strin
   return (
     <motion.div
       variants={promptsListItemVariants}
-      className="group isolate flex h-10 w-full cursor-pointer items-center justify-between gap-2 pl-6 pr-4 transition-[background-color] duration-150 hover:bg-hover"
+      className="group isolate flex h-10 w-full cursor-pointer items-center justify-between gap-2 pl-[18px] pr-4 transition-[background-color] duration-150 hover:bg-hover"
       onClick={handlePromptClick}
     >
       <div className="flex items-center gap-2">
@@ -120,7 +120,7 @@ export function PromptsList({ input }: { input: string }) {
   if (isPinnedPromptsLoading || !userId) {
     return (
       <motion.div variants={promptsListItemVariants} initial="hidden" animate="show" exit="exit">
-        <div className="flex w-full items-center gap-2 rounded-2xl px-6 py-2 transition-[background-color] duration-150">
+        <div className="flex w-full items-center gap-2 rounded-2xl px-4 py-2 transition-[background-color] duration-150">
           <h3 className="text-sm text-tertiary">Loading shortcuts...</h3>
         </div>
       </motion.div>

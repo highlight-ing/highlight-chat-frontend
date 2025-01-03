@@ -24,6 +24,7 @@ export function GroupedVirtualList(props: GroupedVirtuosoProps<unknown, number>)
             const nextIndex = Math.max(0, prev - 1)
             current.scrollToIndex({
               index: nextIndex,
+              align: 'center',
             })
             return nextIndex
           })
@@ -35,6 +36,7 @@ export function GroupedVirtualList(props: GroupedVirtuosoProps<unknown, number>)
             const nextIndex = prev + 1
             current.scrollToIndex({
               index: nextIndex,
+              align: 'center',
             })
             return nextIndex
           })
@@ -42,16 +44,9 @@ export function GroupedVirtualList(props: GroupedVirtuosoProps<unknown, number>)
       }
     }
 
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
   }, [virtuosoRef, setCurrentListIndex])
 
-  return (
-    <GroupedVirtuoso
-      ref={virtuosoRef}
-      initialTopMostItemIndex={currentListIndex}
-      style={{ height: 'calc(100vh - 192px)' }}
-      {...props}
-    />
-  )
+  return <GroupedVirtuoso ref={virtuosoRef} initialTopMostItemIndex={currentListIndex} {...props} />
 }

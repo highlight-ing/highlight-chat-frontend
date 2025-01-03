@@ -218,6 +218,7 @@ function MoreActionsPopover(props: {
 
 export function AudioNotesListItem(props: { audioNote: ConversationData; listIndex: number }) {
   const formattedTitle = formatTitle(props.audioNote.title)
+  const setHomeSidePanelOpen = useSetAtom(homeSidePanelOpenAtom)
   const setSelectedAudioNote = useSetAtom(selectedAudioNoteAtom)
   const setSidePanelOpen = useSetAtom(sidePanelOpenAtom)
   const [currentListIndex, setCurrentListIndex] = useAtom(currentListIndexAtom)
@@ -228,8 +229,16 @@ export function AudioNotesListItem(props: { audioNote: ConversationData; listInd
   const previewAudioNote = React.useCallback(() => {
     setSelectedAudioNote(props.audioNote)
     setSidePanelOpen(true)
+    setHomeSidePanelOpen(true)
     setCurrentListIndex(props.listIndex)
-  }, [props.audioNote, setCurrentListIndex, props.listIndex, setSelectedAudioNote, setSidePanelOpen])
+  }, [
+    setSelectedAudioNote,
+    props.audioNote,
+    props.listIndex,
+    setSidePanelOpen,
+    setHomeSidePanelOpen,
+    setCurrentListIndex,
+  ])
 
   const handleClick = React.useCallback(() => {
     previewAudioNote()

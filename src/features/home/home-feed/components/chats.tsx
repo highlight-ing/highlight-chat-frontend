@@ -10,7 +10,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 import { cn, getDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
-import { selectedChatIdAtom } from '@/atoms/side-panel'
+import { homeSidePanelOpenAtom, selectedChatIdAtom } from '@/atoms/side-panel'
 import { useHistory } from '@/hooks/chat-history'
 import { useCopyChatShareLink, useGenerateChatShareLink } from '@/hooks/share-link'
 import { Tooltip } from '@/components/ui/tooltip'
@@ -88,15 +88,17 @@ function ChatShareLinkCopyButton(props: { chat: ChatHistoryItem }) {
 }
 
 export function ChatListItem(props: { chat: ChatHistoryItem; listIndex: number }) {
+  const setHomeSidePanelOpen = useSetAtom(homeSidePanelOpenAtom)
   const setSelectedChatId = useSetAtom(selectedChatIdAtom)
   const [currentListIndex, setCurrentListIndex] = useAtom(currentListIndexAtom)
   const isActiveElement = currentListIndex === props.listIndex
   const [isMounted, setIsMounted] = useAtom(isMountedAtom)
 
   const previewChat = React.useCallback(() => {
+    setHomeSidePanelOpen(true)
     setSelectedChatId(props.chat.id)
     setCurrentListIndex(props.listIndex)
-  }, [props.chat.id, setSelectedChatId, props.listIndex, setCurrentListIndex])
+  }, [setHomeSidePanelOpen, setSelectedChatId, props.chat.id, props.listIndex, setCurrentListIndex])
 
   const handleClick = React.useCallback(() => {
     previewChat()
@@ -131,7 +133,7 @@ export function ChatListItem(props: { chat: ChatHistoryItem; listIndex: number }
         <h3 className="max-w-sm truncate tracking-tight text-primary">{props.chat.title}</h3>
       </div>
       <div className="flex items-center gap-2 font-medium">
-        <p className="text-sm text-tertiary">{formatUpdatedAtDate(props.chat.updated_at)}</p>
+        <p className="block text-sm text-tertiary group-hover:hidden">{formatUpdatedAtDate(props.chat.updated_at)}</p>
         <ChatAction chat={props.chat} />
         <ChatShareLinkCopyButton chat={props.chat} />
       </div>

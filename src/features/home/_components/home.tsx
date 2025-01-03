@@ -63,7 +63,7 @@ export function ChatHome() {
   return (
     <div
       className={cn(
-        'pointer-events-none fixed flex h-full w-full flex-col justify-between gap-6 px-3 pb-4 pt-16 opacity-0',
+        'pointer-events-none fixed flex h-full w-full flex-col justify-between gap-6 pb-4 pl-3 pt-16 opacity-0',
         isOnHome && 'pointer-events-auto relative opacity-100',
       )}
     >

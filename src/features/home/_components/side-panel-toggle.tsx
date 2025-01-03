@@ -1,9 +1,8 @@
 'use client'
 
-import { ArrowRight } from 'iconsax-react'
+import { Add, ArrowRight } from 'iconsax-react'
 import { useAtomValue, useSetAtom } from 'jotai'
 
-import { cn } from '@/lib/utils'
 import { homeSidePanelOpenAtom, toggleHomeSidePanelAtom } from '@/atoms/side-panel'
 import { Tooltip } from '@/components/ui/tooltip'
 
@@ -17,19 +16,31 @@ export function SidePanelToggle() {
 
   return (
     <Tooltip content={homeSidePanelOpen ? 'Close' : 'Open'} side="right">
-      <div className="absolute -right-3 top-0">
+      <div className="absolute right-0 top-0">
         <button
-          aria-label="Close Side Panel"
+          aria-hidden="true"
+          tabIndex={-1}
+          onKeyDown={(e) => {
+            if (e.key.startsWith('Arrow')) {
+              e.preventDefault()
+              e.currentTarget.blur()
+            }
+          }}
           onClick={handleClick}
           className="group relative hidden h-[60px] w-10 place-items-center rounded-l-[20px] border border-r-0 border-tertiary bg-bg-layer-1 transition-colors hover:bg-secondary lg:grid"
         >
-          <ArrowRight
-            size={18}
-            className={cn(
-              'translate-x-0.5 text-tertiary transition-all group-hover:text-primary',
-              homeSidePanelOpen ? 'rotate-0' : 'rotate-180',
-            )}
-          />
+          {homeSidePanelOpen ? (
+            <Add
+              variant="Linear"
+              size={24}
+              className="translate-x-0.5 rotate-45 text-tertiary transition-all group-hover:text-primary"
+            />
+          ) : (
+            <ArrowRight
+              size={18}
+              className="translate-x-0.5 rotate-180 text-tertiary transition-all group-hover:text-primary"
+            />
+          )}
         </button>
       </div>
     </Tooltip>

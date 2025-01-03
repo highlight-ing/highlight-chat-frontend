@@ -25,7 +25,7 @@ export function HomeFeedListItemLayout({ className, children, ...props }: HomeFe
   return (
     <div
       className={cn(
-        'group rounded-xl px-3 transition-colors hover:bg-secondary focus-visible:bg-hover lg:cursor-pointer [&_div]:last:border-transparent',
+        'group mr-2 rounded-xl px-4 transition-colors hover:bg-secondary focus-visible:bg-hover lg:cursor-pointer [&_div]:last:border-transparent',
         className,
       )}
       {...props}
@@ -264,7 +264,7 @@ function HomeFeedTabContent(props: { value: string; children: React.ReactNode })
 export function HomeFeed() {
   return (
     <Tabs defaultValue="recent">
-      <TabsList className="mb-0 w-full">
+      <TabsList className="mb-0 w-full px-2">
         <div className="flex w-full items-center justify-between border-b border-subtle py-1.5">
           <div className="flex items-center gap-2">
             <TabsTrigger value="recent">Recent</TabsTrigger>
