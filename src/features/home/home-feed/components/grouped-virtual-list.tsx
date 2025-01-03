@@ -6,7 +6,7 @@ import { currentListIndexAtom } from '../atoms'
 
 export function GroupHeaderRow(props: { children: React.ReactNode }) {
   return (
-    <div className="w-full bg-primary px-5 py-3 shadow-md">
+    <div className="w-full bg-primary px-4 py-3 shadow-md">
       <p className="font-medium text-subtle">{props.children}</p>
     </div>
   )
@@ -28,6 +28,7 @@ export function GroupedVirtualList(props: GroupedVirtuosoProps<unknown, number>)
             const nextIndex = Math.max(0, prev - 1)
             current.scrollToIndex({
               index: nextIndex,
+              align: 'center',
             })
             return nextIndex
           })
@@ -39,6 +40,7 @@ export function GroupedVirtualList(props: GroupedVirtuosoProps<unknown, number>)
             const nextIndex = prev + 1
             current.scrollToIndex({
               index: nextIndex,
+              align: 'center',
             })
             return nextIndex
           })
@@ -50,12 +52,5 @@ export function GroupedVirtualList(props: GroupedVirtuosoProps<unknown, number>)
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [virtuosoRef, setCurrentListIndex])
 
-  return (
-    <GroupedVirtuoso
-      ref={virtuosoRef}
-      initialTopMostItemIndex={currentListIndex}
-      style={{ height: 'calc(100vh - 192px)' }}
-      {...props}
-    />
-  )
+  return <GroupedVirtuoso ref={virtuosoRef} initialTopMostItemIndex={currentListIndex} {...props} />
 }

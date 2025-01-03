@@ -133,7 +133,7 @@ export function ChatListItem(props: { chat: ChatHistoryItem; listIndex: number }
         <h3 className="max-w-sm truncate tracking-tight text-primary">{props.chat.title}</h3>
       </div>
       <div className="flex items-center gap-2 font-medium">
-        <p className="text-sm text-tertiary">{formatUpdatedAtDate(props.chat.updated_at)}</p>
+        <p className="block text-sm text-tertiary group-hover:hidden">{formatUpdatedAtDate(props.chat.updated_at)}</p>
         <ChatAction chat={props.chat} />
         <ChatShareLinkCopyButton chat={props.chat} />
       </div>
