@@ -3,7 +3,6 @@ import { Message } from '@/types'
 import { z } from 'zod'
 
 import { trackEvent } from '@/utils/amplitude'
-import client from '@/utils/api-client'
 import useAuth from '@/hooks/useAuth'
 // Components
 import Button from '@/components/Button/Button'
@@ -13,6 +12,7 @@ import FeedbackTextarea from '@/components/Feedback/FeedbackTextarea'
 import FeedbackTypeSelect from '@/components/Feedback/FeedbackTypeSelect'
 import Modal from '@/components/modals/Modal'
 import { useStore } from '@/components/providers/store-provider'
+import { backendUrl } from '@/utils/chatBackendUrl'
 
 export interface SendFeedbackModalProps {
   id: string
@@ -75,19 +75,25 @@ const SendFeedbackModal = ({
     const feedbackData = {
       rating,
       feedback: feedbackDetails ?? '',
-      feedback_type: feedbackType,
-      conversation_id: message.conversation_id,
-      message_id: message.id ?? '',
+      feedbackType: feedbackType,
+      conversationId: message.conversation_id,
+      messageId: message.id ?? '',
     }
+
     try {
-      const { data, error } = await client.POST('/api/v2/feedback/add', {
+      const response = await fetch(`${backendUrl}/api/v4/feedback/`, {
+        method: 'POST',
         headers: {
           Authorization: `Bearer ${await getAccessToken()}`,
+          'Content-Type': 'application/json',
         },
-        body: feedbackData,
+        body: JSON.stringify(feedbackData),
       })
-      if (error) {
-        console.error('Error submitting feedback:', error)
+
+      const data = await response.json()
+
+      if (response.ok) {
+        console.error('Error submitting feedback:', response)
         addToast({
           title: 'Error Submitting Feedback',
           subtext: 'Please try again later.',
@@ -95,6 +101,7 @@ const SendFeedbackModal = ({
           type: 'error',
         })
       }
+
       if (data) {
         setIsLoading(false)
         // get all messages for this conversation

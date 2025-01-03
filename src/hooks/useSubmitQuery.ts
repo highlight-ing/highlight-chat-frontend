@@ -8,6 +8,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 import { Prompt } from '@/types/supabase-helpers'
 import { trackEvent } from '@/utils/amplitude'
+import { isAlpha } from '@/utils/appVersion'
 import { fetchWindows } from '@/utils/attachmentUtils'
 import { processAttachments } from '@/utils/contextprocessor'
 // Import necessary types from formDataUtils
@@ -303,139 +304,293 @@ export const useSubmitQuery = () => {
       if (isPromptApp && promptApp) {
         formData.append('app_id', promptApp.external_id)
       }
-      const response = await post(endpoint, formData, { version: 'v4', signal: abortController.signal })
+
+      const response = await post(endpoint, formData, {
+        version: 'v4',
+        signal: abortController.signal,
+        headers: isAlpha
+          ? {
+              Accept: 'text/event-stream',
+            }
+          : {},
+      })
+
       if (!response.ok) {
         throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`)
-      }
-
-      const reader = response.body?.getReader()
-      if (!reader) {
-        throw new Error('No reader available')
       }
 
       // @ts-expect-error
       addConversationMessage(conversationId, { role: 'assistant', content: '' })
 
       let accumulatedMessage = ''
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ''
 
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
+      if (!reader) {
+        throw new Error('No reader available')
+      }
 
-        checkAbortSignal()
+      if (isAlpha) {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
 
-        const chunk = new TextDecoder().decode(value)
+          checkAbortSignal()
 
-        const { content, windowName, conversation, factIndex, fact, messageId, visualization } =
-          await parseAndHandleStreamChunk(chunk, {
-            showConfirmationModal,
-            addToast,
-            integrations,
-            conversationId,
-            onMetadata: (metadata) => {
-              if (metadata.provider_switch) {
-                console.log('[Provider Switch Event]:', {
-                  from: metadata.from_provider,
-                  to: metadata.to_provider,
-                  reason: metadata.switch_reason,
-                  model: metadata.model,
-                  llm_provider: metadata.llm_provider,
-                  has_live_data: metadata.has_live_data,
-                  requires_live_data: metadata.requires_live_data,
-                })
-              } else if (metadata.tool_activated) {
-                console.log('[Tool Activation Event]:', {
-                  tool_name: metadata.tool_name,
-                  tool_id: metadata.tool_id,
-                })
-              } else if (metadata.model && metadata.llm_provider) {
-                console.log('[Initial Chat Event]:', {
-                  model: metadata.model,
-                  llm_provider: metadata.llm_provider,
-                  has_live_data: metadata.has_live_data,
-                  requires_live_data: metadata.requires_live_data,
-                })
+          // Append new chunk to buffer and split by newlines
+          buffer += decoder.decode(value, { stream: true })
+          const lines = buffer.split('\n')
+
+          // Process all complete lines
+          for (let i = 0; i < lines.length - 1; i++) {
+            const line = lines[i].trim()
+            if (line.startsWith('data: ')) {
+              const eventData = line.slice(6) // Remove 'data: ' prefix
+              if (eventData === '[DONE]') continue
+
+              try {
+                const { content, windowName, conversation, factIndex, fact, messageId, visualization } =
+                  await parseAndHandleStreamChunk(eventData, {
+                    showConfirmationModal,
+                    addToast,
+                    integrations,
+                    conversationId,
+                    onMetadata: (metadata) => {
+                      if (metadata.provider_switch) {
+                        console.log('[Provider Switch Event]:', {
+                          from: metadata.from_provider,
+                          to: metadata.to_provider,
+                          reason: metadata.switch_reason,
+                          model: metadata.model,
+                          llm_provider: metadata.llm_provider,
+                          has_live_data: metadata.has_live_data,
+                          requires_live_data: metadata.requires_live_data,
+                        })
+                      } else if (metadata.tool_activated) {
+                        console.log('[Tool Activation Event]:', {
+                          tool_name: metadata.tool_name,
+                          tool_id: metadata.tool_id,
+                        })
+                      } else if (metadata.model && metadata.llm_provider) {
+                        console.log('[Initial Chat Event]:', {
+                          model: metadata.model,
+                          llm_provider: metadata.llm_provider,
+                          has_live_data: metadata.has_live_data,
+                          requires_live_data: metadata.requires_live_data,
+                        })
+                      }
+                    },
+                  })
+
+                if (content) {
+                  accumulatedMessage += content
+                  updateLastConversationMessage(conversationId, {
+                    role: 'assistant',
+                    content: accumulatedMessage,
+                    conversation_id: conversationId,
+                    id: messageId,
+                    given_feedback: null,
+                    visualization: visualization,
+                  })
+                }
+
+                if (conversation) {
+                  const conversation_data = await Highlight.conversations.getConversationById(conversation)
+                  if (conversation_data) {
+                    addAttachment({
+                      type: 'audio',
+                      value: conversation_data.transcript,
+                      duration: Math.floor(
+                        (new Date(conversation_data.endedAt).getTime() -
+                          new Date(conversation_data.startedAt).getTime()) /
+                          60000,
+                      ),
+                    })
+                  } else {
+                    addToast({
+                      title: 'Failed to request Conversation',
+                      description: 'We were unable to request conversation with this ID',
+                    })
+                  }
+                }
+
+                if (typeof factIndex === 'number' && fact) {
+                  updateLastConversationMessage(conversationId, {
+                    role: 'assistant',
+                    content: accumulatedMessage,
+                    conversation_id: conversationId,
+                    factIndex: factIndex,
+                    fact: fact,
+                    id: messageId,
+                    given_feedback: null,
+                    visualization: visualization,
+                  })
+                } else if (fact) {
+                  updateLastConversationMessage(conversationId, {
+                    role: 'assistant',
+                    content: accumulatedMessage,
+                    conversation_id: conversationId,
+                    fact: fact,
+                    id: messageId,
+                    given_feedback: null,
+                    visualization: visualization,
+                  })
+                }
+
+                if (windowName) {
+                  const contextGranted = await Highlight.permissions.requestWindowContextPermission()
+                  const screenshotGranted = await Highlight.permissions.requestScreenshotPermission()
+                  if (contextGranted && screenshotGranted) {
+                    addToast({
+                      title: 'Context Granted',
+                      description: `Context granted for ${windowName}`,
+                      type: 'success',
+                      timeout: 5000,
+                    })
+                    const screenshot = await Highlight.user.getWindowScreenshot(windowName)
+                    addAttachment({ type: 'image', value: screenshot })
+
+                    const windowContext = await Highlight.user.getWindowContext(windowName)
+                    const ocrScreenContents = windowContext.application.focusedWindow.rawContents
+                      ? windowContext.application.focusedWindow.rawContents
+                      : windowContext.environment.ocrScreenContents || ''
+                    addAttachment({ type: 'window_context', value: ocrScreenContents })
+
+                    await handleSubmit("Here's the context you requested.", promptApp, {
+                      image: screenshot,
+                      window_context: ocrScreenContents,
+                    })
+                  }
+                }
+              } catch (error) {
+                console.error('Error parsing event data:', error)
               }
-            },
-          })
-
-        if (content) {
-          accumulatedMessage += content
-          updateLastConversationMessage(conversationId, {
-            role: 'assistant',
-            content: accumulatedMessage,
-            conversation_id: conversationId,
-            id: messageId,
-            given_feedback: null,
-            visualization: visualization,
-          })
+            }
+          }
+          // Keep the last incomplete line in the buffer
+          buffer = lines[lines.length - 1]
         }
+      } else {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
 
-        if (conversation) {
-          const conversation_data = await Highlight.conversations.getConversationById(conversation)
-          if (conversation_data) {
-            addAttachment({
-              type: 'audio',
-              value: conversation_data.transcript,
-              duration: Math.floor(
-                (new Date(conversation_data.endedAt).getTime() - new Date(conversation_data.startedAt).getTime()) /
-                  60000,
-              ),
+          checkAbortSignal()
+
+          const chunk = new TextDecoder().decode(value)
+
+          const { content, windowName, conversation, factIndex, fact, messageId, visualization } =
+            await parseAndHandleStreamChunk(chunk, {
+              showConfirmationModal,
+              addToast,
+              integrations,
+              conversationId,
+              onMetadata: (metadata) => {
+                if (metadata.provider_switch) {
+                  console.log('[Provider Switch Event]:', {
+                    from: metadata.from_provider,
+                    to: metadata.to_provider,
+                    reason: metadata.switch_reason,
+                    model: metadata.model,
+                    llm_provider: metadata.llm_provider,
+                    has_live_data: metadata.has_live_data,
+                    requires_live_data: metadata.requires_live_data,
+                  })
+                } else if (metadata.tool_activated) {
+                  console.log('[Tool Activation Event]:', {
+                    tool_name: metadata.tool_name,
+                    tool_id: metadata.tool_id,
+                  })
+                } else if (metadata.model && metadata.llm_provider) {
+                  console.log('[Initial Chat Event]:', {
+                    model: metadata.model,
+                    llm_provider: metadata.llm_provider,
+                    has_live_data: metadata.has_live_data,
+                    requires_live_data: metadata.requires_live_data,
+                  })
+                }
+              },
             })
-          } else {
-            addToast({
-              title: 'Failed to request Conversation',
-              description: 'We were unable to request conversation with this ID',
+
+          if (content) {
+            accumulatedMessage += content
+            updateLastConversationMessage(conversationId, {
+              role: 'assistant',
+              content: accumulatedMessage,
+              conversation_id: conversationId,
+              id: messageId,
+              given_feedback: null,
+              visualization: visualization,
             })
           }
-        }
 
-        if (typeof factIndex === 'number' && fact) {
-          updateLastConversationMessage(conversationId, {
-            role: 'assistant',
-            content: accumulatedMessage,
-            conversation_id: conversationId,
-            factIndex: factIndex,
-            fact: fact,
-            id: messageId,
-            given_feedback: null,
-            visualization: visualization,
-          })
-        } else if (fact) {
-          updateLastConversationMessage(conversationId, {
-            role: 'assistant',
-            content: accumulatedMessage,
-            conversation_id: conversationId,
-            fact: fact,
-            id: messageId,
-            given_feedback: null,
-            visualization: visualization,
-          })
-        }
+          if (conversation) {
+            const conversation_data = await Highlight.conversations.getConversationById(conversation)
+            if (conversation_data) {
+              addAttachment({
+                type: 'audio',
+                value: conversation_data.transcript,
+                duration: Math.floor(
+                  (new Date(conversation_data.endedAt).getTime() - new Date(conversation_data.startedAt).getTime()) /
+                    60000,
+                ),
+              })
+            } else {
+              addToast({
+                title: 'Failed to request Conversation',
+                description: 'We were unable to request conversation with this ID',
+              })
+            }
+          }
 
-        if (windowName) {
-          const contextGranted = await Highlight.permissions.requestWindowContextPermission()
-          const screenshotGranted = await Highlight.permissions.requestScreenshotPermission()
-          if (contextGranted && screenshotGranted) {
-            addToast({
-              title: 'Context Granted',
-              description: `Context granted for ${windowName}`,
-              type: 'success',
-              timeout: 5000,
+          if (typeof factIndex === 'number' && fact) {
+            updateLastConversationMessage(conversationId, {
+              role: 'assistant',
+              content: accumulatedMessage,
+              conversation_id: conversationId,
+              factIndex: factIndex,
+              fact: fact,
+              id: messageId,
+              given_feedback: null,
+              visualization: visualization,
             })
-            const screenshot = await Highlight.user.getWindowScreenshot(windowName)
-            addAttachment({ type: 'image', value: screenshot })
-
-            const windowContext = await Highlight.user.getWindowContext(windowName)
-            const ocrScreenContents = windowContext.application.focusedWindow.rawContents
-              ? windowContext.application.focusedWindow.rawContents
-              : windowContext.environment.ocrScreenContents || ''
-            addAttachment({ type: 'window_context', value: ocrScreenContents })
-
-            await handleSubmit("Here's the context you requested.", promptApp, {
-              image: screenshot,
-              window_context: ocrScreenContents,
+          } else if (fact) {
+            updateLastConversationMessage(conversationId, {
+              role: 'assistant',
+              content: accumulatedMessage,
+              conversation_id: conversationId,
+              fact: fact,
+              id: messageId,
+              given_feedback: null,
+              visualization: visualization,
             })
+          }
+
+          if (windowName) {
+            const contextGranted = await Highlight.permissions.requestWindowContextPermission()
+            const screenshotGranted = await Highlight.permissions.requestScreenshotPermission()
+            if (contextGranted && screenshotGranted) {
+              addToast({
+                title: 'Context Granted',
+                description: `Context granted for ${windowName}`,
+                type: 'success',
+                timeout: 5000,
+              })
+              const screenshot = await Highlight.user.getWindowScreenshot(windowName)
+              addAttachment({ type: 'image', value: screenshot })
+
+              const windowContext = await Highlight.user.getWindowContext(windowName)
+              const ocrScreenContents = windowContext.application.focusedWindow.rawContents
+                ? windowContext.application.focusedWindow.rawContents
+                : windowContext.environment.ocrScreenContents || ''
+              addAttachment({ type: 'window_context', value: ocrScreenContents })
+
+              await handleSubmit("Here's the context you requested.", promptApp, {
+                image: screenshot,
+                window_context: ocrScreenContents,
+              })
+            }
           }
         }
       }
