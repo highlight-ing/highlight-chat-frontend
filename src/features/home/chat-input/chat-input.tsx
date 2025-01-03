@@ -45,7 +45,7 @@ function InputFooter() {
       initial="hidden"
       animate="show"
       exit="exit"
-      className="flex items-center gap-5 rounded-full px-6 pt-3"
+      className="flex items-center gap-5 rounded-full px-4 pt-3"
     >
       <OpenAppButton
         appId="prompts"
@@ -113,7 +113,7 @@ export function ChatInput() {
             onClick={focusInput}
           >
             <div ref={ref} className="min-h-14 flex flex-col justify-between py-3">
-              <div className="flex w-full items-end justify-between gap-2 pl-6 pr-4">
+              <div className="flex w-full items-end justify-between gap-2 px-4">
                 <div className="h-auto w-full">
                   <textarea
                     id="textarea-input"
@@ -145,7 +145,7 @@ export function ChatInput() {
 
               <AnimatePresence mode="popLayout">
                 {isInputFocused && attachments.length > 0 && (
-                  <div className="mt-1.5 flex items-center gap-2 px-[22px]">
+                  <div className="mt-1.5 flex items-center gap-2 px-4">
                     {attachments.map((attachment: AttachmentType, index: number) => (
                       <motion.div
                         key={index}
