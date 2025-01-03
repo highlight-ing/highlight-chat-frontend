@@ -46,8 +46,8 @@ export function GroupedVirtualList(props: GroupedVirtuosoProps<unknown, number>)
       }
     }
 
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
   }, [virtuosoRef, setCurrentListIndex])
 
   return (
