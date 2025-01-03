@@ -13,10 +13,9 @@ import { ConversationData } from '@/types/conversations'
 import { cn, getDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { formatTitle } from '@/utils/conversations'
-import { selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
+import { homeSidePanelOpenAtom, selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
 import { useAudioNotes } from '@/hooks/audio-notes'
 import { useCopyAudioShareLink, useGenerateAudioShareLink } from '@/hooks/share-link'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Switch } from '@/components/ui/switch'
 import { Tooltip } from '@/components/ui/tooltip'
@@ -278,14 +277,7 @@ export function AudioNotesListItem(props: { audioNote: ConversationData; listInd
         <h3 className="max-w-64 truncate tracking-tight text-primary">{formattedTitle}</h3>
       </div>
       <div className="flex items-center gap-2 font-medium">
-        <p
-          className={cn(
-            'translate-x-6 text-sm text-tertiary group-hover:translate-x-0',
-            moreOptionsOpen && 'translate-x-0',
-          )}
-        >
-          {formatUpdatedAtDate(props.audioNote.endedAt)}
-        </p>
+        <p className="block text-sm text-tertiary group-hover:hidden">{formatUpdatedAtDate(props.audioNote.endedAt)}</p>
         <ShareLinkAction audioNote={props.audioNote} />
         <MoreActionsPopover audioNote={props.audioNote} open={moreOptionsOpen} setOpen={setMoreOptionsOpen} />
       </div>
