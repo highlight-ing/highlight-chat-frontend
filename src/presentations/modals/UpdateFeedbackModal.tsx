@@ -3,6 +3,7 @@ import { Message } from '@/types'
 import { z } from 'zod'
 
 import { trackEvent } from '@/utils/amplitude'
+import client from '@/utils/api-client'
 import useAuth from '@/hooks/useAuth'
 // Components
 import Button from '@/components/Button/Button'
@@ -12,7 +13,6 @@ import FeedbackTextarea from '@/components/Feedback/FeedbackTextarea'
 import FeedbackTypeSelect from '@/components/Feedback/FeedbackTypeSelect'
 import Modal from '@/components/modals/Modal'
 import { useStore } from '@/components/providers/store-provider'
-import { backendUrl } from '@/utils/chatBackendUrl'
 
 export interface UpdateFeedbackModalProps {
   id: string
@@ -80,17 +80,16 @@ const UpdateFeedbackModal = ({
   const fetchFeedbackData = async () => {
     setIsFetching(true)
     try {
-
-      const response = await fetch(`${backendUrl}/api/v4/feedback/${message.given_feedback}`, {
-        method: 'GET',
+      const { data, error } = await client.POST('/api/v2/feedback/get', {
         headers: {
           Authorization: `Bearer ${await getAccessToken()}`,
         },
+        body: {
+          external_id: message.given_feedback ?? '',
+        },
       })
-      
-      const data = await response.json()
-      if (response.ok) {
-        console.error('Error fetching feedback data:', response)
+      if (error) {
+        console.error('Error fetching feedback data:', error)
         addToast({
           title: 'Error Fetching Feedback Data',
           subtext: 'Please try again later.',
@@ -122,19 +121,18 @@ const UpdateFeedbackModal = ({
     const feedbackData = {
       rating,
       feedback: feedbackDetails ?? '',
-      feedback_type: feedbackType
+      feedback_type: feedbackType,
+      external_id: message.given_feedback ?? '',
     }
     try {
-      const response = await fetch(`${backendUrl}/api/v4/feedback/${message.given_feedback}`, {
-        method: 'PUT',
+      const { data, error } = await client.POST('/api/v2/feedback/update', {
         headers: {
           Authorization: `Bearer ${await getAccessToken()}`,
-          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(feedbackData),
+        body: feedbackData,
       })
-      if (response.ok) {
-        console.error('Error submitting feedback:', response)
+      if (error) {
+        console.error('Error submitting feedback:', error)
         addToast({
           title: 'Error Submitting Feedback',
           subtext: 'Please try again later.',
@@ -142,9 +140,6 @@ const UpdateFeedbackModal = ({
           type: 'error',
         })
       }
-
-      const data = await response.json()
-
       if (data) {
         // get all messages for this conversation
         const allMessages = getConversationMessages(message.conversation_id)
