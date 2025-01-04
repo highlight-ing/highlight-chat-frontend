@@ -140,7 +140,7 @@ function CopyShareLinkAction(props: { audioNote: ConversationData }) {
     <button
       onClick={handleCopyClick}
       disabled={isGeneratingLink}
-      className="flex w-full items-center gap-3 rounded-xl px-2 py-1.5 transition-colors hover:bg-light-5"
+      className="flex w-full items-center gap-3.5 rounded-xl px-2 py-1.5 transition-colors hover:bg-light-5"
     >
       {isGeneratingLink ? <LoadingSpinner size={'16px'} color="#6e6e6e" /> : <Copy size={16} variant={'Bold'} />}
       <AnimatePresence initial={false} mode="popLayout">
@@ -150,6 +150,7 @@ function CopyShareLinkAction(props: { audioNote: ConversationData }) {
           animate="animate"
           exit="exit"
           key={showSuccessState ? 'true' : 'false'}
+          className="w-full text-left"
         >
           {showSuccessState ? 'Copied' : 'Copy Link'}
         </motion.span>
