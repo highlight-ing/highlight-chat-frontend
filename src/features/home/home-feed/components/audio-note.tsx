@@ -4,7 +4,7 @@ import React from 'react'
 import { useConversations } from '@/context/ConversationContext'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { AnimatePresence, motion, Variants } from 'framer-motion'
-import { Copy, Export, MessageText, VoiceSquare } from 'iconsax-react'
+import { Copy, Export, MessageText, Trash, VoiceSquare } from 'iconsax-react'
 import { useAtom, useSetAtom } from 'jotai'
 import { toast } from 'sonner'
 import { useShallow } from 'zustand/react/shallow'
@@ -84,15 +84,52 @@ function ShareLinkAction(props: { audioNote: ConversationData }) {
   }
 
   return (
-    <Tooltip content="Share">
-      <button
-        onClick={handleCopyClick}
-        disabled={isGeneratingLink}
-        className="size-6 hidden place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:grid"
-      >
-        <Export variant="Bold" size={16} className={cn('text-tertiary', isGeneratingLink && 'opacity-50')} />
-      </button>
-    </Tooltip>
+    <button
+      onClick={handleCopyClick}
+      disabled={isGeneratingLink}
+      className="hidden h-6 place-items-center rounded-lg px-2 text-sm text-tertiary transition-colors hover:bg-light-5 group-hover:grid"
+    >
+      Share
+    </button>
+  )
+}
+
+function AttachAudioAction(props: { audioNote: ConversationData }) {
+  const focusInput = useInputFocus()
+
+  const { clearPrompt, addAttachment, startNewConversation } = useStore(
+    useShallow((state) => ({
+      clearPrompt: state.clearPrompt,
+      addAttachment: state.addAttachment,
+      startNewConversation: state.startNewConversation,
+    })),
+  )
+
+  function handleAttachClick() {
+    if (!props.audioNote?.transcript) return
+
+    clearPrompt()
+    startNewConversation()
+    focusInput()
+
+    addAttachment({
+      id: props.audioNote?.id ?? '',
+      type: 'conversation',
+      title: props.audioNote?.title ?? '',
+      value: props.audioNote.transcript,
+      startedAt: props.audioNote?.startedAt ?? new Date(),
+      endedAt: props.audioNote?.endedAt ?? new Date(),
+    })
+  }
+
+  return (
+    <button
+      onClick={handleAttachClick}
+      className="flex w-full items-center gap-3 rounded-xl px-2 py-1.5 transition-colors hover:bg-light-5"
+    >
+      <MessageText variant="Bold" size={16} />
+      <p>Attach to chat</p>
+    </button>
   )
 }
 
@@ -159,41 +196,16 @@ function CopyShareLinkAction(props: { audioNote: ConversationData }) {
   )
 }
 
-function AttachAudioAction(props: { audioNote: ConversationData }) {
-  const focusInput = useInputFocus()
-
-  const { clearPrompt, addAttachment, startNewConversation } = useStore(
-    useShallow((state) => ({
-      clearPrompt: state.clearPrompt,
-      addAttachment: state.addAttachment,
-      startNewConversation: state.startNewConversation,
-    })),
-  )
-
-  function handleAttachClick() {
-    if (!props.audioNote?.transcript) return
-
-    clearPrompt()
-    startNewConversation()
-    focusInput()
-
-    addAttachment({
-      id: props.audioNote?.id ?? '',
-      type: 'conversation',
-      title: props.audioNote?.title ?? '',
-      value: props.audioNote.transcript,
-      startedAt: props.audioNote?.startedAt ?? new Date(),
-      endedAt: props.audioNote?.endedAt ?? new Date(),
-    })
-  }
+function DeleteAction(props: { audioNoteId: ConversationData['id'] }) {
+  function handleDeleteClick() { }
 
   return (
     <button
-      onClick={handleAttachClick}
-      className="flex w-full items-center gap-3 rounded-xl px-2 py-1.5 transition-colors hover:bg-light-5"
+      onClick={handleDeleteClick}
+      className="flex w-full items-center gap-3 rounded-xl px-2 py-1.5 text-[#ff3333] transition-colors hover:bg-light-5"
     >
-      <MessageText variant="Bold" size={16} className="text-tertiary" />
-      <p>Attach to chat</p>
+      <Trash variant="Bold" size={16} />
+      <p>Delete</p>
     </button>
   )
 }
@@ -211,6 +223,7 @@ function MoreActionsPopover(props: {
       <PopoverContent className="max-w-52 p-1.5 text-secondary">
         <AttachAudioAction audioNote={props.audioNote} />
         <CopyShareLinkAction audioNote={props.audioNote} />
+        <DeleteAction audioNoteId={props.audioNote.id} />
       </PopoverContent>
     </Popover>
   )
