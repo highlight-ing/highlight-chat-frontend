@@ -4,7 +4,7 @@ import React from 'react'
 import { useConversations } from '@/context/ConversationContext'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { AnimatePresence, motion, MotionConfig, Variants } from 'framer-motion'
-import { Copy, MessageText, Trash, VoiceSquare } from 'iconsax-react'
+import { Blend2, Copy, MessageText, Trash, VoiceSquare } from 'iconsax-react'
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { ScopeProvider } from 'jotai-scope'
 import { toast } from 'sonner'
@@ -133,6 +133,20 @@ function AttachAudioAction(props: { audioNote: ConversationData }) {
   )
 }
 
+function MergeAudioAction(props: { audioNote: ConversationData }) {
+  function handleMergeClick() { }
+
+  return (
+    <button
+      onClick={handleMergeClick}
+      className="flex w-full items-center gap-3 rounded-xl px-2 py-1.5 transition-colors hover:bg-light-5"
+    >
+      <Blend2 variant="Bold" size={16} />
+      <p>Merge audio</p>
+    </button>
+  )
+}
+
 function CopyShareLinkAction(props: { audioNote: ConversationData }) {
   const {
     mutate: generateShareLink,
@@ -225,18 +239,18 @@ function DeleteAction(props: { audioNoteId: ConversationData['id'] }) {
   }
 
   const descriptionVariants: Variants = {
-    hidden: { opacity: 0, filter: 'blur(2px)' },
-    visible: { opacity: 1, filter: 'blur(0px)', transition: { duration: 0.2, delay: 0.1 } },
+    hidden: { opacity: 0, filter: 'blur(3px)' },
+    visible: { opacity: 1, filter: 'blur(0px)', transition: { duration: 0.1, delay: 0.1 } },
   }
 
   return (
-    <MotionConfig transition={{ type: 'spring', bounce: 0.05, duration: 0.3 }}>
+    <MotionConfig transition={{ type: 'spring', bounce: 0.05, duration: 0.2 }}>
       <AnimatePresence initial={false}>
         {isExpanded ? (
           <motion.div
             layoutId={`${props.audioNoteId}-wrapper`}
             style={{ borderRadius: 12 }}
-            className="space-y-3 bg-light-5 p-2"
+            className="space-y-2 bg-light-5 p-2"
           >
             <motion.p variants={descriptionVariants} initial="hidden" animate="visible" exit="hidden">
               Are you sure you want to delete this audio note?
@@ -286,8 +300,9 @@ function AudioNoteActions(props: { audioNote: ConversationData }) {
         <PopoverTrigger className="size-6 invisible grid place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:visible data-[state=open]:visible data-[state=open]:bg-light-5">
           <DotsHorizontalIcon className="size-4 text-tertiary" />
         </PopoverTrigger>
-        <PopoverContent className="max-w-52 p-1.5 text-secondary">
+        <PopoverContent align="end" sideOffset={16} className="max-w-52 p-1.5 text-secondary">
           <AttachAudioAction audioNote={props.audioNote} />
+          <MergeAudioAction audioNote={props.audioNote} />
           <CopyShareLinkAction audioNote={props.audioNote} />
           <DeleteAction audioNoteId={props.audioNote.id} />
         </PopoverContent>

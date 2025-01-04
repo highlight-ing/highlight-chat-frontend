@@ -30,7 +30,7 @@ export function HomeFeedListItemLayout({ className, children, ...props }: HomeFe
       )}
       {...props}
     >
-      <div className="flex items-center justify-between gap-2 border-b border-subtle py-3 transition-colors">
+      <div className="flex items-center justify-between gap-2 border-b border-subtle py-2 transition-colors">
         {children}
       </div>
     </div>
