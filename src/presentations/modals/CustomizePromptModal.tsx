@@ -16,8 +16,14 @@ const CustomizePromptModal = ({ id, context }: ModalObjectProps) => {
 
   const preferences = context?.data?.promptShortcutPreferences as any
 
-  const { setSelectedApp, setAppVisibility, setContextTypes, setIsInitialPreferencesLoad, setPromptEditorData } =
-    usePromptEditorStore()
+  const {
+    setSelectedApp,
+    setAppVisibility,
+    setContextTypes,
+    setIsInitialPreferencesLoad,
+    setPromptEditorData,
+    clearPromptEditorData,
+  } = usePromptEditorStore()
 
   const closeModal = useStore((state) => state.closeModal)
 
@@ -84,6 +90,11 @@ const CustomizePromptModal = ({ id, context }: ModalObjectProps) => {
     setIsInitialPreferencesLoad(false)
   }, [preferences])
 
+  const onClose = () => {
+    clearPromptEditorData()
+    closeModal(id)
+  }
+
   return (
     <Modal
       id={id}
@@ -91,7 +102,7 @@ const CustomizePromptModal = ({ id, context }: ModalObjectProps) => {
       bodyClassName={styles.createPromptModal}
       header={
         <div className={'flex w-2/4 items-center justify-between'}>
-          <CloseButton alignment="left" onClick={() => closeModal(id)} />
+          <CloseButton alignment="left" onClick={onClose} />
           <div className="flex grow justify-center">{prompt.name}</div>
           <div className="absolute right-0 flex gap-1 p-2">
             <CustomizePromptButton prompt={prompt} />

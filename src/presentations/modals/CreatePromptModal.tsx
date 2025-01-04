@@ -27,6 +27,11 @@ const CreatePromptModal = ({ id, context }: ModalObjectProps) => {
     }
   }, [shouldShowTutorial])
 
+  const onClose = () => {
+    clearPromptEditorData()
+    closeModal(id)
+  }
+
   return (
     <Modal
       id={id}
@@ -34,7 +39,7 @@ const CreatePromptModal = ({ id, context }: ModalObjectProps) => {
       bodyClassName={styles.createPromptModal}
       header={
         <div className={'flex w-full items-center justify-between'}>
-          <CloseButton alignment="left" onClick={() => closeModal(id)} />
+          <CloseButton alignment="left" onClick={onClose} />
           <div className="flex grow justify-center">Create New Action</div>
           <div className="absolute right-0 p-2">
             <PromptSaveButton />

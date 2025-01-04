@@ -40,6 +40,7 @@ export function usePromptEditor() {
     contextTypes,
     forkingShortcutId,
     setForkingShortcutId,
+    clearPromptEditorData,
   } = usePromptEditorStore()
   const { updatePrompt, addPrompt, prompts } = usePromptsStore()
   const addToast = useStore((state) => state.addToast)
@@ -134,18 +135,7 @@ export function usePromptEditor() {
     const formData = new FormData()
     const accessToken = await getAccessToken()
 
-    // Always unpin the original prompt when forking
-    if (forkingShortcutId) {
-      const res = await removePromptFromUser(forkingShortcutId, accessToken)
-      if (res && res.error) {
-        console.error('Error unpinning forked shortcut:', res.error)
-        setSaving(false)
-        return
-      }
-      await refreshPinnedPrompts()
-      setForkingShortcutId(null)
-    }
-
+    // (SP) we should revisit if this is still required, this removes the old default prompts, not the new context based ones
     if (promptEditorData.externalId) {
       if (DEFAULT_PROMPT_EXTERNAL_IDS.includes(promptEditorData.externalId)) {
         const res = await removePromptFromUser(promptEditorData.externalId, accessToken)
@@ -155,7 +145,7 @@ export function usePromptEditor() {
           return
         }
         await refreshPinnedPrompts()
-      } else {
+      } else if (!forkingShortcutId) {
         formData.append('externalId', promptEditorData.externalId)
       }
     }
@@ -196,6 +186,16 @@ export function usePromptEditor() {
         type: 'error',
       })
       return
+    } else if (forkingShortcutId) {
+      // Always unpin the original prompt when successfully forked
+      const res = await removePromptFromUser(forkingShortcutId, accessToken)
+      if (res && res.error) {
+        console.error('Error unpinning forked shortcut:', res.error)
+        setSaving(false)
+        return
+      }
+      await refreshPinnedPrompts()
+      setForkingShortcutId(null)
     }
 
     try {
@@ -221,6 +221,7 @@ export function usePromptEditor() {
         promptId: res.prompt.id,
       }
       await sendExternalMessage(PROMPT_SLUG, message)
+      clearPromptEditorData()
       closeModal('create-prompt')
 
       selectPrompt(res.prompt.external_id, true, false)
@@ -235,6 +236,7 @@ export function usePromptEditor() {
       // Open the app and send message before closing modal
       await openApp(PROMPT_SLUG)
       await sendExternalMessage(PROMPT_SLUG, message)
+      clearPromptEditorData()
 
       closeModal('edit-prompt')
     }
