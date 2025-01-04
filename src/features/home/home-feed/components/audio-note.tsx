@@ -14,7 +14,7 @@ import { cn, getDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { formatTitle } from '@/utils/conversations'
 import { homeSidePanelOpenAtom, selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
-import { useAudioNotes } from '@/hooks/audio-notes'
+import { useAudioNotes, useDeleteAudioNote } from '@/hooks/audio-notes'
 import { useCopyAudioShareLink, useGenerateAudioShareLink } from '@/hooks/share-link'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Switch } from '@/components/ui/switch'
@@ -197,11 +197,16 @@ function CopyShareLinkAction(props: { audioNote: ConversationData }) {
 }
 
 function DeleteAction(props: { audioNoteId: ConversationData['id'] }) {
-  function handleDeleteClick() { }
+  const { mutate: deleteAudioNote, isPending } = useDeleteAudioNote()
+
+  function handleDeleteClick() {
+    deleteAudioNote(props.audioNoteId)
+  }
 
   return (
     <button
       onClick={handleDeleteClick}
+      disabled={isPending}
       className="flex w-full items-center gap-3 rounded-xl px-2 py-1.5 text-[#ff3333] transition-colors hover:bg-light-5"
     >
       <Trash variant="Bold" size={16} />
