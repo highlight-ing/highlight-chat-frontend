@@ -3,9 +3,10 @@
 import React from 'react'
 import { useConversations } from '@/context/ConversationContext'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
-import { AnimatePresence, motion, Variants } from 'framer-motion'
-import { Copy, Export, MessageText, Trash, VoiceSquare } from 'iconsax-react'
-import { useAtom, useSetAtom } from 'jotai'
+import { AnimatePresence, motion, MotionConfig, Variants } from 'framer-motion'
+import { Copy, MessageText, Trash, VoiceSquare } from 'iconsax-react'
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai'
+import { ScopeProvider } from 'jotai-scope'
 import { toast } from 'sonner'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -18,7 +19,6 @@ import { useAudioNotes, useDeleteAudioNote } from '@/hooks/audio-notes'
 import { useCopyAudioShareLink, useGenerateAudioShareLink } from '@/hooks/share-link'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Switch } from '@/components/ui/switch'
-import { Tooltip } from '@/components/ui/tooltip'
 import Button from '@/components/Button/Button'
 import { MeetingIcon } from '@/components/icons'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
@@ -26,7 +26,7 @@ import { useStore } from '@/components/providers/store-provider'
 
 import { GroupedVirtualList, GroupHeaderRow } from '../components/grouped-virtual-list'
 import { useInputFocus } from '../../chat-input/chat-input'
-import { currentListIndexAtom, isMountedAtom } from '../atoms'
+import { currentListIndexAtom, isMountedAtom, moreOptionsOpenAtom } from '../atoms'
 import { HOME_FEED_LIST_HEIGHT } from '../constants'
 import { formatUpdatedAtDate } from '../utils'
 import { HomeFeedListItemLayout, HomeFeedListLayout, ListEmptyState, ListLoadingState } from './home-feed'
@@ -198,39 +198,101 @@ function CopyShareLinkAction(props: { audioNote: ConversationData }) {
 
 function DeleteAction(props: { audioNoteId: ConversationData['id'] }) {
   const { mutate: deleteAudioNote, isPending } = useDeleteAudioNote()
+  const moreOptionsOpen = useAtomValue(moreOptionsOpenAtom)
+  const [state, setState] = React.useState<'idle' | 'expanded'>('idle')
+  const isExpanded = state === 'expanded'
+
+  React.useEffect(() => {
+    function handleEsc(e: KeyboardEvent) {
+      if (isExpanded && moreOptionsOpen && e.key === 'Escape') {
+        setState('idle')
+      }
+    }
+    window.addEventListener('keydown', handleEsc)
+    return () => window.removeEventListener('keydown', handleEsc)
+  }, [isExpanded, moreOptionsOpen])
 
   function handleDeleteClick() {
+    if (!isExpanded) {
+      setState('expanded')
+    } else {
+      setState('idle')
+    }
+  }
+
+  function handleConfirmDeleteClick() {
     deleteAudioNote(props.audioNoteId)
   }
 
+  const descriptionVariants: Variants = {
+    hidden: { opacity: 0, filter: 'blur(2px)' },
+    visible: { opacity: 1, filter: 'blur(0px)', transition: { duration: 0.2, delay: 0.1 } },
+  }
+
   return (
-    <button
-      onClick={handleDeleteClick}
-      disabled={isPending}
-      className="flex w-full items-center gap-3 rounded-xl px-2 py-1.5 text-[#ff3333] transition-colors hover:bg-light-5"
-    >
-      <Trash variant="Bold" size={16} />
-      <p>Delete</p>
-    </button>
+    <MotionConfig transition={{ type: 'spring', bounce: 0.05, duration: 0.3 }}>
+      <AnimatePresence initial={false}>
+        {isExpanded ? (
+          <motion.div
+            layoutId={`${props.audioNoteId}-wrapper`}
+            style={{ borderRadius: 12 }}
+            className="space-y-3 bg-light-5 p-2"
+          >
+            <motion.p variants={descriptionVariants} initial="hidden" animate="visible" exit="hidden">
+              Are you sure you want to delete this audio note?
+            </motion.p>
+            <button
+              onClick={handleConfirmDeleteClick}
+              disabled={isPending}
+              className="flex w-full items-center gap-3 rounded-xl bg-[#ff3333]/10 px-2 py-1.5 text-[#ff3333] transition-colors hover:bg-[#ff3333]/20"
+            >
+              <motion.span layoutId={`${props.audioNoteId}-icon`}>
+                <Trash variant="Bold" size={16} />
+              </motion.span>
+              <motion.span layoutId={`${props.audioNoteId}-button-text`}>Delete</motion.span>
+            </button>
+          </motion.div>
+        ) : (
+          <motion.button
+            layoutId={`${props.audioNoteId}-wrapper`}
+            onClick={handleDeleteClick}
+            disabled={isPending}
+            style={{ borderRadius: 12 }}
+            className="flex w-full items-center gap-3 px-2 py-1.5 text-[#ff3333] transition-colors hover:bg-light-5"
+          >
+            <motion.span layoutId={`${props.audioNoteId}-icon`}>
+              <Trash variant="Bold" size={16} />
+            </motion.span>
+            <motion.span layoutId={`${props.audioNoteId}-button-text`}>Delete</motion.span>
+          </motion.button>
+        )}
+      </AnimatePresence>
+    </MotionConfig>
   )
 }
 
-function MoreActionsPopover(props: {
-  audioNote: ConversationData
-  open: boolean
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>
-}) {
+function AudioNoteActions(props: { audioNote: ConversationData }) {
+  const [moreOptionsOpen, setMoreOptionsOpen] = useAtom(moreOptionsOpenAtom)
+
   return (
-    <Popover open={props.open} onOpenChange={props.setOpen}>
-      <PopoverTrigger className="size-6 hidden place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:grid data-[state=open]:grid">
-        <DotsHorizontalIcon className="size-4 text-tertiary" />
-      </PopoverTrigger>
-      <PopoverContent className="max-w-52 p-1.5 text-secondary">
-        <AttachAudioAction audioNote={props.audioNote} />
-        <CopyShareLinkAction audioNote={props.audioNote} />
-        <DeleteAction audioNoteId={props.audioNote.id} />
-      </PopoverContent>
-    </Popover>
+    <div className="flex items-center gap-2 font-medium">
+      <p
+        className={cn('text-sm text-tertiary group-hover:hidden', moreOptionsOpen ? 'translate-x-0' : 'translate-x-7')}
+      >
+        {formatUpdatedAtDate(props.audioNote.endedAt)}
+      </p>
+      <ShareLinkAction audioNote={props.audioNote} />
+      <Popover open={moreOptionsOpen} onOpenChange={setMoreOptionsOpen}>
+        <PopoverTrigger className="size-6 invisible grid place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:visible data-[state=open]:visible data-[state=open]:bg-light-5">
+          <DotsHorizontalIcon className="size-4 text-tertiary" />
+        </PopoverTrigger>
+        <PopoverContent className="max-w-52 p-1.5 text-secondary">
+          <AttachAudioAction audioNote={props.audioNote} />
+          <CopyShareLinkAction audioNote={props.audioNote} />
+          <DeleteAction audioNoteId={props.audioNote.id} />
+        </PopoverContent>
+      </Popover>
+    </div>
   )
 }
 
@@ -242,7 +304,6 @@ export function AudioNotesListItem(props: { audioNote: ConversationData; listInd
   const [currentListIndex, setCurrentListIndex] = useAtom(currentListIndexAtom)
   const isActiveElement = currentListIndex === props.listIndex
   const [isMounted, setIsMounted] = useAtom(isMountedAtom)
-  const [moreOptionsOpen, setMoreOptionsOpen] = React.useState(false)
 
   const previewAudioNote = React.useCallback(() => {
     setSelectedAudioNote(props.audioNote)
@@ -286,21 +347,19 @@ export function AudioNotesListItem(props: { audioNote: ConversationData; listInd
   }, [isActiveElement, handleClick])
 
   return (
-    <HomeFeedListItemLayout onClick={handleClick} className={cn('justify-between', isActiveElement && 'bg-hover')}>
-      <div className="flex items-center gap-2 font-medium">
-        {props.audioNote?.meeting ? (
-          <MeetingIcon meeting={props.audioNote.meeting} size={20} />
-        ) : (
-          <VoiceSquare size={20} variant="Bold" className="text-green" />
-        )}
-        <h3 className="max-w-64 truncate tracking-tight text-primary">{formattedTitle}</h3>
-      </div>
-      <div className="flex items-center gap-2 font-medium">
-        <p className="block text-sm text-tertiary group-hover:hidden">{formatUpdatedAtDate(props.audioNote.endedAt)}</p>
-        <ShareLinkAction audioNote={props.audioNote} />
-        <MoreActionsPopover audioNote={props.audioNote} open={moreOptionsOpen} setOpen={setMoreOptionsOpen} />
-      </div>
-    </HomeFeedListItemLayout>
+    <ScopeProvider atoms={[moreOptionsOpenAtom]}>
+      <HomeFeedListItemLayout onClick={handleClick} className={cn('justify-between', isActiveElement && 'bg-hover')}>
+        <div className="flex items-center gap-2 font-medium">
+          {props.audioNote?.meeting ? (
+            <MeetingIcon meeting={props.audioNote.meeting} size={20} />
+          ) : (
+            <VoiceSquare size={20} variant="Bold" className="text-green" />
+          )}
+          <h3 className="max-w-64 truncate tracking-tight text-primary">{formattedTitle}</h3>
+        </div>
+        <AudioNoteActions audioNote={props.audioNote} />
+      </HomeFeedListItemLayout>
+    </ScopeProvider>
   )
 }
 

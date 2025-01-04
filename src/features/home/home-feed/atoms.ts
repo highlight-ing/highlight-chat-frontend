@@ -16,3 +16,5 @@ export const currentListIndexAtom = atom(0)
 export const multiSelectedAudioNoteIdsAtom = atom<Array<ConversationData['id']>>([])
 
 export const isMountedAtom = atom(false)
+
+export const moreOptionsOpenAtom = atom(false)
