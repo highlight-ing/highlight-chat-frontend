@@ -189,6 +189,8 @@ export const initialPromptEditorState: PromptEditorState = {
       createLinearIssue: false,
       createNotionPage: false,
     },
+    image: undefined,
+    uploadingImage: undefined,
   },
   forkingShortcutId: null,
   needSave: false,
