@@ -204,7 +204,7 @@ function MoreActionsPopover(props: {
 }) {
   return (
     <Popover open={props.open} onOpenChange={props.setOpen}>
-      <PopoverTrigger className="size-6 invisible grid place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:visible data-[state=open]:visible data-[state=closed]:invisible">
+      <PopoverTrigger className="size-6 hidden place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:grid data-[state=open]:grid">
         <DotsHorizontalIcon className="size-4 text-tertiary" />
       </PopoverTrigger>
       <PopoverContent className="max-w-52 p-1.5 text-secondary">
