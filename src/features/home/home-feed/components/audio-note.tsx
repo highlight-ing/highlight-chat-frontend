@@ -163,7 +163,7 @@ export function AudioNotesListItem(props: { audioNote: ConversationData; listInd
         <h3 className="max-w-64 truncate tracking-tight text-primary">{formattedTitle}</h3>
       </div>
       <div className="flex items-center gap-2 font-medium">
-        <p className="text-sm text-tertiary">{formatUpdatedAtDate(props.audioNote.endedAt)}</p>
+        <p className="block text-sm text-tertiary group-hover:hidden">{formatUpdatedAtDate(props.audioNote.endedAt)}</p>
         <AttachAudioAction audioNote={props.audioNote} />
       </div>
     </HomeFeedListItemLayout>
