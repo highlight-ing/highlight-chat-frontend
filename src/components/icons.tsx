@@ -715,7 +715,7 @@ export const SafariIcon = ({ size = 32 }: IconPropTypes) => {
   )
 }
 
-export function CursorIcon({ size = 28, color = 'currentColor' }) {
+export const CursorIcon = ({ size = 32 }: IconPropTypes) => {
   return (
     <svg width="1000" height="1000" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path

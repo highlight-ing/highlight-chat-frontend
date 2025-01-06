@@ -25,6 +25,7 @@ import { useOnExternalMessage } from '@/features/home/_hooks/use-on-external-mes
 import { useOnPromptChange } from '@/features/home/_hooks/use-on-prompt-change'
 import { useOnPromptLoad } from '@/features/home/_hooks/use-on-prompt-load'
 import { NavigationTopBar } from '@/features/nav-header/top-bar/top-bar'
+import { ShortcutsManager } from '@/features/shortcuts/_components/shortcuts-manager/shortcuts-manager'
 import { HighlightSidePanel } from '@/features/side-panel/components/highlight-side-panel'
 
 export default function Home() {
@@ -82,7 +83,8 @@ export default function Home() {
           <ChatHeader isShowing={!isConversationLoading && !!promptApp && messages.length === 0} />
           {(isChatting || (isConversationLoading && messages.length > 0)) && <Messages />}
           {isConversationLoading && messages.length === 0 && !inputIsDisabled && <MessagesPlaceholder />}
-          {!isChatting && !promptApp && !isConversationLoading && <ChatHome />}
+          {/* {!isChatting && !promptApp && !isConversationLoading && <ChatHome />} */}
+          {!isChatting && !promptApp && !isConversationLoading && <ShortcutsManager />}
           {(isChatting || promptApp) && <Input isActiveChat={true} />}
           <IntercomChat />
         </div>
