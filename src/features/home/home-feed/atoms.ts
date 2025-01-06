@@ -15,4 +15,6 @@ export const currentListIndexAtom = atom(0)
 
 export const multiSelectedAudioNoteIdsAtom = atom<Array<ConversationData['id']>>([])
 
+export const isMultiSelectingAtom = atom((get) => get(multiSelectedAudioNoteIdsAtom).length > 0)
+
 export const isMountedAtom = atom(false)

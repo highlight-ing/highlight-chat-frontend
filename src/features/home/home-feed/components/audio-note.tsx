@@ -301,7 +301,7 @@ function AudioNoteActions(props: {
         </PopoverTrigger>
         <PopoverContent align="end" sideOffset={16} className="max-w-52 p-1.5 text-secondary">
           <AttachAudioAction audioNote={props.audioNote} />
-          <MergeAudioAction audioNote={props.audioNote} />
+          {/* <MergeAudioAction audioNote={props.audioNote} /> */}
           <CopyShareLinkAction audioNote={props.audioNote} />
           <DeleteAction audioNoteId={props.audioNote.id} moreOptionsOpen={props.moreOptionsOpen} />
         </PopoverContent>
