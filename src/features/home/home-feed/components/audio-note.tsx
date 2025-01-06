@@ -383,7 +383,7 @@ export function AudioNotesListItem(props: { audioNote: ConversationData; listInd
 export function MeetingNotesTabContent() {
   const { data, isLoading } = useAudioNotes()
   const { recentMeetingNotes, audioGroupCounts, audioGroupLabels } = React.useMemo(() => {
-    const recentMeetingNotes = data?.filter((audioNote) => audioNote.meeting) ?? []
+    const recentMeetingNotes = data?.length && data.length > 0 ? data?.filter((audioNote) => audioNote.meeting) : []
     const { groupLengths, groupLabels } = getDateGroupLengths(recentMeetingNotes)
     return { recentMeetingNotes, audioGroupCounts: groupLengths, audioGroupLabels: groupLabels }
   }, [data])
@@ -428,7 +428,7 @@ export function MeetingNotesTabContent() {
 export function AudioNotesTabContent() {
   const { data, isLoading } = useAudioNotes()
   const { recentNonMeetingNotes, audioGroupCounts, audioGroupLabels } = React.useMemo(() => {
-    const recentNonMeetingNotes = data?.filter((audioNote) => !audioNote.meeting) ?? []
+    const recentNonMeetingNotes = data?.length && data.length > 0 ? data?.filter((audioNote) => !audioNote.meeting) : []
     const { groupLengths, groupLabels } = getDateGroupLengths(recentNonMeetingNotes)
     return { recentNonMeetingNotes, audioGroupCounts: groupLengths, audioGroupLabels: groupLabels }
   }, [data])
