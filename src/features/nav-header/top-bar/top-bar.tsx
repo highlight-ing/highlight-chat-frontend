@@ -5,7 +5,7 @@ import globalStyles from '@/global.module.scss'
 import { ChatHistoryItem } from '@/types'
 import variables from '@/variables.module.scss'
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
-import { Add, Clock, MessageText } from 'iconsax-react'
+import { Add, Clock, Home, Home2, Home3, MessageText } from 'iconsax-react'
 import { useAtomValue } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -142,7 +142,21 @@ export const NavigationTopBarTab = React.forwardRef<HTMLDivElement, TopTabProps>
           },
         },
       ]
-    }, [openConversations, conversation, conversationId, openConversationMessages])
+    }, [
+      conversationId,
+      conversation,
+      openConversationMessages,
+      openConversations.length,
+      onOpen,
+      clearConversationMessages,
+      onClose,
+      setOpenConversations,
+      clearAllOtherConversationMessages,
+      setConversationId,
+      clearAllConversationMessages,
+      startNewConversation,
+      openModal,
+    ])
 
     React.useEffect(() => {
       const filteredTitle =
@@ -261,7 +275,7 @@ export function NavigationTopBar({ showHistory, setShowHistory }: TopBarProps) {
   const { data: currentConversation } = useHistoryByChatId(conversationId)
   const isOnHome = useAtomValue(isOnHomeAtom)
 
-  const onNewChatClick = () => {
+  function onNewChatClick() {
     startNewConversation()
 
     clearPrompt()
@@ -270,18 +284,27 @@ export function NavigationTopBar({ showHistory, setShowHistory }: TopBarProps) {
     trackEvent('HL Chat New Conversation Started', {})
   }
 
-  const onShowHistoryClick = () => {
+  function handleReturnHomeClick() {
+    startNewConversation()
+
+    clearPrompt()
+
+    router.push('/')
+    trackEvent('HL Chat Return Home')
+  }
+
+  function onShowHistoryClick() {
     setShowHistory(!showHistory)
     trackEvent('HL Chat History Toggled', { newState: !showHistory })
     router.push('/')
   }
 
-  const onSelectChat = async (chat: ChatHistoryItem) => {
+  async function onSelectChat(chat: ChatHistoryItem) {
     setConversationId(chat?.id)
     trackEvent('HL Chat Tab', { action: 'Select' })
   }
 
-  const onDragTabEnd = (result: any) => {
+  function onDragTabEnd(result: any) {
     if (!result.destination) {
       return
     }
@@ -291,7 +314,7 @@ export function NavigationTopBar({ showHistory, setShowHistory }: TopBarProps) {
     setOpenConversations(updated)
   }
 
-  const onCloseTab = (conversation: ChatHistoryItem) => {
+  function onCloseTab(conversation: ChatHistoryItem) {
     removeOpenConversation(conversation.id)
     startNewConversation()
     clearPrompt()
@@ -305,25 +328,22 @@ export function NavigationTopBar({ showHistory, setShowHistory }: TopBarProps) {
     <div className={styles.topBar}>
       <div className="flex w-full items-center justify-between">
         {!isOnHome && (
-          <div className="flex items-center gap-1">
-            <Tooltip
-              tooltip="View chat history"
-              position="bottom"
-              wrapperStyle={
-                showHistory
-                  ? {
-                      visibility: 'hidden',
-                      paddingInlineStart: `calc(${variables.chatHistoryWidth} - 36px)`,
-                      transition: 'padding 250ms ease',
-                    }
-                  : { transition: 'padding 250ms ease' }
-              }
-            >
-              <CircleButton onClick={onShowHistoryClick}>
-                <Clock size={20} variant={'Bold'} />
-              </CircleButton>
-            </Tooltip>
-          </div>
+          <Tooltip
+            tooltip="Return home"
+            position="bottom"
+            wrapperStyle={
+              showHistory
+                ? {
+                    paddingInlineStart: variables.chatHistoryWidth,
+                    transition: 'padding 250ms ease',
+                  }
+                : { transition: 'padding 250ms ease' }
+            }
+          >
+            <CircleButton onClick={handleReturnHomeClick}>
+              <Home3 size={20} variant={'Bold'} />
+            </CircleButton>
+          </Tooltip>
         )}
 
         <div className="flex flex-grow items-center overflow-hidden">
@@ -375,7 +395,14 @@ export function NavigationTopBar({ showHistory, setShowHistory }: TopBarProps) {
 
       {conversationId && (
         <div className={`${styles.topHeader} ${showHistory ? styles.offset : ''}`}>
-          <div className={'flex gap-3'}>
+          <div className={'flex gap-x-1 gap-y-3'}>
+            {!isOnHome && (
+              <Tooltip tooltip="View chat history" position="bottom">
+                <CircleButton onClick={onShowHistoryClick}>
+                  <Clock size={20} variant={'Bold'} />
+                </CircleButton>
+              </Tooltip>
+            )}
             {promptApp ? (
               <>
                 {promptApp.image && promptApp.user_images?.file_extension ? (
