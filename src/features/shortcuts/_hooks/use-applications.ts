@@ -4,6 +4,7 @@ import {
   ChromeIcon,
   CursorIcon,
   DiscordIcon,
+  FigmaIcon,
   IconPropTypes,
   NotionIcon,
   SafariIcon,
@@ -33,6 +34,7 @@ const MOCK_APPLICATIONS: Application[] = [
   { displayName: 'Notion', id: 'Notion', icon: NotionIcon, theme: 'dark', description: 'Manage Notion shortcuts' },
   { displayName: 'Safari', id: 'Safari', icon: SafariIcon, theme: 'dark', description: 'Manage Safari shortcuts' },
   { displayName: 'Discord', id: 'Discord', icon: DiscordIcon, theme: 'dark', description: 'Manage Discord shortcuts' },
+  { displayName: 'Figma', id: 'Figma', icon: FigmaIcon, theme: 'dark', description: 'Manage Figma shortcuts' },
 ]
 
 export function useApplications() {
