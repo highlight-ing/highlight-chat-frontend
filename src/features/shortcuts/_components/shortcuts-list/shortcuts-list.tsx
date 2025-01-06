@@ -1,33 +1,27 @@
 import React from 'react'
 import { Global } from 'iconsax-react'
 
+import { PromptWithTags } from '@/types/supabase-helpers'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useStore } from '@/components/providers/store-provider'
 
 import { useApplications } from '../../_hooks/use-applications'
 import { EmptyState } from './empty-state'
-import { ShortcutCard } from './shortcut-card'
+import { ShortcutItem } from './shortcut-item'
 
 export interface ShortcutsListProps {
   selectedNavItem?: {
     type: 'application' | 'tag' | 'global'
     id: string
   }
+  shortcuts: PromptWithTags[]
+  isLoading?: boolean
   onSelectShortcut?: (shortcutId: string) => void
 }
 
-interface Shortcut {
-  id: string
-  name: string
-}
-
-export function ShortcutsList({ selectedNavItem, onSelectShortcut }: ShortcutsListProps) {
+export function ShortcutsList({ selectedNavItem, shortcuts, isLoading, onSelectShortcut }: ShortcutsListProps) {
   const openModal = useStore((state) => state.openModal)
   const { applications } = useApplications()
-
-  // TODO: Add hook to fetch shortcuts based on selectedNavItem
-  const isLoading = false
-  const shortcuts: Shortcut[] = []
 
   const getSelectedAppIcon = () => {
     if (!selectedNavItem) return null
@@ -77,12 +71,6 @@ export function ShortcutsList({ selectedNavItem, onSelectShortcut }: ShortcutsLi
                   : 'Global Shortcuts'}
             </h2>
           </div>
-          {/* <button
-            onClick={() => openModal('create-prompt')}
-            className="inline-flex items-center justify-center rounded-md text-sm font-medium text-white h-9 px-4 py-2 bg-primary hover:bg-primary/90"
-          >
-            Create Shortcut
-          </button> */}
         </div>
         <p className="text-sm text-light-40 leading-5">
           {selectedNavItem?.type === 'application'
@@ -99,8 +87,12 @@ export function ShortcutsList({ selectedNavItem, onSelectShortcut }: ShortcutsLi
           {shortcuts.length === 0 ? (
             <EmptyState selectedNavItem={selectedNavItem} />
           ) : (
-            shortcuts.map((shortcut) => (
-              <ShortcutCard key={shortcut.id} shortcut={shortcut} onClick={onSelectShortcut} />
+            shortcuts.map((shortcut: PromptWithTags) => (
+              <ShortcutItem
+                key={shortcut.id}
+                shortcut={shortcut}
+                onClick={() => onSelectShortcut?.(shortcut.id.toString())}
+              />
             ))
           )}
         </div>

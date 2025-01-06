@@ -4,6 +4,7 @@ import { Global } from 'iconsax-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 
 import { useApplications } from '../../_hooks/use-applications'
+import { ShortcutsLoader } from './shortcuts-loader'
 
 interface ShortcutsNavigationProps {
   selectedNavItem?: {
@@ -17,11 +18,7 @@ export function ShortcutsNavigation({ selectedNavItem, onSelectNavItem }: Shortc
   const { isLoading, applications } = useApplications()
 
   if (isLoading) {
-    return (
-      <div className="p-4">
-        <p className="text-sm text-light-40">Loading applications...</p>
-      </div>
-    )
+    return <ShortcutsLoader />
   }
 
   return (
@@ -33,7 +30,8 @@ export function ShortcutsNavigation({ selectedNavItem, onSelectNavItem }: Shortc
         </p>
       </div>
 
-      <ScrollArea className="h-[calc(100vh-200px)]">
+      {/* <ScrollArea className="h-[calc(100vh-200px)]"> */}
+      <ScrollArea className="flex-1 ">
         <div className="space-y-1 p-4">
           {/* Global Option */}
           <div

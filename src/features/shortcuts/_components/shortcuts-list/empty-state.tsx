@@ -16,7 +16,13 @@ export function EmptyState({ selectedNavItem }: EmptyStateProps) {
 
   return (
     <div className="flex flex-col items-center justify-center h-full text-center gap-12">
-      <Image src="/empty-shortcuts-icon-lg.webp" alt="Empty shortcuts" width={240} height={240} className="mb-4" />
+      <Image
+        src="/empty-shortcuts-icon-light.webp"
+        alt="Empty shortcuts"
+        width={240}
+        height={240}
+        className="mb-4 opacity-90"
+      />
       <div className="flex flex-col gap-4 items-center justify-center">
         <p className="text-sm text-light-40">
           {selectedNavItem?.type === 'application'
