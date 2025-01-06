@@ -92,10 +92,10 @@ export async function parseAndHandleStreamChunk(
         case 'loading':
           if (jsonChunk.name === 'highlight_search') {
             integrations.showLoading(conversationId, jsonChunk.loaded)
-          } else if (jsonChunk.agentName && jsonChunk.toolName) {
+          } else if (jsonChunk.agent_name && jsonChunk.tool_name) {
             integrations.showMCPLoader(conversationId, jsonChunk.loaded, {
-              agentName: jsonChunk.agentName,
-              toolName: jsonChunk.toolName,
+              agentName: jsonChunk.agent_name,
+              toolName: jsonChunk.tool_name,
             })
           }
           break
@@ -196,14 +196,14 @@ export async function parseAndHandleStreamChunk(
                 messageId: messageId,
               }
             }
-          } else if (jsonChunk.mcp_agent_id || jsonChunk.mcp_agent_name) {
+          } else if (jsonChunk.agent_id || jsonChunk.agent_name) {
             console.log('Trying to find tool from MCP, Tool Name:', jsonChunk.name)
             integrations.createMCPTool(conversationId, {
               toolName: jsonChunk.name,
               toolInput: jsonChunk.input,
               toolId: jsonChunk.tool_id,
-              agentId: jsonChunk.mcp_agent_id,
-              agentName: jsonChunk.mcp_agent_name,
+              agentId: jsonChunk.agent_id,
+              agentName: jsonChunk.agent_name,
             })
           } else {
             console.log('Unknown tool name:', jsonChunk.name)
