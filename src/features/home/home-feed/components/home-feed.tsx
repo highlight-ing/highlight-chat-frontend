@@ -177,6 +177,14 @@ export function FeedHiddenState() {
   )
 }
 
+export function ActionButton(props: React.ComponentProps<'button'>) {
+  return (
+    <button className="hidden h-6 place-items-center rounded-lg px-2 text-sm text-tertiary transition-colors hover:bg-light-5 group-hover:grid">
+      {props.children}
+    </button>
+  )
+}
+
 function RecentActivityTabContent() {
   const { data: recentActivity, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useRecentActions()
   const { recentActivityGroupCounts, recentActivityGroupLabels } = React.useMemo(() => {

@@ -20,7 +20,7 @@ import { GroupedVirtualList, GroupHeaderRow } from '../components/grouped-virtua
 import { currentListIndexAtom, isMountedAtom } from '../atoms'
 import { HOME_FEED_LIST_HEIGHT } from '../constants'
 import { formatUpdatedAtDate } from '../utils'
-import { HomeFeedListItemLayout, HomeFeedListLayout, ListEmptyState, ListLoadingState } from './home-feed'
+import { ActionButton, HomeFeedListItemLayout, HomeFeedListLayout, ListEmptyState, ListLoadingState } from './home-feed'
 
 function ChatAction(props: { chat: ChatHistoryItem }) {
   const { clearPrompt, startNewConversation, addOrUpdateOpenConversation, setConversationId } = useStore(
@@ -46,16 +46,7 @@ function ChatAction(props: { chat: ChatHistoryItem }) {
     })
   }
 
-  return (
-    <Tooltip content="Chat">
-      <button
-        onClick={handleChatClick}
-        className="size-6 hidden place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:grid"
-      >
-        <MessageText variant="Bold" size={16} className="text-tertiary" />
-      </button>
-    </Tooltip>
-  )
+  return <ActionButton onClick={handleChatClick}>Chat</ActionButton>
 }
 
 function ChatShareLinkCopyButton(props: { chat: ChatHistoryItem }) {
@@ -75,15 +66,9 @@ function ChatShareLinkCopyButton(props: { chat: ChatHistoryItem }) {
   }
 
   return (
-    <Tooltip content="Share">
-      <button
-        onClick={handleCopyClick}
-        disabled={isGeneratingLink}
-        className="size-6 hidden place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:grid"
-      >
-        <Export variant="Bold" size={16} className={cn('text-tertiary', isGeneratingLink && 'opacity-50')} />
-      </button>
-    </Tooltip>
+    <ActionButton disabled={isGeneratingLink} onClick={handleCopyClick}>
+      Share
+    </ActionButton>
   )
 }
 
@@ -132,7 +117,7 @@ export function ChatListItem(props: { chat: ChatHistoryItem; listIndex: number }
         <MessageText variant={'Bold'} size={20} className="text-subtle" />
         <h3 className="max-w-sm truncate tracking-tight text-primary">{props.chat.title}</h3>
       </div>
-      <div className="flex items-center gap-2 font-medium">
+      <div className="flex items-center gap-1 font-medium">
         <p className="block text-sm text-tertiary group-hover:hidden">{formatUpdatedAtDate(props.chat.updated_at)}</p>
         <ChatAction chat={props.chat} />
         <ChatShareLinkCopyButton chat={props.chat} />
