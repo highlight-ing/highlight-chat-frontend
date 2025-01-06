@@ -27,6 +27,7 @@ import {
   WindowContentsAttachment,
   WindowListAttachment,
 } from '@/utils/formDataUtils'
+import { getAllMCPTools } from '@/utils/mcp'
 import { parseAndHandleStreamChunk } from '@/utils/streamParser'
 import { formatDateForConversation, getWordCount } from '@/utils/string'
 import { useApi } from '@/hooks/useApi'
@@ -276,6 +277,9 @@ export const useSubmitQuery = () => {
     isPromptApp: boolean,
     promptApp?: Prompt | null,
     toolOverrides?: ToolOverrides,
+    tool_response_type?: 'text' | 'image' | 'json',
+    tool_response?: string,
+    tool_response_tool_id?: string,
   ) => {
     setInputIsDisabled(true)
     const startTime = Date.now()
@@ -294,6 +298,26 @@ export const useSubmitQuery = () => {
       formData.append('conversation_id', conversationId)
       formData.append('tools', JSON.stringify(tools))
       formData.append('origin', 'https://chat.highlight.ing')
+      let mcp = {}
+      let mcpEnabled = true
+      let mcpTools = await getAllMCPTools()
+      if (mcp) {
+        if (tool_response_type && tool_response && tool_response_tool_id) {
+          mcp = {
+            enabled: true,
+            tools: mcpTools,
+            tool_response_type: 'text',
+            tool_response: tool_response,
+            tool_response_tool_id: tool_response_tool_id,
+          }
+        } else {
+          mcp = {
+            enabled: true,
+            tools: mcpTools,
+          }
+        }
+        formData.append('mcp', JSON.stringify(mcp))
+      }
 
       const endpoint = 'chat/'
 
@@ -303,20 +327,29 @@ export const useSubmitQuery = () => {
       if (isPromptApp && promptApp) {
         formData.append('app_id', promptApp.external_id)
       }
-      const response = await post(endpoint, formData, { version: 'v4', signal: abortController.signal })
+      const response = await post(endpoint, formData, {
+        version: 'v4',
+        signal: abortController.signal,
+        headers: {
+          Accept: 'text/event-stream',
+        },
+      })
+
       if (!response.ok) {
         throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`)
-      }
-
-      const reader = response.body?.getReader()
-      if (!reader) {
-        throw new Error('No reader available')
       }
 
       // @ts-expect-error
       addConversationMessage(conversationId, { role: 'assistant', content: '' })
 
       let accumulatedMessage = ''
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ''
+
+      if (!reader) {
+        throw new Error('No reader available')
+      }
 
       while (true) {
         const { done, value } = await reader.read()
@@ -324,120 +357,138 @@ export const useSubmitQuery = () => {
 
         checkAbortSignal()
 
-        const chunk = new TextDecoder().decode(value)
+        // Append new chunk to buffer and split by newlines
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split('\n')
 
-        const { content, windowName, conversation, factIndex, fact, messageId, visualization } =
-          await parseAndHandleStreamChunk(chunk, {
-            showConfirmationModal,
-            addToast,
-            integrations,
-            conversationId,
-            onMetadata: (metadata) => {
-              if (metadata.provider_switch) {
-                console.log('[Provider Switch Event]:', {
-                  from: metadata.from_provider,
-                  to: metadata.to_provider,
-                  reason: metadata.switch_reason,
-                  model: metadata.model,
-                  llm_provider: metadata.llm_provider,
-                  has_live_data: metadata.has_live_data,
-                  requires_live_data: metadata.requires_live_data,
+        // Process all complete lines
+        for (let i = 0; i < lines.length - 1; i++) {
+          const line = lines[i].trim()
+          if (line.startsWith('data: ')) {
+            const eventData = line.slice(6) // Remove 'data: ' prefix
+            if (eventData === '[DONE]') continue
+
+            try {
+              const { content, windowName, conversation, factIndex, fact, messageId, visualization } =
+                await parseAndHandleStreamChunk(eventData, {
+                  showConfirmationModal,
+                  addToast,
+                  integrations,
+                  conversationId,
+                  onMetadata: (metadata) => {
+                    if (metadata.provider_switch) {
+                      console.log('[Provider Switch Event]:', {
+                        from: metadata.from_provider,
+                        to: metadata.to_provider,
+                        reason: metadata.switch_reason,
+                        model: metadata.model,
+                        llm_provider: metadata.llm_provider,
+                        has_live_data: metadata.has_live_data,
+                        requires_live_data: metadata.requires_live_data,
+                      })
+                    } else if (metadata.tool_activated) {
+                      console.log('[Tool Activation Event]:', {
+                        tool_name: metadata.tool_name,
+                        tool_id: metadata.tool_id,
+                      })
+                    } else if (metadata.model && metadata.llm_provider) {
+                      console.log('[Initial Chat Event]:', {
+                        model: metadata.model,
+                        llm_provider: metadata.llm_provider,
+                        has_live_data: metadata.has_live_data,
+                        requires_live_data: metadata.requires_live_data,
+                      })
+                    }
+                  },
                 })
-              } else if (metadata.tool_activated) {
-                console.log('[Tool Activation Event]:', {
-                  tool_name: metadata.tool_name,
-                  tool_id: metadata.tool_id,
-                })
-              } else if (metadata.model && metadata.llm_provider) {
-                console.log('[Initial Chat Event]:', {
-                  model: metadata.model,
-                  llm_provider: metadata.llm_provider,
-                  has_live_data: metadata.has_live_data,
-                  requires_live_data: metadata.requires_live_data,
+
+              if (content) {
+                accumulatedMessage += content
+                updateLastConversationMessage(conversationId, {
+                  role: 'assistant',
+                  content: accumulatedMessage,
+                  conversation_id: conversationId,
+                  id: messageId,
+                  given_feedback: null,
+                  visualization: visualization,
                 })
               }
-            },
-          })
 
-        if (content) {
-          accumulatedMessage += content
-          updateLastConversationMessage(conversationId, {
-            role: 'assistant',
-            content: accumulatedMessage,
-            conversation_id: conversationId,
-            id: messageId,
-            given_feedback: null,
-            visualization: visualization,
-          })
-        }
+              if (conversation) {
+                const conversation_data = await Highlight.conversations.getConversationById(conversation)
+                if (conversation_data) {
+                  addAttachment({
+                    type: 'audio',
+                    value: conversation_data.transcript,
+                    duration: Math.floor(
+                      (new Date(conversation_data.endedAt).getTime() -
+                        new Date(conversation_data.startedAt).getTime()) /
+                        60000,
+                    ),
+                  })
+                } else {
+                  addToast({
+                    title: 'Failed to request Conversation',
+                    description: 'We were unable to request conversation with this ID',
+                  })
+                }
+              }
 
-        if (conversation) {
-          const conversation_data = await Highlight.conversations.getConversationById(conversation)
-          if (conversation_data) {
-            addAttachment({
-              type: 'audio',
-              value: conversation_data.transcript,
-              duration: Math.floor(
-                (new Date(conversation_data.endedAt).getTime() - new Date(conversation_data.startedAt).getTime()) /
-                  60000,
-              ),
-            })
-          } else {
-            addToast({
-              title: 'Failed to request Conversation',
-              description: 'We were unable to request conversation with this ID',
-            })
+              if (typeof factIndex === 'number' && fact) {
+                updateLastConversationMessage(conversationId, {
+                  role: 'assistant',
+                  content: accumulatedMessage,
+                  conversation_id: conversationId,
+                  factIndex: factIndex,
+                  fact: fact,
+                  id: messageId,
+                  given_feedback: null,
+                  visualization: visualization,
+                })
+              } else if (fact) {
+                updateLastConversationMessage(conversationId, {
+                  role: 'assistant',
+                  content: accumulatedMessage,
+                  conversation_id: conversationId,
+                  fact: fact,
+                  id: messageId,
+                  given_feedback: null,
+                  visualization: visualization,
+                })
+              }
+
+              if (windowName) {
+                const contextGranted = await Highlight.permissions.requestWindowContextPermission()
+                const screenshotGranted = await Highlight.permissions.requestScreenshotPermission()
+                if (contextGranted && screenshotGranted) {
+                  addToast({
+                    title: 'Context Granted',
+                    description: `Context granted for ${windowName}`,
+                    type: 'success',
+                    timeout: 5000,
+                  })
+                  const screenshot = await Highlight.user.getWindowScreenshot(windowName)
+                  addAttachment({ type: 'image', value: screenshot })
+
+                  const windowContext = await Highlight.user.getWindowContext(windowName)
+                  const ocrScreenContents = windowContext.application.focusedWindow.rawContents
+                    ? windowContext.application.focusedWindow.rawContents
+                    : windowContext.environment.ocrScreenContents || ''
+                  addAttachment({ type: 'window_context', value: ocrScreenContents })
+
+                  await handleSubmit("Here's the context you requested.", promptApp, {
+                    image: screenshot,
+                    window_context: ocrScreenContents,
+                  })
+                }
+              }
+            } catch (error) {
+              console.error('Error parsing event data:', error)
+            }
           }
         }
-
-        if (typeof factIndex === 'number' && fact) {
-          updateLastConversationMessage(conversationId, {
-            role: 'assistant',
-            content: accumulatedMessage,
-            conversation_id: conversationId,
-            factIndex: factIndex,
-            fact: fact,
-            id: messageId,
-            given_feedback: null,
-            visualization: visualization,
-          })
-        } else if (fact) {
-          updateLastConversationMessage(conversationId, {
-            role: 'assistant',
-            content: accumulatedMessage,
-            conversation_id: conversationId,
-            fact: fact,
-            id: messageId,
-            given_feedback: null,
-            visualization: visualization,
-          })
-        }
-
-        if (windowName) {
-          const contextGranted = await Highlight.permissions.requestWindowContextPermission()
-          const screenshotGranted = await Highlight.permissions.requestScreenshotPermission()
-          if (contextGranted && screenshotGranted) {
-            addToast({
-              title: 'Context Granted',
-              description: `Context granted for ${windowName}`,
-              type: 'success',
-              timeout: 5000,
-            })
-            const screenshot = await Highlight.user.getWindowScreenshot(windowName)
-            addAttachment({ type: 'image', value: screenshot })
-
-            const windowContext = await Highlight.user.getWindowContext(windowName)
-            const ocrScreenContents = windowContext.application.focusedWindow.rawContents
-              ? windowContext.application.focusedWindow.rawContents
-              : windowContext.environment.ocrScreenContents || ''
-            addAttachment({ type: 'window_context', value: ocrScreenContents })
-
-            await handleSubmit("Here's the context you requested.", promptApp, {
-              image: screenshot,
-              window_context: ocrScreenContents,
-            })
-          }
-        }
+        // Keep the last incomplete line in the buffer
+        buffer = lines[lines.length - 1]
       }
     } catch (error: any) {
       const endTime = Date.now()
@@ -566,21 +617,21 @@ export const useSubmitQuery = () => {
         }
       })
 
-      const conversationData = await Highlight.conversations.getAllConversations()
-      const conversationAttachments: Array<ConversationAttachmentMetadata> = conversationData
-        .filter((conversation) => {
-          return Object.entries(conversation).every(([key, value]) => key !== undefined && value !== undefined)
-        })
-        .map((conversation) => ({
-          id: conversation.id,
-          type: 'conversation',
-          title: conversation.title,
-          words: conversation.transcript ? conversation.transcript.split(/\s+/).length : 0,
-          started_at: formatDateForConversation(conversation.startedAt),
-          ended_at: formatDateForConversation(conversation.endedAt),
-        }))
+      // const conversationData = await Highlight.conversations.getAllConversations()
+      // const conversationAttachments: Array<ConversationAttachmentMetadata> = conversationData
+      //   .filter((conversation) => {
+      //     return Object.entries(conversation).every(([key, value]) => key !== undefined && value !== undefined)
+      //   })
+      //   .map((conversation) => ({
+      //     id: conversation.id,
+      //     type: 'conversation',
+      //     title: conversation.title,
+      //     words: conversation.transcript ? conversation.transcript.split(/\s+/).length : 0,
+      //     started_at: formatDateForConversation(conversation.startedAt),
+      //     ended_at: formatDateForConversation(conversation.endedAt),
+      //   }))
 
-      availableContexts.context.push(...conversationAttachments)
+      // availableContexts.context.push(...conversationAttachments)
 
       if (rawContents) {
         const windowContentsAttachment: WindowContentsAttachment = {
@@ -627,8 +678,23 @@ export const useSubmitQuery = () => {
     promptApp?: Prompt | null,
     context?: { image?: string; window_context?: string; conversation?: ConversationAttachment },
     toolOverrides?: ToolOverrides,
+    tool_response_type?: 'text' | 'image' | 'json',
+    tool_response?: string,
+    tool_response_tool_id?: string,
   ) => {
-    const query = input.trim()
+    let query = input.trim()
+
+    if (query === 'Responding to the tool call...') {
+      console.log('Tool response:', {
+        tool_response_type,
+        tool_response,
+        tool_response_tool_id,
+      })
+    }
+
+    if (tool_response_type && tool_response && tool_response_tool_id) {
+      query = `Responding to the tool call...`
+    }
 
     if (!query || query === '') {
       console.log('No query provided, ignoring.')
@@ -685,21 +751,21 @@ export const useSubmitQuery = () => {
           if (metadata) attachedContext.context.push(metadata)
         })
 
-      const conversationData = await Highlight.conversations.getAllConversations()
-      const conversationAttachments: Array<ConversationAttachmentMetadata> = conversationData
-        .filter((conversation) => {
-          return Object.entries(conversation).every(([key, value]) => key !== undefined && value !== undefined)
-        })
-        .map((conversation) => ({
-          id: conversation.id,
-          type: 'conversation',
-          title: conversation.title,
-          words: conversation.transcript ? conversation.transcript.split(/\s+/).length : 0,
-          started_at: formatDateForConversation(conversation.startedAt),
-          ended_at: formatDateForConversation(conversation.endedAt),
-        }))
+      // const conversationData = await Highlight.conversations.getAllConversations()
+      // const conversationAttachments: Array<ConversationAttachmentMetadata> = conversationData
+      //   .filter((conversation) => {
+      //     return Object.entries(conversation).every(([key, value]) => key !== undefined && value !== undefined)
+      //   })
+      //   .map((conversation) => ({
+      //     id: conversation.id,
+      //     type: 'conversation',
+      //     title: conversation.title,
+      //     words: conversation.transcript ? conversation.transcript.split(/\s+/).length : 0,
+      //     started_at: formatDateForConversation(conversation.startedAt),
+      //     ended_at: formatDateForConversation(conversation.endedAt),
+      //   }))
 
-      availableContexts.context.push(...conversationAttachments)
+      // availableContexts.context.push(...conversationAttachments)
 
       if (context?.window_context) {
         const windowContentsAttachment: WindowContentsAttachment = {
@@ -765,7 +831,16 @@ export const useSubmitQuery = () => {
       updateLastMessageSentTimestamp()
       clearAttachments()
 
-      await fetchResponse(conversationId, formData, !!promptApp, promptApp, toolOverrides)
+      await fetchResponse(
+        conversationId,
+        formData,
+        !!promptApp,
+        promptApp,
+        toolOverrides,
+        tool_response_type,
+        tool_response,
+        tool_response_tool_id,
+      )
     } catch (error: any) {
       handleError(error, { method: 'handleSubmit' })
     } finally {

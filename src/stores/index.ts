@@ -20,6 +20,7 @@ import {
   initialHighlightContextState,
 } from './highlight-context'
 import { createIntegrationsSlice, initialIntegrationsState, IntegrationsSlice, IntegrationsState } from './integrations'
+import { createMCPToolsSlice, initialMCPToolsState, MCPToolsSlice, MCPToolsState } from './mcp-tools'
 import { createMessagesSlice, initialMessagesState, MessagesSlice, MessagesState } from './messages'
 import { createModalsSlice, initialModalsState, ModalsSlice, ModalsState } from './modals'
 import {
@@ -57,7 +58,8 @@ export type StoreState = MessagesState &
   PromptEditorState &
   ToastState &
   IntegrationsState &
-  PendingCreateActionsState
+  PendingCreateActionsState &
+  MCPToolsState
 
 export type Store = MessagesSlice &
   AuthSlice &
@@ -73,7 +75,8 @@ export type Store = MessagesSlice &
   PromptEditorSlice &
   ToastSlice &
   IntegrationsSlice &
-  PendingCreateActionsSlice
+  PendingCreateActionsSlice &
+  MCPToolsSlice
 
 const defaultState: StoreState = {
   ...initialMessagesState,
@@ -91,6 +94,7 @@ const defaultState: StoreState = {
   ...initialToastState,
   ...initialIntegrationsState,
   ...initialPendingCreateActionsState,
+  ...initialMCPToolsState,
 }
 
 export const initStore: () => StoreState = () => {
@@ -117,6 +121,7 @@ export const createStore = (initState: StoreState = defaultState) => {
         ...createToastSlice(...a),
         ...createIntegrationsSlice(...a),
         ...createPendingCreateActionsSlice(...a),
+        ...createMCPToolsSlice(...a),
       }),
       {
         name: 'highlight-store',

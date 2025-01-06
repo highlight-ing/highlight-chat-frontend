@@ -1,8 +1,10 @@
 import { useStore } from '@/components/providers/store-provider'
 
 import { IntegrationsLoader } from '../_components/loader'
+import { MCPLoader, MCPLoaderProps } from '../_components/mcp-loader'
 import { CreateGoogleCalEvent } from '../google-cal/google-cal'
 import { CreateLinearTicket } from '../linear/linear'
+import { CreateMCPTool } from '../mcp/mcp'
 import { CreateNotionPage } from '../notion/notion'
 import { SendSlackMessageComponent } from '../slack/slack'
 import { SendSlackMessageParams } from '../types'
@@ -22,6 +24,14 @@ export interface CreateGoogleCalendarEventParams {
   end?: string
 }
 
+export interface CreateMCPToolParams {
+  toolName: string
+  toolInput: object
+  toolId: string
+  agentId: string
+  agentName: string
+}
+
 export interface UseIntegrationsAPI {
   createLinearTicket: (
     conversationId: string,
@@ -37,6 +47,8 @@ export interface UseIntegrationsAPI {
   createGoogleCalendarEvent: (conversationId: string, params: CreateGoogleCalendarEventParams) => Promise<void>
   sendSlackMessage: (conversationId: string, params: SendSlackMessageParams) => Promise<void>
   showLoading: (conversationId: string, loaded: boolean) => void
+  showMCPLoader: (conversationId: string, loaded: boolean, params: MCPLoaderProps) => void
+  createMCPTool: (conversationId: string, params: CreateMCPToolParams) => Promise<void>
 }
 
 function MessageWithComponent({ content, children }: { content: string; children?: React.ReactNode }) {
@@ -142,6 +154,23 @@ export function useIntegrations(): UseIntegrationsAPI {
     })
   }
 
+  async function createMCPTool(conversationId: string, params: CreateMCPToolParams) {
+    const lastMessage = getLastConversationMessage(conversationId)
+    const textContents = lastMessage?.content as string
+
+    previousContent.set(conversationId, textContents)
+
+    // @ts-expect-error
+    updateLastConversationMessage(conversationId!, {
+      content: (
+        <MessageWithComponent content={textContents}>
+          <CreateMCPTool {...params} />
+        </MessageWithComponent>
+      ),
+      role: 'assistant',
+    })
+  }
+
   function showLoading(conversationId: string, loaded: boolean) {
     if (loaded) return
 
@@ -161,5 +190,32 @@ export function useIntegrations(): UseIntegrationsAPI {
     })
   }
 
-  return { createLinearTicket, createNotionPage, createGoogleCalendarEvent, showLoading, sendSlackMessage }
+  function showMCPLoader(conversationId: string, loaded: boolean, params: MCPLoaderProps) {
+    if (loaded) return
+
+    const lastMessage = getLastConversationMessage(conversationId)
+    const textContents = lastMessage?.content as string
+
+    previousContent.set(conversationId, textContents)
+
+    // @ts-expect-error
+    updateLastConversationMessage(conversationId!, {
+      content: (
+        <MessageWithComponent content={textContents}>
+          <MCPLoader {...params} />
+        </MessageWithComponent>
+      ),
+      role: 'assistant',
+    })
+  }
+
+  return {
+    createLinearTicket,
+    createNotionPage,
+    createGoogleCalendarEvent,
+    sendSlackMessage,
+    createMCPTool,
+    showLoading,
+    showMCPLoader,
+  }
 }

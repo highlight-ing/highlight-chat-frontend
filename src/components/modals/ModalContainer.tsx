@@ -3,6 +3,7 @@
 import React, { Fragment, useEffect } from 'react'
 import ChangePromptVisibilityModal from '@/presentations/modals/ChangePromptVisibilityModal'
 import ConfirmDeletePromptModal from '@/presentations/modals/ConfirmDeletePromptModal'
+import ConfirmMCPToolUse from '@/presentations/modals/ConfirmMCPToolUse'
 import ConfirmOverridePrompt from '@/presentations/modals/ConfirmOverridePrompt'
 import CreatePromptFromTemplateModal from '@/presentations/modals/CreatePromptFromTemplate'
 import CreatePromptModal from '@/presentations/modals/CreatePromptModal'
@@ -49,6 +50,7 @@ const ModalMap: Record<string, FunctionalComponent> = {
   'update-feedback': ({ context }: ModalObjectProps) => (
     <UpdateFeedbackModal {...(context as UpdateFeedbackModalProps)} />
   ),
+  'confirm-mcp-tool-use': ConfirmMCPToolUse,
 }
 
 export const ModalContainer = () => {
