@@ -14,6 +14,7 @@ export function useAudioNotes() {
     queryKey: ['audio-notes'],
     queryFn: async () => {
       const recentConversations = await Highlight.conversations.getAllConversations()
+      console.log(recentConversations)
       return recentConversations as Array<ConversationData> | undefined
     },
     staleTime: THIRTY_MINUTES_IN_MS,
@@ -75,7 +76,7 @@ export function useAudioNotesStore() {
   }
 
   async function updateAudioNote(audioNote: Partial<Omit<ConversationData, 'id'>> & { id: ConversationData['id'] }) {
-    queryClient.setQueryData(['audio-notes'], (originalAudioNotes: Array<ConversationData>) => {
+    queryClient.setQueryData(['audio-notes'], async (originalAudioNotes: Array<ConversationData>) => {
       const audioNotes = [...originalAudioNotes]
       const existingAudioNoteIndex = audioNotes.findIndex((note) => note.id === audioNote.id)
       const updatedAudioNote = { ...audioNotes[existingAudioNoteIndex], ...audioNote }
@@ -84,6 +85,13 @@ export function useAudioNotesStore() {
 
       if (selectedAudioNote?.id === audioNote.id) {
         setSelectedAudioNote(updatedAudioNote)
+      }
+
+      try {
+        await Highlight.conversations.updateConversation(updatedAudioNote)
+        console.log('Conversation updated successfully:', updatedAudioNote.id)
+      } catch (error) {
+        console.error('Error updating conversation:', error)
       }
 
       return audioNotes
