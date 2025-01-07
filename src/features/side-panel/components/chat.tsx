@@ -8,13 +8,13 @@ import { trackEvent } from '@/utils/amplitude'
 import { selectedAudioNoteAtom, selectedChatIdAtom } from '@/atoms/side-panel'
 import { useHistoryByChatId } from '@/hooks/chat-history'
 import { useMessages } from '@/hooks/chat-messages'
-import { useCopyChatShareLink, useGenerateChatShareLink } from '@/hooks/share-link'
+import { useCopyLink, useGenerateShareLink } from '@/hooks/share-link'
 import { Popover, PopoverTrigger } from '@/components/ui/popover'
 import { Skeleton } from '@/components/ui/skeleton'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 import { Message } from '@/components/Messages/Message'
 import { useStore } from '@/components/providers/store-provider'
-import { ShareChatPopoverContent } from '@/components/share-popover'
+import { SharePopoverContent } from '@/components/share-popover'
 
 import { formatHeaderTimestamp } from '../utils'
 import { SidePanelHeaderActionButton, SidePanelHeaderActions } from './side-panel'
@@ -97,8 +97,8 @@ function CopyLinkAction() {
   const { data: selectedChat } = useHistoryByChatId(selectedChatId)
   const mostRecentShareLinkId = selectedChat?.shared_conversations?.[0]?.id
   const [showSuccessState, setShowSuccessState] = React.useState(false)
-  const { mutate: generateShareLink, isPending: isGeneratingLink } = useGenerateChatShareLink()
-  const { mutate: copyLink, isSuccess: linkCopied } = useCopyChatShareLink()
+  const { mutate: generateShareLink, isPending: isGeneratingLink } = useGenerateShareLink()
+  const { mutate: copyLink, isSuccess: linkCopied } = useCopyLink()
 
   React.useEffect(() => {
     let timeout: NodeJS.Timeout | null
@@ -153,7 +153,7 @@ function ShareAction() {
   const selectedChatId = useAtomValue(selectedChatIdAtom)
   const { data: selectedChat } = useHistoryByChatId(selectedChatId)
   const mostRecentShareLinkId = selectedChat?.shared_conversations?.[0]?.id
-  const { mutate: generateShareLink, isPending: isGeneratingLink } = useGenerateChatShareLink()
+  const { mutate: generateShareLink, isPending: isGeneratingLink } = useGenerateShareLink()
 
   function handleShareClick() {
     if (!selectedChat || mostRecentShareLinkId) return
@@ -178,7 +178,7 @@ function ShareAction() {
         <Export variant="Bold" size={16} />
         <p>Share</p>
       </PopoverTrigger>
-      <ShareChatPopoverContent conversation={selectedChat} />
+      <SharePopoverContent conversation={selectedChat} />
     </Popover>
   )
 }

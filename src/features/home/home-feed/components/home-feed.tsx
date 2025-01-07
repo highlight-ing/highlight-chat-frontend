@@ -13,7 +13,7 @@ import { Tooltip } from '@/components/ui/tooltip'
 import Button from '@/components/Button/Button'
 
 import { GroupedVirtualList, GroupHeaderRow } from '../components/grouped-virtual-list'
-import { currentListIndexAtom, feedHiddenAtom, multiSelectedAudioNoteIdsAtom, toggleFeedVisibilityAtom } from '../atoms'
+import { currentListIndexAtom, feedHiddenAtom, toggleFeedVisibilityAtom } from '../atoms'
 import { HOME_FEED_LIST_HEIGHT } from '../constants'
 import { useRecentActions } from '../hooks'
 import { AudioNotesListItem, AudioNotesTabContent, MeetingNotesTabContent } from './audio-note'
@@ -30,7 +30,7 @@ export function HomeFeedListItemLayout({ className, children, ...props }: HomeFe
       )}
       {...props}
     >
-      <div className="flex items-center justify-between gap-2 border-b border-subtle py-2 transition-colors">
+      <div className="flex items-center justify-between gap-2 border-b border-subtle py-3 transition-colors">
         {children}
       </div>
     </div>
@@ -177,15 +177,6 @@ export function FeedHiddenState() {
   )
 }
 
-export function ActionButton(props: React.ComponentProps<'button'>) {
-  return (
-    <button
-      className="hidden h-6 place-items-center rounded-lg px-2 text-sm text-tertiary transition-colors hover:bg-light-5 group-hover:grid"
-      {...props}
-    />
-  )
-}
-
 function RecentActivityTabContent() {
   const { data: recentActivity, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useRecentActions()
   const { recentActivityGroupCounts, recentActivityGroupLabels } = React.useMemo(() => {
@@ -264,7 +255,7 @@ function HomeFeedTabContent(props: { value: string; children: React.ReactNode })
   const feedHidden = useAtomValue(feedHiddenAtom)
 
   return (
-    <ScopeProvider key={props.value} atoms={[currentListIndexAtom, multiSelectedAudioNoteIdsAtom]}>
+    <ScopeProvider key={props.value} atoms={[currentListIndexAtom]}>
       <TabsContent value={props.value}>{feedHidden ? <FeedHiddenState /> : props.children}</TabsContent>
     </ScopeProvider>
   )
