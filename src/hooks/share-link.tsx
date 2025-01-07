@@ -75,7 +75,7 @@ export function useGenerateChatShareLink() {
         share_link: `https://highlightai.com/share/${shareLink}`,
       })
 
-      toast('Link generated and copied to clipboard', { icon: <Copy variant="Bold" size={20} /> })
+      toast('Chat is now public. Link copied to clipboard.', { icon: <Copy variant="Bold" size={20} /> })
     },
     onError: (error, conversationId) => {
       console.error('Failed to copy link:', error)
@@ -114,7 +114,7 @@ export function useDisableChatShareLink() {
 
       trackEvent('HL Chat Disable Link', { conversation_id: chatId })
 
-      toast('Share links disabled')
+      toast('Chat is now private. Share links disabled.')
     },
     onError: (error, chatId) => {
       console.error('Failed to disable link:', error)
