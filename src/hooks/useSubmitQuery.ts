@@ -308,10 +308,11 @@ export const useSubmitQuery = () => {
       const response = await post(endpoint, formData, {
         version: 'v4',
         signal: abortController.signal,
+        // @ts-ignore
         headers: isAlpha
           ? {
-              Accept: 'text/event-stream',
-            }
+            Accept: 'text/event-stream',
+          }
           : {},
       })
 
@@ -319,15 +320,17 @@ export const useSubmitQuery = () => {
         throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`)
       }
 
-      const reader = response.body?.getReader()
-      if (!reader) {
-        throw new Error('No reader available')
-      }
-
       // @ts-expect-error
       addConversationMessage(conversationId, { role: 'assistant', content: '' })
 
       let accumulatedMessage = ''
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ''
+
+      if (!reader) {
+        throw new Error('No reader available')
+      }
 
       if (isAlpha) {
         while (true) {
@@ -402,7 +405,7 @@ export const useSubmitQuery = () => {
                       duration: Math.floor(
                         (new Date(conversation_data.endedAt).getTime() -
                           new Date(conversation_data.startedAt).getTime()) /
-                          60000,
+                        60000,
                       ),
                     })
                   } else {
@@ -531,7 +534,7 @@ export const useSubmitQuery = () => {
                 value: conversation_data.transcript,
                 duration: Math.floor(
                   (new Date(conversation_data.endedAt).getTime() - new Date(conversation_data.startedAt).getTime()) /
-                    60000,
+                  60000,
                 ),
               })
             } else {
