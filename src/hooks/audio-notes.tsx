@@ -75,27 +75,31 @@ export function useAudioNotesStore() {
     await queryClient.invalidateQueries({ queryKey: ['audio-notes'] })
   }
 
-  async function updateAudioNote(audioNote: Partial<Omit<ConversationData, 'id'>> & { id: ConversationData['id'] }) {
-    queryClient.setQueryData(['audio-notes'], async (originalAudioNotes: Array<ConversationData>) => {
-      const audioNotes = [...originalAudioNotes]
-      const existingAudioNoteIndex = audioNotes.findIndex((note) => note.id === audioNote.id)
-      const updatedAudioNote = { ...audioNotes[existingAudioNoteIndex], ...audioNote }
+  function getAudioNotes() {
+    return queryClient.getQueryData(['audio-notes']) as Array<ConversationData>
+  }
 
-      audioNotes[existingAudioNoteIndex] = updatedAudioNote
+  async function updateAudioNote(
+    audioNoteUpdates: Partial<Omit<ConversationData, 'id'>> & { id: ConversationData['id'] },
+  ) {
+    const cachedAudioNotes = getAudioNotes()
+    const currentAudioNote = cachedAudioNotes.find((audioNote) => audioNote.id === audioNoteUpdates.id)
 
-      if (selectedAudioNote?.id === audioNote.id) {
-        setSelectedAudioNote(updatedAudioNote)
-      }
+    if (!currentAudioNote) return
 
-      try {
-        await Highlight.conversations.updateConversation(updatedAudioNote)
-        console.log('Conversation updated successfully:', updatedAudioNote.id)
-      } catch (error) {
-        console.error('Error updating conversation:', error)
-      }
+    const updatedAudioNote = { ...currentAudioNote, ...audioNoteUpdates }
 
-      return audioNotes
-    })
+    if (selectedAudioNote?.id === audioNoteUpdates.id) {
+      setSelectedAudioNote(updatedAudioNote)
+    }
+
+    try {
+      await Highlight.conversations.updateConversation(updatedAudioNote)
+      await invalidateAudioNotes()
+      console.log('Conversation updated successfully:', updatedAudioNote.id)
+    } catch (error) {
+      console.error('Error updating conversation:', error)
+    }
   }
 
   return {
