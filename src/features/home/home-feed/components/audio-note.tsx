@@ -199,7 +199,7 @@ function CopyShareLinkAction(props: { audioNote: ConversationData }) {
           key={showSuccessState ? 'true' : 'false'}
           className="w-full text-left"
         >
-          {showSuccessState ? 'Copied' : 'Copy Link'}
+          {showSuccessState ? 'Copied' : shareLinkExsists ? 'Copy share link' : 'Create share link'}
         </motion.span>
       </AnimatePresence>
     </button>

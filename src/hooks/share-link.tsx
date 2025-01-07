@@ -166,7 +166,10 @@ export function useGenerateAudioShareLink() {
         share_link: shareLink,
       })
 
-      toast('Link generated and copied to clipboard', { icon: <Copy variant="Bold" size={20} /> })
+      toast('Audio note is now public. Link copied to clipboard.', {
+        icon: <Copy variant="Bold" size={20} />,
+        duration: 6000,
+      })
     },
     onError: (error, audioNote) => {
       console.error('Failed to copy link:', error)
@@ -197,7 +200,7 @@ export function useDisableAudioShareLink() {
 
       trackEvent('HL Chat Audio Note Disable Link', { conversation_id: updatedAudioNote.id })
 
-      toast('Share links disabled')
+      toast('Audio note is now private. Share links disabled.', { duration: 6000 })
     },
     onError: (error, audioNote) => {
       console.error('Failed to disable link:', error)
