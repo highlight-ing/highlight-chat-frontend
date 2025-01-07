@@ -1,14 +1,20 @@
-import { ArrowRight, Copy, MessageText, VoiceSquare } from 'iconsax-react'
+import React from 'react'
+import { ArrowRight, Copy, Export, MessageText, VoiceSquare } from 'iconsax-react'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { toast } from 'sonner'
 import { useShallow } from 'zustand/react/shallow'
 
+import { ConversationData } from '@/types/conversations'
 import { cn } from '@/lib/utils'
+import { isAlpha } from '@/utils/appVersion'
 import { formatTitle } from '@/utils/conversations'
 import { selectedAudioNoteAtom, showBackButtonAtom, sidePanelContentTypeAtom } from '@/atoms/side-panel'
-import { Tooltip } from '@/components/ui/tooltip'
+import { useGenerateAudioShareLink } from '@/hooks/share-link'
+import { Popover, PopoverTrigger } from '@/components/ui/popover'
 import { MeetingIcon } from '@/components/icons'
+import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 import { useStore } from '@/components/providers/store-provider'
+import { ShareAudioPopoverContent } from '@/components/share-popover'
 
 import { useInputFocus } from '@/features/home/chat-input/chat-input'
 
@@ -100,6 +106,39 @@ function CopyAction() {
   )
 }
 
+function ShareAction() {
+  const [open, setOpen] = React.useState(false)
+  const selectedAudioNote = useAtomValue(selectedAudioNoteAtom)
+  const { mutate: generateShareLink, isPending: isGeneratingLink } = useGenerateAudioShareLink()
+
+  function handleShareClick() {
+    if (!selectedAudioNote || selectedAudioNote?.shareLink) return
+    generateShareLink(selectedAudioNote as ConversationData)
+    setOpen(true)
+  }
+
+  if (!selectedAudioNote) return null
+
+  if (!selectedAudioNote.shareLink) {
+    return (
+      <SidePanelHeaderActionButton onClick={handleShareClick} disabled={isGeneratingLink}>
+        {isGeneratingLink ? <LoadingSpinner size={'16px'} color="#6e6e6e" /> : <Export variant="Bold" size={16} />}
+        <p>Share</p>
+      </SidePanelHeaderActionButton>
+    )
+  }
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger className="flex w-full flex-col items-center rounded-[10px] border border-transparent bg-secondary p-2 text-sm font-medium tracking-tight text-tertiary shadow-md transition hover:border-tertiary hover:bg-hover active:opacity-90 active:shadow-none">
+        <Export variant="Bold" size={16} />
+        <p>Share</p>
+      </PopoverTrigger>
+      <ShareAudioPopoverContent audioNote={selectedAudioNote as ConversationData} />
+    </Popover>
+  )
+}
+
 function AudioNoteViewerBackButton() {
   const setSidePanelContentType = useSetAtom(sidePanelContentTypeAtom)
   const setShowBackButton = useSetAtom(showBackButtonAtom)
@@ -155,6 +194,7 @@ export function AudioNoteSidePanelHeader() {
         <SidePanelHeaderActions>
           <ChatAction />
           <CopyAction />
+          {isAlpha && <ShareAction />}
         </SidePanelHeaderActions>
       </div>
     </div>

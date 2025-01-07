@@ -1,28 +1,13 @@
 'use client'
 
 import React from 'react'
-import Highlight from '@highlight-ai/app-runtime'
-import { useQuery } from '@tanstack/react-query'
 import { useAtom } from 'jotai'
 
-import { ConversationData } from '@/types/conversations'
 import { PAGINATION_LIMIT } from '@/lib/constants'
+import { useAudioNotes } from '@/hooks/audio-notes'
 import { useHistory } from '@/hooks/chat-history'
 
 import { recentActionsPageAtom } from './atoms'
-
-const THIRTY_MINUTES_IN_MS = 30 * 60 * 1000
-
-export function useAudioNotes() {
-  return useQuery({
-    queryKey: ['audio-notes'],
-    queryFn: async () => {
-      const recentConversations = await Highlight.conversations.getAllConversations()
-      return recentConversations as Array<ConversationData> | undefined
-    },
-    staleTime: THIRTY_MINUTES_IN_MS,
-  })
-}
 
 export function useRecentActions() {
   const [localPage, setLocalPage] = useAtom(recentActionsPageAtom)

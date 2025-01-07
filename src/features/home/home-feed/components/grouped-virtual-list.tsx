@@ -5,11 +5,7 @@ import { GroupedVirtuoso, type GroupedVirtuosoHandle, type GroupedVirtuosoProps 
 import { currentListIndexAtom } from '../atoms'
 
 export function GroupHeaderRow(props: { children: React.ReactNode }) {
-  return (
-    <div className="w-full bg-primary px-4 py-3 shadow-md">
-      <p className="font-medium text-subtle">{props.children}</p>
-    </div>
-  )
+  return <div className="w-full bg-primary px-5 py-3 font-medium text-subtle shadow-md">{props.children}</div>
 }
 
 export function GroupedVirtualList(props: GroupedVirtuosoProps<unknown, number>) {
