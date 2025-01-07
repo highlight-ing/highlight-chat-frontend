@@ -1,12 +1,10 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { useConversations } from '@/context/ConversationContext'
-import { DotsHorizontalIcon } from '@radix-ui/react-icons'
-import { AnimatePresence, motion, MotionConfig, Variants } from 'framer-motion'
-import { Blend2, Copy, MessageText, Trash, VoiceSquare } from 'iconsax-react'
-import { useAtom, useAtomValue, useSetAtom } from 'jotai'
-import { toast } from 'sonner'
+import { AnimatePresence } from 'framer-motion'
+import { MessageText, VoiceSquare } from 'iconsax-react'
+import { useAtom, useSetAtom } from 'jotai'
 import { useShallow } from 'zustand/react/shallow'
 
 import { ConversationData } from '@/types/conversations'
@@ -14,26 +12,24 @@ import { cn, getDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { formatTitle } from '@/utils/conversations'
 import { homeSidePanelOpenAtom, selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
-import { useAudioNotes, useDeleteAudioNote } from '@/hooks/audio-notes'
-import { useCopyAudioShareLink, useGenerateAudioShareLink } from '@/hooks/share-link'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Switch } from '@/components/ui/switch'
+import { Tooltip } from '@/components/ui/tooltip'
 import Button from '@/components/Button/Button'
 import { MeetingIcon } from '@/components/icons'
-import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 import { useStore } from '@/components/providers/store-provider'
 
 import { GroupedVirtualList, GroupHeaderRow } from '../components/grouped-virtual-list'
 import { useInputFocus } from '../../chat-input/chat-input'
 import { currentListIndexAtom, isMountedAtom } from '../atoms'
 import { HOME_FEED_LIST_HEIGHT } from '../constants'
+import { useAudioNotes } from '../hooks'
 import { formatUpdatedAtDate } from '../utils'
-import { ActionButton, HomeFeedListItemLayout, HomeFeedListLayout, ListEmptyState, ListLoadingState } from './home-feed'
+import { HomeFeedListItemLayout, HomeFeedListLayout, ListEmptyState, ListLoadingState } from './home-feed'
 
 function ToggleAudioTranscriptButton() {
   const { isAudioTranscripEnabled, setIsAudioTranscriptEnabled } = useConversations()
 
-  function handleToggle() {
+  const handleToggle = () => {
     setIsAudioTranscriptEnabled(!isAudioTranscripEnabled)
   }
 
@@ -47,7 +43,7 @@ function ToggleAudioTranscriptButton() {
 function ToggleAudioTranscriptSwitch() {
   const { isAudioTranscripEnabled, setIsAudioTranscriptEnabled } = useConversations()
 
-  function handleToggle() {
+  const handleToggle = () => {
     setIsAudioTranscriptEnabled(!isAudioTranscripEnabled)
   }
 
@@ -63,29 +59,6 @@ function ToggleAudioTranscriptSwitch() {
         className="h-[15px] w-[26px] data-[state=checked]:bg-conv-green"
       />
     </div>
-  )
-}
-
-function ShareLinkAction(props: { audioNote: ConversationData }) {
-  const { mutate: generateShareLink, isPending: isGeneratingLink } = useGenerateAudioShareLink()
-  const { mutateAsync: copyLink } = useCopyAudioShareLink()
-  const shareLinkExsists = props.audioNote?.shareLink && props.audioNote.shareLink !== ''
-
-  async function handleCopyClick() {
-    if (!props.audioNote) return
-
-    if (!shareLinkExsists) {
-      generateShareLink(props.audioNote)
-    } else {
-      await copyLink(props.audioNote.shareLink)
-      toast('Link copied to clipboard', { icon: <Copy variant="Bold" size={20} /> })
-    }
-  }
-
-  return (
-    <ActionButton onClick={handleCopyClick} disabled={isGeneratingLink}>
-      Share
-    </ActionButton>
   )
 }
 
@@ -118,195 +91,14 @@ function AttachAudioAction(props: { audioNote: ConversationData }) {
   }
 
   return (
-    <button
-      onClick={handleAttachClick}
-      className="flex w-full items-center gap-3 rounded-xl px-2 py-1.5 transition-colors hover:bg-light-5"
-    >
-      <MessageText variant="Bold" size={16} />
-      <p>Attach to chat</p>
-    </button>
-  )
-}
-
-function MergeAudioAction(props: { audioNote: ConversationData }) {
-  function handleMergeClick() {}
-
-  return (
-    <button
-      onClick={handleMergeClick}
-      className="flex w-full items-center gap-3 rounded-xl px-2 py-1.5 transition-colors hover:bg-light-5"
-    >
-      <Blend2 variant="Bold" size={16} />
-      <p>Merge audio</p>
-    </button>
-  )
-}
-
-function CopyShareLinkAction(props: { audioNote: ConversationData }) {
-  const {
-    mutate: generateShareLink,
-    isPending: isGeneratingLink,
-    isSuccess: linkGenerated,
-  } = useGenerateAudioShareLink()
-  const { mutate: copyLink, isSuccess: linkCopied } = useCopyAudioShareLink()
-  const shareLinkExsists = props.audioNote?.shareLink && props.audioNote.shareLink !== ''
-  const [showSuccessState, setShowSuccessState] = React.useState(false)
-
-  React.useEffect(() => {
-    let timeout: NodeJS.Timeout | null
-    if (linkCopied || linkGenerated) {
-      setShowSuccessState(true)
-      timeout = setTimeout(() => {
-        setShowSuccessState(false)
-      }, 1200)
-    }
-    return () => {
-      if (timeout) clearTimeout(timeout)
-      setShowSuccessState(false)
-    }
-  }, [linkCopied, linkGenerated, setShowSuccessState])
-
-  function handleCopyClick() {
-    if (!props.audioNote) return
-
-    if (!shareLinkExsists) {
-      generateShareLink(props.audioNote)
-    } else {
-      copyLink(props.audioNote.shareLink)
-    }
-  }
-
-  const copyLabelVariants: Variants = {
-    initial: { x: 10, opacity: 0 },
-    animate: { x: 0, opacity: 1 },
-    exit: { x: -10, opacity: 0 },
-  }
-
-  return (
-    <button
-      onClick={handleCopyClick}
-      disabled={isGeneratingLink}
-      className="flex w-full items-center gap-3.5 rounded-xl px-2 py-1.5 transition-colors hover:bg-light-5"
-    >
-      {isGeneratingLink ? <LoadingSpinner size={'16px'} color="#6e6e6e" /> : <Copy size={16} variant={'Bold'} />}
-      <AnimatePresence initial={false} mode="popLayout">
-        <motion.span
-          variants={copyLabelVariants}
-          initial="initial"
-          animate="animate"
-          exit="exit"
-          key={showSuccessState ? 'true' : 'false'}
-          className="w-full text-left"
-        >
-          {showSuccessState ? 'Copied' : 'Copy Link'}
-        </motion.span>
-      </AnimatePresence>
-    </button>
-  )
-}
-
-function DeleteAction(props: { audioNoteId: ConversationData['id']; moreOptionsOpen: boolean }) {
-  const { mutate: deleteAudioNote, isPending } = useDeleteAudioNote()
-  const [state, setState] = React.useState<'idle' | 'expanded'>('idle')
-  const isExpanded = state === 'expanded'
-
-  React.useEffect(() => {
-    function handleEsc(e: KeyboardEvent) {
-      if (isExpanded && props.moreOptionsOpen && e.key === 'Escape') {
-        setState('idle')
-      }
-    }
-    window.addEventListener('keydown', handleEsc)
-    return () => window.removeEventListener('keydown', handleEsc)
-  }, [isExpanded, props.moreOptionsOpen])
-
-  function handleDeleteClick() {
-    if (!isExpanded) {
-      setState('expanded')
-    } else {
-      setState('idle')
-    }
-  }
-
-  function handleConfirmDeleteClick() {
-    deleteAudioNote(props.audioNoteId)
-  }
-
-  const descriptionVariants: Variants = {
-    hidden: { opacity: 0, filter: 'blur(3px)' },
-    visible: { opacity: 1, filter: 'blur(0px)', transition: { duration: 0.1, delay: 0.1 } },
-  }
-
-  return (
-    <MotionConfig transition={{ type: 'spring', bounce: 0.05, duration: 0.2 }}>
-      <AnimatePresence initial={false}>
-        {isExpanded ? (
-          <motion.div
-            layoutId={`${props.audioNoteId}-wrapper`}
-            style={{ borderRadius: 12 }}
-            className="space-y-2 bg-light-5 p-2"
-          >
-            <motion.p variants={descriptionVariants} initial="hidden" animate="visible" exit="hidden">
-              Are you sure you want to delete this audio note?
-            </motion.p>
-            <button
-              onClick={handleConfirmDeleteClick}
-              disabled={isPending}
-              className="flex w-full items-center gap-3 rounded-xl bg-[#ff3333]/10 px-2 py-1.5 text-[#ff3333] transition-colors hover:bg-[#ff3333]/20"
-            >
-              <motion.span layoutId={`${props.audioNoteId}-icon`}>
-                <Trash variant="Bold" size={16} />
-              </motion.span>
-              <motion.span layoutId={`${props.audioNoteId}-button-text`}>Delete</motion.span>
-            </button>
-          </motion.div>
-        ) : (
-          <motion.button
-            layoutId={`${props.audioNoteId}-wrapper`}
-            onClick={handleDeleteClick}
-            disabled={isPending}
-            style={{ borderRadius: 12 }}
-            className="flex w-full items-center gap-3 px-2 py-1.5 text-[#ff3333] transition-colors hover:bg-light-5"
-          >
-            <motion.span layoutId={`${props.audioNoteId}-icon`}>
-              <Trash variant="Bold" size={16} />
-            </motion.span>
-            <motion.span layoutId={`${props.audioNoteId}-button-text`}>Delete</motion.span>
-          </motion.button>
-        )}
-      </AnimatePresence>
-    </MotionConfig>
-  )
-}
-
-function AudioNoteActions(props: {
-  audioNote: ConversationData
-  moreOptionsOpen: boolean
-  setMoreOptionsOpen: React.Dispatch<React.SetStateAction<boolean>>
-}) {
-  return (
-    <div className="flex items-center gap-1 font-medium">
-      <p
-        className={cn(
-          'text-sm text-tertiary group-hover:hidden',
-          props.moreOptionsOpen ? 'translate-x-0' : 'translate-x-7',
-        )}
+    <Tooltip content="Chat">
+      <button
+        onClick={handleAttachClick}
+        className="size-6 hidden place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:grid"
       >
-        {formatUpdatedAtDate(props.audioNote.endedAt)}
-      </p>
-      <ShareLinkAction audioNote={props.audioNote} />
-      <Popover open={props.moreOptionsOpen} onOpenChange={props.setMoreOptionsOpen}>
-        <PopoverTrigger className="size-6 invisible grid place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:visible data-[state=open]:visible data-[state=open]:bg-light-5">
-          <DotsHorizontalIcon className="size-4 text-tertiary" />
-        </PopoverTrigger>
-        <PopoverContent align="end" sideOffset={16} className="max-w-52 p-1.5 text-secondary">
-          <AttachAudioAction audioNote={props.audioNote} />
-          {/* <MergeAudioAction audioNote={props.audioNote} /> */}
-          <CopyShareLinkAction audioNote={props.audioNote} />
-          <DeleteAction audioNoteId={props.audioNote.id} moreOptionsOpen={props.moreOptionsOpen} />
-        </PopoverContent>
-      </Popover>
-    </div>
+        <MessageText variant="Bold" size={16} className="text-tertiary" />
+      </button>
+    </Tooltip>
   )
 }
 
@@ -318,7 +110,6 @@ export function AudioNotesListItem(props: { audioNote: ConversationData; listInd
   const [currentListIndex, setCurrentListIndex] = useAtom(currentListIndexAtom)
   const isActiveElement = currentListIndex === props.listIndex
   const [isMounted, setIsMounted] = useAtom(isMountedAtom)
-  const [moreOptionsOpen, setMoreOptionsOpen] = useState(false)
 
   const previewAudioNote = React.useCallback(() => {
     setSelectedAudioNote(props.audioNote)
@@ -371,11 +162,10 @@ export function AudioNotesListItem(props: { audioNote: ConversationData; listInd
         )}
         <h3 className="max-w-64 truncate tracking-tight text-primary">{formattedTitle}</h3>
       </div>
-      <AudioNoteActions
-        audioNote={props.audioNote}
-        moreOptionsOpen={moreOptionsOpen}
-        setMoreOptionsOpen={setMoreOptionsOpen}
-      />
+      <div className="flex items-center gap-2 font-medium">
+        <p className="block text-sm text-tertiary group-hover:hidden">{formatUpdatedAtDate(props.audioNote.endedAt)}</p>
+        <AttachAudioAction audioNote={props.audioNote} />
+      </div>
     </HomeFeedListItemLayout>
   )
 }
@@ -383,7 +173,7 @@ export function AudioNotesListItem(props: { audioNote: ConversationData; listInd
 export function MeetingNotesTabContent() {
   const { data, isLoading } = useAudioNotes()
   const { recentMeetingNotes, audioGroupCounts, audioGroupLabels } = React.useMemo(() => {
-    const recentMeetingNotes = data?.length && data.length > 0 ? data?.filter((audioNote) => audioNote.meeting) : []
+    const recentMeetingNotes = data?.filter((audioNote) => audioNote.meeting) ?? []
     const { groupLengths, groupLabels } = getDateGroupLengths(recentMeetingNotes)
     return { recentMeetingNotes, audioGroupCounts: groupLengths, audioGroupLabels: groupLabels }
   }, [data])
@@ -428,7 +218,7 @@ export function MeetingNotesTabContent() {
 export function AudioNotesTabContent() {
   const { data, isLoading } = useAudioNotes()
   const { recentNonMeetingNotes, audioGroupCounts, audioGroupLabels } = React.useMemo(() => {
-    const recentNonMeetingNotes = data?.length && data.length > 0 ? data?.filter((audioNote) => !audioNote.meeting) : []
+    const recentNonMeetingNotes = data?.filter((audioNote) => !audioNote.meeting) ?? []
     const { groupLengths, groupLabels } = getDateGroupLengths(recentNonMeetingNotes)
     return { recentNonMeetingNotes, audioGroupCounts: groupLengths, audioGroupLabels: groupLabels }
   }, [data])

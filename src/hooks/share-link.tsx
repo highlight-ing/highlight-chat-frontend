@@ -1,25 +1,19 @@
 'use client'
 
-import { deleteAudioNoteShareLink, generateAudioNoteShareLink } from '@/actions/share-audio-note'
 import { ChatHistoryItem } from '@/types'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { Copy } from 'iconsax-react'
-import { useSetAtom } from 'jotai'
 import { toast } from 'sonner'
 
-import { ConversationData } from '@/types/conversations'
 import { trackEvent } from '@/utils/amplitude'
-import { selectedAudioNoteAtom } from '@/atoms/side-panel'
 import { useApi } from '@/hooks/useApi'
 import { useStore } from '@/components/providers/store-provider'
 
-import { useAudioNotesStore } from './audio-notes'
 import { useChatHistoryStore } from './chat-history'
-import useAuth from './useAuth'
 
-export function useCopyChatShareLink() {
+export function useCopyLink() {
   return useMutation({
-    mutationKey: ['copy-chat-share-link'],
+    mutationKey: ['copy-share-link'],
     mutationFn: async (shareLink: string) => {
       await navigator.clipboard.writeText(`https://highlightai.com/share/${shareLink}`)
     },
@@ -31,13 +25,13 @@ export function useCopyChatShareLink() {
   })
 }
 
-export function useGenerateChatShareLink() {
+export function useGenerateShareLink() {
   const { post } = useApi()
   const setShareId = useStore((state) => state.setShareId)
   const { addOrUpdateChat } = useChatHistoryStore()
 
   return useMutation({
-    mutationKey: ['generate-chat-share-link'],
+    mutationKey: ['generate-share-link'],
     mutationFn: async (conversation: ChatHistoryItem) => {
       if (!conversation.id) return
 
@@ -71,7 +65,7 @@ export function useGenerateChatShareLink() {
       })
 
       trackEvent('HL Chat Copy Link', {
-        conversation_id: chat.id,
+        conversation_id: chat,
         share_link: `https://highlightai.com/share/${shareLink}`,
       })
 
@@ -87,13 +81,13 @@ export function useGenerateChatShareLink() {
   })
 }
 
-export function useDisableChatShareLink() {
+export function useDisableLink() {
   const { deleteRequest } = useApi()
   const setShareId = useStore((state) => state.setShareId)
   const { addOrUpdateChat } = useChatHistoryStore()
 
   return useMutation({
-    mutationKey: ['disable-chat-share-link'],
+    mutationKey: ['disable-share-link'],
     mutationFn: async (conversationId: string | undefined) => {
       if (!conversationId) return
 
@@ -120,89 +114,6 @@ export function useDisableChatShareLink() {
       console.error('Failed to disable link:', error)
 
       trackEvent('HL Chat Disable Link Error', { conversation_id: chatId, error: error })
-
-      toast.error('Could disable share links')
-    },
-  })
-}
-
-export function useCopyAudioShareLink() {
-  return useMutation({
-    mutationKey: ['copy-audio-share-link'],
-    mutationFn: async (shareLink: string) => {
-      await navigator.clipboard.writeText(shareLink)
-    },
-    onSuccess: (_, shareLink) => {
-      trackEvent('HL Chat Audio Note Copy Link', {
-        share_link: shareLink,
-      })
-    },
-  })
-}
-
-export function useGenerateAudioShareLink() {
-  const { userId } = useAuth()
-  const { updateAudioNote } = useAudioNotesStore()
-
-  return useMutation({
-    mutationKey: ['generate-chat-share-link'],
-    mutationFn: async (audioNote: ConversationData) => {
-      if (!audioNote || !userId) return
-
-      const shareLink = await generateAudioNoteShareLink(audioNote, userId)
-
-      await navigator.clipboard.writeText(shareLink)
-
-      return shareLink as string
-    },
-    onSuccess: (shareLink, audioNote) => {
-      if (!shareLink || !audioNote.id) return
-
-      // queryClient.invalidateQueries({ queryKey: ['audio-notes'] })
-      updateAudioNote({ id: audioNote.id, shareLink })
-
-      trackEvent('HL Chat Audio Note Copy Link', {
-        conversation_id: audioNote.id,
-        share_link: shareLink,
-      })
-
-      toast('Link generated and copied to clipboard', { icon: <Copy variant="Bold" size={20} /> })
-    },
-    onError: (error, audioNote) => {
-      console.error('Failed to copy link:', error)
-
-      trackEvent('HL Chat Audio Note Copy Link Error', { conversation_id: audioNote.id, error })
-
-      toast.error('Could not copy link')
-    },
-  })
-}
-
-export function useDisableAudioShareLink() {
-  const { updateAudioNote } = useAudioNotesStore()
-
-  return useMutation({
-    mutationKey: ['disable-audio-share-link'],
-    mutationFn: async (audioNote: ConversationData) => {
-      if (!audioNote) return
-
-      const updatedAudioNote = await deleteAudioNoteShareLink(audioNote)
-
-      return updatedAudioNote
-    },
-    onSuccess: (updatedAudioNote) => {
-      if (!updatedAudioNote?.id) return
-
-      updateAudioNote({ id: updatedAudioNote.id, shareLink: '' })
-
-      trackEvent('HL Chat Audio Note Disable Link', { conversation_id: updatedAudioNote.id })
-
-      toast('Share links disabled')
-    },
-    onError: (error, audioNote) => {
-      console.error('Failed to disable link:', error)
-
-      trackEvent('HL Chat Audio Note Disable Link Error', { conversation_id: audioNote, error: error })
 
       toast.error('Could disable share links')
     },

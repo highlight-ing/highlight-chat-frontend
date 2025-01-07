@@ -2,6 +2,7 @@
 
 import { ChatHistoryItem } from '@/types'
 import { InfiniteData, useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useAtomValue } from 'jotai'
 
 import { HistoryByIdResponseData, HistoryResponseData } from '@/types/history'
 import { PAGINATION_LIMIT } from '@/lib/constants'

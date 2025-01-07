@@ -3,8 +3,10 @@ import Highlight from '@highlight-ai/app-runtime'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { ConversationData } from '@/types/conversations'
+import { useAudioPermission } from '@/hooks/useAudioPermission'
 
 const POLL_MIC_ACTIVITY = 300
+const AUDIO_ENABLED_KEY = 'audioEnabled'
 
 interface ConversationContextType {
   conversations: ConversationData[]
@@ -37,15 +39,6 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [isAudioTranscripEnabled, setIsAudioTranscripEnabled] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const queryClient = useQueryClient()
-
-  const fetchLatestData = useCallback(async () => {
-    const allConversations = await Highlight.conversations.getAllConversations()
-    setConversations(allConversations)
-    const currentConv = await Highlight.conversations.getCurrentConversation()
-    setCurrentConversation(currentConv)
-    const elapsedTime = await Highlight.conversations.getElapsedTime()
-    setElapsedTime(elapsedTime)
-  }, [])
 
   const setupListeners = useCallback(() => {
     const removeCurrentConversationListener = Highlight.app.addListener(
@@ -125,7 +118,7 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       removeConversationSavedListener()
       removeAudioPermissionListener()
     }
-  }, [isAudioTranscripEnabled, queryClient, fetchLatestData])
+  }, [isAudioTranscripEnabled])
 
   useEffect(() => {
     const removeListeners = setupListeners()
@@ -142,6 +135,15 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     getInitialAudioTranscriptEnabled()
   }, [])
 
+  const fetchLatestData = useCallback(async () => {
+    const allConversations = await Highlight.conversations.getAllConversations()
+    setConversations(allConversations)
+    const currentConv = await Highlight.conversations.getCurrentConversation()
+    setCurrentConversation(currentConv)
+    const elapsedTime = await Highlight.conversations.getElapsedTime()
+    setElapsedTime(elapsedTime)
+  }, [])
+
   useEffect(() => {
     const fetchInitialData = async () => {
       await fetchLatestData()
@@ -156,7 +158,7 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const pollMicActivity = useCallback(async () => {
     const activity = await Highlight.user.getMicActivity(POLL_MIC_ACTIVITY)
     setMicActivity(activity)
-  }, [])
+  }, [isAudioTranscripEnabled])
 
   useEffect(() => {
     const intervalId = setInterval(pollMicActivity, POLL_MIC_ACTIVITY)
