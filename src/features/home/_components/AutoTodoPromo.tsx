@@ -38,7 +38,13 @@ export default function AutoTodoPromo() {
     return null
   }
 
+  const handleDismissClick = async () => {
+    Highlight.reporting.trackEvent('autotask_dismiss_clicked')
+    setIsDismissed(true)
+  }
+
   const handleLearnMoreClick = async () => {
+    Highlight.reporting.trackEvent('autotask_learn_more_clicked')
     try {
       console.log('open app')
       await Highlight.app.installApp(appId)
@@ -69,7 +75,7 @@ export default function AutoTodoPromo() {
           <Button
             size="small"
             variant="tertiary"
-            onClick={() => setIsDismissed(true)}
+            onClick={handleDismissClick}
           >
             Dismiss
           </Button>
