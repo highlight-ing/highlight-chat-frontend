@@ -12,24 +12,42 @@ export default function AutoTodoPromo() {
 
   useEffect(() => {
     async function checkReleaseChannel() {
-      const channel = await Highlight.app.getReleaseChannel()
-      setIsAlphaChannel(channel === 'alpha')
+      try {
+        if (Highlight.app?.getReleaseChannel) {
+          const channel = await Highlight.app.getReleaseChannel()
+          setIsAlphaChannel(channel === 'alpha')
+        }
+      } catch (error) {
+        console.debug('Release channel check failed:', error)
+      }
     }
     checkReleaseChannel()
   }, [])
 
   useEffect(() => {
     async function checkIsInstalled() {
-      const isInstalled = await Highlight.app.isAppInstalled(appId)
-      setIsInstalled(isInstalled)
+      try {
+        if (Highlight.app?.isAppInstalled) {
+          const isInstalled = await Highlight.app.isAppInstalled(appId)
+          setIsInstalled(isInstalled)
+        }
+      } catch (error) {
+        console.debug('Install check failed:', error)
+      }
     }
     checkIsInstalled()
   }, [])
 
   useEffect(() => {
     async function checkCanRunSlm() {
-      const canRunSlm = await Highlight.inference.isSlmCapable()
-      setCanRunSlm(canRunSlm)
+      try {
+        if (Highlight.inference?.isSlmCapable) {
+          const canRunSlm = await Highlight.inference.isSlmCapable()
+          setCanRunSlm(canRunSlm)
+        }
+      } catch (error) {
+        console.debug('SLM capability check failed:', error)
+      }
     }
     checkCanRunSlm()
   }, [])
@@ -39,17 +57,18 @@ export default function AutoTodoPromo() {
   }
 
   const handleDismissClick = async () => {
-    Highlight.reporting.trackEvent('autotask_dismiss_clicked')
+    Highlight.reporting?.trackEvent?.('autotask_dismiss_clicked')
     setIsDismissed(true)
   }
 
   const handleLearnMoreClick = async () => {
-    Highlight.reporting.trackEvent('autotask_learn_more_clicked')
+    Highlight.reporting?.trackEvent?.('autotask_learn_more_clicked')
     try {
-      console.log('open app')
-      await Highlight.app.installApp(appId)
-      await Highlight.app.openApp(appId)
-      setIsInstalled(true)
+      if (Highlight.app?.installApp && Highlight.app?.openApp) {
+        await Highlight.app.installApp(appId)
+        await Highlight.app.openApp(appId)
+        setIsInstalled(true)
+      }
     } catch (error) {
       console.error('Failed to open autotask app:', error)
     }
