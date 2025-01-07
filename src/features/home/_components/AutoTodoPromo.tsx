@@ -7,6 +7,7 @@ export default function AutoTodoPromo() {
   const [isDismissed, setIsDismissed] = useState(false)
   const [isAlphaChannel, setIsAlphaChannel] = useState(false)
   const [isInstalled, setIsInstalled] = useState(false)
+  const [canRunSlm, setCanRunSlm] = useState(false)
   const appId = 'autotask'
 
   useEffect(() => {
@@ -25,7 +26,15 @@ export default function AutoTodoPromo() {
     checkIsInstalled()
   }, [])
 
-  if (isDismissed || !isAlphaChannel || isInstalled) {
+  useEffect(() => {
+    async function checkCanRunSlm() {
+      const canRunSlm = await Highlight.inference.isSlmCapable()
+      setCanRunSlm(canRunSlm)
+    }
+    checkCanRunSlm()
+  }, [])
+
+  if (isDismissed || !isAlphaChannel || isInstalled || !canRunSlm) {
     return null
   }
 
