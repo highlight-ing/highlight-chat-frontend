@@ -1,5 +1,5 @@
 import React from 'react'
-import { Global } from 'iconsax-react'
+import { Category, Global } from 'iconsax-react'
 
 import { PromptWithTags } from '@/types/supabase-helpers'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -9,14 +9,17 @@ import { useApplications } from '../../_hooks/use-applications'
 import { EmptyState } from './empty-state'
 import { ShortcutItem } from './shortcut-item'
 
-export interface ShortcutsListProps {
-  selectedNavItem?: {
-    type: 'application' | 'tag' | 'global'
-    id: string
-  }
+type NavItemType = 'all' | 'unassigned' | 'application' | 'global' | 'app-based'
+type NavItem = {
+  type: NavItemType
+  id: string
+}
+
+interface ShortcutsListProps {
   shortcuts: PromptWithTags[]
-  isLoading?: boolean
-  onSelectShortcut?: (shortcutId: string) => void
+  isLoading: boolean
+  selectedNavItem: NavItem
+  onSelectShortcut: (shortcutId: string) => void
 }
 
 export function ShortcutsList({ selectedNavItem, shortcuts, isLoading, onSelectShortcut }: ShortcutsListProps) {
@@ -25,11 +28,49 @@ export function ShortcutsList({ selectedNavItem, shortcuts, isLoading, onSelectS
 
   const getSelectedAppIcon = () => {
     if (!selectedNavItem) return null
-    if (selectedNavItem.type === 'global') {
-      return <Global variant="Bold" size={24} />
+    switch (selectedNavItem.type) {
+      case 'all':
+        return
+      case 'global':
+        return
+      case 'unassigned':
+        return
+      case 'app-based':
+        return
+      case 'application':
+        const app = applications.find((a) => a.id === selectedNavItem.id)
+        return app?.icon && React.createElement(app.icon, { size: 24 })
     }
-    const app = applications.find((a) => a.id === selectedNavItem.id)
-    return app?.icon && React.createElement(app.icon, { size: 24 })
+  }
+
+  const getHeaderTitle = () => {
+    switch (selectedNavItem.type) {
+      case 'all':
+        return 'All Shortcuts'
+      case 'global':
+        return 'Global Shortcuts'
+      case 'unassigned':
+        return 'Unassigned Shortcuts'
+      case 'app-based':
+        return 'App Based Shortcuts'
+      case 'application':
+        return `${selectedNavItem.id}`
+    }
+  }
+
+  const getHeaderDescription = () => {
+    switch (selectedNavItem.type) {
+      case 'all':
+        return 'All available shortcuts'
+      case 'global':
+        return 'Shortcuts that work across all applications'
+      case 'unassigned':
+        return 'Shortcuts not assigned to any application'
+      case 'app-based':
+        return 'Shortcuts configured for specific applications'
+      case 'application':
+        return `Shortcuts specific to ${selectedNavItem.id}`
+    }
   }
 
   if (isLoading) {
@@ -45,40 +86,30 @@ export function ShortcutsList({ selectedNavItem, shortcuts, isLoading, onSelectS
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="p-4 space-y-2 border-b border-[#ffffff0d]">
+      <div className=" p-6 space-y-2 border-b border-[#ffffff0d]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            {selectedNavItem && (
+            {selectedNavItem.type === 'application' && (
               <div
-                className={`flex items-center justify-center h-7 w-7 rounded-md p-1.5 ${
-                  selectedNavItem.type === 'application' ? 'border border-[0.25px] border-[#333333]' : 'p-1'
-                }`}
+                className="flex items-center justify-center h-6 w-6 rounded-md p-1 border border-[0.25px] border-[#333333]"
                 style={{
-                  background:
-                    selectedNavItem.type === 'application'
+                  background: (() => {
+                    const app = applications.find((a) => a.id === selectedNavItem.id)
+                    return app?.theme === 'dark'
                       ? 'linear-gradient(139deg, #333 3.52%, #161818 51.69%)'
-                      : undefined,
+                      : 'linear-gradient(139deg, #FFFFFF 3.52%, #E5E5E5 51.69%)'
+                  })(),
                 }}
               >
                 {getSelectedAppIcon()}
               </div>
             )}
-            <h2 className="text-[15px] font-semibold text-white leading-5 tracking-[-0.225px]">
-              {selectedNavItem?.type === 'application'
-                ? `${selectedNavItem.id} Shortcuts`
-                : selectedNavItem?.type === 'tag'
-                  ? `#${selectedNavItem.id}`
-                  : 'Global Shortcuts'}
+            <h2 className="text-[15px] font-medium text-light-90 leading-5 tracking-[-0.225px] h-6 flex items-center">
+              {getHeaderTitle()}
             </h2>
           </div>
         </div>
-        <p className="text-sm text-light-40 leading-5">
-          {selectedNavItem?.type === 'application'
-            ? `Shortcuts specific to ${selectedNavItem.id}`
-            : selectedNavItem?.type === 'tag'
-              ? `Shortcuts tagged with #${selectedNavItem.id}`
-              : 'Shortcuts that work across all applications'}
-        </p>
+        {/* <p className="text-sm text-light-40 leading-5">{getHeaderDescription()}</p> */}
       </div>
 
       {/* Shortcuts List */}

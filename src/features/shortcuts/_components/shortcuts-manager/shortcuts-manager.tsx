@@ -11,18 +11,18 @@ import { ShortcutEditor } from '../shortcut-editor'
 import { ShortcutsList } from '../shortcuts-list'
 import { ShortcutsNavigation } from '../shortcuts-navigation'
 
+type NavItemType = 'all' | 'unassigned' | 'application' | 'global' | 'app-based'
+type NavItem = {
+  type: NavItemType
+  id: string
+}
+
 export function ShortcutsManager() {
   const { getAccessToken } = useAuth()
 
-  const [selectedNavItem, setSelectedNavItem] = useState<
-    | {
-        type: 'application' | 'tag' | 'global'
-        id: string
-      }
-    | undefined
-  >({
-    type: 'global',
-    id: 'global',
+  const [selectedNavItem, setSelectedNavItem] = useState<NavItem>({
+    type: 'all',
+    id: 'all',
   })
 
   const [selectedShortcut, setSelectedShortcut] = useState<string | undefined>()
@@ -47,9 +47,12 @@ export function ShortcutsManager() {
         throw new Error('Failed to fetch shortcuts')
       }
 
-      // Combine and deduplicate shortcuts
+      // Combine and deduplicate shortcuts, marking user-created ones
+      const createdSet = new Set((created || []).map((shortcut) => shortcut.id))
       const combined = [...(created || []), ...(pinned || [])]
-      const deduplicated = Array.from(new Map(combined.map((item) => [item.id, item])).values())
+      const deduplicated = Array.from(
+        new Map(combined.map((item) => [item.id, { ...item, isUserCreated: createdSet.has(item.id) }])).values(),
+      )
 
       console.log('Combined and deduplicated shortcuts:', deduplicated)
       console.groupEnd()
@@ -92,89 +95,110 @@ export function ShortcutsManager() {
       return []
     }
 
-    if (!selectedNavItem) {
-      console.log('No nav item selected, returning all shortcuts')
-      console.groupEnd()
-      return shortcuts
-    }
+    switch (selectedNavItem.type) {
+      case 'all':
+        console.log('Showing all shortcuts')
+        console.groupEnd()
+        return shortcuts
 
-    if (selectedNavItem.type === 'global') {
-      // Show shortcuts that either have no external_id or have preferences marked as global ('*')
-      const filtered = shortcuts.filter(
-        (shortcut) =>
-          !shortcut.external_id ||
-          preferences?.some(
-            (pref) =>
-              pref.prompt_id === shortcut.id &&
-              (pref.application_name_darwin === '*' || pref.application_name_win32 === '*'),
-          ),
-      )
-      console.log('Filtered global shortcuts:', filtered)
-      console.groupEnd()
-      return filtered
-    }
+      case 'app-based':
+        const appBasedShortcuts = shortcuts.filter((shortcut) =>
+          preferences?.some((pref) => {
+            if (pref.prompt_id !== shortcut.id) return false
 
-    if (selectedNavItem.type === 'application' && preferences) {
-      const appName = selectedNavItem.id
-      console.log('Filtering for application:', appName)
+            // Check if the shortcut has any app preferences
+            const hasAppPreferences =
+              (pref.application_name_darwin && pref.application_name_darwin !== '*') ||
+              (pref.application_name_win32 && pref.application_name_win32 !== '*')
 
-      const filtered = shortcuts.filter((shortcut) =>
-        preferences.some((pref: AppShortcutPreferences) => {
-          // Check if the preference is for this shortcut
-          if (pref.prompt_id !== shortcut.id) return false
+            return hasAppPreferences
+          }),
+        )
+        console.log('Filtered app-based shortcuts:', appBasedShortcuts)
+        console.groupEnd()
+        return appBasedShortcuts
 
-          // Handle darwin (Mac) applications
-          let darwinApps: string[] = []
-          if (pref.application_name_darwin === '*') {
-            darwinApps = ['*']
-          } else if (pref.application_name_darwin) {
-            try {
-              darwinApps = JSON.parse(pref.application_name_darwin)
-            } catch (e) {
-              console.error('Error parsing darwin apps:', e)
+      case 'global':
+        const globalShortcuts = shortcuts.filter(
+          (shortcut) =>
+            !shortcut.external_id ||
+            preferences?.some(
+              (pref) =>
+                pref.prompt_id === shortcut.id &&
+                (pref.application_name_darwin === '*' || pref.application_name_win32 === '*'),
+            ),
+        )
+        console.log('Filtered global shortcuts:', globalShortcuts)
+        console.groupEnd()
+        return globalShortcuts
+
+      case 'unassigned':
+        const unassignedShortcuts = shortcuts.filter(
+          (shortcut) => !preferences?.some((pref) => pref.prompt_id === shortcut.id),
+        )
+        console.log('Filtered unassigned shortcuts:', unassignedShortcuts)
+        console.groupEnd()
+        return unassignedShortcuts
+
+      case 'application':
+        if (!preferences) {
+          console.log('No preferences available for application filtering')
+          console.groupEnd()
+          return []
+        }
+        const appName = selectedNavItem.id
+        console.log('Filtering for application:', appName)
+
+        const appShortcuts = shortcuts.filter((shortcut) =>
+          preferences.some((pref: AppShortcutPreferences) => {
+            if (pref.prompt_id !== shortcut.id) return false
+
+            let darwinApps: string[] = []
+            if (pref.application_name_darwin) {
+              try {
+                darwinApps = JSON.parse(pref.application_name_darwin)
+              } catch (e) {
+                console.error('Error parsing darwin apps:', e)
+              }
             }
-          }
 
-          // Handle win32 (Windows) applications
-          let win32Apps: string[] = []
-          if (pref.application_name_win32 === '*') {
-            win32Apps = ['*']
-          } else if (pref.application_name_win32) {
-            try {
-              win32Apps = JSON.parse(pref.application_name_win32)
-            } catch (e) {
-              console.error('Error parsing win32 apps:', e)
+            let win32Apps: string[] = []
+            if (pref.application_name_win32) {
+              try {
+                win32Apps = JSON.parse(pref.application_name_win32)
+              } catch (e) {
+                console.error('Error parsing win32 apps:', e)
+              }
             }
-          }
 
-          const matches = darwinApps.includes(appName) || win32Apps.includes(appName)
+            const matches = darwinApps.includes(appName) || win32Apps.includes(appName)
 
-          console.log('Checking shortcut:', {
-            shortcutId: shortcut.id,
-            shortcutName: shortcut.name,
-            prefPromptId: pref.prompt_id,
-            darwinApps,
-            win32Apps,
-            appName,
-            matches,
-          })
+            console.log('Checking shortcut:', {
+              shortcutId: shortcut.id,
+              shortcutName: shortcut.name,
+              prefPromptId: pref.prompt_id,
+              darwinApps,
+              win32Apps,
+              appName,
+              matches,
+            })
 
-          return matches
-        }),
-      )
+            return matches
+          }),
+        )
 
-      console.log('Filtered application shortcuts:', filtered)
-      console.groupEnd()
-      return filtered
+        console.log('Filtered application shortcuts:', appShortcuts)
+        console.groupEnd()
+        return appShortcuts
+
+      default:
+        console.log('No filtering applied, returning all shortcuts')
+        console.groupEnd()
+        return shortcuts
     }
-
-    console.log('No filtering applied, returning all shortcuts')
-    console.groupEnd()
-    return shortcuts
   }, [shortcuts, preferences, selectedNavItem])
 
-  // Reset selected shortcut when navigation changes
-  const handleNavChange = (navItem: { type: 'application' | 'tag' | 'global'; id: string }) => {
+  const handleNavChange = (navItem: NavItem) => {
     console.log('Navigation changed:', navItem)
     setSelectedShortcut(undefined)
     setSelectedNavItem(navItem)
@@ -196,7 +220,12 @@ export function ShortcutsManager() {
   return (
     <div className="flex w-full h-[calc(100vh-48px)] mt-[48px]">
       <div className="w-96 border-r border-[#ffffff0d]">
-        <ShortcutsNavigation selectedNavItem={selectedNavItem} onSelectNavItem={handleNavChange} />
+        <ShortcutsNavigation
+          selectedNavItem={selectedNavItem}
+          onSelectNavItem={handleNavChange}
+          shortcuts={shortcuts || []}
+          preferences={preferences}
+        />
       </div>
       <div className="w-full border-r border-[#ffffff0d]">
         <ShortcutsList

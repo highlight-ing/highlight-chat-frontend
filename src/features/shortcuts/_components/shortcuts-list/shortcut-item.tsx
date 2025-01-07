@@ -1,10 +1,13 @@
 import { Command } from 'iconsax-react'
 
 import { PromptWithTags } from '@/types/supabase-helpers'
+import { Tooltip } from '@/components/ui/tooltip'
+import Button from '@/components/Button/Button'
+import { UserCreatedShortcutIcon } from '@/components/icons'
 import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
 
 interface ShortcutItemProps {
-  shortcut: PromptWithTags
+  shortcut: PromptWithTags & { isUserCreated?: boolean }
   onClick?: (shortcutId: string) => void
 }
 
@@ -14,10 +17,10 @@ export function ShortcutItem({ shortcut, onClick }: ShortcutItemProps) {
   return (
     <div
       onClick={() => onClick?.(shortcut.id.toString())}
-      className="p-4 rounded-lg border border-[#ffffff0d] hover:bg-[#ffffff05] cursor-pointer"
+      className=" hover:bg-[#ffffff05] cursor-pointer rounded-md  px-3 py-2 cursor-pointer hover:bg-light-5"
     >
       <div className="flex items-center gap-3">
-        <div className="flex items-center justify-center w-8 h-8 rounded-md bg-[#ffffff08]">
+        <div className="flex items-center justify-center rounded-full bg-[#ffffff08]">
           {hasCustomIcon ? (
             <PromptAppIcon
               height={24}
@@ -27,13 +30,27 @@ export function ShortcutItem({ shortcut, onClick }: ShortcutItemProps) {
               className="flex-shrink-0"
             />
           ) : (
-            <Command size={24} className="text-white" />
+            <div className="flex items-center justify-center rounded-full bg-[#ffffff08] w-6 h-6">
+              <Command size={12} className="text-light-60" />
+            </div>
           )}
         </div>
         <div className="flex-1">
-          <h3 className="text-sm font-medium text-white">{shortcut.name}</h3>
+          <h3 className="text-base font-base text-white">{shortcut.name}</h3>
           {/* {shortcut.description && <p className="text-sm text-light-40 mt-1">{shortcut.description}</p>} */}
         </div>
+        {shortcut.isUserCreated && (
+          <Tooltip content="User created shortcut">
+            <div
+              role="button"
+              tabIndex={0}
+              className="flex items-center justify-center w-6 h-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <UserCreatedShortcutIcon />
+            </div>
+          </Tooltip>
+        )}
       </div>
     </div>
   )

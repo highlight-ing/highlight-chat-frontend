@@ -21,18 +21,18 @@ export type Application = {
 }
 
 const MOCK_APPLICATIONS: Application[] = [
-  { displayName: 'Slack', id: 'Slack', icon: SlackIcon, theme: 'dark', description: 'Manage Slack shortcuts' },
+  { displayName: 'Slack', id: 'Slack', icon: SlackIcon, theme: 'light', description: 'Manage Slack shortcuts' },
   { displayName: 'Cursor', id: 'Cursor', icon: CursorIcon, theme: 'dark', description: 'Manage Cursor shortcuts' },
-  { displayName: 'VS Code', id: 'VS Code', icon: VSCodeIcon, theme: 'dark', description: 'Manage VS Code shortcuts' },
+  { displayName: 'VS Code', id: 'VS Code', icon: VSCodeIcon, theme: 'light', description: 'Manage VS Code shortcuts' },
   {
     displayName: 'Chrome',
     id: 'Google Chrome',
     icon: ChromeIcon,
-    theme: 'dark',
+    theme: 'light',
     description: 'Manage Chrome shortcuts',
   },
-  { displayName: 'Notion', id: 'Notion', icon: NotionIcon, theme: 'dark', description: 'Manage Notion shortcuts' },
-  { displayName: 'Safari', id: 'Safari', icon: SafariIcon, theme: 'dark', description: 'Manage Safari shortcuts' },
+  { displayName: 'Notion', id: 'Notion', icon: NotionIcon, theme: 'light', description: 'Manage Notion shortcuts' },
+  { displayName: 'Safari', id: 'Safari', icon: SafariIcon, theme: 'light', description: 'Manage Safari shortcuts' },
   { displayName: 'Discord', id: 'Discord', icon: DiscordIcon, theme: 'dark', description: 'Manage Discord shortcuts' },
   { displayName: 'Figma', id: 'Figma', icon: FigmaIcon, theme: 'dark', description: 'Manage Figma shortcuts' },
 ]
