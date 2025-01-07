@@ -29,7 +29,7 @@ export function useRecentActions() {
         type: 'audio-note' as const,
       })) ?? []
 
-    return [...allChats, ...audioNotes].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
+    return [...allChats, ...audioNotes].sort((a, b) => b.updatedAt?.getTime() - a.updatedAt?.getTime())
   }, [historyQuery.data?.pages, audioQuery.data])
 
   const fetchNextPage = React.useCallback(async () => {
