@@ -11,6 +11,7 @@ import { useStore } from '@/components/providers/store-provider'
 import { chatInputIsFocusedAtom } from '../atoms'
 import { ChatInput } from '../chat-input/chat-input'
 import { HomeFeed } from '../home-feed/components/home-feed'
+import AutoTodoPromo from './AutoTodoPromo'
 
 function InputHeading() {
   const { promptName, promptDescription } = useStore(
@@ -72,6 +73,7 @@ export function ChatHome() {
           <InputHeading />
           <ChatInput />
         </div>
+        <AutoTodoPromo />
         <HomeFeed />
       </div>
       <ChatFocusedOverlay />
