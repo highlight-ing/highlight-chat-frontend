@@ -12,6 +12,7 @@ import { useShallow } from 'zustand/react/shallow'
 import { ConversationData } from '@/types/conversations'
 import { cn, getDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
+import { isAlpha } from '@/utils/appVersion'
 import { formatTitle } from '@/utils/conversations'
 import { homeSidePanelOpenAtom, selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
 import { useAudioNotes, useDeleteAudioNote } from '@/hooks/audio-notes'
@@ -129,7 +130,7 @@ function AttachAudioAction(props: { audioNote: ConversationData }) {
 }
 
 function MergeAudioAction(props: { audioNote: ConversationData }) {
-  function handleMergeClick() {}
+  function handleMergeClick() { }
 
   return (
     <button
@@ -294,7 +295,7 @@ function AudioNoteActions(props: {
       >
         {formatUpdatedAtDate(props.audioNote.endedAt)}
       </p>
-      <ShareLinkAction audioNote={props.audioNote} />
+      {isAlpha && <ShareLinkAction audioNote={props.audioNote} />}
       <Popover open={props.moreOptionsOpen} onOpenChange={props.setMoreOptionsOpen}>
         <PopoverTrigger className="size-6 invisible grid place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:visible data-[state=open]:visible data-[state=open]:bg-light-5">
           <DotsHorizontalIcon className="size-4 text-tertiary" />
@@ -302,7 +303,7 @@ function AudioNoteActions(props: {
         <PopoverContent align="end" sideOffset={16} className="max-w-52 p-1.5 text-secondary">
           <AttachAudioAction audioNote={props.audioNote} />
           {/* <MergeAudioAction audioNote={props.audioNote} /> */}
-          <CopyShareLinkAction audioNote={props.audioNote} />
+          {isAlpha && <CopyShareLinkAction audioNote={props.audioNote} />}
           <DeleteAction audioNoteId={props.audioNote.id} moreOptionsOpen={props.moreOptionsOpen} />
         </PopoverContent>
       </Popover>

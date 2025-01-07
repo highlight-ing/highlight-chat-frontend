@@ -6,6 +6,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 import { ConversationData } from '@/types/conversations'
 import { cn } from '@/lib/utils'
+import { isAlpha } from '@/utils/appVersion'
 import { formatTitle } from '@/utils/conversations'
 import { selectedAudioNoteAtom, showBackButtonAtom, sidePanelContentTypeAtom } from '@/atoms/side-panel'
 import { useGenerateAudioShareLink } from '@/hooks/share-link'
@@ -193,7 +194,7 @@ export function AudioNoteSidePanelHeader() {
         <SidePanelHeaderActions>
           <ChatAction />
           <CopyAction />
-          <ShareAction />
+          {isAlpha && <ShareAction />}
         </SidePanelHeaderActions>
       </div>
     </div>
