@@ -43,7 +43,7 @@ export function ShortcutPreview({ shortcutId, shortcuts, preferences, isLoading 
 
   return (
     <div className="flex flex-col h-full">
-      <div className="p-6 border-b border-[#ffffff0d]">
+      <div className="p-6 border-b border-[#ffffff0d] flex-shrink-0">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             {hasCustomIcon ? (
@@ -81,7 +81,7 @@ export function ShortcutPreview({ shortcutId, shortcuts, preferences, isLoading 
         )}
       </div>
 
-      <div className="p-6">
+      <div className="p-6 overflow-y-auto">
         <div className="flex flex-col gap-6">
           {preferences?.some((pref) => pref.prompt_id === shortcut.id) && (
             <div className="flex flex-col gap-4">

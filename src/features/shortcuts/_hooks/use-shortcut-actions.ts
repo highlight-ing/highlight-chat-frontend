@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import useAuth from '@/hooks/useAuth'
 
 import { deleteShortcut } from '../_actions/deleteShortcut'
+import { deleteShortcutPreferencesById } from '../_actions/deleteShortcutPreferencesById'
 import { pinShortcut as pinShortcutAction } from '../_actions/pinShortcut'
 import { unpinShortcut as unpinShortcutAction } from '../_actions/unpinShortcut'
 
@@ -33,10 +34,12 @@ export function useShortcutActions() {
   const deleteShortcutMutation = useMutation({
     mutationFn: async (promptId: number) => {
       const token = await getAccessToken()
+      await deleteShortcutPreferencesById(promptId, token)
       return deleteShortcut(promptId, token)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['shortcuts'] })
+      queryClient.invalidateQueries({ queryKey: ['user-shortcut-preferences'] })
     },
   })
 
