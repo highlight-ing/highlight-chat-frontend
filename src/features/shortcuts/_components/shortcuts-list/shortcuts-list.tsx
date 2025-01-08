@@ -1,8 +1,9 @@
 import React from 'react'
-import { Category, Global } from 'iconsax-react'
+import { Category, Global, Grid1 } from 'iconsax-react'
 
 import { PromptWithTags } from '@/types/supabase-helpers'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useStore } from '@/components/providers/store-provider'
 
 import { useApplications } from '../../_hooks/use-applications'
@@ -23,6 +24,38 @@ interface ShortcutsListProps {
   onSelectShortcut: (shortcutId: string) => void
 }
 
+function ShortcutsListLoader() {
+  return (
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="px-2 pt-5">
+        <div className="flex items-center justify-between border-b border-[#ffffff0d] pb-5 h-[52px]">
+          <div className="flex items-center gap-2 px-3">
+            <Skeleton className="h-[17px] w-[17px] rounded-md" />
+            <Skeleton className="h-4 w-32" />
+          </div>
+        </div>
+      </div>
+
+      {/* Shortcuts List */}
+      <ScrollArea className="flex-1 h-full">
+        <div className="p-2 space-y-1">
+          {[...Array(8)].map((_, i) => (
+            <div
+              key={i}
+              className={`flex items-center gap-3 px-3 py-2 ${i >= 4 ? `opacity-${100 - (i - 3) * 20}` : ''}`}
+            >
+              <Skeleton className="h-6 w-6 rounded-full" />
+              <Skeleton className="h-[18px] flex-1 w-full" />
+              <Skeleton className="h-6 w-6 rounded-lg" />
+            </div>
+          ))}
+        </div>
+      </ScrollArea>
+    </div>
+  )
+}
+
 export function ShortcutsList({
   selectedNavItem,
   shortcuts,
@@ -33,20 +66,17 @@ export function ShortcutsList({
   const openModal = useStore((state) => state.openModal)
   const { applications } = useApplications()
 
-  const getSelectedAppIcon = () => {
-    if (!selectedNavItem) return null
+  const getHeaderIcon = () => {
     switch (selectedNavItem.type) {
       case 'all':
-        return
+        return <Grid1 size={17} className="text-gray-500" variant="Bold" />
       case 'global':
-        return
-      case 'unassigned':
-        return
-      case 'app-based':
-        return
+        return <Global size={17} className="text-gray-500" variant="Bold" />
       case 'application':
         const app = applications.find((a) => a.id === selectedNavItem.id)
         return app?.icon && React.createElement(app.icon, { size: 24 })
+      default:
+        return null
     }
   }
 
@@ -81,24 +111,17 @@ export function ShortcutsList({
   }
 
   if (isLoading) {
-    return (
-      <div className="flex flex-col h-full">
-        <div className="p-4">
-          <p className="text-sm text-light-40">Loading shortcuts...</p>
-        </div>
-      </div>
-    )
+    return <ShortcutsListLoader />
   }
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className=" p-6 space-y-2 border-b border-[#ffffff0d]">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {selectedNavItem.type === 'application' && (
+      <div className="px-2 pt-5">
+        <div className="flex items-center justify-between border-b border-[#ffffff0d] pb-5 h-[52px]">
+          <div className="flex items-center gap-2 px-3">
+            {selectedNavItem.type === 'application' ? (
               <div
-                className="flex items-center justify-center h-6 w-6 rounded-md p-1 border border-[0.25px] border-[#333333]"
+                className="flex items-center justify-center h-5 w-5 rounded-md p-0.5 border border-[0.25px] border-[#333333]"
                 style={{
                   background: (() => {
                     const app = applications.find((a) => a.id === selectedNavItem.id)
@@ -108,20 +131,19 @@ export function ShortcutsList({
                   })(),
                 }}
               >
-                {getSelectedAppIcon()}
+                {getHeaderIcon()}
               </div>
+            ) : (
+              getHeaderIcon()
             )}
-            <h2 className="text-[15px] font-medium text-light-90 leading-5 tracking-[-0.225px] h-6 flex items-center">
-              {getHeaderTitle()}
-            </h2>
+            <h2 className="text-sm font-medium text-light-90 select-none">{getHeaderTitle()}</h2>
           </div>
         </div>
-        {/* <p className="text-sm text-light-40 leading-5">{getHeaderDescription()}</p> */}
       </div>
 
       {/* Shortcuts List */}
-      <ScrollArea className="flex-1 h-full">
-        <div className="p-4 space-y-1 h-full">
+      <ScrollArea className="flex-1 h-full ">
+        <div className="p-2 space-y-1 h-full">
           {shortcuts.length === 0 ? (
             <EmptyState selectedNavItem={selectedNavItem} />
           ) : (

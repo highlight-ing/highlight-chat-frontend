@@ -281,7 +281,7 @@ export function ShortcutsManager() {
 
   return (
     <div className="flex w-full h-[calc(100vh-48px)] mt-[48px]">
-      <div className="w-[280px] flex-shrink-0 border-r border-[#ffffff0d]">
+      <div className="w-[244px] flex-shrink-0 border-r border-[#ffffff0d]">
         <ShortcutsNavigation
           selectedNavItem={selectedNavItem}
           onSelectNavItem={handleNavChange}
