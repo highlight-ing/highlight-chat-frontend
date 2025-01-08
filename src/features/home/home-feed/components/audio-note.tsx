@@ -17,6 +17,7 @@ import { formatTitle } from '@/utils/conversations'
 import { homeSidePanelOpenAtom, selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
 import { useAudioNotes, useDeleteAudioNote } from '@/hooks/audio-notes'
 import { useCopyAudioShareLink, useGenerateAudioShareLink } from '@/hooks/share-link'
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Switch } from '@/components/ui/switch'
 import Button from '@/components/Button/Button'
@@ -314,6 +315,7 @@ export function AudioNotesListItem(props: { audioNote: ConversationData; listInd
   const [currentListIndex, setCurrentListIndex] = useAtom(currentListIndexAtom)
   const isActiveElement = currentListIndex === props.listIndex
   const [isMounted, setIsMounted] = useAtom(isMountedAtom)
+  const focusInput = useInputFocus()
 
   const previewAudioNote = React.useCallback(() => {
     setSelectedAudioNote(props.audioNote)
@@ -356,18 +358,40 @@ export function AudioNotesListItem(props: { audioNote: ConversationData; listInd
     return () => window.removeEventListener('keydown', handleEnterKeyPress)
   }, [isActiveElement, handleClick])
 
+  const handleDelayInputFocusClick = React.useCallback(() => {
+    const timeout = setTimeout(() => {
+      focusInput()
+    }, 100)
+
+    return () => {
+      if (timeout) clearTimeout(timeout)
+    }
+  }, [focusInput])
+
   return (
-    <HomeFeedListItemLayout onClick={handleClick} className={cn('justify-between', isActiveElement && 'bg-hover')}>
-      <div className="flex items-center gap-2 font-medium">
-        {props.audioNote?.meeting ? (
-          <MeetingIcon meeting={props.audioNote.meeting} size={20} />
-        ) : (
-          <VoiceSquare size={20} variant="Bold" className="text-green" />
-        )}
-        <h3 className="max-w-64 truncate tracking-tight text-primary">{formattedTitle}</h3>
-      </div>
-      <AudioNoteActions audioNote={props.audioNote} />
-    </HomeFeedListItemLayout>
+    <ContextMenu>
+      <ContextMenuTrigger asChild>
+        <HomeFeedListItemLayout onClick={handleClick} className={cn('justify-between', isActiveElement && 'bg-hover')}>
+          <div className="flex items-center gap-2 font-medium">
+            {props.audioNote?.meeting ? (
+              <MeetingIcon meeting={props.audioNote.meeting} size={20} />
+            ) : (
+              <VoiceSquare size={20} variant="Bold" className="text-green" />
+            )}
+            <h3 className="max-w-64 truncate tracking-tight text-primary">{formattedTitle}</h3>
+          </div>
+          <AudioNoteActions audioNote={props.audioNote} />
+        </HomeFeedListItemLayout>
+      </ContextMenuTrigger>
+      <ContextMenuContent className="max-w-52 p-1.5 text-secondary">
+        <ContextMenuItem onClick={handleDelayInputFocusClick}>
+          <AttachAudioAction audioNote={props.audioNote} />
+        </ContextMenuItem>
+        {/* <MergeAudioAction audioNote={props.audioNote} /> */}
+        {isAlpha && <CopyShareLinkAction audioNote={props.audioNote} />}
+        <DeleteAction audioNoteId={props.audioNote.id} moreOptionsOpen={false} />
+      </ContextMenuContent>
+    </ContextMenu>
   )
 }
 
