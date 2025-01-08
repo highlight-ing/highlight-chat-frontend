@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { useConversations } from '@/context/ConversationContext'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { AnimatePresence, motion, MotionConfig, Variants } from 'framer-motion'
 import { Blend2, Copy, MessageText, Trash, VoiceSquare } from 'iconsax-react'
-import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+import { useAtom, useSetAtom } from 'jotai'
 import { toast } from 'sonner'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -280,23 +280,18 @@ function DeleteAction(props: { audioNoteId: ConversationData['id']; moreOptionsO
   )
 }
 
-function AudioNoteActions(props: {
-  audioNote: ConversationData
-  moreOptionsOpen: boolean
-  setMoreOptionsOpen: React.Dispatch<React.SetStateAction<boolean>>
-}) {
+function AudioNoteActions(props: { audioNote: ConversationData }) {
+  const [moreOptionsOpen, setMoreOptionsOpen] = React.useState(false)
+
   return (
     <div className="flex items-center gap-1 font-medium">
       <p
-        className={cn(
-          'text-sm text-tertiary group-hover:hidden',
-          props.moreOptionsOpen ? 'translate-x-0' : 'translate-x-7',
-        )}
+        className={cn('text-sm text-tertiary group-hover:hidden', moreOptionsOpen ? 'translate-x-0' : 'translate-x-7')}
       >
         {formatUpdatedAtDate(props.audioNote.endedAt)}
       </p>
       {isAlpha && <ShareLinkAction audioNote={props.audioNote} />}
-      <Popover open={props.moreOptionsOpen} onOpenChange={props.setMoreOptionsOpen}>
+      <Popover open={moreOptionsOpen} onOpenChange={setMoreOptionsOpen}>
         <PopoverTrigger className="size-6 invisible grid place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:visible data-[state=open]:visible data-[state=open]:bg-light-5">
           <DotsHorizontalIcon className="size-4 text-tertiary" />
         </PopoverTrigger>
@@ -304,7 +299,7 @@ function AudioNoteActions(props: {
           <AttachAudioAction audioNote={props.audioNote} />
           {/* <MergeAudioAction audioNote={props.audioNote} /> */}
           {isAlpha && <CopyShareLinkAction audioNote={props.audioNote} />}
-          <DeleteAction audioNoteId={props.audioNote.id} moreOptionsOpen={props.moreOptionsOpen} />
+          <DeleteAction audioNoteId={props.audioNote.id} moreOptionsOpen={moreOptionsOpen} />
         </PopoverContent>
       </Popover>
     </div>
@@ -319,7 +314,6 @@ export function AudioNotesListItem(props: { audioNote: ConversationData; listInd
   const [currentListIndex, setCurrentListIndex] = useAtom(currentListIndexAtom)
   const isActiveElement = currentListIndex === props.listIndex
   const [isMounted, setIsMounted] = useAtom(isMountedAtom)
-  const [moreOptionsOpen, setMoreOptionsOpen] = useState(false)
 
   const previewAudioNote = React.useCallback(() => {
     setSelectedAudioNote(props.audioNote)
@@ -372,11 +366,7 @@ export function AudioNotesListItem(props: { audioNote: ConversationData; listInd
         )}
         <h3 className="max-w-64 truncate tracking-tight text-primary">{formattedTitle}</h3>
       </div>
-      <AudioNoteActions
-        audioNote={props.audioNote}
-        moreOptionsOpen={moreOptionsOpen}
-        setMoreOptionsOpen={setMoreOptionsOpen}
-      />
+      <AudioNoteActions audioNote={props.audioNote} />
     </HomeFeedListItemLayout>
   )
 }

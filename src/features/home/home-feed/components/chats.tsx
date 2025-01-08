@@ -2,8 +2,9 @@
 
 import React from 'react'
 import { ChatHistoryItem } from '@/types'
-import { AnimatePresence } from 'framer-motion'
-import { Copy, Export, MessageText } from 'iconsax-react'
+import { DotsHorizontalIcon } from '@radix-ui/react-icons'
+import { AnimatePresence, motion, Variants } from 'framer-motion'
+import { Copy, MessageText } from 'iconsax-react'
 import { useAtom, useSetAtom } from 'jotai'
 import { toast } from 'sonner'
 import { useShallow } from 'zustand/react/shallow'
@@ -13,7 +14,8 @@ import { trackEvent } from '@/utils/amplitude'
 import { homeSidePanelOpenAtom, selectedChatIdAtom } from '@/atoms/side-panel'
 import { useHistory } from '@/hooks/chat-history'
 import { useCopyChatShareLink, useGenerateChatShareLink } from '@/hooks/share-link'
-import { Tooltip } from '@/components/ui/tooltip'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 import { useStore } from '@/components/providers/store-provider'
 
 import { GroupedVirtualList, GroupHeaderRow } from '../components/grouped-virtual-list'
@@ -72,6 +74,93 @@ function ChatShareLinkCopyButton(props: { chat: ChatHistoryItem }) {
   )
 }
 
+function CopyShareLinkAction(props: { chat: ChatHistoryItem }) {
+  const {
+    mutate: generateShareLink,
+    isPending: isGeneratingLink,
+    isSuccess: linkGenerated,
+  } = useGenerateChatShareLink()
+  const { mutate: copyLink, isSuccess: linkCopied } = useCopyChatShareLink()
+  const mostRecentShareLink = props.chat?.shared_conversations?.[0]?.id
+  const [showSuccessState, setShowSuccessState] = React.useState(false)
+
+  React.useEffect(() => {
+    let timeout: NodeJS.Timeout | null
+    if (linkCopied || linkGenerated) {
+      setShowSuccessState(true)
+      timeout = setTimeout(() => {
+        setShowSuccessState(false)
+      }, 1200)
+    }
+    return () => {
+      if (timeout) clearTimeout(timeout)
+      setShowSuccessState(false)
+    }
+  }, [linkCopied, linkGenerated, setShowSuccessState])
+
+  function handleCopyClick() {
+    if (!props.chat) return
+
+    if (!mostRecentShareLink) {
+      generateShareLink(props.chat)
+    } else {
+      copyLink(mostRecentShareLink)
+    }
+  }
+
+  const copyLabelVariants: Variants = {
+    initial: { x: 10, opacity: 0 },
+    animate: { x: 0, opacity: 1 },
+    exit: { x: -10, opacity: 0 },
+  }
+
+  return (
+    <button
+      onClick={handleCopyClick}
+      disabled={isGeneratingLink}
+      className="flex w-full items-center gap-3.5 rounded-xl px-2 py-1.5 transition-colors hover:bg-light-5"
+    >
+      {isGeneratingLink ? <LoadingSpinner size={'16px'} color="#6e6e6e" /> : <Copy size={16} variant={'Bold'} />}
+      <AnimatePresence initial={false} mode="popLayout">
+        <motion.span
+          variants={copyLabelVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          key={showSuccessState ? 'true' : 'false'}
+          className="w-full text-left"
+        >
+          {showSuccessState ? 'Copied' : mostRecentShareLink ? 'Copy share link' : 'Create share link'}
+        </motion.span>
+      </AnimatePresence>
+    </button>
+  )
+}
+
+function ChatActions(props: { chat: ChatHistoryItem }) {
+  const [moreOptionsOpen, setMoreOptionsOpen] = React.useState(false)
+
+  return (
+    <div className="flex items-center gap-1 font-medium">
+      <p
+        className={cn('text-sm text-tertiary group-hover:hidden', moreOptionsOpen ? 'translate-x-0' : 'translate-x-7')}
+      >
+        {formatUpdatedAtDate(props.chat.updated_at)}
+      </p>
+      <ChatAction chat={props.chat} />
+      <ChatShareLinkCopyButton chat={props.chat} />
+      <Popover open={moreOptionsOpen} onOpenChange={setMoreOptionsOpen}>
+        <PopoverTrigger className="size-6 invisible grid place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:visible data-[state=open]:visible data-[state=open]:bg-light-5">
+          <DotsHorizontalIcon className="size-4 text-tertiary" />
+        </PopoverTrigger>
+        <PopoverContent align="end" sideOffset={16} className="max-w-52 p-1.5 text-secondary">
+          <CopyShareLinkAction chat={props.chat} />
+        </PopoverContent>
+      </Popover>
+    </div>
+  )
+}
+
 export function ChatListItem(props: { chat: ChatHistoryItem; listIndex: number }) {
   const setHomeSidePanelOpen = useSetAtom(homeSidePanelOpenAtom)
   const setSelectedChatId = useSetAtom(selectedChatIdAtom)
@@ -117,11 +206,8 @@ export function ChatListItem(props: { chat: ChatHistoryItem; listIndex: number }
         <MessageText variant={'Bold'} size={20} className="text-subtle" />
         <h3 className="max-w-sm truncate tracking-tight text-primary">{props.chat.title}</h3>
       </div>
-      <div className="flex items-center gap-1 font-medium">
-        <p className="block text-sm text-tertiary group-hover:hidden">{formatUpdatedAtDate(props.chat.updated_at)}</p>
-        <ChatAction chat={props.chat} />
-        <ChatShareLinkCopyButton chat={props.chat} />
-      </div>
+
+      <ChatActions chat={props.chat} />
     </HomeFeedListItemLayout>
   )
 }
