@@ -8,16 +8,17 @@ import PromptAppIcon from '@/components/PromptAppIcon/PromptAppIcon'
 
 interface ShortcutItemProps {
   shortcut: PromptWithTags & { isUserCreated?: boolean }
+  isSelected?: boolean
   onClick?: (shortcutId: string) => void
 }
 
-export function ShortcutItem({ shortcut, onClick }: ShortcutItemProps) {
+export function ShortcutItem({ shortcut, isSelected, onClick }: ShortcutItemProps) {
   const hasCustomIcon = shortcut.image && shortcut.user_images?.file_extension
 
   return (
     <div
       onClick={() => onClick?.(shortcut.id.toString())}
-      className=" hover:bg-[#ffffff05] cursor-pointer rounded-md  px-3 py-2 cursor-pointer hover:bg-light-5"
+      className={`hover:bg-[#ffffff05] cursor-pointer rounded-md px-3 py-2 ${isSelected ? 'bg-[#ffffff08]' : ''}`}
     >
       <div className="flex items-center gap-3">
         <div className="flex items-center justify-center rounded-full bg-[#ffffff08]">

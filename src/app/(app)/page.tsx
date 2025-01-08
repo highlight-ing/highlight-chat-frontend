@@ -66,7 +66,7 @@ export default function Home() {
     <div className={styles.page}>
       <HistorySidebar />
       <NavigationTopBar showHistory={showHistory} setShowHistory={setShowHistory} />
-      <div
+      {/* <div
         className={cn(
           `${styles.contents} ${showHistory ? styles.partial : styles.full} ${messages.length > 0 || inputIsDisabled || !!promptApp ? styles.justifyEnd : ''}`,
           'grid grid-cols-3 overflow-x-hidden transition duration-700',
@@ -79,7 +79,9 @@ export default function Home() {
             styles.contents,
             showSidePanel && 'lg:col-span-2',
           )}
-        >
+        > */}
+      <div className="flex w-full overflow-x-hidden transition duration-700">
+        <div className="flex w-full flex-col items-center justify-end transition delay-100">
           <ChatHeader isShowing={!isConversationLoading && !!promptApp && messages.length === 0} />
           {(isChatting || (isConversationLoading && messages.length > 0)) && <Messages />}
           {isConversationLoading && messages.length === 0 && !inputIsDisabled && <MessagesPlaceholder />}
@@ -88,7 +90,7 @@ export default function Home() {
           {(isChatting || promptApp) && <Input isActiveChat={true} />}
           <IntercomChat />
         </div>
-        <HighlightSidePanel />
+        {isChatting && <HighlightSidePanel />} {/* Temporarily hide side panel */}
       </div>
     </div>
   )

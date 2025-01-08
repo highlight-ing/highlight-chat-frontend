@@ -1,13 +1,14 @@
 import React, { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 
-import { AppShortcutPreferences } from '@/types/supabase-helpers'
+import { AppShortcutPreferences, PromptWithTags } from '@/types/supabase-helpers'
 import useAuth from '@/hooks/useAuth'
 
 import { fetchPinnedShortcuts } from '../../_actions/fetchPinnedShortcuts'
 import { fetchUserCreatedShortcuts } from '../../_actions/fetchUserCreatedShortcuts'
 import { fetchUserShortcutPreferences } from '../../_actions/fetchUserShortcutPreferences'
 import { ShortcutEditor } from '../shortcut-editor'
+import { ShortcutPreview } from '../shortcut-preview'
 import { ShortcutsList } from '../shortcuts-list'
 import { ShortcutsNavigation } from '../shortcuts-navigation'
 
@@ -200,8 +201,69 @@ export function ShortcutsManager() {
 
   const handleNavChange = (navItem: NavItem) => {
     console.log('Navigation changed:', navItem)
-    setSelectedShortcut(undefined)
     setSelectedNavItem(navItem)
+
+    // Get the filtered shortcuts for the new navigation item
+    const newFilteredShortcuts = getFilteredShortcuts(shortcuts || [], preferences, navItem)
+
+    // Set the first shortcut as selected if available
+    if (newFilteredShortcuts.length > 0) {
+      setSelectedShortcut(newFilteredShortcuts[0].id.toString())
+    } else {
+      setSelectedShortcut(undefined)
+    }
+  }
+  const getFilteredShortcuts = (
+    shortcuts: (PromptWithTags & { isUserCreated?: boolean })[],
+    preferences: AppShortcutPreferences[] | undefined,
+    navItem: NavItem,
+  ) => {
+    switch (navItem.type) {
+      case 'all':
+        return shortcuts
+      case 'global':
+        return shortcuts.filter(
+          (shortcut) =>
+            !shortcut.external_id ||
+            preferences?.some(
+              (pref) =>
+                pref.prompt_id === shortcut.id &&
+                (pref.application_name_darwin === '*' || pref.application_name_win32 === '*'),
+            ),
+        )
+      case 'unassigned':
+        return shortcuts.filter((shortcut) => !preferences?.some((pref) => pref.prompt_id === shortcut.id))
+      case 'application':
+        if (!preferences) return []
+        const appName = navItem.id
+        return shortcuts.filter((shortcut) =>
+          preferences.some((pref) => {
+            if (pref.prompt_id !== shortcut.id) return false
+
+            let darwinApps: string[] = []
+            if (pref.application_name_darwin && pref.application_name_darwin !== '*') {
+              try {
+                darwinApps = JSON.parse(pref.application_name_darwin)
+              } catch (e) {
+                console.error('Error parsing darwin apps:', e)
+              }
+            }
+
+            let win32Apps: string[] = []
+            if (pref.application_name_win32 && pref.application_name_win32 !== '*') {
+              try {
+                win32Apps = JSON.parse(pref.application_name_win32)
+              } catch (e) {
+                console.error('Error parsing win32 apps:', e)
+              }
+            }
+
+            return darwinApps.includes(appName) || win32Apps.includes(appName)
+          }),
+        )
+      default:
+        return shortcuts
+    }
   }
 
   const isLoading = isLoadingShortcuts || isLoadingPreferences
@@ -219,7 +281,7 @@ export function ShortcutsManager() {
 
   return (
     <div className="flex w-full h-[calc(100vh-48px)] mt-[48px]">
-      <div className="w-96 border-r border-[#ffffff0d]">
+      <div className="w-[280px] flex-shrink-0 border-r border-[#ffffff0d]">
         <ShortcutsNavigation
           selectedNavItem={selectedNavItem}
           onSelectNavItem={handleNavChange}
@@ -227,12 +289,21 @@ export function ShortcutsManager() {
           preferences={preferences}
         />
       </div>
-      <div className="w-full border-r border-[#ffffff0d]">
+      <div className="w-[400px] flex-shrink-0 border-r border-[#ffffff0d]">
         <ShortcutsList
           shortcuts={filteredShortcuts}
           isLoading={isLoading}
           selectedNavItem={selectedNavItem}
           onSelectShortcut={setSelectedShortcut}
+          selectedShortcutId={selectedShortcut}
+        />
+      </div>
+      <div className="flex-1 border-r border-[#ffffff0d]">
+        <ShortcutPreview
+          shortcutId={selectedShortcut}
+          shortcuts={shortcuts}
+          preferences={preferences}
+          isLoading={isLoading}
         />
       </div>
     </div>

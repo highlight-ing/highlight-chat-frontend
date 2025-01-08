@@ -19,10 +19,17 @@ interface ShortcutsListProps {
   shortcuts: PromptWithTags[]
   isLoading: boolean
   selectedNavItem: NavItem
+  selectedShortcutId?: string
   onSelectShortcut: (shortcutId: string) => void
 }
 
-export function ShortcutsList({ selectedNavItem, shortcuts, isLoading, onSelectShortcut }: ShortcutsListProps) {
+export function ShortcutsList({
+  selectedNavItem,
+  shortcuts,
+  isLoading,
+  onSelectShortcut,
+  selectedShortcutId,
+}: ShortcutsListProps) {
   const openModal = useStore((state) => state.openModal)
   const { applications } = useApplications()
 
@@ -54,7 +61,7 @@ export function ShortcutsList({ selectedNavItem, shortcuts, isLoading, onSelectS
       case 'app-based':
         return 'App Based Shortcuts'
       case 'application':
-        return `${selectedNavItem.id}`
+        return `${selectedNavItem.id} Shortcuts`
     }
   }
 
@@ -114,7 +121,7 @@ export function ShortcutsList({ selectedNavItem, shortcuts, isLoading, onSelectS
 
       {/* Shortcuts List */}
       <ScrollArea className="flex-1 h-full">
-        <div className="p-4 space-y-2 h-full">
+        <div className="p-4 space-y-1 h-full">
           {shortcuts.length === 0 ? (
             <EmptyState selectedNavItem={selectedNavItem} />
           ) : (
@@ -122,6 +129,7 @@ export function ShortcutsList({ selectedNavItem, shortcuts, isLoading, onSelectS
               <ShortcutItem
                 key={shortcut.id}
                 shortcut={shortcut}
+                isSelected={selectedShortcutId === shortcut.id.toString()}
                 onClick={() => onSelectShortcut?.(shortcut.id.toString())}
               />
             ))
