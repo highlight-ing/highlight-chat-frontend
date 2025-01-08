@@ -8,6 +8,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 import { cn, getDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
+import { isAlpha } from '@/utils/appVersion'
 import { showHistoryAtom, toggleShowHistoryAtom } from '@/atoms/history'
 import { useChatHistoryStore, useHistory } from '@/hooks/chat-history'
 import { useApi } from '@/hooks/useApi'
@@ -218,7 +219,7 @@ export function HistorySidebar() {
     setIsDeleting(true)
     removeChatsByIds(selectedHistoryItems)
     for (const chatId of selectedHistoryItems) {
-      const response = await deleteRequest(`history/${chatId}`)
+      const response = await deleteRequest(`history/${chatId}`, { version: isAlpha ? 'v4' : 'v3' })
       if (!response.ok) {
         // @TODO Error handling
         console.error('Failed to delete')

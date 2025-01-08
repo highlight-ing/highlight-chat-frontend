@@ -3,8 +3,8 @@
 import React from 'react'
 import { ChatHistoryItem } from '@/types'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
-import { AnimatePresence, motion, Variants } from 'framer-motion'
-import { Copy, MessageText } from 'iconsax-react'
+import { AnimatePresence, motion, MotionConfig, Variants } from 'framer-motion'
+import { Copy, MessageText, Trash } from 'iconsax-react'
 import { useAtom, useSetAtom } from 'jotai'
 import { toast } from 'sonner'
 import { useShallow } from 'zustand/react/shallow'
@@ -12,7 +12,7 @@ import { useShallow } from 'zustand/react/shallow'
 import { cn, getDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
 import { homeSidePanelOpenAtom, selectedChatIdAtom } from '@/atoms/side-panel'
-import { useHistory } from '@/hooks/chat-history'
+import { useDeleteChat, useHistory } from '@/hooks/chat-history'
 import { useCopyChatShareLink, useGenerateChatShareLink } from '@/hooks/share-link'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
@@ -137,6 +137,80 @@ function CopyShareLinkAction(props: { chat: ChatHistoryItem }) {
   )
 }
 
+function DeleteAction(props: { chatId: ChatHistoryItem['id']; moreOptionsOpen: boolean }) {
+  const { mutate: deleteChat, isPending } = useDeleteChat()
+  const [state, setState] = React.useState<'idle' | 'expanded'>('idle')
+  const isExpanded = state === 'expanded'
+
+  React.useEffect(() => {
+    function handleEsc(e: KeyboardEvent) {
+      if (isExpanded && props.moreOptionsOpen && e.key === 'Escape') {
+        setState('idle')
+      }
+    }
+    window.addEventListener('keydown', handleEsc)
+    return () => window.removeEventListener('keydown', handleEsc)
+  }, [isExpanded, props.moreOptionsOpen])
+
+  function handleDeleteClick() {
+    if (!isExpanded) {
+      setState('expanded')
+    } else {
+      setState('idle')
+    }
+  }
+
+  function handleConfirmDeleteClick() {
+    deleteChat(props.chatId)
+  }
+
+  const descriptionVariants: Variants = {
+    hidden: { opacity: 0, filter: 'blur(3px)' },
+    visible: { opacity: 1, filter: 'blur(0px)', transition: { duration: 0.1, delay: 0.1 } },
+  }
+
+  return (
+    <MotionConfig transition={{ type: 'spring', bounce: 0.05, duration: 0.2 }}>
+      <AnimatePresence initial={false}>
+        {isExpanded ? (
+          <motion.div
+            layoutId={`${props.chatId}-wrapper`}
+            style={{ borderRadius: 12 }}
+            className="space-y-2 bg-light-5 p-2"
+          >
+            <motion.p variants={descriptionVariants} initial="hidden" animate="visible" exit="hidden">
+              Are you sure you want to delete this chat?
+            </motion.p>
+            <button
+              onClick={handleConfirmDeleteClick}
+              disabled={isPending}
+              className="flex w-full items-center gap-3 rounded-xl bg-[#ff3333]/10 px-2 py-1.5 text-[#ff3333] transition-colors hover:bg-[#ff3333]/20"
+            >
+              <motion.span layoutId={`${props.chatId}-icon`}>
+                <Trash variant="Bold" size={16} />
+              </motion.span>
+              <motion.span layoutId={`${props.chatId}-button-text`}>Delete</motion.span>
+            </button>
+          </motion.div>
+        ) : (
+          <motion.button
+            layoutId={`${props.chatId}-wrapper`}
+            onClick={handleDeleteClick}
+            disabled={isPending}
+            style={{ borderRadius: 12 }}
+            className="flex w-full items-center gap-3 px-2 py-1.5 text-[#ff3333] transition-colors hover:bg-light-5"
+          >
+            <motion.span layoutId={`${props.chatId}-icon`}>
+              <Trash variant="Bold" size={16} />
+            </motion.span>
+            <motion.span layoutId={`${props.chatId}-button-text`}>Delete</motion.span>
+          </motion.button>
+        )}
+      </AnimatePresence>
+    </MotionConfig>
+  )
+}
+
 function ChatActions(props: { chat: ChatHistoryItem }) {
   const [moreOptionsOpen, setMoreOptionsOpen] = React.useState(false)
 
@@ -155,6 +229,7 @@ function ChatActions(props: { chat: ChatHistoryItem }) {
         </PopoverTrigger>
         <PopoverContent align="end" sideOffset={16} className="max-w-52 p-1.5 text-secondary">
           <CopyShareLinkAction chat={props.chat} />
+          <DeleteAction chatId={props.chat.id} moreOptionsOpen={moreOptionsOpen} />
         </PopoverContent>
       </Popover>
     </div>
@@ -206,7 +281,6 @@ export function ChatListItem(props: { chat: ChatHistoryItem; listIndex: number }
         <MessageText variant={'Bold'} size={20} className="text-subtle" />
         <h3 className="max-w-sm truncate tracking-tight text-primary">{props.chat.title}</h3>
       </div>
-
       <ChatActions chat={props.chat} />
     </HomeFeedListItemLayout>
   )

@@ -1,10 +1,16 @@
 'use client'
 
 import { ChatHistoryItem } from '@/types'
-import { InfiniteData, useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Trash } from 'iconsax-react'
+import { useAtom, useSetAtom } from 'jotai'
+import { toast } from 'sonner'
 
 import { HistoryByIdResponseData, HistoryResponseData } from '@/types/history'
 import { PAGINATION_LIMIT } from '@/lib/constants'
+import { isAlpha } from '@/utils/appVersion'
+import { homeSidePanelOpenAtom, selectedChatIdAtom } from '@/atoms/side-panel'
+import { useStore } from '@/components/providers/store-provider'
 
 import { useApi } from './useApi'
 
@@ -64,6 +70,50 @@ export function useHistoryByChatId(chatId: string | undefined) {
     },
     enabled: !!chatId,
     gcTime: 60000,
+  })
+}
+
+export function useDeleteChat() {
+  const { deleteRequest } = useApi()
+  const { removeChatsByIds } = useChatHistoryStore()
+  const startNewConversation = useStore((state) => state.startNewConversation)
+  const [selectedChatId, setSelectedChatId] = useAtom(selectedChatIdAtom)
+  const conversationIdFromStore = useStore((state) => state.conversationId)
+  const setHomeSidePanelOpen = useSetAtom(homeSidePanelOpenAtom)
+  const removeOpenConversation = useStore((state) => state.removeOpenConversation)
+
+  return useMutation({
+    mutationKey: ['delete-chat'],
+    mutationFn: async (chatId: ChatHistoryItem['id']) => {
+      if (!chatId) return
+
+      const response = await deleteRequest(`history/${chatId}`, { version: isAlpha ? 'v4' : 'v3' })
+      if (!response.ok) {
+        console.error('Failed to delete')
+        return
+      }
+      if (chatId === conversationIdFromStore) {
+        startNewConversation()
+      }
+      removeOpenConversation(chatId)
+
+      return chatId
+    },
+    onSuccess: (chatId) => {
+      removeChatsByIds([chatId as string])
+
+      if (selectedChatId === chatId) {
+        setHomeSidePanelOpen(false)
+        setSelectedChatId('')
+      }
+
+      toast('Deleted chat', { icon: <Trash variant="Bold" size={20} /> })
+      console.log('Deleted chat:', chatId)
+    },
+    onError: (chatId) => {
+      toast.error('Could not delete chat', { icon: <Trash variant="Bold" size={20} /> })
+      console.error('Failure to delete chat:', chatId)
+    },
   })
 }
 
