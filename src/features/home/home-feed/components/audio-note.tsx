@@ -383,7 +383,7 @@ export function AudioNotesListItem(props: { audioNote: ConversationData; listInd
           <AudioNoteActions audioNote={props.audioNote} />
         </HomeFeedListItemLayout>
       </ContextMenuTrigger>
-      <ContextMenuContent className="max-w-52 p-1.5 text-secondary">
+      <ContextMenuContent className="w-52">
         <ContextMenuItem onClick={handleDelayInputFocusClick}>
           <AttachAudioAction audioNote={props.audioNote} />
         </ContextMenuItem>

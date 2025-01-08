@@ -14,6 +14,7 @@ import { trackEvent } from '@/utils/amplitude'
 import { homeSidePanelOpenAtom, selectedChatIdAtom } from '@/atoms/side-panel'
 import { useDeleteChat, useHistory } from '@/hooks/chat-history'
 import { useCopyChatShareLink, useGenerateChatShareLink } from '@/hooks/share-link'
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import LoadingSpinner from '@/components/LoadingSpinner/LoadingSpinner'
 import { useStore } from '@/components/providers/store-provider'
@@ -186,9 +187,13 @@ function DeleteAction(props: { chatId: ChatHistoryItem['id']; moreOptionsOpen: b
               disabled={isPending}
               className="flex w-full items-center gap-3 rounded-xl bg-[#ff3333]/10 px-2 py-1.5 text-[#ff3333] transition-colors hover:bg-[#ff3333]/20"
             >
-              <motion.span layoutId={`${props.chatId}-icon`}>
-                <Trash variant="Bold" size={16} />
-              </motion.span>
+              {isPending ? (
+                <LoadingSpinner size="16px" color="#ff3333" />
+              ) : (
+                <motion.span layoutId={`${props.chatId}-icon`}>
+                  <Trash variant="Bold" size={16} />
+                </motion.span>
+              )}
               <motion.span layoutId={`${props.chatId}-button-text`}>Delete</motion.span>
             </button>
           </motion.div>
@@ -276,13 +281,21 @@ export function ChatListItem(props: { chat: ChatHistoryItem; listIndex: number }
   }, [isActiveElement, handleClick])
 
   return (
-    <HomeFeedListItemLayout onClick={handleClick} className={cn('justify-between', isActiveElement && 'bg-hover')}>
-      <div className="flex items-center gap-2 font-medium">
-        <MessageText variant={'Bold'} size={20} className="text-subtle" />
-        <h3 className="max-w-sm truncate tracking-tight text-primary">{props.chat.title}</h3>
-      </div>
-      <ChatActions chat={props.chat} />
-    </HomeFeedListItemLayout>
+    <ContextMenu>
+      <ContextMenuTrigger asChild>
+        <HomeFeedListItemLayout onClick={handleClick} className={cn('justify-between', isActiveElement && 'bg-hover')}>
+          <div className="flex items-center gap-2 font-medium">
+            <MessageText variant={'Bold'} size={20} className="text-subtle" />
+            <h3 className="max-w-sm truncate tracking-tight text-primary">{props.chat.title}</h3>
+          </div>
+          <ChatActions chat={props.chat} />
+        </HomeFeedListItemLayout>
+      </ContextMenuTrigger>
+      <ContextMenuContent className="w-52">
+        <CopyShareLinkAction chat={props.chat} />
+        <DeleteAction chatId={props.chat.id} moreOptionsOpen={false} />
+      </ContextMenuContent>
+    </ContextMenu>
   )
 }
 
