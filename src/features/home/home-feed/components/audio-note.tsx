@@ -12,7 +12,6 @@ import { useShallow } from 'zustand/react/shallow'
 import { ConversationData } from '@/types/conversations'
 import { cn, getDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
-import { isAlpha } from '@/utils/appVersion'
 import { formatTitle } from '@/utils/conversations'
 import { homeSidePanelOpenAtom, selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
 import { useAudioNotes, useDeleteAudioNote } from '@/hooks/audio-notes'
@@ -291,7 +290,7 @@ function AudioNoteActions(props: { audioNote: ConversationData }) {
       >
         {formatUpdatedAtDate(props.audioNote.endedAt)}
       </p>
-      {isAlpha && <ShareLinkAction audioNote={props.audioNote} />}
+      <ShareLinkAction audioNote={props.audioNote} />
       <Popover open={moreOptionsOpen} onOpenChange={setMoreOptionsOpen}>
         <PopoverTrigger className="size-6 invisible grid place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:visible data-[state=open]:visible data-[state=open]:bg-light-5">
           <DotsHorizontalIcon className="size-4 text-tertiary" />
@@ -299,7 +298,7 @@ function AudioNoteActions(props: { audioNote: ConversationData }) {
         <PopoverContent align="end" sideOffset={16} className="max-w-52 p-1.5 text-secondary">
           <AttachAudioAction audioNote={props.audioNote} />
           {/* <MergeAudioAction audioNote={props.audioNote} /> */}
-          {isAlpha && <CopyShareLinkAction audioNote={props.audioNote} />}
+          <CopyShareLinkAction audioNote={props.audioNote} />
           <DeleteAction audioNoteId={props.audioNote.id} moreOptionsOpen={moreOptionsOpen} />
         </PopoverContent>
       </Popover>
@@ -388,7 +387,7 @@ export function AudioNotesListItem(props: { audioNote: ConversationData; listInd
           <AttachAudioAction audioNote={props.audioNote} />
         </ContextMenuItem>
         {/* <MergeAudioAction audioNote={props.audioNote} /> */}
-        {isAlpha && <CopyShareLinkAction audioNote={props.audioNote} />}
+        <CopyShareLinkAction audioNote={props.audioNote} />
         <DeleteAction audioNoteId={props.audioNote.id} moreOptionsOpen={false} />
       </ContextMenuContent>
     </ContextMenu>
