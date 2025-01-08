@@ -1,22 +1,22 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { useConversations } from '@/context/ConversationContext'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { AnimatePresence, motion, MotionConfig, Variants } from 'framer-motion'
 import { Blend2, Copy, MessageText, Trash, VoiceSquare } from 'iconsax-react'
-import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+import { useAtom, useSetAtom } from 'jotai'
 import { toast } from 'sonner'
 import { useShallow } from 'zustand/react/shallow'
 
 import { ConversationData } from '@/types/conversations'
 import { cn, getDateGroupLengths } from '@/lib/utils'
 import { trackEvent } from '@/utils/amplitude'
-import { isAlpha } from '@/utils/appVersion'
 import { formatTitle } from '@/utils/conversations'
 import { homeSidePanelOpenAtom, selectedAudioNoteAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
 import { useAudioNotes, useDeleteAudioNote } from '@/hooks/audio-notes'
 import { useCopyAudioShareLink, useGenerateAudioShareLink } from '@/hooks/share-link'
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Switch } from '@/components/ui/switch'
 import Button from '@/components/Button/Button'
@@ -199,7 +199,7 @@ function CopyShareLinkAction(props: { audioNote: ConversationData }) {
           key={showSuccessState ? 'true' : 'false'}
           className="w-full text-left"
         >
-          {showSuccessState ? 'Copied' : 'Copy Link'}
+          {showSuccessState ? 'Copied' : shareLinkExsists ? 'Copy share link' : 'Create share link'}
         </motion.span>
       </AnimatePresence>
     </button>
@@ -280,31 +280,26 @@ function DeleteAction(props: { audioNoteId: ConversationData['id']; moreOptionsO
   )
 }
 
-function AudioNoteActions(props: {
-  audioNote: ConversationData
-  moreOptionsOpen: boolean
-  setMoreOptionsOpen: React.Dispatch<React.SetStateAction<boolean>>
-}) {
+function AudioNoteActions(props: { audioNote: ConversationData }) {
+  const [moreOptionsOpen, setMoreOptionsOpen] = React.useState(false)
+
   return (
     <div className="flex items-center gap-1 font-medium">
       <p
-        className={cn(
-          'text-sm text-tertiary group-hover:hidden',
-          props.moreOptionsOpen ? 'translate-x-0' : 'translate-x-7',
-        )}
+        className={cn('text-sm text-tertiary group-hover:hidden', moreOptionsOpen ? 'translate-x-0' : 'translate-x-7')}
       >
         {formatUpdatedAtDate(props.audioNote.endedAt)}
       </p>
-      {isAlpha && <ShareLinkAction audioNote={props.audioNote} />}
-      <Popover open={props.moreOptionsOpen} onOpenChange={props.setMoreOptionsOpen}>
+      <ShareLinkAction audioNote={props.audioNote} />
+      <Popover open={moreOptionsOpen} onOpenChange={setMoreOptionsOpen}>
         <PopoverTrigger className="size-6 invisible grid place-items-center rounded-lg p-1 transition-colors hover:bg-light-5 group-hover:visible data-[state=open]:visible data-[state=open]:bg-light-5">
           <DotsHorizontalIcon className="size-4 text-tertiary" />
         </PopoverTrigger>
         <PopoverContent align="end" sideOffset={16} className="max-w-52 p-1.5 text-secondary">
           <AttachAudioAction audioNote={props.audioNote} />
           {/* <MergeAudioAction audioNote={props.audioNote} /> */}
-          {isAlpha && <CopyShareLinkAction audioNote={props.audioNote} />}
-          <DeleteAction audioNoteId={props.audioNote.id} moreOptionsOpen={props.moreOptionsOpen} />
+          <CopyShareLinkAction audioNote={props.audioNote} />
+          <DeleteAction audioNoteId={props.audioNote.id} moreOptionsOpen={moreOptionsOpen} />
         </PopoverContent>
       </Popover>
     </div>
@@ -319,7 +314,7 @@ export function AudioNotesListItem(props: { audioNote: ConversationData; listInd
   const [currentListIndex, setCurrentListIndex] = useAtom(currentListIndexAtom)
   const isActiveElement = currentListIndex === props.listIndex
   const [isMounted, setIsMounted] = useAtom(isMountedAtom)
-  const [moreOptionsOpen, setMoreOptionsOpen] = useState(false)
+  const focusInput = useInputFocus()
 
   const previewAudioNote = React.useCallback(() => {
     setSelectedAudioNote(props.audioNote)
@@ -362,22 +357,40 @@ export function AudioNotesListItem(props: { audioNote: ConversationData; listInd
     return () => window.removeEventListener('keydown', handleEnterKeyPress)
   }, [isActiveElement, handleClick])
 
+  const handleDelayInputFocusClick = React.useCallback(() => {
+    const timeout = setTimeout(() => {
+      focusInput()
+    }, 100)
+
+    return () => {
+      if (timeout) clearTimeout(timeout)
+    }
+  }, [focusInput])
+
   return (
-    <HomeFeedListItemLayout onClick={handleClick} className={cn('justify-between', isActiveElement && 'bg-hover')}>
-      <div className="flex items-center gap-2 font-medium">
-        {props.audioNote?.meeting ? (
-          <MeetingIcon meeting={props.audioNote.meeting} size={20} />
-        ) : (
-          <VoiceSquare size={20} variant="Bold" className="text-green" />
-        )}
-        <h3 className="max-w-64 truncate tracking-tight text-primary">{formattedTitle}</h3>
-      </div>
-      <AudioNoteActions
-        audioNote={props.audioNote}
-        moreOptionsOpen={moreOptionsOpen}
-        setMoreOptionsOpen={setMoreOptionsOpen}
-      />
-    </HomeFeedListItemLayout>
+    <ContextMenu>
+      <ContextMenuTrigger asChild>
+        <HomeFeedListItemLayout onClick={handleClick} className={cn('justify-between', isActiveElement && 'bg-hover')}>
+          <div className="flex items-center gap-2 font-medium">
+            {props.audioNote?.meeting ? (
+              <MeetingIcon meeting={props.audioNote.meeting} size={20} />
+            ) : (
+              <VoiceSquare size={20} variant="Bold" className="text-green" />
+            )}
+            <h3 className="max-w-64 truncate tracking-tight text-primary">{formattedTitle}</h3>
+          </div>
+          <AudioNoteActions audioNote={props.audioNote} />
+        </HomeFeedListItemLayout>
+      </ContextMenuTrigger>
+      <ContextMenuContent className="w-52">
+        <ContextMenuItem onClick={handleDelayInputFocusClick}>
+          <AttachAudioAction audioNote={props.audioNote} />
+        </ContextMenuItem>
+        {/* <MergeAudioAction audioNote={props.audioNote} /> */}
+        <CopyShareLinkAction audioNote={props.audioNote} />
+        <DeleteAction audioNoteId={props.audioNote.id} moreOptionsOpen={false} />
+      </ContextMenuContent>
+    </ContextMenu>
   )
 }
 

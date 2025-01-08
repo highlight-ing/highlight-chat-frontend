@@ -14,7 +14,6 @@ export function useAudioNotes() {
     queryKey: ['audio-notes'],
     queryFn: async () => {
       const recentConversations = await Highlight.conversations.getAllConversations()
-      console.log(recentConversations)
       return recentConversations as Array<ConversationData> | undefined
     },
     staleTime: THIRTY_MINUTES_IN_MS,
