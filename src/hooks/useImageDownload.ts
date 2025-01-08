@@ -52,7 +52,7 @@ export const useImageDownload = (imageId: string | null, conversationId?: string
         URL.revokeObjectURL(imageUrl)
       }
     }
-  }, [])
+  }, [conversationId])
 
   return { imageUrl, isLoading, error }
 }

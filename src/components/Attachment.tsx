@@ -5,7 +5,13 @@ import { useAtomValue, useSetAtom } from 'jotai'
 
 import { formatTitle } from '@/utils/conversations'
 import { getWordCountFormatted } from '@/utils/string'
-import { isOnHomeAtom, selectedAudioNoteAtom, showBackButtonAtom, sidePanelOpenAtom } from '@/atoms/side-panel'
+import {
+  isOnHomeAtom,
+  selectedAudioNoteAtom,
+  selectedChatIdAtom,
+  showBackButtonAtom,
+  sidePanelOpenAtom,
+} from '@/atoms/side-panel'
 import { useImageDownload } from '@/hooks/useImageDownload'
 import { CloseIcon } from '@/components/icons'
 import { useStore } from '@/components/providers/store-provider'
@@ -57,7 +63,8 @@ export const Attachment = ({
   const appName = (props as WindowContextAttachmentProps).appName
   const [isImageLoaded, setIsImageLoaded] = useState(false)
   const conversationIdState = useStore((state) => state.conversationId)
-  const conversationId = version === 'v4' ? conversationIdState : undefined
+  const selectedChatId = useAtomValue(selectedChatIdAtom)
+  const conversationId = version === 'v4' ? (!!conversationIdState ? conversationIdState : selectedChatId) : undefined
   const isConversationLoading = useStore((state) => state.isConversationLoading)
   const inputIsDisabled = useStore((state) => state.inputIsDisabled)
   const [appIconUrl, setAppIconUrl] = useState<string | null>(null)
@@ -200,9 +207,8 @@ export const Attachment = ({
           </button>
         ) : (
           <div
-            className={`flex h-[48px] items-center justify-center rounded-[16px] border border-light-10 bg-secondary ${
-              type === 'pdf' || type === 'text_file' ? 'max-w-40' : ''
-            } ${type !== 'image' ? 'min-w-12' : 'min-w-[52px]'} w-fit overflow-hidden`}
+            className={`flex h-[48px] items-center justify-center rounded-[16px] border border-light-10 bg-secondary ${type === 'pdf' || type === 'text_file' ? 'max-w-40' : ''
+              } ${type !== 'image' ? 'min-w-12' : 'min-w-[52px]'} w-fit overflow-hidden`}
           >
             {renderAttachmentContent()}
           </div>
