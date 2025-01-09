@@ -117,7 +117,7 @@ export function ShortcutItem({ shortcut, isSelected, onClick }: ShortcutItemProp
             {shortcut.isUserCreated && <DeleteAction shortcut={shortcut} moreOptionsOpen={moreOptionsOpen} />}
           </PopoverContent>
         </Popover>
-        {shortcut.isUserCreated && (
+        {/* {shortcut.isUserCreated && (
           <Tooltip content="User created shortcut">
             <div
               role="button"
@@ -128,7 +128,7 @@ export function ShortcutItem({ shortcut, isSelected, onClick }: ShortcutItemProp
               <UserCreatedShortcutIcon />
             </div>
           </Tooltip>
-        )}
+        )} */}
       </div>
     </div>
   )

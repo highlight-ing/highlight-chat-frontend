@@ -91,7 +91,7 @@ export function ShortcutsList({
       case 'app-based':
         return 'App Based Shortcuts'
       case 'application':
-        return `${selectedNavItem.id} Shortcuts`
+        return `${selectedNavItem.id}`
     }
   }
 

@@ -104,7 +104,8 @@ export function ShortcutsNavigation({
           <div className="px-3">
             <Tooltip content="Create new shortcut">
               <Button size="icon" variant="ghost-neutral" onClick={() => openModal('create-prompt')}>
-                <NewShortcutIcon size={15} />
+                {/* <NewShortcutIcon size={15} /> */}
+                <PlusIcon className="h-[15px] w-[15px] text-light-80" />
               </Button>
             </Tooltip>
           </div>

@@ -86,7 +86,6 @@ export function ShortcutPreview({ shortcutId, shortcuts, preferences, isLoading 
       setCopied(false)
     }, 2500)
   }
-
   return (
     <div className="flex flex-col h-full">
       {/* Fixed action bar */}
@@ -174,64 +173,125 @@ export function ShortcutPreview({ shortcutId, shortcuts, preferences, isLoading 
         {/* Rest of content */}
         <div className="pt-8">
           <div className="flex flex-col gap-6">
-            {preferences?.some((pref) => pref.prompt_id === shortcut.id) && (
-              <div className="flex flex-col gap-4">
-                <div className="flex gap-2">
-                  <h3 className="text-[13px] font-normal text-light-40 leading-5 w-[160px]">
-                    Application Availability
-                  </h3>
-                  <div className="">
-                    {preferences
+            <div className="flex flex-col gap-4">
+              <div className="flex gap-2 group items-center">
+                <h3 className="text-[13px] font-normal text-light-40 leading-5 w-[160px]">Application Availability</h3>
+                <div className="flex-1">
+                  {preferences?.some((pref) => pref.prompt_id === shortcut.id) ? (
+                    preferences
                       .filter((pref) => pref.prompt_id === shortcut.id)
                       .map((pref) => {
                         const isGlobal = pref.application_name_darwin === '*' || pref.application_name_win32 === '*'
                         if (isGlobal) {
                           return (
-                            <div
-                              key={pref.id}
-                              className="flex items-center gap-2 px-2 py-0.5 rounded-full border border-[#333333] bg-[#1C1C1C] w-fit"
-                            >
-                              <Global size={17} className="text-light-40" variant="Bold" />
-                              <span className="text-light-60 text-sm">Available Globally</span>
+                            <div key={pref.id} className="flex items-center">
+                              <div className="flex items-center gap-2 px-2 py-0.5 rounded-full border border-[#333333] bg-[#1C1C1C]">
+                                <Global size={17} className="text-light-40" variant="Bold" />
+                                <span className="text-light-60 text-sm">Available Globally</span>
+                              </div>
+                              <Button
+                                size="icon"
+                                variant="ghost-neutral"
+                                onClick={() =>
+                                  openModal('app-selector', {
+                                    data: {
+                                      prompt: shortcut,
+                                      promptShortcutPreferences: preferences?.find(
+                                        (pref) => pref.prompt_id === shortcut.id,
+                                      ),
+                                    },
+                                  })
+                                }
+                                className="opacity-0 group-hover:opacity-100 transition-opacity text-[#6E6E6E] text-[13px] leading-4 ml-2"
+                              >
+                                <Edit2 size={14} className="text-light-40" variant="Bold" />
+                              </Button>
                             </div>
                           )
                         }
 
                         const apps = [...(pref.application_name_darwin ? JSON.parse(pref.application_name_darwin) : [])]
+                        const visibleApps = apps.slice(0, 4)
+                        const remainingCount = apps.length - 4
 
                         return (
-                          <div key={pref.id} className="flex flex-wrap items-center gap-1.5 text-sm text-light-80">
-                            {apps.map((app, index) => {
-                              const appData = applications.find((a) => a.id === app)
-                              return (
-                                <React.Fragment key={app}>
-                                  <div className="flex items-center gap-2 px-2 py-0.5 rounded-full border border-[#333333] bg-[#1C1C1C]">
-                                    <div
-                                      className="flex items-center justify-center h-[17px] w-[17px] rounded-md p-0.5 border border-[0.25px] border-[#333333]"
-                                      style={{
-                                        background:
-                                          appData?.theme === 'dark'
-                                            ? 'linear-gradient(139deg, #333 3.52%, #161818 51.69%)'
-                                            : 'linear-gradient(139deg, #FFFFFF 3.52%, #E5E5E5 51.69%)',
-                                      }}
-                                    >
-                                      {appData?.icon && React.createElement(appData.icon, { size: 12 })}
+                          <div key={pref.id} className="flex items-center">
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              {visibleApps.map((app, index) => {
+                                const appData = applications.find((a) => a.id === app)
+                                return (
+                                  <React.Fragment key={app}>
+                                    <div className="flex items-center gap-2 px-2 py-0.5 rounded-full border border-[#333333] bg-[#1C1C1C]">
+                                      <div
+                                        className="flex items-center justify-center h-[17px] w-[17px] rounded-md p-0.5 border border-[0.25px] border-[#333333]"
+                                        style={{
+                                          background:
+                                            appData?.theme === 'dark'
+                                              ? 'linear-gradient(139deg, #333 3.52%, #161818 51.69%)'
+                                              : 'linear-gradient(139deg, #FFFFFF 3.52%, #E5E5E5 51.69%)',
+                                        }}
+                                      >
+                                        {appData?.icon && React.createElement(appData.icon, { size: 12 })}
+                                      </div>
+                                      <span className="text-light-60 text-[13px]">{app}</span>
                                     </div>
-                                    <span className="text-light-60">{app}</span>
-                                  </div>
-                                </React.Fragment>
-                              )
-                            })}
+                                  </React.Fragment>
+                                )
+                              })}
+                              {remainingCount > 0 && (
+                                <div className="flex items-center gap-2 px-2 py-0.5 rounded-full border border-[#333333] bg-[#1C1C1C]">
+                                  <span className="text-light-60 text-[13px]">+{remainingCount}</span>
+                                </div>
+                              )}
+                            </div>
+                            <Button
+                              size="icon"
+                              variant="ghost-neutral"
+                              onClick={() =>
+                                openModal('app-selector', {
+                                  data: {
+                                    prompt: shortcut,
+                                    promptShortcutPreferences: preferences?.find(
+                                      (pref) => pref.prompt_id === shortcut.id,
+                                    ),
+                                  },
+                                })
+                              }
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-[#6E6E6E] text-[13px] leading-4 ml-2"
+                            >
+                              <Edit2 size={14} className="text-light-40" variant="Bold" />
+                            </Button>
                           </div>
                         )
-                      })}
-                  </div>
+                      })
+                  ) : (
+                    <div className="flex items-center">
+                      <span className="text-[13px] text-light-60">None</span>
+                      <Button
+                        size="icon"
+                        variant="ghost-neutral"
+                        onClick={() =>
+                          openModal('app-selector', {
+                            data: {
+                              prompt: shortcut,
+                              promptShortcutPreferences: preferences?.find((pref) => pref.prompt_id === shortcut.id),
+                            },
+                          })
+                        }
+                        className="opacity-0 group-hover:opacity-100 transition-opacity text-[#6E6E6E] text-[13px] leading-4 ml-2"
+                      >
+                        <Edit2 size={14} className="text-light-40" variant="Bold" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
+              </div>
 
-                <div className="flex gap-2 border-b border-[#ffffff0d] pb-8">
-                  <h3 className="text-[13px] font-normalleading-5 w-[160px] text-light-40">Context Specifications</h3>
-                  <div className="text-sm text-light-80">
-                    {preferences
+              <div className="flex gap-2 group items-center border-b border-[#ffffff0d] pb-8">
+                <h3 className="text-[13px] font-normal leading-5 w-[160px] text-light-40">Context Specifications</h3>
+                <div className="flex-1">
+                  {preferences?.some((pref) => pref.prompt_id === shortcut.id) ? (
+                    preferences
                       .filter((pref) => pref.prompt_id === shortcut.id)
                       .map((pref) => {
                         const contexts = []
@@ -241,26 +301,94 @@ export function ShortcutPreview({ shortcutId, shortcuts, preferences, isLoading 
                         if (pref.context_types?.screenshot) contexts.push('Screenshot')
                         if (pref.context_types?.window) contexts.push('Window')
 
+                        const allContextsSelected = contexts.length === 5
+
                         return contexts.length > 0 ? (
-                          <div className="flex flex-wrap items-center gap-1.5">
-                            {contexts.map((context, index) => (
-                              <React.Fragment key={context}>
+                          <div className="flex items-center">
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              {allContextsSelected ? (
                                 <div className="flex items-center gap-2 px-2 py-0.5 rounded-full border border-[#333333] bg-[#1C1C1C]">
-                                  <div className="text-light-40">{contextIcons[context]}</div>
-                                  <span className="text-light-60">{context}</span>
+                                  {/* <Global size={17} className="text-light-40" variant="Bold" /> */}
+                                  <span className="text-light-60 text-[13px]">All Contexts</span>
                                 </div>
-                              </React.Fragment>
-                            ))}
+                              ) : (
+                                contexts.map((context, index) => (
+                                  <React.Fragment key={context}>
+                                    <div className="flex items-center gap-2 px-2 py-0.5 rounded-full border border-[#333333] bg-[#1C1C1C]">
+                                      <div className="text-light-40">{contextIcons[context]}</div>
+                                      <span className="text-light-60 text-[13px]">{context}</span>
+                                    </div>
+                                  </React.Fragment>
+                                ))
+                              )}
+                            </div>
+                            <Button
+                              size="icon"
+                              variant="ghost-neutral"
+                              onClick={() =>
+                                openModal('app-selector', {
+                                  data: {
+                                    prompt: shortcut,
+                                    promptShortcutPreferences: preferences?.find(
+                                      (pref) => pref.prompt_id === shortcut.id,
+                                    ),
+                                  },
+                                })
+                              }
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-[#6E6E6E] text-[13px] leading-4 ml-2"
+                            >
+                              <Edit2 size={14} className="text-light-40" variant="Bold" />
+                            </Button>
                           </div>
                         ) : (
-                          'No context types selected'
+                          <div className="flex items-center">
+                            <span className="text-[13px] text-light-60">No context types selected</span>
+                            <Button
+                              size="icon"
+                              variant="ghost-neutral"
+                              onClick={() =>
+                                openModal('app-selector', {
+                                  data: {
+                                    prompt: shortcut,
+                                    promptShortcutPreferences: preferences?.find(
+                                      (pref) => pref.prompt_id === shortcut.id,
+                                    ),
+                                  },
+                                })
+                              }
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-[#6E6E6E] text-[13px] leading-4 ml-2"
+                            >
+                              <Edit2 size={14} className="text-light-40" variant="Bold" />
+                            </Button>
+                          </div>
                         )
-                      })}
-                  </div>
+                      })
+                  ) : (
+                    <div className="flex items-center">
+                      <span className="text-[13px] text-light-60">None</span>
+                      <Button
+                        size="icon"
+                        variant="ghost-neutral"
+                        onClick={() =>
+                          openModal('app-selector', {
+                            data: {
+                              prompt: shortcut,
+                              promptShortcutPreferences: preferences?.find((pref) => pref.prompt_id === shortcut.id),
+                            },
+                          })
+                        }
+                        className="opacity-0 group-hover:opacity-100 transition-opacity text-[#6E6E6E] text-[13px] leading-4 ml-2"
+                      >
+                        <Edit2 size={14} className="text-light-40" variant="Bold" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
-            )}
-            <div className="flex flex-col gap-2">
+            </div>
+
+            {/* Prompt Text section */}
+            <div className="flex flex-col gap-2 pt-4">
               <div className="text-[15px] text-light-80 leading-6 tracking-[-0.225px] whitespace-pre-wrap font-light">
                 {shortcut.prompt_text || 'No prompt content available'}
               </div>

@@ -23,11 +23,13 @@ import ConfirmationModal, { ConfirmationModalProps } from '@/components/modals/C
 import { useStore } from '@/components/providers/store-provider'
 
 import { ConnectIntegrationModal } from '@/features/integrations/_components/connect-integration-modal'
+import AppSelectorModal from '@/features/shortcuts/_components/shortcut-editing/app-selector/app-selector-modal'
 
-type FunctionalComponent = (props: ModalObjectProps) => JSX.Element
+type FunctionalComponent = (props: ModalObjectProps) => JSX.Element | null
 
 // Register the modal components by ID here
 const ModalMap: Record<string, FunctionalComponent> = {
+  'app-selector': AppSelectorModal,
   'create-prompt': CreatePromptModal,
   'edit-prompt': EditPromptModal,
   'delete-chat': DeleteChatModal,
