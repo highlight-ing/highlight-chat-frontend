@@ -3,7 +3,7 @@ import { Message } from '@/types'
 import { z } from 'zod'
 
 import { trackEvent } from '@/utils/amplitude'
-import client from '@/utils/api-client'
+import { backendUrl } from '@/utils/chatBackendUrl'
 import useAuth from '@/hooks/useAuth'
 // Components
 import Button from '@/components/Button/Button'
@@ -80,57 +80,61 @@ const SendFeedbackModal = ({
       message_id: message.id ?? '',
     }
     try {
-      const { data, error } = await client.POST('/api/v2/feedback/add', {
+      const response = await fetch(`${backendUrl}/api/v2/feedback/add`, {
+        method: 'POST',
         headers: {
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${await getAccessToken()}`,
         },
-        body: feedbackData,
+        body: JSON.stringify(feedbackData),
       })
-      if (error) {
-        console.error('Error submitting feedback:', error)
+
+      if (!response.ok) {
+        console.error('Error submitting feedback:', await response.text())
         addToast({
           title: 'Error Submitting Feedback',
           subtext: 'Please try again later.',
           description: 'There was an error submitting your feedback. Please try again later.',
           type: 'error',
         })
+        return
       }
-      if (data) {
-        setIsLoading(false)
-        // get all messages for this conversation
-        const allMessages = getConversationMessages(message.conversation_id)
 
-        if (!allMessages) {
-          return
-        }
+      const data = await response.json()
+      setIsLoading(false)
+      // get all messages for this conversation
+      const allMessages = getConversationMessages(message.conversation_id)
 
-        // Update the given_feedback for the specific message
-        const updatedMessages = allMessages?.map((msg) =>
-          msg.id === message.id ? { ...msg, given_feedback: data.external_id } : msg,
-        )
-
-        // Update the conversation messages in the store
-        updateConversationMessages(message.conversation_id, updatedMessages)
-
-        closeModal('send-feedback')
-
-        addToast({
-          title: 'Feedback Successfully Updated',
-          subtext: 'Thank you for your feedback!',
-          description: 'We will review your feedback and use it to improve our product.',
-          type: 'success',
-        })
-
-        trackEvent('HL Chat Send Feedback Modal Action', {
-          action: 'add',
-          modalId: id,
-          rating: rating,
-          feedbackType: feedbackType,
-          feedbackDetails: feedbackDetails,
-          messageId: message.id,
-          conversationId: message.conversation_id,
-        })
+      if (!allMessages) {
+        return
       }
+
+      // Update the given_feedback for the specific message
+      const updatedMessages = allMessages?.map((msg) =>
+        msg.id === message.id ? { ...msg, given_feedback: data.external_id } : msg,
+      )
+
+      // Update the conversation messages in the store
+      updateConversationMessages(message.conversation_id, updatedMessages)
+
+      closeModal('send-feedback')
+
+      addToast({
+        title: 'Feedback Successfully Updated',
+        subtext: 'Thank you for your feedback!',
+        description: 'We will review your feedback and use it to improve our product.',
+        type: 'success',
+      })
+
+      trackEvent('HL Chat Send Feedback Modal Action', {
+        action: 'add',
+        modalId: id,
+        rating: rating,
+        feedbackType: feedbackType,
+        feedbackDetails: feedbackDetails,
+        messageId: message.id,
+        conversationId: message.conversation_id,
+      })
     } catch (error) {
       setIsLoading(false)
       console.error('Error submitting feedback:', error)

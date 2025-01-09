@@ -1,9 +1,11 @@
-import React, { useEffect, useState, type PropsWithChildren } from 'react'
+import React from 'react'
 import { Message } from '@/types'
+import createClient from 'openapi-fetch'
 import { z } from 'zod'
 
+import { paths } from '@/types/backend-schema'
 import { trackEvent } from '@/utils/amplitude'
-import client from '@/utils/api-client'
+import { backendUrl } from '@/utils/chatBackendUrl'
 import useAuth from '@/hooks/useAuth'
 // Components
 import Button from '@/components/Button/Button'
@@ -50,20 +52,24 @@ const UpdateFeedbackModal = ({
   header,
   message,
   rating: initialRating,
-}: PropsWithChildren<UpdateFeedbackModalProps>) => {
+}: React.PropsWithChildren<UpdateFeedbackModalProps>) => {
   const closeModal = useStore((state) => state.closeModal)
   const addToast = useStore((state) => state.addToast)
   const { getAccessToken } = useAuth()
   const getConversationMessages = useStore((state) => state.getConversationMessages)
   const updateConversationMessages = useStore((state) => state.updateConversationMessages)
-  const [isLoading, setIsLoading] = useState(false)
-  const [isFetching, setIsFetching] = useState(true)
-  const [rating, setRating] = useState<z.infer<typeof Rating>>(
+  const [isLoading, setIsLoading] = React.useState(false)
+  const [isFetching, setIsFetching] = React.useState(true)
+  const [rating, setRating] = React.useState<z.infer<typeof Rating>>(
     initialRating === 'like' ? 1 : initialRating === 'dislike' ? -1 : 0,
   )
   const [feedbackType, setFeedbackType] =
-    useState<z.infer<typeof FeedbackNegativeType | typeof FeedbackPositiveType>>('other')
-  const [feedbackDetails, setFeedbackDetails] = useState<z.infer<typeof FeedbackDetails>>('')
+    React.useState<z.infer<typeof FeedbackNegativeType | typeof FeedbackPositiveType>>('other')
+  const [feedbackDetails, setFeedbackDetails] = React.useState<z.infer<typeof FeedbackDetails>>('')
+
+  const client = createClient<paths>({
+    baseUrl: backendUrl,
+  })
 
   const handleCloseModal = (e: any) => {
     e.stopPropagation()
@@ -71,15 +77,11 @@ const UpdateFeedbackModal = ({
     trackEvent('HL Chat Update Feedback Modal Action', { modalId: id, action: 'cancel' })
   }
 
-  useEffect(() => {
-    if (message.given_feedback) {
-      fetchFeedbackData()
-    }
-  }, [])
-
-  const fetchFeedbackData = async () => {
+  const fetchFeedbackData = React.useCallback(async () => {
     setIsFetching(true)
     try {
+      // const { data, error } = await client.POST('/api/v2/feedback/get', {
+      // @ts-ignore
       const { data, error } = await client.POST('/api/v2/feedback/get', {
         headers: {
           Authorization: `Bearer ${await getAccessToken()}`,
@@ -99,7 +101,9 @@ const UpdateFeedbackModal = ({
       }
       if (data) {
         setRating(initialRating === 'like' ? 1 : initialRating === 'dislike' ? -1 : 0)
+        // @ts-ignore
         setFeedbackType(data.feedback_type as z.infer<typeof FeedbackNegativeType | typeof FeedbackPositiveType>)
+        // @ts-ignore
         setFeedbackDetails(data.feedback)
       }
     } catch (error) {
@@ -113,7 +117,13 @@ const UpdateFeedbackModal = ({
     } finally {
       setIsFetching(false)
     }
-  }
+  }, [addToast, client, getAccessToken, initialRating, message.given_feedback])
+
+  React.useEffect(() => {
+    if (message.given_feedback) {
+      fetchFeedbackData()
+    }
+  }, [fetchFeedbackData, message.given_feedback])
 
   const handleSendFeedback = async (e: any) => {
     e.stopPropagation()
@@ -125,6 +135,7 @@ const UpdateFeedbackModal = ({
       external_id: message.given_feedback ?? '',
     }
     try {
+      // @ts-ignore
       const { data, error } = await client.POST('/api/v2/feedback/update', {
         headers: {
           Authorization: `Bearer ${await getAccessToken()}`,
@@ -150,6 +161,7 @@ const UpdateFeedbackModal = ({
 
         // Update the given_feedback for the specific message
         const updatedMessages = allMessages?.map((msg) =>
+          // @ts-ignore
           msg.id === message.id ? { ...msg, given_feedback: data.external_id } : msg,
         )
 
