@@ -76,27 +76,6 @@ export const useApi = () => {
     })
   }
 
-  const getImage = async (imageUrl: string, options?: Partial<RequestOptions>) => {
-    const accessToken = await getAccessToken()
-    const formData = new FormData()
-    formData.append('imageUrl', imageUrl)
-
-    const response = await fetchRequest('image/', {
-      bearerToken: accessToken,
-      method: 'POST',
-      body: formData,
-      version: options?.version,
-      signal: options?.signal,
-    })
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch image')
-    }
-
-    const blob = await response.blob()
-    return URL.createObjectURL(blob)
-  }
-
   const getSharedImage = async (imageUrl: string, options?: Partial<RequestOptions>) => {
     const formData = new FormData()
     formData.append('imageUrl', imageUrl)
@@ -137,7 +116,6 @@ export const useApi = () => {
     get,
     post,
     deleteRequest: deleteRequest,
-    getImage,
     getSharedImage,
     getImageByFileId,
   }

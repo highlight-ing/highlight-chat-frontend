@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useApi } from '@/hooks/useApi'
 
 export const useImageDownload = (imageId: string | null, conversationId?: string) => {
-  const { getImage, getImageByFileId } = useApi()
+  const { getImageByFileId } = useApi()
   const [imageUrl, setImageUrl] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
@@ -26,8 +26,6 @@ export const useImageDownload = (imageId: string | null, conversationId?: string
         let url = ''
         if (conversationId) {
           url = await getImageByFileId(imageId, conversationId, { version: 'v4' })
-        } else {
-          url = await getImage(imageId, { version: 'v3' })
         }
 
         if (isMounted) {
