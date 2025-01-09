@@ -50,6 +50,30 @@ export const supabaseAdmin = () =>
     },
   })
 
+/**
+ * Creates a client for the HL Chat database
+ */
+export const createHLChatClient = () =>
+  createClient<Database>(
+    process.env.NEXT_PUBLIC_HL_CHAT_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_HL_CHAT_SUPABASE_ANON_KEY!,
+  )
+
+/**
+ * Admin client for the HL Chat database
+ */
+export const supabaseHlChatAdmin = (cacheOption: 'no-store' | 'force-cache' | { revalidate: number } = 'no-store') =>
+  createClient<Database>(process.env.NEXT_PUBLIC_HL_CHAT_SUPABASE_URL!, process.env.HL_CHAT_SUPABASE_SERVICE_ROLE!, {
+    global: {
+      fetch: (url: any, options = {}) => {
+        return fetch(url, {
+          ...options,
+          ...(typeof cacheOption === 'object' ? { next: cacheOption } : { cache: cacheOption }),
+        })
+      },
+    },
+  })
+
 export function supabaseLoader({ src, width, quality }: { src: string; width: number; quality?: number }) {
   return `${SUPABASE_URL}/storage/v1/render/image/public/${src}?width=${width}&height=${width}&quality=${quality || 75}`
 }

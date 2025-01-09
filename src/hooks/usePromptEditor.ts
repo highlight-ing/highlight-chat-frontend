@@ -377,5 +377,5 @@ export function usePromptEditor() {
 
   const debouncedSaveShortcutPreferences = debounce(300, saveShortcutPreferences)
 
-  return { save, saveDisabled }
+  return { save, saveDisabled, saveShortcutPreferences, debouncedSaveShortcutPreferences }
 }
