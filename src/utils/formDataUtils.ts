@@ -1,8 +1,3 @@
-import { Prompt } from '@/types/supabase-helpers'
-
-import { isAlpha } from './appVersion'
-import { addAttachmentsToFormData } from './attachmentUtils'
-
 export interface FormDataContext {
   image?: string
   window_context?: string
@@ -124,7 +119,6 @@ export const buildFormData = async ({
   conversationId,
   llmProvider = 'anthropic',
   attachedContext,
-  availableContexts,
   timezone,
 }: FormDataInputs): Promise<FormData> => {
   const formData = new FormData()
@@ -140,7 +134,7 @@ export const buildFormData = async ({
   formData.append('attached_context', attachedContextMetadata)
 
   // Append available_context_metadata
-  const availableContextMetadata = JSON.stringify(isAlpha ? {} : availableContexts)
+  const availableContextMetadata = JSON.stringify({})
   formData.append('available_context', availableContextMetadata)
 
   return formData

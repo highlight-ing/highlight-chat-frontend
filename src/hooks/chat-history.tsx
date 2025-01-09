@@ -8,7 +8,6 @@ import { toast } from 'sonner'
 
 import { HistoryByIdResponseData, HistoryResponseData } from '@/types/history'
 import { PAGINATION_LIMIT } from '@/lib/constants'
-import { isAlpha } from '@/utils/appVersion'
 import { homeSidePanelOpenAtom, selectedChatIdAtom } from '@/atoms/side-panel'
 import { useStore } from '@/components/providers/store-provider'
 
@@ -87,7 +86,7 @@ export function useDeleteChat() {
     mutationFn: async (chatId: ChatHistoryItem['id']) => {
       if (!chatId) return
 
-      const response = await deleteRequest(`history/${chatId}`, { version: isAlpha ? 'v4' : 'v3' })
+      const response = await deleteRequest(`history/${chatId}`, { version: 'v4' })
       if (!response.ok) {
         console.error('Failed to delete')
         return
@@ -133,9 +132,9 @@ export function useChatHistoryStore() {
       const newChatHistory =
         existingChatIndex !== -1
           ? [
-            [...firstPage.slice(0, existingChatIndex), newChat, ...firstPage.slice(existingChatIndex + 1)],
-            ...queryData.pages.slice(1),
-          ]
+              [...firstPage.slice(0, existingChatIndex), newChat, ...firstPage.slice(existingChatIndex + 1)],
+              ...queryData.pages.slice(1),
+            ]
           : [[newChat, ...firstPage], ...queryData.pages.slice(1)]
 
       return {
