@@ -1,3 +1,8 @@
+# Deprecated
+An example app of an LLM chat in Highlight runtime.
+
+---
+
 # Highlight Chat Frontend
 
 This is the frontend interface for Highlight Chat, a UI to talk with LLMs.
